@@ -36,7 +36,7 @@
 SHELL := sh
 BUILD := build
 
-.DEFAULT_GOAL := all
+.DEFAULT_GOAL := m9
 
 # ---------------- 环境探测与工具链选择 ----------------
 ifeq ($(OS),Windows_NT)

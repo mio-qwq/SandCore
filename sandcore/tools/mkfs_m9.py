@@ -205,6 +205,7 @@ def main():
     parser.add_argument('--tree', type=Path)
     parser.add_argument('--out', type=Path, required=True)
     parser.add_argument('--replace', action='store_true')
+    parser.add_argument('--reuse-identical', action='store_true', help='重复构建若字节相同则复用；不同仍需显式replace')
     parser.add_argument('--megabytes', type=int, choices=[8, 16, 32, 64], default=64)
     args = parser.parse_args()
     if not args.source_image and not args.tree:
@@ -212,7 +213,7 @@ def main():
     destination = args.out.resolve()
     if args.source_image and destination == args.source_image.resolve():
         raise ValueError('输出不能是输入盘')
-    if destination.exists() and not args.replace:
+    if destination.exists() and not args.replace and not args.reuse_identical:
         raise FileExistsError('输出已存在；显式--replace才允许替换独立输出盘')
     source = args.source_image.read_bytes() if args.source_image else b''
     records = read_image(source) if source else {}
@@ -241,6 +242,11 @@ def main():
         actual = checked[key]
         if actual.payload != record.payload or (actual.uid, actual.gid, actual.mode) != (record.uid, record.gid, record.mode):
             raise ValueError('新卷回读校验失败')
+    if destination.exists() and not args.replace:
+        if destination.read_bytes()==image:
+            print('SandFS v5：已有输出与本次构建逐字节相同，复用；用户盘未覆盖')
+            return
+        raise FileExistsError('输出不同；显式--replace才允许备份并替换独立输出盘')
     destination.parent.mkdir(parents=True, exist_ok=True)
     temporary = destination.with_name(destination.name + '.tmp-' + secrets.token_hex(8))
     try:

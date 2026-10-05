@@ -1,6 +1,7 @@
 # M9独立产物链。源M8a盘只读迁移，冻结的游戏/影片不进入依赖链。
-# 所有规则现为第一阶段源码接线，尚未执行，不等于引导/原生编译通过。
-M9_BASE_IMAGE ?= build/sanddata.img
+# 干净克隆从仓库精简M8a包提取不可变基线，不再依赖本机旧build目录。
+M9_BASE_IMAGE ?= build/baselines/M8a-sanddata.img
+M9_BASELINE_INPUTS := tools/published_baseline.py ../releases/MANIFEST.json ../releases/SandCore-M7-build.zip ../releases/SandCore-M8a-build.zip
 M9_CLI_NAMES := $(filter-out soundplay,$(basename $(notdir $(wildcard user/m9/*.c))))
 M9_CLI_SCX := $(addprefix $(BUILD)/fs/bin/,$(addsuffix .scx,$(M9_CLI_NAMES)))
 M9_EXTRA_SOURCE := $(patsubst user/%,$(BUILD)/fs/SYS/SRC/%,$(wildcard user/m9/*.c user/audio/*.c user/audio/*.h user/audio/include/*.h user/audio/vendor/*.h user/audio/vendor/*.md user/audio/flacvendor/*.h user/audio/flacvendor/*.md user/compress/*.c user/compress/*.h user/compress/include/*.h user/compress/vendor/*.c user/compress/vendor/*.h user/compress/vendor/*.md user/pack/*.c user/pack/include/*.h))
@@ -9,9 +10,13 @@ M9_NOTICES := $(addprefix $(BUILD)/fs/SYS/LICENSE/,$(M9_NOTICE_NAMES))
 M9_TEST_SOURCE := $(patsubst tests/m9/%,$(BUILD)/fs/SYS/TEST/%,$(wildcard tests/m9/*.C tests/m9/*.c))
 M9_MANUALS := $(patsubst assets/m9/man/%,$(BUILD)/fs/SYS/MAN/%,$(wildcard assets/m9/man/*.TXT)) $(BUILD)/fs/SYS/MAN/sccc.TXT $(BUILD)/fs/SYS/MAN/lsmod.TXT $(BUILD)/fs/SYS/MAN/crontab.TXT
 M9_VENDOR_INPUTS := $(wildcard third_party/stb/* third_party/libwebp/* third_party/libwebp/src/*/* user/audio/vendor/* user/audio/flacvendor/* user/compress/vendor/* user/pack/bzip2/* user/pack/lzma/* user/pack/lzma/C/* user/pack/lzma/DOC/*)
-.PHONY: m9 m9-artifacts m9-publish
-m9:
+.PHONY: m9 m9-artifacts m9-publish m9-environment
+m9-environment:
+	$(PY) tools/check_build_environment.py --nasm "$(NASM)" --art-python "$(ARTPY)"
+m9: m9-environment
 	$(MAKE) BUILD=build/m9-work M9_BUILD=1 M9_BASE_IMAGE="$(M9_BASE_IMAGE)" m9-publish
+build/baselines/M8a-sanddata.img: tools/published_baseline.py ../releases/SandCore-M8a-build.zip
+	$(PY) tools/published_baseline.py --version M8a --image-out "$@"
 ifeq ($(M9_BUILD),1)
 
 # GCC大聚合初始化会隐式调memset/memcpy；M9不提供标准C运行库。
@@ -33,22 +38,22 @@ $(BUILD)/m9-icons.stamp: tools/make_m9_icons.py assets/design/tokens.json $(M9_B
 	$(ARTPY) tools/make_m9_icons.py --tree $(BUILD)/fs --preview $(BUILD)/icons --shell-source-image $(M9_BASE_IMAGE)
 	touch $@
 
-$(BUILD)/m9-visual-baseline.stamp: tools/install_m9_visual_baseline.py tools/audit_m9_compat.py build/SandCore-M8a-2026-10-04.zip | $(BUILD)
+$(BUILD)/m9-visual-baseline.stamp: tools/install_m9_visual_baseline.py $(M9_BASELINE_INPUTS) | $(BUILD)
 	$(PY) tools/install_m9_visual_baseline.py --tree $(BUILD)/fs
 	touch $@
 
 # 第二测试源M8-start没有LEGACY，不能依赖开发盘偶然已有这些旧文件。
 # 固定验收ZIP只读；只向本次M9树补原字节，不重建旧程序/写冻结树。
-$(BUILD)/m9-legacy.stamp: tools/install_m9_legacy.py tools/audit_m9_compat.py build/SandCore-M7-2026-10-02.zip | $(BUILD)
+$(BUILD)/m9-legacy.stamp: tools/install_m9_legacy.py $(M9_BASELINE_INPUTS) | $(BUILD)
 	$(PY) tools/install_m9_legacy.py --tree $(BUILD)/fs
 	touch $@
-$(BUILD)/m9-image-service.stamp: tools/install_m9_image_service.py tools/audit_m9_compat.py build/SandCore-M8a-2026-10-04.zip | $(BUILD)
+$(BUILD)/m9-image-service.stamp: tools/install_m9_image_service.py $(M9_BASELINE_INPUTS) | $(BUILD)
 	$(PY) tools/install_m9_image_service.py --tree $(BUILD)/fs
 	touch $@
 
-m9-publish: m9-artifacts
+m9-publish: m9-artifacts $(M9_BASE_IMAGE)
 	$(PY) tools/audit_third_party.py --tree "$(BUILD)/fs"
-	$(PY) tools/mkfs_m9.py --source-image "$(M9_BASE_IMAGE)" --tree "$(BUILD)/fs" --out "$(BUILD)/sanddata.img" $(if $(filter 1,$(M9_REPLACE)),--replace)
+	$(PY) tools/mkfs_m9.py --source-image "$(M9_BASE_IMAGE)" --tree "$(BUILD)/fs" --out "$(BUILD)/sanddata.img" --reuse-identical $(if $(filter 1,$(M9_REPLACE)),--replace)
 
 $(BUILD)/m9-%.o: user/m9/%.c $(wildcard user/*.H user/*.inc) $(STAMP)
 	$(CC) $(CFLAGS) -ffunction-sections -fdata-sections -Iuser -c $< -o $@

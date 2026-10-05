@@ -7,6 +7,7 @@ from pathlib import Path
 import re
 import zipfile
 from mkfs_m9 import read_image
+from published_baseline import PublishedBaseline
 
 ROOT=Path(__file__).resolve().parents[1]
 BASELINE=ROOT/'build/SandCore-M7-2026-10-02.zip'
@@ -45,10 +46,8 @@ def main():
     parser.add_argument('--data',type=Path,action='append',required=True)
     parser.add_argument('--out',type=Path,required=True)
     args=parser.parse_args()
-    digest=hashlib.sha256(BASELINE.read_bytes()).hexdigest()
-    if digest!=BASELINE_SHA:
-        raise ValueError('原M7验收包摘要不符，不从未知来源核对旧字节')
-    with zipfile.ZipFile(BASELINE) as archive:
+    digest=BASELINE_SHA
+    with PublishedBaseline('M7') as archive:
         old_header=archive.read('sandcore/user/SCAPI.H').decode('utf-8-sig')
         old_task=archive.read('sandcore/kernel/task.h').decode('utf-8-sig')
         legacy={('LEGACY/'+name[len('sandcore/build/fs/'):]).upper():archive.read(name)
@@ -67,9 +66,8 @@ def main():
         raise ValueError('旧task_t字段布局变化')
     # M7不足以代表M8a新增的已发布接口。用独立固定发布包再核对，
     # 不写冻结文件，也不把签名/常量通过当寄存器语义的运行证明。
-    if sha_file(M8A)!=M8A_SHA:
-        raise ValueError('M8a固定发布包摘要不符')
-    with zipfile.ZipFile(M8A) as archive:
+    with PublishedBaseline('M8a') as archive:
+        m8_storage=str(archive.path)
         m8_header=archive.read('sandcore/user/SCAPI.H').decode('utf-8-sig')
         m8_task=archive.read('sandcore/kernel/task.h').decode('utf-8-sig')
     m8_functions,m8_macros=signatures(m8_header),macros(m8_header)
@@ -91,7 +89,7 @@ def main():
         disks.append(dict(path=str(path.resolve()),sha256=hashlib.sha256(blob).hexdigest(),legacy=files))
     result=dict(status='STATIC_COMPATIBILITY_PASS_RUNTIME_PENDING',baseline_sha256=digest,
                 old_api_count=len(before),old_macro_count=len(old_macros),old_apis=sorted(before),
-                m8a=dict(archive=str(M8A),sha256=M8A_SHA,old_api_count=len(m8_functions),
+                m8a=dict(archive=m8_storage,sha256=M8A_SHA,old_api_count=len(m8_functions),
                          old_macro_count=len(m8_macros),old_apis=sorted(m8_functions)),
                 current_header_sha256=hashlib.sha256(current.encode('utf-8')).hexdigest(),disks=disks,
                 scope='signatures, constants, task layout and immutable legacy bytes; runtime still required')

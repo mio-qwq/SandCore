@@ -5,7 +5,8 @@ import hashlib
 import json
 from pathlib import Path
 import zipfile
-from audit_m9_compat import BASELINE, BASELINE_SHA, ROOT
+from published_baseline import PublishedBaseline, VERSIONS, ROOT
+BASELINE_SHA=VERSIONS['M7']['original_sha']
 
 
 def main():
@@ -17,11 +18,8 @@ def main():
     # 原M8发布树不能因补兼容资源而被写入；M9须使用独立BUILD。
     if not tree.is_relative_to(build) or tree==build/'fs' or tree.name!='fs':
         raise ValueError('只允许build/<M9独立目录>/fs')
-    archive_bytes=BASELINE.read_bytes()
-    if hashlib.sha256(archive_bytes).hexdigest()!=BASELINE_SHA:
-        raise ValueError('原M7包摘要不符，拒绝安装未知版本')
     installed=[]
-    with zipfile.ZipFile(BASELINE) as archive:
+    with PublishedBaseline('M7') as archive:
         for name in sorted(archive.namelist()):
             if not name.startswith(('sandcore/build/fs/apps/','sandcore/build/fs/bin/')) or not name.lower().endswith('.scx'):
                 continue
@@ -39,8 +37,6 @@ def main():
             installed.append(dict(path='LEGACY/'+short,bytes=len(payload),sha256=hashlib.sha256(payload).hexdigest()))
     if not installed:
         raise ValueError('原包没有SCX')
-    if hashlib.sha256(BASELINE.read_bytes()).hexdigest()!=BASELINE_SHA:
-        raise RuntimeError('安装期间原包变化')
     result=dict(scope='IMMUTABLE_M7_SCX_INSTALL_ONLY_RUNTIME_PENDING',baseline_sha256=BASELINE_SHA,files=installed)
     (tree.parent/'m9-legacy-install.json').write_text(json.dumps(result,indent=2)+'\n',encoding='utf-8')
     print(f'M9 LEGACY：{len(installed)}份固定M7原版SCX；冻结树未写入')

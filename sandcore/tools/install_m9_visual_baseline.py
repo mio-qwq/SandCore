@@ -5,7 +5,8 @@ import hashlib
 import json
 from pathlib import Path
 import zipfile
-from audit_m9_compat import M8A,M8A_SHA,ROOT,sha_file
+from published_baseline import PublishedBaseline,VERSIONS,ROOT
+M8A_SHA=VERSIONS['M8a']['original_sha']
 
 
 def main():
@@ -16,10 +17,8 @@ def main():
     build=(ROOT/'build').resolve()
     if not tree.is_relative_to(build) or tree==build/'fs' or tree.name!='fs':
         raise ValueError('只允许build/<M9独立目录>/fs')
-    if sha_file(M8A)!=M8A_SHA:
-        raise ValueError('M8a固定发布包摘要不符')
     copied=[]
-    with zipfile.ZipFile(M8A) as archive:
+    with PublishedBaseline('M8a') as archive:
         for name in sorted(archive.namelist()):
             prefix='sandcore/build/fs/'
             if not name.startswith(prefix) or name.endswith('/'):
@@ -40,8 +39,6 @@ def main():
             with target.open('xb') as output:
                 output.write(payload)
             copied.append(dict(path=key,bytes=len(payload),sha256=hashlib.sha256(payload).hexdigest()))
-    if sha_file(M8A)!=M8A_SHA:
-        raise RuntimeError('安装期间M8a包变化')
     result=dict(scope='M8A_EXISTING_VISUAL_BYTES_REUSE_ONLY',baseline_sha256=M8A_SHA,files=copied)
     (tree.parent/'m9-visual-baseline.json').write_text(json.dumps(result,indent=2)+'\n',encoding='utf-8')
     print(f'M9默认主题资源：{len(copied)}份M8a现有文件复用，未运行生成/渲染')
