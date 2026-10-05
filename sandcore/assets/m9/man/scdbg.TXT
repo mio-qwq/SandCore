@@ -1,0 +1,12 @@
+SCDBG - user-process debugger
+
+  scdbg program.scx [arguments ...]
+
+Commands: regs, step, cont, pause, break address, clear address,
+mem address count, stack count, code address count, restart, quit.
+Addresses use hexadecimal; lengths/counts use decimal. Target stdin is fed
+through input commands; bounded queues retain control when a target stops.
+Each target is bound to a kernel job ticket and process generation.
+
+The separate external COM1 debugger handles real Ring0 halt/INT3/TF.
+Source implemented; actual debugger operation is not yet verified.

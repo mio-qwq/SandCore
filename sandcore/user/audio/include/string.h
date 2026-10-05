@@ -1,0 +1,4 @@
+#ifndef SAND_AUDIO_PRIVATE_STRING_H
+#define SAND_AUDIO_PRIVATE_STRING_H
+/* 上游内存操作经DRMP3_COPY/MOVE/ZERO_MEMORY宏，不提供公共string API。 */
+#endif

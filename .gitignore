@@ -1,0 +1,8 @@
+# 原工作区保留完整数据；Git提交源码，二进制与历史备份放私有Release。
+.git/
+__pycache__/
+*.pyc
+/sandcore/build/
+/temp miotest/
+/*.zip
+/backup-output/

@@ -1,0 +1,163 @@
+# M8 图片解码服务与通用客户端 v1
+
+> 作者 mio。2026-10-04第二阶段：已构建，艺术PNG的Lens完整解码/Fit/100%及桌面壁纸/同盘冷启动已实测通过。
+> 这些单例证据不代表JPEG/WebP、异常/OOM和全部消费者矩阵均通过。
+
+## 1. 为什么把解码放到三环
+
+压缩图片解析需要处理外部长度、熵编码和大量临时对象。将成熟解码器
+链接进内核会扩大零环攻击面，也违反内核无libc/浮点的边界。M8使用
+普通任务`SYS/CORE/IMAGE.SCX`解码，内核`image_service.c`只持有路径、
+票据、身份与候选像素页。服务发生异常/退出/超时，桌面和其它任务
+继续运行；原有图片先保留，不能先删除旧缓存再尝试新格式。
+
+这个路径受原有`SYS/CORE`内核写保护，但SCX仍由普通用户页/用户栈
+执行，**不是SKM、不是零环加载模块**。不新增文件系统权限格式。
+
+## 2. 实际格式与明确边界
+
+| 格式 | 实现与输出 | 本版边界 |
+|---|---|---|
+| SCB1 / SCB2 | 原IMAGE.inc/Lens行读取与内核SCB2壁纸路径 | 格式不变；SCB1槽位按原DAC转换，SCB2直通ARGB |
+| BMP | Lens原严格行读取；壁纸服务另有BI_RGB解析 | 24/32位、顶向/底向、行填充；32位保留字节仍视为alpha255 |
+| PNG | 固定版本stb_image，解码前另验chunk长度/CRC/IHDR/IEND | PNG像素alpha保留；文件尾必须完整IEND，无宿主预转换 |
+| JPEG / JPG | 固定版本stb_image内存解码 | 检查实际SOI/末尾EOI；输出alpha255；不提供EXIF旋转/ICC色彩管理 |
+| WebP | 固定版本libwebp真实VP8/VP8L/alpha解码 | RIFF长度必须一致；静态有损/无损；动画明确拒绝，不冒充播放 |
+
+按照内容签名选择解码器；扩展名只用于Files选择Lens。宽1..1920、
+高1..1080、输入非空且≤16MiB。服务输出为未预乘`0xAARRGGBB`，
+x86字节B/G/R/A；stb的RGBA原地换R/B，不再申请第二幅整图。
+不承诺所有损坏流都能被库识别：遇到库宽容行为须第二阶段补充严格
+检测；服务异常必须隔离，不将错误画面当成加载成功。
+
+## 3. 请求、等待与提交
+
+完整寄存器和32B结果快照见SYSCALL.md§10。内核8项旁表，每owner
+最多一作业；queued→busy→ready或error。票据为不与活请求重复的
+正31位整数，另记录owner与worker的任务代数。只有调度器实际启动
+的worker可claim/submit；手动运行同名文件没有额外授权。
+
+任务0轮询时启动一个worker。满任务槽先等待，所有queued/busy请求
+从请求时起30秒PIT超时；ready/error缓存等调用者取走或取消，不因
+下一张图开始而改变。取消/owner退出先撤销资格再结束worker，避免
+task_stop递归清理导致双释放。worker已退出不妨碍取ready像素。
+worker未处理异常仍遵守原三环协议：保留真实暂停诊断卡片，关闭才
+杀任务。代理将请求标为-6并脱离暂停worker，客户端取消错误票据
+不自动消掉异常卡；其它空槽可启动下一请求。暂停任务的页在用户
+关闭卡片后回收，不能在它仍暂停时称这些真实存活页已释放。
+
+成功提交：先校验尺寸与整幅用户映射→分配内核候选→完整复制→标记
+ready。读取：先查询真实尺寸→调用者分配→整幅复制成功才消费。
+两次大复制与EXEC装载期间开硬件IRQ、暂缓任务切换，保护CR3与共享
+装载区。失败、缓冲不足/未映射不消费ready；跨owner/PID复用拒绝。
+
+## 4. 可复用客户端
+
+`IMAGECLIENT.H`声明，`IMAGECLIENT.inc`实现，依赖SCAPI.H，不依赖
+NUI/窗口/鼠标。调用者零初始化`ScImageClient`，每轮调用step；库不
+吞输入、不等待tick、不创建隐藏窗口、不伪造进度。不同程序/上下文
+拥有各自状态，内核仍按同一任务单作业限制。
+
+```c
+#include "SCAPI.H"
+#include "IMAGECLIENT.inc"
+static ScImageClient client;
+/* 在普通事件循环中begin一次，再反复step；不用此处的while忙等。 */
+/* image_client_begin(&client, "/HOME/PHOTO.PNG"); */
+/* int result = image_client_step(&client); */
+/* result: 1等待，0完成，负数失败。 */
+/* 完成后client.pixels属于本程序，使用结束sc_free。 */
+```
+
+begin会取消尚未完成请求并清空输出指针；**调用者须先转交/释放上次
+成功像素**，不能靠begin替自己保存旧指针。step校验版本、尺寸、格式、
+票据、保留字与精确字节数；分配/读取失败释放候选并取消作业。
+cancel仅结束未消费作业，不释放已交给调用者的成功像素。
+
+追加`image_client_begin_root(client,path)`供旧FS根相对身份使用。
+正文最多63B；无前导斜杠时完整加`/`，有前导斜杠保持原值。Lens和
+Settings先用旧FSSTAT/READ校验同一路径，再用该助手，避免默认cwd
+/HOME使SYS/...错误拼成HOME/SYS/...。原begin和IMAGEREQUEST仍保持
+相对路径结合cwd的公开语义；通用应用可直接传`photo.png`访问cwd。
+桌面内部owner0没有用户cwd，按fs_normalize根相对身份解析，不向
+用户开放owner0请求、票据或缓存地址。
+
+## 5. Lens、Files、Settings与桌面的接线
+
+Lens加载压缩流后仍显示旧图；每轮非阻塞检查，完成才交换图片、文件
+身份、Fit缓存和pan状态。失败/取消/第二次Open不破坏旧成功图片。
+原SCB/BMP整行读取与Fit/100%路径继续；Files将PNG/JPG/JPEG/WebP
+后缀分派到Lens。读取中窗口操作、关闭与候选OOM留待第二阶段验证。
+
+Settings选择非SCB壁纸时实际请求解码，得到成功结果才允许提交主题
+配置；有Cancel/Esc。桌面换图保留旧wall及预采样render缓存，候选就绪
+后原子接受，按主题face一次合成alpha，随后按cover裁剪显示。新路径
+失败保留旧壁纸，首次没有旧图才使用主题程序底图；空wallpaper字段
+有意选择程序壁纸。桌面常驻页计入desktop_pages，不能混进应用泄漏。
+
+## 6. 来源、许可与自举范围
+
+stb_image固定官方提交`2c980bb59875b0d32144a71867fbdebb2f77cd20`；
+libwebp固定官方提交`a1d89ff209ca01e7a87aca64317201890bac2749`。
+原文件与许可保持原字节；`third_party/SOURCES.json`登记来源与逐文件
+SHA，libwebp的COPYING/PATENTS/AUTHORS和stb的LICENSE随服务安装为
+`SYS/CORE/IMAGE.LIC`。自写适配与详细中文说明在`user/codec/`。
+
+运行时使用SCAPI页与≤48MiB arena，16B块、小块复用/相邻合并、自写
+memcpy/memmove/memset、无符号/有符号64位整数除法帮助入口。不链接
+宿主CRT/libc，不调用文件stdio，不用线程/浮点/SSE/MMX。stb只启用
+PNG/JPEG；libwebp只列COMMON/DEC，按函数/数据节与--gc-sections剔除
+编码及不可达gamma路径。第二阶段须审计最终SCX无未解析依赖/浮点。
+
+**服务来源明确为HOST_BOOTSTRAP**：当前SCCC不支持第三方所有语法与
+64位整数，因此此服务由freestanding GCC首次构建。Shell、应用、游戏、
+短片、SCENE和图片客户端依然要求系统内SCCC实际生成。不能把服务
+标记SCCC_GUEST，也不能宣布内核/第三方全系统已经完全自举。
+
+## 7. 第二阶段必须覆盖
+
+真实客体读取每种格式，核对完整ARGB与尺寸；透明边缘、窄图、1080p、
+坏CRC/长度/结束/不支持动画、候选OOM、缺服务、worker异常/超时；
+身份、缓冲护栏、PID复用、取消、读取中关闭、冷启动壁纸与严格页回收。
+只用真实输入和只读取证，不把宿主解码结果写入客体冒充运行输出。
+
+## 修订记录
+
+2026-10-03：追加真实三环解码、独立ABI/客户端、全部消费者接线与
+来源/许可/边界；第一阶段未执行构建或运行，未登记成功证据。
+### 2026-10-03 第二阶段构建修订
+
+用户明确批准第二阶段；首轮实际build.bat在libwebp通用palette.c的
+qsort声明处失败，原始日志保留build/m8-phase2-20261003-01/build-01.log。
+服务私有stdlib.h/runtime.c补齐原地堆排序，O(n log n)/O(1)额外空间，
+无宿主libc/临时分配；第三方固定源码字节不改。此项是构建修复记录，
+尚不代表图片解码或系统内编译通过。
+
+第二/三轮链接发现VP8L多输出可达分支仍引用编码gamma/pow，而随机
+幅度转换也有软件浮点依赖。tools/adapt_webp.py对固定SHA上游生成
+build中的独立副本：RGB->YUV编码gamma关闭，实际使用的YUV->BGRA
+解码转换不改；VP8InitRandom保留原ABI/种子/序列，按IEEE754位型转
+Q8，不执行浮点运算。副本各有来源/输出SHA记录，第三方快照保持
+原字节/许可。官方WEBP_REDUCE_SIZE关闭服务不使用的库内缩放，
+Lens的完整原图和高质量整数缩放保留；最终ELF仍需审计与实图验证。
+
+实际链接还显示stb默认__thread生成.tbss；SandCore没有TLS运行时，
+因此显式STBI_NO_THREAD_LOCALS，把库私有选项/错误信息放任务BSS。
+每个worker任务地址空间隔离，单任务解码没有共享线程竞态。完整
+静态审计新增TLS节拒绝，避免把“链接成功”误当成客体安全运行。
+
+2026-10-04：默认真实PNG首轮在请求阶段失败，Lens界面显示Cannot
+start image service且无三环异常。源码定位为FS根相对路径与新请求
+cwd路径混用；Lens/Settings追加root助手，内核内部桌面owner0单独
+根规范化。公开SCAPI/ABI、普通用户cwd合同保持原样，失败证据保留
+lens-default-png-01。build-11已通过，实际解码/整幅像素与回收重测中，
+不能把这项路径修复登记成PNG/JPEG/WebP全矩阵PASS。
+
+2026-10-04：修复后的真正G2 Lens默认PNG完整实际解码PASS，
+lens-default-png-02/results.json。1672×941所有BGRA字节与独立
+无损参考一致，实际Fit/100%客户帧及严格页回收通过；新核静态
+static-11无FPU/SIMD/libc/TLS与旧API布局/用户字体/LEGACY保持通过。
+这不证明JPEG/WebP/坏图/异常/壁纸所有路径，后续矩阵继续。
+
+
+2026-10-04：prism-wallpaper-03通过真实owner0服务请求：同一1672×941艺术PNG完整6MB RGB像素与独立源相等，640×480中心cover缓存全量一致，实际PCI纯背景区域逐像素一致；同盘两次正常冷启动资源计数均相等，IMAGE任务结束并回收。PNG单例/该模式已通过，其它编码/异常/OOM/更换回滚仍继续。

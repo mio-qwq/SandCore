@@ -1,0 +1,12 @@
+S3C / SCCC - native command-line compiler
+
+  s3c source.c output.scx
+  sccc source.c output.skm --skm
+
+No compiler window is created. Diagnostics use standard byte streams.
+Includes resolve SYS/INC and the source directory. A failed compilation
+keeps the old output. Run ordinary SCX with its current caller identity.
+SKM packaging supplies real relocations and BSS, not a renamed SCX.
+Only an external-serial SYSTEM session may publish SYS/MOD or run SKM.
+
+Source implemented; native compilation and compatibility are unverified.

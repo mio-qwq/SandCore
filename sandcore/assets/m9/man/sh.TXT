@@ -1,0 +1,16 @@
+SandCore sh - bounded native shell
+
+  sh script [arguments ...]
+  sh -c 'commands' [name [arguments ...]]
+
+Quotes, variables, positional arguments, functions, if/for/while/case,
+pipelines, redirections, here documents, substitutions and integer
+arithmetic are implemented. jobs reads state; wait [PID ...] takes results.
+$! holds the most recent background PID; $$ is the current kernel PID.
+Background tasks belong to their parent shell and cannot escape identity.
+
+Limits: 32767 script bytes, 512 tokens, 256 AST slots, 8 pipeline stages,
+32 arguments / 1023 serialized bytes, 48 variables / 255 value bytes,
+16 functions and background jobs, bounded expansion/execution nesting.
+Unsupported syntax/options fail. No standard C runtime is installed.
+Source implemented; option/behavior coverage is not yet verified.

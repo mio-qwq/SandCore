@@ -1,0 +1,126 @@
+# M9统一验证记录（进行中）
+
+> 当前验证范围已更新，见末尾“2026-10-05 M9最终验证记录”及[M9验收报告](M9-ACCEPTANCE.md)。早期未验证/待验标记保留阶段背景。
+
+> 2026-10-05当前：新增FLAC/大封面/左下角模式与传输进度条已完成本轮分项验证；完整M9仍在验收。build24通过；player07两个不同来源盘各44项（合计88）通过，native PCM/seek/CRC/截断/内嵌和目录封面、两主题真实大屏/迷你/Open取消/恢复/全屏、无损串口截图和实际页回收均有证据。nofpu01双盘20项、20身份/GUI/原版M7回归双盘54项、progress01发布宿主菜单17项通过；sound03两来源有/无AC97共4VM、开关机/六音效16段波形连续及真实关机通过。新增225份第三方源码归档，dr_flac固定快照选择MIT-0。独立试玩入口temp miotest/run-m9-flac.bat，原M9镜像/用户会话保留。
+
+2026-10-05：本记录只说明已实际发生的构建/运行，不宣称M9完成。
+全部原盘、M8a及失败日志保留，最新代码不能借历史PASS替代验收。
+
+当前补充：18两个来源盘各112项、合计224项集成分项通过。回退01在两盘
+各测试禁SSE2、FNSAVE、禁FPU和缺AC97，8组共68项通过；每项只代表
+该记录的实际范围。17两个盘直接运行原M7探针，三种模式每盘9项通过。
+15次盘缺主题、16旧程序参数引号失败均保留；build-13只读复用固定M8a
+资源，build-14修Shell序列化，旧API不改。19命令行SCCC自举双盘各9项通过。
+试玩快照在根temp miotest/M9，原有用户.c文件保留；镜像基线不写入，
+每次从上次试玩盘复制到新会话。串口菜单修复已补入，客体盘未替换。
+
+## 已有证据
+
+| 项目 | 实际结果 | 证据 |
+|---|---|---|
+| WSL完整make m9 | build-05退出0，新内核/独立CLI/音效/947项v5盘生成 | build/m9-work/build-05.log |
+| 内核边界 | text211591/data64/BSS827796B，末端0x1CA194；无未定义符号 | 同批kernel.elf/kernel.sym |
+| 第三方源码归档 | 221份固定文件及客体完整源码/声明副本校验通过 | build-05审计输出；third_party/M9-SOURCES.json |
+| 首轮客体启动/外部SYSTEM | 04真实Windows QEMU启动和正式管理帧连通 | build/m9-verify-20261005-04/disk-1/session.json、console.txt |
+| 串口与前18用例 | 二进制往返、坏SHA/CRC与取消、Shell及awk字段累加通过；后续数组失败 | 04/verification.json |
+| 真实两主题图标 | 05由系统内s3c编译THEME.C，通过正式API换Classic/Aurora并回读确认；HMP截1920×1080桌面 | 05/verification.json、desktop-*.png |
+| AWK修复重测 | 05数组、gsub、短路/格式输出及拒绝不支持赋值用例通过 | 05/verification.json |
+| 后续CLI与原生编译 | 05已有66项PASS，包含压缩/散列及系统内s3c编译；IODENY随后编译失败 | 05/verification.json |
+| Shell原资源恢复 | build-08退出0，Shell三份SCB与原盘字节一致；06实际切换/回读两个主题并截图 | build-08.log、icons/resources.json、06/verification.json |
+| 零环/GUI两个阶段双盘 | 14两盘各12项：SKM一次性/常驻、COM1真实INT3/TF/字节恢复，GUI按键与全部BGRA像素传回通过 | 14/matrix.json、disk-*/verification.json |
+| 宿主串口菜单协调 | COM2硬件IRQ入口断点停12秒，菜单可操作COM1，ACK/后续echo/退出0/源盘不变通过 | build/m9-host-debug-20261005-02/verification.json |
+| 公开头与旧原字节静态兼容 | M7的40API/29宏、M8a的76API/59宏、两版task_t布局及每盘16份LEGACY原字节通过；不代表全部运行语义 | build/m9-compat-static-03.json |
+| 整体集成首盘 | 15首盘95项通过、48kHz/S16/stereo非零PCM；次盘缺主题CFG失败，不称整个矩阵通过 | 15/matrix.json、disk-*/verification.json |
+| 当前十阶段集成双盘 | 18两盘各112项/共224项，通过CLI/原生编译/nano/scdbg/身份/SSE2/MP3-WAV/零环/窗口与原版M7兼容；完整M9仍有未覆盖项 | 18/matrix.json、disk-*/verification.json |
+| CPU与缺设备双盘 | 禁SSE2/FXSAVE、FNSAVE、禁FPU、缺AC97共8组68项：实际能力快照、标量/扩展现场/MP3拒绝或播放/整数WAV/后续Shell均通过 | build/m9-fallbacks-20261005-01/matrix.json |
+| 命令行编译器自举 | 19两盘各9项，G2/G3固定点143524B及独立ABI/流/SSE2/真实SKM通过；未据固定点宣布编译器全指令正确 | 19/matrix.json、disk-*/verification.json |
+| FS提交与损坏边界 | FS05两来源各13变体，共26次QEMU/136项，正确CRC但非法目录也拒绝；原盘不变。不是实际掉电/扇区撕裂/I/O故障全覆盖 | build/m9-fs-20261005-05/matrix.json |
+| 坏卷独立COM1 | 发布工具--debug-only实际halt/regs/RAM/cont、HMP截图与退出0；不创建COM2 Shell且拒绝管理/传文件 | FS05/host-debug-only/verification.json |
+
+![Aurora实际桌面](../build/m9-verify-20261005-06/disk-1/desktop-aurora.png)
+
+![Classic实际桌面](../build/m9-verify-20261005-06/disk-1/desktop-classic.png)
+
+两张是06新M9内核/盘的实际QEMU画面，Shell/Sound使用当前iconroot。
+按用户最新要求，Shell逐字节复用原盘两主题及默认回退；只有Sound
+分开绘制128px Aurora和32px Classic。文件路径/摘要见resources.json；
+其它桌面物件及壁纸来自保留的M8a成果，这次没有重新渲染M8影片或游戏。
+05中重新设计Shell的画面保留为历史方案，不能当当前交付图标。
+
+## 失败及修复
+
+- build-01低端BSS越界：SCX中转改为首次实际装载时申请64页，保持262144B容量和2MiB保留边界。
+- build-02 cron大结构赋值隐式调用memcpy：只复制有效配置项；build-03聚合清零隐式memset：M9编译器使用-minline-all-stringops，未引入libc。
+- build-04音频token与公共头解析辅助函数同名：改audio_token，build-05全链通过。
+- QEMU01 ACL字符串误判：Windows展开GA/FA及SID别名，改回读实际ACE/SID/掩码/顺序/保护位；不放宽权限规则。
+- QEMU02/03 named-pipe QMP cont无响应：无盘/无客体串口的最小VM也复现；去音频/单线程TCG/x86_64宿主目标仍失败，匿名stdio五步真实返回。只替换QMP宿主控制传输；两个UART仍独立管道，拒绝NETWORK并核对启动子进程PID。
+- QEMU04 AWK将print首项括号误当整个参数列表：补括号外逗号和表达式尾部，05相应用例重测通过。
+- QEMU05 IODENY系统内编译缺AL/DX端口操作数：新增严格宽度的六种IN/OUT编码，build-08通过；真实三环GP及后续矩阵在06重测。
+- QEMU06已有81项PASS，包含全部原生夹具编译、旧API护栏、流/SSE2、XMM/MXCSR/x87抢占及槽复用、MP3/WAV、nano和SCDBG。身份阶段root的MOD/零环/窗口/UART拒绝全部PASS；紧接的第二次用户切换没有遵守同一创建者200tick登录节流，父测试报FAIL。只修夹具有界等待-6及分项诊断，内核策略不改；07继续双盘重测。
+- QEMU07节流修正后root和普通UID 1001全项、父SYSTEM身份不变、窗口可继续截取及关闭后拒绝全部PASS。随后SKM夹具用module_init而非SCCC约定skm_main，编译拒绝；修夹具名称，build-10通过，08重测余段。
+- QEMU08一次性/新BSS/常驻/列举/拒绝热重载和COM1暂停/寄存器/RAM/真实TF/继续通过。后续夹具在运行态查看内存，被调试器按合同拒绝；09又遇IRQ正好打断三环、夹具把用户EIP当恒等RAM。两处均改夹具：先真实暂停，再使用同批内核文本符号查看RAM；权限/地址范围不放宽。10只重测Ring0/GUI两个阶段。
+- QEMU10首盘Ring0/COM1真实断点/GUI按键/BMP传回12项通过，但结束音频WAV解析失败，整批FAIL，第二盘未运行。当前Windows QEMU11.1.0在正常退出0后wav后端仍留RIFF/data长度0，原文件保留；宿主改用正式wavcapture并显式stopcapture录制48000/S16/stereo，不手工修录制内容。11/12仅捕获状态解析错误、均未cont；13重测。GUI夹具补FRAME32所需alpha255，并新增全部客户区像素/alpha逐字节核对；不改FRAME32或捕获ABI。
+- QEMU13已实际命中rtc_snapshot断点，父测试同步等待输入ACK导致无法执行COM1 clear/cont；两通道协作后14两盘均通过。13录制已解析为859283帧有效非零PCM，不能扩大为全部音效验收。
+- 外部菜单01完整现场超过256B，尾部裁剪漏STOP，心跳超时；改完整行跨read解析和暂停时前台可操作，02硬件COM2 IRQ断点12秒暂停/恢复通过。
+- 静态兼容01发现第二来源盘没有LEGACY原文件；build-12从固定M7包只向M9树安装16份原SCX，02两盘原字节通过；03继续核对M8a新增已发布头，76API/59宏均保留。
+- QEMU15首盘95项通过后，次盘CLASSIC.CFG缺失导致theme -5；build-13只读固定M8a ZIP补45份现有主题资源并保留M9新Sound资源，完整重测继续。
+- QEMU16原M7探针没有PASS，因为Shell把handler也包双引号，旧GETARGS原样返回导致旧程序走错分支。build-14修Shell只在必要时编码，17两盘原版UD2恢复、旧88B调试现场/INT3/TF、字体与指针边界、窗口像素/ESC回收共18项通过；旧SCX不重编。
+- QEMU18使用新Shell、完整默认主题及旧原字节，两个盘全部十阶段224项通过；19单独扩展SCCC自举。新增FPUSTATE仅是回退测试夹具，不修改已验证的内核/产品实现；build-16后新953/907项盘用于回退/自举。
+
+窗口取回续测采用实际客体独立gzip无损压缩，再经同一串口协议取回，
+宿主校验gzip结束/CRC并按完整BMP核对原生尺寸与BGRA/alpha。18首盘
+261058B客户区BMP为1450B串口正文，实际0.234秒；旧探针客户区182522B
+分别为468/477/1957B。报告记录原/传输摘要与时间；这是传输证据，不是
+全系统帧率或整体性能达标。没有降尺寸、改像素或省略完整比较。
+
+## 怎样复现及后续范围
+
+工具tools/verify_m9.py在Windows调用实际QEMU与两个不同来源的新v5盘，
+每次创建全新目录/镜像副本。serial_protocol按正式管理协议输入和传文件；
+HMP sendkey/screendump提供实际客体按键与图像。各用例记录字节摘要、
+退出码、耗时和QEMU进程CPU时间，源盘启动前后摘要核对。
+
+当前06输入：build/m9-matrix-input/current-v5-08.img为951项，
+legacy-v5-08.img为840项，均64MiB。新代码和资源来自build-08。
+本轮仍执行后续CLI、系统内编译、nano/scdbg、身份/UART、SIMD/音频、
+SKM/COM1及截图闭环；完整坏盘/兼容/许可/性能与CLI行为矩阵仍需收齐。
+集成脚本即使全通过也只报告INTEGRATION_CASES_PASS_REMAINDER_PENDING。
+--stage可选需要重测的阶段，报告保留selected_stages。新的测试盘中scdbg/
+identity/gui所需夹具始终先实际系统内编译，即使没选native整段；部分阶段
+通过不能冒充完整集成范围。
+约80%目标必须看行为证据，原310表与适用性口径继续保留，不能据名字达标。
+
+修订：2026-10-05，登记实际构建、启动故障诊断、前18项/后续AWK和两主题图标阶段证据；验收未完成。
+修订：2026-10-05，05已有66项PASS后遇原生端口编码失败；build-08修复并恢复原Shell两主题，06截图替换当前展示，余项继续。
+修订：2026-10-05，06推进到身份前81项PASS，root权限拒绝实际通过；登录节流夹具修正后按明确阶段范围重测，完整验收继续。
+修订：2026-10-05，07root/普通UID权限及父身份通过，修SKM测试入口名称；08继续两个新盘后续阶段，未宣称全版本通过。
+修订：2026-10-05，14零环/像素闭环双盘及宿主菜单12秒断点通过；15首盘95项通过、次盘缺默认主题失败，补M7原字节和M8a现有资源。试玩副本交付，完整M9继续验收。
+修订：2026-10-05，18双盘224项集成与8组68项CPU/设备回退通过，17原版M7兼容通过；记录无损截图传输及19SCCC自举范围，仍未声明完整M9完成。
+修订：2026-10-05，19两盘各9项命令行自举通过，G2/G3的143524B载荷摘要均为9621ae73c499a9d73a1f449ae703c9c405007e80dfd3a7df4d4f7bad466c7e24；独立实际执行继续约束固定点证据，完整编码矩阵仍待验。
+修订：2026-10-05，FS05离线构造26个提交/损坏变体，实际136项通过；03独立模式过早首行失败保留，工具等待真实UART就绪后04/05通过。没有据此承诺硬件掉电原子性；声音/关机专项继续。
+
+
+## 2026-10-05音频追加验收批
+
+| 分项 | 实际结果 | 证据 |
+|---|---|---|
+| FLAC/封面/迷你最终GUI | 双盘88项PASS；1920×1080/150%和1024×768/100%，两主题均核对真实封面锚点/位置/尺寸、同PID同窗口恢复和页计数回收；迷你选曲展开/取消恢复 | build/m9-player-20261005-07/matrix.json、disk-*/verification.json、*.png |
+| 无FPU整数FLAC | 两盘20项PASS；禁FPU/FXSR/SSE/SSE2实际解码16位mono、24位stereo、Ogg未知长度seek，CLI真实播放和坏CRC/截断拒绝 | build/m9-player-nofpu-20261005-01/matrix.json |
+| 开机/六提示/关机 | 两盘有/无AC97四次QEMU，通过16段参考波形的256帧步长/64帧锚点连续检查，实际QMP shutdown；无设备关机约0.125秒，回复ACK不截断 | build/m9-sound-20261005-03/matrix.json、disk-*/audio.wav/effect-*.wav/shutdown.wav |
+| 兼容/身份/截图 | 两盘54项PASS，包含SYSTEM/UID/root/UART拒绝、BGRA截图、原M7三探针原字节执行与退出回收；新功能号0x23C只追加 | build/m9-verify-20261005-20/matrix.json |
+| PUT/GET进度 | 发布宿主菜单真实64KiB及空文件往返、SHA/完整提交、下载不覆盖已有文件、失败清理/连接恢复17项PASS；显示0/中间/100和阶段 | build/m9-progress-20261005-01/verification.json、stdout.txt |
+| 传输速度 | QEMU完整PUT64KiB：4.688/4.547秒，13.65/14.08KiB/s；256KiB：15.937秒，16.06KiB/s。客体sha256sum复核已提交文件。GET示例64KiB完成时约27.1KiB/s；样本数有限，不宣称硬件速率 | build/m9-player-20261005-03/disk-1/verification.json、m9-progress-20261005-01/stdout.txt |
+| 固定源码/许可证 | dr_flac固定原头不改，MIT-0、双许可原文和版权全文归档；7个直接代码组件（含另登记minimp3）共225份固定来源/本地声明文件与客体副本核对 | tools/audit_third_party.py --tree build/m9-work/fs、third_party/M9-SOURCES.json |
+
+独立编码器FFmpeg生成mono16/stereo24/Ogg FLAC；原始原创PCM全字节FNV和帧数、前段/1秒seek段/重播一致，摘要与固定宿主工具版本留在build/m9-player-fixtures-02/fixtures.json。FNV/波形锚点不是完整硬件/所有外部FLAC编码器证明；尚未做全部采样率/长曲/损坏流/音频设备故障和扬声器主观听感矩阵。GUI缩放缓存依据曲目路径/对象代数/目录封面代数/主题/客户尺寸失效，不逐帧解码/写盘；本轮证据未宣称整机性能达标。
+
+失败沿革完整保留：sound01开机断续；sound02缺设备关机截断ACK；player01未知总长度Ogg seek；player02夹具假设100%而继承盘实际150%；player03迷你封面坐标夹具误用12而实现10；player04次盘缺IMAGE服务；player05固定0.25秒等待不足；06修成观察实际画面/几何后双盘84项PASS，07补迷你Open真实操作双盘88项PASS。M9从固定M8a包复用IMAGE.SCX/LIC原字节，不重启冻结游戏/影片/图像生成。
+
+修订：2026-10-05，同批登记本轮实际验证、失败沿革、传输进度/速度、第三方完整归档与独立试玩快照；完整M9/80% CLI行为/安全故障性能验收尚未完成。
+
+## 2026-10-05 M9最终验证记录
+
+完整专项索引见[M9-ACCEPTANCE](M9-ACCEPTANCE.md)。本地171口径获用户确认；最后图形92项、关键内核92项及CORE/VGA回归通过。player07锚点没检测窗外残影，08保留心跳超时失败；修复/09重测与逐行全工作区证据保留，不删失败。
+
+修订：2026-10-05，记录实际范围与证据，待用户验收；前述早期未验证叙述保留为历史。

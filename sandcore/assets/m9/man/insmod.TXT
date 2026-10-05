@@ -1,0 +1,13 @@
+insmod / lsmod - SandCore resident module administration
+
+  insmod file.skm
+  lsmod
+
+insmod validates and runs a real SKM with relocations, preserving its
+code and registered callbacks until reboot. lsmod lists names of loaded
+resident modules; it does not scan filenames and call them running.
+Both tools require an external-serial SYSTEM administration chain.
+No hot unload/reload is provided. Linux .ko files are not supported.
+Use skmrun file.skm for a one-shot entry with resource reclamation.
+
+Source implemented; actual module lifecycle is not yet verified.

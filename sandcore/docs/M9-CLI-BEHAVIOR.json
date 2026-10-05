@@ -1,0 +1,2509 @@
+{
+  "status": "DECLARED_LOCAL_CLI_SUBSETS_PASS",
+  "user_approved_denominator": "M9-local",
+  "reference_total": 310,
+  "local_total": 171,
+  "tested_local_commands": 140,
+  "local_reference_command_ratio": 81.87134502923976,
+  "original_reference_command_ratio": 45.16129032258065,
+  "not_full_BusyBox_options_compatibility": true,
+  "aliases_share_behavior": [
+    "hd/hexdump"
+  ],
+  "missing_local": [
+    "[[",
+    "addgroup",
+    "ash",
+    "chpst",
+    "cryptpw",
+    "delgroup",
+    "dmesg",
+    "envuidgid",
+    "fsck",
+    "fuser",
+    "hostid",
+    "hush",
+    "last",
+    "lzop",
+    "lzopcat",
+    "mesg",
+    "mkpasswd",
+    "nohup",
+    "rpm2cpio",
+    "runsv",
+    "runsvdir",
+    "setuidgid",
+    "showkey",
+    "start-stop-daemon",
+    "stty",
+    "sulogin",
+    "sv",
+    "svlogd",
+    "uncompress",
+    "unlzop",
+    "who"
+  ],
+  "evidence": {
+    "[": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "bracket-true"
+      },
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "bracket-false"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "bracket-true"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "bracket-false"
+      }
+    ],
+    "adduser": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "adduser-create"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "adduser-create"
+      },
+      {
+        "disk": 1,
+        "report": "build/m9-security-extra-20261005-07/disk-1/verification.json",
+        "case": "create-account"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-security-extra-20261005-07/disk-2/verification.json",
+        "case": "create-account"
+      }
+    ],
+    "ar": [
+      {
+        "disk": 1,
+        "report": "build/m9-final-cli-core-20261005-02/disk-1/verification.json",
+        "case": "ar-roundtrip"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-final-cli-core-20261005-02/disk-2/verification.json",
+        "case": "ar-roundtrip"
+      }
+    ],
+    "awk": [
+      {
+        "disk": 1,
+        "report": "build/m9-final-cli-core-20261005-02/disk-1/verification.json",
+        "case": "awk-sum"
+      },
+      {
+        "disk": 1,
+        "report": "build/m9-final-cli-core-20261005-02/disk-1/verification.json",
+        "case": "awk-array"
+      },
+      {
+        "disk": 1,
+        "report": "build/m9-final-cli-core-20261005-02/disk-1/verification.json",
+        "case": "awk-gsub"
+      },
+      {
+        "disk": 1,
+        "report": "build/m9-final-cli-core-20261005-02/disk-1/verification.json",
+        "case": "awk-short-circuit"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-final-cli-core-20261005-02/disk-2/verification.json",
+        "case": "awk-sum"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-final-cli-core-20261005-02/disk-2/verification.json",
+        "case": "awk-array"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-final-cli-core-20261005-02/disk-2/verification.json",
+        "case": "awk-gsub"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-final-cli-core-20261005-02/disk-2/verification.json",
+        "case": "awk-short-circuit"
+      }
+    ],
+    "basename": [
+      {
+        "disk": 1,
+        "report": "build/m9-final-cli-core-20261005-02/disk-1/verification.json",
+        "case": "basename"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-final-cli-core-20261005-02/disk-2/verification.json",
+        "case": "basename"
+      }
+    ],
+    "beep": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "beep-effect"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "beep-effect"
+      }
+    ],
+    "bunzip2": [
+      {
+        "disk": 1,
+        "report": "build/m9-final-cli-core-20261005-02/disk-1/verification.json",
+        "case": "bzip2-roundtrip"
+      },
+      {
+        "disk": 1,
+        "report": "build/m9-final-cli-core-20261005-02/disk-1/verification.json",
+        "case": "truncated-BZIP-preserves-target"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-final-cli-core-20261005-02/disk-2/verification.json",
+        "case": "bzip2-roundtrip"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-final-cli-core-20261005-02/disk-2/verification.json",
+        "case": "truncated-BZIP-preserves-target"
+      },
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "bzip2-truncated"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "bzip2-truncated"
+      }
+    ],
+    "bzcat": [
+      {
+        "disk": 1,
+        "report": "build/m9-final-cli-core-20261005-02/disk-1/verification.json",
+        "case": "bzip2-external-fixture"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-final-cli-core-20261005-02/disk-2/verification.json",
+        "case": "bzip2-external-fixture"
+      }
+    ],
+    "bzip2": [
+      {
+        "disk": 1,
+        "report": "build/m9-final-cli-core-20261005-02/disk-1/verification.json",
+        "case": "bzip2-roundtrip"
+      },
+      {
+        "disk": 1,
+        "report": "build/m9-final-cli-core-20261005-02/disk-1/verification.json",
+        "case": "bzip2-compress-oracle"
+      },
+      {
+        "disk": 1,
+        "report": "build/m9-final-cli-core-20261005-02/disk-1/verification.json",
+        "case": "bzip2-independent-decoder"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-final-cli-core-20261005-02/disk-2/verification.json",
+        "case": "bzip2-roundtrip"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-final-cli-core-20261005-02/disk-2/verification.json",
+        "case": "bzip2-compress-oracle"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-final-cli-core-20261005-02/disk-2/verification.json",
+        "case": "bzip2-independent-decoder"
+      }
+    ],
+    "cal": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "cal-leap-year"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "cal-leap-year"
+      }
+    ],
+    "cat": [
+      {
+        "disk": 1,
+        "report": "build/m9-final-cli-core-20261005-02/disk-1/verification.json",
+        "case": "cat-binary"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-final-cli-core-20261005-02/disk-2/verification.json",
+        "case": "cat-binary"
+      }
+    ],
+    "catv": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "catv-controls"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "catv-controls"
+      }
+    ],
+    "chgrp": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "chgrp-numeric"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "chgrp-numeric"
+      }
+    ],
+    "chmod": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "chmod-rw-model"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "chmod-rw-model"
+      }
+    ],
+    "chown": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "chown-numeric"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "chown-numeric"
+      }
+    ],
+    "chpasswd": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "chpasswd-set"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "chpasswd-set"
+      }
+    ],
+    "cksum": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "cksum-POSIX-answer"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "cksum-POSIX-answer"
+      }
+    ],
+    "clear": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "external-terminal-clear"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "external-terminal-clear"
+      }
+    ],
+    "cmp": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "cmp-identical"
+      },
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "cmp-different-silent"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "cmp-identical"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "cmp-different-silent"
+      }
+    ],
+    "comm": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "comm-columns"
+      },
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "comm-common-only"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "comm-columns"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "comm-common-only"
+      }
+    ],
+    "cp": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "cp-binary"
+      },
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "cp-recursive"
+      },
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "cp-self-reject"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "cp-binary"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "cp-recursive"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "cp-self-reject"
+      }
+    ],
+    "cpio": [
+      {
+        "disk": 1,
+        "report": "build/m9-final-cli-core-20261005-02/disk-1/verification.json",
+        "case": "cpio-roundtrip"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-final-cli-core-20261005-02/disk-2/verification.json",
+        "case": "cpio-roundtrip"
+      }
+    ],
+    "crond": [
+      {
+        "disk": 1,
+        "report": "build/m9-final-cli-core-20261005-02/disk-1/verification.json",
+        "case": "cron-matching-shell"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-final-cli-core-20261005-02/disk-2/verification.json",
+        "case": "cron-matching-shell"
+      }
+    ],
+    "crontab": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "crontab-publish-list"
+      },
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "crontab-invalid-preserves"
+      },
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "crontab-remove"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "crontab-publish-list"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "crontab-invalid-preserves"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "crontab-remove"
+      }
+    ],
+    "cut": [
+      {
+        "disk": 1,
+        "report": "build/m9-final-cli-core-20261005-02/disk-1/verification.json",
+        "case": "cut"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-final-cli-core-20261005-02/disk-2/verification.json",
+        "case": "cut"
+      }
+    ],
+    "date": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "date-format-literals"
+      },
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "date-refuse-setting"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "date-format-literals"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "date-refuse-setting"
+      }
+    ],
+    "dc": [
+      {
+        "disk": 1,
+        "report": "build/m9-final-cli-core-20261005-02/disk-1/verification.json",
+        "case": "dc"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-final-cli-core-20261005-02/disk-2/verification.json",
+        "case": "dc"
+      }
+    ],
+    "dd": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "dd-skip-count"
+      },
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "dd-binary-write"
+      },
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "dd-bad-block"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "dd-skip-count"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "dd-binary-write"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "dd-bad-block"
+      }
+    ],
+    "deluser": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "deluser-remove"
+      },
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "deluser-protected-system"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "deluser-remove"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "deluser-protected-system"
+      },
+      {
+        "disk": 1,
+        "report": "build/m9-security-extra-20261005-07/disk-1/verification.json",
+        "case": "delete-account"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-security-extra-20261005-07/disk-2/verification.json",
+        "case": "delete-account"
+      }
+    ],
+    "df": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "df-capacity"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "df-capacity"
+      }
+    ],
+    "diff": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "diff-same"
+      },
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "diff-exit-and-change"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "diff-same"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "diff-exit-and-change"
+      }
+    ],
+    "dirname": [
+      {
+        "disk": 1,
+        "report": "build/m9-final-cli-core-20261005-02/disk-1/verification.json",
+        "case": "dirname"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-final-cli-core-20261005-02/disk-2/verification.json",
+        "case": "dirname"
+      }
+    ],
+    "dos2unix": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "dos2unix-stream"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "dos2unix-stream"
+      }
+    ],
+    "du": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "du-summary"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "du-summary"
+      }
+    ],
+    "echo": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "echo-escapes"
+      },
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "echo-no-newline"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "echo-escapes"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "echo-no-newline"
+      }
+    ],
+    "ed": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "ed-save-contents"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "ed-save-contents"
+      }
+    ],
+    "egrep": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "egrep-alternation"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "egrep-alternation"
+      }
+    ],
+    "env": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "env-child-and-parent"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "env-child-and-parent"
+      }
+    ],
+    "envdir": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "envdir-trim"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "envdir-trim"
+      }
+    ],
+    "expand": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "expand-tabstops"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "expand-tabstops"
+      }
+    ],
+    "expr": [
+      {
+        "disk": 1,
+        "report": "build/m9-final-cli-core-20261005-02/disk-1/verification.json",
+        "case": "expr"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-final-cli-core-20261005-02/disk-2/verification.json",
+        "case": "expr"
+      }
+    ],
+    "false": [
+      {
+        "disk": 1,
+        "report": "build/m9-final-cli-core-20261005-02/disk-1/verification.json",
+        "case": "false"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-final-cli-core-20261005-02/disk-2/verification.json",
+        "case": "false"
+      }
+    ],
+    "fgrep": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "fgrep-literal"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "fgrep-literal"
+      }
+    ],
+    "find": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "find-name-type"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "find-name-type"
+      }
+    ],
+    "fold": [
+      {
+        "disk": 1,
+        "report": "build/m9-final-cli-core-20261005-02/disk-1/verification.json",
+        "case": "fold"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-final-cli-core-20261005-02/disk-2/verification.json",
+        "case": "fold"
+      }
+    ],
+    "free": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "free-accounting"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "free-accounting"
+      }
+    ],
+    "fsync": [
+      {
+        "disk": 1,
+        "report": "build/m9-final-cli-core-20261005-02/disk-1/verification.json",
+        "case": "storage-flush"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-final-cli-core-20261005-02/disk-2/verification.json",
+        "case": "storage-flush"
+      },
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "fsync-existing"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "fsync-existing"
+      }
+    ],
+    "getopt": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "getopt-quoted-options"
+      },
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "getopt-invalid"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "getopt-quoted-options"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "getopt-invalid"
+      }
+    ],
+    "grep": [
+      {
+        "disk": 1,
+        "report": "build/m9-final-cli-core-20261005-02/disk-1/verification.json",
+        "case": "grep-pipeline"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-final-cli-core-20261005-02/disk-2/verification.json",
+        "case": "grep-pipeline"
+      },
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "grep-no-match"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "grep-no-match"
+      }
+    ],
+    "gunzip": [
+      {
+        "disk": 1,
+        "report": "build/m9-final-cli-core-20261005-02/disk-1/verification.json",
+        "case": "gzip-roundtrip"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-final-cli-core-20261005-02/disk-2/verification.json",
+        "case": "gzip-roundtrip"
+      },
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "gunzip-bad-format"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "gunzip-bad-format"
+      }
+    ],
+    "gzip": [
+      {
+        "disk": 1,
+        "report": "build/m9-final-cli-core-20261005-02/disk-1/verification.json",
+        "case": "gzip-roundtrip"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-final-cli-core-20261005-02/disk-2/verification.json",
+        "case": "gzip-roundtrip"
+      }
+    ],
+    "hd": [
+      {
+        "disk": 1,
+        "report": "build/m9-security-extra-20261005-07/disk-1/verification.json",
+        "case": "hd-binary-exact"
+      },
+      {
+        "disk": 1,
+        "report": "build/m9-security-extra-20261005-07/disk-1/verification.json",
+        "case": "hd-missing-file"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-security-extra-20261005-07/disk-2/verification.json",
+        "case": "hd-binary-exact"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-security-extra-20261005-07/disk-2/verification.json",
+        "case": "hd-missing-file"
+      }
+    ],
+    "head": [
+      {
+        "disk": 1,
+        "report": "build/m9-final-cli-core-20261005-02/disk-1/verification.json",
+        "case": "head-tail"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-final-cli-core-20261005-02/disk-2/verification.json",
+        "case": "head-tail"
+      }
+    ],
+    "hexdump": [
+      {
+        "disk": 1,
+        "report": "build/m9-security-extra-20261005-07/disk-1/verification.json",
+        "case": "hexdump-binary-exact"
+      },
+      {
+        "disk": 1,
+        "report": "build/m9-security-extra-20261005-07/disk-1/verification.json",
+        "case": "hexdump-missing-file"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-security-extra-20261005-07/disk-2/verification.json",
+        "case": "hexdump-binary-exact"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-security-extra-20261005-07/disk-2/verification.json",
+        "case": "hexdump-missing-file"
+      }
+    ],
+    "hwclock": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "hwclock-read"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "hwclock-read"
+      }
+    ],
+    "id": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "id-management"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "id-management"
+      },
+      {
+        "disk": 1,
+        "report": "build/m9-security-extra-20261005-07/disk-1/verification.json",
+        "case": "parent-remains-external-SYSTEM"
+      },
+      {
+        "disk": 1,
+        "report": "build/m9-security-extra-20261005-07/disk-1/verification.json",
+        "case": "id-group-selection"
+      },
+      {
+        "disk": 1,
+        "report": "build/m9-security-extra-20261005-07/disk-1/verification.json",
+        "case": "id-current-user-name"
+      },
+      {
+        "disk": 1,
+        "report": "build/m9-security-extra-20261005-07/disk-1/verification.json",
+        "case": "id-reject--u -g"
+      },
+      {
+        "disk": 1,
+        "report": "build/m9-security-extra-20261005-07/disk-1/verification.json",
+        "case": "id-reject--gn"
+      },
+      {
+        "disk": 1,
+        "report": "build/m9-security-extra-20261005-07/disk-1/verification.json",
+        "case": "id-reject--z"
+      },
+      {
+        "disk": 1,
+        "report": "build/m9-security-extra-20261005-07/disk-1/verification.json",
+        "case": "id-reject-other"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-security-extra-20261005-07/disk-2/verification.json",
+        "case": "parent-remains-external-SYSTEM"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-security-extra-20261005-07/disk-2/verification.json",
+        "case": "id-group-selection"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-security-extra-20261005-07/disk-2/verification.json",
+        "case": "id-current-user-name"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-security-extra-20261005-07/disk-2/verification.json",
+        "case": "id-reject--u -g"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-security-extra-20261005-07/disk-2/verification.json",
+        "case": "id-reject--gn"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-security-extra-20261005-07/disk-2/verification.json",
+        "case": "id-reject--z"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-security-extra-20261005-07/disk-2/verification.json",
+        "case": "id-reject-other"
+      }
+    ],
+    "insmod": [
+      {
+        "disk": 1,
+        "report": "build/m9-security-extra-20261005-07/disk-1/verification.json",
+        "case": "insmod-native-resident"
+      },
+      {
+        "disk": 1,
+        "report": "build/m9-security-extra-20261005-07/disk-1/verification.json",
+        "case": "insmod-case-alias-no-hot-reload"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-security-extra-20261005-07/disk-2/verification.json",
+        "case": "insmod-native-resident"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-security-extra-20261005-07/disk-2/verification.json",
+        "case": "insmod-case-alias-no-hot-reload"
+      }
+    ],
+    "install": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "install-copy-mode"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "install-copy-mode"
+      }
+    ],
+    "kill": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "kill-job"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "kill-job"
+      }
+    ],
+    "killall": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "killall-live-process"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "killall-live-process"
+      }
+    ],
+    "length": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "length-argument-bytes"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "length-argument-bytes"
+      }
+    ],
+    "less": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "less-redirected"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "less-redirected"
+      }
+    ],
+    "logger": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "logger-write-read"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "logger-write-read"
+      }
+    ],
+    "login": [
+      {
+        "disk": 1,
+        "report": "build/m9-security-extra-20261005-07/disk-1/verification.json",
+        "case": "old-password-ordinary-login"
+      },
+      {
+        "disk": 1,
+        "report": "build/m9-security-extra-20261005-07/disk-1/verification.json",
+        "case": "new-password-ordinary-login"
+      },
+      {
+        "disk": 1,
+        "report": "build/m9-security-extra-20261005-07/disk-1/verification.json",
+        "case": "nested-login-parent-SYSTEM-return"
+      },
+      {
+        "disk": 1,
+        "report": "build/m9-security-extra-20261005-07/disk-1/verification.json",
+        "case": "login-secret-not-echoed"
+      },
+      {
+        "disk": 1,
+        "report": "build/m9-security-extra-20261005-07/disk-1/verification.json",
+        "case": "SYSTEM-ordinary-login-impossible"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-security-extra-20261005-07/disk-2/verification.json",
+        "case": "old-password-ordinary-login"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-security-extra-20261005-07/disk-2/verification.json",
+        "case": "new-password-ordinary-login"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-security-extra-20261005-07/disk-2/verification.json",
+        "case": "nested-login-parent-SYSTEM-return"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-security-extra-20261005-07/disk-2/verification.json",
+        "case": "login-secret-not-echoed"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-security-extra-20261005-07/disk-2/verification.json",
+        "case": "SYSTEM-ordinary-login-impossible"
+      }
+    ],
+    "logname": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "logname-management"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "logname-management"
+      }
+    ],
+    "logread": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "logread-exact-last-line"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "logread-exact-last-line"
+      }
+    ],
+    "ls": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "ls-sort-hidden"
+      },
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "ls-all-excludes-dot-pair"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "ls-sort-hidden"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "ls-all-excludes-dot-pair"
+      }
+    ],
+    "lsmod": [
+      {
+        "disk": 1,
+        "report": "build/m9-security-extra-20261005-07/disk-1/verification.json",
+        "case": "lsmod-resident-name"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-security-extra-20261005-07/disk-2/verification.json",
+        "case": "lsmod-resident-name"
+      }
+    ],
+    "lzmacat": [
+      {
+        "disk": 1,
+        "report": "build/m9-final-cli-core-20261005-02/disk-1/verification.json",
+        "case": "lzma-external-fixture"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-final-cli-core-20261005-02/disk-2/verification.json",
+        "case": "lzma-external-fixture"
+      }
+    ],
+    "man": [
+      {
+        "disk": 1,
+        "report": "build/m9-final-cli-core-20261005-02/disk-1/verification.json",
+        "case": "manual-cli-page"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-final-cli-core-20261005-02/disk-2/verification.json",
+        "case": "manual-cli-page"
+      }
+    ],
+    "md5sum": [
+      {
+        "disk": 1,
+        "report": "build/m9-final-cli-core-20261005-02/disk-1/verification.json",
+        "case": "md5-known-answer"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-final-cli-core-20261005-02/disk-2/verification.json",
+        "case": "md5-known-answer"
+      }
+    ],
+    "mkdir": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "mkdir-parents"
+      },
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "mkdir-existing-error"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "mkdir-parents"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "mkdir-existing-error"
+      }
+    ],
+    "mktemp": [
+      {
+        "disk": 1,
+        "report": "build/m9-final-cli-core-20261005-02/disk-1/verification.json",
+        "case": "mktemp"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-final-cli-core-20261005-02/disk-2/verification.json",
+        "case": "mktemp"
+      }
+    ],
+    "more": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "more-redirected"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "more-redirected"
+      }
+    ],
+    "mountpoint": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "mountpoint-root"
+      },
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "mountpoint-nonroot"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "mountpoint-root"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "mountpoint-nonroot"
+      }
+    ],
+    "mv": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "mv-keeps-data"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "mv-keeps-data"
+      }
+    ],
+    "od": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "od-byte-format"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "od-byte-format"
+      }
+    ],
+    "passwd": [
+      {
+        "disk": 1,
+        "report": "build/m9-security-extra-20261005-07/disk-1/verification.json",
+        "case": "passwd-secret-not-echoed"
+      },
+      {
+        "disk": 1,
+        "report": "build/m9-security-extra-20261005-07/disk-1/verification.json",
+        "case": "SYSTEM-passwd-success"
+      },
+      {
+        "disk": 1,
+        "report": "build/m9-security-extra-20261005-07/disk-1/verification.json",
+        "case": "passwd-secret-not-echoed"
+      },
+      {
+        "disk": 1,
+        "report": "build/m9-security-extra-20261005-07/disk-1/verification.json",
+        "case": "passwd-replacement-success"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-security-extra-20261005-07/disk-2/verification.json",
+        "case": "passwd-secret-not-echoed"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-security-extra-20261005-07/disk-2/verification.json",
+        "case": "SYSTEM-passwd-success"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-security-extra-20261005-07/disk-2/verification.json",
+        "case": "passwd-secret-not-echoed"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-security-extra-20261005-07/disk-2/verification.json",
+        "case": "passwd-replacement-success"
+      }
+    ],
+    "patch": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "patch-dry-run"
+      },
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "patch-apply"
+      },
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "patch-reverse"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "patch-dry-run"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "patch-apply"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "patch-reverse"
+      }
+    ],
+    "pgrep": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "pgrep-live-process"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "pgrep-live-process"
+      }
+    ],
+    "pidof": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "pidof-live-process"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "pidof-live-process"
+      }
+    ],
+    "pipe_progress": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "pipe-progress-binary"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "pipe-progress-binary"
+      }
+    ],
+    "pkill": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "pkill-live-process"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "pkill-live-process"
+      }
+    ],
+    "printenv": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "printenv-missing"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "printenv-missing"
+      }
+    ],
+    "printf": [
+      {
+        "disk": 1,
+        "report": "build/m9-final-cli-core-20261005-02/disk-1/verification.json",
+        "case": "shell-quote"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-final-cli-core-20261005-02/disk-2/verification.json",
+        "case": "shell-quote"
+      }
+    ],
+    "ps": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "ps-visible-identity"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "ps-visible-identity"
+      }
+    ],
+    "pwd": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "pwd-working-directory"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "pwd-working-directory"
+      }
+    ],
+    "readlink": [
+      {
+        "disk": 1,
+        "report": "build/m9-final-cli-core-20261005-02/disk-1/verification.json",
+        "case": "readlink"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-final-cli-core-20261005-02/disk-2/verification.json",
+        "case": "readlink"
+      },
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "readlink-canonical-missing"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "readlink-canonical-missing"
+      }
+    ],
+    "realpath": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "realpath-existing"
+      },
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "realpath-missing"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "realpath-existing"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "realpath-missing"
+      }
+    ],
+    "reset": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "external-terminal-reset"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "external-terminal-reset"
+      }
+    ],
+    "resize": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "external-terminal-resize"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "external-terminal-resize"
+      }
+    ],
+    "rm": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "rm-recursive"
+      },
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "rm-missing-force"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "rm-recursive"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "rm-missing-force"
+      }
+    ],
+    "rmdir": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "rmdir-empty"
+      },
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "rmdir-nonempty-refuse"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "rmdir-empty"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "rmdir-nonempty-refuse"
+      }
+    ],
+    "run-parts": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "run-parts-sorted-filter"
+      },
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "run-parts-execute"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "run-parts-sorted-filter"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "run-parts-execute"
+      }
+    ],
+    "script": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "script-persist-child-text"
+      },
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "script-child-failure-persists"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "script-persist-child-text"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "script-child-failure-persists"
+      }
+    ],
+    "scriptreplay": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "scriptreplay-content"
+      },
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "scriptreplay-reject-extra"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "scriptreplay-content"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "scriptreplay-reject-extra"
+      }
+    ],
+    "sed": [
+      {
+        "disk": 1,
+        "report": "build/m9-final-cli-core-20261005-02/disk-1/verification.json",
+        "case": "sed-substitute"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-final-cli-core-20261005-02/disk-2/verification.json",
+        "case": "sed-substitute"
+      }
+    ],
+    "seq": [
+      {
+        "disk": 1,
+        "report": "build/m9-final-cli-core-20261005-02/disk-1/verification.json",
+        "case": "seq"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-final-cli-core-20261005-02/disk-2/verification.json",
+        "case": "seq"
+      }
+    ],
+    "sh": [
+      {
+        "disk": 1,
+        "report": "build/m9-final-cli-core-20261005-02/disk-1/verification.json",
+        "case": "shell-quote"
+      },
+      {
+        "disk": 1,
+        "report": "build/m9-final-cli-core-20261005-02/disk-1/verification.json",
+        "case": "shell-function"
+      },
+      {
+        "disk": 1,
+        "report": "build/m9-final-cli-core-20261005-02/disk-1/verification.json",
+        "case": "shell-loop"
+      },
+      {
+        "disk": 1,
+        "report": "build/m9-final-cli-core-20261005-02/disk-1/verification.json",
+        "case": "shell-condition"
+      },
+      {
+        "disk": 1,
+        "report": "build/m9-final-cli-core-20261005-02/disk-1/verification.json",
+        "case": "shell-case"
+      },
+      {
+        "disk": 1,
+        "report": "build/m9-final-cli-core-20261005-02/disk-1/verification.json",
+        "case": "shell-parameters"
+      },
+      {
+        "disk": 1,
+        "report": "build/m9-final-cli-core-20261005-02/disk-1/verification.json",
+        "case": "shell-substitute"
+      },
+      {
+        "disk": 1,
+        "report": "build/m9-final-cli-core-20261005-02/disk-1/verification.json",
+        "case": "shell-arithmetic"
+      },
+      {
+        "disk": 1,
+        "report": "build/m9-final-cli-core-20261005-02/disk-1/verification.json",
+        "case": "shell-here"
+      },
+      {
+        "disk": 1,
+        "report": "build/m9-final-cli-core-20261005-02/disk-1/verification.json",
+        "case": "shell-here-quoted"
+      },
+      {
+        "disk": 1,
+        "report": "build/m9-final-cli-core-20261005-02/disk-1/verification.json",
+        "case": "shell-here-tabs"
+      },
+      {
+        "disk": 1,
+        "report": "build/m9-final-cli-core-20261005-02/disk-1/verification.json",
+        "case": "shell-short-circuit"
+      },
+      {
+        "disk": 1,
+        "report": "build/m9-final-cli-core-20261005-02/disk-1/verification.json",
+        "case": "shell-background-status"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-final-cli-core-20261005-02/disk-2/verification.json",
+        "case": "shell-quote"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-final-cli-core-20261005-02/disk-2/verification.json",
+        "case": "shell-function"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-final-cli-core-20261005-02/disk-2/verification.json",
+        "case": "shell-loop"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-final-cli-core-20261005-02/disk-2/verification.json",
+        "case": "shell-condition"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-final-cli-core-20261005-02/disk-2/verification.json",
+        "case": "shell-case"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-final-cli-core-20261005-02/disk-2/verification.json",
+        "case": "shell-parameters"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-final-cli-core-20261005-02/disk-2/verification.json",
+        "case": "shell-substitute"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-final-cli-core-20261005-02/disk-2/verification.json",
+        "case": "shell-arithmetic"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-final-cli-core-20261005-02/disk-2/verification.json",
+        "case": "shell-here"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-final-cli-core-20261005-02/disk-2/verification.json",
+        "case": "shell-here-quoted"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-final-cli-core-20261005-02/disk-2/verification.json",
+        "case": "shell-here-tabs"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-final-cli-core-20261005-02/disk-2/verification.json",
+        "case": "shell-short-circuit"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-final-cli-core-20261005-02/disk-2/verification.json",
+        "case": "shell-background-status"
+      },
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "shell-home-rooted"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "shell-home-rooted"
+      }
+    ],
+    "sha1sum": [
+      {
+        "disk": 1,
+        "report": "build/m9-final-cli-core-20261005-02/disk-1/verification.json",
+        "case": "sha1-known-answer"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-final-cli-core-20261005-02/disk-2/verification.json",
+        "case": "sha1-known-answer"
+      }
+    ],
+    "sha256sum": [
+      {
+        "disk": 1,
+        "report": "build/m9-final-cli-core-20261005-02/disk-1/verification.json",
+        "case": "sha256-known-answer"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-final-cli-core-20261005-02/disk-2/verification.json",
+        "case": "sha256-known-answer"
+      }
+    ],
+    "sha512sum": [
+      {
+        "disk": 1,
+        "report": "build/m9-final-cli-core-20261005-02/disk-1/verification.json",
+        "case": "sha512-known-answer"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-final-cli-core-20261005-02/disk-2/verification.json",
+        "case": "sha512-known-answer"
+      }
+    ],
+    "sleep": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "sleep-zero"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "sleep-zero"
+      }
+    ],
+    "sort": [
+      {
+        "disk": 1,
+        "report": "build/m9-final-cli-core-20261005-02/disk-1/verification.json",
+        "case": "sort-unique"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-final-cli-core-20261005-02/disk-2/verification.json",
+        "case": "sort-unique"
+      }
+    ],
+    "split": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "split-byte-parts"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "split-byte-parts"
+      }
+    ],
+    "stat": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "stat-exact-object"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "stat-exact-object"
+      }
+    ],
+    "strings": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "strings-separation"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "strings-separation"
+      }
+    ],
+    "su": [
+      {
+        "disk": 1,
+        "report": "build/m9-security-extra-20261005-07/disk-1/verification.json",
+        "case": "su-valid-kernel-ticket-creates-user-shell"
+      },
+      {
+        "disk": 1,
+        "report": "build/m9-security-extra-20261005-07/disk-1/verification.json",
+        "case": "su-child-UID-GID-and-parent-return"
+      },
+      {
+        "disk": 1,
+        "report": "build/m9-security-extra-20261005-07/disk-1/verification.json",
+        "case": "su-home-owned-write"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-security-extra-20261005-07/disk-2/verification.json",
+        "case": "su-valid-kernel-ticket-creates-user-shell"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-security-extra-20261005-07/disk-2/verification.json",
+        "case": "su-child-UID-GID-and-parent-return"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-security-extra-20261005-07/disk-2/verification.json",
+        "case": "su-home-owned-write"
+      }
+    ],
+    "sum": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "sum-system-v"
+      },
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "sum-BSD"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "sum-system-v"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "sum-BSD"
+      }
+    ],
+    "sync": [
+      {
+        "disk": 1,
+        "report": "build/m9-final-cli-core-20261005-02/disk-1/verification.json",
+        "case": "storage-flush"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-final-cli-core-20261005-02/disk-2/verification.json",
+        "case": "storage-flush"
+      },
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "sync-disk"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "sync-disk"
+      }
+    ],
+    "tac": [
+      {
+        "disk": 1,
+        "report": "build/m9-final-cli-core-20261005-02/disk-1/verification.json",
+        "case": "tac"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-final-cli-core-20261005-02/disk-2/verification.json",
+        "case": "tac"
+      }
+    ],
+    "tail": [
+      {
+        "disk": 1,
+        "report": "build/m9-final-cli-core-20261005-02/disk-1/verification.json",
+        "case": "head-tail"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-final-cli-core-20261005-02/disk-2/verification.json",
+        "case": "head-tail"
+      }
+    ],
+    "tar": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "tar-create-list"
+      },
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "tar-extract"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "tar-create-list"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "tar-extract"
+      }
+    ],
+    "tee": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "tee-binary"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "tee-binary"
+      }
+    ],
+    "test": [
+      {
+        "disk": 1,
+        "report": "build/m9-final-cli-core-20261005-02/disk-1/verification.json",
+        "case": "test"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-final-cli-core-20261005-02/disk-2/verification.json",
+        "case": "test"
+      }
+    ],
+    "time": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "time-child-output"
+      },
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "time-child-failure"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "time-child-output"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "time-child-failure"
+      }
+    ],
+    "timeout": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "timeout-child-success"
+      },
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "timeout-terminates"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "timeout-child-success"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "timeout-terminates"
+      }
+    ],
+    "top": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "top-batch-once"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "top-batch-once"
+      }
+    ],
+    "touch": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "touch-preserves-data"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "touch-preserves-data"
+      }
+    ],
+    "tr": [
+      {
+        "disk": 1,
+        "report": "build/m9-final-cli-core-20261005-02/disk-1/verification.json",
+        "case": "tr"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-final-cli-core-20261005-02/disk-2/verification.json",
+        "case": "tr"
+      }
+    ],
+    "true": [
+      {
+        "disk": 1,
+        "report": "build/m9-final-cli-core-20261005-02/disk-1/verification.json",
+        "case": "true"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-final-cli-core-20261005-02/disk-2/verification.json",
+        "case": "true"
+      }
+    ],
+    "tty": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "tty-management"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "tty-management"
+      }
+    ],
+    "ttysize": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "external-terminal-ttysize"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "external-terminal-ttysize"
+      }
+    ],
+    "uname": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "uname-platform"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "uname-platform"
+      }
+    ],
+    "unexpand": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "unexpand-tabs"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "unexpand-tabs"
+      }
+    ],
+    "uniq": [
+      {
+        "disk": 1,
+        "report": "build/m9-final-cli-core-20261005-02/disk-1/verification.json",
+        "case": "sort-unique"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-final-cli-core-20261005-02/disk-2/verification.json",
+        "case": "sort-unique"
+      }
+    ],
+    "unix2dos": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "unix2dos-stream"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "unix2dos-stream"
+      }
+    ],
+    "unlzma": [
+      {
+        "disk": 1,
+        "report": "build/m9-final-cli-core-20261005-02/disk-1/verification.json",
+        "case": "truncated-LZMA-preserves-target"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-final-cli-core-20261005-02/disk-2/verification.json",
+        "case": "truncated-LZMA-preserves-target"
+      },
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "unlzma-stdin"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "unlzma-stdin"
+      }
+    ],
+    "unzip": [
+      {
+        "disk": 1,
+        "report": "build/m9-final-cli-core-20261005-02/disk-1/verification.json",
+        "case": "unzip-deflate"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-final-cli-core-20261005-02/disk-2/verification.json",
+        "case": "unzip-deflate"
+      }
+    ],
+    "uptime": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "uptime-shape"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "uptime-shape"
+      }
+    ],
+    "usleep": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "usleep-small"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "usleep-small"
+      }
+    ],
+    "uudecode": [
+      {
+        "disk": 1,
+        "report": "build/m9-final-cli-core-20261005-02/disk-1/verification.json",
+        "case": "uu-roundtrip"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-final-cli-core-20261005-02/disk-2/verification.json",
+        "case": "uu-roundtrip"
+      }
+    ],
+    "uuencode": [
+      {
+        "disk": 1,
+        "report": "build/m9-final-cli-core-20261005-02/disk-1/verification.json",
+        "case": "uu-roundtrip"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-final-cli-core-20261005-02/disk-2/verification.json",
+        "case": "uu-roundtrip"
+      }
+    ],
+    "watch": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "watch-bounded"
+      },
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "watch-child-status"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "watch-bounded"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "watch-child-status"
+      }
+    ],
+    "wc": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "wc-counts"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "wc-counts"
+      }
+    ],
+    "which": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "which-executable"
+      },
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "which-missing"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "which-executable"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "which-missing"
+      }
+    ],
+    "whoami": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "whoami-management"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "whoami-management"
+      }
+    ],
+    "xargs": [
+      {
+        "disk": 1,
+        "report": "build/m9-final-cli-core-20261005-02/disk-1/verification.json",
+        "case": "xargs"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-final-cli-core-20261005-02/disk-2/verification.json",
+        "case": "xargs"
+      }
+    ],
+    "yes": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "yes-pipe-close"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "yes-pipe-close"
+      }
+    ],
+    "zcat": [
+      {
+        "disk": 1,
+        "report": "build/m9-cli-behavior-20261005-03/disk-1/verification.json",
+        "case": "zcat-stream"
+      },
+      {
+        "disk": 2,
+        "report": "build/m9-cli-behavior-20261005-03/disk-2/verification.json",
+        "case": "zcat-stream"
+      }
+    ]
+  },
+  "catalog_sha256": "61aa4bc2cac38493273303858e8be2528407c1bc08e659ee880944181d44c617"
+}

@@ -1,0 +1,12 @@
+SandNano - serial and graphical-terminal source editor
+
+  nano [-v] [file]
+
+Ctrl-O saves through a SandFS transaction; a failed save keeps the buffer.
+Ctrl-X exits and asks about unsaved changes. Ctrl-W searches literal text.
+Ctrl-G shows keys. Ctrl-K cuts a line; Ctrl-U pastes. Alt-U/Alt-E undo/redo.
+-v opens read-only. UTF-8 and the file's CRLF/LF bytes are preserved.
+Use the host serial tool's :raw mode for individual keys.
+
+Limits: 4 MiB document, 131072 indexed lines, 32 undo entries / 8 MiB.
+Source implemented; M9 behavior and performance are not yet verified.

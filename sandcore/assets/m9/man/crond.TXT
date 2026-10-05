@@ -1,0 +1,17 @@
+crontab / crond - local UTC script scheduling
+
+  crontab file | crontab -l | crontab -r | crontab -e
+  crond [-f] [-c directory] [--once]
+
+The current user's HOME/CRON.TAB has five numeric fields and a shell line:
+minute (0..59), hour (0..23), day (1..31), month (1..12), weekday (0..7).
+0/7 means Sunday. Fields accept *, ranges, comma lists and /steps.
+Restricted day and weekday match either; otherwise both must match.
+-e edits a private temporary file with nano and validates before publishing.
+crond stays foreground; --once runs matching jobs once and waits for them.
+Jobs run under the caller's kernel UID/GID. Invalid replacements retain the
+last valid table. Clock jumps do not replay missed minutes. Ctrl-C cancels.
+Limits: 32 entries, 32767 table bytes, 1023 command bytes, 16 active jobs.
+No @keywords, field names, environment lines, -u or Unix daemonization.
+
+Source implemented; actual scheduling and native execution are unverified.

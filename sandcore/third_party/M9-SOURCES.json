@@ -1,0 +1,146 @@
+{
+  "version": 1,
+  "status": "SOURCE-UNVERIFIED",
+  "allowed_licenses": [
+    "MIT",
+    "MIT-0",
+    "BSD-3-Clause",
+    "CC0-1.0",
+    "Unlicense",
+    "bzip2-1.0.6",
+    "LicenseRef-LZMA-SDK-Public-Domain"
+  ],
+  "components": [
+    {
+      "name": "stb_image",
+      "upstream": "https://github.com/nothings/stb",
+      "revision": "2c980bb59875b0d32144a71867fbdebb2f77cd20",
+      "license": "MIT",
+      "source": "third_party/stb",
+      "guest": "SYS/LICENSE/STB",
+      "hash_catalog": "SOURCES.json",
+      "catalog_prefix": "stb/"
+    },
+    {
+      "name": "libwebp",
+      "upstream": "https://github.com/webmproject/libwebp",
+      "revision": "a1d89ff209ca01e7a87aca64317201890bac2749",
+      "license": "BSD-3-Clause",
+      "source": "third_party/libwebp",
+      "guest": "SYS/LICENSE/LIBWEBP",
+      "hash_catalog": "SOURCES.json",
+      "catalog_prefix": "libwebp/"
+    },
+    {
+      "name": "dr_mp3",
+      "upstream": "https://github.com/mackron/dr_libs",
+      "revision": "dfe8377631000664666519fdb83da193fd8037f4",
+      "license": "MIT-0",
+      "source": "user/audio/vendor",
+      "guest": "SYS/LICENSE/DR_MP3",
+      "embedded": [
+        {
+          "name": "minimp3",
+          "upstream": "https://github.com/lieff/minimp3",
+          "license": "CC0-1.0",
+          "revision": "embedded-in-dr_mp3-snapshot"
+        }
+      ],
+      "files": {
+        "dr_mp3.h": "997b7ee18de6e6b81e2a83f1ea9fc62aef25c62b28d48db95635f49e65de0a2f",
+        "LICENSE": "dd1c647e6f767f8ff4b2dfae0fed314726600a01e0cf1ef556afddd5fa96ff15"
+      },
+      "local_files": [
+        "PROVENANCE.md",
+        "DR-MP3-NOTICE",
+        "MINIMP3-NOTICE"
+      ]
+    },
+    {
+      "name": "miniz",
+      "upstream": "https://github.com/richgel999/miniz",
+      "revision": "b9dd683c42c965a5e98bdb9d4eb322defd966a7c",
+      "license": "MIT",
+      "source": "user/compress/vendor",
+      "guest": "SYS/LICENSE/MINIZ",
+      "files": {
+        "LICENSE": "0115478d567121238cf6cc1c0c361926cf07a49d9e4c9e66da97fac6a01646b3",
+        "miniz.h": "82a729d609c3006bf7949225a8d8b290fda249b68e4440d0d4980a7805af0598",
+        "miniz_common.h": "d0770cc478923e33bf22820fc51bbe22b6b99c3230ce4f5fc10eea3debc75623",
+        "miniz_tdef.h": "18d4da29bd70a9395404e60b35b25e690fbc6bbc540bade2581639be05d5534b",
+        "miniz_tdef.c": "989e124126377e9e892469749822e3582fa11afc6ad2ec6f53c0f0fba20869a7",
+        "miniz_tinfl.h": "2c89615a4cbc5de4eac5b861051849392ec698264ee7dd399ea587c592cf68d1",
+        "miniz_tinfl.c": "7113a08a7722d671ce89b8de61fe6d02d0cadca0ff274ba357bf2a9dc85745ca",
+        "miniz_zip.h": "43d09867f79993a9ba1627cb1f3bbd78d3bf5ee0c91cd6e7527aa9ca1e3aed44"
+      },
+      "local_files": [
+        "PROVENANCE.md",
+        "miniz_export.h"
+      ]
+    },
+    {
+      "upstream": "https://sourceware.org/bzip2/",
+      "archive_sha256": "ab5a03176ee106d3f0fa90e381da478ddae405918153cca248e682cd0c4a2269",
+      "guest": "SYS/LICENSE/BZIP2",
+      "revision": "1.0.8",
+      "source": "user/pack/bzip2",
+      "name": "libbzip2",
+      "archive": "third_party/imports/bzip2-1.0.8.tar.gz",
+      "local_files": [
+        "PROVENANCE.md"
+      ],
+      "files": {
+        "blocksort.c": "4e48cd2ccff44699e67a7c949b0e9576c05b8dcbe20f863475c4fcc8db11a409",
+        "bzlib_private.h": "c0cda4f35ee1f2d54c9beacd524f8d28e0dbf8494aca30d854af3f143af4341b",
+        "bzlib.c": "d06cf1bd991df1f2dc8ef4f7713d186eb636767111cbd4807ef5fc4a54ca6838",
+        "bzlib.h": "6ac62e811669598ee30c9e1c379b9e627f6ff17a5a3dc1e0b4fa8b8ea75e580d",
+        "compress.c": "75995bd6e8c5f1e1dad05178f3cf53137df99ce860a1984324f78591f28deed3",
+        "crctable.c": "2fb7a564629386456e731f431a5cf4f5026747bace4cd10be8f5ecf082066a92",
+        "decompress.c": "31a89f8bf408ef0e4acae83e8be60a8eb4edece6c866d6e32b8f7e557ca54bc6",
+        "huffman.c": "bdeb45f3f535546a672811b68aa87cc58fd395b28ecebc34fa3566a656a4d1d1",
+        "LICENSE": "c6dbbf828498be844a89eaa3b84adbab3199e342eb5cb2ed2f0d4ba7ec0f38a3",
+        "randtable.c": "407054ca6f54cd737dbc26ceb6b7874b55a0fcff86c2eb23cbec2fbdbb884815",
+        "README": "152f0da2867a1160a8f956628296ff45e766e492ad0d7054ffb8d981f7518782"
+      },
+      "license": "bzip2-1.0.6"
+    },
+    {
+      "upstream": "https://www.7-zip.org/sdk.html",
+      "archive_sha256": "86c213f752520ab5325c310f50bef63ec344b56dd1c80b0246d06dc6cec953b2",
+      "guest": "SYS/LICENSE/LZMA",
+      "revision": "26.03",
+      "source": "user/pack/lzma",
+      "name": "LZMA SDK decoder",
+      "archive": "third_party/imports/lzma2603.7z",
+      "local_files": [
+        "PROVENANCE.md"
+      ],
+      "files": {
+        "C/7zTypes.h": "126c3ce886391042443fcc82764d26be7aacda2298588c6ec9bb7ce8c7b47732",
+        "C/Compiler.h": "cfafaa89ba98a7f4f38cc589533fc03facb98ae1176dfe29d58217767ed5f149",
+        "C/CpuArch.h": "c59a2105b941bf915fb9c2859c2024de95adfcade60db6a0373e55f4d8c338ca",
+        "C/LzmaDec.c": "8a9d33dd01259a71b3c3cfbf645d06944bef65a152d307671372c332e9e0e022",
+        "C/LzmaDec.h": "3a3b0ece1ba58601a8265a421a91b9720b39ee92ce898fadecb22f052bc3011f",
+        "C/Precomp.h": "88acadbc12902012872fa29337c86564bb8f9198d6be416aad6119bb537425d1",
+        "DOC/lzma-sdk.txt": "4c37f39ebe9b924a5949f2b482298924783d7c559f9ac09497ce12ef695428d3"
+      },
+      "license": "LicenseRef-LZMA-SDK-Public-Domain"
+    },
+    {
+      "name": "dr_flac",
+      "upstream": "https://github.com/mackron/dr_libs",
+      "revision": "dfe8377631000664666519fdb83da193fd8037f4",
+      "license": "MIT-0",
+      "source": "user/audio/flacvendor",
+      "guest": "SYS/LICENSE/DR_FLAC",
+      "files": {
+        "dr_flac.h": "111144e778f55738db6851cb226015c419e00d04b916a09506d4856d9cff945c",
+        "LICENSE": "dd1c647e6f767f8ff4b2dfae0fed314726600a01e0cf1ef556afddd5fa96ff15"
+      },
+      "local_files": [
+        "PROVENANCE.md",
+        "DR-FLAC-NOTICE"
+      ]
+    }
+  ]
+}
