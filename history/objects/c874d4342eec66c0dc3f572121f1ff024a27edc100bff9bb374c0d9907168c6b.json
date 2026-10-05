@@ -1,0 +1,54 @@
+{
+  "author": "mio",
+  "scope": "HOST_CYCLES_DEVICE_ENUMERATION_ONLY",
+  "observed_local": "2026-10-04T15:20:56",
+  "blender_version": "4.5.3 LTS",
+  "executable": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\host-tools\\blender\\blender-4.5.3-windows-x64\\blender.exe",
+  "probe_sha256": "44416a3fcbf38d89d806ad0edac018d56a9d5147407f1812389337e384279e6d",
+  "backends": {
+    "ONEAPI": {
+      "devices": [
+        {
+          "name": "Intel Core 5 210H",
+          "type": "CPU",
+          "id": "CPU"
+        }
+      ],
+      "gpu_devices": []
+    },
+    "CUDA": {
+      "devices": [
+        {
+          "name": "Intel Core 5 210H",
+          "type": "CPU",
+          "id": "CPU"
+        }
+      ],
+      "gpu_devices": []
+    },
+    "OPTIX": {
+      "devices": [
+        {
+          "name": "Intel Core 5 210H",
+          "type": "CPU",
+          "id": "CPU"
+        }
+      ],
+      "gpu_devices": []
+    },
+    "HIP": {
+      "devices": [
+        {
+          "name": "Intel Core 5 210H",
+          "type": "CPU",
+          "id": "CPU"
+        }
+      ],
+      "gpu_devices": []
+    }
+  },
+  "render_started": false,
+  "limitations": "真实设备枚举，不是渲染速度/画质或SandCore GPU驱动证明",
+  "available_gpu_backends": [],
+  "status": "ENUMERATED"
+}

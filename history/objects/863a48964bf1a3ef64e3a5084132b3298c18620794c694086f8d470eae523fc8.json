@@ -1,0 +1,39 @@
+{
+  "author": "mio",
+  "status": "PASS",
+  "scope": "HOST_GPU_COMPUTE_PROBE_ONLY",
+  "source_sha256": "50503ae8a3666177b34ec8ca07090c9741030e5b1da9f2c09f38762e3498cd54",
+  "words": 262144,
+  "platforms": [
+    {
+      "gpu_status": 0,
+      "devices": [
+        {
+          "name": "Intel(R) Graphics",
+          "vendor": "Intel(R) Corporation",
+          "device_version": "OpenCL 3.0 NEO ",
+          "driver_version": "32.0.101.6556"
+        }
+      ]
+    }
+  ],
+  "limitations": "真实GPU内核/完整整数输出，不是影片渲染器、光追质量或4K帧率证明",
+  "selected": {
+    "name": "Intel(R) Graphics",
+    "vendor": "Intel(R) Corporation",
+    "device_version": "OpenCL 3.0 NEO ",
+    "driver_version": "32.0.101.6556"
+  },
+  "build_seconds": 1.953,
+  "output_sha256": "b48ac5b76e63dd8b8f116463519a659fa321408f9d1664a7f0d67bd5418aea75",
+  "device_kernel_nanoseconds": 51197,
+  "complete_readback": "PASS",
+  "release_statuses": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ]
+}

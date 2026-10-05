@@ -1,0 +1,196 @@
+# SandCore OS（沙核）
+
+一个从零手写的 32 位 x86 迷你图形操作系统。**不使用 GRUB、不使用 ELF 作为系统格式、不使用 FAT** —— 引导器、内核、图形、Shell、文件系统、可执行格式，自己定义、自己实现；中文点阵统一采用用户 mio 管理的凤凰点阵体，按专用导入工具补字。
+
+2026-10-03 性能进展：任务0无工作时交还忙三环的空闲量子；同一
+G2计算程序用户样本48.5%→97%、实际批数中位361.19→990，旧
+YIELD空闲、双忙任务/键鼠/关闭回收通过。当前120980B/237扇区。
+GUI/历史组件四套新核回归PASS；1080p拖动、全组件、写实真彩游戏
+与实时光追仍继续，精确测量和限制见[PERFORMANCE.md](docs/PERFORMANCE.md)。
+
+```
+电源 → BIOS → [自研引导器] → [自研内核] → [自研图形] → [自研窗口系统] → [自研Shell]
+```
+
+当前进度：**M7 已由用户验收通过，M8 用户空间打磨已授权开工**。SCCC 18 组语言测试、四类失败诊断及 G1→G2→G3 逐字节收敛通过；图形 IDE/Files/真实调试器、赛车、沙盒、42 秒六幕短片和统一凤凰 UTF-8 接口均已在 Windows QEMU 实测。已验收 M7 包的数据盘运行真实 G2 与其生成的七个 M7 应用，M6 功能在该盘完成回归；当前 M8 开发盘的原生发布尚未完成。联合操作见 [docs/TESTING.md](docs/TESTING.md)，证据与交付见 [docs/M7.md](docs/M7.md)、[docs/PACKAGE.md](docs/PACKAGE.md)。
+
+M8 已选白色极光，另提供真正复古的 Classic；选定的三个 Logo 壁纸保留，仿古款
+已实际处理为320×180、15个使用色的索引图。真彩色画布/图形堆已实测，命名主题与NUI控件继续实施。状态与范围见
+[docs/M8.md](docs/M8.md)、[docs/M8-DESIGN.md](docs/M8-DESIGN.md)。高分辨率底座已验证
+1024×768 与 VGA 320×200 回退，完整 M8 矩阵尚未完成。
+
+2026-10-03：Monitor新增100Hz客体CPU分类/任务占用与卷信息；G2原生
+生成、512项目录与旧192项盘的填满/拒绝/冷启动/重命名/回收通过，
+见[CPU.md](docs/CPU.md)、[STORAGE.md](docs/STORAGE.md)、build/m8-system。
+新版Shell和19个独立CLI的原生运行、取消、异常、冷启动与回收已通过；
+Settings六页/通用UTF-8/纯检查及菜单壁纸、坏值拒绝、640及200%
+预览、VGA、同盘冷启动/回收阶段PASS，见
+[CONFIG.md](docs/CONFIG.md)。API/ABI只增不减，40个M7入口
+兼容核对通过。1024输入延迟对照显著改善，1080拖动和全系统性能
+仍优化，方法/数据见[PERFORMANCE.md](docs/PERFORMANCE.md)。
+
+整帧复制已改为持续接收IRQ、固定当前任务/CR3，实际大帧PIT、
+输入/完整像素/活动关闭通过；RGB/VGA/32MB、CPU新旧盘、设置和
+19CLI四套回归同核通过，build/m8-frame-irq。全组件余项见
+[M8-COMPONENTS.md](docs/M8-COMPONENTS.md)，完整M8仍实施中。
+
+> 接手/续作必读：根目录 `../HANDOFF.md`（现状 + 剩余清单 + M6/M7 规格）。
+
+2026-10-03：Settings六页阶段PASS与手工步骤同步，首字焦点顺序
+修复；完整M8、全部旧游戏写实真彩和实时真彩光追继续。
+
+**作者: mio** ｜ 全系统字体统一来源: 凤凰点阵体 (CC0, 详见 kernel/font16.txt 头注释), M5 起字体文件上 SandFS 作为默认字体。
+
+![Welcome to Graphics：系统内编译并实时绘制](build/m7-graphics/film-1.png)
+
+
+## 快速开始
+
+```sh
+# 验收包可直接 run.bat；需要改源码时再构建（优先 WSL ELF）
+build.bat
+# WSL 内也可直接 make；mingw32-make 是备用路线
+
+# 玩 (弹出 QEMU 窗口)
+run.bat            # 或: mingw32-make run
+
+# 无头验证 (自动截屏到 build/shot.png)
+build.bat run-headless   # 窗口 A
+python tools/snap.py build/shot.png --quit   # 窗口 B
+
+# 自动验收，分别启动自己的 Windows QEMU、复制测试数据盘、验证后退出
+python tools/verify_m6.py all
+python tools/verify_apps.py
+# M7 的完整原生重建/验收顺序见 docs/TESTING.md §I
+```
+
+前提：QEMU 装在 `C:\Program Files\qemu`（`run.bat` 已写全路径）；WSL 里需要 `gcc / make / nasm`（Ubuntu: `sudo apt install gcc make nasm`）。
+
+> ⚠️ **`if=floppy` 是铁律**：QEMU 缺省把 raw 镜像挂成 IDE 硬盘，我们的
+> CHS 软盘寻址会读错磁头——所有启动命令必须带 `if=floppy`（详见 docs/BOOT.md §0）。
+
+## 目录结构
+
+```
+sandcore/
+├── boot/boot.asm      一级引导器: E820 采集 + 读盘 + VGA 13h + 保护模式
+├── kernel/
+│   ├── entry.asm      内核入口 (0x10000): 清 .bss → call kmain
+│   ├── idt.asm        48 个中断/异常入口桩 (宏生成) + 桩地址表
+│   ├── interrupts.c   IDT 装配、PIC 重映射、IRQ 分发表、panic 红屏
+│   ├── timer.c        PIT 时钟驱动 (100Hz 心跳, uptime)
+│   ├── keyboard.c     PS/2 键盘驱动 (扫描码→ASCII, Shift/CapsLock, 环形缓冲)
+│   ├── mouse.c        PS/2 鼠标驱动 (IRQ12, 三字节包, 光标状态)
+│   ├── memory.c       E820 解析 + PF-Bitmap 物理页分配器
+│   ├── heap.c         SC-Heap v1 内核堆 (8 级尺寸 + 分级空闲链)
+│   ├── gfx.c          绘图模块 v2: 双缓冲/线/圆/文字渲染 (SCF-8+SCF-16)
+│   ├── term.c         M4 历史终端缓冲（M6 内核不链接，用户窗口流式输出取代）
+│   ├── wm.c           窗口管理器: 合成器/拖拽/置顶/关闭/任务栏/光标/panic 屏
+│   ├── task.c         任务/调度 v2: 分页版 ring3 + int 0x7C 分发 + SCX 装载
+│   ├── paging.c       分页: 恒等映射 + 每任务用户区 (0x400000 私有)
+│   ├── ata.c          ATA PIO 驱动 (读 + 写)
+│   ├── fs.c           SandFS v4 (新512/旧192项、完整路径/空目录/核心保护)
+│   ├── main.c         内核主体: 开机画面 + 桌面主循环
+│   ├── palette.h      调色板槽位分配 (唯一权威定义, 配 docs/GFX.md 表)
+│   ├── font.h         同源凤凰 ASCII 兼容表 (生成缓存，无旧手绘字形)
+│   ├── font16.h       SCF-16 中文字体接口 (数据由 font16.txt 编译生成)
+│   └── io.h           端口 IO / hlt / 开关中断 (全内核共用)
+├── linker.ld          内核链接脚本 (两套工具链共用)
+├── user/hello.asm     ring3 窗口程序 (系统调用画图)
+├── user/shell.asm     SandShell: ring3 化的 Shell (help/clear/echo/ls/run)
+├── user/SCAPI.H       唯一公共接口 (完全大写、头内联汇编、C/UTF-8/调试等)
+├── user/start.asm     freestanding C 入口与 cdecl 系统调用桥
+├── user/assembler.c   SandAsm: 系统内两遍汇编生成 SCX
+├── user/*.c           SCCC / Studio / Debug / Files / Race / World / Lumen / M6 应用
+├── assets/            文件快捷方式、独立 SCF 图标、示例文本/汇编源
+├── tools/
+│   ├── mkimg.py       引导/内核盘打包器
+│   ├── mkfs.py        SandFS 数据盘打包器 (字体+程序上盘)
+│   ├── mkscx.py       SCX1MIO 可执行容器打包器
+│   ├── mkscf.py       字体/图标 SCF1MIO 打包（12B 头与内核对齐）
+│   ├── verify_m6.py   M6a 行为/分页/画布/生命周期断言与截图
+│   ├── verify_apps.py M6 原生汇编/应用/错误/重启验证与截图
+│   ├── snap.py        QEMU 截屏 (HMP screendump + PPM→PNG, 纯标准库)
+│   ├── keys.py        QEMU 按键注入 (HMP sendkey)
+│   ├── mouse.py       QMP 鼠标注入 (move/down/up/click)
+│   ├── mkfont.py      字形表编译器 (font16.txt → font16_data.h)
+│   └── font_preview.py 字形预览器 (不开机看全部汉字)
+├── docs/              ★ 全部自定义规范的详细文档 (见下)
+├── run.bat / run.sh   一键运行
+└── Makefile           双工具链自动切换 (WSL-ELF 主力 / MinGW-PE 备用)
+```
+
+## 文档索引（自定义规范，改代码前必读）
+
+| 文档 | 内容 |
+|---|---|
+| [docs/BOOT.md](docs/BOOT.md) | **启动协议 v0.4**：`if=floppy` 铁律、双盘布局、E820 契约、引导器↔内核交接、256 扇区合同 |
+| [docs/INTR.md](docs/INTR.md) | **中断子系统**：向量号地图、IDT 门格式与栈帧、PIC 重映射、PIT、键盘/鼠标、panic 政策 |
+| [docs/SYSCALL.md](docs/SYSCALL.md) | **系统调用 API**：int 0x7C 调用约定、功能号表、用户程序写法 (作者 mio) |
+| [docs/FS.md](docs/FS.md) | **磁盘格式**：SandFS 版图 (SANDFSMIO)、SCF1MIO 字体文件、SCX1MIO 可执行 (作者 mio) |
+| [docs/MEM.md](docs/MEM.md) | **内存管理**：物理内存版图、E820 解析规则、PF-Bitmap 页分配器、SC-Heap v1 |
+| [docs/WM.md](docs/WM.md) | **窗口系统**：鼠标协议、终端缓冲、z 序窗口、合成流水、脏标记模型 |
+| [docs/SHELL.md](docs/SHELL.md) | **Shell 规范**：输入流水、分词、命令表、退格守卫、中文命令名路线 |
+| [docs/GFX.md](docs/GFX.md) | **图形规范**：VGA 13h 帧缓冲、调色板槽位分配表、统一凤凰字体/UTF-8 接口、绘图 API、图形控制台 |
+| [docs/THEME.md](docs/THEME.md) | **M8主题**：命名RGB角色、STHEME1MIO配置、验证/持久化与三环查询接口 |
+| [docs/IMAGE.md](docs/IMAGE.md) / [M8_GOAL.md](../M8_GOAL.md) | **M8图像与目标**：ARGB/SCX图标、壁纸、LEGACY、游戏重做与光追、Shell/全配置扩展 |
+| [docs/BUILD.md](docs/BUILD.md) | **构建系统**：双工具链、PE 路线的坑与解法、工具链指纹、镜像打包格式、截屏原理 |
+| [docs/ROADMAP.md](docs/ROADMAP.md) | **路线图与 ABI 草案**：里程碑、系统调用/可执行格式/用户态设计、自举（self-hosting）路线 |
+| [docs/ASM.md](docs/ASM.md) | **SandAsm**：原生两遍汇编器的语法、机器码、SCX 输出、容量与错误边界 |
+| [docs/APPS.md](docs/APPS.md) | **M6 应用**：文件管理器/记事本/调色板/计算器/扫雷，操作与当前限制 |
+| [docs/PACKAGE.md](docs/PACKAGE.md) | **交付包**：正式盘、原生来源、102 张成功截图、完整性与复验顺序 |
+| [docs/M7.md](docs/M7.md) | **M7 验收状态**：三环隔离、原生自编译、图形工具与游戏证据 |
+| [docs/M8.md](docs/M8.md) / [docs/M8-DESIGN.md](docs/M8-DESIGN.md) | **M8 当前工作**：原生高分辨率/兼容、配置与日常工具、六套视觉候选及选型状态 |
+| [docs/C.md](docs/C.md) | **SCCC**：基本整数 C/宏、x86 后端、自编译、容量与未支持项 |
+| [docs/FONT.md](docs/FONT.md) | **字体接口**：唯一汉字文件、同源 ASCII、UTF-8/Unicode、示例与缺字规则 |
+| [docs/MODULE.md](docs/MODULE.md) | **SKM 零环模块**：格式/重定位/开机 CORE/MOD/三环强制保护 |
+| [docs/GAMES.md](docs/GAMES.md) / [docs/WELCOME.md](docs/WELCOME.md) | **游戏与短片**：操作/存档、六段实时动画的视觉设计 |
+| [docs/TESTING.md](docs/TESTING.md) | **自测指南**：当前手工操作、自动验收命令及历史里程碑存档 |
+| [docs/M6A.md](docs/M6A.md) / [docs/M6.md](docs/M6.md) | **验收记录**：变更清单、行为断言、截图索引与用户待验收状态 |
+
+## 里程碑
+
+| 里程碑 | 内容 | 状态 |
+|---|---|---|
+| M0 | 引导器 + 保护模式内核 + 图形点亮 | ✅ 2026-10-01 |
+| M1 | 中断 + 键盘 + 图形控制台（滚动/退格/uptime） | ✅ 2026-10-01 |
+| M2 | E820 + 物理页分配器 + SC-Heap + Shell 十条命令 | ✅ 2026-10-01 |
+| M3 | gfx 双缓冲模块 + SCF-16 中文点阵字体 + 中文上屏 | ✅ 2026-10-01 |
+| M4 | 鼠标驱动 + 窗口系统 + 桌面 + GUI 终端 | ✅ 2026-10-02 |
+| M5 | ATA + SandFS + SCX1MIO + ring3 + 系统调用 + 抢占调度 | ✅ 2026-10-02 |
+| M6a | 双盘桌面 + ring3 Shell + 分页并发 + 窗口/输入/回收 | 自动化通过，待用户界面验收，2026-10-02 |
+| M6 | 原生汇编器 + 用户态应用矩阵 + 持久化壁纸 + 系统调用完善 | 自动化通过，待用户界面验收，2026-10-02 |
+| M7 | Welcome to Graphics：SCCC/SCAPI.H、异常隔离、图形工具/游戏/短片、Unicode、SKM | 用户验收通过，2026-10-02 |
+| M8 | Welcome to true color：RGB/主题/图标/多格式图片、原生显示与用户工具打磨 | 白色极光/Classic已定；完整实施与验收进行中，2026-10-02 |
+
+**自测**：每个里程碑的详细自测指南见 [docs/TESTING.md](docs/TESTING.md)。
+
+## 设计原则
+
+1. **核心组件自己写**：不用 GRUB（引导器手写）、不用 ELF 当系统格式（SCX 自研格式）、不用 FAT（SandFS 自研），系统调用走自己的 `int 0x7C`；图标点阵自己设计，所有字体遵循用户统一凤凰来源与 import_font 工作流。
+2. **所有自定义的东西必须有文档**：内存布局、磁盘格式、调色板、字体编码、ABI，全部落在 `docs/`，代码与文档同步修改。
+3. **全中文注释**：解释"为什么"而不只是"是什么"，让每一步都能看懂原理。
+4. **可自举方向**：ABI 与格式稳定后，目标是让 SandCore 能在自己的系统上编译自己的程序（详见 ROADMAP）。
+
+## 修订记录
+
+| 日期 | 变更 |
+|---|---|
+| 2026-10-02 | M6a 自动化实测、验收包与状态表同步；M6 汇编器/应用继续推进，用户界面验收尚未确认 |
+| 2026-10-02 | M6 系统内生成/执行 SCX 与应用矩阵实测，双盘快速开始/文档索引/目录结构/里程碑同步；新增代码详细中文注释，M7 留作下一阶段 |
+
+2026-10-02：M7 当前进度、SCAPI.H 大写、统一凤凰字体与联合自测/新规范索引同步。
+
+2026-10-02：M7 全矩阵与原生正式盘/M6 回归通过，联合指南/102 图验收包和待用户界面验收状态同步。
+
+2026-10-02：用户明确验收 M7 总体达成预期；M8 已同意原生高分辨率/VGA 回退/三档缩放和配置注册程序，完整规格见 M8.md。历史验收包字节保持原样。
+
+2026-10-02：M8 显示底座实测与六套交互视觉候选同步；用户选定后统一重写组件，候选截图与系统 QEMU 证据分别登记。
+
+2026-10-02：选型已定白色极光/Classic；三个生成式Logo版本保留，数学Logo稿不采用。
+仿古壁纸真实低像素处理，摄影沙面细化为TIDAL-FINE-V4候选；完整范围保持M8.md。
+
+2026-10-02：真RGB/高端堆实测56977色/透明混合/回收/OOM及G2探针；新增命名主题
+与ARGB NUI控件，G2实际编译本轮Settings并鼠标切主题，完整M8继续。
+
+2026-10-02：M8新增SCB2/原尺寸ARGB图标/选定Logo壁纸/64MB盘/SCX bit1和原字节LEGACY，主题切换及冷启动回归通过。用户追加全部组件、极高现代游戏画质、真实光追动画、新Shell/用户名/环境/纯CLI与Settings全配置；完整目标见根M8_GOAL.md，完整M8仍未完成。

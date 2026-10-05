@@ -1,0 +1,14 @@
+{
+  "stopped_local": "2026-10-04T15:25:19",
+  "last_queue_state_is_historical": true,
+  "author": "mio",
+  "queue_pid": 20672,
+  "status": "SUPERSEDED_BY_USER_MATH_RENDERER",
+  "reason": "User explicitly changed renderer to own mathematical program and delegated API choice; retain Blender sources and valid frames.",
+  "render_pid": 10432,
+  "first_stop_attempt_failed": "Process.Stop does not exist; no process terminated in first attempt; this record follows verified Kill and exit.",
+  "magic": "SCFSTOP1MIO",
+  "render_exited": true,
+  "completed_frames_retained": 1,
+  "queue_exited": true
+}

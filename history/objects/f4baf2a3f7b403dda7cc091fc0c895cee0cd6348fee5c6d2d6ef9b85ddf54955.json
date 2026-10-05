@@ -1,0 +1,21 @@
+{
+  "author": "mio",
+  "magic": "SCFQUEUE1MIO",
+  "status": "FAILED_RETAINED_OUTPUT",
+  "queue_pid": 22176,
+  "batch": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\film\\queue-boundaries-20261004-05",
+  "target_frames": 2520,
+  "target_resolution": [
+    3840,
+    2160
+  ],
+  "fps": 60,
+  "seconds": 42,
+  "sequence_complete": false,
+  "encoded_movie_complete": false,
+  "guest_player_complete": false,
+  "started_local": "2026-10-04T14:40:37",
+  "error": "PermissionError(13, 'Permission denied')",
+  "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\tools\\film_queue.py\", line 170, in main\n    lock.seek(0); msvcrt.locking(lock.fileno(), msvcrt.LK_NBLCK, 1)\n                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nPermissionError: [Errno 13] Permission denied\n",
+  "active_owned_worker_alive": false
+}

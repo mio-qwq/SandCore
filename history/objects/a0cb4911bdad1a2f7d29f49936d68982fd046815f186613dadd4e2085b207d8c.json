@@ -1,0 +1,19 @@
+{
+  "author": "mio",
+  "scope": "HOST_OPENCL_READ_ONLY_CAPABILITIES",
+  "platforms": [
+    {
+      "gpu_status": 0,
+      "devices": [
+        {
+          "name": "Intel(R) Graphics",
+          "vendor": "Intel(R) Corporation",
+          "device_version": "OpenCL 3.0 NEO ",
+          "driver_version": "32.0.101.6556"
+        }
+      ]
+    }
+  ],
+  "platform_status": 0,
+  "status": "OBSERVED"
+}

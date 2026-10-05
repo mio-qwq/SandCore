@@ -1,0 +1,26 @@
+{
+  "author": "mio",
+  "status": "OBSERVATION_COMPLETE",
+  "scope": "GPU_ACTUAL_INPUT_AND_SUPPORT_PLANES",
+  "source_sha256": "652b56954f2dafacb0f50639ea6395b08cddce05ba20f73d678d4341e7ed78a6",
+  "queries": 4096,
+  "input_mismatches": 0,
+  "prism_interval_mismatches": [],
+  "independent_mismatches": [],
+  "device": {
+    "name": "Intel(R) Graphics",
+    "vendor": "Intel(R) Corporation",
+    "version": "OpenCL 3.0 NEO ",
+    "driver": "32.0.101.6556"
+  },
+  "output_sha256": "352807e7fc48a04b02a416846065895d2efd53e4674c39291b1dae950a22a7c5",
+  "release_statuses": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ]
+}

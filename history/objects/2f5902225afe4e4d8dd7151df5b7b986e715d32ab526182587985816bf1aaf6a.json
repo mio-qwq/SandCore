@@ -1,0 +1,17 @@
+{
+  "author": "mio",
+  "status": "FAILED_RETAINED_OUTPUT",
+  "scope": "HOST_MATH_GPU_REAL_RAY_FRAMES",
+  "identity_sha256": "307dec1dbe847654e1dc153a596dd12f55108c64b5b6eff93320d84c8f61aa29",
+  "process_pid": 23380,
+  "frames": [],
+  "requested_frames": [
+    2221,
+    1410
+  ],
+  "full_movie_complete": false,
+  "guest_player_complete": false,
+  "limitations": "actual ray frames; visual/temporal acceptance and full movie/player separate",
+  "error": "RuntimeError('program-build: OpenCL error -11')",
+  "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\tools\\film_math\\render.py\", line 208, in main\n    gpu=Gpu((HERE/'render.cl').read_bytes(),out/'build.log');report['device']=gpu.identity;report['build_seconds']=gpu.build_seconds\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\tools\\film_math\\opencl_host.py\", line 61, in __init__\n    log_path.write_bytes(log.value);require(code,'program-build')\n                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\tools\\film_math\\opencl_host.py\", line 8, in require\n    raise RuntimeError('%s: OpenCL error %d'%(label,status))\nRuntimeError: program-build: OpenCL error -11\n"
+}

@@ -1,0 +1,23 @@
+{
+  "author": "mio",
+  "identity_sha256": "7f3d81d0051de5b461d959878c74875e70d42a6bf39b17ea6c56a6455455a0f2",
+  "pid": 10432,
+  "created_filetime": 134355691019971143,
+  "command": [
+    "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\host-tools\\blender\\blender-4.5.3-windows-x64\\blender.exe",
+    "-b",
+    "--python-exit-code",
+    "2",
+    "--python",
+    "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\film\\20261004-master-08\\film_scene.py",
+    "--",
+    "--out",
+    "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\film\\20261004-master-08",
+    "--mode",
+    "master",
+    "--samples",
+    "512",
+    "--frames",
+    "all"
+  ]
+}

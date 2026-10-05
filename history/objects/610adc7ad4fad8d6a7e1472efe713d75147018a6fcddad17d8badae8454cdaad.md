@@ -1,0 +1,252 @@
+# M6/M7 联合验收交付记录
+
+> 作者 mio，2026-10-02。M7 实现、构建与完整自动化验证通过，用户已明确验收 M7。
+> M6 独立用户验收未另行确认。本页记录不可覆盖的 M7 历史包，当前 M8 开发状态见 M8.md。
+
+## 1. 从哪里开始
+
+交付文件：build/SandCore-M7-2026-10-02.zip，整包摘要在同名 .sha256；
+包内 manifest.json 列出每个文件的尺寸与 SHA256。解压保留 projectos 的
+工程层级，进入 sandcore 直接运行 run.bat；默认同时挂载软盘引导镜像与
+IDE 数据镜像。不需要先重新构建。联合手工指南是 TESTING.md 当前版 A..I。
+
+本包包括全部源码/规范、授权字体归档、默认双盘、原生资源树/符号图、
+启动版快照、诊断 ELF/符号、六套测试盘与 102 张成功截图。历史 M6 原包
+原样保留，里面的旧 ABI/27 字/红屏行为是历史快照，当前以 M7 规范为准。
+打包工具从 ZIP 逐文件重读验证 CRC、尺寸和 SHA256，不只检查源目录。
+
+## 2. 默认运行盘确实用了什么
+
+引导器仍为 512B；当前内核原始 52164B，在软盘补齐为 52224B/102 扇区，
+加载额度 256 扇区。BSS 为 NOLOAD，0x100000 起，末端 0x1EF8E0。
+SandFS v4 8MB、192 项容量、51 个发布文件，32 扇区目录，数据从 LBA 33 开始。
+
+bin/s3c.scx 是系统内编译的 G2，SHA256：
+`c182fc6746520d213e3ea5f2789826afe7931ffae2264f9c5d595f1a12ad8494`。
+G1 与 G3 逐字节相同，G2 实际编译 G3。以下七个程序同样由该 G2 生成，
+并经过运行/交互/退出验证：Files、Studio、Debug、Lumen、Race、World、Probe。
+它们的 SCX 与 .map，以及编译器的 .map，均已安装到正式盘。
+m7-native-runtime.json 保存源码/API/SCX/双盘摘要，m7-integrity.json 核对磁盘
+资源字节、SCX/SCF 格式、字体保留、BSS 边界与内核/启动版的无库/无浮点向量指令。
+
+宿主 GCC 的 ELF/.sym 只属于首次启动链及诊断；原生目标的测试读取真实
+SCCC .map，再逐级读取页表。测试没有向应用状态变量写入假值。
+字体当前 36 字，只经 import_font.py 补九字；原 27 字逐位不变。
+汉字源仍为用户 font16.txt；ASCII 同源凤凰。具体编码和调用见 FONT.md。
+
+## 3. 证据分组
+
+| 目录 | 成功截图 | 实际验证内容 |
+|---|---:|---|
+| build/m7-base | 10 | 三类真实异常、关闭回收、注册恢复、INT3/TF、帧变化、FS/CORE、Unicode |
+| build/m7-compiler | 20 | 18 组 C/宏语义、四类错误诊断/保留旧文件、三代收敛、G2 再编译程序 |
+| build/m7-graphics | 35 | 七个 G2 应用的编译命令、字体、六幕短片、游戏、Files、IDE、Debug |
+| build/m7-modules | 2 | CORE+合法 MOD 两项加载、坏 ABI/重叠重定位两项拒绝、坏字体同源兜底 |
+| build/m6a-m7 | 11 | 正式盘桌面/Shell/分页/并发/拖动/退格/十轮回收/异常暂停 |
+| build/m6-apps-m7 | 24 | 内部汇编、Notes 保存重读、错误/溢出、扫雷胜负、壁纸重启恢复 |
+
+各组都有 results.json、完整 qemu-command.json 和独立 sanddata-test.img。
+输入经 HMP sendkey，鼠标经 QMP，截图为真实 HMP screendump 转 PNG。
+compiler/graphics 另保留完整命令与生成来源。旧失败截图/早期单景预览
+不计入上述数量，不作为本包通过证据；工作区可能仍保留这些调试历史。
+
+## 4. 重做验证与当前边界
+
+要重新生成首次启动版本，先保存个人数据盘，然后 build.bat -B，依次
+verify_m7_base.py → verify_s3c.py → verify_graphics.py → verify_modules.py →
+publish_native.py → verify_m6.py all → verify_apps.py → audit_m7.py → package_m7.py。
+这些命令完整参数和手工操作均在 TESTING.md；脚本顺序运行，共享端口不能并发。
+只改文档或直接体验交付盘时不需要重复生成。之后修改源码必须重做相关验证。
+
+当前图形为 320×200/256 色、318×170 最大客户区、整数软件渲染；目标 25 帧
+调度不构成固定 FPS 的测量结论。沙盒有限世界、赛车简化物理、反汇编明确子集。
+C 的浮点/i64/VLA/libc/聚合按值调用与完整 GCC 扩展未支持；中文显示已支持，
+中文输入法未实现。SCCC 已自编译，整机内核重建尚未自举。零环扩展是可信代码，
+自身异常仍为内核 panic；三环异常隔离的范围以 INTR.md 为准。
+
+## 5. 修订记录
+
+| 日期 | 变更 |
+|---|---|
+| 2026-10-02 | 记录 M6/M7 完整自动化、真实 G2/七应用默认盘、102 图证据、联合包校验/重建流程与用户界面待验收状态 |
+
+2026-10-02：用户明确验收 M7 总体达成预期；M8 已同意原生高分辨率/VGA 回退/三档缩放和配置注册程序，完整规格见 M8.md。历史验收包字节保持原样。
+
+2026-10-02：页首验收状态与用户 M7 结论统一；当前 M8 开发盘/设计候选不替代本页的原生 M7 交付证据和历史 ZIP。
+
+## 6. M8 开发阶段证据（完整 M8 仍在进行）
+
+build/M8-settings-evidence.zip 冻结六页 Settings 的原生交互、冷启动、
+VGA 与当时 120532B 内核的大帧 IF=0 参考。259 个归档文件，整包摘要：
+`d663e572baffb835b02b99ffa95e4545eefc1cacb7de6ec2d4905e638fd00e71`。
+后续源码不能套用该包的 PASS；测试盘中的 tester 配置与开发默认盘
+分别保存，默认盘仍为宿主首次启动版本，不冒充整盘原生发布。
+
+build/M8-frame-irq-evidence.zip 由 package_m8_frame_irq_stage.py 创建，
+禁止覆盖已有文件。它冻结 120660B/236 扇区内核、整帧开 IRQ 的实际
+G2 探针，以及 RGB/CPU/Settings/Shell 四套串行回归。归档保存当前
+源码、双盘、各套测试盘、原生 SCX/.map、运行命令、成功截图和报告；
+stage-manifest.json 逐项列出 SHA256，写完重读 CRC 与所有内容摘要。
+整包摘要见同名 .sha256。旧核参考明确引用上一设置包及其精确摘要，
+不拿当前核冒充旧核。结果单位修订同时保存原报告和审计说明。
+
+大帧验证实测复制内 PIT 样本 110/12，27 字输入与六组鼠标边沿完整，
+画布字节与用户源帧一致，连续提交时关闭严格回收。四套回归包含
+VGA/32MB、旧 192 项与新 512 项盘冷启动、六页设置和 19 个独立 CLI。
+具体测试范围见 PERFORMANCE.md 与 TESTING.md。它们不代表五档×
+三档全部组件、压缩图片、所有写实真彩游戏、实时光追短片或最终
+M8 原生交付已完成；那些项目继续实施与单独验证。
+
+本次开IRQ阶段包已实际重读验包，325个归档文件，整包摘要
+`25ad98e580302a1c6527b4aff5669e7b76bdff133e6220a72af7610cfebd3235`。
+后续任务0空闲调度的对照参考核取自此包；旧包字节保持原样。
+
+2026-10-03：记录六页 Settings 冻结包和整帧开 IRQ/四套回归冻结工具，
+区分旧核参考、宿主开发盘、真实 G2 产物及测试盘，保留 M7 历史包。
+
+2026-10-03：空量子优化由package_m8_idle_yield_stage.py独立封存
+M8-idle-yield-evidence.zip，禁止覆盖；同一G2工作计数/旧YIELD/
+双忙任务、四套新核回归、大帧输入/活动关闭和1024/1080延迟的
+原生产物、测试双盘/截图/命令/报告分别保存。精确参考核逐项核对
+上一不可变整帧包，新核源码不能冒充参考。整包摘要见同名.sha256，
+全部CRC和文件SHA重读验证；完整M8与正式原生发布继续。
+
+空量子阶段包现已实际重读通过，360个归档文件，整包摘要
+`9ffdc24a9da74c81cb32b205be166fed1b1a9d27581f30d68a40a28c1279a23a`。
+后续局部合成对照以此237扇区核/精确源码/原样输入证据为参考。
+
+2026-10-03：243扇区局部合成阶段的18组合、四套、大帧和延迟均PASS，package_m8_damage_stage.py准备独立封存源码/双盘/真实G2及全部成功证据，上一237扇区参考包保持原字节。默认盘仍HOST开发盘；下一批Canvas合同已登记，尚未实现。
+
+2026-10-03：局部合成阶段包M8-damage-evidence.zip已实际封存并重读CRC/560项SHA，整包15d34f56a440bef7905eeaa673d20b96a5c9048f4fb6556d1a91d70e4a9ff390。包含243扇区精确核/源码/默认HOST双盘、真实G2原生产物、18组合和四套/大帧/延迟成功证据及独立测试盘；旧验证器快照保存，失败历史不计入成功。完整M8与下一批Canvas/NUI适配继续。
+
+2026-10-03：Canvas/NUI阶段包M8-canvas-evidence.zip已实际冻结并
+重读CRC/627项SHA，整包a1750271f80c01631693c5ea54b6342bba2462bd56504fcff226555b4dae7d87。
+保留243扇区精确核/当前源码/HOST开发双盘、真实G2 Canvas/Lens/
+路径/Settings、十九布局/241图、已排队首字及三轮成本成功证据与
+独立盘。它是Canvas阶段验收包，完整M8/所有组件/写实真彩游戏/
+实时光追未完成；随后Files新代码与原生验证继续，后续开发盘和
+源码不能冒充此包精确输入。
+
+2026-10-03：Files阶段在7a03638a/243扇区核完成真实G2核心、十九
+组合/222成功图、512实际直接子项及空槽再用。新核串行RGB（三轮/
+VGA/32MB）、CPU新旧目录盘、Settings六页/冷启动、Shell与19CLI
+四套回归全部PASS；SCAPI.H/36字用户字体/旧布局保持原合同。
+package_m8_files_stage.py按精确输入、原生产物、测试规则和上一
+不可变Canvas包核对后封存，默认盘仍HOST开发产物，G2及各副本
+盘单独标明。Lens全尺寸解码/整数双线性缓存草稿仅宿主语法检查，
+未激活、未称运行通过；完整M8及其余全部组件/写实游戏/光追继续。
+
+2026-10-03：Files阶段M8-files-evidence.zip已实际冻结并重读CRC/
+653项文件SHA，整包0db50bbbd44ca4e642560b563523eaf7f1049cbcd172558570cf535a5794fc9d。
+包内7a03638a核/双盘、真实G2五应用、十九组合/222图、512项真实
+GUI与四套同核回归分别绑定输入；默认盘仍HOST开发盘。旧Canvas
+包及Files修复前的精确失败历史保持原字节。Lens草稿验证另存，
+不改变此包的已冻结源码、产物和结论，完整M8继续。
+
+2026-10-03：Lens十九布局第一轮13组PASS之后，1080从极小放大
+的运行中布局读取见viewport暂为0，完整失败现场EIP0040287d/
+ui_physical_rgb表明正在绘制下一帧，实际照片已经正常上屏。
+精确旧验证器、13组成功及1080未完成现场全部封存在
+m8-lens-history/before-layout-snapshot；不修改旧结果或称19组已过。
+新测试在同一暂停快照核对几何/布局与完整私有帧=画布，恢复后
+最多15秒重新取完整结果，不放宽像素/布局边界、不写客体状态。
+源974ac054/G2 d0e41de8/map13eb42f6/7a03638a核及49718852盘
+保持原字节，重新执行全部十九组合。真实OOM/首字/Canvas与Files
+联动由verify_lens_followups.py串行门控，矩阵失败不启动后续。
+package_m8_lens_stage.py仅在全部精确PASS时允许封存，尚未生成
+Lens阶段ZIP；Files冻结包与用户字体/API保留，完整M8继续。
+
+2026-10-03：Lens正式源974ac054/实际G2 d0e41de8 map13eb42f6/
+7a03638a核/49718852 HOST默认盘的核心、十九组合203图、真实
+候选OOM/排队首字、Canvas/Files原生联动全部PASS。封存器
+package_m8_lens_stage.py逐项核对输入/原生产物/规则/旧Files包，
+即将生成Lens阶段包；附Studio独立草稿f230d4be核心证据，明确
+尚未发布，不把它的核心当Studio全矩阵或Lens证据。当前文件
+仍HOST开发双盘，最终M8原生双盘/压缩格式/游戏/光追继续。
+
+2026-10-03：M8-lens-evidence.zip已实际封存，653项文件逐一
+重读CRC/SHA，353439474B，整包SHA256
+53ffe88731b80610615fa4fec14df1a138c0daded61ce7b6d40aae68db575970。
+Lens核心/十九组合203图/真实候选OOM/首字/Canvas与Files联动
+及精确源码/核/默认HOST双盘、实际G2产物/符号/独立盘全部在包。
+附Studio独立草稿G2核心，标G2_CORE_PASS_UNPUBLISHED；正在执行
+的后续Studio证据不混入包，旧Files/Canvas/M6/M7包原字节保留。
+完整M8和最终原生发布仍继续，不将阶段包当最终版本。
+
+2026-10-03：Studio独立阶段M8-studio-evidence.zip已冻结，663
+文件/240061726B，重读CRC/全部成员SHA通过，整包摘要
+e64ef60373dd755eb2cef97fa358a2f863eb6416c9f493f5f779f968a54e5c75。
+包含bd433ea4候选、真正G2 f230d4be/mapdd9fba7e、核心/PID/
+排队首字/提交版本/十九组合222图/十二次成本和各独立副本盘。
+根user/ide.c与默认双盘保留旧正式HOST开发版本，候选尚未激活；
+此前Lens包按53ffe887摘要引用，失败历史不算成功。Debug/Monitor
+仅封存时审阅草稿，随后新增db XX/右下栈及其原生报告另属后批，
+不能用该ZIP证明后批实现或整个M8完成。源码与阶段输入按清单
+区分；M6/M7不可变包和旧设备/字体/API继续保留。
+
+
+## 7. M8完整原生发布与封存接线（第一阶段源码，未执行）
+
+当前不是最终M8验收包；第一阶段只写完产品/构建/发布源与规范，
+必须用户明确同意第二阶段后完成TESTING.md完整目标。本节新工具
+拒绝缺证据的发布，不覆盖默认/用户盘或历史ZIP。以前M8-stage包
+只证明其冻结输入，不能升级名称当完整版本。
+
+### 7.1 第二阶段验收清单
+
+publish_m8_native.py接收项目内JSON，phase=2、author=mio、status=PASS。
+必需group键为display/themes/components/images/configuration/native/
+games/film/performance/resources/api_abi/m6_m7。每组status=PASS、
+report项目内路径/sha256及非空screenshots[{path,sha256}]，绑定实际
+报告/截图。视觉/流畅要求仍由真实内容与用户评价判定，哈希只证明
+字节身份，不能自动证明好看。
+
+另外必需：sources为整个user树路径→SHA；input_sources为boot/
+kernel/modules/user/third_party所有文件（排除__pycache__）及Makefile/
+linker.ld/user/linker.ld路径→SHA；api_sha256、floppy_sha256；
+factory_resources为当前build/fs逐文件ASCII折叠路径→SHA；
+native_disk={path,sha256}为真正系统内生成全部产物的客体盘。
+旧用户字体固定摘要必须不变，所有来源均须与当前源/资源逐项相同。
+
+outputs按正式user顶层.c枚举：s3c/shell/assembler到BIN（assembler
+命名ASM），cli对应19个独立BIN命令，其余到APPS。每项为：
+{source:SCCC_GUEST,path,sha256,map_path,map_sha256}，这些path引用
+native_disk的实际SCX/.map，不能宿主重编替代。codec另列
+{source:HOST_BOOTSTRAP,sha256}，对应SYS/CORE/IMAGE.SCX固定引导
+服务；SCX/icon布局/尺寸也严格检查。没有三环全应用来源不能发布。
+
+批准并完成真实验收后，调用示例（尚未执行）：
+
+```text
+python tools/publish_m8_native.py --manifest build/m8-final/manifest.json --output build/M8-release
+```
+
+output必须build下不存在的新目录。生成独立64MB/80扇区512项v4
+出厂盘与当前引导软盘，原生替换只从客体盘提取，资源来自绑定的
+出厂树，测试垃圾/坏流/个人作品不混入。来源provenance.json标记
+NATIVE_ASSEMBLED_REQUIRES_FINAL_COLD_BOOT，装配成功不自封运行PASS。
+
+### 7.2 精确发布盘冷启动与完整ZIP
+
+在独立发布双盘上重新执行真实冷启动/相关完整回归，保存同样12组
+报告/截图；cold-boot JSON要求phase=2/author=mio/status=PASS及
+sandcore_sha256/sanddata_sha256恰好等于provenance，还有完整groups。
+不允许拿发布前的测试盘或宿主重新写入的状态冒充最终运行盘。
+
+```text
+python tools/package_m8.py --manifest build/m8-final/manifest.json --release build/M8-release --cold-boot build/m8-final/cold-boot.json --output build/SandCore-M8-2026-10-03.zip
+```
+
+工具核对当前源/来源/报告/截图/双盘及不可变M7 ZIP，再收录全部
+boot/kernel/modules/user/docs/tools/assets/legacy/third_party和根
+AGENTS/HANDOFF/M8_GOAL、构建入口、原生生成客体盘、成功证据。
+解压的sandcore/build/sandcore.img和sanddata.img明确为原生发布盘，
+run.bat直接挂这两块；GCC引导codec许可保留且来源明确。M7原ZIP
+按原SHA保存，失败历史留原处，不改成成功。
+
+封存新ZIP，逐项从ZIP重读CRC/SHA，M8-INVENTORY.json与外部摘要
+记录准确字节。这些工具第一阶段未执行，因此没有最终M8发布/验包
+结论；第二阶段发现问题后修复、重测、重新绑定全部受影响来源。
+
+2026-10-03：新增完整发布/最终冷启动/验收ZIP源代码与清单合同，
+明确SCCC普通应用与HOST_BOOTSTRAP图片服务，不覆盖历史包或用户盘。

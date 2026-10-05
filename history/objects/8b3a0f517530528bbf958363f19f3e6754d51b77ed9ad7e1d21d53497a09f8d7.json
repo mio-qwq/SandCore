@@ -1,0 +1,50 @@
+{
+  "author": "mio",
+  "status": "REQUESTED_FRAMES_RENDERED",
+  "identity_sha256": "1f2a6e33a2292cf34e6744395fa75cb13fd480b0d25a7e906f7c2a4d538d8fb1",
+  "frames": [
+    {
+      "frame": 180,
+      "seconds": 57.484,
+      "bytes": 865516,
+      "sha256": "a7bd7d1c6ba3c8aea3195245d88c7072e9ee290a6f0e52508839c0da4b289fb0"
+    },
+    {
+      "frame": 570,
+      "seconds": 185.078,
+      "bytes": 800208,
+      "sha256": "eae1f81679126d9dd7002f5300ef1d7775eecba093e5887725785273d8724de3"
+    },
+    {
+      "frame": 990,
+      "seconds": 266.031,
+      "bytes": 752261,
+      "sha256": "f1fe9a2bcd6de8545b39c142d4ab56c3f29ca1249bc18ed5831e454804958a61"
+    },
+    {
+      "frame": 1410,
+      "seconds": 179.5,
+      "bytes": 842792,
+      "sha256": "d19886daf4d1bfb3a805c9a76dc0c338905843637c3d9f9ea2a3b57dc479903f"
+    },
+    {
+      "frame": 1830,
+      "seconds": 197.328,
+      "bytes": 867809,
+      "sha256": "6c68ddd8419176ff3d7bab1528ca08fe7068008cb0b2fff7cc6f32eb4b597179"
+    },
+    {
+      "frame": 2221,
+      "seconds": 208.969,
+      "bytes": 717302,
+      "sha256": "201e6ebbcfdee1916b225d9c866ece1ded9ca3f25ef8e5c28e76c65bac6cbda5"
+    }
+  ],
+  "requested_frames": 6,
+  "completed_requested": 6,
+  "mean_frame_seconds": 182.398,
+  "remaining_estimate_seconds": 0,
+  "disk_free_bytes": 78630842368,
+  "projected_full_sequence_bytes": 2035272960,
+  "full_sequence_complete": false
+}

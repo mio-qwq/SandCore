@@ -1,0 +1,172 @@
+{
+  "author": "mio",
+  "status": "REQUESTED_REAL_FRAMES_COMPLETE",
+  "scope": "HOST_MATH_GPU_REAL_RAY_FRAMES",
+  "identity_sha256": "3263e6f113c093aad99202f6865f3bc0290b92b18be58346afee21a1495d13e9",
+  "process_pid": 21004,
+  "frames": [
+    {
+      "frame": 180,
+      "seconds": 2.14000000001397,
+      "bytes": 1744307,
+      "sha256": "06e04413d63f7726d2b231b4c6426572825eb538149962a5f5b8a2ce80b766b6",
+      "stats": {
+        "trace_gpu_seconds": 1.6815559500000001,
+        "average_gpu_seconds": 0.000198802,
+        "denoise_gpu_seconds": 0.008557237,
+        "encode_gpu_seconds": 0.000365989,
+        "readback_seconds": 0.0,
+        "compute_and_readback_seconds": 1.922000000020489,
+        "longest_trace_dispatch_seconds": 0.0051275,
+        "nonfinite_samples": 0,
+        "samples_per_physical_pixel": 128,
+        "physical_width": 960,
+        "physical_height": 540,
+        "shot": 1,
+        "png_save_validate_seconds": 0.17199999999138527
+      }
+    },
+    {
+      "frame": 570,
+      "seconds": 2.0469999999913853,
+      "bytes": 1856846,
+      "sha256": "0e15a9cec6eacf57584daf8f01d60c9ec830092edbe28609fa1c215f11f9dc9f",
+      "stats": {
+        "trace_gpu_seconds": 1.554623648999999,
+        "average_gpu_seconds": 0.00019776,
+        "denoise_gpu_seconds": 0.008640675,
+        "encode_gpu_seconds": 0.000365885,
+        "readback_seconds": 0.0,
+        "compute_and_readback_seconds": 1.7969999999913853,
+        "longest_trace_dispatch_seconds": 0.004623906,
+        "nonfinite_samples": 0,
+        "samples_per_physical_pixel": 128,
+        "physical_width": 960,
+        "physical_height": 540,
+        "shot": 2,
+        "png_save_validate_seconds": 0.20300000000861473
+      }
+    },
+    {
+      "frame": 990,
+      "seconds": 2.062000000005355,
+      "bytes": 1967968,
+      "sha256": "2ae4d3bc63c2def2401687049b691d11f9d367a072af6e5cb19d4659c8d7738d",
+      "stats": {
+        "trace_gpu_seconds": 1.5369674420000001,
+        "average_gpu_seconds": 0.000198958,
+        "denoise_gpu_seconds": 0.008504633000000001,
+        "encode_gpu_seconds": 0.000365885,
+        "readback_seconds": 0.0,
+        "compute_and_readback_seconds": 1.7810000000172295,
+        "longest_trace_dispatch_seconds": 0.00521927,
+        "nonfinite_samples": 0,
+        "samples_per_physical_pixel": 128,
+        "physical_width": 960,
+        "physical_height": 540,
+        "shot": 3,
+        "png_save_validate_seconds": 0.25
+      }
+    },
+    {
+      "frame": 1410,
+      "seconds": 2.0469999999913853,
+      "bytes": 2091973,
+      "sha256": "99081dff2e9810597d95cd0705b851a631be655f9046b961d53b347268ea23ad",
+      "stats": {
+        "trace_gpu_seconds": 1.5502640309999993,
+        "average_gpu_seconds": 0.00024776,
+        "denoise_gpu_seconds": 0.008866457,
+        "encode_gpu_seconds": 0.000366562,
+        "readback_seconds": 0.0,
+        "compute_and_readback_seconds": 1.75,
+        "longest_trace_dispatch_seconds": 0.004941197,
+        "nonfinite_samples": 0,
+        "samples_per_physical_pixel": 128,
+        "physical_width": 960,
+        "physical_height": 540,
+        "shot": 4,
+        "png_save_validate_seconds": 0.23399999999674037
+      }
+    },
+    {
+      "frame": 1830,
+      "seconds": 2.0,
+      "bytes": 2099874,
+      "sha256": "4d1a76953711fe1148002119257b9cf7b3fc71794dbc8d0fedd6bb8cc21f6fdd",
+      "stats": {
+        "trace_gpu_seconds": 1.603614902,
+        "average_gpu_seconds": 0.000184427,
+        "denoise_gpu_seconds": 0.00876057,
+        "encode_gpu_seconds": 0.000363645,
+        "readback_seconds": 0.0,
+        "compute_and_readback_seconds": 1.797000000020489,
+        "longest_trace_dispatch_seconds": 0.006036614,
+        "nonfinite_samples": 0,
+        "samples_per_physical_pixel": 128,
+        "physical_width": 960,
+        "physical_height": 540,
+        "shot": 5,
+        "png_save_validate_seconds": 0.15599999998812564
+      }
+    },
+    {
+      "frame": 2221,
+      "seconds": 1.8910000000032596,
+      "bytes": 1899364,
+      "sha256": "a65715c1425b3db798f9d3d1ad8344f2fe072e24344af9a8d37d30a9fbb9ef79",
+      "stats": {
+        "trace_gpu_seconds": 1.4123717299999994,
+        "average_gpu_seconds": 0.000194687,
+        "denoise_gpu_seconds": 0.00877333,
+        "encode_gpu_seconds": 0.000364843,
+        "readback_seconds": 0.0,
+        "compute_and_readback_seconds": 1.625,
+        "longest_trace_dispatch_seconds": 0.004785104,
+        "nonfinite_samples": 0,
+        "samples_per_physical_pixel": 128,
+        "physical_width": 960,
+        "physical_height": 540,
+        "shot": 6,
+        "png_save_validate_seconds": 0.20300000000861473
+      }
+    }
+  ],
+  "requested_frames": [
+    180,
+    570,
+    990,
+    1410,
+    1830,
+    2221
+  ],
+  "full_movie_complete": false,
+  "guest_player_complete": false,
+  "limitations": "actual ray frames; visual/temporal acceptance and full movie/player separate",
+  "device": {
+    "name": "Intel(R) Graphics",
+    "vendor": "Intel(R) Corporation",
+    "version": "OpenCL 3.0 NEO ",
+    "driver": "32.0.101.6556"
+  },
+  "build_seconds": 3.4219999999913853,
+  "gpu_buffer_bytes": 46656132,
+  "release_statuses": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ]
+}

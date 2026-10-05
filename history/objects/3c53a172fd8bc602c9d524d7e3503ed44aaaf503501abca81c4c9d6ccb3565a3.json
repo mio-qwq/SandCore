@@ -1,0 +1,28 @@
+{
+  "author": "mio",
+  "scope": "INDEPENDENT_HOST_RENDER_WORKER",
+  "started_local": "2026-10-04T13:14:20.5860966+08:00",
+  "pid": 20880,
+  "executable": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\host-tools\\blender\\blender-4.5.3-windows-x64\\blender.exe",
+  "arguments": [
+    "-b",
+    "--python",
+    "\"C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\film\\20261004-master-08\\film_scene.py\"",
+    "--",
+    "--out",
+    "\"C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\film\\20261004-master-08\"",
+    "--mode",
+    "master",
+    "--samples",
+    "512",
+    "--frames",
+    "2221"
+  ],
+  "batch": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\film\\20261004-master-08",
+  "stdout": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\film\\20261004-master-08\\attempt-20261004-131420-552.stdout.log",
+  "stderr": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\film\\20261004-master-08\\attempt-20261004-131420-552.stderr.log",
+  "requested_frames": "2221",
+  "source_sha256": "3fb31c1ed4fa04bcfdb1fd8b7f12c12a30d0ad0831cba6f899e413093bf6d1c6",
+  "io_sha256": "f91484475a55ce6808613a5e2af8120acd7b862ecb1abb970b76648480fbb925",
+  "status": "STARTED_REQUIRES_LIVE_PROCESS_OBSERVATION"
+}

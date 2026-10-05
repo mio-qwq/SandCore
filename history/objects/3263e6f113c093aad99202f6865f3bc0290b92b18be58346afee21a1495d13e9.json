@@ -1,0 +1,27 @@
+{
+  "author": "mio",
+  "magic": "SCMATHFILM1MIO",
+  "version": 1,
+  "mode": "draft",
+  "width": 960,
+  "height": 540,
+  "samples": 128,
+  "fps": 60,
+  "seconds": 42,
+  "frames": 2520,
+  "output_bits": 16,
+  "band": 32,
+  "sample_batch": 4,
+  "sources": {
+    "render.py": "ae97b16562f0ca38a088384b3fca52b6bb4b885efb61d0d1226b30d3ce932d2c",
+    "render.cl": "4f1c1f4d1907d1859a1762d2b4631542576d93c8a591f63a5d37cf8c5e27622b",
+    "opencl_host.py": "0a9ee530b6b318036cd5adda7bdc1f21de8d792b72794489cdc54abbc1cd3131",
+    "film_io.py": "f91484475a55ce6808613a5e2af8120acd7b862ecb1abb970b76648480fbb925"
+  },
+  "fonts": {
+    "C:\\Windows\\Fonts\\georgia.ttf": "38dffcaf1fac89492f7c56c600a14daf36ae42f7c21985cd4134ae113124a58f",
+    "C:\\Windows\\Fonts\\segoeuil.ttf": "866557576dfc772395301b581eccef4c0daf1dbb75f9667f26784b260bce7da1"
+  },
+  "model": "closed-convex prism; Snell/Fresnel RGB; stochastic rough reflection; 3 area lights; analytical art emission fields",
+  "denoise": "five spatial normal/depth/material/variance guided a-trous passes; no time interpolation"
+}

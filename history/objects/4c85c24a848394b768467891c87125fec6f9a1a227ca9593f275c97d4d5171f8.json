@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "exit_confirmed": true,
+  "pid": 22200,
+  "guest_player_complete": false,
+  "author": "mio",
+  "reason": "User authorized nearly imperceptible differences at unchanged resolution; replace fixed 512 sampling with verified adaptive route. Original frames retained.",
+  "completed_frames": 46,
+  "magic": "SCMATHSTOP1MIO",
+  "created_filetime": 134355738794314518,
+  "no_explicit_gpu_release_claim": true,
+  "observed_local": "2026-10-04T18:08:26",
+  "full_movie_complete": false,
+  "retained_source_identity": "bca8f5819e34955cb332b2193c00a91ec86cf1b7d5155d1c07515e5ea7950a39"
+}

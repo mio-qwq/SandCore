@@ -1,0 +1,20 @@
+{
+  "author": "mio",
+  "scope": "HOST_QUEUE_BOUNDARIES_ONLY",
+  "status": "PASS",
+  "cases": {
+    "4k16-complete-cached": "PASS",
+    "duplicate-frame": "REJECT",
+    "outside-frame": "REJECT",
+    "wrong-identity": "REJECT",
+    "wrong-size": "REJECT",
+    "wrong-sha": "REJECT",
+    "cache-invalidated-after-change": "REJECT",
+    "good-frame-retained-after-failures": "PASS",
+    "pid-creation-mismatch": "REJECT",
+    "executable-mismatch": "REJECT",
+    "actual-process-alive-exit": "PASS"
+  },
+  "frame_sha256": "87494da4dd90302aafc08e79ea467274c10a11abdd8c75496c718c7d8cd5ca91",
+  "limitations": "仅队列/真实Windows进程与4K PNG边界，不是整片/编码/客体播放器验收"
+}

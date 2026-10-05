@@ -1,0 +1,26 @@
+{
+  "author": "mio",
+  "status": "REQUESTED_FRAMES_RENDERED",
+  "identity_sha256": "4a0061a6001272335e2f4145a6903fabf8bb4f1ae7af689cc6516e727130c818",
+  "frames": [
+    {
+      "frame": 1321,
+      "seconds": 138.672,
+      "bytes": 881174,
+      "sha256": "b8436087f77c7a46fd82570e2908ae406c98fb1953a8f392a40e50a14d8cd6e5"
+    },
+    {
+      "frame": 2221,
+      "seconds": 135.844,
+      "bytes": 789521,
+      "sha256": "12e67d0d7ea20eef8d7e9078cd207c8bb085c1aa6849eb8837f0fa37c03c26f9"
+    }
+  ],
+  "requested_frames": 2,
+  "completed_requested": 2,
+  "mean_frame_seconds": 137.258,
+  "remaining_estimate_seconds": 0,
+  "disk_free_bytes": 79096475648,
+  "projected_full_sequence_bytes": 2105075700,
+  "full_sequence_complete": false
+}

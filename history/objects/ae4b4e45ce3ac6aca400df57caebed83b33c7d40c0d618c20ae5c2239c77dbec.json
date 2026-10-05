@@ -1,0 +1,84 @@
+{
+  "author": "mio",
+  "status": "REQUESTED_REAL_FRAMES_COMPLETE",
+  "scope": "HOST_MATH_GPU_REAL_RAY_FRAMES",
+  "identity_sha256": "58007cd5cae3a882c0f034c6b237c184b22f6533f216df563f1fc1c8c7ccb3e7",
+  "process_pid": 3344,
+  "frames": [
+    {
+      "frame": 2221,
+      "seconds": 9.094000000011874,
+      "bytes": 1855556,
+      "sha256": "33651ebe8e0e8045263dc40ac8c1729d5aa4be36fa1abc0d0abfaaa0b11d38a6",
+      "stats": {
+        "trace_gpu_seconds": 7.939939067000002,
+        "average_gpu_seconds": 0.000283229,
+        "denoise_gpu_seconds": 0.008467341,
+        "encode_gpu_seconds": 0.00067526,
+        "readback_seconds": 0.015000000013969839,
+        "compute_and_readback_seconds": 8.85899999999674,
+        "longest_trace_dispatch_seconds": 0.008215572,
+        "nonfinite_samples": 0,
+        "samples_per_physical_pixel": 512,
+        "physical_width": 960,
+        "physical_height": 540,
+        "shot": 6,
+        "png_save_validate_seconds": 0.17199999999138527
+      }
+    },
+    {
+      "frame": 1410,
+      "seconds": 8.609000000025844,
+      "bytes": 2064210,
+      "sha256": "e482668e88b3b3be81ac14e273f1c45ac53328cba16969e6895e537613d91459",
+      "stats": {
+        "trace_gpu_seconds": 7.631136794000004,
+        "average_gpu_seconds": 0.000191302,
+        "denoise_gpu_seconds": 0.00884604,
+        "encode_gpu_seconds": 0.000364791,
+        "readback_seconds": 0.0,
+        "compute_and_readback_seconds": 8.437000000005355,
+        "longest_trace_dispatch_seconds": 0.007076197,
+        "nonfinite_samples": 0,
+        "samples_per_physical_pixel": 512,
+        "physical_width": 960,
+        "physical_height": 540,
+        "shot": 4,
+        "png_save_validate_seconds": 0.14100000000325963
+      }
+    }
+  ],
+  "requested_frames": [
+    2221,
+    1410
+  ],
+  "full_movie_complete": false,
+  "guest_player_complete": false,
+  "limitations": "actual ray frames; visual/temporal acceptance and full movie/player separate",
+  "device": {
+    "name": "Intel(R) Graphics",
+    "vendor": "Intel(R) Corporation",
+    "version": "OpenCL 3.0 NEO ",
+    "driver": "32.0.101.6556"
+  },
+  "build_seconds": 3.5,
+  "gpu_buffer_bytes": 46656644,
+  "release_statuses": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ]
+}

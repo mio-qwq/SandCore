@@ -1,0 +1,109 @@
+{
+  "author": "mio",
+  "magic": "SCFILMGEOM1MIO",
+  "version": 1,
+  "status": "PASS",
+  "scope": "ACTUAL_GPU_PRISM_FIELDS_AND_INDEPENDENT_PLANE_REFERENCE",
+  "source_sha256": {
+    "OLD": "360eac3f9d5d750ec5e318f26e8fd79b8e59b9245be325f3e28462eaaf2075ce",
+    "NEW": "484536d424cf041c3d6267324325ed54f7403605c635c858ed25b2922b862baa"
+  },
+  "ray_sha256": "0c989c3d2c446ceb8995db94e1a4ae9ca7db821c8a09c293a30e950ef0a8214f",
+  "poses": [
+    {
+      "angle": 0,
+      "queries": 4096,
+      "hits": 1185,
+      "reference_hits": 300,
+      "all_field_sha256": "638299aaae6bcb653696cdc355503a7d485a3c280ea05b3a6b9e552e8ac13173",
+      "guards": "PASS"
+    },
+    {
+      "angle": 0.001,
+      "queries": 4096,
+      "hits": 1183,
+      "reference_hits": 304,
+      "all_field_sha256": "5689f84186a5092f479f21cb919bcc2936316e60c50bb3e9e14b375a7dfc4178",
+      "guards": "PASS"
+    },
+    {
+      "angle": -0.025,
+      "queries": 4096,
+      "hits": 1179,
+      "reference_hits": 303,
+      "all_field_sha256": "ba8218f6a97deac0d00347be285c3ac4d38eadb450b041f12d243d7c107e3bb6",
+      "guards": "PASS"
+    },
+    {
+      "angle": 0.025,
+      "queries": 4096,
+      "hits": 1185,
+      "reference_hits": 307,
+      "all_field_sha256": "b9b310c077b72f9c801d75dc9f147bd4835c3a802c9a83c70a5a23243ac1d64c",
+      "guards": "PASS"
+    },
+    {
+      "angle": 0.7853981633974483,
+      "queries": 4096,
+      "hits": 1148,
+      "reference_hits": 296,
+      "all_field_sha256": "40ef758240dca20698bc9409a2a94623a9aefe3dd80347017114bcf0298edbfa",
+      "guards": "PASS"
+    },
+    {
+      "angle": -0.7853981633974483,
+      "queries": 4096,
+      "hits": 1154,
+      "reference_hits": 293,
+      "all_field_sha256": "86a65f35679ff9d55408268cb0060812bf6cf7c51f4f11f27b517fb8ed406a02",
+      "guards": "PASS"
+    },
+    {
+      "angle": 1.5707963267948966,
+      "queries": 4096,
+      "hits": 1139,
+      "reference_hits": 285,
+      "all_field_sha256": "dbca4f2c83e8f7d57d3f61f517c5c8f9f88badcab2976640baf71958c7c45b6d",
+      "guards": "PASS"
+    },
+    {
+      "angle": 3.141592653589793,
+      "queries": 4096,
+      "hits": 1185,
+      "reference_hits": 300,
+      "all_field_sha256": "22468a9aca64b19c325dd938f4e35b597c7336120dd6731c029060fbe2feada2",
+      "guards": "PASS"
+    }
+  ],
+  "independent_checks": 8175,
+  "reference_boundary_cases": 17,
+  "diagnostic_noinline": false,
+  "limits": "生产GPU可能同时在渲染；本夹具只证几何/粗筛/缓冲，不测整片速度或美术",
+  "device": {
+    "name": "Intel(R) Graphics",
+    "vendor": "Intel(R) Corporation",
+    "version": "OpenCL 3.0 NEO ",
+    "driver": "32.0.101.6556"
+  },
+  "paired_queries": 32768,
+  "release_statuses": {
+    "OLD": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "NEW": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ]
+  }
+}

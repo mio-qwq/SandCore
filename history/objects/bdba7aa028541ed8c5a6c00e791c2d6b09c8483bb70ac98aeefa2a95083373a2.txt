@@ -1,0 +1,5 @@
+SandCore LEGACY / mio
+Verified M7 applications. Open APPS or BIN with Files.
+Run an SCX to start the original program.
+Source and maps: repository legacy/M7.
+These binaries are preserved, not rebuilt with M8.

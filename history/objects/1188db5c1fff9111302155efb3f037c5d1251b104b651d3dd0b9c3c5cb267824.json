@@ -1,0 +1,44 @@
+{
+  "author": "mio",
+  "magic": "SCFILMGEOM1MIO",
+  "version": 1,
+  "status": "FAIL",
+  "scope": "ACTUAL_GPU_PRISM_FIELDS_AND_INDEPENDENT_PLANE_REFERENCE",
+  "source_sha256": {
+    "OLD": "652b56954f2dafacb0f50639ea6395b08cddce05ba20f73d678d4341e7ed78a6",
+    "NEW": "c60c0e3ed0a1a52a8b9e866363e0b595a20e0a39678a17867d1c1c1480a74eab"
+  },
+  "ray_sha256": "0c989c3d2c446ceb8995db94e1a4ae9ca7db821c8a09c293a30e950ef0a8214f",
+  "poses": [],
+  "independent_checks": 0,
+  "reference_boundary_cases": 0,
+  "limits": "生产GPU可能同时在渲染；本夹具只证几何/粗筛/缓冲，不测整片速度或美术",
+  "device": {
+    "name": "Intel(R) Graphics",
+    "vendor": "Intel(R) Corporation",
+    "version": "OpenCL 3.0 NEO ",
+    "driver": "32.0.101.6556"
+  },
+  "error": "AssertionError(('保守粗筛改变原求交字段', 0))",
+  "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\tools\\verify_math_film_geometry.py\", line 132, in main\n    assert values['OLD']==values['NEW'],('保守粗筛改变原求交字段',angle)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: ('保守粗筛改变原求交字段', 0)\n",
+  "release_statuses": {
+    "OLD": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "NEW": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ]
+  }
+}

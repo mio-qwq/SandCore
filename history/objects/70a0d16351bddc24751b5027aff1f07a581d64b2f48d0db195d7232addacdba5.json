@@ -1,0 +1,12 @@
+{
+  "magic": "SCFILM1MIO",
+  "mode": "master",
+  "width": 3840,
+  "height": 2160,
+  "output_bits": 16,
+  "fps": 60,
+  "seconds": 42,
+  "samples": 512,
+  "source_sha256": "fb5854a54704d3181b396d32ebfb7138487ca0a4150ec299ee54c7974ce512b2",
+  "io_source_sha256": "9cc841b505cce024bada11af46dab91d7bdb4a1839eac0df9f04924c943cb80d"
+}

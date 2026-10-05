@@ -1,0 +1,62 @@
+{
+  "author": "mio",
+  "status": "REQUESTED_REAL_FRAMES_COMPLETE",
+  "scope": "HOST_MATH_GPU_REAL_RAY_FRAMES",
+  "identity_sha256": "a3568568a08c91ac24dcc1653f2fcbde8c6486cc110681f5b1a0d8474f023398",
+  "process_pid": 16280,
+  "frames": [
+    {
+      "frame": 2221,
+      "seconds": 30.187999999994645,
+      "bytes": 24035815,
+      "sha256": "9a254a8ca3f1b03125ad827a4c9ebf6357cdda288fdff48dafa35a065da250f6",
+      "stats": {
+        "trace_gpu_seconds": 26.376407191000002,
+        "average_gpu_seconds": 0.00427677,
+        "denoise_gpu_seconds": 0.142407082,
+        "encode_gpu_seconds": 0.005601406,
+        "readback_seconds": 0.046999999991385266,
+        "compute_and_readback_seconds": 27.844000000011874,
+        "longest_trace_dispatch_seconds": 0.023184739,
+        "nonfinite_samples": 0,
+        "samples_per_physical_pixel": 128,
+        "physical_width": 3840,
+        "physical_height": 2160,
+        "shot": 6,
+        "png_save_validate_seconds": 2.0309999999881256
+      }
+    }
+  ],
+  "requested_frames": [
+    2221
+  ],
+  "full_movie_complete": false,
+  "guest_player_complete": false,
+  "limitations": "actual ray frames; visual/temporal acceptance and full movie/player separate",
+  "device": {
+    "name": "Intel(R) Graphics",
+    "vendor": "Intel(R) Corporation",
+    "version": "OpenCL 3.0 NEO ",
+    "driver": "32.0.101.6556"
+  },
+  "build_seconds": 0.01600000000325963,
+  "gpu_buffer_bytes": 746496644,
+  "release_statuses": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ]
+}

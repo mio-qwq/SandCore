@@ -1,0 +1,12 @@
+{
+  "author": "mio",
+  "magic": "SCFQUEUE1MIO",
+  "target_frames": 2520,
+  "requested_frames": "all",
+  "batch": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\film\\20261004-master-08",
+  "blender": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\host-tools\\blender\\blender-4.5.3-windows-x64\\blender.exe",
+  "created_local": "2026-10-04T14:31:41.5028840+08:00",
+  "identity_sha256": "7f3d81d0051de5b461d959878c74875e70d42a6bf39b17ea6c56a6455455a0f2",
+  "queue_source_sha256": "d643abf4eefac95644f0f941e29c56bc14c11a5dfa5b5e2a5e0e1d470e0fbc73",
+  "adopt_process": null
+}

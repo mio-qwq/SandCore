@@ -1,0 +1,22 @@
+{
+  "author": "mio",
+  "status": "SCOUT_RENDER_REQUEST_STARTED",
+  "frames": [
+    180,
+    570,
+    990,
+    1410,
+    1830,
+    2221
+  ],
+  "resolution": [
+    1280,
+    720
+  ],
+  "samples": 64,
+  "threads": 12,
+  "process_id_observed": 14348,
+  "observed_at": "2026-10-03T20:17:10.773726+00:00",
+  "log": "20261004-scout-06-six-shots.log",
+  "scope": "SIX_SHOT_SCOUTS_ONLY_NOT_4K_MASTER"
+}

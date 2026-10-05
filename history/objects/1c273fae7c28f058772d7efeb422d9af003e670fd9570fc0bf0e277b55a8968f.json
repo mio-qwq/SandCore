@@ -1,0 +1,15 @@
+{
+  "author": "mio",
+  "status": "STARTED",
+  "scope": "MASTER_REPRESENTATIVE_FRAME_ONLY",
+  "started_utc": "2026-10-03 21:29:25 UTC",
+  "frames": [
+    2221
+  ],
+  "width": 3840,
+  "height": 2160,
+  "bits": 16,
+  "samples": 512,
+  "full_sequence_frames": 2520,
+  "full_sequence_requested": false
+}

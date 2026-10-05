@@ -1,0 +1,30 @@
+{
+  "author": "mio",
+  "scope": "HOST_QUEUE_BOUNDARIES_ONLY",
+  "status": "PASS",
+  "cases": {
+    "4k16-complete-cached": "PASS",
+    "duplicate-frame": "REJECT",
+    "outside-frame": "REJECT",
+    "wrong-identity": "REJECT",
+    "wrong-size": "REJECT",
+    "wrong-sha": "REJECT",
+    "cache-invalidated-after-change": "REJECT",
+    "good-frame-retained-after-failures": "PASS",
+    "pid-creation-mismatch": "REJECT",
+    "executable-mismatch": "REJECT",
+    "actual-process-alive-exit": "PASS",
+    "frozen-identity-valid": "PASS",
+    "source-change-refused": "REJECT",
+    "manifest-change-refused": "REJECT",
+    "quality-change-refused": "REJECT",
+    "duplicate-queue-lock-retains-active-state": "REJECT"
+  },
+  "source_sha256": {
+    "source\\verifier.py": "9ca01bce27c1f3c3dd5ecb33a740031b9002f76714f6aa5c8987e7494a8d52f0",
+    "source\\film_queue.py": "d643abf4eefac95644f0f941e29c56bc14c11a5dfa5b5e2a5e0e1d470e0fbc73",
+    "source\\film_io.py": "f91484475a55ce6808613a5e2af8120acd7b862ecb1abb970b76648480fbb925"
+  },
+  "frame_sha256": "87494da4dd90302aafc08e79ea467274c10a11abdd8c75496c718c7d8cd5ca91",
+  "limitations": "仅队列/真实Windows进程与4K PNG边界，不是整片/编码/客体播放器验收"
+}
