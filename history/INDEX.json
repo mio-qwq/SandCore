@@ -1,8 +1,8 @@
 {
   "format": "SandCoreHistoricalSources1",
   "scope": "historical source/doc/project only; no images/video/rendered frames; not new product code",
-  "unique_extra_objects": 771,
-  "extra_bytes": 30868354,
+  "unique_extra_objects": 772,
+  "extra_bytes": 30890392,
   "objects": [
     {
       "path": "history/objects/003cb34e92cd3265f816234b2396a9cac50edeae55061f8b0c6c96d31f1543c4.sh",
@@ -3843,6 +3843,11 @@
       "path": "history/objects/fcb578ca75206e332e309dce6bcc2d2399b6ade9a40a453811256bdfccc9fea6.md",
       "size": 3642,
       "sha256": "fcb578ca75206e332e309dce6bcc2d2399b6ade9a40a453811256bdfccc9fea6"
+    },
+    {
+      "path": "history/objects/fd2dc701f4e9fc9d16af291b82cc12afebc5a8a0a12e7fba3b9db404305ab3bb.md",
+      "size": 22038,
+      "sha256": "fd2dc701f4e9fc9d16af291b82cc12afebc5a8a0a12e7fba3b9db404305ab3bb"
     },
     {
       "path": "history/objects/fe250c10c1dfddd08a0fb60b3e1528be11dbdccb96724a963af5bed7fe5633c8.py",
@@ -23807,7 +23812,7 @@
     },
     {
       "original": "sandcore/build/SandCore-M9-acceptance-2026-10-05.zip::M9-ACCEPTANCE/docs/BUILD.md",
-      "stored": "sandcore/docs/BUILD.md",
+      "stored": "history/objects/fd2dc701f4e9fc9d16af291b82cc12afebc5a8a0a12e7fba3b9db404305ab3bb.md",
       "size": 22038,
       "sha256": "fd2dc701f4e9fc9d16af291b82cc12afebc5a8a0a12e7fba3b9db404305ab3bb"
     },
@@ -24305,7 +24310,7 @@
     },
     {
       "original": "sandcore/build/SandCore-M9-acceptance-2026-10-05.zip::M9-ACCEPTANCE/source/sandcore/docs/BUILD.md",
-      "stored": "sandcore/docs/BUILD.md",
+      "stored": "history/objects/fd2dc701f4e9fc9d16af291b82cc12afebc5a8a0a12e7fba3b9db404305ab3bb.md",
       "size": 22038,
       "sha256": "fd2dc701f4e9fc9d16af291b82cc12afebc5a8a0a12e7fba3b9db404305ab3bb"
     },
@@ -51299,7 +51304,7 @@
     },
     {
       "original": "temp miotest/M9-ACCEPTANCE/docs/BUILD.md",
-      "stored": "sandcore/docs/BUILD.md",
+      "stored": "history/objects/fd2dc701f4e9fc9d16af291b82cc12afebc5a8a0a12e7fba3b9db404305ab3bb.md",
       "size": 22038,
       "sha256": "fd2dc701f4e9fc9d16af291b82cc12afebc5a8a0a12e7fba3b9db404305ab3bb"
     },
@@ -51797,7 +51802,7 @@
     },
     {
       "original": "temp miotest/M9-ACCEPTANCE/source/sandcore/docs/BUILD.md",
-      "stored": "sandcore/docs/BUILD.md",
+      "stored": "history/objects/fd2dc701f4e9fc9d16af291b82cc12afebc5a8a0a12e7fba3b9db404305ab3bb.md",
       "size": 22038,
       "sha256": "fd2dc701f4e9fc9d16af291b82cc12afebc5a8a0a12e7fba3b9db404305ab3bb"
     },

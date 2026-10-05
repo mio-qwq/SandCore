@@ -1,0 +1,249 @@
+mkdir -p build
+python3 tools/mkscf.py kernel/font16.txt build/fs/sys/font.scf
+python3 tools/mkscf.py assets/icons/shell.txt build/fs/sys/shell.scf
+mkscf: 1 glyphs -> build/fs/sys/shell.scf
+mkscf: 36 glyphs -> build/fs/sys/font.scf
+mkdir -p build/fs/desk
+/usr/bin/nasm -f bin user/panic.asm -o build/panic.bin
+cp assets/desk/shell.lnk build/fs/desk/shell.lnk
+mkdir -p build/fs/desk
+mkdir -p build/fs/desk
+cp assets/desk/files.lnk build/fs/desk/files.lnk
+cp assets/desk/notes.lnk build/fs/desk/notes.lnk
+mkdir -p build/fs/desk
+python3 tools/mkscf.py assets/icons/files.txt build/fs/sys/files.scf
+cp assets/desk/palette.lnk build/fs/desk/palette.lnk
+python3 tools/mkscf.py assets/icons/notes.txt build/fs/sys/notes.scf
+mkscf: 1 glyphs -> build/fs/sys/files.scf
+python3 tools/mkscf.py assets/icons/palette.txt build/fs/sys/palette.scf
+mkscf: 1 glyphs -> build/fs/sys/notes.scf
+mkdir -p build/fs/home
+cp assets/home/demo.asm build/fs/home/demo.asm
+mkdir -p build/fs/home
+cp assets/home/notes.txt build/fs/home/notes.txt
+mkscf: 1 glyphs -> build/fs/sys/palette.scf
+mkdir -p build/fs/home
+cp assets/home/FEATURE.C build/fs/home/FEATURE.C
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -c modules/core.c -o build/module-core.o
+/usr/bin/nasm -f elf32 user/start.asm -o build/user-start.o
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -Iuser -c user/s3c.c -o build/user-s3c.o
+mkdir -p build/fs/SYS/SRC
+cp user/s3c.c build/fs/SYS/SRC/s3c.c
+mkdir -p build/fs/SYS/SRC
+cp user/s3c_lex.inc build/fs/SYS/SRC/s3c_lex.inc
+mkdir -p build/fs/SYS/SRC
+cp user/s3c_pp.inc build/fs/SYS/SRC/s3c_pp.inc
+mkdir -p build/fs/SYS/SRC
+cp user/s3c_parse.inc build/fs/SYS/SRC/s3c_parse.inc
+mkdir -p build/fs/SYS/SRC
+cp user/s3c_emit.inc build/fs/SYS/SRC/s3c_emit.inc
+mkdir -p build/fs/SYS/SRC
+cp user/UI.inc build/fs/SYS/SRC/UI.inc
+mkdir -p build/fs/SYS/SRC
+cp user/files.c build/fs/SYS/SRC/files.c
+mkdir -p build/fs/SYS/SRC
+cp user/ide.c build/fs/SYS/SRC/ide.c
+mkdir -p build/fs/SYS/SRC
+cp user/debugger.c build/fs/SYS/SRC/debugger.c
+mkdir -p build/fs/SYS/SRC
+cp user/lumen.c build/fs/SYS/SRC/lumen.c
+mkdir -p build/fs/SYS/SRC
+cp user/race.c build/fs/SYS/SRC/race.c
+mkdir -p build/fs/SYS/SRC
+cp user/world.c build/fs/SYS/SRC/world.c
+mkdir -p build/fs/SYS/SRC
+cp user/probe.c build/fs/SYS/SRC/probe.c
+mkdir -p build/fs/SYS/INC
+cp user/SCAPI.H build/fs/SYS/INC/SCAPI.H
+/usr/bin/nasm -f bin boot/boot.asm -o build/boot.bin
+/usr/bin/nasm -f elf32 kernel/entry.asm -o build/entry.o
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -c kernel/main.c -o build/main.o
+/usr/bin/nasm -f elf32 kernel/idt.asm -o build/idt.o
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -c kernel/interrupts.c -o build/interrupts.o
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -c kernel/timer.c -o build/timer.o
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -c kernel/keyboard.c -o build/keyboard.o
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -c kernel/mouse.c -o build/mouse.o
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -c kernel/memory.c -o build/memory.o
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -c kernel/heap.c -o build/heap.o
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -c kernel/paging.c -o build/paging.o
+python3 tools/mkfont.py kernel/font16.txt build/font16_data.h
+mkfont: 36 字 -> build/font16_data.h
+python3 tools/mkfont8.py assets/font/phoenix-ascii.json build/font8_data.h
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -c kernel/process.c -o build/process.o
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -c kernel/module.c -o build/module.o
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -c kernel/ata.c -o build/ata.o
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -c kernel/fs.c -o build/fs.o
+/usr/bin/nasm -f bin user/shell.asm -o build/shell.bin
+/usr/bin/nasm -f bin user/hello.asm -o build/hello.bin
+mkdir -p build/fs/apps
+python3 tools/mkscx.py build/panic.bin build/fs/apps/panic.scx
+mkscx: build/panic.bin -> build/fs/apps/panic.scx (entry=0x0 base=0x400000 load=11B)
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -Iuser -c user/files.c -o build/user-files.o
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -Iuser -c user/note.c -o build/user-note.o
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -Iuser -c user/palette.c -o build/user-palette.o
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -Iuser -c user/calc.c -o build/user-calc.o
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -Iuser -c user/mines.c -o build/user-mines.o
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -Iuser -c user/probe.c -o build/user-probe.o
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -Iuser -c user/ide.c -o build/user-ide.o
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -Iuser -c user/debugger.c -o build/user-debugger.o
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -Iuser -c user/lumen.c -o build/user-lumen.o
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -Iuser -c user/race.c -o build/user-race.o
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -Iuser -c user/world.c -o build/user-world.o
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -Iuser -c user/assembler.c -o build/user-assembler.o
+ld -m elf_i386 --emit-relocs -T modules/linker.ld build/module-core.o -o build/module-core.elf
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: build/module-core.elf has a LOAD segment with RWX permissions
+ld -m elf_i386 -T user/linker.ld build/user-start.o build/user-s3c.o -o build/user-s3c.kernel.elf
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: build/user-s3c.kernel.elf has a LOAD segment with RWX permissions
+nm -n build/user-s3c.kernel.elf > build/user-s3c.sym
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -c kernel/gfx.c -o build/gfx.o
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -c kernel/wm.c -o build/wm.o
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -c kernel/task.c -o build/task.o
+mkdir -p build/fs/bin
+python3 tools/mkscx.py build/shell.bin build/fs/bin/shell.scx 0 0x400000
+mkscx: build/shell.bin -> build/fs/bin/shell.scx (entry=0x0 base=0x400000 load=5142B)
+mkdir -p build/fs/apps
+python3 tools/mkscx.py build/hello.bin build/fs/apps/hello.scx 0 0x400000
+ld -m elf_i386 -T user/linker.ld build/user-start.o build/user-files.o -o build/user-files.kernel.elf
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: build/user-files.kernel.elf has a LOAD segment with RWX permissions
+mkscx: build/hello.bin -> build/fs/apps/hello.scx (entry=0x0 base=0x400000 load=252B)
+ld -m elf_i386 -T user/linker.ld build/user-start.o build/user-note.o -o build/user-note.kernel.elf
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: build/user-note.kernel.elf has a LOAD segment with RWX permissions
+nm -n build/user-files.kernel.elf > build/user-files.sym
+nm -n build/user-note.kernel.elf > build/user-note.sym
+ld -m elf_i386 -T user/linker.ld build/user-start.o build/user-palette.o -o build/user-palette.kernel.elf
+ld -m elf_i386 -T user/linker.ld build/user-start.o build/user-calc.o -o build/user-calc.kernel.elf
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: build/user-palette.kernel.elf has a LOAD segment with RWX permissions
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: build/user-calc.kernel.elf has a LOAD segment with RWX permissions
+nm -n build/user-palette.kernel.elf > build/user-palette.sym
+nm -n build/user-calc.kernel.elf > build/user-calc.sym
+ld -m elf_i386 -T user/linker.ld build/user-start.o build/user-mines.o -o build/user-mines.kernel.elf
+ld -m elf_i386 -T user/linker.ld build/user-start.o build/user-probe.o -o build/user-probe.kernel.elf
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: build/user-mines.kernel.elf has a LOAD segment with RWX permissions
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: build/user-probe.kernel.elf has a LOAD segment with RWX permissions
+nm -n build/user-mines.kernel.elf > build/user-mines.sym
+nm -n build/user-probe.kernel.elf > build/user-probe.sym
+ld -m elf_i386 -T user/linker.ld build/user-start.o build/user-ide.o -o build/user-ide.kernel.elf
+ld -m elf_i386 -T user/linker.ld build/user-start.o build/user-debugger.o -o build/user-debugger.kernel.elf
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: build/user-ide.kernel.elf has a LOAD segment with RWX permissions
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: build/user-debugger.kernel.elf has a LOAD segment with RWX permissions
+nm -n build/user-ide.kernel.elf > build/user-ide.sym
+nm -n build/user-debugger.kernel.elf > build/user-debugger.sym
+ld -m elf_i386 -T user/linker.ld build/user-start.o build/user-lumen.o -o build/user-lumen.kernel.elf
+ld -m elf_i386 -T user/linker.ld build/user-start.o build/user-race.o -o build/user-race.kernel.elf
+/usr/bin/x86_64-linux-gnu-ld.bfd: /usr/bin/x86_64-linux-gnu-ld.bfd: warning: warning: build/user-race.kernel.elfbuild/user-lumen.kernel.elf has a LOAD segment with RWX permissions has a LOAD segment with RWX permissions
+
+nm -n build/user-race.kernel.elf > build/user-race.sym
+nm -n build/user-lumen.kernel.elf > build/user-lumen.sym
+ld -m elf_i386 -T user/linker.ld build/user-start.o build/user-world.o -o build/user-world.kernel.elf
+ld -m elf_i386 -T user/linker.ld build/user-start.o build/user-assembler.o -o build/user-assembler.kernel.elf
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: build/user-world.kernel.elf has a LOAD segment with RWX permissions/usr/bin/x86_64-linux-gnu-ld.bfd: warning: 
+build/user-assembler.kernel.elf has a LOAD segment with RWX permissions
+nm -n build/user-assembler.kernel.elf > build/user-assembler.sym
+nm -n build/user-world.kernel.elf > build/user-world.sym
+objcopy -O binary build/module-core.elf build/module-core.bin
+objcopy  -O binary build/user-s3c.kernel.elf build/user-s3c.bin
+ld -m elf_i386 -T linker.ld build/entry.o build/main.o build/idt.o build/interrupts.o build/timer.o build/keyboard.o build/mouse.o build/memory.o build/heap.o build/paging.o build/gfx.o build/wm.o build/task.o build/process.o build/module.o build/ata.o build/fs.o -o build/kernel.elf
+objcopy  -O binary build/user-files.kernel.elf build/user-files.bin
+objcopy  -O binary build/user-note.kernel.elf build/user-note.bin
+objcopy  -O binary build/user-palette.kernel.elf build/user-palette.bin
+objcopy  -O binary build/user-calc.kernel.elf build/user-calc.bin
+objcopy  -O binary build/user-mines.kernel.elf build/user-mines.bin
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: build/kernel.elf has a LOAD segment with RWX permissions
+objcopy  -O binary build/user-probe.kernel.elf build/user-probe.bin
+objcopy  -O binary build/user-ide.kernel.elf build/user-ide.bin
+objcopy  -O binary build/user-debugger.kernel.elf build/user-debugger.bin
+nm -n build/kernel.elf > build/kernel.sym
+objcopy  -O binary build/user-lumen.kernel.elf build/user-lumen.bin
+objcopy  -O binary build/user-race.kernel.elf build/user-race.bin
+objcopy  -O binary build/user-world.kernel.elf build/user-world.bin
+objcopy  -O binary build/user-assembler.kernel.elf build/user-assembler.bin
+python3 tools/mkskm.py build/module-core.elf build/module-core.bin build/fs/SYS/CORE/CORE.SKM
+mkdir -p build/fs/bin
+python3 tools/mkscx.py build/user-s3c.bin build/fs/bin/s3c.scx 0 0x400000 build/user-s3c.sym
+mkscx: build/user-s3c.bin -> build/fs/bin/s3c.scx (entry=0x0 base=0x400000 load=71017B)
+objcopy  -O binary build/kernel.elf build/kernel.bin
+mkskm: 696B + bss 4B, 9 relocations -> build/fs/SYS/CORE/CORE.SKM
+mkdir -p build/fs/apps
+python3 tools/mkscx.py build/user-files.bin build/fs/apps/files.scx 0 0x400000 build/user-files.sym
+mkdir -p build/fs/apps
+python3 tools/mkscx.py build/user-note.bin build/fs/apps/note.scx 0 0x400000 build/user-note.sym
+mkscx: build/user-files.bin -> build/fs/apps/files.scx (entry=0x0 base=0x400000 load=10145B)
+mkdir -p build/fs/apps
+python3 tools/mkscx.py build/user-palette.bin build/fs/apps/palette.scx 0 0x400000 build/user-palette.sym
+mkscx: build/user-note.bin -> build/fs/apps/note.scx (entry=0x0 base=0x400000 load=2313B)
+mkdir -p build/fs/apps
+python3 tools/mkscx.py build/user-calc.bin build/fs/apps/calc.scx 0 0x400000 build/user-calc.sym
+mkscx: build/user-palette.bin -> build/fs/apps/palette.scx (entry=0x0 base=0x400000 load=905B)
+mkdir -p build/fs/apps
+python3 tools/mkscx.py build/user-mines.bin build/fs/apps/mines.scx 0 0x400000 build/user-mines.sym
+mkscx: build/user-calc.bin -> build/fs/apps/calc.scx (entry=0x0 base=0x400000 load=2537B)
+mkdir -p build/fs/apps
+python3 tools/mkscx.py build/user-probe.bin build/fs/apps/probe.scx 0 0x400000 build/user-probe.sym
+mkscx: build/user-mines.bin -> build/fs/apps/mines.scx (entry=0x0 base=0x400000 load=3404B)
+mkdir -p build/fs/apps
+python3 tools/mkscx.py build/user-ide.bin build/fs/apps/ide.scx 0 0x400000 build/user-ide.sym
+mkscx: build/user-probe.bin -> build/fs/apps/probe.scx (entry=0x0 base=0x400000 load=5884B)
+mkdir -p build/fs/apps
+python3 tools/mkscx.py build/user-debugger.bin build/fs/apps/debugger.scx 0 0x400000 build/user-debugger.sym
+mkscx: build/user-ide.bin -> build/fs/apps/ide.scx (entry=0x0 base=0x400000 load=13761B)
+mkdir -p build/fs/apps
+python3 tools/mkscx.py build/user-lumen.bin build/fs/apps/lumen.scx 0 0x400000 build/user-lumen.sym
+mkscx: build/user-debugger.bin -> build/fs/apps/debugger.scx (entry=0x0 base=0x400000 load=13165B)
+mkdir -p build/fs/apps
+python3 tools/mkscx.py build/user-race.bin build/fs/apps/race.scx 0 0x400000 build/user-race.sym
+mkscx: build/user-lumen.bin -> build/fs/apps/lumen.scx (entry=0x0 base=0x400000 load=17525B)
+mkdir -p build/fs/apps
+python3 tools/mkscx.py build/user-world.bin build/fs/apps/world.scx 0 0x400000 build/user-world.sym
+mkscx: build/user-race.bin -> build/fs/apps/race.scx (entry=0x0 base=0x400000 load=8055B)
+mkdir -p build/fs/bin
+mkscx: build/user-world.bin -> build/fs/apps/world.scx (entry=0x0 base=0x400000 load=7177B)
+python3 tools/mkscx.py build/user-assembler.bin build/fs/bin/asm.scx 0 0x400000 build/user-assembler.sym
+python3 tools/mkimg.py build/boot.bin build/kernel.bin build/sandcore.img
+mkscx: build/user-assembler.bin -> build/fs/bin/asm.scx (entry=0x0 base=0x400000 load=7670B)
+python3 tools/mkfs.py
+boot=512B  kernel=52224B (102 sectors)  -> build/sandcore.img
+  apps/calc.scx: 2573B @ LBA 33
+  apps/debugger.scx: 13201B @ LBA 39
+  apps/files.scx: 10181B @ LBA 65
+  apps/hello.scx: 288B @ LBA 85
+  apps/ide.scx: 13797B @ LBA 86
+  apps/lumen.scx: 17561B @ LBA 113
+  apps/mines.scx: 3440B @ LBA 148
+  apps/note.scx: 2349B @ LBA 155
+  apps/palette.scx: 941B @ LBA 160
+  apps/panic.scx: 47B @ LBA 162
+  apps/probe.scx: 5920B @ LBA 163
+  apps/race.scx: 8091B @ LBA 175
+  apps/world.scx: 7213B @ LBA 191
+  bin/asm.scx: 7706B @ LBA 206
+  bin/s3c.scx: 71053B @ LBA 222
+  bin/shell.scx: 5178B @ LBA 361
+  desk/files.lnk: 35B @ LBA 372
+  desk/notes.lnk: 34B @ LBA 373
+  desk/palette.lnk: 41B @ LBA 374
+  desk/shell.lnk: 34B @ LBA 375
+  home/FEATURE.C: 3369B @ LBA 376
+  home/demo.asm: 337B @ LBA 383
+  home/notes.txt: 159B @ LBA 384
+  sys/files.scf: 288B @ LBA 385
+  sys/font.scf: 9948B @ LBA 386
+  sys/notes.scf: 288B @ LBA 406
+  sys/palette.scf: 288B @ LBA 407
+  sys/shell.scf: 288B @ LBA 408
+  SYS/CORE/CORE.SKM: 764B @ LBA 409
+  sys/INC/SCAPI.H: 13238B @ LBA 411
+  sys/SRC/UI.inc: 9027B @ LBA 437
+  sys/SRC/debugger.c: 10901B @ LBA 455
+  sys/SRC/files.c: 6652B @ LBA 477
+  sys/SRC/ide.c: 10650B @ LBA 490
+  sys/SRC/lumen.c: 11671B @ LBA 511
+  sys/SRC/probe.c: 6878B @ LBA 534
+  sys/SRC/race.c: 4439B @ LBA 548
+  sys/SRC/s3c.c: 8794B @ LBA 557
+  sys/SRC/s3c_emit.inc: 33904B @ LBA 575
+  sys/SRC/s3c_lex.inc: 6622B @ LBA 642
+  sys/SRC/s3c_parse.inc: 33904B @ LBA 655
+  sys/SRC/s3c_pp.inc: 22124B @ LBA 722
+  sys/SRC/world.c: 9201B @ LBA 766
+mkfs: 43 files -> /mnt/c/Users/Administrator/Desktop/projectos/backup-output/clean-clone-versions-01/rebuild-output/M7/sandcore/tools/../build/sanddata.img (SandFS @ LBA 0)
+{"status": "HISTORICAL_SOURCE_BUILD_PASS", "version": "M7", "source": "/mnt/c/Users/Administrator/Desktop/projectos/backup-output/clean-clone-versions-01/snapshots/M7/sandcore", "source_files_verified": 132, "command": ["make", "-j2"], "adaptation": [], "artifacts": [{"path": "/mnt/c/Users/Administrator/Desktop/projectos/backup-output/clean-clone-versions-01/rebuild-output/M7/sandcore/build/sandcore.img", "size": 1474560, "sha256": "2f1bef7eb44c1cd2a78a1a3907ad545a84043bfb6c7dac4edf20fe842736a758"}, {"path": "/mnt/c/Users/Administrator/Desktop/projectos/backup-output/clean-clone-versions-01/rebuild-output/M7/sandcore/build/sanddata.img", "size": 8388608, "sha256": "e91d97187c3b9b5c6e831794489e0d616d70f30febeb58af971b4c3b54ef77b3"}], "scope": "historical snapshot host build; native compiler publication and QEMU runtime remain separate"}

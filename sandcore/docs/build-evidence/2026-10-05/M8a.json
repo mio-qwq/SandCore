@@ -1,0 +1,26 @@
+{
+  "status": "HISTORICAL_SOURCE_BUILD_PASS",
+  "version": "M8a",
+  "source": "/mnt/c/Users/Administrator/Desktop/projectos/backup-output/clean-clone-versions-01/snapshots/M8a/sandcore",
+  "source_files_verified": 580,
+  "command": [
+    "make",
+    "-j2"
+  ],
+  "adaptation": [
+    "M8a独立副本仅替换M7原字节读取脚本与其ZIP文件前置条件"
+  ],
+  "artifacts": [
+    {
+      "path": "/mnt/c/Users/Administrator/Desktop/projectos/backup-output/clean-clone-versions-01/rebuild-output/M8a/sandcore/build/sandcore.img",
+      "size": 1474560,
+      "sha256": "3fc11c1a76cd11384826682d9b2b45ecdbe91ee785686abcbdef8fc9bcd353d1"
+    },
+    {
+      "path": "/mnt/c/Users/Administrator/Desktop/projectos/backup-output/clean-clone-versions-01/rebuild-output/M8a/sandcore/build/sanddata.img",
+      "size": 67108864,
+      "sha256": "e805e4c7d36e5afde6fd6bcddc893dffe7404fbfe15cfa124d22fd99925c9c10"
+    }
+  ],
+  "scope": "historical snapshot host build; native compiler publication and QEMU runtime remain separate"
+}

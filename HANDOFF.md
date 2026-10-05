@@ -1,5 +1,7 @@
 # HANDOFF.md —— 沙核 OS (SandCore) 交接文档
 
+> 2026-10-05备份复现最终：私有GitHub已保留完整当前/历史源码、字体输入、历史build/试玩源码及影片工程输入，并只保留M6/M7/M8a/M9每版一套精简镜像（共19.913MiB）。根build.bat默认M9，build-version.bat重建M6a/M6/M7/M8a独立快照。五版干净克隆宿主构建通过，M9启动盘与验收盘相同，串口17项、客体SCCC编译执行及HMP截图通过；旧快照逐文件摘要不变。仓库内精简基线读取替代本机原M7/M8a大ZIP依赖；四个可见Releases只链接Git构建包，0附件。范围与宿主/原生发布区别见SOURCE-BACKUP.md和REBUILD-VERIFICATION.md。保留GitHub用户删除.zcodeignore的提交。M9仍待用户验收，M8未完目标继续封存。
+
 > 2026-10-05最终：M9本轮Windows QEMU验证通过，待用户验收。CLI按用户确认本地140/171（81.9%）公开支持子集，完整310原表/31本地缺项保留。build31内核213240B；最后内核92项、播放器92项、40个连续生命周期/82项、随包工具17项通过。报告sandcore/docs/M9-ACCEPTANCE.md；独立入口temp miotest/run-m9-acceptance.bat。下文旧“当前/待验”均是阶段记录。
 
 CORE同色区段优化前后两盘仅CORE.SKM变化，完整1920×1032/1024×736工作区像素相同；实测空闲单核心CPU 7.42%/11.33%降为3.52%/6.25%，仅本机4秒样本。证据为build/m9-core-equivalence-01.json和m9-performance-20261005-02/03。08单次心跳超时根因未证实，09和最后40周期未复现。原试玩基线/会话、失败及历史证据保留，M8封存、M10网络/最终冻结和GPU安排保持。

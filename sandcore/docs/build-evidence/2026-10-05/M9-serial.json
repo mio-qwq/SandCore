@@ -1,0 +1,87 @@
+{
+  "status": "HOST_PROGRESS_CASES_PASS",
+  "cases": [
+    {
+      "name": "published-host-exit",
+      "status": "PASS"
+    },
+    {
+      "name": "PUT-GET-exact-full-content",
+      "status": "PASS"
+    },
+    {
+      "name": "PUT-GET-empty-file",
+      "status": "PASS"
+    },
+    {
+      "name": "GET-preserve-existing",
+      "status": "PASS"
+    },
+    {
+      "name": "PUT-initial-bar",
+      "status": "PASS"
+    },
+    {
+      "name": "PUT-intermediate-ACK-progress",
+      "status": "PASS"
+    },
+    {
+      "name": "PUT-speed-and-ETA",
+      "status": "PASS"
+    },
+    {
+      "name": "PUT-complete-after-commit",
+      "status": "PASS"
+    },
+    {
+      "name": "GET-initial-bar",
+      "status": "PASS"
+    },
+    {
+      "name": "GET-intermediate-ACK-progress",
+      "status": "PASS"
+    },
+    {
+      "name": "GET-speed-and-ETA",
+      "status": "PASS"
+    },
+    {
+      "name": "GET-complete-after-commit",
+      "status": "PASS"
+    },
+    {
+      "name": "GET-SHA-before-save",
+      "status": "PASS"
+    },
+    {
+      "name": "PUT-SHA-before-commit",
+      "status": "PASS"
+    },
+    {
+      "name": "failure-reports-incomplete",
+      "status": "PASS"
+    },
+    {
+      "name": "no-receiving-file-left",
+      "status": "PASS"
+    },
+    {
+      "name": "QEMU-exit-and-source-unchanged",
+      "status": "PASS"
+    }
+  ],
+  "scope": "HOST_PROGRESS_REAL_TRANSFER_ONLY",
+  "wall_seconds": 14.297000000020489,
+  "sha256": "7daca2095d0438260fa849183dfc67faa459fdf4936e1bc91eec6b281b27e4c2",
+  "stdout_sha256": "d3bc49555378db5b73534fbc05f9d1ae78412d5b2a5b7e5b214f3e0ff3573f68",
+  "commands": [
+    ":put \"C:/Users/Administrator/Desktop/projectos/sandcore/build/m9-clean-clone-progress-01/source.bin\" /TMP/PROGRESS.BIN",
+    ":get /TMP/PROGRESS.BIN \"C:/Users/Administrator/Desktop/projectos/sandcore/build/m9-clean-clone-progress-01/received.bin\"",
+    ":put \"C:/Users/Administrator/Desktop/projectos/sandcore/build/m9-clean-clone-progress-01/empty.bin\" /TMP/EMPTY.BIN",
+    ":get /TMP/EMPTY.BIN \"C:/Users/Administrator/Desktop/projectos/sandcore/build/m9-clean-clone-progress-01/zero.bin\"",
+    ":get /TMP/PROGRESS.BIN \"C:/Users/Administrator/Desktop/projectos/sandcore/build/m9-clean-clone-progress-01/existing.bin\"",
+    ":get /TMP/MISSING /does/not/exist/out.bin",
+    "echo M9-PROGRESS-ALIVE",
+    ":quit"
+  ]
+}

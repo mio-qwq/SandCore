@@ -1,0 +1,1701 @@
+mkdir -p build
+python3 tools/mkscf.py kernel/font16.txt build/fs/sys/font.scf
+python3 tools/mkscf.py assets/icons/shell.txt build/fs/sys/shell.scf
+mkscf: 1 glyphs -> build/fs/sys/shell.scf
+mkscf: 36 glyphs -> build/fs/sys/font.scf
+mkdir -p build/fs/desk
+/usr/bin/nasm -f bin user/panic.asm -o build/panic.bin
+cp assets/desk/shell.lnk build/fs/desk/shell.lnk
+mkdir -p build/fs/desk
+mkdir -p build/fs/desk
+cp assets/desk/files.lnk build/fs/desk/files.lnk
+cp assets/desk/notes.lnk build/fs/desk/notes.lnk
+mkdir -p build/fs/desk
+python3 tools/mkscf.py assets/icons/files.txt build/fs/sys/files.scf
+cp assets/desk/palette.lnk build/fs/desk/palette.lnk
+python3 tools/mkscf.py assets/icons/notes.txt build/fs/sys/notes.scf
+mkscf: 1 glyphs -> build/fs/sys/files.scf
+python3 tools/mkscf.py assets/icons/palette.txt build/fs/sys/palette.scf
+mkscf: 1 glyphs -> build/fs/sys/notes.scf
+mkdir -p build/fs/home
+cp assets/home/demo.asm build/fs/home/demo.asm
+mkdir -p build/fs/home
+cp assets/home/notes.txt build/fs/home/notes.txt
+mkscf: 1 glyphs -> build/fs/sys/palette.scf
+mkdir -p build/fs/home
+cp assets/home/FEATURE.C build/fs/home/FEATURE.C
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -c modules/core.c -o build/module-core.o
+/usr/bin/nasm -f elf32 user/start.asm -o build/user-start.o
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -Iuser -c user/s3c.c -o build/user-s3c.o
+In file included from user/COMPILEUI.inc:5,
+                 from user/s3c.c:20:
+user/NUI.inc: In function ‘ui_button_box’:
+user/NUI.inc:351:13: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  351 |             if(left<ui_clip_x)left=ui_clip_x;if(top<ui_clip_y)top=ui_clip_y;
+      |             ^~
+user/NUI.inc:351:46: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  351 |             if(left<ui_clip_x)left=ui_clip_x;if(top<ui_clip_y)top=ui_clip_y;
+      |                                              ^~
+user/NUI.inc:352:13: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  352 |             if(right>ui_clip_right)right=ui_clip_right;if(bottom>ui_clip_bottom)bottom=ui_clip_bottom;
+      |             ^~
+user/NUI.inc:352:56: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  352 |             if(right>ui_clip_right)right=ui_clip_right;if(bottom>ui_clip_bottom)bottom=ui_clip_bottom;
+      |                                                        ^~
+mkdir -p build/codec/webp/src/dec/
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -Os -DWEBP_REDUCE_SIZE -ffunction-sections -fdata-sections -Iuser/codec/include -Iuser/codec -Iuser -Ithird_party/stb -Ithird_party/libwebp -c third_party/libwebp/src/dec/alpha_dec.c -o build/codec/webp/src/dec/alpha_dec.o
+In file included from user/NUI.inc:12:
+user/SCMEM.inc: At top level:
+user/SCMEM.inc:39:14: warning: ‘sc_mem_fill’ defined but not used [-Wunused-function]
+   39 | static void *sc_mem_fill(void *destination,int value,u32 bytes)
+      |              ^~~~~~~~~~~
+user/SCMEM.inc:26:14: warning: ‘sc_mem_move’ defined but not used [-Wunused-function]
+   26 | static void *sc_mem_move(void *destination,const void *source,u32 bytes)
+      |              ^~~~~~~~~~~
+mkdir -p build/codec/webp/src/dec/
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -Os -DWEBP_REDUCE_SIZE -ffunction-sections -fdata-sections -Iuser/codec/include -Iuser/codec -Iuser -Ithird_party/stb -Ithird_party/libwebp -c third_party/libwebp/src/dec/buffer_dec.c -o build/codec/webp/src/dec/buffer_dec.o
+mkdir -p build/codec/webp/src/dec/
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -Os -DWEBP_REDUCE_SIZE -ffunction-sections -fdata-sections -Iuser/codec/include -Iuser/codec -Iuser -Ithird_party/stb -Ithird_party/libwebp -c third_party/libwebp/src/dec/frame_dec.c -o build/codec/webp/src/dec/frame_dec.o
+mkdir -p build/codec/webp/src/dec/
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -Os -DWEBP_REDUCE_SIZE -ffunction-sections -fdata-sections -Iuser/codec/include -Iuser/codec -Iuser -Ithird_party/stb -Ithird_party/libwebp -c third_party/libwebp/src/dec/idec_dec.c -o build/codec/webp/src/dec/idec_dec.o
+mkdir -p build/codec/webp/src/dec/
+mkdir -p build/codec/webp/src/dec/
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -Os -DWEBP_REDUCE_SIZE -ffunction-sections -fdata-sections -Iuser/codec/include -Iuser/codec -Iuser -Ithird_party/stb -Ithird_party/libwebp -c third_party/libwebp/src/dec/io_dec.c -o build/codec/webp/src/dec/io_dec.o
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -Os -DWEBP_REDUCE_SIZE -ffunction-sections -fdata-sections -Iuser/codec/include -Iuser/codec -Iuser -Ithird_party/stb -Ithird_party/libwebp -c third_party/libwebp/src/dec/quant_dec.c -o build/codec/webp/src/dec/quant_dec.o
+mkdir -p build/codec/webp/src/dec/
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -Os -DWEBP_REDUCE_SIZE -ffunction-sections -fdata-sections -Iuser/codec/include -Iuser/codec -Iuser -Ithird_party/stb -Ithird_party/libwebp -c third_party/libwebp/src/dec/tree_dec.c -o build/codec/webp/src/dec/tree_dec.o
+mkdir -p build/codec/webp/src/dec/
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -Os -DWEBP_REDUCE_SIZE -ffunction-sections -fdata-sections -Iuser/codec/include -Iuser/codec -Iuser -Ithird_party/stb -Ithird_party/libwebp -c third_party/libwebp/src/dec/vp8_dec.c -o build/codec/webp/src/dec/vp8_dec.o
+mkdir -p build/codec/webp/src/dec/
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -Os -DWEBP_REDUCE_SIZE -ffunction-sections -fdata-sections -Iuser/codec/include -Iuser/codec -Iuser -Ithird_party/stb -Ithird_party/libwebp -c third_party/libwebp/src/dec/vp8l_dec.c -o build/codec/webp/src/dec/vp8l_dec.o
+mkdir -p build/codec/webp/src/dec/
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -Os -DWEBP_REDUCE_SIZE -ffunction-sections -fdata-sections -Iuser/codec/include -Iuser/codec -Iuser -Ithird_party/stb -Ithird_party/libwebp -c third_party/libwebp/src/dec/webp_dec.c -o build/codec/webp/src/dec/webp_dec.o
+mkdir -p build/codec/webp/src/dsp/
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -Os -DWEBP_REDUCE_SIZE -ffunction-sections -fdata-sections -Iuser/codec/include -Iuser/codec -Iuser -Ithird_party/stb -Ithird_party/libwebp -c third_party/libwebp/src/dsp/alpha_processing.c -o build/codec/webp/src/dsp/alpha_processing.o
+mkdir -p build/codec/webp/src/dsp/
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -Os -DWEBP_REDUCE_SIZE -ffunction-sections -fdata-sections -Iuser/codec/include -Iuser/codec -Iuser -Ithird_party/stb -Ithird_party/libwebp -c third_party/libwebp/src/dsp/cpu.c -o build/codec/webp/src/dsp/cpu.o
+mkdir -p build/codec/webp/src/dsp/
+mkdir -p build/codec/webp/src/dsp/
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -Os -DWEBP_REDUCE_SIZE -ffunction-sections -fdata-sections -Iuser/codec/include -Iuser/codec -Iuser -Ithird_party/stb -Ithird_party/libwebp -c third_party/libwebp/src/dsp/dec.c -o build/codec/webp/src/dsp/dec.o
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -Os -DWEBP_REDUCE_SIZE -ffunction-sections -fdata-sections -Iuser/codec/include -Iuser/codec -Iuser -Ithird_party/stb -Ithird_party/libwebp -c third_party/libwebp/src/dsp/dec_clip_tables.c -o build/codec/webp/src/dsp/dec_clip_tables.o
+mkdir -p build/codec/webp/src/dsp/
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -Os -DWEBP_REDUCE_SIZE -ffunction-sections -fdata-sections -Iuser/codec/include -Iuser/codec -Iuser -Ithird_party/stb -Ithird_party/libwebp -c third_party/libwebp/src/dsp/filters.c -o build/codec/webp/src/dsp/filters.o
+mkdir -p build/codec/webp/src/dsp/
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -Os -DWEBP_REDUCE_SIZE -ffunction-sections -fdata-sections -Iuser/codec/include -Iuser/codec -Iuser -Ithird_party/stb -Ithird_party/libwebp -c third_party/libwebp/src/dsp/lossless.c -o build/codec/webp/src/dsp/lossless.o
+mkdir -p build/codec/webp/src/dsp/
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -Os -DWEBP_REDUCE_SIZE -ffunction-sections -fdata-sections -Iuser/codec/include -Iuser/codec -Iuser -Ithird_party/stb -Ithird_party/libwebp -c third_party/libwebp/src/dsp/rescaler.c -o build/codec/webp/src/dsp/rescaler.o
+mkdir -p build/codec/webp/src/dsp/
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -Os -DWEBP_REDUCE_SIZE -ffunction-sections -fdata-sections -Iuser/codec/include -Iuser/codec -Iuser -Ithird_party/stb -Ithird_party/libwebp -c third_party/libwebp/src/dsp/upsampling.c -o build/codec/webp/src/dsp/upsampling.o
+python3 tools/adapt_webp.py
+libwebp integer adapter: {'author': 'mio', 'source': 'libwebp/src/utils/random_utils.c', 'source_sha256': 'e8dd9b5df3fe23d78df8184550d86d61bb019241665ea126ea099e96c2359e71', 'generated_sha256': '7eb48396b116383d5a0f126309c780cf675d9e2003a0f5d50926ac6693d10a94', 'change': 'VP8InitRandom amplitude: IEEE754 bit pattern to Q8, no floating arithmetic'}
+mkdir -p build/codec/webp/src/utils/
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -Os -DWEBP_REDUCE_SIZE -ffunction-sections -fdata-sections -Iuser/codec/include -Iuser/codec -Iuser -Ithird_party/stb -Ithird_party/libwebp -c third_party/libwebp/src/utils/bit_reader_utils.c -o build/codec/webp/src/utils/bit_reader_utils.o
+mkdir -p build/codec/webp/src/utils/
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -Os -DWEBP_REDUCE_SIZE -ffunction-sections -fdata-sections -Iuser/codec/include -Iuser/codec -Iuser -Ithird_party/stb -Ithird_party/libwebp -c third_party/libwebp/src/utils/color_cache_utils.c -o build/codec/webp/src/utils/color_cache_utils.o
+mkdir -p build/codec/webp/src/utils/
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -Os -DWEBP_REDUCE_SIZE -ffunction-sections -fdata-sections -Iuser/codec/include -Iuser/codec -Iuser -Ithird_party/stb -Ithird_party/libwebp -c third_party/libwebp/src/utils/filters_utils.c -o build/codec/webp/src/utils/filters_utils.o
+mkdir -p build/codec/webp/src/utils/
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -Os -DWEBP_REDUCE_SIZE -ffunction-sections -fdata-sections -Iuser/codec/include -Iuser/codec -Iuser -Ithird_party/stb -Ithird_party/libwebp -c third_party/libwebp/src/utils/huffman_utils.c -o build/codec/webp/src/utils/huffman_utils.o
+mkdir -p build/codec/webp/src/utils/
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -Os -DWEBP_REDUCE_SIZE -ffunction-sections -fdata-sections -Iuser/codec/include -Iuser/codec -Iuser -Ithird_party/stb -Ithird_party/libwebp -c third_party/libwebp/src/utils/palette.c -o build/codec/webp/src/utils/palette.o
+mkdir -p build/codec/webp/src/utils/
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -Os -DWEBP_REDUCE_SIZE -ffunction-sections -fdata-sections -Iuser/codec/include -Iuser/codec -Iuser -Ithird_party/stb -Ithird_party/libwebp -c third_party/libwebp/src/utils/quant_levels_dec_utils.c -o build/codec/webp/src/utils/quant_levels_dec_utils.o
+mkdir -p build/codec/webp/src/utils/
+mkdir -p build/codec/webp/src/utils/
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -Os -DWEBP_REDUCE_SIZE -ffunction-sections -fdata-sections -Iuser/codec/include -Iuser/codec -Iuser -Ithird_party/stb -Ithird_party/libwebp -c third_party/libwebp/src/utils/rescaler_utils.c -o build/codec/webp/src/utils/rescaler_utils.o
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -Os -DWEBP_REDUCE_SIZE -ffunction-sections -fdata-sections -Iuser/codec/include -Iuser/codec -Iuser -Ithird_party/stb -Ithird_party/libwebp -c build/codec/webp-adapt/random_utils.c -o build/codec/webp/src/utils/random_utils.o
+mkdir -p build/codec/webp/src/utils/
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -Os -DWEBP_REDUCE_SIZE -ffunction-sections -fdata-sections -Iuser/codec/include -Iuser/codec -Iuser -Ithird_party/stb -Ithird_party/libwebp -c third_party/libwebp/src/utils/thread_utils.c -o build/codec/webp/src/utils/thread_utils.o
+mkdir -p build/codec/webp/src/utils/
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -Os -DWEBP_REDUCE_SIZE -ffunction-sections -fdata-sections -Iuser/codec/include -Iuser/codec -Iuser -Ithird_party/stb -Ithird_party/libwebp -c third_party/libwebp/src/utils/utils.c -o build/codec/webp/src/utils/utils.o
+mkdir -p build/codec/
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -Os -DWEBP_REDUCE_SIZE -ffunction-sections -fdata-sections -Iuser/codec/include -Iuser/codec -Iuser -Ithird_party/stb -Ithird_party/libwebp -c user/codec/service.c -o build/codec/service.o
+mkdir -p build/codec/
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -Os -DWEBP_REDUCE_SIZE -ffunction-sections -fdata-sections -Iuser/codec/include -Iuser/codec -Iuser -Ithird_party/stb -Ithird_party/libwebp -c user/codec/runtime.c -o build/codec/runtime.o
+mkdir -p build/codec/
+user/codec/runtime.c: In function ‘divide64’:
+user/codec/runtime.c:153:5: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  153 |     if(remainder)*remainder=r.value;return q.value;
+      |     ^~
+user/codec/runtime.c:153:37: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  153 |     if(remainder)*remainder=r.value;return q.value;
+      |                                     ^~~~~~
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -Os -DWEBP_REDUCE_SIZE -ffunction-sections -fdata-sections -Iuser/codec/include -Iuser/codec -Iuser -Ithird_party/stb -Ithird_party/libwebp -c user/codec/decode.c -o build/codec/decode.o
+mkdir -p build/fs/SYS/CORE/
+cat third_party/stb/LICENSE third_party/libwebp/COPYING third_party/libwebp/PATENTS third_party/libwebp/AUTHORS > build/fs/SYS/CORE/IMAGE.LIC
+mkdir -p build/fs/SYS/SRC
+cp user/assembler.c build/fs/SYS/SRC/assembler.c
+mkdir -p build/fs/SYS/SRC
+cp user/calc.c build/fs/SYS/SRC/calc.c
+mkdir -p build/fs/SYS/SRC
+cp user/canvas.c build/fs/SYS/SRC/canvas.c
+mkdir -p build/fs/SYS/SRC
+cp user/cli.c build/fs/SYS/SRC/cli.c
+mkdir -p build/fs/SYS/SRC
+cp user/configprobe.c build/fs/SYS/SRC/configprobe.c
+mkdir -p build/fs/SYS/SRC
+cp user/damageprobe.c build/fs/SYS/SRC/damageprobe.c
+mkdir -p build/fs/SYS/SRC
+cp user/debugger.c build/fs/SYS/SRC/debugger.c
+mkdir -p build/fs/SYS/SRC
+cp user/files.c build/fs/SYS/SRC/files.c
+mkdir -p build/fs/SYS/SRC
+cp user/frameirqprobe.c build/fs/SYS/SRC/frameirqprobe.c
+mkdir -p build/fs/SYS/SRC
+cp user/ide.c build/fs/SYS/SRC/ide.c
+mkdir -p build/fs/SYS/SRC
+cp user/imageprobe.c build/fs/SYS/SRC/imageprobe.c
+mkdir -p build/fs/SYS/SRC
+cp user/indexprobe.c build/fs/SYS/SRC/indexprobe.c
+mkdir -p build/fs/SYS/SRC
+cp user/lens.c build/fs/SYS/SRC/lens.c
+mkdir -p build/fs/SYS/SRC
+cp user/lumen.c build/fs/SYS/SRC/lumen.c
+mkdir -p build/fs/SYS/SRC
+cp user/mines.c build/fs/SYS/SRC/mines.c
+mkdir -p build/fs/SYS/SRC
+cp user/monitor.c build/fs/SYS/SRC/monitor.c
+mkdir -p build/fs/SYS/SRC
+cp user/note.c build/fs/SYS/SRC/note.c
+mkdir -p build/fs/SYS/SRC
+cp user/palette.c build/fs/SYS/SRC/palette.c
+mkdir -p build/fs/SYS/SRC
+cp user/pathprobe.c build/fs/SYS/SRC/pathprobe.c
+mkdir -p build/fs/SYS/SRC
+cp user/probe.c build/fs/SYS/SRC/probe.c
+mkdir -p build/fs/SYS/SRC
+cp user/race.c build/fs/SYS/SRC/race.c
+mkdir -p build/fs/SYS/SRC
+cp user/rgbprobe.c build/fs/SYS/SRC/rgbprobe.c
+mkdir -p build/fs/SYS/SRC
+cp user/s3c.c build/fs/SYS/SRC/s3c.c
+mkdir -p build/fs/SYS/SRC
+cp user/schedprobe.c build/fs/SYS/SRC/schedprobe.c
+mkdir -p build/fs/SYS/SRC
+cp user/settings.c build/fs/SYS/SRC/settings.c
+mkdir -p build/fs/SYS/SRC
+cp user/shell.c build/fs/SYS/SRC/shell.c
+mkdir -p build/fs/SYS/SRC
+cp user/sysprobe.c build/fs/SYS/SRC/sysprobe.c
+mkdir -p build/fs/SYS/SRC
+cp user/themeprobe.c build/fs/SYS/SRC/themeprobe.c
+mkdir -p build/fs/SYS/SRC
+cp user/userprobe.c build/fs/SYS/SRC/userprobe.c
+mkdir -p build/fs/SYS/SRC
+cp user/world.c build/fs/SYS/SRC/world.c
+mkdir -p build/fs/SYS/SRC
+cp user/COMPILEUI.inc build/fs/SYS/SRC/COMPILEUI.inc
+mkdir -p build/fs/SYS/SRC
+cp user/IMAGE.inc build/fs/SYS/SRC/IMAGE.inc
+mkdir -p build/fs/SYS/SRC
+cp user/IMAGECLIENT.inc build/fs/SYS/SRC/IMAGECLIENT.inc
+mkdir -p build/fs/SYS/SRC
+cp user/NUI.inc build/fs/SYS/SRC/NUI.inc
+mkdir -p build/fs/SYS/SRC
+cp user/SCENE.inc build/fs/SYS/SRC/SCENE.inc
+mkdir -p build/fs/SYS/SRC
+cp user/SCENENUI.inc build/fs/SYS/SRC/SCENENUI.inc
+mkdir -p build/fs/SYS/SRC
+cp user/SCMEM.inc build/fs/SYS/SRC/SCMEM.inc
+mkdir -p build/fs/SYS/SRC
+cp user/SCVOX.inc build/fs/SYS/SRC/SCVOX.inc
+mkdir -p build/fs/SYS/SRC
+cp user/SCWIDE.inc build/fs/SYS/SRC/SCWIDE.inc
+mkdir -p build/fs/SYS/SRC
+cp user/SETTINGS.inc build/fs/SYS/SRC/SETTINGS.inc
+mkdir -p build/fs/SYS/SRC
+cp user/UI.inc build/fs/SYS/SRC/UI.inc
+mkdir -p build/fs/SYS/SRC
+cp user/race_game.inc build/fs/SYS/SRC/race_game.inc
+mkdir -p build/fs/SYS/SRC
+cp user/s3c_emit.inc build/fs/SYS/SRC/s3c_emit.inc
+mkdir -p build/fs/SYS/SRC
+cp user/s3c_lex.inc build/fs/SYS/SRC/s3c_lex.inc
+mkdir -p build/fs/SYS/SRC
+cp user/s3c_parse.inc build/fs/SYS/SRC/s3c_parse.inc
+mkdir -p build/fs/SYS/SRC
+cp user/s3c_pp.inc build/fs/SYS/SRC/s3c_pp.inc
+mkdir -p build/fs/SYS/SRC
+cp user/world_entities.inc build/fs/SYS/SRC/world_entities.inc
+mkdir -p build/fs/SYS/SRC
+cp user/world_game.inc build/fs/SYS/SRC/world_game.inc
+mkdir -p build/fs/SYS/SRC
+cp user/world_panels.inc build/fs/SYS/SRC/world_panels.inc
+mkdir -p build/fs/SYS/SRC
+cp user/IMAGECLIENT.H build/fs/SYS/SRC/IMAGECLIENT.H
+mkdir -p build/fs/SYS/SRC
+cp user/RACEGAME.H build/fs/SYS/SRC/RACEGAME.H
+mkdir -p build/fs/SYS/SRC
+cp user/SCAPI.H build/fs/SYS/SRC/SCAPI.H
+mkdir -p build/fs/SYS/SRC
+cp user/SCENE.H build/fs/SYS/SRC/SCENE.H
+mkdir -p build/fs/SYS/SRC
+cp user/SCMEM.H build/fs/SYS/SRC/SCMEM.H
+mkdir -p build/fs/SYS/SRC
+cp user/SCVOX.H build/fs/SYS/SRC/SCVOX.H
+mkdir -p build/fs/SYS/SRC
+cp user/SCWIDE.H build/fs/SYS/SRC/SCWIDE.H
+mkdir -p build/fs/SYS/SRC
+cp user/WORLDGAME.H build/fs/SYS/SRC/WORLDGAME.H
+mkdir -p build/fs/SYS/SRC
+cp user/api.h build/fs/SYS/SRC/api.h
+mkdir -p build/fs/SYS/INC
+cp user/IMAGECLIENT.H build/fs/SYS/INC/IMAGECLIENT.H
+mkdir -p build/fs/SYS/INC
+cp user/RACEGAME.H build/fs/SYS/INC/RACEGAME.H
+mkdir -p build/fs/SYS/INC
+cp user/SCAPI.H build/fs/SYS/INC/SCAPI.H
+mkdir -p build/fs/SYS/INC
+cp user/SCENE.H build/fs/SYS/INC/SCENE.H
+mkdir -p build/fs/SYS/INC
+cp user/SCMEM.H build/fs/SYS/INC/SCMEM.H
+mkdir -p build/fs/SYS/INC
+cp user/SCVOX.H build/fs/SYS/INC/SCVOX.H
+mkdir -p build/fs/SYS/INC
+cp user/SCWIDE.H build/fs/SYS/INC/SCWIDE.H
+mkdir -p build/fs/SYS/INC
+cp user/WORLDGAME.H build/fs/SYS/INC/WORLDGAME.H
+/mnt/c/Users/Administrator/AppData/Local/Programs/Python/Python312//python.exe tools/gen_m8_assets.py
+python3 tools/preserve_legacy.py
+ARGB resources: 128px Aurora / real 32px 16-color Classic; selected source wallpapers
+M8 assets: color icons, editable menu/display, welcome image
+touch build/m8-assets.stamp
+/usr/bin/nasm -f bin boot/boot.asm -o build/boot.bin
+/usr/bin/nasm -f elf32 kernel/entry.asm -o build/entry.o
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -c kernel/main.c -o build/main.o
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -c kernel/boot_scene.c -o build/boot_scene.o
+kernel/boot_scene.c: In function ‘boot_scene_draw’:
+kernel/boot_scene.c:51:13: warning: this ‘while’ clause does not guard... [-Wmisleading-indentation]
+   51 |             while(dx*dx+dy*dy>radius*radius)dx--;inset=radius-dx;
+      |             ^~~~~
+kernel/boot_scene.c:51:50: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘while’
+   51 |             while(dx*dx+dy*dy>radius*radius)dx--;inset=radius-dx;
+      |                                                  ^~~~~
+/usr/bin/nasm -f elf32 kernel/idt.asm -o build/idt.o
+Repository M7 legacy verified and installed
+touch build/legacy.stamp
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -c kernel/interrupts.c -o build/interrupts.o
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -c kernel/timer.c -o build/timer.o
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -c kernel/keyboard.c -o build/keyboard.o
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -c kernel/mouse.c -o build/mouse.o
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -c kernel/memory.c -o build/memory.o
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -c kernel/heap.c -o build/heap.o
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -c kernel/paging.c -o build/paging.o
+python3 tools/mkfont.py kernel/font16.txt build/font16_data.h
+mkfont: 36 字 -> build/font16_data.h
+python3 tools/mkfont8.py assets/font/phoenix-ascii.json build/font8_data.h
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -c kernel/display.c -o build/display.o
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -c kernel/theme.c -o build/theme.o
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -c kernel/image.c -o build/image.o
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -c kernel/image_service.c -o build/image_service.o
+kernel/image_service.c: In function ‘image_service_submit’:
+kernel/image_service.c:122:9: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  122 |         if(job==jobs)wm_request_compose();return 0;
+      |         ^~
+kernel/image_service.c:122:43: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  122 |         if(job==jobs)wm_request_compose();return 0;
+      |                                           ^~~~~~
+kernel/image_service.c:136:5: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  136 |     if(job==jobs)wm_request_compose();return 0;
+      |     ^~
+kernel/image_service.c:136:39: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  136 |     if(job==jobs)wm_request_compose();return 0;
+      |                                       ^~~~~~
+kernel/image_service.c: In function ‘image_service_poll’:
+kernel/image_service.c:174:13: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  174 |             if(!i)wm_request_compose();continue;
+      |             ^~
+kernel/image_service.c:174:40: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  174 |             if(!i)wm_request_compose();continue;
+      |                                        ^~~~~~~~
+kernel/image_service.c:188:9: warning: this ‘while’ clause does not guard... [-Wmisleading-indentation]
+  188 |         while(n)command[at++]=reverse[--n];command[at]=0;
+      |         ^~~~~
+kernel/image_service.c:188:44: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘while’
+  188 |         while(n)command[at++]=reverse[--n];command[at]=0;
+      |                                            ^~~~~~~
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -c kernel/userspace.c -o build/userspace.o
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -c kernel/desktop.c -o build/desktop.o
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -c kernel/wm.c -o build/wm.o
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -c kernel/task.c -o build/task.o
+kernel/wm.c: In function ‘wm_user_mouse_relative’:
+kernel/wm.c:156:5: warning: this ‘for’ clause does not guard... [-Wmisleading-indentation]
+  156 |     for(int i=0;i<8;i++)out[i]=0;out[0]=1;out[7]=wm_focused(pid);
+      |     ^~~
+kernel/wm.c:156:34: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘for’
+  156 |     for(int i=0;i<8;i++)out[i]=0;out[0]=1;out[7]=wm_focused(pid);
+      |                                  ^~~
+In file included from kernel/wm.c:401:
+kernel/wm_terminal.inc: In function ‘terminal_rect’:
+kernel/wm_terminal.inc:44:5: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+   44 |     if(width>w->cw-x)width=w->cw-x;if(height>w->ch-y)height=w->ch-y;
+      |     ^~
+kernel/wm_terminal.inc:44:36: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+   44 |     if(width>w->cw-x)width=w->cw-x;if(height>w->ch-y)height=w->ch-y;
+      |                                    ^~
+kernel/wm_terminal.inc: In function ‘terminal_redraw’:
+kernel/wm_terminal.inc:76:5: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+   76 |     if(t->first>max)t->first=max;if(t->first<0)t->first=0;
+      |     ^~
+kernel/wm_terminal.inc:76:34: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+   76 |     if(t->first>max)t->first=max;if(t->first<0)t->first=0;
+      |                                  ^~
+kernel/wm_terminal.inc: In function ‘terminal_mouse’:
+kernel/wm_terminal.inc:167:13: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  167 |             if(position<0)position=0;if(position>travel)position=travel;
+      |             ^~
+kernel/wm_terminal.inc:167:38: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  167 |             if(position<0)position=0;if(position>travel)position=travel;
+      |                                      ^~
+kernel/wm_terminal.inc:175:13: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  175 |             if(t->first<0)t->first=0;if(t->first>max)t->first=max;
+      |             ^~
+kernel/wm_terminal.inc:175:38: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  175 |             if(t->first<0)t->first=0;if(t->first>max)t->first=max;
+      |                                      ^~
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -c kernel/process.c -o build/process.o
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -c kernel/module.c -o build/module.o
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -c kernel/ata.c -o build/ata.o
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -c kernel/fs.c -o build/fs.o
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -Iuser -c user/shell.c -o build/user-shell.o
+/usr/bin/nasm -f bin user/hello.asm -o build/hello.bin
+mkdir -p build/fs/apps
+python3 tools/mkscx.py build/panic.bin build/fs/apps/panic.scx
+mkscx: build/panic.bin -> build/fs/apps/panic.scx (entry=0x0 base=0x400000 load=11B)
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -Iuser -c user/files.c -o build/user-files.o
+In file included from user/files.c:11:
+user/NUI.inc: In function ‘ui_button_box’:
+user/NUI.inc:351:13: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  351 |             if(left<ui_clip_x)left=ui_clip_x;if(top<ui_clip_y)top=ui_clip_y;
+      |             ^~
+user/NUI.inc:351:46: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  351 |             if(left<ui_clip_x)left=ui_clip_x;if(top<ui_clip_y)top=ui_clip_y;
+      |                                              ^~
+user/NUI.inc:352:13: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  352 |             if(right>ui_clip_right)right=ui_clip_right;if(bottom>ui_clip_bottom)bottom=ui_clip_bottom;
+      |             ^~
+user/NUI.inc:352:56: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  352 |             if(right>ui_clip_right)right=ui_clip_right;if(bottom>ui_clip_bottom)bottom=ui_clip_bottom;
+      |                                                        ^~
+In file included from user/NUI.inc:12:
+user/SCMEM.inc: At top level:
+user/SCMEM.inc:39:14: warning: ‘sc_mem_fill’ defined but not used [-Wunused-function]
+   39 | static void *sc_mem_fill(void *destination,int value,u32 bytes)
+      |              ^~~~~~~~~~~
+user/SCMEM.inc:26:14: warning: ‘sc_mem_move’ defined but not used [-Wunused-function]
+   26 | static void *sc_mem_move(void *destination,const void *source,u32 bytes)
+      |              ^~~~~~~~~~~
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -Iuser -c user/note.c -o build/user-note.o
+In file included from user/note.c:14:
+user/NUI.inc: In function ‘ui_button_box’:
+user/NUI.inc:351:13: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  351 |             if(left<ui_clip_x)left=ui_clip_x;if(top<ui_clip_y)top=ui_clip_y;
+      |             ^~
+user/NUI.inc:351:46: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  351 |             if(left<ui_clip_x)left=ui_clip_x;if(top<ui_clip_y)top=ui_clip_y;
+      |                                              ^~
+user/NUI.inc:352:13: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  352 |             if(right>ui_clip_right)right=ui_clip_right;if(bottom>ui_clip_bottom)bottom=ui_clip_bottom;
+      |             ^~
+user/NUI.inc:352:56: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  352 |             if(right>ui_clip_right)right=ui_clip_right;if(bottom>ui_clip_bottom)bottom=ui_clip_bottom;
+      |                                                        ^~
+user/note.c: At top level:
+user/note.c:57:12: warning: ‘line_end’ defined but not used [-Wunused-function]
+   57 | static int line_end(int at)
+      |            ^~~~~~~~
+In file included from user/NUI.inc:12:
+user/SCMEM.inc:39:14: warning: ‘sc_mem_fill’ defined but not used [-Wunused-function]
+   39 | static void *sc_mem_fill(void *destination,int value,u32 bytes)
+      |              ^~~~~~~~~~~
+user/SCMEM.inc:26:14: warning: ‘sc_mem_move’ defined but not used [-Wunused-function]
+   26 | static void *sc_mem_move(void *destination,const void *source,u32 bytes)
+      |              ^~~~~~~~~~~
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -Iuser -c user/palette.c -o build/user-palette.o
+In file included from user/palette.c:4:
+user/NUI.inc: In function ‘ui_button_box’:
+user/NUI.inc:351:13: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  351 |             if(left<ui_clip_x)left=ui_clip_x;if(top<ui_clip_y)top=ui_clip_y;
+      |             ^~
+user/NUI.inc:351:46: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  351 |             if(left<ui_clip_x)left=ui_clip_x;if(top<ui_clip_y)top=ui_clip_y;
+      |                                              ^~
+user/NUI.inc:352:13: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  352 |             if(right>ui_clip_right)right=ui_clip_right;if(bottom>ui_clip_bottom)bottom=ui_clip_bottom;
+      |             ^~
+user/NUI.inc:352:56: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  352 |             if(right>ui_clip_right)right=ui_clip_right;if(bottom>ui_clip_bottom)bottom=ui_clip_bottom;
+      |                                                        ^~
+In file included from user/NUI.inc:12:
+user/SCMEM.inc: At top level:
+user/SCMEM.inc:39:14: warning: ‘sc_mem_fill’ defined but not used [-Wunused-function]
+   39 | static void *sc_mem_fill(void *destination,int value,u32 bytes)
+      |              ^~~~~~~~~~~
+user/SCMEM.inc:26:14: warning: ‘sc_mem_move’ defined but not used [-Wunused-function]
+   26 | static void *sc_mem_move(void *destination,const void *source,u32 bytes)
+      |              ^~~~~~~~~~~
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -Iuser -c user/calc.c -o build/user-calc.o
+In file included from user/calc.c:4:
+user/NUI.inc: In function ‘ui_button_box’:
+user/NUI.inc:351:13: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  351 |             if(left<ui_clip_x)left=ui_clip_x;if(top<ui_clip_y)top=ui_clip_y;
+      |             ^~
+user/NUI.inc:351:46: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  351 |             if(left<ui_clip_x)left=ui_clip_x;if(top<ui_clip_y)top=ui_clip_y;
+      |                                              ^~
+user/NUI.inc:352:13: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  352 |             if(right>ui_clip_right)right=ui_clip_right;if(bottom>ui_clip_bottom)bottom=ui_clip_bottom;
+      |             ^~
+user/NUI.inc:352:56: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  352 |             if(right>ui_clip_right)right=ui_clip_right;if(bottom>ui_clip_bottom)bottom=ui_clip_bottom;
+      |                                                        ^~
+In file included from user/NUI.inc:12:
+user/SCMEM.inc: At top level:
+user/SCMEM.inc:39:14: warning: ‘sc_mem_fill’ defined but not used [-Wunused-function]
+   39 | static void *sc_mem_fill(void *destination,int value,u32 bytes)
+      |              ^~~~~~~~~~~
+user/SCMEM.inc:26:14: warning: ‘sc_mem_move’ defined but not used [-Wunused-function]
+   26 | static void *sc_mem_move(void *destination,const void *source,u32 bytes)
+      |              ^~~~~~~~~~~
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -Iuser -c user/mines.c -o build/user-mines.o
+In file included from user/SCENENUI.inc:3,
+                 from user/mines.c:9:
+user/NUI.inc: In function ‘ui_button_box’:
+user/NUI.inc:351:13: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  351 |             if(left<ui_clip_x)left=ui_clip_x;if(top<ui_clip_y)top=ui_clip_y;
+      |             ^~
+user/NUI.inc:351:46: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  351 |             if(left<ui_clip_x)left=ui_clip_x;if(top<ui_clip_y)top=ui_clip_y;
+      |                                              ^~
+user/NUI.inc:352:13: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  352 |             if(right>ui_clip_right)right=ui_clip_right;if(bottom>ui_clip_bottom)bottom=ui_clip_bottom;
+      |             ^~
+user/NUI.inc:352:56: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  352 |             if(right>ui_clip_right)right=ui_clip_right;if(bottom>ui_clip_bottom)bottom=ui_clip_bottom;
+      |                                                        ^~
+In file included from user/SCENE.inc:12,
+                 from user/SCENENUI.inc:4:
+user/SCWIDE.inc: In function ‘scw_ratio16’:
+user/SCWIDE.inc:141:5: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  141 |     if(n.high<0)scw_neg(&n,&n);if(d.high<0)scw_neg(&d,&d);
+      |     ^~
+user/SCWIDE.inc:141:32: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  141 |     if(n.high<0)scw_neg(&n,&n);if(d.high<0)scw_neg(&d,&d);
+      |                                ^~
+user/SCENE.inc: In function ‘scn_query’:
+user/SCENE.inc:508:13: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  508 |             if(any)return;scn_set(&hit->n,0,256,0);}
+      |             ^~
+user/SCENE.inc:508:27: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  508 |             if(any)return;scn_set(&hit->n,0,256,0);}
+      |                           ^~~~~~~
+user/mines.c: In function ‘draw’:
+user/mines.c:136:5: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  136 |     if(cell_size>100)cell_size=100;board_x=16;
+      |     ^~
+user/mines.c:136:36: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  136 |     if(cell_size>100)cell_size=100;board_x=16;
+      |                                    ^~~~~~~
+user/mines.c: In function ‘main’:
+user/mines.c:175:5: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  175 |     if(ui_open("Mines / mio")<0)return 1;reset();
+      |     ^~
+user/mines.c:175:42: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  175 |     if(ui_open("Mines / mio")<0)return 1;reset();
+      |                                          ^~~~~
+user/SCENE.inc: At top level:
+user/SCENE.inc:638:12: warning: ‘scn_draw_rows’ defined but not used [-Wunused-function]
+  638 | static int scn_draw_rows(u32 *pixels,int width,int height,int stride,int focal,int row_begin,int row_end)
+      |            ^~~~~~~~~~~~~
+user/SCENE.inc:448:12: warning: ‘scn_prepare_primary’ defined but not used [-Wunused-function]
+  448 | static int scn_prepare_primary(ScnVec *origin,ScnPrepared *workspace,int capacity)
+      |            ^~~~~~~~~~~~~~~~~~~
+user/SCENE.inc:370:12: warning: ‘scn_prepare_exact’ defined but not used [-Wunused-function]
+  370 | static int scn_prepare_exact(ScnVec *origin,ScnExact *workspace,int capacity)
+      |            ^~~~~~~~~~~~~~~~~
+user/SCENE.inc:353:12: warning: ‘scn_triangle_exact’ defined but not used [-Wunused-function]
+  353 | static int scn_triangle_exact(ScnVec *a,ScnVec *b,ScnVec *c,u32 color,int reflection)
+      |            ^~~~~~~~~~~~~~~~~~
+user/SCENE.inc:320:12: warning: ‘scn_triangle’ defined but not used [-Wunused-function]
+  320 | static int scn_triangle(ScnVec *a,ScnVec *b,ScnVec *c,u32 color,int reflection)
+      |            ^~~~~~~~~~~~
+user/SCENE.inc:313:12: warning: ‘scn_box’ defined but not used [-Wunused-function]
+  313 | static int scn_box(int x,int y,int z,int xx,int yy,int zz,u32 color,int reflection,int texture)
+      |            ^~~~~~~
+user/SCENE.inc:306:12: warning: ‘scn_sphere’ defined but not used [-Wunused-function]
+  306 | static int scn_sphere(int x,int y,int z,int radius,u32 color,int reflection,int texture)
+      |            ^~~~~~~~~~
+user/SCENE.inc:305:13: warning: ‘scn_reset’ defined but not used [-Wunused-function]
+  305 | static void scn_reset(void){scn_count=0;scn_prepared_valid=scn_exact_valid=0;scn_active->error=0;scn_floor=1;scn_floor_reflection=28;scn_floor_color=SCN_STONE;}
+      |             ^~~~~~~~~
+user/SCENE.inc:297:12: warning: ‘scn_use’ defined but not used [-Wunused-function]
+  297 | static int scn_use(ScnScene *scene)
+      |            ^~~~~~~
+user/SCENE.inc:291:12: warning: ‘scn_bind’ defined but not used [-Wunused-function]
+  291 | static int scn_bind(ScnScene *scene,ScnObject *objects,int capacity)
+      |            ^~~~~~~~
+user/SCENE.inc:261:13: warning: ‘scn_camera’ defined but not used [-Wunused-function]
+  261 | static void scn_camera(int x,int y,int z,int tx,int ty,int tz)
+      |             ^~~~~~~~~~
+user/SCENE.inc:63:54: warning: ‘scn_render_height’ defined but not used [-Wunused-variable]
+   63 | static int scn_tick,scn_frame_ticks,scn_render_width,scn_render_height;
+      |                                                      ^~~~~~~~~~~~~~~~~
+user/SCENE.inc:63:37: warning: ‘scn_render_width’ defined but not used [-Wunused-variable]
+   63 | static int scn_tick,scn_frame_ticks,scn_render_width,scn_render_height;
+      |                                     ^~~~~~~~~~~~~~~~
+user/SCENE.inc:63:21: warning: ‘scn_frame_ticks’ defined but not used [-Wunused-variable]
+   63 | static int scn_tick,scn_frame_ticks,scn_render_width,scn_render_height;
+      |                     ^~~~~~~~~~~~~~~
+user/SCENE.inc:63:12: warning: ‘scn_tick’ defined but not used [-Wunused-variable]
+   63 | static int scn_tick,scn_frame_ticks,scn_render_width,scn_render_height;
+      |            ^~~~~~~~
+In file included from user/NUI.inc:12:
+user/SCMEM.inc:39:14: warning: ‘sc_mem_fill’ defined but not used [-Wunused-function]
+   39 | static void *sc_mem_fill(void *destination,int value,u32 bytes)
+      |              ^~~~~~~~~~~
+user/SCMEM.inc:26:14: warning: ‘sc_mem_move’ defined but not used [-Wunused-function]
+   26 | static void *sc_mem_move(void *destination,const void *source,u32 bytes)
+      |              ^~~~~~~~~~~
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -Iuser -c user/probe.c -o build/user-probe.o
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -Iuser -c user/ide.c -o build/user-ide.o
+In file included from user/ide.c:12:
+user/NUI.inc: In function ‘ui_button_box’:
+user/NUI.inc:351:13: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  351 |             if(left<ui_clip_x)left=ui_clip_x;if(top<ui_clip_y)top=ui_clip_y;
+      |             ^~
+user/NUI.inc:351:46: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  351 |             if(left<ui_clip_x)left=ui_clip_x;if(top<ui_clip_y)top=ui_clip_y;
+      |                                              ^~
+user/NUI.inc:352:13: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  352 |             if(right>ui_clip_right)right=ui_clip_right;if(bottom>ui_clip_bottom)bottom=ui_clip_bottom;
+      |             ^~
+user/NUI.inc:352:56: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  352 |             if(right>ui_clip_right)right=ui_clip_right;if(bottom>ui_clip_bottom)bottom=ui_clip_bottom;
+      |                                                        ^~
+user/ide.c: At top level:
+user/ide.c:59:12: warning: ‘line_end’ defined but not used [-Wunused-function]
+   59 | static int line_end(int at)
+      |            ^~~~~~~~
+In file included from user/NUI.inc:12:
+user/SCMEM.inc:39:14: warning: ‘sc_mem_fill’ defined but not used [-Wunused-function]
+   39 | static void *sc_mem_fill(void *destination,int value,u32 bytes)
+      |              ^~~~~~~~~~~
+user/SCMEM.inc:26:14: warning: ‘sc_mem_move’ defined but not used [-Wunused-function]
+   26 | static void *sc_mem_move(void *destination,const void *source,u32 bytes)
+      |              ^~~~~~~~~~~
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -Iuser -c user/debugger.c -o build/user-debugger.o
+In file included from user/debugger.c:18:
+user/NUI.inc: In function ‘ui_button_box’:
+user/NUI.inc:351:13: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  351 |             if(left<ui_clip_x)left=ui_clip_x;if(top<ui_clip_y)top=ui_clip_y;
+      |             ^~
+user/NUI.inc:351:46: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  351 |             if(left<ui_clip_x)left=ui_clip_x;if(top<ui_clip_y)top=ui_clip_y;
+      |                                              ^~
+user/NUI.inc:352:13: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  352 |             if(right>ui_clip_right)right=ui_clip_right;if(bottom>ui_clip_bottom)bottom=ui_clip_bottom;
+      |             ^~
+user/NUI.inc:352:56: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  352 |             if(right>ui_clip_right)right=ui_clip_right;if(bottom>ui_clip_bottom)bottom=ui_clip_bottom;
+      |                                                        ^~
+In file included from user/NUI.inc:12:
+user/SCMEM.inc: At top level:
+user/SCMEM.inc:39:14: warning: ‘sc_mem_fill’ defined but not used [-Wunused-function]
+   39 | static void *sc_mem_fill(void *destination,int value,u32 bytes)
+      |              ^~~~~~~~~~~
+user/SCMEM.inc:26:14: warning: ‘sc_mem_move’ defined but not used [-Wunused-function]
+   26 | static void *sc_mem_move(void *destination,const void *source,u32 bytes)
+      |              ^~~~~~~~~~~
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -Iuser -c user/lumen.c -o build/user-lumen.o
+In file included from user/SCENENUI.inc:3,
+                 from user/lumen.c:10:
+user/NUI.inc: In function ‘ui_button_box’:
+user/NUI.inc:351:13: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  351 |             if(left<ui_clip_x)left=ui_clip_x;if(top<ui_clip_y)top=ui_clip_y;
+      |             ^~
+user/NUI.inc:351:46: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  351 |             if(left<ui_clip_x)left=ui_clip_x;if(top<ui_clip_y)top=ui_clip_y;
+      |                                              ^~
+user/NUI.inc:352:13: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  352 |             if(right>ui_clip_right)right=ui_clip_right;if(bottom>ui_clip_bottom)bottom=ui_clip_bottom;
+      |             ^~
+user/NUI.inc:352:56: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  352 |             if(right>ui_clip_right)right=ui_clip_right;if(bottom>ui_clip_bottom)bottom=ui_clip_bottom;
+      |                                                        ^~
+In file included from user/SCENE.inc:12,
+                 from user/SCENENUI.inc:4:
+user/SCWIDE.inc: In function ‘scw_ratio16’:
+user/SCWIDE.inc:141:5: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  141 |     if(n.high<0)scw_neg(&n,&n);if(d.high<0)scw_neg(&d,&d);
+      |     ^~
+user/SCWIDE.inc:141:32: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  141 |     if(n.high<0)scw_neg(&n,&n);if(d.high<0)scw_neg(&d,&d);
+      |                                ^~
+user/SCENE.inc: In function ‘scn_query’:
+user/SCENE.inc:508:13: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  508 |             if(any)return;scn_set(&hit->n,0,256,0);}
+      |             ^~
+user/SCENE.inc:508:27: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  508 |             if(any)return;scn_set(&hit->n,0,256,0);}
+      |                           ^~~~~~~
+user/SCENENUI.inc: At top level:
+user/SCENENUI.inc:5:13: warning: ‘scn_disc’ defined but not used [-Wunused-function]
+    5 | static void scn_disc(int cx,int cy,int radius,u32 color)
+      |             ^~~~~~~~
+user/SCENE.inc:638:12: warning: ‘scn_draw_rows’ defined but not used [-Wunused-function]
+  638 | static int scn_draw_rows(u32 *pixels,int width,int height,int stride,int focal,int row_begin,int row_end)
+      |            ^~~~~~~~~~~~~
+user/SCENE.inc:370:12: warning: ‘scn_prepare_exact’ defined but not used [-Wunused-function]
+  370 | static int scn_prepare_exact(ScnVec *origin,ScnExact *workspace,int capacity)
+      |            ^~~~~~~~~~~~~~~~~
+user/SCENE.inc:353:12: warning: ‘scn_triangle_exact’ defined but not used [-Wunused-function]
+  353 | static int scn_triangle_exact(ScnVec *a,ScnVec *b,ScnVec *c,u32 color,int reflection)
+      |            ^~~~~~~~~~~~~~~~~~
+user/SCENE.inc:297:12: warning: ‘scn_use’ defined but not used [-Wunused-function]
+  297 | static int scn_use(ScnScene *scene)
+      |            ^~~~~~~
+user/SCENE.inc:63:12: warning: ‘scn_tick’ defined but not used [-Wunused-variable]
+   63 | static int scn_tick,scn_frame_ticks,scn_render_width,scn_render_height;
+      |            ^~~~~~~~
+In file included from user/NUI.inc:12:
+user/SCMEM.inc:39:14: warning: ‘sc_mem_fill’ defined but not used [-Wunused-function]
+   39 | static void *sc_mem_fill(void *destination,int value,u32 bytes)
+      |              ^~~~~~~~~~~
+user/SCMEM.inc:26:14: warning: ‘sc_mem_move’ defined but not used [-Wunused-function]
+   26 | static void *sc_mem_move(void *destination,const void *source,u32 bytes)
+      |              ^~~~~~~~~~~
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -Iuser -c user/race.c -o build/user-race.o
+In file included from user/SCENENUI.inc:3,
+                 from user/race.c:10:
+user/NUI.inc: In function ‘ui_button_box’:
+user/NUI.inc:351:13: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  351 |             if(left<ui_clip_x)left=ui_clip_x;if(top<ui_clip_y)top=ui_clip_y;
+      |             ^~
+user/NUI.inc:351:46: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  351 |             if(left<ui_clip_x)left=ui_clip_x;if(top<ui_clip_y)top=ui_clip_y;
+      |                                              ^~
+user/NUI.inc:352:13: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  352 |             if(right>ui_clip_right)right=ui_clip_right;if(bottom>ui_clip_bottom)bottom=ui_clip_bottom;
+      |             ^~
+user/NUI.inc:352:56: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  352 |             if(right>ui_clip_right)right=ui_clip_right;if(bottom>ui_clip_bottom)bottom=ui_clip_bottom;
+      |                                                        ^~
+In file included from user/SCENE.inc:12,
+                 from user/SCENENUI.inc:4:
+user/SCWIDE.inc: In function ‘scw_ratio16’:
+user/SCWIDE.inc:141:5: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  141 |     if(n.high<0)scw_neg(&n,&n);if(d.high<0)scw_neg(&d,&d);
+      |     ^~
+user/SCWIDE.inc:141:32: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  141 |     if(n.high<0)scw_neg(&n,&n);if(d.high<0)scw_neg(&d,&d);
+      |                                ^~
+user/SCENE.inc: In function ‘scn_query’:
+user/SCENE.inc:508:13: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  508 |             if(any)return;scn_set(&hit->n,0,256,0);}
+      |             ^~
+user/SCENE.inc:508:27: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  508 |             if(any)return;scn_set(&hit->n,0,256,0);}
+      |                           ^~~~~~~
+In file included from user/race.c:35:
+user/race_game.inc: In function ‘race_new_series’:
+user/race_game.inc:251:5: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  251 |     if(race_mode==2)race_track=0;race_start_event();
+      |     ^~
+user/race_game.inc:251:34: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  251 |     if(race_mode==2)race_track=0;race_start_event();
+      |                                  ^~~~~~~~~~~~~~~~
+user/race_game.inc: In function ‘race_content_key’:
+user/race_game.inc:266:9: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  266 |         if(key=='t'||key=='T')race_choice_mode=1;if(key=='c'||key=='C')race_choice_mode=2;if(key=='f'||key=='F')race_choice_mode=0;
+      |         ^~
+user/race_game.inc:266:50: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  266 |         if(key=='t'||key=='T')race_choice_mode=1;if(key=='c'||key=='C')race_choice_mode=2;if(key=='f'||key=='F')race_choice_mode=0;
+      |                                                  ^~
+user/race_game.inc: In function ‘race_content_action’:
+user/race_game.inc:275:5: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  275 |     if(action==110)race_choice_mode=1;if(action==111)race_choice_mode=2;if(action==112)race_choice_mode=0;
+      |     ^~
+user/race_game.inc:275:39: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  275 |     if(action==110)race_choice_mode=1;if(action==111)race_choice_mode=2;if(action==112)race_choice_mode=0;
+      |                                       ^~
+user/race_game.inc:277:5: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  277 |     if(action==113)race_new_series();if(action==114)race_menu_page=(race_menu_page+1)%3;
+      |     ^~
+user/race_game.inc:277:38: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  277 |     if(action==113)race_new_series();if(action==114)race_menu_page=(race_menu_page+1)%3;
+      |                                      ^~
+user/race_game.inc:280:5: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  280 |     if(action==120)race_advance();if(action==121){race_menu=race_setup=1;race_choice_track=race_track;race_choice_mode=race_mode;race_choice_difficulty=race_difficulty;}
+      |     ^~
+user/race_game.inc:280:35: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  280 |     if(action==120)race_advance();if(action==121){race_menu=race_setup=1;race_choice_track=race_track;race_choice_mode=race_mode;race_choice_difficulty=race_difficulty;}
+      |                                   ^~
+user/race.c: In function ‘race_shadow_bounds’:
+user/race.c:156:17: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  156 |                 if(second<bottom)bottom=second;if(second>top)top=second;
+      |                 ^~
+user/race.c:156:48: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  156 |                 if(second<bottom)bottom=second;if(second>top)top=second;
+      |                                                ^~
+user/race.c:158:21: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  158 |                     if(third<bottom)bottom=third;if(third>top)top=third;}
+      |                     ^~
+user/race.c:158:50: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  158 |                     if(third<bottom)bottom=third;if(third>top)top=third;}
+      |                                                  ^~
+user/race.c: In function ‘main’:
+user/race.c:395:13: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  395 |             if(!race_legacy)race_menu=1;drive_mouse=0;
+      |             ^~
+user/race.c:395:41: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  395 |             if(!race_legacy)race_menu=1;drive_mouse=0;
+      |                                         ^~~~~~~~~~~
+user/race.c:401:9: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  401 |         if(!race_menu&&!race_finished&&ui_action==1)reset();sc_yield();
+      |         ^~
+user/race.c:401:61: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  401 |         if(!race_menu&&!race_finished&&ui_action==1)reset();sc_yield();
+      |                                                             ^~~~~~~~
+user/SCENENUI.inc: At top level:
+user/SCENENUI.inc:5:13: warning: ‘scn_disc’ defined but not used [-Wunused-function]
+    5 | static void scn_disc(int cx,int cy,int radius,u32 color)
+      |             ^~~~~~~~
+user/SCENE.inc:638:12: warning: ‘scn_draw_rows’ defined but not used [-Wunused-function]
+  638 | static int scn_draw_rows(u32 *pixels,int width,int height,int stride,int focal,int row_begin,int row_end)
+      |            ^~~~~~~~~~~~~
+user/SCENE.inc:448:12: warning: ‘scn_prepare_primary’ defined but not used [-Wunused-function]
+  448 | static int scn_prepare_primary(ScnVec *origin,ScnPrepared *workspace,int capacity)
+      |            ^~~~~~~~~~~~~~~~~~~
+user/SCENE.inc:297:12: warning: ‘scn_use’ defined but not used [-Wunused-function]
+  297 | static int scn_use(ScnScene *scene)
+      |            ^~~~~~~
+user/SCENE.inc:291:12: warning: ‘scn_bind’ defined but not used [-Wunused-function]
+  291 | static int scn_bind(ScnScene *scene,ScnObject *objects,int capacity)
+      |            ^~~~~~~~
+user/SCENE.inc:261:13: warning: ‘scn_camera’ defined but not used [-Wunused-function]
+  261 | static void scn_camera(int x,int y,int z,int tx,int ty,int tz)
+      |             ^~~~~~~~~~
+user/SCENE.inc:218:12: warning: ‘scn_cos’ defined but not used [-Wunused-function]
+  218 | static int scn_cos(int phase){return scn_sin(phase+256);}
+      |            ^~~~~~~
+user/SCENE.inc:63:12: warning: ‘scn_tick’ defined but not used [-Wunused-variable]
+   63 | static int scn_tick,scn_frame_ticks,scn_render_width,scn_render_height;
+      |            ^~~~~~~~
+In file included from user/NUI.inc:12:
+user/SCMEM.inc:39:14: warning: ‘sc_mem_fill’ defined but not used [-Wunused-function]
+   39 | static void *sc_mem_fill(void *destination,int value,u32 bytes)
+      |              ^~~~~~~~~~~
+user/SCMEM.inc:26:14: warning: ‘sc_mem_move’ defined but not used [-Wunused-function]
+   26 | static void *sc_mem_move(void *destination,const void *source,u32 bytes)
+      |              ^~~~~~~~~~~
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -Iuser -c user/world.c -o build/user-world.o
+In file included from user/SCENENUI.inc:3,
+                 from user/world.c:14:
+user/NUI.inc: In function ‘ui_button_box’:
+user/NUI.inc:351:13: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  351 |             if(left<ui_clip_x)left=ui_clip_x;if(top<ui_clip_y)top=ui_clip_y;
+      |             ^~
+user/NUI.inc:351:46: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  351 |             if(left<ui_clip_x)left=ui_clip_x;if(top<ui_clip_y)top=ui_clip_y;
+      |                                              ^~
+user/NUI.inc:352:13: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  352 |             if(right>ui_clip_right)right=ui_clip_right;if(bottom>ui_clip_bottom)bottom=ui_clip_bottom;
+      |             ^~
+user/NUI.inc:352:56: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  352 |             if(right>ui_clip_right)right=ui_clip_right;if(bottom>ui_clip_bottom)bottom=ui_clip_bottom;
+      |                                                        ^~
+In file included from user/SCENE.inc:12,
+                 from user/SCENENUI.inc:4:
+user/SCWIDE.inc: In function ‘scw_ratio16’:
+user/SCWIDE.inc:141:5: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  141 |     if(n.high<0)scw_neg(&n,&n);if(d.high<0)scw_neg(&d,&d);
+      |     ^~
+user/SCWIDE.inc:141:32: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  141 |     if(n.high<0)scw_neg(&n,&n);if(d.high<0)scw_neg(&d,&d);
+      |                                ^~
+user/SCENE.inc: In function ‘scn_query’:
+user/SCENE.inc:508:13: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  508 |             if(any)return;scn_set(&hit->n,0,256,0);}
+      |             ^~
+user/SCENE.inc:508:27: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  508 |             if(any)return;scn_set(&hit->n,0,256,0);}
+      |                           ^~~~~~~
+user/world.c: In function ‘load_world’:
+user/world.c:87:53: warning: comparison of integer expressions of different signedness: ‘u32’ {aka ‘unsigned int’} and ‘int’ [-Wsign-compare]
+   87 |     if(sc_stat("HOME/WORLD/CHUNK.SCW",info)||info[1]!=bytes) return 0;
+      |                                                     ^~
+In file included from user/world.c:104:
+user/world_game.inc: In function ‘world_new_generate’:
+user/world_game.inc:76:9: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+   76 |         if(x>35 && z>29)continue;int h=world_top(x,z);
+      |         ^~
+user/world_game.inc:76:34: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+   76 |         if(x>35 && z>29)continue;int h=world_top(x,z);
+      |                                  ^~~
+user/world_game.inc: In function ‘world_craft’:
+user/world_game.inc:197:5: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  197 |     if(upgrade)world_tool=upgrade;if(heal)world_health=ui_clamp(world_health+heal,0,20);
+      |     ^~
+user/world_game.inc:197:35: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  197 |     if(upgrade)world_tool=upgrade;if(heal)world_health=ui_clamp(world_health+heal,0,20);
+      |                                   ^~
+user/world_game.inc: In function ‘world_new_load’:
+user/world_game.inc:250:9: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  250 |         if(n<0)return 0;int kind=save_bytes[WORLD2_HEADER+n];if(kind && kind!=16)return 0;
+      |         ^~
+user/world_game.inc:250:25: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  250 |         if(n<0)return 0;int kind=save_bytes[WORLD2_HEADER+n];if(kind && kind!=16)return 0;
+      |                         ^~~
+In file included from user/world.c:220:
+user/world_entities.inc: In function ‘world_enemies_draw’:
+user/world_entities.inc:98:9: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+   98 |         if(chosen<0)break;drawn|=1<<chosen;
+      |         ^~
+user/world_entities.inc:98:27: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+   98 |         if(chosen<0)break;drawn|=1<<chosen;
+      |                           ^~~~~
+user/world.c: In function ‘simulation’:
+user/world.c:417:5: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  417 |     if(sc_down(0x82))yaw=(yaw-10)&1023;if(sc_down(0x83))yaw=(yaw+10)&1023;
+      |     ^~
+user/world.c:417:40: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  417 |     if(sc_down(0x82))yaw=(yaw-10)&1023;if(sc_down(0x83))yaw=(yaw+10)&1023;
+      |                                        ^~
+user/world.c:418:5: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  418 |     if(sc_down(0x80))pitch=ui_clamp(pitch+8,-180,180);if(sc_down(0x81))pitch=ui_clamp(pitch-8,-180,180);
+      |     ^~
+user/world.c:418:55: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  418 |     if(sc_down(0x80))pitch=ui_clamp(pitch+8,-180,180);if(sc_down(0x81))pitch=ui_clamp(pitch-8,-180,180);
+      |                                                       ^~
+user/world.c:425:5: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  425 |     if(mx)move_player(px+mx,pz);if(mz)move_player(px,pz+mz);
+      |     ^~
+user/world.c:425:33: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  425 |     if(mx)move_player(px+mx,pz);if(mz)move_player(px,pz+mz);
+      |                                 ^~
+user/world.c:440:13: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  440 |             if(step<0)world_grounded=1;jump_velocity=0;break;
+      |             ^~
+user/world.c:440:40: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  440 |             if(step<0)world_grounded=1;jump_velocity=0;break;
+      |                                        ^~~~~~~~~~~~~
+In file included from user/world.c:445:
+user/world_panels.inc: In function ‘world_game_action’:
+user/world_panels.inc:41:5: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+   41 |     if(action==40)world_panel_open(1);if(action==41)world_panel_open(2);
+      |     ^~
+user/world_panels.inc:41:39: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+   41 |     if(action==40)world_panel_open(1);if(action==41)world_panel_open(2);
+      |                                       ^~
+user/world_panels.inc:42:5: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+   42 |     if(action==42)world_panel_open(3);if(action==43)world_panel_open(0);
+      |     ^~
+user/world_panels.inc:42:39: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+   42 |     if(action==42)world_panel_open(3);if(action==43)world_panel_open(0);
+      |                                       ^~
+user/world_panels.inc:43:5: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+   43 |     if(action==44)world_page++;if(action==45){if(world_page)world_page--;}
+      |     ^~
+user/world_panels.inc:43:32: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+   43 |     if(action==44)world_page++;if(action==45){if(world_page)world_page--;}
+      |                                ^~
+user/world_panels.inc:44:5: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+   44 |     if(action==46)world_panel_open(6);if(action==47)world_panel_open(4);
+      |     ^~
+user/world_panels.inc:44:39: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+   44 |     if(action==46)world_panel_open(6);if(action==47)world_panel_open(4);
+      |                                       ^~
+user/world_panels.inc:61:5: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+   61 |     if(action==206)world_panel_open(1);if(action==207)world_panel_open(3);
+      |     ^~
+user/world_panels.inc:61:40: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+   61 |     if(action==206)world_panel_open(1);if(action==207)world_panel_open(3);
+      |                                        ^~
+user/world_panels.inc:62:5: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+   62 |     if(action==208)world_panel_open(2);if(action==209)world_panel_open(6);
+      |     ^~
+user/world_panels.inc:62:40: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+   62 |     if(action==208)world_panel_open(2);if(action==209)world_panel_open(6);
+      |                                        ^~
+user/world_panels.inc:67:9: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+   67 |         if(world_panel==5)world_new_load();world_panel_open(4);
+      |         ^~
+user/world_panels.inc:67:44: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+   67 |         if(world_panel==5)world_new_load();world_panel_open(4);
+      |                                            ^~~~~~~~~~~~~~~~
+user/world_panels.inc:73:9: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+   73 |         if(world_panel==5)world_new_load();world_panel_open(4);
+      |         ^~
+user/world_panels.inc:73:44: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+   73 |         if(world_panel==5)world_new_load();world_panel_open(4);
+      |                                            ^~~~~~~~~~~~~~~~
+user/world.c: In function ‘main’:
+user/world.c:467:13: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  467 |             if(key=='q'||key=='Q')edit(0);if(key=='e'||key=='E')edit(1);
+      |             ^~
+user/world.c:467:43: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  467 |             if(key=='q'||key=='Q')edit(0);if(key=='e'||key=='E')edit(1);
+      |                                           ^~
+user/world.c:468:13: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  468 |             if(key==0x82)yaw=(yaw-20)&1023;if(key==0x83)yaw=(yaw+20)&1023;
+      |             ^~
+user/world.c:468:44: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  468 |             if(key==0x82)yaw=(yaw-20)&1023;if(key==0x83)yaw=(yaw+20)&1023;
+      |                                            ^~
+user/world.c:469:13: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  469 |             if(key==0x80)pitch=ui_clamp(pitch+24,-180,180);if(key==0x81)pitch=ui_clamp(pitch-24,-180,180);
+      |             ^~
+user/world.c:469:60: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  469 |             if(key==0x80)pitch=ui_clamp(pitch+24,-180,180);if(key==0x81)pitch=ui_clamp(pitch-24,-180,180);
+      |                                                            ^~
+user/world.c:470:13: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  470 |             if(key==2)save_world();if(key==3&&!load_world())copy(message,"No valid save",sizeof(message));
+      |             ^~
+user/world.c:470:36: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  470 |             if(key==2)save_world();if(key==3&&!load_world())copy(message,"No valid save",sizeof(message));
+      |                                    ^~
+user/world.c:507:13: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  507 |             if(relative[4]&1)edit(0);if(relative[4]&2)edit(1);
+      |             ^~
+user/world.c:507:38: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  507 |             if(relative[4]&1)edit(0);if(relative[4]&2)edit(1);
+      |                                      ^~
+user/world.c:528:13: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  528 |             if(ui_pressed&1)edit(0);if(ui_pressed&2)edit(1);
+      |             ^~
+user/world.c:528:37: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  528 |             if(ui_pressed&1)edit(0);if(ui_pressed&2)edit(1);
+      |                                     ^~
+user/SCENE.inc: At top level:
+user/SCENE.inc:638:12: warning: ‘scn_draw_rows’ defined but not used [-Wunused-function]
+  638 | static int scn_draw_rows(u32 *pixels,int width,int height,int stride,int focal,int row_begin,int row_end)
+      |            ^~~~~~~~~~~~~
+user/SCENE.inc:448:12: warning: ‘scn_prepare_primary’ defined but not used [-Wunused-function]
+  448 | static int scn_prepare_primary(ScnVec *origin,ScnPrepared *workspace,int capacity)
+      |            ^~~~~~~~~~~~~~~~~~~
+user/SCENE.inc:370:12: warning: ‘scn_prepare_exact’ defined but not used [-Wunused-function]
+  370 | static int scn_prepare_exact(ScnVec *origin,ScnExact *workspace,int capacity)
+      |            ^~~~~~~~~~~~~~~~~
+user/SCENE.inc:353:12: warning: ‘scn_triangle_exact’ defined but not used [-Wunused-function]
+  353 | static int scn_triangle_exact(ScnVec *a,ScnVec *b,ScnVec *c,u32 color,int reflection)
+      |            ^~~~~~~~~~~~~~~~~~
+user/SCENE.inc:320:12: warning: ‘scn_triangle’ defined but not used [-Wunused-function]
+  320 | static int scn_triangle(ScnVec *a,ScnVec *b,ScnVec *c,u32 color,int reflection)
+      |            ^~~~~~~~~~~~
+user/SCENE.inc:313:12: warning: ‘scn_box’ defined but not used [-Wunused-function]
+  313 | static int scn_box(int x,int y,int z,int xx,int yy,int zz,u32 color,int reflection,int texture)
+      |            ^~~~~~~
+user/SCENE.inc:297:12: warning: ‘scn_use’ defined but not used [-Wunused-function]
+  297 | static int scn_use(ScnScene *scene)
+      |            ^~~~~~~
+user/SCENE.inc:291:12: warning: ‘scn_bind’ defined but not used [-Wunused-function]
+  291 | static int scn_bind(ScnScene *scene,ScnObject *objects,int capacity)
+      |            ^~~~~~~~
+user/SCENE.inc:261:13: warning: ‘scn_camera’ defined but not used [-Wunused-function]
+  261 | static void scn_camera(int x,int y,int z,int tx,int ty,int tz)
+      |             ^~~~~~~~~~
+user/SCENE.inc:63:12: warning: ‘scn_tick’ defined but not used [-Wunused-variable]
+   63 | static int scn_tick,scn_frame_ticks,scn_render_width,scn_render_height;
+      |            ^~~~~~~~
+In file included from user/NUI.inc:12:
+user/SCMEM.inc:39:14: warning: ‘sc_mem_fill’ defined but not used [-Wunused-function]
+   39 | static void *sc_mem_fill(void *destination,int value,u32 bytes)
+      |              ^~~~~~~~~~~
+user/SCMEM.inc:26:14: warning: ‘sc_mem_move’ defined but not used [-Wunused-function]
+   26 | static void *sc_mem_move(void *destination,const void *source,u32 bytes)
+      |              ^~~~~~~~~~~
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -Iuser -c user/settings.c -o build/user-settings.o
+In file included from user/settings.c:12:
+user/NUI.inc: In function ‘ui_button_box’:
+user/NUI.inc:351:13: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  351 |             if(left<ui_clip_x)left=ui_clip_x;if(top<ui_clip_y)top=ui_clip_y;
+      |             ^~
+user/NUI.inc:351:46: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  351 |             if(left<ui_clip_x)left=ui_clip_x;if(top<ui_clip_y)top=ui_clip_y;
+      |                                              ^~
+user/NUI.inc:352:13: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  352 |             if(right>ui_clip_right)right=ui_clip_right;if(bottom>ui_clip_bottom)bottom=ui_clip_bottom;
+      |             ^~
+user/NUI.inc:352:56: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  352 |             if(right>ui_clip_right)right=ui_clip_right;if(bottom>ui_clip_bottom)bottom=ui_clip_bottom;
+      |                                                        ^~
+user/settings.c: In function ‘choose_wallpaper’:
+user/settings.c:332:21: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  332 |                     if(sc_key_peek()==27)sc_key();image_client_cancel(&client);
+      |                     ^~
+user/settings.c:332:51: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  332 |                     if(sc_key_peek()==27)sc_key();image_client_cancel(&client);
+      |                                                   ^~~~~~~~~~~~~~~~~~~
+In file included from user/NUI.inc:12:
+user/SCMEM.inc: At top level:
+user/SCMEM.inc:39:14: warning: ‘sc_mem_fill’ defined but not used [-Wunused-function]
+   39 | static void *sc_mem_fill(void *destination,int value,u32 bytes)
+      |              ^~~~~~~~~~~
+user/SCMEM.inc:26:14: warning: ‘sc_mem_move’ defined but not used [-Wunused-function]
+   26 | static void *sc_mem_move(void *destination,const void *source,u32 bytes)
+      |              ^~~~~~~~~~~
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -Iuser -c user/lens.c -o build/user-lens.o
+In file included from user/lens.c:12:
+user/NUI.inc: In function ‘ui_button_box’:
+user/NUI.inc:351:13: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  351 |             if(left<ui_clip_x)left=ui_clip_x;if(top<ui_clip_y)top=ui_clip_y;
+      |             ^~
+user/NUI.inc:351:46: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  351 |             if(left<ui_clip_x)left=ui_clip_x;if(top<ui_clip_y)top=ui_clip_y;
+      |                                              ^~
+user/NUI.inc:352:13: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  352 |             if(right>ui_clip_right)right=ui_clip_right;if(bottom>ui_clip_bottom)bottom=ui_clip_bottom;
+      |             ^~
+user/NUI.inc:352:56: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  352 |             if(right>ui_clip_right)right=ui_clip_right;if(bottom>ui_clip_bottom)bottom=ui_clip_bottom;
+      |                                                        ^~
+user/lens.c: In function ‘poll_compressed’:
+user/lens.c:73:5: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+   73 |     if(preview)sc_free(preview);release_fit();preview=compressed.pixels;compressed.pixels=0;
+      |     ^~
+user/lens.c:73:33: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+   73 |     if(preview)sc_free(preview);release_fit();preview=compressed.pixels;compressed.pixels=0;
+      |                                 ^~~~~~~~~~~
+user/lens.c: In function ‘load’:
+user/lens.c:149:5: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  149 |     if(result!=2)lens_operations++;return result;
+      |     ^~
+user/lens.c:149:36: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  149 |     if(result!=2)lens_operations++;return result;
+      |                                    ^~~~~~
+In file included from user/NUI.inc:12:
+user/SCMEM.inc: At top level:
+user/SCMEM.inc:39:14: warning: ‘sc_mem_fill’ defined but not used [-Wunused-function]
+   39 | static void *sc_mem_fill(void *destination,int value,u32 bytes)
+      |              ^~~~~~~~~~~
+user/SCMEM.inc:26:14: warning: ‘sc_mem_move’ defined but not used [-Wunused-function]
+   26 | static void *sc_mem_move(void *destination,const void *source,u32 bytes)
+      |              ^~~~~~~~~~~
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -Iuser -c user/canvas.c -o build/user-canvas.o
+In file included from user/canvas.c:17:
+user/NUI.inc: In function ‘ui_button_box’:
+user/NUI.inc:351:13: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  351 |             if(left<ui_clip_x)left=ui_clip_x;if(top<ui_clip_y)top=ui_clip_y;
+      |             ^~
+user/NUI.inc:351:46: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  351 |             if(left<ui_clip_x)left=ui_clip_x;if(top<ui_clip_y)top=ui_clip_y;
+      |                                              ^~
+user/NUI.inc:352:13: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  352 |             if(right>ui_clip_right)right=ui_clip_right;if(bottom>ui_clip_bottom)bottom=ui_clip_bottom;
+      |             ^~
+user/NUI.inc:352:56: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  352 |             if(right>ui_clip_right)right=ui_clip_right;if(bottom>ui_clip_bottom)bottom=ui_clip_bottom;
+      |                                                        ^~
+In file included from user/NUI.inc:12:
+user/SCMEM.inc: At top level:
+user/SCMEM.inc:39:14: warning: ‘sc_mem_fill’ defined but not used [-Wunused-function]
+   39 | static void *sc_mem_fill(void *destination,int value,u32 bytes)
+      |              ^~~~~~~~~~~
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -Iuser -c user/monitor.c -o build/user-monitor.o
+user/SCMEM.inc:26:14: warning: ‘sc_mem_move’ defined but not used [-Wunused-function]
+   26 | static void *sc_mem_move(void *destination,const void *source,u32 bytes)
+      |              ^~~~~~~~~~~
+In file included from user/monitor.c:12:
+user/NUI.inc: In function ‘ui_button_box’:
+user/NUI.inc:351:13: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  351 |             if(left<ui_clip_x)left=ui_clip_x;if(top<ui_clip_y)top=ui_clip_y;
+      |             ^~
+user/NUI.inc:351:46: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  351 |             if(left<ui_clip_x)left=ui_clip_x;if(top<ui_clip_y)top=ui_clip_y;
+      |                                              ^~
+user/NUI.inc:352:13: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  352 |             if(right>ui_clip_right)right=ui_clip_right;if(bottom>ui_clip_bottom)bottom=ui_clip_bottom;
+      |             ^~
+user/NUI.inc:352:56: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  352 |             if(right>ui_clip_right)right=ui_clip_right;if(bottom>ui_clip_bottom)bottom=ui_clip_bottom;
+      |                                                        ^~
+user/monitor.c: In function ‘task_name’:
+user/monitor.c:131:9: warning: this ‘for’ clause does not guard... [-Wmisleading-indentation]
+  131 |         for(int j=0;j<bytes;j++)out[n+j]=input[n+j];n+=bytes;
+      |         ^~~
+user/monitor.c:131:53: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘for’
+  131 |         for(int j=0;j<bytes;j++)out[n+j]=input[n+j];n+=bytes;
+      |                                                     ^
+user/monitor.c: In function ‘volumes’:
+user/monitor.c:179:5: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  179 |     if(volume_rows>8)volume_rows=8;ui_panel(16,monitor_y,UI_W-32,monitor_bottom-monitor_y);
+      |     ^~
+user/monitor.c:179:36: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  179 |     if(volume_rows>8)volume_rows=8;ui_panel(16,monitor_y,UI_W-32,monitor_bottom-monitor_y);
+      |                                    ^~~~~~~~
+user/monitor.c: In function ‘details’:
+user/monitor.c:196:5: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  196 |     if(metric_rows>8)metric_rows=8;first_metric=ui_clamp(first_metric,0,8-metric_rows);
+      |     ^~
+user/monitor.c:196:36: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  196 |     if(metric_rows>8)metric_rows=8;first_metric=ui_clamp(first_metric,0,8-metric_rows);
+      |                                    ^~~~~~~~~~~~
+user/monitor.c: In function ‘draw’:
+user/monitor.c:237:9: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  237 |         if((ui_pressed&1)&&ui_hit(4,(UI_H-h)/2,UI_W-8,h))ui_action=98;return;
+      |         ^~
+user/monitor.c:237:71: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  237 |         if((ui_pressed&1)&&ui_hit(4,(UI_H-h)/2,UI_W-8,h))ui_action=98;return;
+      |                                                                       ^~~~~~
+user/monitor.c:248:9: warning: this ‘else’ clause does not guard... [-Wmisleading-indentation]
+  248 |         else append(footer,"--",sizeof(footer));append(footer," / Right menu / Left-Right pages",sizeof(footer));}
+      |         ^~~~
+user/monitor.c:248:49: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘else’
+  248 |         else append(footer,"--",sizeof(footer));append(footer," / Right menu / Left-Right pages",sizeof(footer));}
+      |                                                 ^~~~~~
+user/monitor.c: In function ‘main’:
+user/monitor.c:277:9: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  277 |         if(action==1)view=0;if(action==2)view=1;
+      |         ^~
+user/monitor.c:277:29: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  277 |         if(action==1)view=0;if(action==2)view=1;
+      |                             ^~
+user/monitor.c:284:9: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  284 |         if(action==20||key==0x80)scroll(0);if(action==21||key==0x81)scroll(1);
+      |         ^~
+user/monitor.c:284:44: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  284 |         if(action==20||key==0x80)scroll(0);if(action==21||key==0x81)scroll(1);
+      |                                            ^~
+user/monitor.c:285:9: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  285 |         if(key==0x82)view=(view+4)%5;if(key==0x83)view=(view+1)%5;
+      |         ^~
+user/monitor.c:285:38: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  285 |         if(key==0x82)view=(view+4)%5;if(key==0x83)view=(view+1)%5;
+      |                                      ^~
+In file included from user/NUI.inc:12:
+user/SCMEM.inc: At top level:
+user/SCMEM.inc:39:14: warning: ‘sc_mem_fill’ defined but not used [-Wunused-function]
+   39 | static void *sc_mem_fill(void *destination,int value,u32 bytes)
+      |              ^~~~~~~~~~~
+user/SCMEM.inc:26:14: warning: ‘sc_mem_move’ defined but not used [-Wunused-function]
+   26 | static void *sc_mem_move(void *destination,const void *source,u32 bytes)
+      |              ^~~~~~~~~~~
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -Iuser -c user/rgbprobe.c -o build/user-rgbprobe.o
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -Iuser -c user/themeprobe.c -o build/user-themeprobe.o
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -Iuser -c user/imageprobe.c -o build/user-imageprobe.o
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -Iuser -c user/sysprobe.c -o build/user-sysprobe.o
+user/sysprobe.c: In function ‘main’:
+user/sysprobe.c:65:9: warning: this ‘while’ clause does not guard... [-Wmisleading-indentation]
+   65 |         while(sc_key()!=27)sc_yield();return sys_probe[1]?1:0;
+      |         ^~~~~
+user/sysprobe.c:65:39: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘while’
+   65 |         while(sc_key()!=27)sc_yield();return sys_probe[1]?1:0;
+      |                                       ^~~~~~
+user/sysprobe.c:115:5: warning: this ‘while’ clause does not guard... [-Wmisleading-indentation]
+  115 |     while(sc_key()!=27)sc_yield();return sys_probe[1]?1:0;
+      |     ^~~~~
+user/sysprobe.c:115:35: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘while’
+  115 |     while(sc_key()!=27)sc_yield();return sys_probe[1]?1:0;
+      |                                   ^~~~~~
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -Iuser -c user/cli.c -o build/user-cli.o
+user/cli.c:4:12: warning: ‘/*’ within comment [-Wcomment]
+    4 |  * 每个/BIN/*.SCX都是可替换的普通三环程序；没有WINOPEN，不侵占
+user/cli.c: In function ‘system_command’:
+user/cli.c:111:13: warning: this ‘for’ clause does not guard... [-Wmisleading-indentation]
+  111 |             for(int j=0;j<12;j++)label[j]=((char *)(row+2))[j];label[12]=0;
+      |             ^~~
+user/cli.c:111:64: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘for’
+  111 |             for(int j=0;j<12;j++)label[j]=((char *)(row+2))[j];label[12]=0;
+      |                                                                ^~~~~
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -Iuser -c user/assembler.c -o build/user-assembler.o
+In file included from user/COMPILEUI.inc:5,
+                 from user/assembler.c:9:
+user/NUI.inc: In function ‘ui_button_box’:
+user/NUI.inc:351:13: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  351 |             if(left<ui_clip_x)left=ui_clip_x;if(top<ui_clip_y)top=ui_clip_y;
+      |             ^~
+user/NUI.inc:351:46: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  351 |             if(left<ui_clip_x)left=ui_clip_x;if(top<ui_clip_y)top=ui_clip_y;
+      |                                              ^~
+user/NUI.inc:352:13: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  352 |             if(right>ui_clip_right)right=ui_clip_right;if(bottom>ui_clip_bottom)bottom=ui_clip_bottom;
+      |             ^~
+user/NUI.inc:352:56: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  352 |             if(right>ui_clip_right)right=ui_clip_right;if(bottom>ui_clip_bottom)bottom=ui_clip_bottom;
+      |                                                        ^~
+user/assembler.c: In function ‘main’:
+user/assembler.c:197:9: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  197 |         if(!ide)build_view_wait();return 2;
+      |         ^~
+user/assembler.c:197:35: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  197 |         if(!ide)build_view_wait();return 2;
+      |                                   ^~~~~~
+In file included from user/NUI.inc:12:
+user/SCMEM.inc: At top level:
+user/SCMEM.inc:39:14: warning: ‘sc_mem_fill’ defined but not used [-Wunused-function]
+   39 | static void *sc_mem_fill(void *destination,int value,u32 bytes)
+      |              ^~~~~~~~~~~
+user/SCMEM.inc:26:14: warning: ‘sc_mem_move’ defined but not used [-Wunused-function]
+   26 | static void *sc_mem_move(void *destination,const void *source,u32 bytes)
+      |              ^~~~~~~~~~~
+ld -m elf_i386 --emit-relocs -T modules/linker.ld build/module-core.o -o build/module-core.elf
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: build/module-core.elf has a LOAD segment with RWX permissions
+ld -m elf_i386 -T user/linker.ld build/user-start.o build/user-s3c.o -o build/user-s3c.kernel.elf
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: build/user-s3c.kernel.elf has a LOAD segment with RWX permissions
+nm -n build/user-s3c.kernel.elf > build/user-s3c.sym
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -c kernel/gfx.c -o build/gfx.o
+kernel/gfx.c: In function ‘gfx_indexed_row’:
+kernel/gfx.c:162:5: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  162 |     if(right>GFX_W)right=GFX_W;if(bottom>GFX_H)bottom=GFX_H;
+      |     ^~
+kernel/gfx.c:162:32: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  162 |     if(right>GFX_W)right=GFX_W;if(bottom>GFX_H)bottom=GFX_H;
+      |                                ^~
+kernel/gfx.c:164:9: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  164 |         if(left<clip_x0)left=clip_x0;if(top<clip_y0)top=clip_y0;
+      |         ^~
+kernel/gfx.c:164:38: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  164 |         if(left<clip_x0)left=clip_x0;if(top<clip_y0)top=clip_y0;
+      |                                      ^~
+kernel/gfx.c:165:9: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  165 |         if(right>clip_x1)right=clip_x1;if(bottom>clip_y1)bottom=clip_y1;
+      |         ^~
+kernel/gfx.c:165:40: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  165 |         if(right>clip_x1)right=clip_x1;if(bottom>clip_y1)bottom=clip_y1;
+      |                                        ^~
+ld -m elf_i386 -T user/linker.ld build/user-start.o build/user-shell.o -o build/user-shell.kernel.elf
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: build/user-shell.kernel.elf has a LOAD segment with RWX permissions
+nm -n build/user-shell.kernel.elf > build/user-shell.sym
+mkdir -p build/fs/apps
+python3 tools/mkscx.py build/hello.bin build/fs/apps/hello.scx 0 0x400000
+ld -m elf_i386 -T user/linker.ld build/user-start.o build/user-files.o -o build/user-files.kernel.elf
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: build/user-files.kernel.elf has a LOAD segment with RWX permissions
+nm -n build/user-files.kernel.elf > build/user-files.sym
+ld -m elf_i386 -T user/linker.ld build/user-start.o build/user-note.o -o build/user-note.kernel.elf
+mkscx: build/hello.bin -> build/fs/apps/hello.scx (entry=0x0 base=0x400000 load=252B)
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: build/user-note.kernel.elf has a LOAD segment with RWX permissions
+ld -m elf_i386 -T user/linker.ld build/user-start.o build/user-palette.o -o build/user-palette.kernel.elf
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: build/user-palette.kernel.elf has a LOAD segment with RWX permissions
+nm -n build/user-note.kernel.elf > build/user-note.sym
+ld -m elf_i386 -T user/linker.ld build/user-start.o build/user-calc.o -o build/user-calc.kernel.elf
+nm -n build/user-palette.kernel.elf > build/user-palette.sym
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: build/user-calc.kernel.elf has a LOAD segment with RWX permissionsld -m elf_i386 -T user/linker.ld build/user-start.o build/user-mines.o -o build/user-mines.kernel.elf
+
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: build/user-mines.kernel.elf has a LOAD segment with RWX permissions
+nm -n build/user-calc.kernel.elf > build/user-calc.sym
+nm -n build/user-mines.kernel.elf > build/user-mines.sym
+ld -m elf_i386 -T user/linker.ld build/user-start.o build/user-probe.o -o build/user-probe.kernel.elf
+ld -m elf_i386 -T user/linker.ld build/user-start.o build/user-ide.o -o build/user-ide.kernel.elf
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: build/user-probe.kernel.elf has a LOAD segment with RWX permissions
+nm -n build/user-probe.kernel.elf > build/user-probe.sym
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: build/user-ide.kernel.elf has a LOAD segment with RWX permissions
+ld -m elf_i386 -T user/linker.ld build/user-start.o build/user-debugger.o -o build/user-debugger.kernel.elf
+nm -n build/user-ide.kernel.elf > build/user-ide.sym
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: build/user-debugger.kernel.elf has a LOAD segment with RWX permissions
+ld -m elf_i386 -T user/linker.ld build/user-start.o build/user-lumen.o -o build/user-lumen.kernel.elf
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: build/user-lumen.kernel.elf has a LOAD segment with RWX permissionsnm -n build/user-debugger.kernel.elf > build/user-debugger.sym
+
+ld -m elf_i386 -T user/linker.ld build/user-start.o build/user-race.o -o build/user-race.kernel.elf
+nm -n build/user-lumen.kernel.elf > build/user-lumen.sym
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: build/user-race.kernel.elf has a LOAD segment with RWX permissionsld -m elf_i386 -T user/linker.ld build/user-start.o build/user-world.o -o build/user-world.kernel.elf
+
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: build/user-world.kernel.elfnm -n build/user-race.kernel.elf > build/user-race.sym
+ has a LOAD segment with RWX permissions
+ld -m elf_i386 -T user/linker.ld build/user-start.o build/user-settings.o -o build/user-settings.kernel.elf
+nm -n build/user-world.kernel.elf > build/user-world.sym
+ld -m elf_i386 -T user/linker.ld build/user-start.o build/user-lens.o -o build/user-lens.kernel.elf
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: build/user-settings.kernel.elf has a LOAD segment with RWX permissions
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: build/user-lens.kernel.elf has a LOAD segment with RWX permissions
+nm -n build/user-settings.kernel.elf > build/user-settings.sym
+nm -n build/user-lens.kernel.elf > build/user-lens.sym
+ld -m elf_i386 -T user/linker.ld build/user-start.o build/user-canvas.o -o build/user-canvas.kernel.elf
+ld -m elf_i386 -T user/linker.ld build/user-start.o build/user-monitor.o -o build/user-monitor.kernel.elf
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: build/user-canvas.kernel.elf has a LOAD segment with RWX permissions
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: build/user-monitor.kernel.elf has a LOAD segment with RWX permissions
+nm -n build/user-canvas.kernel.elf > build/user-canvas.sym
+nm -n build/user-monitor.kernel.elf > build/user-monitor.sym
+ld -m elf_i386 -T user/linker.ld build/user-start.o build/user-rgbprobe.o -o build/user-rgbprobe.kernel.elf
+ld -m elf_i386 -T user/linker.ld build/user-start.o build/user-themeprobe.o -o build/user-themeprobe.kernel.elf
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: build/user-rgbprobe.kernel.elf has a LOAD segment with RWX permissions
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: build/user-themeprobe.kernel.elf has a LOAD segment with RWX permissions
+nm -n build/user-rgbprobe.kernel.elf > build/user-rgbprobe.sym
+nm -n build/user-themeprobe.kernel.elf > build/user-themeprobe.sym
+ld -m elf_i386 -T user/linker.ld build/user-start.o build/user-imageprobe.o -o build/user-imageprobe.kernel.elf
+ld -m elf_i386 -T user/linker.ld build/user-start.o build/user-sysprobe.o -o build/user-sysprobe.kernel.elf
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: build/user-imageprobe.kernel.elf has a LOAD segment with RWX permissions
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: build/user-sysprobe.kernel.elf has a LOAD segment with RWX permissions
+nm -n build/user-imageprobe.kernel.elf > build/user-imageprobe.sym
+nm -n build/user-sysprobe.kernel.elf > build/user-sysprobe.sym
+ld -m elf_i386 -T user/linker.ld build/user-start.o build/user-cli.o -o build/user-cli.kernel.elf
+ld -m elf_i386 -T user/linker.ld build/user-start.o build/user-assembler.o -o build/user-assembler.kernel.elf
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: build/user-cli.kernel.elf has a LOAD segment with RWX permissions
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: build/user-assembler.kernel.elf has a LOAD segment with RWX permissions
+nm -n build/user-cli.kernel.elf > build/user-cli.sym
+nm -n build/user-assembler.kernel.elf > build/user-assembler.sym
+objcopy -O binary build/module-core.elf build/module-core.bin
+objcopy  -O binary build/user-s3c.kernel.elf build/user-s3c.bin
+mkdir -p build/codec/webp/src/dsp/
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -Os -DWEBP_REDUCE_SIZE -ffunction-sections -fdata-sections -Iuser/codec/include -Iuser/codec -Iuser -Ithird_party/stb -Ithird_party/libwebp -c build/codec/webp-adapt/yuv.c -o build/codec/webp/src/dsp/yuv.o
+ld -m elf_i386 -T linker.ld build/entry.o build/main.o build/boot_scene.o build/idt.o build/interrupts.o build/timer.o build/keyboard.o build/mouse.o build/memory.o build/heap.o build/paging.o build/gfx.o build/display.o build/theme.o build/image.o build/image_service.o build/userspace.o build/desktop.o build/wm.o build/task.o build/process.o build/module.o build/ata.o build/fs.o -o build/kernel.elf
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: build/kernel.elf has a LOAD segment with RWX permissions
+nm -n build/kernel.elf > build/kernel.sym
+objcopy  -O binary build/user-shell.kernel.elf build/user-shell.bin
+objcopy  -O binary build/user-files.kernel.elf build/user-files.bin
+objcopy  -O binary build/user-note.kernel.elf build/user-note.bin
+objcopy  -O binary build/user-palette.kernel.elf build/user-palette.bin
+objcopy  -O binary build/user-calc.kernel.elf build/user-calc.bin
+objcopy  -O binary build/user-mines.kernel.elf build/user-mines.bin
+objcopy  -O binary build/user-probe.kernel.elf build/user-probe.bin
+objcopy  -O binary build/user-ide.kernel.elf build/user-ide.bin
+objcopy  -O binary build/user-debugger.kernel.elf build/user-debugger.bin
+objcopy  -O binary build/user-lumen.kernel.elf build/user-lumen.bin
+objcopy  -O binary build/user-race.kernel.elf build/user-race.bin
+objcopy  -O binary build/user-world.kernel.elf build/user-world.bin
+objcopy  -O binary build/user-settings.kernel.elf build/user-settings.bin
+objcopy  -O binary build/user-lens.kernel.elf build/user-lens.bin
+objcopy  -O binary build/user-canvas.kernel.elf build/user-canvas.bin
+objcopy  -O binary build/user-monitor.kernel.elf build/user-monitor.bin
+objcopy  -O binary build/user-rgbprobe.kernel.elf build/user-rgbprobe.bin
+objcopy  -O binary build/user-themeprobe.kernel.elf build/user-themeprobe.bin
+objcopy  -O binary build/user-imageprobe.kernel.elf build/user-imageprobe.bin
+objcopy  -O binary build/user-sysprobe.kernel.elf build/user-sysprobe.bin
+objcopy  -O binary build/user-cli.kernel.elf build/user-cli.bin
+objcopy  -O binary build/user-assembler.kernel.elf build/user-assembler.bin
+python3 tools/mkskm.py build/module-core.elf build/module-core.bin build/fs/SYS/CORE/CORE.SKM
+mkdir -p build/fs/bin
+python3 tools/mkscx.py build/user-s3c.bin build/fs/bin/s3c.scx 0 0x400000 build/user-s3c.sym
+mkskm: 856B + bss 4B, 10 relocations -> build/fs/SYS/CORE/CORE.SKM
+ld -m elf_i386 --gc-sections -T user/linker.ld build/user-start.o build/codec/webp/src/dec/alpha_dec.o build/codec/webp/src/dec/buffer_dec.o build/codec/webp/src/dec/frame_dec.o build/codec/webp/src/dec/idec_dec.o build/codec/webp/src/dec/io_dec.o build/codec/webp/src/dec/quant_dec.o build/codec/webp/src/dec/tree_dec.o build/codec/webp/src/dec/vp8_dec.o build/codec/webp/src/dec/vp8l_dec.o build/codec/webp/src/dec/webp_dec.o build/codec/webp/src/dsp/alpha_processing.o build/codec/webp/src/dsp/cpu.o build/codec/webp/src/dsp/dec.o build/codec/webp/src/dsp/dec_clip_tables.o build/codec/webp/src/dsp/filters.o build/codec/webp/src/dsp/lossless.o build/codec/webp/src/dsp/rescaler.o build/codec/webp/src/dsp/upsampling.o build/codec/webp/src/dsp/yuv.o build/codec/webp/src/utils/bit_reader_utils.o build/codec/webp/src/utils/color_cache_utils.o build/codec/webp/src/utils/filters_utils.o build/codec/webp/src/utils/huffman_utils.o build/codec/webp/src/utils/palette.o build/codec/webp/src/utils/quant_levels_dec_utils.o build/codec/webp/src/utils/rescaler_utils.o build/codec/webp/src/utils/random_utils.o build/codec/webp/src/utils/thread_utils.o build/codec/webp/src/utils/utils.o build/codec/service.o build/codec/runtime.o build/codec/decode.o -o build/user-codec.kernel.elf
+mkscx: build/user-s3c.bin -> build/fs/bin/s3c.scx (entry=0x0 base=0x400000 load=86541B)
+objcopy  -O binary build/kernel.elf build/kernel.bin
+mkdir -p build/fs/bin
+python3 tools/mkscx.py build/user-shell.bin build/fs/bin/shell.scx 0 0x400000 build/user-shell.sym
+mkscx: build/user-shell.bin -> build/fs/bin/shell.scx (entry=0x0 base=0x400000 load=4593B)
+mkdir -p build/fs/apps
+python3 tools/mkscx.py build/user-files.bin build/fs/apps/files.scx 0 0x400000 build/user-files.sym
+mkscx: build/user-files.bin -> build/fs/apps/files.scx (entry=0x0 base=0x400000 load=31605B)
+mkdir -p build/fs/apps
+python3 tools/mkscx.py build/user-note.bin build/fs/apps/note.scx 0 0x400000 build/user-note.sym
+mkscx: build/user-note.bin -> build/fs/apps/note.scx (entry=0x0 base=0x400000 load=31525B)
+mkdir -p build/fs/apps
+python3 tools/mkscx.py build/user-palette.bin build/fs/apps/palette.scx 0 0x400000 build/user-palette.sym
+mkscx: build/user-palette.bin -> build/fs/apps/palette.scx (entry=0x0 base=0x400000 load=16113B)
+mkdir -p build/fs/apps
+python3 tools/mkscx.py build/user-calc.bin build/fs/apps/calc.scx 0 0x400000 build/user-calc.sym
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: build/user-codec.kernel.elf has a LOAD segment with RWX permissions
+mkscx: build/user-calc.bin -> build/fs/apps/calc.scx (entry=0x0 base=0x400000 load=12933B)
+mkdir -p build/fs/apps
+python3 tools/mkscx.py build/user-mines.bin build/fs/apps/mines.scx 0 0x400000 build/user-mines.sym
+mkscx: build/user-mines.bin -> build/fs/apps/mines.scx (entry=0x0 base=0x400000 load=21669B)
+mkdir -p build/fs/apps
+python3 tools/mkscx.py build/user-probe.bin build/fs/apps/probe.scx 0 0x400000 build/user-probe.sym
+nm -n build/user-codec.kernel.elf > build/user-codec.sym
+mkdir -p build/fs/apps
+python3 tools/mkscx.py build/user-ide.bin build/fs/apps/ide.scx 0 0x400000 build/user-ide.sym
+mkscx: build/user-probe.bin -> build/fs/apps/probe.scx (entry=0x0 base=0x400000 load=5884B)
+mkdir -p build/fs/apps
+python3 tools/mkscx.py build/user-debugger.bin build/fs/apps/debugger.scx 0 0x400000 build/user-debugger.sym
+mkscx: build/user-ide.bin -> build/fs/apps/ide.scx (entry=0x0 base=0x400000 load=40069B)
+mkdir -p build/fs/apps
+python3 tools/mkscx.py build/user-lumen.bin build/fs/apps/lumen.scx 0 0x400000 build/user-lumen.sym
+mkscx: build/user-debugger.bin -> build/fs/apps/debugger.scx (entry=0x0 base=0x400000 load=33777B)
+mkdir -p build/fs/apps
+python3 tools/mkscx.py build/user-race.bin build/fs/apps/race.scx 0 0x400000 build/user-race.sym
+mkscx: build/user-lumen.bin -> build/fs/apps/lumen.scx (entry=0x0 base=0x400000 load=29053B)
+mkdir -p build/fs/apps
+python3 tools/mkscx.py build/user-world.bin build/fs/apps/world.scx 0 0x400000 build/user-world.sym
+mkscx: build/user-race.bin -> build/fs/apps/race.scx (entry=0x0 base=0x400000 load=61661B)
+mkdir -p build/fs/apps
+python3 tools/mkscx.py build/user-settings.bin build/fs/apps/settings.scx 0 0x400000 build/user-settings.sym
+mkscx: build/user-world.bin -> build/fs/apps/world.scx (entry=0x0 base=0x400000 load=75805B)
+mkdir -p build/fs/apps
+python3 tools/mkscx.py build/user-lens.bin build/fs/apps/lens.scx 0 0x400000 build/user-lens.sym
+mkscx: build/user-settings.bin -> build/fs/apps/settings.scx (entry=0x0 base=0x400000 load=73125B)
+mkdir -p build/fs/apps
+python3 tools/mkscx.py build/user-canvas.bin build/fs/apps/canvas.scx 0 0x400000 build/user-canvas.sym
+mkscx: build/user-lens.bin -> build/fs/apps/lens.scx (entry=0x0 base=0x400000 load=30917B)
+mkdir -p build/fs/apps
+python3 tools/mkscx.py build/user-monitor.bin build/fs/apps/monitor.scx 0 0x400000 build/user-monitor.sym
+mkscx: build/user-canvas.bin -> build/fs/apps/canvas.scx (entry=0x0 base=0x400000 load=38245B)
+mkdir -p build/fs/apps
+python3 tools/mkscx.py build/user-rgbprobe.bin build/fs/apps/rgbprobe.scx 0 0x400000 build/user-rgbprobe.sym
+mkscx: build/user-monitor.bin -> build/fs/apps/monitor.scx (entry=0x0 base=0x400000 load=25753B)
+mkdir -p build/fs/apps
+python3 tools/mkscx.py build/user-themeprobe.bin build/fs/apps/themeprobe.scx 0 0x400000 build/user-themeprobe.sym
+mkscx: build/user-rgbprobe.bin -> build/fs/apps/rgbprobe.scx (entry=0x0 base=0x400000 load=2489B)
+mkdir -p build/fs/apps
+python3 tools/mkscx.py build/user-imageprobe.bin build/fs/apps/imageprobe.scx 0 0x400000 build/user-imageprobe.sym
+mkscx: build/user-themeprobe.bin -> build/fs/apps/themeprobe.scx (entry=0x0 base=0x400000 load=3417B)
+mkdir -p build/fs/apps
+python3 tools/mkscx.py build/user-sysprobe.bin build/fs/apps/sysprobe.scx 0 0x400000 build/user-sysprobe.sym
+mkscx: build/user-imageprobe.bin -> build/fs/apps/imageprobe.scx (entry=0x0 base=0x400000 load=2630B)
+mkdir -p build/fs/bin
+python3 tools/mkscx.py build/user-cli.bin build/fs/bin/ls.scx 0 0x400000 build/user-cli.sym
+mkscx: build/user-sysprobe.bin -> build/fs/apps/sysprobe.scx (entry=0x0 base=0x400000 load=5726B)
+mkdir -p build/fs/bin
+python3 tools/mkscx.py build/user-cli.bin build/fs/bin/pwd.scx 0 0x400000 build/user-cli.sym
+mkscx: build/user-cli.bin -> build/fs/bin/ls.scx (entry=0x0 base=0x400000 load=7850B)
+mkdir -p build/fs/bin
+python3 tools/mkscx.py build/user-cli.bin build/fs/bin/cat.scx 0 0x400000 build/user-cli.sym
+mkscx: build/user-cli.bin -> build/fs/bin/pwd.scx (entry=0x0 base=0x400000 load=7850B)
+mkdir -p build/fs/bin
+python3 tools/mkscx.py build/user-cli.bin build/fs/bin/echo.scx 0 0x400000 build/user-cli.sym
+mkscx: build/user-cli.bin -> build/fs/bin/cat.scx (entry=0x0 base=0x400000 load=7850B)
+mkdir -p build/fs/bin
+python3 tools/mkscx.py build/user-cli.bin build/fs/bin/stat.scx 0 0x400000 build/user-cli.sym
+mkscx: build/user-cli.bin -> build/fs/bin/echo.scx (entry=0x0 base=0x400000 load=7850B)
+mkdir -p build/fs/bin
+python3 tools/mkscx.py build/user-cli.bin build/fs/bin/cp.scx 0 0x400000 build/user-cli.sym
+mkscx: build/user-cli.bin -> build/fs/bin/stat.scx (entry=0x0 base=0x400000 load=7850B)
+mkdir -p build/fs/bin
+python3 tools/mkscx.py build/user-cli.bin build/fs/bin/mkdir.scx 0 0x400000 build/user-cli.sym
+mkscx: build/user-cli.bin -> build/fs/bin/cp.scx (entry=0x0 base=0x400000 load=7850B)
+mkdir -p build/fs/bin
+python3 tools/mkscx.py build/user-cli.bin build/fs/bin/rm.scx 0 0x400000 build/user-cli.sym
+mkscx: build/user-cli.bin -> build/fs/bin/mkdir.scx (entry=0x0 base=0x400000 load=7850B)
+mkdir -p build/fs/bin
+python3 tools/mkscx.py build/user-cli.bin build/fs/bin/mv.scx 0 0x400000 build/user-cli.sym
+mkscx: build/user-cli.bin -> build/fs/bin/rm.scx (entry=0x0 base=0x400000 load=7850B)
+mkdir -p build/fs/bin
+python3 tools/mkscx.py build/user-cli.bin build/fs/bin/mem.scx 0 0x400000 build/user-cli.sym
+mkscx: build/user-cli.bin -> build/fs/bin/mv.scx (entry=0x0 base=0x400000 load=7850B)
+mkdir -p build/fs/bin
+python3 tools/mkscx.py build/user-cli.bin build/fs/bin/uptime.scx 0 0x400000 build/user-cli.sym
+mkscx: build/user-cli.bin -> build/fs/bin/mem.scx (entry=0x0 base=0x400000 load=7850B)
+mkdir -p build/fs/bin
+python3 tools/mkscx.py build/user-cli.bin build/fs/bin/help.scx 0 0x400000 build/user-cli.sym
+mkscx: build/user-cli.bin -> build/fs/bin/uptime.scx (entry=0x0 base=0x400000 load=7850B)
+mkdir -p build/fs/bin
+python3 tools/mkscx.py build/user-cli.bin build/fs/bin/whoami.scx 0 0x400000 build/user-cli.sym
+mkscx: build/user-cli.bin -> build/fs/bin/help.scx (entry=0x0 base=0x400000 load=7850B)
+mkdir -p build/fs/bin
+python3 tools/mkscx.py build/user-cli.bin build/fs/bin/env.scx 0 0x400000 build/user-cli.sym
+mkscx: build/user-cli.bin -> build/fs/bin/whoami.scx (entry=0x0 base=0x400000 load=7850B)
+mkdir -p build/fs/bin
+python3 tools/mkscx.py build/user-cli.bin build/fs/bin/lsblk.scx 0 0x400000 build/user-cli.sym
+mkscx: build/user-cli.bin -> build/fs/bin/env.scx (entry=0x0 base=0x400000 load=7850B)
+mkdir -p build/fs/bin
+python3 tools/mkscx.py build/user-cli.bin build/fs/bin/partitions.scx 0 0x400000 build/user-cli.sym
+mkscx: build/user-cli.bin -> build/fs/bin/lsblk.scx (entry=0x0 base=0x400000 load=7850B)
+mkdir -p build/fs/bin
+python3 tools/mkscx.py build/user-cli.bin build/fs/bin/df.scx 0 0x400000 build/user-cli.sym
+mkscx: build/user-cli.bin -> build/fs/bin/partitions.scx (entry=0x0 base=0x400000 load=7850B)
+mkdir -p build/fs/bin
+python3 tools/mkscx.py build/user-cli.bin build/fs/bin/ps.scx 0 0x400000 build/user-cli.sym
+mkscx: build/user-cli.bin -> build/fs/bin/df.scx (entry=0x0 base=0x400000 load=7850B)
+mkdir -p build/fs/bin
+python3 tools/mkscx.py build/user-cli.bin build/fs/bin/cpu.scx 0 0x400000 build/user-cli.sym
+mkscx: build/user-cli.bin -> build/fs/bin/ps.scx (entry=0x0 base=0x400000 load=7850B)
+mkdir -p build/fs/bin
+python3 tools/mkscx.py build/user-assembler.bin build/fs/bin/asm.scx 0 0x400000 build/user-assembler.sym
+mkscx: build/user-cli.bin -> build/fs/bin/cpu.scx (entry=0x0 base=0x400000 load=7850B)
+objcopy  -O binary build/user-codec.kernel.elf build/user-codec.bin
+mkscx: build/user-assembler.bin -> build/fs/bin/asm.scx (entry=0x0 base=0x400000 load=22433B)
+python3 tools/mkimg.py build/boot.bin build/kernel.bin build/sandcore.img
+mkdir -p build/fs/SYS/CORE/
+python3 tools/mkscx.py build/user-codec.bin build/fs/SYS/CORE/IMAGE.SCX 0 0x400000 build/user-codec.sym
+boot=512B  kernel=140800B (275 sectors)  -> build/sandcore.img
+mkscx: build/user-codec.bin -> build/fs/SYS/CORE/IMAGE.SCX (entry=0x0 base=0x400000 load=97562B)
+python3 tools/mkfs.py
+  apps/calc.scx: 12969B @ LBA 81
+  apps/canvas.scx: 38281B @ LBA 107
+  apps/debugger.scx: 33813B @ LBA 182
+  apps/files.scx: 31641B @ LBA 249
+  apps/hello.scx: 288B @ LBA 311
+  apps/ide.scx: 40105B @ LBA 312
+  apps/imageprobe.scx: 2666B @ LBA 391
+  apps/lens.scx: 30953B @ LBA 397
+  apps/lumen.scx: 29089B @ LBA 458
+  apps/mines.scx: 21705B @ LBA 515
+  apps/monitor.scx: 25789B @ LBA 558
+  apps/note.scx: 31561B @ LBA 609
+  apps/palette.scx: 16149B @ LBA 671
+  apps/panic.scx: 47B @ LBA 703
+  apps/probe.scx: 5920B @ LBA 704
+  apps/race.scx: 61697B @ LBA 716
+  apps/rgbprobe.scx: 2525B @ LBA 837
+  apps/settings.scx: 73161B @ LBA 842
+  apps/sysprobe.scx: 5762B @ LBA 985
+  apps/themeprobe.scx: 3453B @ LBA 997
+  apps/world.scx: 75841B @ LBA 1004
+  bin/asm.scx: 22469B @ LBA 1153
+  bin/cat.scx: 7886B @ LBA 1197
+  bin/cp.scx: 7886B @ LBA 1213
+  bin/cpu.scx: 7886B @ LBA 1229
+  bin/df.scx: 7886B @ LBA 1245
+  bin/echo.scx: 7886B @ LBA 1261
+  bin/env.scx: 7886B @ LBA 1277
+  bin/help.scx: 7886B @ LBA 1293
+  bin/ls.scx: 7886B @ LBA 1309
+  bin/lsblk.scx: 7886B @ LBA 1325
+  bin/mem.scx: 7886B @ LBA 1341
+  bin/mkdir.scx: 7886B @ LBA 1357
+  bin/mv.scx: 7886B @ LBA 1373
+  bin/partitions.scx: 7886B @ LBA 1389
+  bin/ps.scx: 7886B @ LBA 1405
+  bin/pwd.scx: 7886B @ LBA 1421
+  bin/rm.scx: 7886B @ LBA 1437
+  bin/s3c.scx: 86577B @ LBA 1453
+  bin/shell.scx: 4629B @ LBA 1623
+  bin/stat.scx: 7886B @ LBA 1633
+  bin/uptime.scx: 7886B @ LBA 1649
+  bin/whoami.scx: 7886B @ LBA 1665
+  desk/files.lnk: 28B @ LBA 1681
+  desk/notes.lnk: 26B @ LBA 1682
+  desk/palette.lnk: 34B @ LBA 1683
+  desk/shell.lnk: 27B @ LBA 1684
+  desk/Z-CALCULATOR.LNK: 31B @ LBA 1685
+  desk/Z-CANVAS.LNK: 31B @ LBA 1686
+  desk/Z-DEBUG.LNK: 31B @ LBA 1687
+  desk/Z-LENS.LNK: 25B @ LBA 1688
+  desk/Z-LUMEN.LNK: 28B @ LBA 1689
+  desk/Z-MINES.LNK: 28B @ LBA 1690
+  desk/Z-MONITOR.LNK: 34B @ LBA 1691
+  desk/Z-RACE.LNK: 25B @ LBA 1692
+  desk/Z-SETTINGS.LNK: 37B @ LBA 1693
+  desk/Z-STUDIO.LNK: 28B @ LBA 1694
+  desk/Z-WORLD.LNK: 28B @ LBA 1695
+  home/demo.asm: 337B @ LBA 1696
+  home/FEATURE.C: 3369B @ LBA 1697
+  home/notes.txt: 159B @ LBA 1704
+  home/WELCOME.SCB: 230424B @ LBA 1705
+  LEGACY/APPS/CALC.SCX: 2573B @ LBA 2156
+  LEGACY/APPS/DEBUGGER.SCX: 30122B @ LBA 2162
+  LEGACY/APPS/FILES.SCX: 23249B @ LBA 2221
+  LEGACY/APPS/HELLO.SCX: 288B @ LBA 2267
+  LEGACY/APPS/IDE.SCX: 28700B @ LBA 2268
+  LEGACY/APPS/LUMEN.SCX: 30555B @ LBA 2325
+  LEGACY/APPS/MINES.SCX: 3440B @ LBA 2385
+  LEGACY/APPS/NOTE.SCX: 2349B @ LBA 2392
+  LEGACY/APPS/PALETTE.SCX: 941B @ LBA 2397
+  LEGACY/APPS/PANIC.SCX: 47B @ LBA 2399
+  LEGACY/APPS/PROBE.SCX: 13374B @ LBA 2400
+  LEGACY/APPS/RACE.SCX: 20938B @ LBA 2427
+  LEGACY/APPS/WORLD.SCX: 27471B @ LBA 2468
+  LEGACY/BIN/ASM.SCX: 7706B @ LBA 2522
+  LEGACY/BIN/S3C.SCX: 130408B @ LBA 2538
+  LEGACY/BIN/SHELL.SCX: 5178B @ LBA 2793
+  LEGACY/README.TXT: 209B @ LBA 2804
+  SYS/CORE/CORE.SKM: 928B @ LBA 2805
+  SYS/CORE/IMAGE.LIC: 8721B @ LBA 2807
+  SYS/CORE/IMAGE.SCX: 97598B @ LBA 2825
+  sys/DISPLAY.CFG: 41B @ LBA 3016
+  sys/ENV.CFG: 25B @ LBA 3017
+  sys/files.scf: 288B @ LBA 3018
+  sys/font.scf: 9948B @ LBA 3019
+  sys/ICONS/AURORA/CALC.SCB: 65568B @ LBA 3039
+  sys/ICONS/AURORA/CANVAS.SCB: 65568B @ LBA 3168
+  sys/ICONS/AURORA/DEBUG.SCB: 65568B @ LBA 3297
+  sys/ICONS/AURORA/FILES.SCB: 65568B @ LBA 3426
+  sys/ICONS/AURORA/LENS.SCB: 65568B @ LBA 3555
+  sys/ICONS/AURORA/LUMEN.SCB: 65568B @ LBA 3684
+  sys/ICONS/AURORA/MINES.SCB: 65568B @ LBA 3813
+  sys/ICONS/AURORA/MONITOR.SCB: 65568B @ LBA 3942
+  sys/ICONS/AURORA/NOTE.SCB: 65568B @ LBA 4071
+  sys/ICONS/AURORA/PALETTE.SCB: 65568B @ LBA 4200
+  sys/ICONS/AURORA/RACE.SCB: 65568B @ LBA 4329
+  sys/ICONS/AURORA/SETTINGS.SCB: 65568B @ LBA 4458
+  sys/ICONS/AURORA/SHELL.SCB: 65568B @ LBA 4587
+  sys/ICONS/AURORA/STUDIO.SCB: 65568B @ LBA 4716
+  sys/ICONS/AURORA/WORLD.SCB: 65568B @ LBA 4845
+  sys/ICONS/CALC.SCB: 65568B @ LBA 4974
+  sys/ICONS/CANVAS.SCB: 65568B @ LBA 5103
+  sys/ICONS/CLASSIC/CALC.SCB: 4128B @ LBA 5232
+  sys/ICONS/CLASSIC/CANVAS.SCB: 4128B @ LBA 5241
+  sys/ICONS/CLASSIC/DEBUG.SCB: 4128B @ LBA 5250
+  sys/ICONS/CLASSIC/FILES.SCB: 4128B @ LBA 5259
+  sys/ICONS/CLASSIC/LENS.SCB: 4128B @ LBA 5268
+  sys/ICONS/CLASSIC/LUMEN.SCB: 4128B @ LBA 5277
+  sys/ICONS/CLASSIC/MINES.SCB: 4128B @ LBA 5286
+  sys/ICONS/CLASSIC/MONITOR.SCB: 4128B @ LBA 5295
+  sys/ICONS/CLASSIC/NOTE.SCB: 4128B @ LBA 5304
+  sys/ICONS/CLASSIC/PALETTE.SCB: 4128B @ LBA 5313
+  sys/ICONS/CLASSIC/RACE.SCB: 4128B @ LBA 5322
+  sys/ICONS/CLASSIC/SETTINGS.SCB: 4128B @ LBA 5331
+  sys/ICONS/CLASSIC/SHELL.SCB: 4128B @ LBA 5340
+  sys/ICONS/CLASSIC/STUDIO.SCB: 4128B @ LBA 5349
+  sys/ICONS/CLASSIC/WORLD.SCB: 4128B @ LBA 5358
+  sys/ICONS/DEBUG.SCB: 65568B @ LBA 5367
+  sys/ICONS/FILES.SCB: 65568B @ LBA 5496
+  sys/ICONS/LENS.SCB: 65568B @ LBA 5625
+  sys/ICONS/LUMEN.SCB: 65568B @ LBA 5754
+  sys/ICONS/MINES.SCB: 65568B @ LBA 5883
+  sys/ICONS/MONITOR.SCB: 65568B @ LBA 6012
+  sys/ICONS/NOTE.SCB: 65568B @ LBA 6141
+  sys/ICONS/PALETTE.SCB: 65568B @ LBA 6270
+  sys/ICONS/RACE.SCB: 65568B @ LBA 6399
+  sys/ICONS/SETTINGS.SCB: 65568B @ LBA 6528
+  sys/ICONS/SHELL.SCB: 65568B @ LBA 6657
+  sys/ICONS/STUDIO.SCB: 65568B @ LBA 6786
+  sys/ICONS/WORLD.SCB: 65568B @ LBA 6915
+  sys/INC/IMAGECLIENT.H: 1108B @ LBA 7044
+  sys/INC/RACEGAME.H: 752B @ LBA 7047
+  sys/INC/SCAPI.H: 25319B @ LBA 7049
+  sys/INC/SCENE.H: 4281B @ LBA 7099
+  sys/INC/SCMEM.H: 1137B @ LBA 7108
+  sys/INC/SCVOX.H: 2889B @ LBA 7111
+  sys/INC/SCWIDE.H: 2840B @ LBA 7117
+  sys/INC/WORLDGAME.H: 1278B @ LBA 7123
+  sys/MENU.CFG: 493B @ LBA 7126
+  sys/notes.scf: 288B @ LBA 7127
+  sys/palette.scf: 288B @ LBA 7128
+  sys/PICTURES/WELCOME.PNG: 1715161B @ LBA 7129
+  sys/shell.scf: 288B @ LBA 10479
+  sys/SRC/api.h: 210B @ LBA 10480
+  sys/SRC/assembler.c: 12497B @ LBA 10481
+  sys/SRC/calc.c: 4565B @ LBA 10506
+  sys/SRC/canvas.c: 15644B @ LBA 10515
+  sys/SRC/cli.c: 10512B @ LBA 10546
+  sys/SRC/COMPILEUI.inc: 3864B @ LBA 10567
+  sys/SRC/configprobe.c: 3321B @ LBA 10575
+  sys/SRC/damageprobe.c: 3048B @ LBA 10582
+  sys/SRC/debugger.c: 24897B @ LBA 10588
+  sys/SRC/files.c: 13551B @ LBA 10637
+  sys/SRC/frameirqprobe.c: 5606B @ LBA 10664
+  sys/SRC/ide.c: 20864B @ LBA 10675
+  sys/SRC/IMAGE.inc: 2460B @ LBA 10716
+  sys/SRC/IMAGECLIENT.H: 1108B @ LBA 10721
+  sys/SRC/IMAGECLIENT.inc: 2343B @ LBA 10724
+  sys/SRC/imageprobe.c: 3981B @ LBA 10729
+  sys/SRC/indexprobe.c: 1186B @ LBA 10737
+  sys/SRC/lens.c: 18910B @ LBA 10740
+  sys/SRC/lumen.c: 12409B @ LBA 10777
+  sys/SRC/mines.c: 10278B @ LBA 10802
+  sys/SRC/monitor.c: 16948B @ LBA 10823
+  sys/SRC/note.c: 15927B @ LBA 10857
+  sys/SRC/NUI.inc: 28357B @ LBA 10889
+  sys/SRC/palette.c: 4164B @ LBA 10945
+  sys/SRC/pathprobe.c: 816B @ LBA 10954
+  sys/SRC/probe.c: 6878B @ LBA 10956
+  sys/SRC/race.c: 23194B @ LBA 10970
+  sys/SRC/RACEGAME.H: 752B @ LBA 11016
+  sys/SRC/race_game.inc: 16836B @ LBA 11018
+  sys/SRC/rgbprobe.c: 4631B @ LBA 11051
+  sys/SRC/s3c.c: 9457B @ LBA 11061
+  sys/SRC/s3c_emit.inc: 47054B @ LBA 11080
+  sys/SRC/s3c_lex.inc: 6622B @ LBA 11172
+  sys/SRC/s3c_parse.inc: 34321B @ LBA 11185
+  sys/SRC/s3c_pp.inc: 22676B @ LBA 11253
+  sys/SRC/SCAPI.H: 25319B @ LBA 11298
+  sys/SRC/SCENE.H: 4281B @ LBA 11348
+  sys/SRC/SCENE.inc: 38967B @ LBA 11357
+  sys/SRC/SCENENUI.inc: 480B @ LBA 11434
+  sys/SRC/schedprobe.c: 2819B @ LBA 11435
+  sys/SRC/SCMEM.H: 1137B @ LBA 11441
+  sys/SRC/SCMEM.inc: 2787B @ LBA 11444
+  sys/SRC/SCVOX.H: 2889B @ LBA 11450
+  sys/SRC/SCVOX.inc: 8163B @ LBA 11456
+  sys/SRC/SCWIDE.H: 2840B @ LBA 11472
+  sys/SRC/SCWIDE.inc: 7473B @ LBA 11478
+  sys/SRC/settings.c: 23678B @ LBA 11493
+  sys/SRC/SETTINGS.inc: 12915B @ LBA 11540
+  sys/SRC/shell.c: 4851B @ LBA 11566
+  sys/SRC/sysprobe.c: 5713B @ LBA 11576
+  sys/SRC/themeprobe.c: 4613B @ LBA 11588
+  sys/SRC/UI.inc: 9027B @ LBA 11598
+  sys/SRC/userprobe.c: 4199B @ LBA 11616
+  sys/SRC/world.c: 29081B @ LBA 11625
+  sys/SRC/WORLDGAME.H: 1278B @ LBA 11682
+  sys/SRC/world_entities.inc: 7014B @ LBA 11685
+  sys/SRC/world_game.inc: 18205B @ LBA 11699
+  sys/SRC/world_panels.inc: 12214B @ LBA 11735
+  sys/THEME.CFG: 102B @ LBA 11759
+  sys/THEMES/AURORA.CFG: 102B @ LBA 11760
+  sys/THEMES/CLASSIC.CFG: 105B @ LBA 11761
+  sys/USER.CFG: 34B @ LBA 11762
+  sys/WALL/AURORA.SCB: 6293440B @ LBA 11763
+  sys/WALL/CLASSIC.SCB: 230432B @ LBA 24055
+  sys/WALL/SATIN.SCB: 6293440B @ LBA 24506
+  sys/WALL/TIDAL.SCB: 6293440B @ LBA 36798
+mkfs: 210 files -> /mnt/c/Users/Administrator/Desktop/projectos/backup-output/clean-clone-versions-01/rebuild-output/M8a/sandcore/tools/../build/sanddata.img (SandFS @ LBA 0)
+{"status": "HISTORICAL_SOURCE_BUILD_PASS", "version": "M8a", "source": "/mnt/c/Users/Administrator/Desktop/projectos/backup-output/clean-clone-versions-01/snapshots/M8a/sandcore", "source_files_verified": 580, "command": ["make", "-j2"], "adaptation": ["M8a独立副本仅替换M7原字节读取脚本与其ZIP文件前置条件"], "artifacts": [{"path": "/mnt/c/Users/Administrator/Desktop/projectos/backup-output/clean-clone-versions-01/rebuild-output/M8a/sandcore/build/sandcore.img", "size": 1474560, "sha256": "3fc11c1a76cd11384826682d9b2b45ecdbe91ee785686abcbdef8fc9bcd353d1"}, {"path": "/mnt/c/Users/Administrator/Desktop/projectos/backup-output/clean-clone-versions-01/rebuild-output/M8a/sandcore/build/sanddata.img", "size": 67108864, "sha256": "e805e4c7d36e5afde6fd6bcddc893dffe7404fbfe15cfa124d22fd99925c9c10"}], "scope": "historical snapshot host build; native compiler publication and QEMU runtime remain separate"}

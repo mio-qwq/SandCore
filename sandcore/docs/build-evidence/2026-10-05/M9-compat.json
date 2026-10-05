@@ -1,0 +1,222 @@
+{
+  "status": "STATIC_COMPATIBILITY_PASS_RUNTIME_PENDING",
+  "baseline_sha256": "516811f6477c33a5028f8bfd736d9f7b98cdfc40bce84d35ae730f298d3278fc",
+  "old_api_count": 40,
+  "old_macro_count": 29,
+  "old_apis": [
+    "append",
+    "copy",
+    "decimal",
+    "equal",
+    "length",
+    "page",
+    "sc_args",
+    "sc_call",
+    "sc_dbgexec",
+    "sc_debug",
+    "sc_dir",
+    "sc_down",
+    "sc_exec",
+    "sc_exit",
+    "sc_fill",
+    "sc_font8",
+    "sc_fontinfo",
+    "sc_frame",
+    "sc_glyph16",
+    "sc_handler",
+    "sc_info",
+    "sc_key",
+    "sc_list",
+    "sc_mkdir",
+    "sc_mouse",
+    "sc_open",
+    "sc_puts",
+    "sc_read",
+    "sc_remove",
+    "sc_rename",
+    "sc_resume",
+    "sc_stat",
+    "sc_status",
+    "sc_text",
+    "sc_text16",
+    "sc_tick",
+    "sc_wallpaper",
+    "sc_write",
+    "sc_yield",
+    "wait_escape"
+  ],
+  "m8a": {
+    "archive": "C:\\Users\\Administrator\\Desktop\\projectos\\backup-output\\clean-clone-m9-02\\releases\\SandCore-M8a-build.zip",
+    "sha256": "e9db18c1dd3c6987c4b66a2a33e1bf354e39b6da8b2b920db2cb366f42ca61e5",
+    "old_api_count": 76,
+    "old_macro_count": 59,
+    "old_apis": [
+      "append",
+      "copy",
+      "decimal",
+      "equal",
+      "length",
+      "page",
+      "sc_args",
+      "sc_call",
+      "sc_chdir",
+      "sc_cli",
+      "sc_config_check",
+      "sc_cpu",
+      "sc_dbgexec",
+      "sc_debug",
+      "sc_dir",
+      "sc_display",
+      "sc_display_apply",
+      "sc_down",
+      "sc_exec",
+      "sc_exit",
+      "sc_fill",
+      "sc_fill_rgb",
+      "sc_font8",
+      "sc_fontinfo",
+      "sc_frame",
+      "sc_frame32",
+      "sc_free",
+      "sc_glyph16",
+      "sc_handler",
+      "sc_image_cancel",
+      "sc_image_claim",
+      "sc_image_request",
+      "sc_image_result",
+      "sc_image_submit",
+      "sc_info",
+      "sc_job",
+      "sc_key",
+      "sc_key_peek",
+      "sc_list",
+      "sc_mkdir",
+      "sc_monitor",
+      "sc_mouse",
+      "sc_mouse_capture",
+      "sc_mouse_relative",
+      "sc_open",
+      "sc_open2",
+      "sc_open_rgb",
+      "sc_palette",
+      "sc_pointer",
+      "sc_pointer_peek",
+      "sc_puts",
+      "sc_read",
+      "sc_read_at",
+      "sc_reload",
+      "sc_remove",
+      "sc_rename",
+      "sc_resolve",
+      "sc_resume",
+      "sc_stat",
+      "sc_status",
+      "sc_storage",
+      "sc_terminal",
+      "sc_text",
+      "sc_text16",
+      "sc_text_rgb",
+      "sc_theme",
+      "sc_theme_load",
+      "sc_theme_path",
+      "sc_tick",
+      "sc_user",
+      "sc_user_config",
+      "sc_wallpaper",
+      "sc_window",
+      "sc_write",
+      "sc_yield",
+      "wait_escape"
+    ]
+  },
+  "current_header_sha256": "e562ada466261df8c56495f935e710c79c9b768b9d92dfd8d837b7e500ee86f0",
+  "disks": [
+    {
+      "path": "C:\\Users\\Administrator\\Desktop\\projectos\\backup-output\\clean-clone-m9-02\\sandcore\\build\\m9-work\\sanddata.img",
+      "sha256": "58983f02dcc1c2d5256d50cf9c29d749906637ef65ac5da865df6a2ae76b0ba7",
+      "legacy": [
+        {
+          "path": "LEGACY/APPS/CALC.SCX",
+          "bytes": 2573,
+          "sha256": "246216136ec137500fdef962791488d912a11959cc21cf867c338d73aec37e84"
+        },
+        {
+          "path": "LEGACY/APPS/DEBUGGER.SCX",
+          "bytes": 30122,
+          "sha256": "8fb1e50a074a438cb6043bcf91e443fcba7aa2a85d806e8a49c0f002a75499d5"
+        },
+        {
+          "path": "LEGACY/APPS/FILES.SCX",
+          "bytes": 23249,
+          "sha256": "da94fbcea50b634f0f364d004cf73b9787a80734a462514dd01b4281d67a0a35"
+        },
+        {
+          "path": "LEGACY/APPS/HELLO.SCX",
+          "bytes": 288,
+          "sha256": "07d8ef24167c8c494929696191ee798f113304d702bc3a1ae6d73487d975cd41"
+        },
+        {
+          "path": "LEGACY/APPS/IDE.SCX",
+          "bytes": 28700,
+          "sha256": "81784a43003707a76827917ebebf58e6fa1207ce089c52aba664ad1f15e51dc7"
+        },
+        {
+          "path": "LEGACY/APPS/LUMEN.SCX",
+          "bytes": 30555,
+          "sha256": "2ad27c18413596d7f9ea37f40a2f9a5f3488407050ec4a7e94fc50f185513124"
+        },
+        {
+          "path": "LEGACY/APPS/MINES.SCX",
+          "bytes": 3440,
+          "sha256": "191bb63bbaf9055b4131dc47483e8953c5bd143a3d8f129e16ad13072fca5007"
+        },
+        {
+          "path": "LEGACY/APPS/NOTE.SCX",
+          "bytes": 2349,
+          "sha256": "ac44974dd85de818bb216e7f39adc73abc57909c932556687f33eaab160fcc90"
+        },
+        {
+          "path": "LEGACY/APPS/PALETTE.SCX",
+          "bytes": 941,
+          "sha256": "481c3c34f04b0a93fa045c70edf72b2d70ca81da623e973070c5f7c9c51adb4a"
+        },
+        {
+          "path": "LEGACY/APPS/PANIC.SCX",
+          "bytes": 47,
+          "sha256": "1e6fe5e2b6337d1a6f253c819833b64d1bb6a50f28d7881f1d4e63e6c1d950a7"
+        },
+        {
+          "path": "LEGACY/APPS/PROBE.SCX",
+          "bytes": 13374,
+          "sha256": "483e0a3d0b8cf273d59d13a1e6be05bb20a1f71de195151e244f81a66d53f1ac"
+        },
+        {
+          "path": "LEGACY/APPS/RACE.SCX",
+          "bytes": 20938,
+          "sha256": "035bde7ba765fcf020a186b5bfdc2403a40802b74daa332043bf6f9790177ad8"
+        },
+        {
+          "path": "LEGACY/APPS/WORLD.SCX",
+          "bytes": 27471,
+          "sha256": "d72d25d429c8e54775588bf9208604c56a8645b8a6dbe5fbefe37413d2450ff8"
+        },
+        {
+          "path": "LEGACY/BIN/ASM.SCX",
+          "bytes": 7706,
+          "sha256": "6b50de628f191490ae4a81bf464a88b3af29a6fd67fd3f3e162b1028fa4a4071"
+        },
+        {
+          "path": "LEGACY/BIN/S3C.SCX",
+          "bytes": 130408,
+          "sha256": "c182fc6746520d213e3ea5f2789826afe7931ffae2264f9c5d595f1a12ad8494"
+        },
+        {
+          "path": "LEGACY/BIN/SHELL.SCX",
+          "bytes": 5178,
+          "sha256": "21e8744596ef609ef1179f1b06fb0dc0043e1588f7020aaaacc48e4326e1d1fc"
+        }
+      ]
+    }
+  ],
+  "scope": "signatures, constants, task layout and immutable legacy bytes; runtime still required"
+}

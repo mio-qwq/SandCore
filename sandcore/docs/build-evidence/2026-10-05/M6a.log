@@ -1,0 +1,54 @@
+mkdir -p build
+/usr/bin/nasm -f bin boot/boot.asm -o build/boot.bin
+python3 tools/mkfont.py kernel/font16.txt build/font16_data.h
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -O2 -Wall -Wextra -c kernel/term.c -o build/term.o
+mkfont: 27 字 -> build/font16_data.h
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -O2 -Wall -Wextra -c kernel/wm.c -o build/wm.o
+kernel/wm.c:10:48: warning: ‘/*’ within comment [-Wcomment]
+   10 |  *  【桌面】开机即桌面: 图标来自 SandFS 的 desk/*.lnk (文本:
+kernel/wm.c:55:35: warning: ‘/*’ within comment [-Wcomment]
+   55 | /* ---------------- 桌面图标 (desk/*.lnk) ----------------
+kernel/wm.c: In function ‘wm_init’:
+kernel/wm.c:411:49: warning: ‘/*’ within comment [-Wcomment]
+  411 |     load_desktop();                   /* 读 desk/*.lnk + 图标 */
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -O2 -Wall -Wextra -c kernel/task.c -o build/task.o
+kernel/task.c: In function ‘task_exec_scx’:
+kernel/task.c:258:9: warning: variable ‘first’ set but not used [-Wunused-but-set-variable]
+  258 |     u32 first = 0;
+      |         ^~~~~
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -O2 -Wall -Wextra -c kernel/ata.c -o build/ata.o
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -O2 -Wall -Wextra -c kernel/fs.c -o build/fs.o
+mkdir -p build/fs/bin
+python3 tools/mkscx.py user/shell.asm build/fs/bin/shell.scx 0 0x400000
+mkdir -p build/fs/apps
+python3 tools/mkscx.py user/hello.asm build/fs/apps/hello.scx 0 0x400000
+mkscx: user/shell.asm -> build/fs/bin/shell.scx (entry=0x0 base=0x400000 load=5735B)
+/usr/bin/nasm -f elf32 kernel/entry.asm -o build/entry.o
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -O2 -Wall -Wextra -c kernel/main.c -o build/main.o
+mkscx: user/hello.asm -> build/fs/apps/hello.scx (entry=0x0 base=0x400000 load=1363B)
+/usr/bin/nasm -f elf32 kernel/idt.asm -o build/idt.o
+kernel/main.c:7:37: warning: ‘/*’ within comment [-Wcomment]
+    7 |  *     * 桌面图标来自 SandFS 的 desk/*.lnk (含 SCF 图标)
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -O2 -Wall -Wextra -c kernel/interrupts.c -o build/interrupts.o
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -O2 -Wall -Wextra -c kernel/timer.c -o build/timer.o
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -O2 -Wall -Wextra -c kernel/keyboard.c -o build/keyboard.o
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -O2 -Wall -Wextra -c kernel/mouse.c -o build/mouse.o
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -O2 -Wall -Wextra -c kernel/memory.c -o build/memory.o
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -O2 -Wall -Wextra -c kernel/heap.c -o build/heap.o
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -O2 -Wall -Wextra -c kernel/paging.c -o build/paging.o
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild -O2 -Wall -Wextra -c kernel/gfx.c -o build/gfx.o
+python3 tools/mkfs.py
+kernel/gfx.c: In function ‘gfx_text16’:
+kernel/gfx.c:136:18: warning: unused variable ‘tmp’ [-Wunused-variable]
+  136 |             char tmp[2] = { (char)b, 0 };
+      |                  ^~~
+ld -m elf_i386 -T linker.ld build/entry.o build/main.o build/idt.o build/interrupts.o build/timer.o build/keyboard.o build/mouse.o build/memory.o build/heap.o build/paging.o build/gfx.o build/term.o build/wm.o build/task.o build/ata.o build/fs.o -o build/kernel.elf
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: build/kernel.elf has a LOAD segment with RWX permissions
+  font.scf: 7463B @ LBA 2
+  apps/hello.scx: 1399B @ LBA 17
+  bin/shell.scx: 5771B @ LBA 20
+mkfs: 3 files -> /mnt/c/Users/Administrator/Desktop/projectos/backup-output/clean-clone-versions-01/rebuild-output/M6a/sandcore/tools/../build/sanddata.img (SandFS @ LBA 0)
+objcopy  -O binary build/kernel.elf build/kernel.bin
+python3 tools/mkimg.py build/boot.bin build/kernel.bin build/sandcore.img
+boot=512B  kernel=26624B (52 sectors)  -> build/sandcore.img
+{"status": "HISTORICAL_SOURCE_BUILD_PASS", "version": "M6a", "source": "/mnt/c/Users/Administrator/Desktop/projectos/backup-output/clean-clone-versions-01/snapshots/M6a/sandcore", "source_files_verified": 63, "command": ["make", "-j2"], "adaptation": [], "artifacts": [{"path": "/mnt/c/Users/Administrator/Desktop/projectos/backup-output/clean-clone-versions-01/rebuild-output/M6a/sandcore/build/sandcore.img", "size": 1474560, "sha256": "98f53a84175f592aca3ed924aca46982103b34ec47dfd5a5317ebc641e8e73e2"}, {"path": "/mnt/c/Users/Administrator/Desktop/projectos/backup-output/clean-clone-versions-01/rebuild-output/M6a/sandcore/build/sanddata.img", "size": 8388608, "sha256": "08b2775ece0b28c1df98f94186f876f444721917d5909e7b1220fedaee2c38b8"}], "scope": "historical snapshot host build; native compiler publication and QEMU runtime remain separate"}

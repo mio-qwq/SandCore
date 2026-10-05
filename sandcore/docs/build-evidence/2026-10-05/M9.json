@@ -1,0 +1,24 @@
+{
+  "status": "CLEAN_CLONE_M9_BUILD_AND_RUNTIME_SMOKE_PASS",
+  "command": "cmd.exe /c build.bat",
+  "build_exit_code": 0,
+  "baseline": "repository compact M7/M8a ZIPs and historical source snapshots",
+  "original_large_zip_present": false,
+  "artifacts": [
+    {
+      "path": "sandcore.img",
+      "size": 1474560,
+      "sha256": "d279523c76d6431fac1b0baecb5dd09cf5d5b24d68d1bb07c973077fe6939202"
+    },
+    {
+      "path": "sanddata.img",
+      "size": 67108864,
+      "sha256": "58983f02dcc1c2d5256d50cf9c29d749906637ef65ac5da865df6a2ae76b0ba7"
+    }
+  ],
+  "boot_identical_to_accepted": true,
+  "serial_cases": 17,
+  "native_program_return_code": 23,
+  "hmp_sendkey_and_screendump": true,
+  "scope": "build reproducibility and runtime smoke; original full M9 acceptance remains separately recorded"
+}

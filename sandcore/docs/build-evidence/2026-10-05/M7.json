@@ -1,0 +1,24 @@
+{
+  "status": "HISTORICAL_SOURCE_BUILD_PASS",
+  "version": "M7",
+  "source": "/mnt/c/Users/Administrator/Desktop/projectos/backup-output/clean-clone-versions-01/snapshots/M7/sandcore",
+  "source_files_verified": 132,
+  "command": [
+    "make",
+    "-j2"
+  ],
+  "adaptation": [],
+  "artifacts": [
+    {
+      "path": "/mnt/c/Users/Administrator/Desktop/projectos/backup-output/clean-clone-versions-01/rebuild-output/M7/sandcore/build/sandcore.img",
+      "size": 1474560,
+      "sha256": "2f1bef7eb44c1cd2a78a1a3907ad545a84043bfb6c7dac4edf20fe842736a758"
+    },
+    {
+      "path": "/mnt/c/Users/Administrator/Desktop/projectos/backup-output/clean-clone-versions-01/rebuild-output/M7/sandcore/build/sanddata.img",
+      "size": 8388608,
+      "sha256": "e91d97187c3b9b5c6e831794489e0d616d70f30febeb58af971b4c3b54ef77b3"
+    }
+  ],
+  "scope": "historical snapshot host build; native compiler publication and QEMU runtime remain separate"
+}

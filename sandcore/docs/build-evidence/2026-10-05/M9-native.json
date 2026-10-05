@@ -1,0 +1,32 @@
+{
+  "scope": "clean clone M9 native compiler and screenshot smoke",
+  "cases": [
+    {
+      "command": "sccc /TMP/CLEAN.C /TMP/CLEAN.SCX",
+      "exit_code": 0,
+      "expected_exit": 0,
+      "status": "PASS",
+      "wall_seconds": 3.3119999999762513,
+      "output": "sccc /TMP/CLEAN.C /TMP/CLEAN.SCX; _m9_status=$?; printf \"\\n\"; echo __M9_b9f8ef6b75b917bf5dee7f93:$_m9_status\nSCCC / mio\nTMP/CLEAN.C -> TMP/CLEAN.SCX\nSCCC: preprocess -> C -> x86\nPreprocessing source and includes\nParsing C and generating x86\nLinking and writing SCX\nSCCC OK load=11614 bss=0 / mio\nCompilation complete\n"
+    },
+    {
+      "command": "/TMP/CLEAN.SCX",
+      "exit_code": 23,
+      "expected_exit": 23,
+      "status": "PASS",
+      "wall_seconds": 0.15600000001722947,
+      "output": "/TMP/CLEAN.SCX; _m9_status=$?; printf \"\\n\"; echo __M9_b40edbc08fcad7ad3b9f4136:$_m9_status\nCLEAN-SOURCE-BUILD-PASS\n"
+    }
+  ],
+  "screenshot": {
+    "path": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m9-clean-clone-native-01\\desktop.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "0781bd1491bde2546c755ed6960a39bea22f6503bac0bd51545ed9462bbc6574"
+  },
+  "status": "CLEAN_NATIVE_AND_HMP_SMOKE_PASS",
+  "source_unchanged": {
+    "sandcore": true,
+    "sanddata": true
+  }
+}

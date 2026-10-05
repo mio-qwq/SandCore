@@ -1,0 +1,24 @@
+{
+  "status": "HISTORICAL_SOURCE_BUILD_PASS",
+  "version": "M6a",
+  "source": "/mnt/c/Users/Administrator/Desktop/projectos/backup-output/clean-clone-versions-01/snapshots/M6a/sandcore",
+  "source_files_verified": 63,
+  "command": [
+    "make",
+    "-j2"
+  ],
+  "adaptation": [],
+  "artifacts": [
+    {
+      "path": "/mnt/c/Users/Administrator/Desktop/projectos/backup-output/clean-clone-versions-01/rebuild-output/M6a/sandcore/build/sandcore.img",
+      "size": 1474560,
+      "sha256": "98f53a84175f592aca3ed924aca46982103b34ec47dfd5a5317ebc641e8e73e2"
+    },
+    {
+      "path": "/mnt/c/Users/Administrator/Desktop/projectos/backup-output/clean-clone-versions-01/rebuild-output/M6a/sandcore/build/sanddata.img",
+      "size": 8388608,
+      "sha256": "08b2775ece0b28c1df98f94186f876f444721917d5909e7b1220fedaee2c38b8"
+    }
+  ],
+  "scope": "historical snapshot host build; native compiler publication and QEMU runtime remain separate"
+}

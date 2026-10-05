@@ -42,7 +42,7 @@ def main():
         origins.append(dict(original=name,stored=target,size=len(body),sha256=digest))
     archives=[]
     for parent,dirs,files in os.walk(ROOT):
-        dirs[:]=[d for d in dirs if d not in ('.git','__pycache__','backup-output','history') and not (Path(parent)/d).relative_to(ROOT).as_posix()=='sandcore/build/host-tools']
+        dirs[:]=[d for d in dirs if d not in ('.git','__pycache__','backup-output','history','rebuild-output') and not (Path(parent)/d).relative_to(ROOT).as_posix()=='sandcore/build/host-tools']
         for name in files:
             path=Path(parent)/name;relative=path.relative_to(ROOT).as_posix()
             if relative.startswith(('sandcore/build/','temp miotest/')) and relevant(relative):preserve(relative,path.read_bytes())

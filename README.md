@@ -19,11 +19,19 @@
 [第三方源码/许可](sandcore/docs/THIRD-PARTY.md)、[完整CLI对照](sandcore/docs/M9-CLI-MATRIX.tsv)。
 项目源码在`sandcore/`，工作区规则在`AGENTS.md`，当前接力状态在`HANDOFF.md`。
 
+在 Windows 安装 WSL Ubuntu 工具链和 Python/Pillow 后，根目录运行 `build.bat`
+构建 M9；历史版本运行 `build-version.bat M6a`、`M6`、`M7` 或 `M8a`。
+五份源码均已在干净克隆中实际构建通过；M9另通过真实串口及客体编译运行检查。
+依赖、输出及验证边界见[构建复现记录](sandcore/docs/REBUILD-VERIFICATION.md)。
+
 本仓库保存完整工程源码、必要资源、文档、测试工具及许可证；`snapshots/`保留
 M6/M6a/M7/M8a的历史源码，`releases/`仅保存M6/M7/M8a/M9各一份精简构建包。
 每包包含一套既有启动盘/数据盘和启动工具，镜像字节来自原交付包，不重新构建旧版本。
+`history/`还保存被历史build/试玩目录忽略的源码、文档和影片工程输入，按内容去重。
 文件范围、摘要和复现条件见[备份说明](sandcore/docs/SOURCE-BACKUP.md)。
+[GitHub Releases](https://github.com/mio-qwq/SandCore/releases)提供四个版本页面及构建包链接。
 历史测试盘、录像、渲染输出、宿主下载工具和缓存留在本机。仓库保持私有。
 网络留M10、GPU暂缓；M10完成时基础内核冻结为仅安全更新，功能通过CORE SKM发布。
 
 修订：2026-10-05，M9验收候选；按用户最新范围保存完整工程代码与每版本一份构建产物。
+修订：2026-10-05，补齐历史源码输入与字体，五版干净构建及M9客体运行通过；建立轻量Releases页面。
