@@ -1,4 +1,4 @@
-# 原工作区保留完整数据；Git提交源码，二进制与历史备份放私有Release。
+# Git保存工程源码和每版本一份精简构建包；本机历史输出保留而不上传。
 .git/
 __pycache__/
 *.pyc
@@ -6,3 +6,4 @@ __pycache__/
 /temp miotest/
 /*.zip
 /backup-output/
+/backup/

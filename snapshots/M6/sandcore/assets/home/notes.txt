@@ -1,0 +1,8 @@
+SandCore / mio
+
+Write here. F2 saves this file.
+F3 reloads it from SandFS.
+
+Build a program inside SandCore:
+asm home/demo.asm apps/demo.scx
+run apps/demo.scx

@@ -1,0 +1,14 @@
+{
+  "author": "mio",
+  "mode": "built-in imagegen edit",
+  "source": "TIDAL-PHOTO-V3.png (user supplied attachment)",
+  "output": "TIDAL-FINE-V4.png",
+  "status": "更细腻的沙面版本，候选待用户评价；未作为QEMU系统效果证据",
+  "prompt": "Use case: precise-object-edit\nAsset type: SandCore desktop landscape wallpaper, wide 16:9.\nInput image 1 is the edit target.\nPrimary request: Refine this landscape into a harmonious, convincing fine-art travel photograph. Preserve the curved white sand dunes at left, sweeping shore curve, clear cyan lagoon at right, distant low dune vegetation, and open blue sky. The essential correction is the sand: remove ALL rough gravel-like lumps, large pits, crunchy grains, footprints and over-sharpened pebble texture in the foreground. Replace with real fine pale quartz sand gently smoothed by wind, a few very shallow delicate wind ripples, softly shaded dune contours, realistic subtle microtexture that is only barely visible at this viewing distance. The sand should feel soft and clean, not blurred or plastic. Preserve the elegant dune ridge geometry and natural shadow shape.\nPhotographic treatment: authentic outdoor daylight, gentle highlight rolloff, warm ivory sand and restrained turquoise-blue water, slight atmospheric softness in distant dunes, natural contrast. Reduce excessive clarity and HDR effects. Water caustics near shore should be subtle and irregular, not unnaturally perfect repeated luminous patterns. Slightly quieter natural ripples. Clouds should have natural photographic detail and irregular edges, no painted CGI fluff. Balanced, beautiful, calm, credible as an actual location photographed with a good landscape camera.\nConstraints: Same composition and horizon, preserve generous sky and lagoon space for desktop use. No text, logos, people, boats, buildings or added props. Do not invent dramatic lighting, oversaturated colors, oversharpening, artificial-looking detail or heavy blur. This is a targeted refinement of the supplied photograph-like scene, not a new scene.",
+  "size": [
+    1672,
+    941
+  ],
+  "sha256": "10e54f72d19f67d97bc3a6a9f36ffef67cc92cb5d5b146559bb8215f98be098d",
+  "note": "Generated image edit; photo-like candidate, not an actual captured photograph"
+}

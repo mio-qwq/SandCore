@@ -1,0 +1,443 @@
+# =====================================================================
+#  SandCore OS 构建脚本 —— 双工具链自动切换
+#  ---------------------------------------------------------------------
+#  【两条构建路线】
+#
+#  ① WSL / Linux (主力, 正统 ELF 工具链):
+#       wsl -e bash -c "cd /mnt/c/.../sandcore && make"
+#     ld 用 elf_i386 模拟产出 kernel.elf, 再 objcopy 抻直成纯二进制。
+#     nasm 优先用 WSL 内安装的; 没装也能干活 —— 通过 WSL 互操作直接
+#     调用 Windows 侧的 nasm.exe (引导扇区汇编成 -f bin 与平台无关)。
+#
+#  ② Windows MinGW (备用): mingw32-make；build.bat 优先调用 WSL make，
+#     WSL 未安装时才转备用工具链，不把 WSL 构建失败误当缺失而静默换链。
+#     Windows 的 ld 只会产 PE, 所以走 PE -> objcopy -O binary 的路,
+#     --section-alignment 压掉段间隙, -j 只抽取需要的段。
+#     环境判断用 OS 环境变量 (Windows 恒为 Windows_NT)。
+#     【M3 调试实录】曾用 uname 判断 —— PowerShell 里没有 uname,
+#     误判成 Linux 后去调 python3/uname, 报 Error 9009。
+#
+#  【产物链】
+#    boot/boot.asm  --nasm-->   build/boot.bin   (512B 引导扇区)
+#    kernel/font16.txt --mkfont.py-> build/font16_data.h (汉字字形表)
+#    kernel/*.c/asm --gcc/nasm-> build/*.o
+#    *.o + linker.ld --ld-->     build/kernel.elf / kernel.pe
+#                    --objcopy-> build/kernel.bin  (纯二进制内核)
+#    boot.bin + kernel.bin --mkimg.py-> build/sandcore.img (引导/内核盘)
+#    user/*.asm --nasm bin-> *.bin --mkscx.py-> build/fs/{bin,apps}/*.scx
+#    user/*.c + start.asm --gcc/ld/objcopy/mkscx-> build/fs/{bin,apps}/*.scx
+#    字体/图标/快捷方式/示例源 --mkscf/cp-> build/fs/{sys,desk,home}/*
+#    build/fs/*         --mkfs.py-> build/sanddata.img (SandFS 数据盘)
+#
+#  【QEMU 挂盘铁律】引导镜像必须 if=floppy (M3 实录);
+#  SandFS 在数据盘 sanddata.img 上 (IDE), 因 ATA 驱动够不着 FDC 软盘 (M5 实录)。
+# =====================================================================
+
+SHELL := sh
+BUILD := build
+
+.DEFAULT_GOAL := all
+
+# ---------------- 环境探测与工具链选择 ----------------
+ifeq ($(OS),Windows_NT)
+# ============ 路线②: Windows MinGW 原生 ============
+NASM        := nasm
+ENTFMT      := win32
+CC          := gcc
+# --image-base=0: 让脚本地址 (0x10000) 原样生效, 避开例行警告
+# --section/file-alignment=16: 压掉 PE 段间隙, 否则纯二进制全是 0 洞
+LDFLAGS     := -m i386pe --image-base=0 --section-alignment=16 --file-alignment=16
+KOUT        := kernel.pe
+OBJCPYFLAGS := -j .text -j .rdata -j .rodata -j .data
+PY          := python
+QEMU        ?= C:/Program Files/qemu/qemu-system-x86_64.exe
+else
+# ============ 路线①: WSL / Linux 正统 ELF ============
+NASM        := $(shell command -v nasm 2>/dev/null)
+ifeq ($(NASM),)
+  NASM      := /mnt/c/Users/Administrator/mingw32/bin/nasm.exe
+endif
+ENTFMT      := elf32
+CC          := gcc
+LDFLAGS     := -m elf_i386
+KOUT        := kernel.elf
+OBJCPYFLAGS :=
+PY          := python3
+QEMU        ?= /mnt/c/Program Files/qemu/qemu-system-x86_64.exe
+endif
+
+# mio：宿主x86_64 QEMU提供WHPX，仍启动32位客体；内核尚非SMP，
+# 因而只用一个vCPU。auto仅在加速器初始化失败时由QEMU回退TCG，
+# 明确whpx用于性能对照，失败就停；tcg保留旧软件路径。
+QEMU_ACCEL ?= auto
+ifeq ($(QEMU_ACCEL),auto)
+QEMU_ACCEL_FLAGS := -accel whpx -accel tcg
+else ifeq ($(QEMU_ACCEL),whpx)
+QEMU_ACCEL_FLAGS := -accel whpx
+else ifeq ($(QEMU_ACCEL),tcg)
+QEMU_ACCEL_FLAGS := -accel tcg
+else
+$(error QEMU_ACCEL must be auto, whpx or tcg)
+endif
+
+# 图片资源编译需要Pillow；WSL没有它时使用已安装的Windows Python，
+# 仅资源转换换解释器，GCC/LD仍严格使用WSL ELF主力工具链。
+ARTPY ?= $(PY)
+ifneq ($(OS),Windows_NT)
+ifeq ($(shell $(PY) -c "import PIL" >/dev/null 2>&1 && echo yes),)
+ARTPY := $(shell command -v python.exe 2>/dev/null)
+endif
+endif
+
+LD      := ld
+OBJCOPY := objcopy
+
+# -fno-leading-underscore: Windows PE 默认给 C 符号加 "_" 前缀, 关掉它,
+#                          汇编与 C 两边符号名完全一致 (ELF 本来就没前缀)
+CFLAGS := -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector \
+          -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions \
+          -fno-leading-underscore \
+          -I$(BUILD) \
+          -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra
+
+# ---------------- 工具链指纹 ----------------
+# 切换工具链后 build/ 里的旧格式 .o 会混链出错。指纹文件变了就全量重编。
+STAMP := $(BUILD)/.toolchain-$(KOUT)
+
+$(STAMP): | $(BUILD)
+	@rm -f $(BUILD)/.toolchain-*
+	@touch $@
+
+# ---------------- 字形表编译 ----------------
+# 汉字字形的真正源头是用户 mio 所有的 kernel/font16.txt；补字必须
+# 用 tools/import_font.py 从统一字库导入，不允许代理手绘/重排用户文件。
+# make 先编译 build/font16_data.h 供 gfx.o 兜底，同时生成磁盘默认
+# sys/font.scf。两个输出来自同一源，运行时只加载 SCF，不能把头文件上盘。
+$(BUILD)/font16_data.h: kernel/font16.txt tools/mkfont.py | $(BUILD)
+	$(PY) tools/mkfont.py kernel/font16.txt $@
+
+$(BUILD)/font8_data.h: assets/font/phoenix-ascii.json tools/mkfont8.py | $(BUILD)
+	$(PY) tools/mkfont8.py $< $@
+
+# ---------------- 产物规则 ----------------
+# 内核参与链接的全部目标文件。entry.o 必须排第一 (链接脚本里 _start 在前)。
+OBJS := entry.o main.o boot_scene.o idt.o interrupts.o timer.o keyboard.o mouse.o \
+        memory.o heap.o paging.o gfx.o display.o theme.o image.o image_service.o userspace.o desktop.o wm.o task.o process.o module.o ata.o fs.o
+
+# mio：全部普通三环C源与私有include一并上盘，让Notes/计算器/
+# 游戏和通用客户端也能在系统内编辑编译。第三方解码服务单独由
+# 宿主引导构建；不把它宣称为SCCC产物。明确枚举源扩展名，不安装
+# 宿主目标/验证日志；SCAPI.H是内核ABI，其它.H是可复用源级库。
+SCCC_SOURCE := $(patsubst user/%,$(BUILD)/fs/SYS/SRC/%,$(wildcard user/*.c user/*.inc user/*.H)) \
+               $(BUILD)/fs/SYS/SRC/api.h \
+               $(patsubst user/%,$(BUILD)/fs/SYS/INC/%,$(wildcard user/*.H))
+
+USER_APPS := files note palette calc mines probe ide debugger lumen race world settings lens canvas monitor rgbprobe themeprobe imageprobe sysprobe
+USER_SCX := $(addprefix $(BUILD)/fs/apps/,$(addsuffix .scx,$(USER_APPS)))
+CLI_NAMES := ls pwd cat echo stat cp mkdir rm mv mem uptime help whoami env lsblk partitions df ps cpu
+CLI_SCX := $(addprefix $(BUILD)/fs/bin/,$(addsuffix .scx,$(CLI_NAMES)))
+DESKTOP_LINKS := shell files notes palette
+DESKTOP_ASSETS := $(addprefix $(BUILD)/fs/desk/,$(addsuffix .lnk,$(DESKTOP_LINKS))) \
+                  $(addprefix $(BUILD)/fs/sys/,$(addsuffix .scf,$(DESKTOP_LINKS)))
+
+all: $(BUILD)/sandcore.img $(BUILD)/sanddata.img
+
+$(BUILD):
+	mkdir -p $@
+
+$(BUILD)/boot.bin: boot/boot.asm | $(BUILD)
+	$(NASM) -f bin $< -o $@
+
+$(BUILD)/entry.o: kernel/entry.asm $(STAMP)
+	$(NASM) -f $(ENTFMT) $< -o $@
+
+$(BUILD)/idt.o: kernel/idt.asm $(STAMP)
+	$(NASM) -f $(ENTFMT) $< -o $@
+
+$(BUILD)/main.o: kernel/main.c kernel/palette.h kernel/gfx.h \
+                 kernel/interrupts.h kernel/timer.h kernel/keyboard.h \
+                 kernel/mouse.h kernel/memory.h kernel/heap.h kernel/ata.h \
+                 kernel/fs.h kernel/task.h kernel/wm.h $(STAMP)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILD)/interrupts.o: kernel/interrupts.c kernel/interrupts.h kernel/io.h \
+                       kernel/timer.h kernel/keyboard.h kernel/mouse.h \
+                       kernel/wm.h kernel/task.h $(STAMP)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILD)/timer.o: kernel/timer.c kernel/timer.h kernel/io.h $(STAMP)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILD)/keyboard.o: kernel/keyboard.c kernel/keyboard.h kernel/io.h $(STAMP)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILD)/mouse.o: kernel/mouse.c kernel/mouse.h kernel/io.h $(STAMP)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILD)/memory.o: kernel/memory.c kernel/memory.h kernel/io.h $(STAMP)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILD)/heap.o: kernel/heap.c kernel/heap.h kernel/memory.h kernel/io.h $(STAMP)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILD)/gfx.o: kernel/gfx.c kernel/gfx.h kernel/font.h kernel/font16.h \
+                kernel/io.h $(BUILD)/font16_data.h $(BUILD)/font8_data.h $(STAMP)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILD)/display.o: kernel/display.c kernel/display.h kernel/gfx.h kernel/wm.h kernel/fs.h $(STAMP)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILD)/desktop.o: kernel/desktop.c kernel/desktop.h kernel/gfx.h kernel/fs.h $(STAMP)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILD)/theme.o: kernel/theme.c kernel/theme.h kernel/gfx.h kernel/fs.h kernel/wm.h $(STAMP)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILD)/image.o: kernel/image.c kernel/image.h kernel/fs.h kernel/memory.h kernel/display.h $(STAMP)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILD)/image_service.o: kernel/image_service.c kernel/image_service.h kernel/task.h kernel/paging.h kernel/userspace.h $(STAMP)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILD)/boot_scene.o: kernel/boot_scene.c kernel/boot_scene.h kernel/gfx.h kernel/theme.h kernel/display.h kernel/desktop.h $(STAMP)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILD)/userspace.o: kernel/userspace.c kernel/userspace.h kernel/task.h kernel/wm.h kernel/fs.h $(STAMP)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILD)/term.o: kernel/term.c kernel/term.h kernel/io.h kernel/palette.h $(STAMP)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILD)/wm.o: kernel/wm.c kernel/wm_terminal.inc kernel/wm.h kernel/gfx.h kernel/term.h kernel/mouse.h \
+               kernel/timer.h kernel/palette.h kernel/io.h kernel/font.h $(BUILD)/font8_data.h $(STAMP)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILD)/paging.o: kernel/paging.c kernel/paging.h kernel/memory.h kernel/io.h $(STAMP)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILD)/task.o: kernel/task.c kernel/task.h kernel/memory.h kernel/term.h \
+                 kernel/timer.h kernel/fs.h kernel/io.h kernel/gfx.h kernel/font.h $(BUILD)/font8_data.h $(STAMP)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILD)/ata.o: kernel/ata.c kernel/ata.h kernel/io.h $(STAMP)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILD)/process.o: kernel/process.c kernel/process.h kernel/task.h kernel/paging.h kernel/wm.h $(STAMP)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILD)/module.o: kernel/module.c kernel/module.h kernel/fs.h kernel/gfx.h $(STAMP)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILD)/module-core.o: modules/core.c kernel/module.h kernel/palette.h $(STAMP)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILD)/module-core.elf: $(BUILD)/module-core.o modules/linker.ld
+	$(LD) -m elf_i386 --emit-relocs -T modules/linker.ld $< -o $@
+
+$(BUILD)/module-core.bin: $(BUILD)/module-core.elf
+	$(OBJCOPY) -O binary $< $@
+
+$(BUILD)/fs/SYS/CORE/CORE.SKM: $(BUILD)/module-core.elf $(BUILD)/module-core.bin tools/mkskm.py
+	$(PY) tools/mkskm.py $(BUILD)/module-core.elf $(BUILD)/module-core.bin $@
+
+$(BUILD)/fs.o: kernel/fs.c kernel/fs.h kernel/ata.h kernel/io.h $(STAMP)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILD)/$(KOUT): $(addprefix $(BUILD)/,$(OBJS)) linker.ld | $(BUILD)
+	$(LD) $(LDFLAGS) -T linker.ld $(addprefix $(BUILD)/,$(OBJS)) -o $@
+	nm -n $@ > $(BUILD)/kernel.sym
+
+$(BUILD)/kernel.bin: $(BUILD)/$(KOUT)
+	$(OBJCOPY) $(OBJCPYFLAGS) -O binary $< $@
+
+$(BUILD)/sandcore.img: $(BUILD)/boot.bin $(BUILD)/kernel.bin tools/mkimg.py
+	$(PY) tools/mkimg.py $(BUILD)/boot.bin $(BUILD)/kernel.bin $@
+
+# SandFS 数据盘: 字体 + 用户程序上盘 (独立于引导软盘, 挂 IDE)
+$(BUILD)/sanddata.img: tools/mkfs.py \
+                       $(BUILD)/fs/bin/shell.scx $(BUILD)/fs/apps/hello.scx \
+                       $(BUILD)/fs/sys/font.scf $(BUILD)/fs/sys/shell.scf \
+                       $(BUILD)/fs/desk/shell.lnk $(BUILD)/fs/apps/panic.scx \
+                       $(USER_SCX) $(CLI_SCX) $(BUILD)/fs/bin/asm.scx $(DESKTOP_ASSETS) \
+                       $(BUILD)/fs/home/demo.asm $(BUILD)/fs/home/notes.txt $(BUILD)/fs/home/FEATURE.C $(BUILD)/fs/SYS/CORE/CORE.SKM \
+                       $(BUILD)/fs/bin/s3c.scx $(BUILD)/fs/SYS/CORE/IMAGE.SCX $(BUILD)/fs/SYS/CORE/IMAGE.LIC \
+                       $(SCCC_SOURCE) $(BUILD)/m8-assets.stamp $(BUILD)/legacy.stamp
+	$(PY) tools/mkfs.py
+
+$(BUILD)/hello.bin: user/hello.asm | $(BUILD)
+	$(NASM) -f bin $< -o $@
+
+$(BUILD)/panic.bin: user/panic.asm | $(BUILD)
+	$(NASM) -f bin $< -o $@
+
+$(BUILD)/fs/apps/panic.scx: $(BUILD)/panic.bin tools/mkscx.py
+	mkdir -p $(BUILD)/fs/apps
+	$(PY) tools/mkscx.py $< $@
+
+$(BUILD)/shell.bin: user/shell.asm | $(BUILD)
+	$(NASM) -f bin $< -o $@
+
+$(BUILD)/fs/bin/shell.scx: $(BUILD)/user-shell.bin tools/mkscx.py | $(BUILD)
+	mkdir -p $(BUILD)/fs/bin
+	$(PY) tools/mkscx.py $< $@ 0 0x400000 $(BUILD)/user-shell.sym
+
+# 命令独立安装，同一实现按内核提供的实际执行路径分派。没有
+# Shell内建替身；用户可替换任何一个SCX而无需重编Shell或内核。
+$(CLI_SCX): $(BUILD)/user-cli.bin tools/mkscx.py
+	mkdir -p $(BUILD)/fs/bin
+	$(PY) tools/mkscx.py $< $@ 0 0x400000 $(BUILD)/user-cli.sym
+
+$(BUILD)/fs/apps/hello.scx: $(BUILD)/hello.bin tools/mkscx.py | $(BUILD)
+	mkdir -p $(BUILD)/fs/apps
+	$(PY) tools/mkscx.py $< $@ 0 0x400000
+
+$(BUILD)/fs/sys/font.scf: kernel/font16.txt tools/mkscf.py tools/mkfont.py
+	$(PY) tools/mkscf.py $< $@
+
+$(BUILD)/fs/sys/shell.scf: assets/icons/shell.txt tools/mkscf.py tools/mkfont.py
+	$(PY) tools/mkscf.py $< $@
+
+$(BUILD)/fs/desk/shell.lnk: assets/desk/shell.lnk
+	mkdir -p $(BUILD)/fs/desk
+	cp $< $@
+
+# 用户态 C 应用也不引入 libc：宿主 GCC 只负责生成 x86，运行时完全依赖
+# 沙核系统调用。入口在 start.asm，用户链接脚本把私有映像排到 0x400000。
+# 此链产生 SCCC 的最初启动版本；原生自编译的证据必须来自 QEMU 中
+# bin/s3c.scx 对 SYS/SRC/s3c.c 的实际编译，不能拿宿主链替代它。
+$(BUILD)/user-start.o: user/start.asm $(STAMP)
+	$(NASM) -f $(ENTFMT) $< -o $@
+
+$(BUILD)/user-%.o: user/%.c user/api.h $(wildcard user/*.H user/*.inc) kernel/palette.h $(STAMP)
+	$(CC) $(CFLAGS) -Iuser -c $< -o $@
+
+$(BUILD)/user-%.$(KOUT): $(BUILD)/user-start.o $(BUILD)/user-%.o user/linker.ld
+	$(LD) $(LDFLAGS) -T user/linker.ld $(filter %.o,$^) -o $@
+	nm -n $@ > $(BUILD)/user-$*.sym
+
+$(BUILD)/user-%.bin: $(BUILD)/user-%.$(KOUT)
+	$(OBJCOPY) $(OBJCPYFLAGS) -O binary $< $@
+
+$(BUILD)/fs/apps/%.scx: $(BUILD)/user-%.bin tools/mkscx.py
+	mkdir -p $(BUILD)/fs/apps
+	$(PY) tools/mkscx.py $< $@ 0 0x400000 $(BUILD)/user-$*.sym
+
+# include 内容改变必须重编编译器，否则启动版本会保留旧后端。
+$(BUILD)/user-s3c.o: user/s3c.c $(wildcard user/*.H user/*.inc) $(STAMP)
+	$(CC) $(CFLAGS) -Iuser -c $< -o $@
+
+$(BUILD)/fs/bin/s3c.scx: $(BUILD)/user-s3c.bin tools/mkscx.py
+	mkdir -p $(BUILD)/fs/bin
+	$(PY) tools/mkscx.py $< $@ 0 0x400000 $(BUILD)/user-s3c.sym
+
+$(BUILD)/fs/SYS/SRC/%: user/%
+	mkdir -p $(BUILD)/fs/SYS/SRC
+	cp $< $@
+
+$(BUILD)/fs/SYS/INC/%.H: user/%.H
+	mkdir -p $(BUILD)/fs/SYS/INC
+	cp $< $@
+
+# mio：外来压缩流只在普通三环服务处理。宿主GCC引导构建固定第三方
+# 源，不把它冒充SCCC的原生自编译结果。所有普通应用/客户端仍能SCCC
+# 编译。使用库官方COMMON/DEC源清单，关闭线程/SIMD/HDR；只链接解码
+# 可达节，编码gamma/pow及其它格式代码不进入SCX，不链接任何libc。
+WEBP_DEC := alpha_dec buffer_dec frame_dec idec_dec io_dec quant_dec tree_dec vp8_dec vp8l_dec webp_dec
+WEBP_DSP := alpha_processing cpu dec dec_clip_tables filters lossless rescaler upsampling yuv
+WEBP_UTIL := bit_reader_utils color_cache_utils filters_utils huffman_utils palette quant_levels_dec_utils rescaler_utils random_utils thread_utils utils
+WEBP_SOURCES := $(addprefix third_party/libwebp/src/dec/,$(addsuffix .c,$(WEBP_DEC))) \
+                $(addprefix third_party/libwebp/src/dsp/,$(addsuffix .c,$(WEBP_DSP))) \
+                $(addprefix third_party/libwebp/src/utils/,$(addsuffix .c,$(WEBP_UTIL)))
+CODEC_OBJS := $(patsubst third_party/libwebp/%.c,$(BUILD)/codec/webp/%.o,$(WEBP_SOURCES)) \
+              $(addprefix $(BUILD)/codec/,$(addsuffix .o,service runtime decode))
+CODEC_HEADERS := user/SCAPI.H $(wildcard user/codec/include/*.h user/codec/*.H third_party/libwebp/src/dec/*.h \
+                 third_party/libwebp/src/dsp/*.h third_party/libwebp/src/utils/*.h third_party/libwebp/src/webp/*.h)
+CODEC_CFLAGS := $(CFLAGS) -Os -DWEBP_REDUCE_SIZE -ffunction-sections -fdata-sections -Iuser/codec/include -Iuser/codec \
+                -Iuser -Ithird_party/stb -Ithird_party/libwebp
+
+# mio：服务只要求原尺寸BGRA输出；官方REDUCE_SIZE关闭服务不用的
+# 库内缩放，Lens继续用自己的高质量整数缩放。VP8L仍链接多输出
+# 分支；适配副本另关闭服务不用的RGB->YUV编码gamma/pow。
+# 私有随机初始化适配在build生成，固定第三方快照保持原SHA。
+$(BUILD)/codec/webp-adapt/random_utils.c: third_party/libwebp/src/utils/random_utils.c third_party/libwebp/src/dsp/yuv.c third_party/SOURCES.json tools/adapt_webp.py
+	$(PY) tools/adapt_webp.py
+
+$(BUILD)/codec/webp-adapt/yuv.c: $(BUILD)/codec/webp-adapt/random_utils.c
+	@test -f $@ || $(PY) tools/adapt_webp.py
+
+$(BUILD)/codec/webp/src/dsp/yuv.o: $(BUILD)/codec/webp-adapt/yuv.c $(CODEC_HEADERS) Makefile $(STAMP)
+	mkdir -p $(dir $@)
+	$(CC) $(CODEC_CFLAGS) -c $< -o $@
+
+$(BUILD)/codec/webp/src/utils/random_utils.o: $(BUILD)/codec/webp-adapt/random_utils.c $(CODEC_HEADERS) Makefile $(STAMP)
+	mkdir -p $(dir $@)
+	$(CC) $(CODEC_CFLAGS) -c $< -o $@
+
+$(BUILD)/codec/webp/%.o: third_party/libwebp/%.c $(CODEC_HEADERS) Makefile $(STAMP)
+	mkdir -p $(dir $@)
+	$(CC) $(CODEC_CFLAGS) -c $< -o $@
+
+$(BUILD)/codec/%.o: user/codec/%.c $(CODEC_HEADERS) user/SCAPI.H third_party/stb/stb_image.h Makefile $(STAMP)
+	mkdir -p $(dir $@)
+	$(CC) $(CODEC_CFLAGS) -c $< -o $@
+
+$(BUILD)/user-codec.$(KOUT): $(BUILD)/user-start.o $(CODEC_OBJS) user/linker.ld
+	$(LD) $(LDFLAGS) --gc-sections -T user/linker.ld $(filter %.o,$^) -o $@
+	nm -n $@ > $(BUILD)/user-codec.sym
+
+$(BUILD)/user-codec.bin: $(BUILD)/user-codec.$(KOUT)
+	$(OBJCOPY) $(OBJCPYFLAGS) -O binary $< $@
+
+$(BUILD)/fs/SYS/CORE/IMAGE.SCX: $(BUILD)/user-codec.bin tools/mkscx.py
+	mkdir -p $(dir $@)
+	$(PY) tools/mkscx.py $< $@ 0 0x400000 $(BUILD)/user-codec.sym
+
+$(BUILD)/fs/SYS/CORE/IMAGE.LIC: third_party/stb/LICENSE third_party/libwebp/COPYING third_party/libwebp/PATENTS third_party/libwebp/AUTHORS
+	mkdir -p $(dir $@)
+	cat $^ > $@
+
+$(BUILD)/fs/bin/asm.scx: $(BUILD)/user-assembler.bin tools/mkscx.py
+	mkdir -p $(BUILD)/fs/bin
+	$(PY) tools/mkscx.py $< $@ 0 0x400000 $(BUILD)/user-assembler.sym
+
+$(BUILD)/fs/sys/%.scf: assets/icons/%.txt tools/mkscf.py tools/mkfont.py
+	$(PY) tools/mkscf.py $< $@
+
+$(BUILD)/fs/desk/%.lnk: assets/desk/%.lnk
+	mkdir -p $(BUILD)/fs/desk
+	cp $< $@
+
+$(BUILD)/fs/home/%: assets/home/%
+	mkdir -p $(BUILD)/fs/home
+	cp $< $@
+
+.SECONDARY:
+
+# ---------------- 运行与辅助 ----------------
+$(BUILD)/m8-assets.stamp: tools/gen_m8_assets.py tools/make_m8_art.py kernel/palette.h assets/design/tokens.json \
+                         assets/wallpapers/AURORA-DUNE-V2.png assets/wallpapers/AURORA-SATIN-V3.png \
+                         assets/wallpapers/CLASSIC-LOW320.png assets/wallpapers/TIDAL-FINE-V4.png \
+                         assets/pictures/WELCOME-TRUECOLOR-V1.png
+	$(ARTPY) tools/gen_m8_assets.py
+	touch $@
+
+$(BUILD)/legacy.stamp: tools/preserve_legacy.py build/SandCore-M7-2026-10-02.zip
+	$(PY) tools/preserve_legacy.py
+	touch $@
+
+run: all
+	"$(QEMU)" $(QEMU_ACCEL_FLAGS) -cpu qemu32 -smp 1 -m 128 -vga std -boot a -drive format=raw,if=floppy,file=$(BUILD)/sandcore.img \
+		-drive format=raw,if=ide,file=$(BUILD)/sanddata.img
+
+run-headless: all
+	"$(QEMU)" $(QEMU_ACCEL_FLAGS) -cpu qemu32 -smp 1 -m 128 -vga std -boot a -drive format=raw,if=floppy,file=$(BUILD)/sandcore.img \
+		-drive format=raw,if=ide,file=$(BUILD)/sanddata.img \
+		-display none -monitor tcp:127.0.0.1:4444,server,nowait \
+		-qmp tcp:127.0.0.1:4445,server,nowait
+
+clean:
+	rm -rf $(BUILD)
+
+.PHONY: all run run-headless clean
+
+-include $(wildcard $(BUILD)/*.d $(BUILD)/codec/*.d $(BUILD)/codec/webp/src/dec/*.d $(BUILD)/codec/webp/src/dsp/*.d $(BUILD)/codec/webp/src/utils/*.d)

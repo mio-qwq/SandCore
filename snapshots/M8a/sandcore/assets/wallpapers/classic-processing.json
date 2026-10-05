@@ -1,0 +1,32 @@
+{
+  "author": "mio",
+  "source": "CLASSIC-FALSE-V3.png",
+  "source_sha256": "e20b3a499ae8352152c9f364c499c091072135ea85a87d7c4ffcc4378a88028d",
+  "output": "CLASSIC-LOW320.png",
+  "size": [
+    320,
+    180
+  ],
+  "mode": "P",
+  "color_count": 15,
+  "palette": [
+    "#008080",
+    "#005F64",
+    "#0E1B28",
+    "#101F3F",
+    "#24618F",
+    "#00A8A8",
+    "#78DCDD",
+    "#FFF8DF",
+    "#FFD17F",
+    "#A87020",
+    "#AE5595",
+    "#E4A6C6",
+    "#B4BAB6",
+    "#D9DED3",
+    "#C67461",
+    "#324551"
+  ],
+  "sha256": "90881dae4b9f4271ba5ccfc92e8f917efbcc319be0dbb5f6e18a75b27cb25d8e",
+  "preview": "nearest-neighbor 6x, 1920x1080"
+}

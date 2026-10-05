@@ -1,0 +1,4395 @@
+{
+  "status": "CRC_SHA256_AND_ORIGINAL_IMAGE_BYTES_PASS",
+  "products": [
+    {
+      "version": "M6",
+      "file": "SandCore-M6-build.zip",
+      "size": 41559,
+      "sha256": "7af674bd6717e46886b28fbef1943d301214aa52bde4ef69e08b27e3e0791f24",
+      "source_archive": "SandCore-M6-2026-10-02.zip",
+      "source_archive_sha256": "65d61fd4cf33f287d97259becf08d59cb2e865bd20a3ac596542102193ed7d09",
+      "verified_files": 4,
+      "image_count": 2,
+      "status": "历史M6交付，独立界面验收未另确认"
+    },
+    {
+      "version": "M7",
+      "file": "SandCore-M7-build.zip",
+      "size": 176316,
+      "sha256": "032bfaf5bb51ff45e07ebbebbf73f15c021473c808a604b88dd85d6046172de0",
+      "source_archive": "SandCore-M7-2026-10-02.zip",
+      "source_archive_sha256": "516811f6477c33a5028f8bfd736d9f7b98cdfc40bce84d35ae730f298d3278fc",
+      "verified_files": 4,
+      "image_count": 2,
+      "status": "用户已验收的历史M7交付"
+    },
+    {
+      "version": "M8a",
+      "file": "SandCore-M8a-build.zip",
+      "size": 8892983,
+      "sha256": "107490f4c2493b5e3813921d8f575113071e05af84d320eea300032911bb7bd5",
+      "source_archive": "SandCore-M8a-2026-10-04.zip",
+      "source_archive_sha256": "e9db18c1dd3c6987c4b66a2a33e1bf354e39b6da8b2b920db2cb366f42ca61e5",
+      "verified_files": 4,
+      "image_count": 2,
+      "status": "用户批准的M8a部分发布，原完整M8未完成目标继续封存"
+    },
+    {
+      "version": "M9",
+      "file": "SandCore-M9-build.zip",
+      "size": 11769550,
+      "sha256": "3e90bda185730b9d7b3039e9cb8cb3219e818483e37ceeef611d6723c9c7bd41",
+      "source_archive": "SandCore-M9-acceptance-2026-10-05.zip",
+      "source_archive_sha256": "0f06e20cf1ca69cd4020d301aa21be14482ae00a7c5c3c597155618d150d0e3d",
+      "verified_files": 12,
+      "image_count": 2,
+      "status": "Windows QEMU验证通过，待用户验收"
+    }
+  ],
+  "product_bytes": 20880408,
+  "historical_sources": {
+    "M6": [
+      {
+        "path": "sandcore/Makefile",
+        "size": 11233,
+        "sha256": "cdc32f8b083061f1e8100e5bc072112277e4427b52c5f4913ad56f540b46e8d8"
+      },
+      {
+        "path": "sandcore/README.md",
+        "size": 9926,
+        "sha256": "5381b5a7f9f05c41b0243f0db9e16122ed3f1cc402ef8888d555fc1e39293500"
+      },
+      {
+        "path": "sandcore/assets/desk/files.lnk",
+        "size": 35,
+        "sha256": "7350da2a148c48b76e2b1eb123e3c0bd8f14c0a1a8708b5ee55c18c75922f5bf"
+      },
+      {
+        "path": "sandcore/assets/desk/notes.lnk",
+        "size": 34,
+        "sha256": "d82ce509710a648407b6911671ca01ae61e5b8703ff10bff9e5f559d1a72ba0d"
+      },
+      {
+        "path": "sandcore/assets/desk/palette.lnk",
+        "size": 41,
+        "sha256": "08482d5a2e24e378703bd58bc063058fbfeb12df3572e9165f2d4089ff1b2b2e"
+      },
+      {
+        "path": "sandcore/assets/desk/shell.lnk",
+        "size": 34,
+        "sha256": "ccb64fc818b39b9fd28c32239baa495fd2f9adddae2f5366e975cca7d04b6b5a"
+      },
+      {
+        "path": "sandcore/assets/home/demo.asm",
+        "size": 337,
+        "sha256": "fe38202d8e97137c4b2c5e188c62ba74a304397e22839144bb161955d1d048ae"
+      },
+      {
+        "path": "sandcore/assets/home/notes.txt",
+        "size": 159,
+        "sha256": "a36c51032b1de46af3e5fbda1bb53c863a17e03351bdf5bf18b20fb4368a248a"
+      },
+      {
+        "path": "sandcore/assets/icons/files.txt",
+        "size": 372,
+        "sha256": "c6933d3fdcf4ae7e11863eaee22b597d1faa777ec6ad66131a5adcbdd1e2f576"
+      },
+      {
+        "path": "sandcore/assets/icons/notes.txt",
+        "size": 370,
+        "sha256": "976f5eae73a04d50a7e9bbf75ebe5078a4eb26951e22610d16b99556bd5892f1"
+      },
+      {
+        "path": "sandcore/assets/icons/palette.txt",
+        "size": 351,
+        "sha256": "67f151bec851291559075a1cc118aa757564cea261da3253857b403ce6fbb78e"
+      },
+      {
+        "path": "sandcore/assets/icons/shell.txt",
+        "size": 367,
+        "sha256": "789902a8483d185911bea77224666f5bff9197955ce62ca406d2e97ab35b2044"
+      },
+      {
+        "path": "sandcore/boot/boot.asm",
+        "size": 12844,
+        "sha256": "b04e16512480ac7cf5d5dffe3b4799dac7c5b3f33c09e47607ab15e6e121a3e7"
+      },
+      {
+        "path": "sandcore/build.bat",
+        "size": 543,
+        "sha256": "a148943893b00cc211e5682b0b6b4a60fb877251b94b5d63c2d37340483b0d19"
+      },
+      {
+        "path": "sandcore/docs/APPS.md",
+        "size": 4070,
+        "sha256": "4596d208d33e59f03a2c8fc3e2e7550113b46e0840983c095d4046587dbcdb15"
+      },
+      {
+        "path": "sandcore/docs/ASM.md",
+        "size": 3857,
+        "sha256": "26823160b09d28636062e7be1395b178a6a0e02e95c23b2be6deaf9d64877f15"
+      },
+      {
+        "path": "sandcore/docs/BOOT.md",
+        "size": 6833,
+        "sha256": "23b11fd748e821a561cc750808de37d7b36d4e08b09b31ba06c7d83a1a0c645d"
+      },
+      {
+        "path": "sandcore/docs/BUILD.md",
+        "size": 8809,
+        "sha256": "3e07a178a8d7d0cda9f78168d0c1e950bb9748000598bfdc1a706dc04d972223"
+      },
+      {
+        "path": "sandcore/docs/FS.md",
+        "size": 5364,
+        "sha256": "f4954e8b25aca8eacc123289e7dd224d4757aa006448f0f2b63b1863719d476d"
+      },
+      {
+        "path": "sandcore/docs/GFX.md",
+        "size": 9875,
+        "sha256": "3ef363bdf5be7b4378905b26e32be435bfe15f4e96171566688694fa4561be6a"
+      },
+      {
+        "path": "sandcore/docs/INTR.md",
+        "size": 5824,
+        "sha256": "4a8eb6206ec7da0324022106681e33d29679ef23a1134bbb3cbf6d5d2a67e023"
+      },
+      {
+        "path": "sandcore/docs/M6.md",
+        "size": 8569,
+        "sha256": "4b3a36a703d1d65e11eb33499e3808b9848f96a4fead4d162947a9c7c2752017"
+      },
+      {
+        "path": "sandcore/docs/M6A.md",
+        "size": 2972,
+        "sha256": "38995abdc5bedecefcf730ec674e53947a7957e57ab9a56b795458e4b04de01e"
+      },
+      {
+        "path": "sandcore/docs/MEM.md",
+        "size": 4739,
+        "sha256": "dee12fee860c63988b63e4452d2d48d016abf605ed2e95abdd2c4c406901adda"
+      },
+      {
+        "path": "sandcore/docs/ROADMAP.md",
+        "size": 9956,
+        "sha256": "89103f41db1202d90a2772461765a13f1ef0c3f56218bb1ad49e941525a129ed"
+      },
+      {
+        "path": "sandcore/docs/SHELL.md",
+        "size": 3732,
+        "sha256": "3dc9c30ad3357fb807d2445547d18165c416dc2a8490c2f2fd7c796b129d9c6e"
+      },
+      {
+        "path": "sandcore/docs/SYSCALL.md",
+        "size": 7653,
+        "sha256": "a3dcbfa01f128b0ad99e32d071c841e7f7ce22b1d760f7bd31857ea093bd67ae"
+      },
+      {
+        "path": "sandcore/docs/TESTING.md",
+        "size": 8475,
+        "sha256": "aab539b084502f2bea8105f2e7629bd88d9b93c498247e2711d4f4067df760ce"
+      },
+      {
+        "path": "sandcore/docs/WM.md",
+        "size": 6160,
+        "sha256": "0846bf96abd29efd29de43d7ba7dba5706a108e1033bf1836619b0b1d246c123"
+      },
+      {
+        "path": "sandcore/kernel/ata.c",
+        "size": 3865,
+        "sha256": "97aa5ad8ef55a649e7cea8a140da47b2627b4c9d2f3733884681d1cc169c3e38"
+      },
+      {
+        "path": "sandcore/kernel/ata.h",
+        "size": 754,
+        "sha256": "29e5021635523319fa82c7fcf5e7e789929a8df4ee9af0a7459e740362bced47"
+      },
+      {
+        "path": "sandcore/kernel/entry.asm",
+        "size": 1819,
+        "sha256": "6f10951e7dec231e8b06457f914d40e49ba83a4de2c5ea07b83ea96f249ab74e"
+      },
+      {
+        "path": "sandcore/kernel/font.h",
+        "size": 7463,
+        "sha256": "31383234b44fc4ea8b739cf8b0caba78e3f457c0eb9a6fc335f8a6f51ff245d7"
+      },
+      {
+        "path": "sandcore/kernel/font16.h",
+        "size": 1998,
+        "sha256": "ba4344e01ec518fb70cf75fb67ff4e4ae89eea4dfd8fce67aa328f3c25ce2cea"
+      },
+      {
+        "path": "sandcore/kernel/font16.txt",
+        "size": 10303,
+        "sha256": "1ef3876e7adbf0f42dc432dbdf21c927282a7e28bb076613c6cb50fbf0de9b55"
+      },
+      {
+        "path": "sandcore/kernel/fs.c",
+        "size": 7741,
+        "sha256": "440cde6a527856f74bb738f376167376129de0740c12bda5be70674e79f7dcd3"
+      },
+      {
+        "path": "sandcore/kernel/fs.h",
+        "size": 1305,
+        "sha256": "0d6d767af57393864e60b505a208cc0fa868c586b5c3eea1b0a0151f1a2bd305"
+      },
+      {
+        "path": "sandcore/kernel/gfx.c",
+        "size": 5483,
+        "sha256": "ce9bfe10a2693da30d97262f2feb7428652d64cf60ef600f3f232d59d770dde4"
+      },
+      {
+        "path": "sandcore/kernel/gfx.h",
+        "size": 1939,
+        "sha256": "a649f4195223b33bdbdc087825fd203adb2fa64b1771b244942a2388c071b44e"
+      },
+      {
+        "path": "sandcore/kernel/heap.c",
+        "size": 3792,
+        "sha256": "e131cc1eeab70a3a93cb1d1139af1095800a386e457b9f199bb4002a6341cbbc"
+      },
+      {
+        "path": "sandcore/kernel/heap.h",
+        "size": 527,
+        "sha256": "cbcb131bc4223c8bf65a0a5873f0e3176e96961438084b9d5b224f0ed9c6806d"
+      },
+      {
+        "path": "sandcore/kernel/idt.asm",
+        "size": 6795,
+        "sha256": "e5b0f08629e8f9feff3ab3da3f6882972dc2fe74ee6262cc664dab9743aa514a"
+      },
+      {
+        "path": "sandcore/kernel/interrupts.c",
+        "size": 4917,
+        "sha256": "a32f0273a177b1c1fb9ccb0464ecd5dbdd88feb5451af415ae733f1fc3c45ced"
+      },
+      {
+        "path": "sandcore/kernel/interrupts.h",
+        "size": 487,
+        "sha256": "7d8e7cc86d14ee5406f0d8e6f619baf081ef6bf113fdcb3b0d334fa07811650e"
+      },
+      {
+        "path": "sandcore/kernel/io.h",
+        "size": 1665,
+        "sha256": "d7769e25e2544f2aa84b4501e6208d9db8ade0a65630ec1b3d67ae13eb02315d"
+      },
+      {
+        "path": "sandcore/kernel/keyboard.c",
+        "size": 5883,
+        "sha256": "e74a8fa08f57825ae2783bf7fcf29d3e80d49e3cb06615a0829704ffe06d31ef"
+      },
+      {
+        "path": "sandcore/kernel/keyboard.h",
+        "size": 412,
+        "sha256": "fe9033c05ce6d9af534ea426d42db2bc806ab1fe0cdaf635814ae62eca00a45e"
+      },
+      {
+        "path": "sandcore/kernel/main.c",
+        "size": 7319,
+        "sha256": "e657f1109daee8043246574a1a23dd32260687ea3656906ee623695ee8fe2f09"
+      },
+      {
+        "path": "sandcore/kernel/memory.c",
+        "size": 4371,
+        "sha256": "6ecc85d3fd871a0f598c5a75db857d8c641541492fcf50c17eb5f5b774088361"
+      },
+      {
+        "path": "sandcore/kernel/memory.h",
+        "size": 1193,
+        "sha256": "b94c39022fdc21905d40640e998ee089840e4b4123dd4debef0b087f4ffe9dfb"
+      },
+      {
+        "path": "sandcore/kernel/mouse.c",
+        "size": 3752,
+        "sha256": "b3a0722e303211b7a76b18a4055cf6d8a7f0cc93a08ebafe04418279ee31e2ed"
+      },
+      {
+        "path": "sandcore/kernel/mouse.h",
+        "size": 487,
+        "sha256": "c38e092c9c834e1b28abc711127fec60c9dd142977bf1e4f00de362010794695"
+      },
+      {
+        "path": "sandcore/kernel/paging.c",
+        "size": 4776,
+        "sha256": "667ea5e09a18b1bfcec98a43316eb3cb36539c9b23e35a2b345d3503e12557a8"
+      },
+      {
+        "path": "sandcore/kernel/paging.h",
+        "size": 1401,
+        "sha256": "7d17f0ec0d2ee91a5eb0a18cadfda50c49bcbffb85ff2e08a066054a5fc7b5e3"
+      },
+      {
+        "path": "sandcore/kernel/palette.h",
+        "size": 1457,
+        "sha256": "1cb5a528d9811feb94d1e773072362d3aa1877e8ba2225fc334c3822e0d788d5"
+      },
+      {
+        "path": "sandcore/kernel/task.c",
+        "size": 16064,
+        "sha256": "572a7e000e4433094351f6161876fdec7b8e03aab29c998efe336ca5597f112b"
+      },
+      {
+        "path": "sandcore/kernel/task.h",
+        "size": 1976,
+        "sha256": "afb77fa85a8a4f20d8134ecd7569ef2d43bc7a45d1ae4eaf6aaca422d601727e"
+      },
+      {
+        "path": "sandcore/kernel/term.c",
+        "size": 3179,
+        "sha256": "4c2ac5fb29f6667b3bff5e13723a3d154dc2f7393a453fe7b65b2c560cd237c3"
+      },
+      {
+        "path": "sandcore/kernel/term.h",
+        "size": 993,
+        "sha256": "328994c97d64c489b7ce9196e48c0fe9aff2bc9c219666adb3842cf18d2f6d17"
+      },
+      {
+        "path": "sandcore/kernel/timer.c",
+        "size": 1246,
+        "sha256": "9f3e61e8e6d1812cd8b101f474dae99aec499121fe80ebf280e9a8c6fbe26418"
+      },
+      {
+        "path": "sandcore/kernel/timer.h",
+        "size": 505,
+        "sha256": "a20e919031046058a51fe1a28fb5b7efdd87d9027a7b94bc32a6f9bbbee88ccf"
+      },
+      {
+        "path": "sandcore/kernel/wm.c",
+        "size": 18845,
+        "sha256": "9519bb27d46164b86ae49eb4568abee4c437ee6f8b4bb13acb2a4faf4c97fc12"
+      },
+      {
+        "path": "sandcore/kernel/wm.h",
+        "size": 1956,
+        "sha256": "6f7e80bb6c9b534d721567463c83849ae3fa3b6baf3eb3a30499b5fd38d2dc68"
+      },
+      {
+        "path": "sandcore/linker.ld",
+        "size": 2213,
+        "sha256": "45cae31754bb3279bacb041e8e237c9961c3a479e872610bae4edf108bf8f418"
+      },
+      {
+        "path": "sandcore/run.bat",
+        "size": 971,
+        "sha256": "43fcf00512f5e43312269680690aa8c46bd111cdc606f0c7cbe97365a1fb4c0b"
+      },
+      {
+        "path": "sandcore/run.sh",
+        "size": 359,
+        "sha256": "c52d9aa4cdbb8481f0c8910066b7bd2b42125747a1be4da5dced077b13f52144"
+      },
+      {
+        "path": "sandcore/tools/audit_m6.py",
+        "size": 5645,
+        "sha256": "b2195db2736883b86283e7db7c0e1173e00b88a02e099b229a43aef0f1a6dabf"
+      },
+      {
+        "path": "sandcore/tools/font_preview.py",
+        "size": 2501,
+        "sha256": "a3dd4ff4d4416080c9ff5450faad9f1621fb442a358e8156a9e0139baab479db"
+      },
+      {
+        "path": "sandcore/tools/import_font.py",
+        "size": 2787,
+        "sha256": "873e5eb54e102c4f2cd6e84fd5b704ed1dd30c4a32ed90bd8ddadd5a1bfee2ec"
+      },
+      {
+        "path": "sandcore/tools/keys.py",
+        "size": 1102,
+        "sha256": "04003b20234f565f1df6df66f11182fc2c8b9469b199122b206bfbaddb83ec75"
+      },
+      {
+        "path": "sandcore/tools/mkfont.py",
+        "size": 4438,
+        "sha256": "7b195d5a3491e4093f8e1b7024c538f986db83fc8e6f798715659f06e99903f7"
+      },
+      {
+        "path": "sandcore/tools/mkfs.py",
+        "size": 2957,
+        "sha256": "8768dfe02cd2e556ff07c0a6e15de82a8aa8e6f5a02242ee4060908c8a472b2d"
+      },
+      {
+        "path": "sandcore/tools/mkimg.py",
+        "size": 1065,
+        "sha256": "cc0be275035bce757222c3fd234cdf63eb92cd5e38336cd5440e99f3a6b80405"
+      },
+      {
+        "path": "sandcore/tools/mkscf.py",
+        "size": 961,
+        "sha256": "1dec5ec3f84e366cfa655ec957fb8ec9c953c16286cd7adc790782bdc733c2bd"
+      },
+      {
+        "path": "sandcore/tools/mkscx.py",
+        "size": 1400,
+        "sha256": "4c007beb2ec92bedad32b4f2828fd24d14528b14c120613f0baa0ae911a9ca6b"
+      },
+      {
+        "path": "sandcore/tools/mouse.py",
+        "size": 2580,
+        "sha256": "08dd1814b4a9dd32eeb231083aae85f50fc1fdcfd6484df5c0b58577bbb07372"
+      },
+      {
+        "path": "sandcore/tools/package_m6.py",
+        "size": 4227,
+        "sha256": "617c4827140e91671115422fd6479ec0093607f16696e2337d125481c83cb73c"
+      },
+      {
+        "path": "sandcore/tools/snap.py",
+        "size": 2394,
+        "sha256": "53357d451a0849dbcf21b320749f56bd52847f2c2ffd64256a6314254e1c8637"
+      },
+      {
+        "path": "sandcore/tools/verify_apps.py",
+        "size": 10144,
+        "sha256": "4665d6ed186ef2dd818628ab649c86c82293812f02e53d4c04b7b3a24286eaf0"
+      },
+      {
+        "path": "sandcore/tools/verify_m6.py",
+        "size": 8837,
+        "sha256": "2aab8f40374655895b1ee64b3aee36495c2e8833346d9df6ec9088c3a78a1a06"
+      },
+      {
+        "path": "sandcore/user/api.h",
+        "size": 6709,
+        "sha256": "40930a47db4a717b662fb98cc361a74e579f3dff7719aa60d2c4422b7008b092"
+      },
+      {
+        "path": "sandcore/user/assembler.c",
+        "size": 11133,
+        "sha256": "35be97e81cd4e3814042a8b1dcbd69c5550da960bf6b3500389c37b7f0cc7be3"
+      },
+      {
+        "path": "sandcore/user/calc.c",
+        "size": 3734,
+        "sha256": "ea614483b60e34a9588e5d1d24c3a34a1976e4bc908d2c2cb413b3d4e1df1d01"
+      },
+      {
+        "path": "sandcore/user/files.c",
+        "size": 4996,
+        "sha256": "61f50b8edb0c5f5406ac0f5da121821672a27caeeb2c35bde98ea494f0c95c74"
+      },
+      {
+        "path": "sandcore/user/hello.asm",
+        "size": 1411,
+        "sha256": "7c56f8ea32f93e3fb7a25621e451cea1cfa2af3e3cfcea6cb98140775b675268"
+      },
+      {
+        "path": "sandcore/user/linker.ld",
+        "size": 617,
+        "sha256": "08fae4c40a416be4fa9e93c26bf82cb6ab2f576337f7cc8d40e65dbb75e1ce12"
+      },
+      {
+        "path": "sandcore/user/mines.c",
+        "size": 6124,
+        "sha256": "db5773e9ef7c2289b2dcbab88593cfd5f07f477b9d54af3dada1e974b0a924c0"
+      },
+      {
+        "path": "sandcore/user/note.c",
+        "size": 3748,
+        "sha256": "d7eb0a5caf6c21bf809ee89f403cb86b64e340725aeefbebf3a88fd900e1f42f"
+      },
+      {
+        "path": "sandcore/user/palette.c",
+        "size": 1560,
+        "sha256": "1553404fcacab064cb8ff93115bf2b690d4c99f1e579ead1dad58af072241e7a"
+      },
+      {
+        "path": "sandcore/user/panic.asm",
+        "size": 174,
+        "sha256": "c7fa162fa264dab6a26f68d3f9696e60a5358de56087811d3b65d1a521a44d0a"
+      },
+      {
+        "path": "sandcore/user/shell.asm",
+        "size": 4249,
+        "sha256": "ff79fe251f3c3a69813d8fb89f73690b950480ac11ee1ef0ca502c115a969173"
+      },
+      {
+        "path": "sandcore/user/start.asm",
+        "size": 1098,
+        "sha256": "a0af906ad35bc01d042565364d3341842ceb7b8618bbcbb43ad05bc203bd302c"
+      }
+    ],
+    "M7": [
+      {
+        "path": "sandcore/Makefile",
+        "size": 13336,
+        "sha256": "b9c53c12f53deb5cfc5ebae727ca6b53d2c0b982a638113d212324068aa878e3"
+      },
+      {
+        "path": "sandcore/README.md",
+        "size": 11318,
+        "sha256": "7303348d139c826b164dbf9e5ca4af21e4e6c7e1c57ddb5bc0c97ff5c010d530"
+      },
+      {
+        "path": "sandcore/assets/desk/files.lnk",
+        "size": 35,
+        "sha256": "7350da2a148c48b76e2b1eb123e3c0bd8f14c0a1a8708b5ee55c18c75922f5bf"
+      },
+      {
+        "path": "sandcore/assets/desk/notes.lnk",
+        "size": 34,
+        "sha256": "d82ce509710a648407b6911671ca01ae61e5b8703ff10bff9e5f559d1a72ba0d"
+      },
+      {
+        "path": "sandcore/assets/desk/palette.lnk",
+        "size": 41,
+        "sha256": "08482d5a2e24e378703bd58bc063058fbfeb12df3572e9165f2d4089ff1b2b2e"
+      },
+      {
+        "path": "sandcore/assets/desk/shell.lnk",
+        "size": 34,
+        "sha256": "ccb64fc818b39b9fd28c32239baa495fd2f9adddae2f5366e975cca7d04b6b5a"
+      },
+      {
+        "path": "sandcore/assets/font/phoenix-ascii.json",
+        "size": 19674,
+        "sha256": "e054d594d212cd21a5a8bc24393a338d722690d5f30ca7a1b5abe5f2545a720c"
+      },
+      {
+        "path": "sandcore/assets/home/FEATURE.C",
+        "size": 3369,
+        "sha256": "cdd11cc9acd11cfa566340962878385e076a8e7b950083a39e832240d5a3f0bf"
+      },
+      {
+        "path": "sandcore/assets/home/demo.asm",
+        "size": 337,
+        "sha256": "fe38202d8e97137c4b2c5e188c62ba74a304397e22839144bb161955d1d048ae"
+      },
+      {
+        "path": "sandcore/assets/home/notes.txt",
+        "size": 159,
+        "sha256": "a36c51032b1de46af3e5fbda1bb53c863a17e03351bdf5bf18b20fb4368a248a"
+      },
+      {
+        "path": "sandcore/assets/icons/files.txt",
+        "size": 372,
+        "sha256": "c6933d3fdcf4ae7e11863eaee22b597d1faa777ec6ad66131a5adcbdd1e2f576"
+      },
+      {
+        "path": "sandcore/assets/icons/notes.txt",
+        "size": 370,
+        "sha256": "976f5eae73a04d50a7e9bbf75ebe5078a4eb26951e22610d16b99556bd5892f1"
+      },
+      {
+        "path": "sandcore/assets/icons/palette.txt",
+        "size": 351,
+        "sha256": "67f151bec851291559075a1cc118aa757564cea261da3253857b403ce6fbb78e"
+      },
+      {
+        "path": "sandcore/assets/icons/shell.txt",
+        "size": 367,
+        "sha256": "789902a8483d185911bea77224666f5bff9197955ce62ca406d2e97ab35b2044"
+      },
+      {
+        "path": "sandcore/boot/boot.asm",
+        "size": 12865,
+        "sha256": "c57f1d7118726e6888a6fa74314e61939462c6e078bcb71314a54ee05f0e4859"
+      },
+      {
+        "path": "sandcore/build.bat",
+        "size": 543,
+        "sha256": "a148943893b00cc211e5682b0b6b4a60fb877251b94b5d63c2d37340483b0d19"
+      },
+      {
+        "path": "sandcore/docs/APPS.md",
+        "size": 4892,
+        "sha256": "59d2bee909e98e9e0bec2b208ccef60d5a24eccc66ba1a93efcb37a87f1d05ae"
+      },
+      {
+        "path": "sandcore/docs/ASM.md",
+        "size": 4360,
+        "sha256": "aef05048d68fce79f4ce0c8205808e14564dd09b9f57ec08ade21e5ef8b7aa2b"
+      },
+      {
+        "path": "sandcore/docs/BOOT.md",
+        "size": 7641,
+        "sha256": "43f82b167c9c1467c3b71c3571694c7363c12391a53c0f3dc9c0afadfc103d81"
+      },
+      {
+        "path": "sandcore/docs/BUILD.md",
+        "size": 11178,
+        "sha256": "f121b2e86300f82c328a99c1b72c5898c2f0963e840cb152c43f42cf122d99c6"
+      },
+      {
+        "path": "sandcore/docs/C.md",
+        "size": 5414,
+        "sha256": "2ce1dc5006e895801ed846436d9cdd77cfe1f5ce2f0259f552b0e433a7983d1c"
+      },
+      {
+        "path": "sandcore/docs/FONT.md",
+        "size": 5124,
+        "sha256": "08165b1e9647d8a8f0d6ae4cf59301d1afdb918060cd8ceb25a2f56b233af606"
+      },
+      {
+        "path": "sandcore/docs/FS.md",
+        "size": 6926,
+        "sha256": "f7ecd5db77eac0789dc552995f23f939977bdb94e919d14d05da373b17f6c8ba"
+      },
+      {
+        "path": "sandcore/docs/GAMES.md",
+        "size": 2497,
+        "sha256": "0429367950a29314cc230fb67ec655f348f58c048f72cffafe048cbb3303287f"
+      },
+      {
+        "path": "sandcore/docs/GFX.md",
+        "size": 12198,
+        "sha256": "debebff288bd972d625a6a47f5a94fde34a0845391ea327de8c5adaa4efd5853"
+      },
+      {
+        "path": "sandcore/docs/INTR.md",
+        "size": 6652,
+        "sha256": "4b25e098029835c102c6a01875de6faa07104909244431f87db8c62d57cbd3a6"
+      },
+      {
+        "path": "sandcore/docs/M6.md",
+        "size": 9135,
+        "sha256": "9a06bb947d5805e4e3b9e63c789a72dff66c321bb5ded0fd2bd8093909d097d6"
+      },
+      {
+        "path": "sandcore/docs/M6A.md",
+        "size": 3373,
+        "sha256": "48dea3a4922feaf2d69b1ad7d4e465265244dcdf7cbd0f0694f6aa0d1d514a43"
+      },
+      {
+        "path": "sandcore/docs/M7.md",
+        "size": 7182,
+        "sha256": "b23ec8aa6eaae1f610bd86059ae3558d6295251e116662bb998e60c8679b33ff"
+      },
+      {
+        "path": "sandcore/docs/MEM.md",
+        "size": 6036,
+        "sha256": "3bee955b3d905dfd4ced4696a3dfef53b1a21c250c814aab119484fef8b1ba5b"
+      },
+      {
+        "path": "sandcore/docs/MODULE.md",
+        "size": 3069,
+        "sha256": "7776a5811078bf0c19279d04253892bec7780b1e8edca98d18287e539c640af6"
+      },
+      {
+        "path": "sandcore/docs/PACKAGE.md",
+        "size": 4603,
+        "sha256": "2dc311b78189f790d8a4e39cc6db6648ee6842d2d66667e54334c55a80e6c3a3"
+      },
+      {
+        "path": "sandcore/docs/ROADMAP.md",
+        "size": 11109,
+        "sha256": "513d0636ab93d423ab4a60c194afd42ef476d9b23ea3b7f60ff99f7690e567aa"
+      },
+      {
+        "path": "sandcore/docs/SHELL.md",
+        "size": 3945,
+        "sha256": "7ce251b0e0f29687d4b8737f7c642f6a8237437633d7a40ebe2092d28a79ab5d"
+      },
+      {
+        "path": "sandcore/docs/SYSCALL.md",
+        "size": 11815,
+        "sha256": "79b6814dd22e5719163979b3e3a7eb69ef74b3e3fcc660e40851ff19e3c82dd4"
+      },
+      {
+        "path": "sandcore/docs/TESTING.md",
+        "size": 16207,
+        "sha256": "9cf110fcade84db94ed4324e61eb1a3bfe6b5d8160bf6f29df381c69a0a11079"
+      },
+      {
+        "path": "sandcore/docs/WELCOME.md",
+        "size": 2507,
+        "sha256": "1e01d454354572f9dd256d2095d78ca4df26c09956d3ceb49d52359daa47f607"
+      },
+      {
+        "path": "sandcore/docs/WM.md",
+        "size": 7544,
+        "sha256": "c02c176ed3626aada14cff5f244753b11ed2ada78cb3ea978b41c220d27f6d64"
+      },
+      {
+        "path": "sandcore/kernel/ata.c",
+        "size": 3865,
+        "sha256": "97aa5ad8ef55a649e7cea8a140da47b2627b4c9d2f3733884681d1cc169c3e38"
+      },
+      {
+        "path": "sandcore/kernel/ata.h",
+        "size": 754,
+        "sha256": "29e5021635523319fa82c7fcf5e7e789929a8df4ee9af0a7459e740362bced47"
+      },
+      {
+        "path": "sandcore/kernel/entry.asm",
+        "size": 1819,
+        "sha256": "6f10951e7dec231e8b06457f914d40e49ba83a4de2c5ea07b83ea96f249ab74e"
+      },
+      {
+        "path": "sandcore/kernel/font.h",
+        "size": 688,
+        "sha256": "7f27867745b269635f289987011079b6430b593a6b66a0c63cf77e34e28db992"
+      },
+      {
+        "path": "sandcore/kernel/font16.h",
+        "size": 2062,
+        "sha256": "b0c7d247ab5ea333380c360dd341cadc39de1ae40e090988241c42c7f6beec0b"
+      },
+      {
+        "path": "sandcore/kernel/font16.txt",
+        "size": 12851,
+        "sha256": "8f286f8ac7e9c1d714a2dec6613bb9416660a7232fc8d78ffa8024b3c23e782b"
+      },
+      {
+        "path": "sandcore/kernel/fs.c",
+        "size": 11191,
+        "sha256": "a6fb77cdd216a14525b27e2e319a2c599806809a2c78907a2c106182b4479369"
+      },
+      {
+        "path": "sandcore/kernel/fs.h",
+        "size": 2073,
+        "sha256": "af0cb3f3bd5b1c89d3e068601a6a319539d25fe07fb44f60f55eab634e650534"
+      },
+      {
+        "path": "sandcore/kernel/gfx.c",
+        "size": 7928,
+        "sha256": "65b90d91d6cef1685c2abd9b2746af58ce7877927b9c046327a1b874756d0348"
+      },
+      {
+        "path": "sandcore/kernel/gfx.h",
+        "size": 2519,
+        "sha256": "dbcf45ae7cab581b7dd7409e123e4a3cdff23383c3b92846e9dbd34091660f53"
+      },
+      {
+        "path": "sandcore/kernel/heap.c",
+        "size": 3792,
+        "sha256": "e131cc1eeab70a3a93cb1d1139af1095800a386e457b9f199bb4002a6341cbbc"
+      },
+      {
+        "path": "sandcore/kernel/heap.h",
+        "size": 527,
+        "sha256": "cbcb131bc4223c8bf65a0a5873f0e3176e96961438084b9d5b224f0ed9c6806d"
+      },
+      {
+        "path": "sandcore/kernel/idt.asm",
+        "size": 6795,
+        "sha256": "e5b0f08629e8f9feff3ab3da3f6882972dc2fe74ee6262cc664dab9743aa514a"
+      },
+      {
+        "path": "sandcore/kernel/interrupts.c",
+        "size": 5340,
+        "sha256": "cdc1187b31c447630653670b816021e7e59c7acd961f1bf68eddb44bb042c354"
+      },
+      {
+        "path": "sandcore/kernel/interrupts.h",
+        "size": 487,
+        "sha256": "7d8e7cc86d14ee5406f0d8e6f619baf081ef6bf113fdcb3b0d334fa07811650e"
+      },
+      {
+        "path": "sandcore/kernel/io.h",
+        "size": 1665,
+        "sha256": "d7769e25e2544f2aa84b4501e6208d9db8ade0a65630ec1b3d67ae13eb02315d"
+      },
+      {
+        "path": "sandcore/kernel/keyboard.c",
+        "size": 6497,
+        "sha256": "5c69c6a05820f3d630d3af57667bac3b45b9dd48e827d7459419ae7a1ab6e241"
+      },
+      {
+        "path": "sandcore/kernel/keyboard.h",
+        "size": 520,
+        "sha256": "8b9ed0c3061f937c301bb5f8e0d1d836265503c88a3c57664c6d97b74e3364e0"
+      },
+      {
+        "path": "sandcore/kernel/main.c",
+        "size": 8995,
+        "sha256": "43f53e48ebbd6c46b881c5840b19b05dd82871cc813d3c3cceb8f3b56ef9bdea"
+      },
+      {
+        "path": "sandcore/kernel/memory.c",
+        "size": 4371,
+        "sha256": "6ecc85d3fd871a0f598c5a75db857d8c641541492fcf50c17eb5f5b774088361"
+      },
+      {
+        "path": "sandcore/kernel/memory.h",
+        "size": 1193,
+        "sha256": "b94c39022fdc21905d40640e998ee089840e4b4123dd4debef0b087f4ffe9dfb"
+      },
+      {
+        "path": "sandcore/kernel/module.c",
+        "size": 3305,
+        "sha256": "a5bf2a427074726ef7c5400394403d4e6feda76dd926aa9961cdd7653668347e"
+      },
+      {
+        "path": "sandcore/kernel/module.h",
+        "size": 968,
+        "sha256": "228b3d59bb04cadfaafa037fbaa3e8316f9d46cf5c4460396cd05630395ae128"
+      },
+      {
+        "path": "sandcore/kernel/mouse.c",
+        "size": 3752,
+        "sha256": "b3a0722e303211b7a76b18a4055cf6d8a7f0cc93a08ebafe04418279ee31e2ed"
+      },
+      {
+        "path": "sandcore/kernel/mouse.h",
+        "size": 487,
+        "sha256": "c38e092c9c834e1b28abc711127fec60c9dd142977bf1e4f00de362010794695"
+      },
+      {
+        "path": "sandcore/kernel/paging.c",
+        "size": 5209,
+        "sha256": "aed29beace3cf25cff99d52fd937ec4783c25c6971c98b05739955f415f46eb8"
+      },
+      {
+        "path": "sandcore/kernel/paging.h",
+        "size": 1855,
+        "sha256": "6f117d805b89147d82e3defe61c93a7d3397924dedf89a166ca7cffaac3fa29f"
+      },
+      {
+        "path": "sandcore/kernel/palette.h",
+        "size": 2008,
+        "sha256": "df3d1f60aeaf55eecdee525cef09fe32d1d6e7ca08fbf9d07b8739764ef0b046"
+      },
+      {
+        "path": "sandcore/kernel/process.c",
+        "size": 8089,
+        "sha256": "859075683bee96175c986d62b2d1ee14f9ac386274780b70d3b7dc0fcd8fab91"
+      },
+      {
+        "path": "sandcore/kernel/process.h",
+        "size": 1469,
+        "sha256": "ab2821929ff03dd44e7b41f95c9c79209c9689242dcd070c50ae7acc5addd4a5"
+      },
+      {
+        "path": "sandcore/kernel/task.c",
+        "size": 21487,
+        "sha256": "71c63e45d836cadb88a034108560c84c751bb8bc4dc81ce251b2916b474acdb4"
+      },
+      {
+        "path": "sandcore/kernel/task.h",
+        "size": 2569,
+        "sha256": "a7aa5f3cb68ecd3137680b335c6127f78155f73df377a30d750a27b1fafd5eca"
+      },
+      {
+        "path": "sandcore/kernel/term.c",
+        "size": 3179,
+        "sha256": "4c2ac5fb29f6667b3bff5e13723a3d154dc2f7393a453fe7b65b2c560cd237c3"
+      },
+      {
+        "path": "sandcore/kernel/term.h",
+        "size": 993,
+        "sha256": "328994c97d64c489b7ce9196e48c0fe9aff2bc9c219666adb3842cf18d2f6d17"
+      },
+      {
+        "path": "sandcore/kernel/timer.c",
+        "size": 1246,
+        "sha256": "9f3e61e8e6d1812cd8b101f474dae99aec499121fe80ebf280e9a8c6fbe26418"
+      },
+      {
+        "path": "sandcore/kernel/timer.h",
+        "size": 505,
+        "sha256": "a20e919031046058a51fe1a28fb5b7efdd87d9027a7b94bc32a6f9bbbee88ccf"
+      },
+      {
+        "path": "sandcore/kernel/wm.c",
+        "size": 24929,
+        "sha256": "f6e983c4914019c740a79dbf5bc81ad1a3981cef63427cb87f7c0cf9e55c72c1"
+      },
+      {
+        "path": "sandcore/kernel/wm.h",
+        "size": 2461,
+        "sha256": "abaa19b19ea3a619dd7a63f7075b814a102db2b22b03632d180e90b2b1f0b3a3"
+      },
+      {
+        "path": "sandcore/linker.ld",
+        "size": 2508,
+        "sha256": "8da1852c4dee4fcd31704d0d11232306e0c2866554c628d16da5ca7696cda2da"
+      },
+      {
+        "path": "sandcore/modules/core.c",
+        "size": 1603,
+        "sha256": "621c3886a581b43ae7c79d59de7d8cb2ff05d5b855d4798f20e33c7e4e23c12b"
+      },
+      {
+        "path": "sandcore/modules/linker.ld",
+        "size": 470,
+        "sha256": "0885ca18ad7d0fd78620f0d17843b8b26d2a041e8a6819f398ebd179e1cc2b35"
+      },
+      {
+        "path": "sandcore/run.bat",
+        "size": 971,
+        "sha256": "43fcf00512f5e43312269680690aa8c46bd111cdc606f0c7cbe97365a1fb4c0b"
+      },
+      {
+        "path": "sandcore/run.sh",
+        "size": 359,
+        "sha256": "c52d9aa4cdbb8481f0c8910066b7bd2b42125747a1be4da5dced077b13f52144"
+      },
+      {
+        "path": "sandcore/tools/audit_m6.py",
+        "size": 5645,
+        "sha256": "b2195db2736883b86283e7db7c0e1173e00b88a02e099b229a43aef0f1a6dabf"
+      },
+      {
+        "path": "sandcore/tools/audit_m7.py",
+        "size": 7432,
+        "sha256": "f1540a0e76cbc04d7dd4aaf55660493baa9f1a8593f5c2b28a23c9d8d32c3d37"
+      },
+      {
+        "path": "sandcore/tools/check_s3c.py",
+        "size": 1725,
+        "sha256": "1c7f406f4f3b479117feb9d08270f8bd3e93430fef9ab1eafbad40dee309a6aa"
+      },
+      {
+        "path": "sandcore/tools/check_s3c_pp.py",
+        "size": 5055,
+        "sha256": "31c48479d3fa5bb7763ea035d60a49dc66da105262a9a897a9fe7e977042f4a1"
+      },
+      {
+        "path": "sandcore/tools/font_preview.py",
+        "size": 2501,
+        "sha256": "a3dd4ff4d4416080c9ff5450faad9f1621fb442a358e8156a9e0139baab479db"
+      },
+      {
+        "path": "sandcore/tools/import_font.py",
+        "size": 3993,
+        "sha256": "0a9c3ccbd8bb9a8f256c6af4bf0193f0da53307d05ffe0216fd597977ca287ad"
+      },
+      {
+        "path": "sandcore/tools/keys.py",
+        "size": 1102,
+        "sha256": "04003b20234f565f1df6df66f11182fc2c8b9469b199122b206bfbaddb83ec75"
+      },
+      {
+        "path": "sandcore/tools/mkfont.py",
+        "size": 4438,
+        "sha256": "7b195d5a3491e4093f8e1b7024c538f986db83fc8e6f798715659f06e99903f7"
+      },
+      {
+        "path": "sandcore/tools/mkfont8.py",
+        "size": 1548,
+        "sha256": "f7268e0dcd446960c64df4c9e7ba10ede03216ea9deb87802b63d2bda11567b7"
+      },
+      {
+        "path": "sandcore/tools/mkfs.py",
+        "size": 3384,
+        "sha256": "60ddbabe80ccbe76b01f01604175be3bd26bfdb0f5ea311ddf84ecda5290856a"
+      },
+      {
+        "path": "sandcore/tools/mkimg.py",
+        "size": 1075,
+        "sha256": "9fe731a3777d437639022212425ca434c7dbd03d24dc58116c0da56d2e8aaf14"
+      },
+      {
+        "path": "sandcore/tools/mkscf.py",
+        "size": 961,
+        "sha256": "1dec5ec3f84e366cfa655ec957fb8ec9c953c16286cd7adc790782bdc733c2bd"
+      },
+      {
+        "path": "sandcore/tools/mkscx.py",
+        "size": 2029,
+        "sha256": "5c4193d118d106594ac7e8f9c4db8b05f00731a5a9780c91171008e303a79dbc"
+      },
+      {
+        "path": "sandcore/tools/mkskm.py",
+        "size": 2379,
+        "sha256": "ef4aca27b1250f3e9f3e614860905d5d201aeae084df644cdeeab2b95e5382ae"
+      },
+      {
+        "path": "sandcore/tools/mouse.py",
+        "size": 2580,
+        "sha256": "08dd1814b4a9dd32eeb231083aae85f50fc1fdcfd6484df5c0b58577bbb07372"
+      },
+      {
+        "path": "sandcore/tools/package_m6.py",
+        "size": 4227,
+        "sha256": "617c4827140e91671115422fd6479ec0093607f16696e2337d125481c83cb73c"
+      },
+      {
+        "path": "sandcore/tools/package_m7.py",
+        "size": 5818,
+        "sha256": "55156e64b0d0ef9d38ce59a41b5aa6e6685289a71f7564f3f0bb6d601e6d9c19"
+      },
+      {
+        "path": "sandcore/tools/publish_native.py",
+        "size": 5021,
+        "sha256": "52cd55b3ab07cbbbb8f00ac5871121a78499ed2a7a07d1a39606f9e3189c7279"
+      },
+      {
+        "path": "sandcore/tools/snap.py",
+        "size": 2394,
+        "sha256": "53357d451a0849dbcf21b320749f56bd52847f2c2ffd64256a6314254e1c8637"
+      },
+      {
+        "path": "sandcore/tools/split_c_statements.py",
+        "size": 1834,
+        "sha256": "d6bc58ec5efa4a707f815653bf1298b609306f8bd764b6beb1675ecb9351483f"
+      },
+      {
+        "path": "sandcore/tools/verify_apps.py",
+        "size": 11328,
+        "sha256": "55406ce72c7f826cfc35dc8a3fd199729400f155da48abc76d2136c6edce3d69"
+      },
+      {
+        "path": "sandcore/tools/verify_graphics.py",
+        "size": 13538,
+        "sha256": "532db27fb26fe4b1b25bbde1f7cfa4d99bdf601d446a3be97417e795d644b201"
+      },
+      {
+        "path": "sandcore/tools/verify_m6.py",
+        "size": 9533,
+        "sha256": "4fe80011126a844827794343962c98d6b09f9ed49001d1d23cd9faf5781957f5"
+      },
+      {
+        "path": "sandcore/tools/verify_m7_base.py",
+        "size": 6186,
+        "sha256": "8e227052b7e2b97acb6bffd9fed48b10971b804df52f14068ca6f6ae21c8fa2c"
+      },
+      {
+        "path": "sandcore/tools/verify_modules.py",
+        "size": 2945,
+        "sha256": "5b407c340575d81ecfda45e927a91ac6d12339cdf7edd09c0aa3000cf067db33"
+      },
+      {
+        "path": "sandcore/tools/verify_s3c.py",
+        "size": 7698,
+        "sha256": "db76da1087f07f36b0d1222e81081e15f4d01e7de514fc78c9cb772cdc39f793"
+      },
+      {
+        "path": "sandcore/user/SCAPI.H",
+        "size": 13238,
+        "sha256": "68691d9be1bdb179ed0a1f69b92897c9e60cb11a0da0ed9ae18fef978128df3b"
+      },
+      {
+        "path": "sandcore/user/UI.inc",
+        "size": 9027,
+        "sha256": "bd6ff8599c7ef2405b0f65b485a5447a89b65b194c8f59a63679817ca1c935fc"
+      },
+      {
+        "path": "sandcore/user/api.h",
+        "size": 210,
+        "sha256": "c66b373b9cc856882d9d3225366aaedd3fa2fd27ad4217b52ea70fbc3c73b0de"
+      },
+      {
+        "path": "sandcore/user/assembler.c",
+        "size": 11970,
+        "sha256": "fd56513470c5272fd3b4a6b05e0cb9e69b1c0ff12bd669d7c7df6ef03dcb02cd"
+      },
+      {
+        "path": "sandcore/user/calc.c",
+        "size": 3734,
+        "sha256": "ea614483b60e34a9588e5d1d24c3a34a1976e4bc908d2c2cb413b3d4e1df1d01"
+      },
+      {
+        "path": "sandcore/user/debugger.c",
+        "size": 10901,
+        "sha256": "11c183b49040bd7a00a74924c79d2385168f1abbe11d6c1a3557a15d29c1b716"
+      },
+      {
+        "path": "sandcore/user/files.c",
+        "size": 6652,
+        "sha256": "148969719b22fa2f017364a511c28fd636bdfcea8ea8ee92c66d08a4dc7b0bcd"
+      },
+      {
+        "path": "sandcore/user/hello.asm",
+        "size": 1411,
+        "sha256": "7c56f8ea32f93e3fb7a25621e451cea1cfa2af3e3cfcea6cb98140775b675268"
+      },
+      {
+        "path": "sandcore/user/ide.c",
+        "size": 10650,
+        "sha256": "f802c4272dcad3a67e22ec81e239c604d602266da139712a458da61a32ee8eb1"
+      },
+      {
+        "path": "sandcore/user/linker.ld",
+        "size": 868,
+        "sha256": "f559a3fc2ee06410e0ba3d8aae340e2bcaff3f1116acf371f7961d9940cbabef"
+      },
+      {
+        "path": "sandcore/user/lumen.c",
+        "size": 11671,
+        "sha256": "416d6e0a8f7ab51029e1f1f7497b315492ddd1391d01c78ee53831726a42b0ec"
+      },
+      {
+        "path": "sandcore/user/mines.c",
+        "size": 6124,
+        "sha256": "db5773e9ef7c2289b2dcbab88593cfd5f07f477b9d54af3dada1e974b0a924c0"
+      },
+      {
+        "path": "sandcore/user/note.c",
+        "size": 3748,
+        "sha256": "d7eb0a5caf6c21bf809ee89f403cb86b64e340725aeefbebf3a88fd900e1f42f"
+      },
+      {
+        "path": "sandcore/user/palette.c",
+        "size": 1560,
+        "sha256": "1553404fcacab064cb8ff93115bf2b690d4c99f1e579ead1dad58af072241e7a"
+      },
+      {
+        "path": "sandcore/user/panic.asm",
+        "size": 174,
+        "sha256": "c7fa162fa264dab6a26f68d3f9696e60a5358de56087811d3b65d1a521a44d0a"
+      },
+      {
+        "path": "sandcore/user/probe.c",
+        "size": 6878,
+        "sha256": "3891924310a617d19b5f648e00949704094e289d23bcc5ce7d19b4da0cdaea2c"
+      },
+      {
+        "path": "sandcore/user/race.c",
+        "size": 4439,
+        "sha256": "578ff53251653fc9ebde9f18a137d753273c4eee4442c0005302a35415a76b4b"
+      },
+      {
+        "path": "sandcore/user/s3c.c",
+        "size": 8794,
+        "sha256": "c5d365c5ac3221775e83a07c9774f83b84b5e25b024690c6dfb6daaf3dbf47b8"
+      },
+      {
+        "path": "sandcore/user/s3c_emit.inc",
+        "size": 33904,
+        "sha256": "4fd61f320a9722b279debe6e869119d3e330e2366cc34ef8d7aeb5754b541194"
+      },
+      {
+        "path": "sandcore/user/s3c_lex.inc",
+        "size": 6622,
+        "sha256": "daac00f4c34383cbb47ec2dfce8fa3e959ef2813c66f647284ab2ab4b75becfc"
+      },
+      {
+        "path": "sandcore/user/s3c_parse.inc",
+        "size": 33904,
+        "sha256": "951fadb75100a97b80e23cf48a14e08a0a032ce5e1f390f53391532981c1a794"
+      },
+      {
+        "path": "sandcore/user/s3c_pp.inc",
+        "size": 22124,
+        "sha256": "3acad50c6016615c09d391d4892a927a76572b18859a957f12856a770972c754"
+      },
+      {
+        "path": "sandcore/user/shell.asm",
+        "size": 4271,
+        "sha256": "594250b7d662446bfc47148a8567d0ff1638dea4696647a30e5ab5835739f7a4"
+      },
+      {
+        "path": "sandcore/user/start.asm",
+        "size": 1235,
+        "sha256": "9d496e17db4902ad1e73b8b370b89b6b32a62731e350c3e4d59c5074acb30ef1"
+      },
+      {
+        "path": "sandcore/user/world.c",
+        "size": 9201,
+        "sha256": "94d8109415ced1f6c6ed458a3c83175fbedb2176bdc0b5f02460978b1a9ef7af"
+      }
+    ],
+    "M8a": [
+      {
+        "path": "sandcore/assets/design/AURORA-DUNE-preview.png",
+        "size": 58628,
+        "sha256": "38b2a6a707be8032b4295e38b4a06027586a7320e9f4f987d4cc689f8f5cdd28"
+      },
+      {
+        "path": "sandcore/assets/design/AURORA-DUNE.png",
+        "size": 332083,
+        "sha256": "811dd9ca43e647206ffbeffac61b0f20858165b24bdc1d0b0c3e1069fc08b2de"
+      },
+      {
+        "path": "sandcore/assets/design/AURORA-DUNE.svg",
+        "size": 15182,
+        "sha256": "8d50186abe172468d58db891c8ebfd1b41b95b4ea8351fd7ce80ef2cf65214bb"
+      },
+      {
+        "path": "sandcore/assets/design/CLASSIC-DUNE-preview.png",
+        "size": 25062,
+        "sha256": "52ad0128e655defd0d6791dcf8aa076d36ac65089fe00dbada625a3a7e015e93"
+      },
+      {
+        "path": "sandcore/assets/design/CLASSIC-DUNE.index8",
+        "size": 230400,
+        "sha256": "49e12303f163f786f57f4d89ee4e5bf0d8892e2ea063b707a97e28b59d85a836"
+      },
+      {
+        "path": "sandcore/assets/design/CLASSIC-DUNE.png",
+        "size": 196198,
+        "sha256": "1874d5ce4fef83999fad495c59b9ba5aa4c3c83de23939cd2a0ed8f0b482fd92"
+      },
+      {
+        "path": "sandcore/assets/design/CLASSIC-DUNE.svg",
+        "size": 1343352,
+        "sha256": "8b0ecf1645356faf538b693f810c31de16ffc8e7a855f14689b6e686481f4548"
+      },
+      {
+        "path": "sandcore/assets/design/SANDCORE-MARK.png",
+        "size": 30198,
+        "sha256": "4b1f2a910f079d6597afa10f576d1d101a011a6aad7ad85f5f996cf5e06921c7"
+      },
+      {
+        "path": "sandcore/assets/design/SANDCORE-MARK.svg",
+        "size": 496,
+        "sha256": "ffcf1aead053e1b31645ba01d293761a2a9f8e664e59146ff97a174882664304"
+      },
+      {
+        "path": "sandcore/assets/design/tokens.json",
+        "size": 752,
+        "sha256": "284f3836e0da42974c416da8c35c4b252a5a7696eb7e21f9cc90613896747271"
+      },
+      {
+        "path": "sandcore/assets/desk/files.lnk",
+        "size": 28,
+        "sha256": "94fda020647551e733ae11b8449f84fd8ace3e9a4168268e5f0b722c32f8d7d3"
+      },
+      {
+        "path": "sandcore/assets/desk/notes.lnk",
+        "size": 26,
+        "sha256": "99aa38412ed9460619bf50fd23c594b5c8a889eca0277e1fbcf38ee9f755a89d"
+      },
+      {
+        "path": "sandcore/assets/desk/palette.lnk",
+        "size": 34,
+        "sha256": "cb73d49455105b0eb6b152671d657f8774f1b77b88d7b71e15a1678863235b4e"
+      },
+      {
+        "path": "sandcore/assets/desk/shell.lnk",
+        "size": 27,
+        "sha256": "c0919c822d2079bf1285d80b9370ccaf1091db01a6c665c95585baa8707c5917"
+      },
+      {
+        "path": "sandcore/assets/font/phoenix-ascii.json",
+        "size": 19674,
+        "sha256": "e054d594d212cd21a5a8bc24393a338d722690d5f30ca7a1b5abe5f2545a720c"
+      },
+      {
+        "path": "sandcore/assets/home/demo.asm",
+        "size": 337,
+        "sha256": "fe38202d8e97137c4b2c5e188c62ba74a304397e22839144bb161955d1d048ae"
+      },
+      {
+        "path": "sandcore/assets/home/FEATURE.C",
+        "size": 3369,
+        "sha256": "cdd11cc9acd11cfa566340962878385e076a8e7b950083a39e832240d5a3f0bf"
+      },
+      {
+        "path": "sandcore/assets/home/notes.txt",
+        "size": 159,
+        "sha256": "a36c51032b1de46af3e5fbda1bb53c863a17e03351bdf5bf18b20fb4368a248a"
+      },
+      {
+        "path": "sandcore/assets/icons/files.txt",
+        "size": 372,
+        "sha256": "c6933d3fdcf4ae7e11863eaee22b597d1faa777ec6ad66131a5adcbdd1e2f576"
+      },
+      {
+        "path": "sandcore/assets/icons/notes.txt",
+        "size": 370,
+        "sha256": "976f5eae73a04d50a7e9bbf75ebe5078a4eb26951e22610d16b99556bd5892f1"
+      },
+      {
+        "path": "sandcore/assets/icons/palette.txt",
+        "size": 351,
+        "sha256": "67f151bec851291559075a1cc118aa757564cea261da3253857b403ce6fbb78e"
+      },
+      {
+        "path": "sandcore/assets/icons/shell.txt",
+        "size": 367,
+        "sha256": "789902a8483d185911bea77224666f5bff9197955ce62ca406d2e97ab35b2044"
+      },
+      {
+        "path": "sandcore/assets/pictures/WELCOME-TRUECOLOR-V1.md",
+        "size": 1166,
+        "sha256": "121a65b68e37226b0345781f67cc174c90ffd1f3ce616b9a440d3205904c394d"
+      },
+      {
+        "path": "sandcore/assets/pictures/WELCOME-TRUECOLOR-V1.png",
+        "size": 1715161,
+        "sha256": "ac3857f26b8f65e39c9669d46dede8cdd8cdb58869512e13867abc60cba75a20"
+      },
+      {
+        "path": "sandcore/assets/wallpapers/AURORA-CORE.png",
+        "size": 1305211,
+        "sha256": "070348914d38b5ebbb8c35c184569c71b3e7e12a6b50a0c4e6087d9dbbc693a8"
+      },
+      {
+        "path": "sandcore/assets/wallpapers/AURORA-DUNE-V2.png",
+        "size": 1102027,
+        "sha256": "a3ea1a118a89493d633fcefb7d10970c1e6d25a56dec596cffe510e0659243d4"
+      },
+      {
+        "path": "sandcore/assets/wallpapers/AURORA-SATIN-V3.png",
+        "size": 1112369,
+        "sha256": "6db504e553d3494e9be9b8ac551ca8cb86c857f731b06651db1b6596df165a74"
+      },
+      {
+        "path": "sandcore/assets/wallpapers/CLASSIC-CORE.png",
+        "size": 1376761,
+        "sha256": "35917393b91d6d5eb9dcca87504ed1da7bf9f1a1070082fbd13bacd1bb4e0e8e"
+      },
+      {
+        "path": "sandcore/assets/wallpapers/CLASSIC-FALSE-V3.png",
+        "size": 1060300,
+        "sha256": "e20b3a499ae8352152c9f364c499c091072135ea85a87d7c4ffcc4378a88028d"
+      },
+      {
+        "path": "sandcore/assets/wallpapers/CLASSIC-LOW320-preview.png",
+        "size": 8248,
+        "sha256": "d52967a5cfc670158fea77e668ec9c2f41c6fbc6b3b51543c31f4ae303baa97b"
+      },
+      {
+        "path": "sandcore/assets/wallpapers/CLASSIC-LOW320.png",
+        "size": 2353,
+        "sha256": "90881dae4b9f4271ba5ccfc92e8f917efbcc319be0dbb5f6e18a75b27cb25d8e"
+      },
+      {
+        "path": "sandcore/assets/wallpapers/CLASSIC-PIXEL-V2.png",
+        "size": 1047100,
+        "sha256": "93e0038a4f5009b6afe57945b4f61248fd215a85ad203d033ed2293400450632"
+      },
+      {
+        "path": "sandcore/assets/wallpapers/classic-processing.json",
+        "size": 667,
+        "sha256": "25ae637facc397b07fd0596f59c625cfd69314a9870e39198fc916b451899365"
+      },
+      {
+        "path": "sandcore/assets/wallpapers/COAST-PHOTO-V2.png",
+        "size": 2573462,
+        "sha256": "17176a5dd8b444bbbdf0f3fe6ff4ac07ac28db3a631944595fe2a1140a60cd2f"
+      },
+      {
+        "path": "sandcore/assets/wallpapers/generation-v2.json",
+        "size": 5058,
+        "sha256": "f55e409aeba7e279f012afa773c4f2a1aae11a1070cf50a74ceddc3cefc3e7a8"
+      },
+      {
+        "path": "sandcore/assets/wallpapers/generation-v4.json",
+        "size": 2296,
+        "sha256": "d2a5802c7bfabdc013eee0007fa8f94e8fab047148269cdafb4c45cb753c0190"
+      },
+      {
+        "path": "sandcore/assets/wallpapers/generation.json",
+        "size": 6400,
+        "sha256": "de747c5b6c8947a1c6637385b5bb60495056812d49a0a37c9f0a819028b961d5"
+      },
+      {
+        "path": "sandcore/assets/wallpapers/SANDCORE-TIDAL.png",
+        "size": 2004483,
+        "sha256": "96e6e0af57b74cd05df5b543d5bf5204536b144f5aa8963ac9159ac24fb9440f"
+      },
+      {
+        "path": "sandcore/assets/wallpapers/selection.json",
+        "size": 4719,
+        "sha256": "752ccf5328d84d6a977baf7f2fc4c78ce45613c8d482c57a048af8ac8f4ebc14"
+      },
+      {
+        "path": "sandcore/assets/wallpapers/TIDAL-DUNES.png",
+        "size": 2125731,
+        "sha256": "d4d226bc967dc6b4067923643e17f40f9097facfaf6a8e0493ac8334430f133e"
+      },
+      {
+        "path": "sandcore/assets/wallpapers/TIDAL-FINE-V4.png",
+        "size": 2024253,
+        "sha256": "10e54f72d19f67d97bc3a6a9f36ffef67cc92cb5d5b146559bb8215f98be098d"
+      },
+      {
+        "path": "sandcore/assets/wallpapers/TIDAL-PHOTO-V3.png",
+        "size": 2314008,
+        "sha256": "7fc7da30775a55df7b2eb22f6e197f5639f9dc0276f101615397633961539241"
+      },
+      {
+        "path": "sandcore/boot/boot.asm",
+        "size": 12871,
+        "sha256": "f2c20841cf12efa9c87e41c8a5eaf616f05c1859f2bb834b2fe09328e34e4cd5"
+      },
+      {
+        "path": "sandcore/build.bat",
+        "size": 567,
+        "sha256": "c3485d1656cc91d6888017b421d2bae55de7456054fc09ed21d7f6356cb35e21"
+      },
+      {
+        "path": "sandcore/docs/APPS.md",
+        "size": 6606,
+        "sha256": "a5b40b31dad05285152d9e705235084fa4b80830e9f6158dd07daa8898ef9ac8"
+      },
+      {
+        "path": "sandcore/docs/ASM.md",
+        "size": 4963,
+        "sha256": "014c262709a3ddf6b12f981b87311be5a04db383c2f57d98fc7f0dedec60e2b4"
+      },
+      {
+        "path": "sandcore/docs/BOOT.md",
+        "size": 10507,
+        "sha256": "8871bb7e911a236ca0df21293bbb4ed03a2e43a0647e193602470a2b7fb403f1"
+      },
+      {
+        "path": "sandcore/docs/BUILD.md",
+        "size": 17182,
+        "sha256": "8a0450da3c176bcc84c68c62ed2557fcb5d4152e8120fa6f66c4593b0db006ac"
+      },
+      {
+        "path": "sandcore/docs/C.md",
+        "size": 18275,
+        "sha256": "946c9e41b94249e99c3d70c7f11bd7e976bd49a8ca915ac7e84501e7ad678230"
+      },
+      {
+        "path": "sandcore/docs/CANVAS.md",
+        "size": 9946,
+        "sha256": "4c305498415f714668bcc3cf7a18c6bbea9855f0d2e43c4e5c56b21e3c7cd113"
+      },
+      {
+        "path": "sandcore/docs/CONFIG.md",
+        "size": 9025,
+        "sha256": "ac1ada9244f02117cb210d221327b5ec4a2240676d57f69338a99ade39dddaa0"
+      },
+      {
+        "path": "sandcore/docs/CPU.md",
+        "size": 4058,
+        "sha256": "23df6a7db49e399da3272ec3a466726fad8596535443cdc2c883ff282f88a071"
+      },
+      {
+        "path": "sandcore/docs/DEBUGGER.md",
+        "size": 10442,
+        "sha256": "a561867c5af5033f7a7e8dd7e000bbd7d64a58c6284df3a4aad32ae6b04688c5"
+      },
+      {
+        "path": "sandcore/docs/FILES.md",
+        "size": 9277,
+        "sha256": "f452c80edf625555dad478038af92a2f2ecd88b01908d08701a4f2f10377ca1b"
+      },
+      {
+        "path": "sandcore/docs/FILM-STORYBOARD.md",
+        "size": 6032,
+        "sha256": "dd688abcaa40adbca16a24cbae30729ca139df8e000d3d1ab1dc23aa365fda8f"
+      },
+      {
+        "path": "sandcore/docs/FILM.md",
+        "size": 16334,
+        "sha256": "98b1d98b060b7e47504beb23fb7487dab027a9a304070daaa5d6db7ca76dbc52"
+      },
+      {
+        "path": "sandcore/docs/FONT.md",
+        "size": 5124,
+        "sha256": "08165b1e9647d8a8f0d6ae4cf59301d1afdb918060cd8ceb25a2f56b233af606"
+      },
+      {
+        "path": "sandcore/docs/FS.md",
+        "size": 9662,
+        "sha256": "b52e04cdea44563dc8e9bf4d0475912d108f7abe1159e35f04fa38849cf03d86"
+      },
+      {
+        "path": "sandcore/docs/GAMES.md",
+        "size": 6286,
+        "sha256": "67b9ec4cf13177acaeb8ace218702a4ae52e1125027319d1014d893947c5cd93"
+      },
+      {
+        "path": "sandcore/docs/GFX.md",
+        "size": 22833,
+        "sha256": "5155f78769461db1c7a5edb4323daf9ba06ad1813e79bafbb5d47b182cdc7c0d"
+      },
+      {
+        "path": "sandcore/docs/IMAGE-SERVICE.md",
+        "size": 10476,
+        "sha256": "485eba9d8a46cdbd888c169488df6d6a1376d13359862c05fb5aae87db1ff2ee"
+      },
+      {
+        "path": "sandcore/docs/IMAGE.md",
+        "size": 6531,
+        "sha256": "f2fa579bfe3d20c57c5c502cc54e3b252e950545c494097a3e8edd9ccd33d605"
+      },
+      {
+        "path": "sandcore/docs/INTR.md",
+        "size": 11523,
+        "sha256": "4df6837bb6b46ef2c8592ed7789f7c6c7dec44627d5d9f5fec7f672b6258a61a"
+      },
+      {
+        "path": "sandcore/docs/LENS.md",
+        "size": 10823,
+        "sha256": "bafdac262ff72dcad8f11b04283bab0efa05d0c91666fdbd38cc27c66a5d301b"
+      },
+      {
+        "path": "sandcore/docs/M6.md",
+        "size": 9135,
+        "sha256": "9a06bb947d5805e4e3b9e63c789a72dff66c321bb5ded0fd2bd8093909d097d6"
+      },
+      {
+        "path": "sandcore/docs/M6A.md",
+        "size": 3373,
+        "sha256": "48dea3a4922feaf2d69b1ad7d4e465265244dcdf7cbd0f0694f6aa0d1d514a43"
+      },
+      {
+        "path": "sandcore/docs/M7.md",
+        "size": 7388,
+        "sha256": "37233814ea59d376ecc0532d9dedb0e06ae00dd065669b65a86e30729b18df91"
+      },
+      {
+        "path": "sandcore/docs/M8-COMPONENTS.md",
+        "size": 22138,
+        "sha256": "c5547feae7a383f1d0105c3c97dbe2eb4c692131d64cd9748a61a8755c0b9fc5"
+      },
+      {
+        "path": "sandcore/docs/M8-DESIGN.md",
+        "size": 9784,
+        "sha256": "f22a2470e261ba37a764c16abc054a0646af2365c0457101164bd18ba4580c5c"
+      },
+      {
+        "path": "sandcore/docs/M8-FROZEN.md",
+        "size": 8458,
+        "sha256": "3f26b0d8090f9db6d52a80c3f307d0154d52e959d59758f2f24eb2a33fcdd684"
+      },
+      {
+        "path": "sandcore/docs/M8-GAMES.md",
+        "size": 28354,
+        "sha256": "2c9d1a6d20720f5f67a5904bdd47b5e76c529bfbf6b8bf504240de035c46b2b6"
+      },
+      {
+        "path": "sandcore/docs/M8-IMPLEMENTATION.md",
+        "size": 10430,
+        "sha256": "fb6fdebcedc00a8909f5906f548c325bafd2a889901d16f28d39b04e20d474a3"
+      },
+      {
+        "path": "sandcore/docs/M8-PHASE2.md",
+        "size": 30258,
+        "sha256": "fc12bc1797b71c94335a12e2c03ed3b34aca118087c76de103059ddbd0630650"
+      },
+      {
+        "path": "sandcore/docs/M8-RETROSPECTIVE.md",
+        "size": 7026,
+        "sha256": "43963cef0492f58d1beb404b18bcda2328a0b05a56a604a46566ef607a8ca307"
+      },
+      {
+        "path": "sandcore/docs/M8.md",
+        "size": 14352,
+        "sha256": "a138f2278ea0b3d6a16debcfb5911bcc1079d91b889aee22da898dc5905a4e6d"
+      },
+      {
+        "path": "sandcore/docs/M8A-RELEASE.md",
+        "size": 4775,
+        "sha256": "7cb404ce94c491cecfb2a8a19e5ec7f06fc316c988c0f4f068483fd801c5303d"
+      },
+      {
+        "path": "sandcore/docs/MATH-FILM.md",
+        "size": 13747,
+        "sha256": "76568a36717ef9467e3820485131cf7439b0e086157f82704d2ec3e8e3cb31e0"
+      },
+      {
+        "path": "sandcore/docs/MEM.md",
+        "size": 9870,
+        "sha256": "3b511faa23194433dc3d27694c8fcf6b9c500a5a94fadf846a2b20ebc4b3fe21"
+      },
+      {
+        "path": "sandcore/docs/MODULE.md",
+        "size": 3756,
+        "sha256": "1199829ab715f7db6fdb91fa64f657d4efe8b71ae534afce1cd9f87a24247aa1"
+      },
+      {
+        "path": "sandcore/docs/MONITOR.md",
+        "size": 4485,
+        "sha256": "41adc07abaa781bc3ea0dde526fc7d863d0ff51779d0e9ff94ed8c731fe60d76"
+      },
+      {
+        "path": "sandcore/docs/NOTES.md",
+        "size": 3615,
+        "sha256": "4352e621727a703c8d103bc4e5813777f347d0d6ad9346c8e6d89336e374ed60"
+      },
+      {
+        "path": "sandcore/docs/PACKAGE.md",
+        "size": 17823,
+        "sha256": "20358fefcc74a2024b19d2671363377f38d67c1a16d6d3dff835fbfe0bebc23e"
+      },
+      {
+        "path": "sandcore/docs/PERFORMANCE.md",
+        "size": 45277,
+        "sha256": "8b768bcf4f8098c293640e308bd4df2770655346333536262765ab892b4175ac"
+      },
+      {
+        "path": "sandcore/docs/QEMU.md",
+        "size": 3962,
+        "sha256": "99e2cc07f67d7035faf2c5ea28904e9b484e2b68b241543bf7564339721f5dd4"
+      },
+      {
+        "path": "sandcore/docs/ROADMAP.md",
+        "size": 50372,
+        "sha256": "76659387e3bbe40f65dc350064a981cdc378db9950bcdd115756e9e049dbd261"
+      },
+      {
+        "path": "sandcore/docs/SCENE.md",
+        "size": 18882,
+        "sha256": "90f194dbfb93dafffc9e82d9c6a2e990dcf18d9345b52e1d6be6bade4d9a289c"
+      },
+      {
+        "path": "sandcore/docs/SCMEM.md",
+        "size": 3411,
+        "sha256": "8057a43d01118fa6a2fe91d2f65758df69865163a98625f6fdca8aed9d29955f"
+      },
+      {
+        "path": "sandcore/docs/SCVOX.md",
+        "size": 7767,
+        "sha256": "86667dbde756aad6ac35128c83ad7906255bd476c6306f2cf4808614e8b46fc5"
+      },
+      {
+        "path": "sandcore/docs/SCWIDE.md",
+        "size": 5512,
+        "sha256": "77709fe30bc069b4709a2cf46b0892a762318467dfb36e0687f7d8a95d012c71"
+      },
+      {
+        "path": "sandcore/docs/SHELL.md",
+        "size": 4876,
+        "sha256": "b8c8f77cd06eae2b1432f6cc635cf39c6a2346acdb366c7db6078a0a262e316f"
+      },
+      {
+        "path": "sandcore/docs/STORAGE.md",
+        "size": 2358,
+        "sha256": "1792c03ee747bb0d84e91fc6210ceb13372fcb0c855ed87f5d5efe4732761f25"
+      },
+      {
+        "path": "sandcore/docs/STUDIO.md",
+        "size": 11270,
+        "sha256": "adcd4a531f52f871aea34670dc7bed552d986d3a26b9b10538ca389b4de70ed9"
+      },
+      {
+        "path": "sandcore/docs/SYSCALL.md",
+        "size": 26429,
+        "sha256": "e277c51c6df7ce98e41c9ed00cfc14f742b6ca594f62f7954b401a4b90d411d0"
+      },
+      {
+        "path": "sandcore/docs/TESTING.md",
+        "size": 60466,
+        "sha256": "7882f7198bbe748baf8c3f28e75570dd65a76779b307b8713d7fa589eae2c7a1"
+      },
+      {
+        "path": "sandcore/docs/THEME.md",
+        "size": 4813,
+        "sha256": "8f23cbf6a3db412bcd3ae9f5dbda621de36f7fddaf39f75d6f16f336aeb0f722"
+      },
+      {
+        "path": "sandcore/docs/USERSPACE.md",
+        "size": 8323,
+        "sha256": "cfc792b22ecf46682c907016f282bc68bfb750077865729d471ebbfef9b0097e"
+      },
+      {
+        "path": "sandcore/docs/WELCOME.md",
+        "size": 6049,
+        "sha256": "a8c81af7c6f69b0a515c942d9ce70ef765cf9121434668cc235af7415c49bf32"
+      },
+      {
+        "path": "sandcore/docs/WM.md",
+        "size": 16779,
+        "sha256": "b77d2b50d6a3d866b47b7865098da87798a774cfef8860eaf4a3e171e10161fc"
+      },
+      {
+        "path": "sandcore/kernel/ata.c",
+        "size": 4524,
+        "sha256": "86d4e7b7f9c300f2623d713aa543a2434442cdd38d85eb5b801121c8a95f9c92"
+      },
+      {
+        "path": "sandcore/kernel/ata.h",
+        "size": 847,
+        "sha256": "e981985364174b3084a7c715f8f779890a6057809b92f7d427a88af8932bc9e2"
+      },
+      {
+        "path": "sandcore/kernel/boot_scene.c",
+        "size": 3792,
+        "sha256": "736fdc6c53974cae7e45ccd8c4b2dcf7f14086ff899e7706fe3c107e2240d263"
+      },
+      {
+        "path": "sandcore/kernel/boot_scene.h",
+        "size": 375,
+        "sha256": "a2cc077569aee10daf11614be3cc531b8d89b475116089090409d1c2b2fa45b4"
+      },
+      {
+        "path": "sandcore/kernel/desktop.c",
+        "size": 15909,
+        "sha256": "1689c063b8e0286af7f42844f1e7897a9dd1a8f69276474cd71b09c0a28eb4d4"
+      },
+      {
+        "path": "sandcore/kernel/desktop.h",
+        "size": 1049,
+        "sha256": "7470b3821db712f2095937c308c9afa8fb813f10601b567217c58b61db6d60aa"
+      },
+      {
+        "path": "sandcore/kernel/display.c",
+        "size": 10667,
+        "sha256": "3915557c9d81d94b664178fbfa5c3ef8cfbbee9258c1fbfcb2060c89d7637cd3"
+      },
+      {
+        "path": "sandcore/kernel/display.h",
+        "size": 1574,
+        "sha256": "009d792b3d902bcef204d29e82acb1ba57c58a8f6627239ba68573d673d7caf8"
+      },
+      {
+        "path": "sandcore/kernel/entry.asm",
+        "size": 1819,
+        "sha256": "6f10951e7dec231e8b06457f914d40e49ba83a4de2c5ea07b83ea96f249ab74e"
+      },
+      {
+        "path": "sandcore/kernel/font.h",
+        "size": 688,
+        "sha256": "7f27867745b269635f289987011079b6430b593a6b66a0c63cf77e34e28db992"
+      },
+      {
+        "path": "sandcore/kernel/font16.h",
+        "size": 2062,
+        "sha256": "b0c7d247ab5ea333380c360dd341cadc39de1ae40e090988241c42c7f6beec0b"
+      },
+      {
+        "path": "sandcore/kernel/font16.txt",
+        "size": 12851,
+        "sha256": "8f286f8ac7e9c1d714a2dec6613bb9416660a7232fc8d78ffa8024b3c23e782b"
+      },
+      {
+        "path": "sandcore/kernel/fs.c",
+        "size": 14717,
+        "sha256": "1f13084d40c5514a140eb1a71d2e153fc7c214477fac1387e82608e91d6299ca"
+      },
+      {
+        "path": "sandcore/kernel/fs.h",
+        "size": 2459,
+        "sha256": "8ad87bd1dca1fa9f6dfd6d6a7e8fb10026d3fb65e7a0de8ddf9293590337f88a"
+      },
+      {
+        "path": "sandcore/kernel/gfx.c",
+        "size": 18305,
+        "sha256": "b8f7add5da6d959e8bf30b17aaeda10e7f04f17082c5ff59b12b532bab0d784e"
+      },
+      {
+        "path": "sandcore/kernel/gfx.h",
+        "size": 5119,
+        "sha256": "70cd8c1be1a045f6d2ed89d4e88a09dce5a9863b808ac06a3227561858a5dc47"
+      },
+      {
+        "path": "sandcore/kernel/heap.c",
+        "size": 3792,
+        "sha256": "e131cc1eeab70a3a93cb1d1139af1095800a386e457b9f199bb4002a6341cbbc"
+      },
+      {
+        "path": "sandcore/kernel/heap.h",
+        "size": 527,
+        "sha256": "cbcb131bc4223c8bf65a0a5873f0e3176e96961438084b9d5b224f0ed9c6806d"
+      },
+      {
+        "path": "sandcore/kernel/idt.asm",
+        "size": 6890,
+        "sha256": "b87db019adba34c6971edfd395acbd4cac3c46df6e8754a3bf2fe532fb2ac20c"
+      },
+      {
+        "path": "sandcore/kernel/image.c",
+        "size": 4059,
+        "sha256": "5c6a431b2923e1ce1b7768df80af35d8512efd89f0cfa93c744a63a02c75d46f"
+      },
+      {
+        "path": "sandcore/kernel/image.h",
+        "size": 1044,
+        "sha256": "9dd14415701e9c62bff0c977fe1fcc9be810ff31cacfcc4223526a15047165cc"
+      },
+      {
+        "path": "sandcore/kernel/image_service.c",
+        "size": 9887,
+        "sha256": "ba72eec68fcf095da9386f97a9aa8a36fa263defd0520d5a618cb958dc3c8d42"
+      },
+      {
+        "path": "sandcore/kernel/image_service.h",
+        "size": 1301,
+        "sha256": "62d07c9684677366942a6e9f45691ecdd8a6196afd608901d3e838d9862a15e7"
+      },
+      {
+        "path": "sandcore/kernel/interrupts.c",
+        "size": 5550,
+        "sha256": "dac41322b552734a013fa6bc9e02e8a97fdb96bcae37670f9c600e5df6286176"
+      },
+      {
+        "path": "sandcore/kernel/interrupts.h",
+        "size": 487,
+        "sha256": "7d8e7cc86d14ee5406f0d8e6f619baf081ef6bf113fdcb3b0d334fa07811650e"
+      },
+      {
+        "path": "sandcore/kernel/io.h",
+        "size": 2393,
+        "sha256": "b475c80afa24a3dc900b048c3d2c71c5fa893978e041081954a23093d59610da"
+      },
+      {
+        "path": "sandcore/kernel/keyboard.c",
+        "size": 6795,
+        "sha256": "07bd23dfbf79391d54ab98ba1b5962fa0e2c950ab8349417e657464a67fd4a60"
+      },
+      {
+        "path": "sandcore/kernel/keyboard.h",
+        "size": 690,
+        "sha256": "7babed758a3b57c59a74ac4d1fb749a29878b49587ff59007015a8366fd19bee"
+      },
+      {
+        "path": "sandcore/kernel/main.c",
+        "size": 11841,
+        "sha256": "b857256903db896a0bf6fb74d5456025afed7e5430a8c0054e83ced5b7f0762d"
+      },
+      {
+        "path": "sandcore/kernel/memory.c",
+        "size": 5245,
+        "sha256": "db28e89d38b4821c352d669ea0ae4b810f4cfc31816e39015f7517c4ef71c953"
+      },
+      {
+        "path": "sandcore/kernel/memory.h",
+        "size": 1466,
+        "sha256": "ae27d28088555dadc70f834a39de528882787071ff9d098edd8106b695c56752"
+      },
+      {
+        "path": "sandcore/kernel/module.c",
+        "size": 3425,
+        "sha256": "24090549126235700ec02b40bb8af02ecc112003139489ff8f82140d78c72676"
+      },
+      {
+        "path": "sandcore/kernel/module.h",
+        "size": 1187,
+        "sha256": "f1a172a35e56354075d8d730da853ab3a549eb27e7a3dd963f3def8f6b8803b2"
+      },
+      {
+        "path": "sandcore/kernel/mouse.c",
+        "size": 6173,
+        "sha256": "75e15ff2c271292c96031fe5c3aecf0d5accfb0137ee368f837cc7db7a577b8f"
+      },
+      {
+        "path": "sandcore/kernel/mouse.h",
+        "size": 823,
+        "sha256": "57465446b18744ae45460f235527f8da22dc48898a69cb22eebc595ffd68fd7b"
+      },
+      {
+        "path": "sandcore/kernel/paging.c",
+        "size": 10234,
+        "sha256": "bac3a91bb45f3735956c9ec8c1b541e09bab2f82da4553deeeee0b6b89a7e0c8"
+      },
+      {
+        "path": "sandcore/kernel/paging.h",
+        "size": 2355,
+        "sha256": "b6387469ae24d395a6dcff4a2546cb421580482a10e57db4ba4186b12fbd2652"
+      },
+      {
+        "path": "sandcore/kernel/palette.h",
+        "size": 2008,
+        "sha256": "df3d1f60aeaf55eecdee525cef09fe32d1d6e7ca08fbf9d07b8739764ef0b046"
+      },
+      {
+        "path": "sandcore/kernel/process.c",
+        "size": 8089,
+        "sha256": "859075683bee96175c986d62b2d1ee14f9ac386274780b70d3b7dc0fcd8fab91"
+      },
+      {
+        "path": "sandcore/kernel/process.h",
+        "size": 1469,
+        "sha256": "ab2821929ff03dd44e7b41f95c9c79209c9689242dcd070c50ae7acc5addd4a5"
+      },
+      {
+        "path": "sandcore/kernel/task.c",
+        "size": 35854,
+        "sha256": "edee9153d34fd7ffd623b637deee3069e332ffae1ed4ff02ccfd0bb8be70974b"
+      },
+      {
+        "path": "sandcore/kernel/task.h",
+        "size": 4880,
+        "sha256": "b2960034200bdb35c4b34b09843a66560f51355be4e7bfd7d728ff1d9db5fcad"
+      },
+      {
+        "path": "sandcore/kernel/term.c",
+        "size": 3179,
+        "sha256": "4c2ac5fb29f6667b3bff5e13723a3d154dc2f7393a453fe7b65b2c560cd237c3"
+      },
+      {
+        "path": "sandcore/kernel/term.h",
+        "size": 993,
+        "sha256": "328994c97d64c489b7ce9196e48c0fe9aff2bc9c219666adb3842cf18d2f6d17"
+      },
+      {
+        "path": "sandcore/kernel/theme.c",
+        "size": 7589,
+        "sha256": "c1a41465a59e66fd8e85a6545c1cbf1db97d7980329839dd0dd33de0b8275f14"
+      },
+      {
+        "path": "sandcore/kernel/theme.h",
+        "size": 1249,
+        "sha256": "d89753800a91e804be85748caa4347bb857d1f6b66d972dae4ea568c08c1b9b4"
+      },
+      {
+        "path": "sandcore/kernel/timer.c",
+        "size": 1246,
+        "sha256": "9f3e61e8e6d1812cd8b101f474dae99aec499121fe80ebf280e9a8c6fbe26418"
+      },
+      {
+        "path": "sandcore/kernel/timer.h",
+        "size": 505,
+        "sha256": "a20e919031046058a51fe1a28fb5b7efdd87d9027a7b94bc32a6f9bbbee88ccf"
+      },
+      {
+        "path": "sandcore/kernel/userspace.c",
+        "size": 13164,
+        "sha256": "9c27d982f22a3edb4429e471111d903bc6c612cfb087605bf1dc1680bd996c58"
+      },
+      {
+        "path": "sandcore/kernel/userspace.h",
+        "size": 1914,
+        "sha256": "68c399a99589b9095f9891e7dfc024c99edadc2f50befc2d27fa8e2165337340"
+      },
+      {
+        "path": "sandcore/kernel/wm.c",
+        "size": 45213,
+        "sha256": "ef0fad93f8b417db836590b76998af1d44d1377b8a9573db4e51a3424f98753d"
+      },
+      {
+        "path": "sandcore/kernel/wm.h",
+        "size": 4703,
+        "sha256": "5805b4c27742610af4c381a889d501f3240181290f38e201b92ff2df22926e7b"
+      },
+      {
+        "path": "sandcore/kernel/wm_native.inc",
+        "size": 32528,
+        "sha256": "d3a1d5ce05817cb5a39b2d58a8d0578fe698a8b5bc72b70b29822482960a502f"
+      },
+      {
+        "path": "sandcore/kernel/wm_terminal.inc",
+        "size": 9334,
+        "sha256": "07510797b189e04b37855e3c7b6a6dad7664f18f5c939410355f6782ef7ca7cb"
+      },
+      {
+        "path": "sandcore/legacy/M7/build/fs/apps/calc.scx",
+        "size": 2573,
+        "sha256": "246216136ec137500fdef962791488d912a11959cc21cf867c338d73aec37e84"
+      },
+      {
+        "path": "sandcore/legacy/M7/build/fs/apps/debugger.scx",
+        "size": 30122,
+        "sha256": "8fb1e50a074a438cb6043bcf91e443fcba7aa2a85d806e8a49c0f002a75499d5"
+      },
+      {
+        "path": "sandcore/legacy/M7/build/fs/apps/debugger.scx.map",
+        "size": 3542,
+        "sha256": "bbc18df3d3e3ad6420998fbdffce6617116f5d3455d05fc1d90edaf88783c043"
+      },
+      {
+        "path": "sandcore/legacy/M7/build/fs/apps/files.scx",
+        "size": 23249,
+        "sha256": "da94fbcea50b634f0f364d004cf73b9787a80734a462514dd01b4281d67a0a35"
+      },
+      {
+        "path": "sandcore/legacy/M7/build/fs/apps/files.scx.map",
+        "size": 3270,
+        "sha256": "5875e184293c3ce8232c00d9cd1d2c6f9639b0b0a88ae7195609b60a1adf0067"
+      },
+      {
+        "path": "sandcore/legacy/M7/build/fs/apps/hello.scx",
+        "size": 288,
+        "sha256": "07d8ef24167c8c494929696191ee798f113304d702bc3a1ae6d73487d975cd41"
+      },
+      {
+        "path": "sandcore/legacy/M7/build/fs/apps/ide.scx",
+        "size": 28700,
+        "sha256": "81784a43003707a76827917ebebf58e6fa1207ce089c52aba664ad1f15e51dc7"
+      },
+      {
+        "path": "sandcore/legacy/M7/build/fs/apps/ide.scx.map",
+        "size": 3803,
+        "sha256": "e85ce9939664cba895915ba5ee584e8d0990fdaebf4ced98fe6e09ac74cf6af4"
+      },
+      {
+        "path": "sandcore/legacy/M7/build/fs/apps/lumen.scx",
+        "size": 30555,
+        "sha256": "2ad27c18413596d7f9ea37f40a2f9a5f3488407050ec4a7e94fc50f185513124"
+      },
+      {
+        "path": "sandcore/legacy/M7/build/fs/apps/lumen.scx.map",
+        "size": 3623,
+        "sha256": "3489692fc1fb4fad17b3f2411445dffb1d02a0e683888562dcc277f1c463c473"
+      },
+      {
+        "path": "sandcore/legacy/M7/build/fs/apps/mines.scx",
+        "size": 3440,
+        "sha256": "191bb63bbaf9055b4131dc47483e8953c5bd143a3d8f129e16ad13072fca5007"
+      },
+      {
+        "path": "sandcore/legacy/M7/build/fs/apps/note.scx",
+        "size": 2349,
+        "sha256": "ac44974dd85de818bb216e7f39adc73abc57909c932556687f33eaab160fcc90"
+      },
+      {
+        "path": "sandcore/legacy/M7/build/fs/apps/palette.scx",
+        "size": 941,
+        "sha256": "481c3c34f04b0a93fa045c70edf72b2d70ca81da623e973070c5f7c9c51adb4a"
+      },
+      {
+        "path": "sandcore/legacy/M7/build/fs/apps/panic.scx",
+        "size": 47,
+        "sha256": "1e6fe5e2b6337d1a6f253c819833b64d1bb6a50f28d7881f1d4e63e6c1d950a7"
+      },
+      {
+        "path": "sandcore/legacy/M7/build/fs/apps/probe.scx",
+        "size": 13374,
+        "sha256": "483e0a3d0b8cf273d59d13a1e6be05bb20a1f71de195151e244f81a66d53f1ac"
+      },
+      {
+        "path": "sandcore/legacy/M7/build/fs/apps/probe.scx.map",
+        "size": 1800,
+        "sha256": "6ced25b7e8b56666031546758c633849e4e5d4c22e4ade8bf42838541558e080"
+      },
+      {
+        "path": "sandcore/legacy/M7/build/fs/apps/race.scx",
+        "size": 20938,
+        "sha256": "035bde7ba765fcf020a186b5bfdc2403a40802b74daa332043bf6f9790177ad8"
+      },
+      {
+        "path": "sandcore/legacy/M7/build/fs/apps/race.scx.map",
+        "size": 3032,
+        "sha256": "d68b68e7690ad7de88e18410200d0ccb5f98243ed0cbfd682ff666d2b6fd133c"
+      },
+      {
+        "path": "sandcore/legacy/M7/build/fs/apps/world.scx",
+        "size": 27471,
+        "sha256": "d72d25d429c8e54775588bf9208604c56a8645b8a6dbe5fbefe37413d2450ff8"
+      },
+      {
+        "path": "sandcore/legacy/M7/build/fs/apps/world.scx.map",
+        "size": 3473,
+        "sha256": "c7c25d288243475ef39c6d58e2de798f37203146c3f74f77fa58fcdf3148d4f3"
+      },
+      {
+        "path": "sandcore/legacy/M7/build/fs/bin/asm.scx",
+        "size": 7706,
+        "sha256": "6b50de628f191490ae4a81bf464a88b3af29a6fd67fd3f3e162b1028fa4a4071"
+      },
+      {
+        "path": "sandcore/legacy/M7/build/fs/bin/s3c.scx",
+        "size": 130408,
+        "sha256": "c182fc6746520d213e3ea5f2789826afe7931ffae2264f9c5d595f1a12ad8494"
+      },
+      {
+        "path": "sandcore/legacy/M7/build/fs/bin/s3c.scx.map",
+        "size": 8459,
+        "sha256": "16cd542cac65f4c7db86329769f35e86d65363f037bcd078c8c1a31677e31110"
+      },
+      {
+        "path": "sandcore/legacy/M7/build/fs/bin/shell.scx",
+        "size": 5178,
+        "sha256": "21e8744596ef609ef1179f1b06fb0dc0043e1588f7020aaaacc48e4326e1d1fc"
+      },
+      {
+        "path": "sandcore/legacy/M7/provenance.json",
+        "size": 2665,
+        "sha256": "d79b18ed9a6285ababe2b982e0c33aa50a055331dd8cb31420ffe71896f5d56f"
+      },
+      {
+        "path": "sandcore/legacy/M7/user/api.h",
+        "size": 210,
+        "sha256": "c66b373b9cc856882d9d3225366aaedd3fa2fd27ad4217b52ea70fbc3c73b0de"
+      },
+      {
+        "path": "sandcore/legacy/M7/user/assembler.c",
+        "size": 11970,
+        "sha256": "fd56513470c5272fd3b4a6b05e0cb9e69b1c0ff12bd669d7c7df6ef03dcb02cd"
+      },
+      {
+        "path": "sandcore/legacy/M7/user/calc.c",
+        "size": 3734,
+        "sha256": "ea614483b60e34a9588e5d1d24c3a34a1976e4bc908d2c2cb413b3d4e1df1d01"
+      },
+      {
+        "path": "sandcore/legacy/M7/user/debugger.c",
+        "size": 10901,
+        "sha256": "11c183b49040bd7a00a74924c79d2385168f1abbe11d6c1a3557a15d29c1b716"
+      },
+      {
+        "path": "sandcore/legacy/M7/user/files.c",
+        "size": 6652,
+        "sha256": "148969719b22fa2f017364a511c28fd636bdfcea8ea8ee92c66d08a4dc7b0bcd"
+      },
+      {
+        "path": "sandcore/legacy/M7/user/hello.asm",
+        "size": 1411,
+        "sha256": "7c56f8ea32f93e3fb7a25621e451cea1cfa2af3e3cfcea6cb98140775b675268"
+      },
+      {
+        "path": "sandcore/legacy/M7/user/ide.c",
+        "size": 10650,
+        "sha256": "f802c4272dcad3a67e22ec81e239c604d602266da139712a458da61a32ee8eb1"
+      },
+      {
+        "path": "sandcore/legacy/M7/user/linker.ld",
+        "size": 868,
+        "sha256": "f559a3fc2ee06410e0ba3d8aae340e2bcaff3f1116acf371f7961d9940cbabef"
+      },
+      {
+        "path": "sandcore/legacy/M7/user/lumen.c",
+        "size": 11671,
+        "sha256": "416d6e0a8f7ab51029e1f1f7497b315492ddd1391d01c78ee53831726a42b0ec"
+      },
+      {
+        "path": "sandcore/legacy/M7/user/mines.c",
+        "size": 6124,
+        "sha256": "db5773e9ef7c2289b2dcbab88593cfd5f07f477b9d54af3dada1e974b0a924c0"
+      },
+      {
+        "path": "sandcore/legacy/M7/user/note.c",
+        "size": 3748,
+        "sha256": "d7eb0a5caf6c21bf809ee89f403cb86b64e340725aeefbebf3a88fd900e1f42f"
+      },
+      {
+        "path": "sandcore/legacy/M7/user/palette.c",
+        "size": 1560,
+        "sha256": "1553404fcacab064cb8ff93115bf2b690d4c99f1e579ead1dad58af072241e7a"
+      },
+      {
+        "path": "sandcore/legacy/M7/user/panic.asm",
+        "size": 174,
+        "sha256": "c7fa162fa264dab6a26f68d3f9696e60a5358de56087811d3b65d1a521a44d0a"
+      },
+      {
+        "path": "sandcore/legacy/M7/user/probe.c",
+        "size": 6878,
+        "sha256": "3891924310a617d19b5f648e00949704094e289d23bcc5ce7d19b4da0cdaea2c"
+      },
+      {
+        "path": "sandcore/legacy/M7/user/race.c",
+        "size": 4439,
+        "sha256": "578ff53251653fc9ebde9f18a137d753273c4eee4442c0005302a35415a76b4b"
+      },
+      {
+        "path": "sandcore/legacy/M7/user/s3c.c",
+        "size": 8794,
+        "sha256": "c5d365c5ac3221775e83a07c9774f83b84b5e25b024690c6dfb6daaf3dbf47b8"
+      },
+      {
+        "path": "sandcore/legacy/M7/user/s3c_emit.inc",
+        "size": 33904,
+        "sha256": "4fd61f320a9722b279debe6e869119d3e330e2366cc34ef8d7aeb5754b541194"
+      },
+      {
+        "path": "sandcore/legacy/M7/user/s3c_lex.inc",
+        "size": 6622,
+        "sha256": "daac00f4c34383cbb47ec2dfce8fa3e959ef2813c66f647284ab2ab4b75becfc"
+      },
+      {
+        "path": "sandcore/legacy/M7/user/s3c_parse.inc",
+        "size": 33904,
+        "sha256": "951fadb75100a97b80e23cf48a14e08a0a032ce5e1f390f53391532981c1a794"
+      },
+      {
+        "path": "sandcore/legacy/M7/user/s3c_pp.inc",
+        "size": 22124,
+        "sha256": "3acad50c6016615c09d391d4892a927a76572b18859a957f12856a770972c754"
+      },
+      {
+        "path": "sandcore/legacy/M7/user/SCAPI.H",
+        "size": 13238,
+        "sha256": "68691d9be1bdb179ed0a1f69b92897c9e60cb11a0da0ed9ae18fef978128df3b"
+      },
+      {
+        "path": "sandcore/legacy/M7/user/shell.asm",
+        "size": 4271,
+        "sha256": "594250b7d662446bfc47148a8567d0ff1638dea4696647a30e5ab5835739f7a4"
+      },
+      {
+        "path": "sandcore/legacy/M7/user/start.asm",
+        "size": 1235,
+        "sha256": "9d496e17db4902ad1e73b8b370b89b6b32a62731e350c3e4d59c5074acb30ef1"
+      },
+      {
+        "path": "sandcore/legacy/M7/user/UI.inc",
+        "size": 9027,
+        "sha256": "bd6ff8599c7ef2405b0f65b485a5447a89b65b194c8f59a63679817ca1c935fc"
+      },
+      {
+        "path": "sandcore/legacy/M7/user/world.c",
+        "size": 9201,
+        "sha256": "94d8109415ced1f6c6ed458a3c83175fbedb2176bdc0b5f02460978b1a9ef7af"
+      },
+      {
+        "path": "sandcore/linker.ld",
+        "size": 2508,
+        "sha256": "5aba8e81f4717e5864e7204a53514be49b71089bc412decf9b0a5f97f7e31bb0"
+      },
+      {
+        "path": "sandcore/Makefile",
+        "size": 20684,
+        "sha256": "3b04626df441385be5199bb8ebc76184a113c8a408644db33c110527d9d9b62b"
+      },
+      {
+        "path": "sandcore/modules/core.c",
+        "size": 1827,
+        "sha256": "078879c38e75ba1655fc899a803c46d6c7a763dcd05c88cd9d245f1f41203190"
+      },
+      {
+        "path": "sandcore/modules/linker.ld",
+        "size": 470,
+        "sha256": "0885ca18ad7d0fd78620f0d17843b8b26d2a041e8a6819f398ebd179e1cc2b35"
+      },
+      {
+        "path": "sandcore/README.md",
+        "size": 46474,
+        "sha256": "f6c038ecb6c42867b2736d4765a1325ab27e0438798164685090eb3d4fae9176"
+      },
+      {
+        "path": "sandcore/run.bat",
+        "size": 2294,
+        "sha256": "2f716821fde229e09b9e98cb3b8ec897dbed76b552205f0991340b2ed0430fd7"
+      },
+      {
+        "path": "sandcore/run.sh",
+        "size": 359,
+        "sha256": "c52d9aa4cdbb8481f0c8910066b7bd2b42125747a1be4da5dced077b13f52144"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/AUTHORS",
+        "size": 3279,
+        "sha256": "f251be89fd442bd9d701360730aea163cc8e2076ff03528f59267dc2c4f8b60a"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/COPYING",
+        "size": 1496,
+        "sha256": "5aec868f669e384a22372a4e8a1a6cd7d44c64cd451f960ca69cc170d1e13acf"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/PATENTS",
+        "size": 1436,
+        "sha256": "cc3273e0694ea5896145e0677699b53471b03ea43021ddc50e7923fbb9f5023c"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/README.md",
+        "size": 1730,
+        "sha256": "600430fa713bb1407c191007a5dd32d3ddd0090320fa1bc21a5c3c3fb5d15852"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dec/alpha_dec.c",
+        "size": 11177,
+        "sha256": "77f714e1f848535732d1af5bc01cf2fb1afd5a1ba399b73a60d50db1191f0430"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dec/alphai_dec.h",
+        "size": 2714,
+        "sha256": "51fba1bf7f3e5a5edd1c1a3673e343d9fc82529cf9a2734270a0a9b534661e5b"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dec/buffer_dec.c",
+        "size": 10940,
+        "sha256": "d11a6b3d3d7c8e4d6107952b7eaade8886f3f880d03d1d9944c17172fd5bca32"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dec/common_dec.h",
+        "size": 1817,
+        "sha256": "acc14deb480eed8978959fbf818a50d3f4b352acdcc845e80217146eb2b4f922"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dec/frame_dec.c",
+        "size": 29342,
+        "sha256": "4983cb00d549560b02e585e7210dcc3c0772139860919cbbbdb5492d7e22b051"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dec/idec_dec.c",
+        "size": 33449,
+        "sha256": "0ed1eef7e57459bb86769db2fe094220aec7b253d2d372570315077c84a379ba"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dec/io_dec.c",
+        "size": 25115,
+        "sha256": "bdd00f6788b410cd10abd1b0332e2137add75c7362c47fd6a59bb0b2663fb65a"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dec/Makefile.am",
+        "size": 1026,
+        "sha256": "07b6e9d84e080a1f95bac4e357d241d60ebacddbf5792330df9a11a74495106d"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dec/quant_dec.c",
+        "size": 4417,
+        "sha256": "4a5bab8cfb301ac3aa924ae89f014c47dbcdc3d8d3f020bbc2d25f643f434cb3"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dec/tree_dec.c",
+        "size": 23341,
+        "sha256": "c567d2a455f43048a81d1bed411f246ff8eca9a352a27bd669a408b9da4b7009"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dec/vp8_dec.c",
+        "size": 23483,
+        "sha256": "eacde647704c8945473c028857a80f4e2fd62d9d65b9167b4ce7d7a2e43f6afb"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dec/vp8_dec.h",
+        "size": 7285,
+        "sha256": "ca25a6eb4e65e2fe7f99adada0e45d0ddd49fca4deac56c56276116ea2a2f8ee"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dec/vp8i_dec.h",
+        "size": 11714,
+        "sha256": "6e3148a7420790181a15dae5c2093d6faa8cb4ece1d1739073060181a4c32982"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dec/vp8l_dec.c",
+        "size": 78975,
+        "sha256": "b1130107710335ea49233a25c14eaf4079440a139b6e0534489f49b71a2ff5cf"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dec/vp8li_dec.h",
+        "size": 6324,
+        "sha256": "db86d367cda469062606a204dc8a74b9515410d9cb0cc051f07c782a5c974786"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dec/webp_dec.c",
+        "size": 34972,
+        "sha256": "7abeaa414c9c2d61eac158e9ee899b4ea80b456c69fa545ed0416a934b7ff123"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dec/webpi_dec.h",
+        "size": 6625,
+        "sha256": "53d2f275f12ab5fe85e5a472ad130e3f64d77351d55b017e255eb41adaca5e3c"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/demux/anim_decode.c",
+        "size": 17592,
+        "sha256": "1ea86a92440a566dedb5b02d9a43f3fec050388ca2a1830e1d8b10cfd1135ed2"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/demux/demux.c",
+        "size": 32320,
+        "sha256": "101bc6ed662fc362ef6463a3f1c91ae9cc07eef8c4672ded4204fa8dd252f957"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/demux/libwebpdemux.pc.in",
+        "size": 307,
+        "sha256": "496b5640c21c89043aed03dfd0aaac4ae8cd1b1ad0a537fda644d218a1cd5004"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/demux/libwebpdemux.rc",
+        "size": 1037,
+        "sha256": "8cb523389f35d5c8b69a42df9803f8f17b0baa5c2218fbbd9c3ece49073a745c"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/demux/Makefile.am",
+        "size": 623,
+        "sha256": "7565e3cdf141a7c037b64be6818218eff17067248ab50c3125ea0708b344bce4"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dsp/alpha_processing.c",
+        "size": 19619,
+        "sha256": "f217f1bbeca6ca488911f70d0cabaaa35245a1a382e7deae58d40013df31e2c2"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dsp/alpha_processing_mips_dsp_r2.c",
+        "size": 10466,
+        "sha256": "125fa567f64c7c3bf7f3d616a273a8647f94596172449ce1bb0b80f0d35d37aa"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dsp/alpha_processing_neon.c",
+        "size": 7175,
+        "sha256": "61d412fdb438570f86f0dbe16365bc507ebb4038468f91941bb7581acca342da"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dsp/alpha_processing_sse2.c",
+        "size": 17689,
+        "sha256": "f6228567ed8887fc4aef81f66f4683465c92a6d84ac0d3cddc3922215745a2b1"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dsp/alpha_processing_sse41.c",
+        "size": 3676,
+        "sha256": "5eb6d2271144568f44351d0eeddd278bfb800b92e66e5f5df5dbd7fad674a0ad"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dsp/common_sse2.h",
+        "size": 8040,
+        "sha256": "1c299ca6a84bf59d9e0bf0c2edad93f231c0a9a35bc2f75f0789df78b65231b2"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dsp/common_sse41.h",
+        "size": 4785,
+        "sha256": "9ed13beffbef3492db0b74b93cc6d211813600f25c6eccb1bc8ce2afaadda56f"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dsp/cost.c",
+        "size": 18640,
+        "sha256": "35fc608721fcd79e091ee86e6e88fa08c600bf65ea1523aca017c59c916223fc"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dsp/cost_mips32.c",
+        "size": 7178,
+        "sha256": "b79268399296668e9561b0db508be9957ffa625c872a469f1066274c04f80bb4"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dsp/cost_mips_dsp_r2.c",
+        "size": 4926,
+        "sha256": "9c42c50c3c845056dd08f298a4d7a786cb05162024d4f47cde1b374a6695bea7"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dsp/cost_neon.c",
+        "size": 4340,
+        "sha256": "4a5caa785f9718d6a0dc7c358bcdb849229b7bfbc7cdad7ec742bc63ecdd25d5"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dsp/cost_sse2.c",
+        "size": 4578,
+        "sha256": "747156a8bd60c5f257d53aad6a2548aaf59d9d2d043b2a4ca103b51d72a7d9fe"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dsp/cpu.c",
+        "size": 8126,
+        "sha256": "5bd740d27c2128bb6b2297875563340826be7df12ceabadce62df6ca4ff4b938"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dsp/cpu.h",
+        "size": 10747,
+        "sha256": "18e4e0d8ed649e002faece27eabd2bd63755d92ea53c7498d1254fad324b7d5c"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dsp/dec.c",
+        "size": 27647,
+        "sha256": "195cf085af9e65430fa08f324a58ac5c5b7e9dded236a907d24718759f34f802"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dsp/dec_clip_tables.c",
+        "size": 22982,
+        "sha256": "dd37987c87727467468f8163fe6b21a5ebe9844fa5bf5ba60aa3796d6cfe5e48"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dsp/dec_mips32.c",
+        "size": 26886,
+        "sha256": "190ef56bee40a821f25d502909a4ce05ab06bceafab46b116a504a66b65f65e7"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dsp/dec_mips_dsp_r2.c",
+        "size": 51175,
+        "sha256": "c358f10f6c767433b08c929eb638b90fb93336ef08ece46436080c7fef5b201f"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dsp/dec_msa.c",
+        "size": 41808,
+        "sha256": "e1555dd60c1b532cf5f7668e2bda30f471ae07135f177b0ebff3472c832fcfbd"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dsp/dec_neon.c",
+        "size": 70161,
+        "sha256": "d1d9d0d8f5824b1ec27b89ca2daf7ea473e524bbcfb7d4eecc6affe901062382"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dsp/dec_sse2.c",
+        "size": 46999,
+        "sha256": "a977c9c239fc427fb069a38ff9d2303073831490ca912aaf310e31cad3ec4a57"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dsp/dec_sse41.c",
+        "size": 1417,
+        "sha256": "e487e65296cf39271f1ed4228bda4ab03cd555ecc7a1ce8e16436aeee3ab1fc9"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dsp/dsp.h",
+        "size": 24459,
+        "sha256": "1076f659f0f6b029894034058a0b2c943ccc69c3f63078c92a8d4408eac85b05"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dsp/enc.c",
+        "size": 26466,
+        "sha256": "9b28b6cf5a5f0fa41c012ce2826f5328a3cd87c6cee6ee2e463c8442f25e7dbf"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dsp/enc_mips32.c",
+        "size": 36203,
+        "sha256": "d9fda10ba18a4331a421d5bcd9c6397d0f6f0805b08f0d6791e9eab00f38ca8a"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dsp/enc_mips_dsp_r2.c",
+        "size": 84192,
+        "sha256": "10be26b44fc8067bfb36487f6d119ba91562db947438cfb99d5fc72c86d57da1"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dsp/enc_msa.c",
+        "size": 34601,
+        "sha256": "abaffe2ed9da36d14cad1cc9b6ffca611cb16f0c59e155a43f434385d3d93c67"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dsp/enc_neon.c",
+        "size": 48048,
+        "sha256": "c8bcd91b5b4bebd7f516e8ca293de767929ab36d18db53c24c61c5e724608421"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dsp/enc_sse2.c",
+        "size": 61959,
+        "sha256": "9e2aa448890d879f4f808b25798527c31fbf4d534904fa084f1b80617e8ca315"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dsp/enc_sse41.c",
+        "size": 13513,
+        "sha256": "bead4fd6cfaa166987b3c1ec1f87945a566477252674976e99db34e69bae7561"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dsp/filters.c",
+        "size": 8495,
+        "sha256": "e43a739998024bdf84784cd62ca79a317c9136f84cec377eab2266eece358aee"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dsp/filters_mips_dsp_r2.c",
+        "size": 19782,
+        "sha256": "5308d186a77bbb7521d8ed55715ee0ee13b5a214ea8beb397157378631e9a7f0"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dsp/filters_msa.c",
+        "size": 6092,
+        "sha256": "428c6783f486c45c938fcb6308b58b29c1c27c01a341a25c2f1e79087aadd088"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dsp/filters_neon.c",
+        "size": 10853,
+        "sha256": "11ae76d29251eaee0720db020996a87c48715beb6a43e5e567210f48b3e4fc81"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dsp/filters_sse2.c",
+        "size": 12332,
+        "sha256": "01067ffac96d12e463bb848f47db1fea6d2212aa7bdb05cf4ff6f67a0018fc8e"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dsp/lossless.c",
+        "size": 28668,
+        "sha256": "0da0f0ef37b9bb65b858651b63b8c0882003dcdc5de59faad2bbc566be5fa1b6"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dsp/lossless.h",
+        "size": 12823,
+        "sha256": "e8202b12981adea6e81bcaf80a56e2d1e22773605e5d52d38c2c3bcc09f2fddd"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dsp/lossless_avx2.c",
+        "size": 22539,
+        "sha256": "9df509763a16d2c5baa880ad1110b1e6e15c89f7b3554f1270ac6ab4d5dfc416"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dsp/lossless_common.h",
+        "size": 8428,
+        "sha256": "8c57eb97f29662ad013233acb6b4deaa830fe78ab4cd5434a7942cdd24064971"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dsp/lossless_enc.c",
+        "size": 35995,
+        "sha256": "c785eb93f6d7ef9c5ff45b4fb590880200f06508d5b228585b486d8c8a3b4896"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dsp/lossless_enc_avx2.c",
+        "size": 32473,
+        "sha256": "8985510fbf454e3888c827f5cf7fd7c221551113861897cb3f0fcc0e7d410923"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dsp/lossless_enc_mips32.c",
+        "size": 12992,
+        "sha256": "662a82c95dea070bd183faac6b08c8739434fd3b34264b9e2cc321f2e871c65a"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dsp/lossless_enc_mips_dsp_r2.c",
+        "size": 13873,
+        "sha256": "71c59aa49dce7ae059f3b16def476b5dcad45d13f97aad5d93fd117d3a39845f"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dsp/lossless_enc_msa.c",
+        "size": 5699,
+        "sha256": "20513def3e8c0e9fa9eb04b6c8208780fa92340a9f7aac49d42b34fd3ea5de5d"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dsp/lossless_enc_neon.c",
+        "size": 8805,
+        "sha256": "02ffdccadd1af6b551677f841dfe12fc0f99220eee717bd28cb87c0e51a033f2"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dsp/lossless_enc_sse2.c",
+        "size": 32626,
+        "sha256": "bd1217fd4a51ad0bd00732729baa7c83db79ae2aeec6c9b067fabf718a9e3e65"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dsp/lossless_enc_sse41.c",
+        "size": 7181,
+        "sha256": "b3e8e10e7f5f190ebd6ad20720b128cfeebd500a1a66e55b32ec8d4310b4166f"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dsp/lossless_mips_dsp_r2.c",
+        "size": 40105,
+        "sha256": "90aa712e9739921b8e2b5c434c7191b1dfa0b007d0668bb32782b1ba53da0fca"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dsp/lossless_msa.c",
+        "size": 13456,
+        "sha256": "dd9e3989c3b347535a6ead4de8d9175e716895b7e9d5adbcc43161b8e3692c9a"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dsp/lossless_neon.c",
+        "size": 27382,
+        "sha256": "f9f387eb75d6c0567837d99c678746cff3223b1c884c18708c64125378c43132"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dsp/lossless_sse2.c",
+        "size": 32123,
+        "sha256": "16e256509c3d3b56b5477ef2e5b619fc6703c2a99e486197fcf92b4e692599ec"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dsp/lossless_sse41.c",
+        "size": 5591,
+        "sha256": "4244019376d514816a236272e43df94aa0da1976149ec6b647bfa9dde477e8fb"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dsp/Makefile.am",
+        "size": 8263,
+        "sha256": "c09e5204bfa0176792737fd3f26b982794f2ec9174dc918fcb035991d5f6f818"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dsp/mips_macro.h",
+        "size": 12515,
+        "sha256": "6b0b38c00eb572f5db57751e61b37464e2bc01e8dd7af108aafcd604a43ba9c5"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dsp/msa_macro.h",
+        "size": 68497,
+        "sha256": "39af7ee9b4bafcfa8e7836ef02dfc1fede2dc6225565e198e3ece3d16cb00d3f"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dsp/neon.h",
+        "size": 4126,
+        "sha256": "8ee1168bd821f19421d065b028e97ebca82fedbfecc949fe1db9eccb1341a6b3"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dsp/quant.h",
+        "size": 2624,
+        "sha256": "b36cc77960c2aef08ee45c3dc8843b3ce7d4641e939f9a30f767e26166042aa0"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dsp/rescaler.c",
+        "size": 8278,
+        "sha256": "29b0996025a44a8a2b342a87fb18c997264c3592020ad00ed62725d409d3f7f1"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dsp/rescaler_mips32.c",
+        "size": 13746,
+        "sha256": "e2af8a7685d3be01cd2594abd8929e28df80ea7260722c102883594043613365"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dsp/rescaler_mips_dsp_r2.c",
+        "size": 16190,
+        "sha256": "0147676c924a904634a1dfe3916d0e65fe43d03e18111683c360858e0af2a0f4"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dsp/rescaler_msa.c",
+        "size": 17634,
+        "sha256": "bafe43ee830de51af44c97487ce63dbad05ee0f07efdc5d8b2fb9b198678f1c8"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dsp/rescaler_neon.c",
+        "size": 7310,
+        "sha256": "04e72da6b37f90e473181cafdb54283e477669575848ba9dd05f235a4e6258f8"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dsp/rescaler_sse2.c",
+        "size": 14438,
+        "sha256": "6e47cad2c36b2238c77b613926d59c031c28fe3fbd906317026b0bf85de0439e"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dsp/ssim.c",
+        "size": 5324,
+        "sha256": "691f9b3e659e8b01e13854dbdd8278b91000d6abda220764bc9774d65bf3e366"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dsp/ssim_sse2.c",
+        "size": 5943,
+        "sha256": "42d25dbf21827d992e7b6142c55d102b22fdae5e82969ee99468060f137d20b7"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dsp/upsampling.c",
+        "size": 15452,
+        "sha256": "d7250934ce887e2460d8af873e35e5ae48d02e8388c8538f3f72f74f3fa7663e"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dsp/upsampling_mips_dsp_r2.c",
+        "size": 13491,
+        "sha256": "9875a7c309307b0c3aead4fba68a3804187fb3c1a24824c356188ae6fd350eeb"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dsp/upsampling_msa.c",
+        "size": 30596,
+        "sha256": "24402b046c90a90c3a8d989aeb8e05b8d1d9cceafb171788f6823dfcd2ca2f2a"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dsp/upsampling_neon.c",
+        "size": 16154,
+        "sha256": "8f1af79142f4afe7642adc26a2c549c031801778707127fe1d36fca25372abb9"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dsp/upsampling_sse2.c",
+        "size": 15959,
+        "sha256": "8eb9f676f8675d2d8c32baab52e141dcf434a63277f20cd672ee02a6e68212be"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dsp/upsampling_sse41.c",
+        "size": 14233,
+        "sha256": "40c15e70d60dbba5b92a71f5f61416139c804a1e103a2be8e85b1c5b81ac84cf"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dsp/yuv.c",
+        "size": 29238,
+        "sha256": "6d8931fb68538e876e96b6b7498a3190d47f6d231698c18d513db4e619309e33"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dsp/yuv.h",
+        "size": 10008,
+        "sha256": "b98d88716ce25b096f91a71e29c1780f6cb816c564d12a9baa253b5d9776d9bf"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dsp/yuv_mips32.c",
+        "size": 5792,
+        "sha256": "7ba9eafcad2d18364304695cb0f8375367c3fada1c28c77c841c2b342815b792"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dsp/yuv_mips_dsp_r2.c",
+        "size": 7971,
+        "sha256": "270c22f44d233ce1b4c13529163a7b74b13fe0830ad15a25d562590daad55b6c"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dsp/yuv_neon.c",
+        "size": 8111,
+        "sha256": "f7a269af72e80e4fabfe04160b9fb10cdd8b357965fc514e87371e135c8f0fea"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dsp/yuv_sse2.c",
+        "size": 31421,
+        "sha256": "1f3a4dd86af899352e418562142012ab889af27d548cc37f27fd716132f121db"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/dsp/yuv_sse41.c",
+        "size": 26246,
+        "sha256": "6ba362897edf3e481902f54ddd1a585d605303e6fe8b5d948c44f63155a61969"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/enc/alpha_enc.c",
+        "size": 16077,
+        "sha256": "a6141ffa800e06d3f3a0af4841d6e369c52f14ce5c4a6294b7e0cc23e08d1a1d"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/enc/analysis_enc.c",
+        "size": 16639,
+        "sha256": "eb33ffe18b2ab8d40f43d721a123deecb91d2d511764be8ad2dc88574ec7ffe2"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/enc/backward_references_cost_enc.c",
+        "size": 29844,
+        "sha256": "5504c204ed0b6bb9fb74c06a4e8afef5be68d5cbaa7a2e7bb785511f823b2d7a"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/enc/backward_references_enc.c",
+        "size": 38471,
+        "sha256": "7387c23c679c08d8d5d5bfde7db040f7e646c6c55cb358ea8330ca4918806a3f"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/enc/backward_references_enc.h",
+        "size": 8748,
+        "sha256": "06359857d93a775da9d0ae3959d9129863938ff438331ed48b41a74e961f9d95"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/enc/config_enc.c",
+        "size": 5795,
+        "sha256": "4684ec2c7c7ca9f1753f9110a3fcc7bbc17e17736339104203d02230c016945e"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/enc/cost_enc.c",
+        "size": 14806,
+        "sha256": "20183f4b4f07d25302be58cb7c17ae7185413e8880aa46efba751b8185b3523d"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/enc/cost_enc.h",
+        "size": 2566,
+        "sha256": "1014280e96b22fd28d8823338d84009558d57f46bc6d2a310a243628b7e8a9bd"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/enc/filter_enc.c",
+        "size": 8979,
+        "sha256": "e937da2d17c934ee9a826a7129b57cd75228f0a2ea4907c2018aaa9d53d30c2c"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/enc/frame_enc.c",
+        "size": 29779,
+        "sha256": "4b3f25fba13b9405267ac3ffa5e01bbecd0a302c28e3e858de40feff770a31ac"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/enc/histogram_enc.c",
+        "size": 44821,
+        "sha256": "1cccb1ff3806bcc3d602e920005685018bd9ee72184bf8e2a8532448db55d5ab"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/enc/histogram_enc.h",
+        "size": 5035,
+        "sha256": "3dd64c0ad27e0339839261974944c65be7b3b0e84973a38cbd5cdf405b695c05"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/enc/iterator_enc.c",
+        "size": 15282,
+        "sha256": "2709bbed66d4d154832923e63eabbbf62e28e023514dd021bb3f29fd00ce099d"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/enc/Makefile.am",
+        "size": 1705,
+        "sha256": "f5e3d099fed4d82e487bc74425f7135b7635d853bdd4cf3133e1e286441712ff"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/enc/near_lossless_enc.c",
+        "size": 5341,
+        "sha256": "294d1b217376365f0b958fc5089d42b81e769383ac2a2384c897dc5d6c5e6cb8"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/enc/picture_csp_enc.c",
+        "size": 17340,
+        "sha256": "e5a2fe202a2021a7d9e82972a99b36ab1f469af97b13079b591d43b0b1e59088"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/enc/picture_enc.c",
+        "size": 9038,
+        "sha256": "723253007b6a578c5c0b067ff5fcf0ec76cf850ab613ca432be0ddaff7527b22"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/enc/picture_psnr_enc.c",
+        "size": 8616,
+        "sha256": "a78cd8a041d1f613dad8c8fa2d339c1fd1988c0b0e4b1e8a1d5a5949492e12b8"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/enc/picture_rescale_enc.c",
+        "size": 10781,
+        "sha256": "ae1075c66e2a139b7d66d56d219919dc4f8027b4a4d77ff02d94541be50f7eaa"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/enc/picture_tools_enc.c",
+        "size": 8952,
+        "sha256": "2dc858291057eba644fb40129315bf45f35e2d7eb0a392beab290a8649228958"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/enc/predictor_enc.c",
+        "size": 50520,
+        "sha256": "48076b90b688c6ff730e615cf720e7bc102732d3a947ef04fd403412f1ea4641"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/enc/quant_enc.c",
+        "size": 50410,
+        "sha256": "4721bea46ab964cfaa89c25d090ad11f1e87056febe39cb066e601472b8de0ca"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/enc/syntax_enc.c",
+        "size": 12829,
+        "sha256": "7bf6e70413e2c086d1e1e3f87ebbf5e32d9a28c85898a3948d7ad2067500c20e"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/enc/token_enc.c",
+        "size": 8408,
+        "sha256": "199da0cd6ac65840b0a6a99d1379ee344f64ef32769e76ad27c40ba88eb97e4c"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/enc/tree_enc.c",
+        "size": 21384,
+        "sha256": "8528905029fea5e7925a2415fd9a33183b086850e5bd76fa6f202334cd101094"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/enc/vp8i_enc.h",
+        "size": 21456,
+        "sha256": "2d4c2c016f5e2b946826fc795946da959d1e0efb5bf58721afb128c6bc3c0fd8"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/enc/vp8l_enc.c",
+        "size": 72716,
+        "sha256": "8d25803c9b875a61eadd1f2af46a87456eed884f7838ecc9fd1ec10252b3fe55"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/enc/vp8li_enc.h",
+        "size": 5051,
+        "sha256": "4c72c160ab3b7ca8e31debf41e2a71515694db6cdd812a0b2f28822892c0e0b4"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/enc/webp_enc.c",
+        "size": 14297,
+        "sha256": "d81b12f1f735d2b398545987dc6955bbecb8c27be0bac3715b2c2cc1a30107fb"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/libwebp.pc.in",
+        "size": 324,
+        "sha256": "30f7f2208a26e7205c6ff33e69990a83c38f4118c1baf1f01120387286a22808"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/libwebp.rc",
+        "size": 1020,
+        "sha256": "739b483681b0ed9a55b5f9609f632c4e4b51410157334e6834321afe85210768"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/libwebpdecoder.pc.in",
+        "size": 322,
+        "sha256": "3b3574e3657d02ebc45b22bc54e9d11b47fba90f65862f01d9181ed7e21e7ec2"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/libwebpdecoder.rc",
+        "size": 1043,
+        "sha256": "fc8829cc120f360410b24f68f8348776c56a2168fdf56033030e2de2f6d19808"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/Makefile.am",
+        "size": 1601,
+        "sha256": "3c58c7bdb76e230d03e2ef53d19fb8fb7ea0fc90e96fb3d5832fbc92f84187d4"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/mux/anim_encode.c",
+        "size": 71877,
+        "sha256": "56a1ce59ef554e2f2d59cd8976e6358f9765ba451591c13f4110f3ba9f4705cf"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/mux/animi.h",
+        "size": 1598,
+        "sha256": "0a60200653bae7ab0eff06a13b7065b6bdf754e6865c0903688915fe274598e2"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/mux/libwebpmux.pc.in",
+        "size": 326,
+        "sha256": "f1c1de85c0e094ed498f2a4c79d0f9df13e2e409b382c72a09dd11a2c1ece5d2"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/mux/libwebpmux.rc",
+        "size": 1029,
+        "sha256": "01e1e7cb2b14bfb2e42b0c2e55e4521f920b2cea06b58670eaa8f2d592ab6651"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/mux/Makefile.am",
+        "size": 720,
+        "sha256": "8470d0099dffc0419969e51bc700865bfd903900e696c90fef23291b45510b17"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/mux/muxedit.c",
+        "size": 22173,
+        "sha256": "57ccbec7cad46863f412fcc071fd8f61c59bb9f711eb74b420db953e9ff1e45d"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/mux/muxi.h",
+        "size": 7663,
+        "sha256": "8694a30771ec912f670d0c4c9706ca7bfbe4a105ed95adca780279ffeda09b1c"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/mux/muxinternal.c",
+        "size": 18045,
+        "sha256": "ea44fde6ce3cdfe885a236df35c407e68e950cbd3b1f8c3f21a3ae91c8a11538"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/mux/muxread.c",
+        "size": 19558,
+        "sha256": "0301276083f4ed234793328c0ce625e239c5d685bd900b0df20b7efef691db8a"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/utils/bit_reader_inl_utils.h",
+        "size": 6046,
+        "sha256": "0b1fe045bba53bdc1e5f29ee1882bc4e28d9ab36b75f7cabb4fab1c3c3336fd5"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/utils/bit_reader_utils.c",
+        "size": 9344,
+        "sha256": "5415000f7d40955df7967c299995c9fd01384cee598666829125f31fa9569397"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/utils/bit_reader_utils.h",
+        "size": 7863,
+        "sha256": "5c2228b990ff353dfa420c3916a7b35eee931ad64764f47847f9dab9eba92f06"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/utils/bit_writer_utils.c",
+        "size": 11097,
+        "sha256": "1f60b8825e976e8fe8eb8f502135d5393ea7fff2f93a3c86f685fd7491b93d5c"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/utils/bit_writer_utils.h",
+        "size": 6432,
+        "sha256": "7b1a1e9065f44c9f437305ae986dbf92698d7582e4b5bebedc6463cf55fbcbc0"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/utils/bounds_safety.h",
+        "size": 2466,
+        "sha256": "23507b98513fdd0cb614f79bf4dbc71d938e54c7c896c83710e1e53acee50123"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/utils/color_cache_utils.c",
+        "size": 2089,
+        "sha256": "5a47e72e7e84f8bffa9cfd492b89d30bc7490447ec313b4d5a3c96f9612ab016"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/utils/color_cache_utils.h",
+        "size": 3129,
+        "sha256": "bf8d78c509a728c855b85ba72445efd1d8bb0c3100ae99dd4b10e6022f22becb"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/utils/endian_inl_utils.h",
+        "size": 2930,
+        "sha256": "6b1321ec93184af3047bbd3c426fbf2976f57a3b9d2ee4799bb5b9f3ffa16b03"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/utils/filters_utils.c",
+        "size": 2666,
+        "sha256": "57cc738a26fd75c303d5d39b1b815c52fe1179ff68f89f06bdea9f444bbb91df"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/utils/filters_utils.h",
+        "size": 1051,
+        "sha256": "14e9021cffa7180742bd58085faee7aa212a5f848aa6b632beee43132d7d37cb"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/utils/huffman_encode_utils.c",
+        "size": 14455,
+        "sha256": "e11f36c6602ed2f2d963209b929f54d9626c1d9c236a525a5b2ad7ce01404ffa"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/utils/huffman_encode_utils.h",
+        "size": 2255,
+        "sha256": "1b350fb15700e1f45c85258af9d9f2421202d782a2062944791d139ccaee9612"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/utils/huffman_utils.c",
+        "size": 12201,
+        "sha256": "1b5c72658f4f107b27a42a9cb62a630c70ab140a06c8f86abb64adce2307ed7e"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/utils/huffman_utils.h",
+        "size": 4736,
+        "sha256": "84059a7c2c3a8164335e2470f8dcb7dc642c405bce0edf1a583a26b7537c1e80"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/utils/Makefile.am",
+        "size": 1575,
+        "sha256": "35583668727112e640f5053214ac292dfd8f867bfd9581ab3f31684e1302d798"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/utils/palette.c",
+        "size": 22281,
+        "sha256": "49dfdcbbb9619bdaa13d0b280cc500a5c1acf671c354a333887a258b4df06fb5"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/utils/palette.h",
+        "size": 3346,
+        "sha256": "bafa96545ecad85fbb7c0154bae7dba6fbd50420875e49bc37f763dbea899797"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/utils/quant_levels_dec_utils.c",
+        "size": 10125,
+        "sha256": "6f2c2a0e912ea2f1bfcda3f25c4be29be349b05393a7da267fa099f1448b6527"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/utils/quant_levels_dec_utils.h",
+        "size": 1360,
+        "sha256": "828caed17205985a40d758d072343fecad25c3d6db2acfd644e36a9766dacea4"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/utils/quant_levels_utils.c",
+        "size": 4206,
+        "sha256": "4312734c480de6503018ca75f9ca9da69edfaf1da1281d00bfe697b22801ad2e"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/utils/quant_levels_utils.h",
+        "size": 1316,
+        "sha256": "04803b010f66587b638e694d3b25c46c4c03f610ebf44a7c15d9a7e13bd5d183"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/utils/random_utils.c",
+        "size": 1990,
+        "sha256": "e8dd9b5df3fe23d78df8184550d86d61bb019241665ea126ea099e96c2359e71"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/utils/random_utils.h",
+        "size": 2207,
+        "sha256": "9b0604cdd196ece7e5cb007dd048cb06e31793f4905921f04638ae6dce94ac1c"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/utils/rescaler_utils.c",
+        "size": 6428,
+        "sha256": "80050bbd354fac66abd1eb7a855f44141edc03433c909a6a7b41932f3e610748"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/utils/rescaler_utils.h",
+        "size": 4357,
+        "sha256": "9c0fa53ff34bb73b47141844532a94de9715509665671de1793a522fa1c3e1aa"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/utils/thread_utils.c",
+        "size": 8921,
+        "sha256": "91dc9c94165af2085205cc658a4d84bcd7816a9456b03aef83ab6216c360dc9d"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/utils/thread_utils.h",
+        "size": 3751,
+        "sha256": "772f023a6535fabb7d73bc1e9102ff04b8c44825061364cebdfd69fe6bdb4d6f"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/utils/utils.c",
+        "size": 9901,
+        "sha256": "3533f75f7635a3ebee144281ec3ac05dcd73b7c1accac2ef0107368174e500d2"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/utils/utils.h",
+        "size": 7639,
+        "sha256": "cb5f9f8a4505544d6be156268daf8b7fe569afb533d3a31c64771837da5aaded"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/webp/decode.h",
+        "size": 26618,
+        "sha256": "ddcc1b939eb406b3619ea7dc162e224119706c260cb1aa9ac39a25699477b8ed"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/webp/demux.h",
+        "size": 16189,
+        "sha256": "741723f1badf084af22961b657cb0083446a3ae34f17c6ae578689512088297e"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/webp/encode.h",
+        "size": 29971,
+        "sha256": "51ebc610e5b49d43302eedeada1d7854424402efc6b31934b08a9286692c55c0"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/webp/format_constants.h",
+        "size": 3908,
+        "sha256": "9004df0dec13a533f6247961cf1746498b83e4bf6e42d5489da1ae83b260ab4c"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/webp/mux.h",
+        "size": 27305,
+        "sha256": "6596b2f370c55ff597eef91f516bc8405324db3e8cf9ad6c8f14ecc3b6432891"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/webp/mux_types.h",
+        "size": 3237,
+        "sha256": "f3fdab503004a7487fd484c18dfad2ad79f2f624081df47174caff5eb9f6be9d"
+      },
+      {
+        "path": "sandcore/third_party/libwebp/src/webp/types.h",
+        "size": 6849,
+        "sha256": "26dd2af1ad8870bcd276d5caaddacf4471b5374fe3e7ff311e6188c4ffee5b74"
+      },
+      {
+        "path": "sandcore/third_party/libwebp-source.zip",
+        "size": 4121049,
+        "sha256": "2f194262facc38a7dfd50ae6dcbbaeaee85378282bd4cdfe9e0d569e055d1df3"
+      },
+      {
+        "path": "sandcore/third_party/SOURCES.json",
+        "size": 20173,
+        "sha256": "3bd5ce4cc26819e85d02394a5bf999e7d0fd829e085341ea9df684c05cb9e988"
+      },
+      {
+        "path": "sandcore/third_party/stb/LICENSE",
+        "size": 2510,
+        "sha256": "bebfe904b14301657e4e5d655c811d51fd31b97c455b9cc2d8600d6bac6cff63"
+      },
+      {
+        "path": "sandcore/third_party/stb/stb_image.h",
+        "size": 283010,
+        "sha256": "594c2fe35d49488b4382dbfaec8f98366defca819d916ac95becf3e75f4200b3"
+      },
+      {
+        "path": "sandcore/tools/adapt_webp.py",
+        "size": 3818,
+        "sha256": "d2f38f23a9f866681c40e94cef28b2a8f108a32aba92ed48bf61cb2b76c38eb8"
+      },
+      {
+        "path": "sandcore/tools/audit_api_compat.py",
+        "size": 2842,
+        "sha256": "620e2e19ad8bbaa171fd4a2832e76348097dfa1dbfa70a1564b61bf1663c57eb"
+      },
+      {
+        "path": "sandcore/tools/audit_m6.py",
+        "size": 5645,
+        "sha256": "b2195db2736883b86283e7db7c0e1173e00b88a02e099b229a43aef0f1a6dabf"
+      },
+      {
+        "path": "sandcore/tools/audit_m7.py",
+        "size": 7432,
+        "sha256": "f1540a0e76cbc04d7dd4aaf55660493baa9f1a8593f5c2b28a23c9d8d32c3d37"
+      },
+      {
+        "path": "sandcore/tools/audit_m8_current.py",
+        "size": 7922,
+        "sha256": "153fb607f0f9d3e95a2bd7c507c3e158cdb5c486f964d73d0f05d9336878f5b9"
+      },
+      {
+        "path": "sandcore/tools/audit_truecolor.py",
+        "size": 3699,
+        "sha256": "a746b5890c6e652c5f0cab22386906b26432e77e3457ee0e3f25485fd1427e0c"
+      },
+      {
+        "path": "sandcore/tools/check_s3c.py",
+        "size": 1725,
+        "sha256": "1c7f406f4f3b479117feb9d08270f8bd3e93430fef9ab1eafbad40dee309a6aa"
+      },
+      {
+        "path": "sandcore/tools/check_s3c_pp.py",
+        "size": 5055,
+        "sha256": "31c48479d3fa5bb7763ea035d60a49dc66da105262a9a897a9fe7e977042f4a1"
+      },
+      {
+        "path": "sandcore/tools/compare_film_quality.py",
+        "size": 5114,
+        "sha256": "1afd0ed1983ef07cefea87440a262ef5fbceb738d55d04559f4feb20716583c5"
+      },
+      {
+        "path": "sandcore/tools/design_m8_brand.py",
+        "size": 10224,
+        "sha256": "82ad225f0d5ec1bb5ff4c809335a79c0fd35548da88a530ad2e1197ee1bb0fea"
+      },
+      {
+        "path": "sandcore/tools/diagnose_canvas_vga.py",
+        "size": 3077,
+        "sha256": "ed6a009dc9ed878797bb63cde5ac42e9a4755b933cbf811c8ad011ce37fdb03f"
+      },
+      {
+        "path": "sandcore/tools/diagnose_math_prism.py",
+        "size": 5248,
+        "sha256": "33003a1b0e8a5ebe2bb02697711a1cf100ba77cbefe422b149e7461f79f4f847"
+      },
+      {
+        "path": "sandcore/tools/film_io.py",
+        "size": 2645,
+        "sha256": "f91484475a55ce6808613a5e2af8120acd7b862ecb1abb970b76648480fbb925"
+      },
+      {
+        "path": "sandcore/tools/film_math/opencl_host.py",
+        "size": 6880,
+        "sha256": "0a9ee530b6b318036cd5adda7bdc1f21de8d792b72794489cdc54abbc1cd3131"
+      },
+      {
+        "path": "sandcore/tools/film_math/render.cl",
+        "size": 24983,
+        "sha256": "484536d424cf041c3d6267324325ed54f7403605c635c858ed25b2922b862baa"
+      },
+      {
+        "path": "sandcore/tools/film_math/render.py",
+        "size": 18234,
+        "sha256": "5bf93099206b455562dc7b3053b55ca9bf71f0fc0ca9d69aab41b83f2bf1134b"
+      },
+      {
+        "path": "sandcore/tools/film_queue.py",
+        "size": 14863,
+        "sha256": "d643abf4eefac95644f0f941e29c56bc14c11a5dfa5b5e2a5e0e1d470e0fbc73"
+      },
+      {
+        "path": "sandcore/tools/film_scene.py",
+        "size": 32849,
+        "sha256": "3fb31c1ed4fa04bcfdb1fd8b7f12c12a30d0ad0831cba6f899e413093bf6d1c6"
+      },
+      {
+        "path": "sandcore/tools/font_preview.py",
+        "size": 2501,
+        "sha256": "a3dd4ff4d4416080c9ff5450faad9f1621fb442a358e8156a9e0139baab479db"
+      },
+      {
+        "path": "sandcore/tools/gen_m8_assets.py",
+        "size": 6310,
+        "sha256": "d48ab5f5ab105d0731cd917c741ccc2a7c8d630149b2a6410c7524d496d7ad36"
+      },
+      {
+        "path": "sandcore/tools/import_font.py",
+        "size": 3993,
+        "sha256": "0a9c3ccbd8bb9a8f256c6af4bf0193f0da53307d05ffe0216fd597977ca287ad"
+      },
+      {
+        "path": "sandcore/tools/keys.py",
+        "size": 1102,
+        "sha256": "04003b20234f565f1df6df66f11182fc2c8b9469b199122b206bfbaddb83ec75"
+      },
+      {
+        "path": "sandcore/tools/make_m8_art.py",
+        "size": 10536,
+        "sha256": "e6aff4404e334a7c3e58ef1e70340940507b9ac0359fb898c4fa6740b0792af1"
+      },
+      {
+        "path": "sandcore/tools/mkfont.py",
+        "size": 4438,
+        "sha256": "7b195d5a3491e4093f8e1b7024c538f986db83fc8e6f798715659f06e99903f7"
+      },
+      {
+        "path": "sandcore/tools/mkfont8.py",
+        "size": 1548,
+        "sha256": "f7268e0dcd446960c64df4c9e7ba10ede03216ea9deb87802b63d2bda11567b7"
+      },
+      {
+        "path": "sandcore/tools/mkfs.py",
+        "size": 7559,
+        "sha256": "3c2efac83b86f645f25b2b26dc660d3438440cd1cb91785223838f902ed840c2"
+      },
+      {
+        "path": "sandcore/tools/mkimg.py",
+        "size": 1081,
+        "sha256": "5e6c23f170772101886622c3717526735f9563cb05075be5c27632a8fd0ed10e"
+      },
+      {
+        "path": "sandcore/tools/mkscf.py",
+        "size": 961,
+        "sha256": "1dec5ec3f84e366cfa655ec957fb8ec9c953c16286cd7adc790782bdc733c2bd"
+      },
+      {
+        "path": "sandcore/tools/mkscx.py",
+        "size": 2686,
+        "sha256": "0861fe0aebc07d3b7699195ee5e9436a7241ab7eab4251d5c26d4c0b7ae47899"
+      },
+      {
+        "path": "sandcore/tools/mkskm.py",
+        "size": 2379,
+        "sha256": "ef4aca27b1250f3e9f3e614860905d5d201aeae084df644cdeeab2b95e5382ae"
+      },
+      {
+        "path": "sandcore/tools/mouse.py",
+        "size": 2580,
+        "sha256": "08dd1814b4a9dd32eeb231083aae85f50fc1fdcfd6484df5c0b58577bbb07372"
+      },
+      {
+        "path": "sandcore/tools/package_m6.py",
+        "size": 4227,
+        "sha256": "617c4827140e91671115422fd6479ec0093607f16696e2337d125481c83cb73c"
+      },
+      {
+        "path": "sandcore/tools/package_m7.py",
+        "size": 5818,
+        "sha256": "55156e64b0d0ef9d38ce59a41b5aa6e6685289a71f7564f3f0bb6d601e6d9c19"
+      },
+      {
+        "path": "sandcore/tools/package_m8.py",
+        "size": 7639,
+        "sha256": "0f3ea59728bff7910c4c00e9237703c1390a3d5aa05efc3f20a72c2548255a92"
+      },
+      {
+        "path": "sandcore/tools/package_m8_canvas_stage.py",
+        "size": 6784,
+        "sha256": "eae12f2f5c5a42569af07bd4c98ed1a1c6895730e4e524d5956fe85ceee9dea6"
+      },
+      {
+        "path": "sandcore/tools/package_m8_damage_stage.py",
+        "size": 6199,
+        "sha256": "237f35519a6270cee061da61951f25bf0d9caac2c269f621b502affb62ca9841"
+      },
+      {
+        "path": "sandcore/tools/package_m8_files_stage.py",
+        "size": 7348,
+        "sha256": "767e6019eee94d006218ef71e136b3b77b1d1c3de108a27fb0bd50e717eb3663"
+      },
+      {
+        "path": "sandcore/tools/package_m8_frame_irq_stage.py",
+        "size": 5137,
+        "sha256": "012c2e430eebdd1a457a1b77f3d6a5ebaa920c3e5229e2e24a2e96b09d16a2a3"
+      },
+      {
+        "path": "sandcore/tools/package_m8_idle_yield_stage.py",
+        "size": 5784,
+        "sha256": "9553ea456077d1483999b448de54c200f4a3679093541062aacb23423f888afe"
+      },
+      {
+        "path": "sandcore/tools/package_m8_lens_stage.py",
+        "size": 9265,
+        "sha256": "465987cd624dccbc5537ada855058ab5ec9036b2739abaef49f5350e2260f746"
+      },
+      {
+        "path": "sandcore/tools/package_m8_settings_stage.py",
+        "size": 4070,
+        "sha256": "bc77fa73db948b26cf3386245665ec6532495d3f38924124a76927314c4acb8d"
+      },
+      {
+        "path": "sandcore/tools/package_m8_stage.py",
+        "size": 3104,
+        "sha256": "362578956c8ef672508179ce40714be957647989f3afc94b44e9e3ff30868311"
+      },
+      {
+        "path": "sandcore/tools/package_m8_studio_stage.py",
+        "size": 8476,
+        "sha256": "83ead5166ecd432c03432ee94aa1ea06a4a790121f16c2f926a87d304e46ba27"
+      },
+      {
+        "path": "sandcore/tools/package_m8a.py",
+        "size": 10124,
+        "sha256": "085aed8173027bab95bb7d8c99697de204c48f7b8305746ac529da0f4af058dc"
+      },
+      {
+        "path": "sandcore/tools/prepare_classic_wallpaper.py",
+        "size": 1852,
+        "sha256": "d72cddabb28df93f77b6a1d58ecabf93359ec08575079955963480ec709c74c5"
+      },
+      {
+        "path": "sandcore/tools/preserve_legacy.py",
+        "size": 2603,
+        "sha256": "2ea2914c8028f1c289b941698d9225115ec08e37c945de9589d1df7c84e674c2"
+      },
+      {
+        "path": "sandcore/tools/probe_film_cycles.py",
+        "size": 2273,
+        "sha256": "44416a3fcbf38d89d806ad0edac018d56a9d5147407f1812389337e384279e6d"
+      },
+      {
+        "path": "sandcore/tools/probe_film_opencl.py",
+        "size": 7269,
+        "sha256": "5a0cd4d1b02b57cff474b0bbe44750a8f7f83fcd0c742c744e8a55aa626530ca"
+      },
+      {
+        "path": "sandcore/tools/profile_m8_games.py",
+        "size": 16477,
+        "sha256": "1bc2b0b19ceb330137f0b0854e807b42b577759557e9b5c11a76d827484f5b80"
+      },
+      {
+        "path": "sandcore/tools/profile_m8_runtime.py",
+        "size": 10581,
+        "sha256": "2e0b4892fe50048343b56ddb07000662e17c6b71f6d7f4ca963439f7d73537dd"
+      },
+      {
+        "path": "sandcore/tools/publish_m8_native.py",
+        "size": 10498,
+        "sha256": "d3e8730d9eedaf761bf183ed51f485d9c2c813859fd1136dde0c7ee4d9282b89"
+      },
+      {
+        "path": "sandcore/tools/publish_native.py",
+        "size": 5021,
+        "sha256": "52cd55b3ab07cbbbb8f00ac5871121a78499ed2a7a07d1a39606f9e3189c7279"
+      },
+      {
+        "path": "sandcore/tools/qemu_config.py",
+        "size": 5120,
+        "sha256": "c8b37fcfce6ff26115ba98239f629a1408ac83ab6c61d0e5a52c4034b257f936"
+      },
+      {
+        "path": "sandcore/tools/render_m8_design.cjs",
+        "size": 853,
+        "sha256": "c855b663cde7e03e697da1fd914e2cc2df0dbfa80ab16a150960f6fceca12883"
+      },
+      {
+        "path": "sandcore/tools/snap.py",
+        "size": 2394,
+        "sha256": "53357d451a0849dbcf21b320749f56bd52847f2c2ffd64256a6314254e1c8637"
+      },
+      {
+        "path": "sandcore/tools/split_c_statements.py",
+        "size": 1834,
+        "sha256": "d6bc58ec5efa4a707f815653bf1298b609306f8bd764b6beb1675ecb9351483f"
+      },
+      {
+        "path": "sandcore/tools/start_film.ps1",
+        "size": 3125,
+        "sha256": "a91700d1ae1b7ba9485b1351dce628cedfcb9c834d5e23a812cc74a81df16673"
+      },
+      {
+        "path": "sandcore/tools/start_film_queue.ps1",
+        "size": 3669,
+        "sha256": "319214a383fe9f608d4d60ea7b5f17a580ba545755bc2c19151c0206ded2c997"
+      },
+      {
+        "path": "sandcore/tools/start_m8_phase2.py",
+        "size": 5736,
+        "sha256": "cd97a1384a6f20167d672d4de4c18a0efe9f8f424318a848ddb6e117508c5779"
+      },
+      {
+        "path": "sandcore/tools/start_math_film.ps1",
+        "size": 2318,
+        "sha256": "5166f77c153d9448ebfadc6ae0e431de1e88502c909283009e0ce98f4e96fc05"
+      },
+      {
+        "path": "sandcore/tools/verify_apps.py",
+        "size": 11328,
+        "sha256": "55406ce72c7f826cfc35dc8a3fd199729400f155da48abc76d2136c6edce3d69"
+      },
+      {
+        "path": "sandcore/tools/verify_canvas.py",
+        "size": 16003,
+        "sha256": "18646d99f7f5e20c8eb1d227b9f1bc43954a5e507d8b80650bd163f1f4fcf4d5"
+      },
+      {
+        "path": "sandcore/tools/verify_canvas_action_queue.py",
+        "size": 6880,
+        "sha256": "cc742ff4c662d5ad28297ada30260a06841e9b64321936064a8512ade72062ee"
+      },
+      {
+        "path": "sandcore/tools/verify_canvas_matrix.py",
+        "size": 16179,
+        "sha256": "c0eb365d6a4e6c15dd3328d3386a79dfbcd9c588980367ad787bb9aeac2784eb"
+      },
+      {
+        "path": "sandcore/tools/verify_cpu_storage.py",
+        "size": 8414,
+        "sha256": "fa7e6521fd897a1c6596fd00226575450787203ecbda51b7090bde488f2a740d"
+      },
+      {
+        "path": "sandcore/tools/verify_damage.py",
+        "size": 6243,
+        "sha256": "d7420f6c66ae68b54ddad553b2636b10e4d5171697e99c97888ce74f977b58cb"
+      },
+      {
+        "path": "sandcore/tools/verify_damage_matrix.py",
+        "size": 10620,
+        "sha256": "37fe65987b13e7dada6979972ad411ecaa6efc30b24edc34e94198fc07c0921a"
+      },
+      {
+        "path": "sandcore/tools/verify_files.py",
+        "size": 12631,
+        "sha256": "33504a2c8eb69de6b4cd78774a1966806befa826d69dcf8013508775a87fa552"
+      },
+      {
+        "path": "sandcore/tools/verify_files_capacity.py",
+        "size": 7769,
+        "sha256": "7b0f001f9c5e06c5b83188378f791a719d7a4c018a7602dbd89f7394b363e956"
+      },
+      {
+        "path": "sandcore/tools/verify_files_matrix.py",
+        "size": 13084,
+        "sha256": "02bc98e1bd9b829756cc9116b516bc2264ae041233bbcbbb9565277b4b4f6712"
+      },
+      {
+        "path": "sandcore/tools/verify_film_io.py",
+        "size": 3189,
+        "sha256": "778e19b72056e724d8cc1843fb8790a3a53462263dda5b1be1835ba7ada54cc3"
+      },
+      {
+        "path": "sandcore/tools/verify_film_queue.py",
+        "size": 7855,
+        "sha256": "9ca01bce27c1f3c3dd5ecb33a740031b9002f76714f6aa5c8987e7494a8d52f0"
+      },
+      {
+        "path": "sandcore/tools/verify_frame_irq.py",
+        "size": 8434,
+        "sha256": "34aa4858046b7c19118061b0c84d397d888b679a2508199f7cd261b6a8159fe2"
+      },
+      {
+        "path": "sandcore/tools/verify_frame_regressions.py",
+        "size": 2662,
+        "sha256": "01290c4d138fee3f4ec97c5f692f0d916fae30ecb20d06597f014892c89b7f36"
+      },
+      {
+        "path": "sandcore/tools/verify_graphics.py",
+        "size": 13538,
+        "sha256": "532db27fb26fe4b1b25bbde1f7cfa4d99bdf601d446a3be97417e795d644b201"
+      },
+      {
+        "path": "sandcore/tools/verify_idle_yield.py",
+        "size": 7572,
+        "sha256": "c612e4ede460879a548bf49b07f0ef4e39953a9f3b0d5e44ab13cad36daa1b2a"
+      },
+      {
+        "path": "sandcore/tools/verify_images.py",
+        "size": 7911,
+        "sha256": "866c11c1144b0857ebc80e2a15b1335108ed0c9906d1df34f79f5bbd3171b48e"
+      },
+      {
+        "path": "sandcore/tools/verify_indexed_rows.py",
+        "size": 6904,
+        "sha256": "b25fcce8dbeca113cb14bec595aefb1f25417c8138e022529d3f492f0191a6c7"
+      },
+      {
+        "path": "sandcore/tools/verify_latency.py",
+        "size": 5721,
+        "sha256": "d32c282d9ca04a999a6db0cfe1d0da6145466c78e2d5df1a60ce644c2657231f"
+      },
+      {
+        "path": "sandcore/tools/verify_lens.py",
+        "size": 14417,
+        "sha256": "743c00a671c49ab3d96d3a6cef7f2a8eae58ed546c8804da012f8c221d90b69e"
+      },
+      {
+        "path": "sandcore/tools/verify_lens_action_queue.py",
+        "size": 7342,
+        "sha256": "d65a562ece6a2d02bd123b9f77cb6a5cfedcfe162d01e7bc2c1b02fb587f8fb3"
+      },
+      {
+        "path": "sandcore/tools/verify_lens_default_png.py",
+        "size": 6765,
+        "sha256": "02fea8bb0b5219f415067dc83c53348a8dbea0b0a84b6d12159c09dbb22f76ff"
+      },
+      {
+        "path": "sandcore/tools/verify_lens_followups.py",
+        "size": 3186,
+        "sha256": "ce6eaad3bc5a786459bdea7630dbdfef35562e6cfb93edd8138eb686a26064cb"
+      },
+      {
+        "path": "sandcore/tools/verify_lens_matrix.py",
+        "size": 16719,
+        "sha256": "97e02c3b603c8eca43e82a9ac879b20b4baebd705c56b81f2f5756c07797fbb5"
+      },
+      {
+        "path": "sandcore/tools/verify_lens_memory.py",
+        "size": 9981,
+        "sha256": "03ded4828f5b7eed66187866bcd0e442f97a2ce1aec1b476a9a7cc99802b822c"
+      },
+      {
+        "path": "sandcore/tools/verify_m6.py",
+        "size": 9617,
+        "sha256": "a4e53563602eabacaa8967cf105ec34d8e4c0e1cf06ad2642648514a618a1752"
+      },
+      {
+        "path": "sandcore/tools/verify_m7_base.py",
+        "size": 6202,
+        "sha256": "9d90e1b9faaf8b7445d01952d6bfedcf2c1529d6e60d82458f80e396bfb41f11"
+      },
+      {
+        "path": "sandcore/tools/verify_m8.py",
+        "size": 3963,
+        "sha256": "74b9c9f4422ffd793ad972ca269737c5a08b07efe3a84c834a010d251a3b7d29"
+      },
+      {
+        "path": "sandcore/tools/verify_m8_native_apps.py",
+        "size": 6911,
+        "sha256": "c5029d712c0a4b88df074d00f8307e5d12783f064bd1a7f99b347299b869a5e8"
+      },
+      {
+        "path": "sandcore/tools/verify_m8_phase2.py",
+        "size": 7212,
+        "sha256": "9f6fe11105d29ae6eef39d2979b4cb5b4453490f2c8bf8f51b1ee73ca4e22e8d"
+      },
+      {
+        "path": "sandcore/tools/verify_math_film_geometry.py",
+        "size": 9793,
+        "sha256": "6b2f04498a41ff837237c39e9cfd0d3731582cb935cbddc257675867475a65bb"
+      },
+      {
+        "path": "sandcore/tools/verify_modules.py",
+        "size": 2945,
+        "sha256": "5b407c340575d81ecfda45e927a91ac6d12339cdf7edd09c0aa3000cf067db33"
+      },
+      {
+        "path": "sandcore/tools/verify_nui_row_cost.py",
+        "size": 7184,
+        "sha256": "5b2fcb787f671d6a0ea1fafe1c324570919be57b29b75cf4aeb5914b84aa3061"
+      },
+      {
+        "path": "sandcore/tools/verify_prism_wallpaper.py",
+        "size": 5024,
+        "sha256": "b5fc74c5d3cb47ae16cc2148dc0938e28047b8b9bcfa2ed39824f407e26ee130"
+      },
+      {
+        "path": "sandcore/tools/verify_qemu_launcher.py",
+        "size": 5891,
+        "sha256": "69244a388405a21598d228a24123d93283ccacd1b325bb600a1e5b3203698f5f"
+      },
+      {
+        "path": "sandcore/tools/verify_race_equivalence.py",
+        "size": 14770,
+        "sha256": "fe557168a4465b5fad9f132b16e1ae3714eca6c655af58907443e1613dcfe1fc"
+      },
+      {
+        "path": "sandcore/tools/verify_s3c.py",
+        "size": 7855,
+        "sha256": "cf0face99d745fd2c7413a315fda2c4beb454e704f00dc27559e8434f50184e1"
+      },
+      {
+        "path": "sandcore/tools/verify_sccc_codegen.py",
+        "size": 11182,
+        "sha256": "3ad9f4739374de969a3a4ccd800e1a724b04ab76b276d051835874391f658b02"
+      },
+      {
+        "path": "sandcore/tools/verify_sccc_frames.py",
+        "size": 10139,
+        "sha256": "2521f3ee21a3e57bf5ee7b4e72471045f0bf086fabaac224700c458947b267a7"
+      },
+      {
+        "path": "sandcore/tools/verify_scene_equivalence.py",
+        "size": 17221,
+        "sha256": "ea118dac6e7345b358203653fddfb39d1f8e662a317d885229b9f008c2fba82d"
+      },
+      {
+        "path": "sandcore/tools/verify_scene_exact.py",
+        "size": 21001,
+        "sha256": "51b70e9dc65fb01ee498af30dfa76f30ca4e6a9f09c4ef4363dc53c300676afd"
+      },
+      {
+        "path": "sandcore/tools/verify_scmem.py",
+        "size": 12724,
+        "sha256": "cb123b263fe80d42c3b107ba204184d4440f29230f1d41854b02555161a7db77"
+      },
+      {
+        "path": "sandcore/tools/verify_scvox.py",
+        "size": 14393,
+        "sha256": "c5b2f74c2941a32da8cac1f359170664e5d25de3ac422d34807f5b75666f0e6e"
+      },
+      {
+        "path": "sandcore/tools/verify_scwide.py",
+        "size": 12707,
+        "sha256": "7922474fc07f7956a171bcaa5aa1dd54f2c84797da5f52f38b88c18266a72614"
+      },
+      {
+        "path": "sandcore/tools/verify_settings.py",
+        "size": 15918,
+        "sha256": "882c379bd898fbb5c0e5d0240329109d215d60d5d9cd9f26adb1b031e937dc4d"
+      },
+      {
+        "path": "sandcore/tools/verify_theme.py",
+        "size": 7985,
+        "sha256": "7f53fabcd08c212d30f2fa59e8cd25b155f267e9cde3bc0b70a55345517b58d5"
+      },
+      {
+        "path": "sandcore/tools/verify_truecolor.py",
+        "size": 17758,
+        "sha256": "dcf2f241df6fb2cec09107663df4c85211f52019d1425aba1bd2783177eb9423"
+      },
+      {
+        "path": "sandcore/tools/verify_userspace.py",
+        "size": 10972,
+        "sha256": "25c10c11081837737a1f7456bfdd67efc1dc75b20363731389ac5ac55c8cbf92"
+      },
+      {
+        "path": "sandcore/tools/verify_world_lighting.py",
+        "size": 10727,
+        "sha256": "af80835fa04284f31dfd68188963ee684caff1195e7f395262cc0371a3469420"
+      },
+      {
+        "path": "sandcore/user/api.h",
+        "size": 210,
+        "sha256": "c66b373b9cc856882d9d3225366aaedd3fa2fd27ad4217b52ea70fbc3c73b0de"
+      },
+      {
+        "path": "sandcore/user/assembler.c",
+        "size": 12497,
+        "sha256": "cfbd6454ed35ecebf51451048781e0a88e9209b093e5231ab4770aae25f3251f"
+      },
+      {
+        "path": "sandcore/user/calc.c",
+        "size": 4565,
+        "sha256": "a695665ca2df0d373c4c1f30b6d2da3fa55d037ef3080f027311a5b590d4ba86"
+      },
+      {
+        "path": "sandcore/user/canvas.c",
+        "size": 15644,
+        "sha256": "83c430d20f9596831257a05435cecb99b53e1e0ee7b79c70030e1ed5eea448a9"
+      },
+      {
+        "path": "sandcore/user/cli.c",
+        "size": 10512,
+        "sha256": "65da315ab4258da171420b4a6248aa1d7b2c23c10275a0323817b603bddb3af8"
+      },
+      {
+        "path": "sandcore/user/codec/CODEC.H",
+        "size": 456,
+        "sha256": "d42605abd078bb803f35507c45518b0ec2717321a39adeab72448d0502852b21"
+      },
+      {
+        "path": "sandcore/user/codec/decode.c",
+        "size": 5691,
+        "sha256": "caaf23b65a7023286457ddc7ce30141838cf810d6382e04c2fd4469c8a033bdb"
+      },
+      {
+        "path": "sandcore/user/codec/include/assert.h",
+        "size": 395,
+        "sha256": "d8665a07f8fcf938bef0779ac6966494249bf21e0c998248a06fea7eb8e747e1"
+      },
+      {
+        "path": "sandcore/user/codec/include/inttypes.h",
+        "size": 95,
+        "sha256": "f1bccc5647146a932f7b05236bc78f3a4d8f8ed6a55c9cfb99bcf8847b05094d"
+      },
+      {
+        "path": "sandcore/user/codec/include/limits.h",
+        "size": 540,
+        "sha256": "4e573a0b539732d2046c978650307d4e3ac64d1971a254b0e1d92453bb9f989c"
+      },
+      {
+        "path": "sandcore/user/codec/include/math.h",
+        "size": 493,
+        "sha256": "7f5b683950953e5b009b6fbb3419d77667b64f422281a68ff2b485df44a01942"
+      },
+      {
+        "path": "sandcore/user/codec/include/stdint.h",
+        "size": 997,
+        "sha256": "cfebd6cafc2c940c3c1e1c4c35bb0189500e7c19e125715fbe110e16da3f459c"
+      },
+      {
+        "path": "sandcore/user/codec/include/stdlib.h",
+        "size": 553,
+        "sha256": "a2bde2508303aea47d9fc1b9396261f80bcbcd84fc07155003a44740bba39de1"
+      },
+      {
+        "path": "sandcore/user/codec/include/string.h",
+        "size": 331,
+        "sha256": "6a92247c4d2085fa6ae15bc7f158c1f22d8c8930a2f2d65d2bcd26986c752b26"
+      },
+      {
+        "path": "sandcore/user/codec/runtime.c",
+        "size": 8013,
+        "sha256": "e64edf317f9ab0e431f55346959045d1d10ad8d673298791aa46e1b9b9afcb83"
+      },
+      {
+        "path": "sandcore/user/codec/service.c",
+        "size": 1713,
+        "sha256": "eb8c0ae737a8906f0731c5d05ee6d69c52041e5d17cee50f4a88f803a92a68bf"
+      },
+      {
+        "path": "sandcore/user/COMPILEUI.inc",
+        "size": 3864,
+        "sha256": "62c2335ee8674c5924020c145f95652d1de0e858f61639f6dcb149d93ebea05d"
+      },
+      {
+        "path": "sandcore/user/configprobe.c",
+        "size": 3321,
+        "sha256": "fbba2cca44e5cfedd40e0aaab21c26d2699fe17ec2588365dd47d50fd4e4057f"
+      },
+      {
+        "path": "sandcore/user/damageprobe.c",
+        "size": 3048,
+        "sha256": "c76090b9b1fc33b2ef1f2b97170d3693ecc32cfa857d72b5d15289e37abbf93c"
+      },
+      {
+        "path": "sandcore/user/debugger.c",
+        "size": 24897,
+        "sha256": "8d00db75a3a3bc898e346314f4e39df836f4d905afe7fffaab0497d66d50f963"
+      },
+      {
+        "path": "sandcore/user/files.c",
+        "size": 13551,
+        "sha256": "410a40f20e07406c143593a42ed7a8e013dad105dc55596df0782b9720a97298"
+      },
+      {
+        "path": "sandcore/user/frameirqprobe.c",
+        "size": 5606,
+        "sha256": "024a9e4537eb204dad8e31d7ec7f40d27fb8c2e805741030c737de896a7fef83"
+      },
+      {
+        "path": "sandcore/user/hello.asm",
+        "size": 1411,
+        "sha256": "7c56f8ea32f93e3fb7a25621e451cea1cfa2af3e3cfcea6cb98140775b675268"
+      },
+      {
+        "path": "sandcore/user/ide.c",
+        "size": 20864,
+        "sha256": "7f596749a96925c31a8d561fe2ad5446d36920d0749657b0a7fc1fe80da1133a"
+      },
+      {
+        "path": "sandcore/user/IMAGE.inc",
+        "size": 2460,
+        "sha256": "f6eb5958b5b08f4f2ce004b0bfa1587883c590cace6a5c63bbcf03ddd1c2a415"
+      },
+      {
+        "path": "sandcore/user/IMAGECLIENT.H",
+        "size": 1108,
+        "sha256": "8d19eddaf8e6b705f8c0748a04186a1807ef1017a2f47934cf20cf215b565a4a"
+      },
+      {
+        "path": "sandcore/user/IMAGECLIENT.inc",
+        "size": 2343,
+        "sha256": "0d794db2fbcc0f1c99aa019579151749aeb0bd1a9bf41db0781703f0cae81f94"
+      },
+      {
+        "path": "sandcore/user/imageprobe.c",
+        "size": 3981,
+        "sha256": "c383542e101978d096fbd00857fa26c4a56d6de0a0498327391a2308dbfd0929"
+      },
+      {
+        "path": "sandcore/user/indexprobe.c",
+        "size": 1186,
+        "sha256": "361ff3670d4ee116de25a8943ee75de26c181df2b2b53d232cce744705a5f662"
+      },
+      {
+        "path": "sandcore/user/lens.c",
+        "size": 18910,
+        "sha256": "b464205f91d29f8a7951afd30c8bfd6f9e0c1a01cb89a989f23db9923ceee33d"
+      },
+      {
+        "path": "sandcore/user/linker.ld",
+        "size": 868,
+        "sha256": "f559a3fc2ee06410e0ba3d8aae340e2bcaff3f1116acf371f7961d9940cbabef"
+      },
+      {
+        "path": "sandcore/user/lumen.c",
+        "size": 12409,
+        "sha256": "eca83b1740e4abec200b9079ec4a88230b6e7af5c8196c01b76ae07eea2ae79d"
+      },
+      {
+        "path": "sandcore/user/mines.c",
+        "size": 10278,
+        "sha256": "0290e563b024249d646508c93b232f3fa609aeb4cd3d70a62f283ad70035e855"
+      },
+      {
+        "path": "sandcore/user/monitor.c",
+        "size": 16948,
+        "sha256": "6076b6e7fda256270d4794a225fc5a622db01fd91008f3209ea54af3e08c633e"
+      },
+      {
+        "path": "sandcore/user/note.c",
+        "size": 15927,
+        "sha256": "04512af4d584b9f98c3ea79066cc0c58f42e285f2c06295313f536e14b564e5e"
+      },
+      {
+        "path": "sandcore/user/NUI.inc",
+        "size": 28357,
+        "sha256": "863edbb625962c54287fe67ca756429a4db5a4be9ca254a87db3228b0fac1ca0"
+      },
+      {
+        "path": "sandcore/user/palette.c",
+        "size": 4164,
+        "sha256": "9509fd3c338d7caeec85610683668a5772ffd73e42f2202cefea25103e929644"
+      },
+      {
+        "path": "sandcore/user/panic.asm",
+        "size": 174,
+        "sha256": "c7fa162fa264dab6a26f68d3f9696e60a5358de56087811d3b65d1a521a44d0a"
+      },
+      {
+        "path": "sandcore/user/pathprobe.c",
+        "size": 816,
+        "sha256": "0d3542d7863ab0b0bb40873724e3a379e4247ad058784adaec48f6555dad3041"
+      },
+      {
+        "path": "sandcore/user/probe.c",
+        "size": 6878,
+        "sha256": "3891924310a617d19b5f648e00949704094e289d23bcc5ce7d19b4da0cdaea2c"
+      },
+      {
+        "path": "sandcore/user/race.c",
+        "size": 23194,
+        "sha256": "5b29d163b9ae22b5f4ae487b0dee5e3221ac07541b48ad9b388b8e255d3ff15b"
+      },
+      {
+        "path": "sandcore/user/race_game.inc",
+        "size": 16836,
+        "sha256": "9d5c2dc714d1ec134731d8755e0f841356933456219961b3e25a67c069cbe5fd"
+      },
+      {
+        "path": "sandcore/user/RACEGAME.H",
+        "size": 752,
+        "sha256": "0c945b3cd8f9c9ef1ea89a1651421529e4d353163a777ec4fe94c39163819170"
+      },
+      {
+        "path": "sandcore/user/rgbprobe.c",
+        "size": 4631,
+        "sha256": "77e3524b03088751b5dc8ff6334f00db22a7a31a0dd3628b3135ec0e2fb1e8f5"
+      },
+      {
+        "path": "sandcore/user/s3c.c",
+        "size": 9457,
+        "sha256": "9be79a77e4e346605a2016646195b6a96d8ff327ad22c4de5f7a2a85c3998fb6"
+      },
+      {
+        "path": "sandcore/user/s3c_emit.inc",
+        "size": 47054,
+        "sha256": "1079fc2e0f035fef94ca8c6cb946c7459f991e474a50313a5d0a2b59e8f69643"
+      },
+      {
+        "path": "sandcore/user/s3c_lex.inc",
+        "size": 6622,
+        "sha256": "daac00f4c34383cbb47ec2dfce8fa3e959ef2813c66f647284ab2ab4b75becfc"
+      },
+      {
+        "path": "sandcore/user/s3c_parse.inc",
+        "size": 34321,
+        "sha256": "a44dc02ecf3bc99c46f38f29b142ff878f99e78b8a82c7e372f98e3bc29497fb"
+      },
+      {
+        "path": "sandcore/user/s3c_pp.inc",
+        "size": 22676,
+        "sha256": "b05cccc88180a8193d9b89caa32f1c07118651e6cdef690c3a41ac6fdb4a54aa"
+      },
+      {
+        "path": "sandcore/user/SCAPI.H",
+        "size": 25319,
+        "sha256": "3822d8180006dc869926538fff6293378217bf7df927f8e9e647a483dd092f78"
+      },
+      {
+        "path": "sandcore/user/SCENE.H",
+        "size": 4281,
+        "sha256": "e7a3d8b2ad850a1aa4b167387c6a6f600e45a5b821a833fd87e3f6b6fac2468b"
+      },
+      {
+        "path": "sandcore/user/SCENE.inc",
+        "size": 38967,
+        "sha256": "243fd70a9fccec21946e567f56ef5aba4dfae6680b439b24d5f4792bfd3d2d73"
+      },
+      {
+        "path": "sandcore/user/SCENENUI.inc",
+        "size": 480,
+        "sha256": "29a7bcd19d87d8cda2f5e61419d191e81da37d3e3e169e4527c5c11ee1f1d0b0"
+      },
+      {
+        "path": "sandcore/user/schedprobe.c",
+        "size": 2819,
+        "sha256": "7f61069626759c0cb5aa25406a8fbd55c52a423b2b95a7a8d95c9038928aa57f"
+      },
+      {
+        "path": "sandcore/user/SCMEM.H",
+        "size": 1137,
+        "sha256": "8e2d9b67648b61af01271117f0fa66cbccda1ace032f5aa8a229e1fcab0628d5"
+      },
+      {
+        "path": "sandcore/user/SCMEM.inc",
+        "size": 2787,
+        "sha256": "e73f1b650cc2a2654ffc6939bfaa1c87a0b46a95913c3a9869181d632d88dbbd"
+      },
+      {
+        "path": "sandcore/user/SCVOX.H",
+        "size": 2889,
+        "sha256": "bf584b16bf2f99cec83e036d540b4cb0fe94e6b17d6bec8ad70d56dfbc2cd41c"
+      },
+      {
+        "path": "sandcore/user/SCVOX.inc",
+        "size": 8163,
+        "sha256": "c028157a4084637a0484203ec8630f33b1f686f8ea166afb141737e8f3493cfa"
+      },
+      {
+        "path": "sandcore/user/SCWIDE.H",
+        "size": 2840,
+        "sha256": "9122fe2ced392570f51a111784e1bfde87918462583c816e6ed5687583157f9f"
+      },
+      {
+        "path": "sandcore/user/SCWIDE.inc",
+        "size": 7473,
+        "sha256": "e52a7384bcf6bd42bcd01b124ed3151a8d9301a0287055af0298fb5e00cb1be2"
+      },
+      {
+        "path": "sandcore/user/settings.c",
+        "size": 23678,
+        "sha256": "79c485de6b4516589e39ad01bbaca697f569244fd4371a5199d35c90b234fdef"
+      },
+      {
+        "path": "sandcore/user/SETTINGS.inc",
+        "size": 12915,
+        "sha256": "eb3f846d6049ab8653fd2e1582500c659839b9942a26d5d03609dc559b98103a"
+      },
+      {
+        "path": "sandcore/user/shell.asm",
+        "size": 4612,
+        "sha256": "6e2db458a3c5a1570dec80c45acbdd3c1dfad61ac0fe808e1b5ddfb6f6fc1cb6"
+      },
+      {
+        "path": "sandcore/user/shell.c",
+        "size": 4851,
+        "sha256": "80aeeedee101a00e0d1c6a3241c03cb0651ae9e72c5d2f187c62ca65c1015d6a"
+      },
+      {
+        "path": "sandcore/user/start.asm",
+        "size": 1235,
+        "sha256": "9d496e17db4902ad1e73b8b370b89b6b32a62731e350c3e4d59c5074acb30ef1"
+      },
+      {
+        "path": "sandcore/user/sysprobe.c",
+        "size": 5713,
+        "sha256": "64ba77c56b1786fecbb4159c77d2c2a239ad2719b8640b814d045c7b3f608dd1"
+      },
+      {
+        "path": "sandcore/user/themeprobe.c",
+        "size": 4613,
+        "sha256": "99bd69d36ae463df82bfb7dcc6991f6a6fef9801806982d26548bc06146703c2"
+      },
+      {
+        "path": "sandcore/user/UI.inc",
+        "size": 9027,
+        "sha256": "bd6ff8599c7ef2405b0f65b485a5447a89b65b194c8f59a63679817ca1c935fc"
+      },
+      {
+        "path": "sandcore/user/userprobe.c",
+        "size": 4199,
+        "sha256": "43afc2e222d5fec0f426085fad36e65a4c6cbc4e5c6ffc63044cbaef866c645e"
+      },
+      {
+        "path": "sandcore/user/world.c",
+        "size": 29081,
+        "sha256": "a1ec25835f6b791e6a2452dbd57e15d1d84fae15c4727764ea729f7f2ad6baac"
+      },
+      {
+        "path": "sandcore/user/world_entities.inc",
+        "size": 7014,
+        "sha256": "160c0abfa4294215d75fa9606119d32cff923306d91a257d03a4439b00776289"
+      },
+      {
+        "path": "sandcore/user/world_game.inc",
+        "size": 18205,
+        "sha256": "188ffb88ac4fb26183f8ec8bdbfc6fe3dd23ea2c28a144de86ca68b5b9cadd5e"
+      },
+      {
+        "path": "sandcore/user/world_panels.inc",
+        "size": 12214,
+        "sha256": "a1da4e4be3a94ee35cf9c4e5967c9d8893418a06236c458bc5aa2f267526f8e7"
+      },
+      {
+        "path": "sandcore/user/WORLDGAME.H",
+        "size": 1278,
+        "sha256": "9c0920638f5abbb63b81998bca1ebee038ad8150a5ca158d1d4c5ac0302d53c9"
+      }
+    ],
+    "M6a": [
+      {
+        "path": "sandcore/build.bat",
+        "size": 437,
+        "sha256": "766bda540741a22f5273e8edeb4a3f72f4c247d564378137bfd59155d758c0eb"
+      },
+      {
+        "path": "sandcore/linker.ld",
+        "size": 2140,
+        "sha256": "6156de8bc5cbc84b9864d3c221e0c30fe6c8c073cf4c8e962b8162e9c52a0f87"
+      },
+      {
+        "path": "sandcore/Makefile",
+        "size": 8078,
+        "sha256": "84b0b9474e39a9763b2ed679e45e426fddf4b0333a02b2d2f9906864b2c60e06"
+      },
+      {
+        "path": "sandcore/README.md",
+        "size": 8095,
+        "sha256": "2993a9b0315629774107099a8b802e655ea10b66866a124dd6921c051f7fed57"
+      },
+      {
+        "path": "sandcore/run.bat",
+        "size": 802,
+        "sha256": "9a8232a3ed8ed3fdb4e6a5d5fa9b421d83a03acde9ea2cb87427aebe65c2418b"
+      },
+      {
+        "path": "sandcore/run.sh",
+        "size": 242,
+        "sha256": "f8d27b581bc1bacbaef87404f0b9ea8240adf42d48efa762cd8045d46dd8f37c"
+      },
+      {
+        "path": "sandcore/boot/boot.asm",
+        "size": 12844,
+        "sha256": "b04e16512480ac7cf5d5dffe3b4799dac7c5b3f33c09e47607ab15e6e121a3e7"
+      },
+      {
+        "path": "sandcore/docs/BOOT.md",
+        "size": 6659,
+        "sha256": "1b0e6e37b1411963960daaccab70c760cc35e4718871ba401a3d2b35c59cb8f9"
+      },
+      {
+        "path": "sandcore/docs/BUILD.md",
+        "size": 6088,
+        "sha256": "8d44abed215cf19f2bf46d203b87fedd933ef1570afa977c9b2a38846c5c311e"
+      },
+      {
+        "path": "sandcore/docs/FS.md",
+        "size": 3145,
+        "sha256": "4f849eaa7ae5864e628cf0fc684f40eecfb678148b45e73563c8edc19cdd4c9e"
+      },
+      {
+        "path": "sandcore/docs/GFX.md",
+        "size": 9180,
+        "sha256": "d9bda16d6dfad2516de97e6a8d280425f793fd3056587b4c95c3d5d28a0d5845"
+      },
+      {
+        "path": "sandcore/docs/INTR.md",
+        "size": 5230,
+        "sha256": "f2dcb6c2ffc7bcffa8774299ef1573f75b10fe5c774c75c4de1f315348e81607"
+      },
+      {
+        "path": "sandcore/docs/MEM.md",
+        "size": 3472,
+        "sha256": "1bfb3769d5f92343ad61ad48e59bd7562d0e9a125fd02a7e2fc3375c8686d8cf"
+      },
+      {
+        "path": "sandcore/docs/ROADMAP.md",
+        "size": 7738,
+        "sha256": "f59ff4315885a05110862b4d77a4797d22507c5969c6d9c49a39f2c3745292d3"
+      },
+      {
+        "path": "sandcore/docs/SHELL.md",
+        "size": 2335,
+        "sha256": "6cdc9abf5274abdbb209175e920fe401d5b4bb7149339d57b31c423112b504c8"
+      },
+      {
+        "path": "sandcore/docs/SYSCALL.md",
+        "size": 5402,
+        "sha256": "be5cfdc9b7cc74e4e6bfbdf8c4bbca373e6ad35cf8ad5884f5095f217fa49eb5"
+      },
+      {
+        "path": "sandcore/docs/TESTING.md",
+        "size": 3802,
+        "sha256": "feca46b93bffb6d3cc46c341e4954650cdd2b311f7f3dc164d0e279c122ec2bb"
+      },
+      {
+        "path": "sandcore/docs/WM.md",
+        "size": 4348,
+        "sha256": "0dd6a36806da25c0457363e64ec8cfb53093b08e2a9e627e231e2cc0c64cb360"
+      },
+      {
+        "path": "sandcore/kernel/ata.c",
+        "size": 3674,
+        "sha256": "a2b1e134ab26dbdbba1acf0b3cf942aa06371afab83163de74d49599fb88058a"
+      },
+      {
+        "path": "sandcore/kernel/ata.h",
+        "size": 455,
+        "sha256": "64bb6e27b6699c906c150f4f644c3bb18a3436b8c6958d73c2585c0f1cc4d254"
+      },
+      {
+        "path": "sandcore/kernel/entry.asm",
+        "size": 1819,
+        "sha256": "6f10951e7dec231e8b06457f914d40e49ba83a4de2c5ea07b83ea96f249ab74e"
+      },
+      {
+        "path": "sandcore/kernel/font.h",
+        "size": 7463,
+        "sha256": "31383234b44fc4ea8b739cf8b0caba78e3f457c0eb9a6fc335f8a6f51ff245d7"
+      },
+      {
+        "path": "sandcore/kernel/font16.h",
+        "size": 1889,
+        "sha256": "b244f58bd09d3f408b3484993757caa1f4cbc5bb5ad0ff9ab5dea99c6be23172"
+      },
+      {
+        "path": "sandcore/kernel/font16.txt",
+        "size": 10303,
+        "sha256": "1ef3876e7adbf0f42dc432dbdf21c927282a7e28bb076613c6cb50fbf0de9b55"
+      },
+      {
+        "path": "sandcore/kernel/fs.c",
+        "size": 5548,
+        "sha256": "f583a12557761988beca1b3b33a7b2a3e5265be7d2807bc2c6187f78a8a93eb2"
+      },
+      {
+        "path": "sandcore/kernel/fs.h",
+        "size": 764,
+        "sha256": "5b0c5ab4b563fd3d0550f8344312dacd224c8b2a7e7a7b1cd83fde600d33ea45"
+      },
+      {
+        "path": "sandcore/kernel/gfx.c",
+        "size": 5495,
+        "sha256": "d0c534ee619b0c80eb9c583c2cc647a44f780154c2f9254e741c96004388e3ce"
+      },
+      {
+        "path": "sandcore/kernel/gfx.h",
+        "size": 1939,
+        "sha256": "a649f4195223b33bdbdc087825fd203adb2fa64b1771b244942a2388c071b44e"
+      },
+      {
+        "path": "sandcore/kernel/heap.c",
+        "size": 3792,
+        "sha256": "e131cc1eeab70a3a93cb1d1139af1095800a386e457b9f199bb4002a6341cbbc"
+      },
+      {
+        "path": "sandcore/kernel/heap.h",
+        "size": 527,
+        "sha256": "cbcb131bc4223c8bf65a0a5873f0e3176e96961438084b9d5b224f0ed9c6806d"
+      },
+      {
+        "path": "sandcore/kernel/idt.asm",
+        "size": 6453,
+        "sha256": "89c0c60311dec2d202d270c3e94e2cf7cf3968d0ae223ba21022b5bdb9cfccab"
+      },
+      {
+        "path": "sandcore/kernel/interrupts.c",
+        "size": 4917,
+        "sha256": "a32f0273a177b1c1fb9ccb0464ecd5dbdd88feb5451af415ae733f1fc3c45ced"
+      },
+      {
+        "path": "sandcore/kernel/interrupts.h",
+        "size": 487,
+        "sha256": "7d8e7cc86d14ee5406f0d8e6f619baf081ef6bf113fdcb3b0d334fa07811650e"
+      },
+      {
+        "path": "sandcore/kernel/io.h",
+        "size": 1665,
+        "sha256": "d7769e25e2544f2aa84b4501e6208d9db8ade0a65630ec1b3d67ae13eb02315d"
+      },
+      {
+        "path": "sandcore/kernel/keyboard.c",
+        "size": 5227,
+        "sha256": "f9470f02ae5edda634c61fc146accb0ae125fcc9353a00a8ea314f8df5470070"
+      },
+      {
+        "path": "sandcore/kernel/keyboard.h",
+        "size": 412,
+        "sha256": "fe9033c05ce6d9af534ea426d42db2bc806ab1fe0cdaf635814ae62eca00a45e"
+      },
+      {
+        "path": "sandcore/kernel/main.c",
+        "size": 6692,
+        "sha256": "135173061676c76c146116a88d3cc9427980a071b491de437af0462b65018006"
+      },
+      {
+        "path": "sandcore/kernel/memory.c",
+        "size": 4371,
+        "sha256": "6ecc85d3fd871a0f598c5a75db857d8c641541492fcf50c17eb5f5b774088361"
+      },
+      {
+        "path": "sandcore/kernel/memory.h",
+        "size": 1193,
+        "sha256": "b94c39022fdc21905d40640e998ee089840e4b4123dd4debef0b087f4ffe9dfb"
+      },
+      {
+        "path": "sandcore/kernel/mouse.c",
+        "size": 3752,
+        "sha256": "b3a0722e303211b7a76b18a4055cf6d8a7f0cc93a08ebafe04418279ee31e2ed"
+      },
+      {
+        "path": "sandcore/kernel/mouse.h",
+        "size": 487,
+        "sha256": "c38e092c9c834e1b28abc711127fec60c9dd142977bf1e4f00de362010794695"
+      },
+      {
+        "path": "sandcore/kernel/paging.c",
+        "size": 2993,
+        "sha256": "803e0ac481ccd7b74527a28b552ecccd6f076865f896bfd729d88804c8020fa1"
+      },
+      {
+        "path": "sandcore/kernel/paging.h",
+        "size": 1141,
+        "sha256": "89e8e135e777cc0f5a5bfb11a3056b418f47f17675966d086c1797451514558a"
+      },
+      {
+        "path": "sandcore/kernel/palette.h",
+        "size": 1457,
+        "sha256": "1cb5a528d9811feb94d1e773072362d3aa1877e8ba2225fc334c3822e0d788d5"
+      },
+      {
+        "path": "sandcore/kernel/task.c",
+        "size": 10254,
+        "sha256": "7051768ccf3b14c5bd7d89bd988b2148c4a3cc213cfcb2ec3caa95a51bfd30d9"
+      },
+      {
+        "path": "sandcore/kernel/task.h",
+        "size": 1565,
+        "sha256": "d5ab1dca2885427a945826a386081fd18c69a126b3cecb83cf5e6d47721cf009"
+      },
+      {
+        "path": "sandcore/kernel/term.c",
+        "size": 3179,
+        "sha256": "4c2ac5fb29f6667b3bff5e13723a3d154dc2f7393a453fe7b65b2c560cd237c3"
+      },
+      {
+        "path": "sandcore/kernel/term.h",
+        "size": 993,
+        "sha256": "328994c97d64c489b7ce9196e48c0fe9aff2bc9c219666adb3842cf18d2f6d17"
+      },
+      {
+        "path": "sandcore/kernel/timer.c",
+        "size": 1246,
+        "sha256": "9f3e61e8e6d1812cd8b101f474dae99aec499121fe80ebf280e9a8c6fbe26418"
+      },
+      {
+        "path": "sandcore/kernel/timer.h",
+        "size": 505,
+        "sha256": "a20e919031046058a51fe1a28fb5b7efdd87d9027a7b94bc32a6f9bbbee88ccf"
+      },
+      {
+        "path": "sandcore/kernel/wm.c",
+        "size": 13465,
+        "sha256": "4016330503bdb01c1fb85e196efad53e06f810dfec16c6a9fe1eef239d325f45"
+      },
+      {
+        "path": "sandcore/kernel/wm.h",
+        "size": 1091,
+        "sha256": "b81666c368c475394e8ff245b44623a2f37896b85ea3af49e7abe41a006a2027"
+      },
+      {
+        "path": "sandcore/tools/font_preview.py",
+        "size": 2501,
+        "sha256": "a3dd4ff4d4416080c9ff5450faad9f1621fb442a358e8156a9e0139baab479db"
+      },
+      {
+        "path": "sandcore/tools/import_font.py",
+        "size": 2599,
+        "sha256": "666b870237a8e8f1c342c74b958d062ce11ee38de2e3a25c0a39f6b0df8639fc"
+      },
+      {
+        "path": "sandcore/tools/keys.py",
+        "size": 1102,
+        "sha256": "04003b20234f565f1df6df66f11182fc2c8b9469b199122b206bfbaddb83ec75"
+      },
+      {
+        "path": "sandcore/tools/mkfont.py",
+        "size": 4440,
+        "sha256": "09b3c78f5c043293d8f755e5a216302ba927141bac24fe7eef16e30c535e9131"
+      },
+      {
+        "path": "sandcore/tools/mkfs.py",
+        "size": 3681,
+        "sha256": "46a57c67e54ae425319c4fa0f4c84eee0caf95945afcf57fcccd8c68d217dae7"
+      },
+      {
+        "path": "sandcore/tools/mkimg.py",
+        "size": 1065,
+        "sha256": "cc0be275035bce757222c3fd234cdf63eb92cd5e38336cd5440e99f3a6b80405"
+      },
+      {
+        "path": "sandcore/tools/mkscx.py",
+        "size": 1397,
+        "sha256": "673915d2ac95b672691dac93535a667ab9184b8943fe4c172e010979d77cb38a"
+      },
+      {
+        "path": "sandcore/tools/mouse.py",
+        "size": 2170,
+        "sha256": "9f9a4c16cd5ceff1accdaa5270e178b8114b7dff4292199335efddc2186275d7"
+      },
+      {
+        "path": "sandcore/tools/snap.py",
+        "size": 2363,
+        "sha256": "7a116f669de411e91bfb74ee2287587133eddeb8de05ea3854f9e2e24091d084"
+      },
+      {
+        "path": "sandcore/user/hello.asm",
+        "size": 1363,
+        "sha256": "a1f165a24a6465733f8a41ad8568eaf65874e63e51a9b529cd98191d4c01b4f8"
+      },
+      {
+        "path": "sandcore/user/shell.asm",
+        "size": 5735,
+        "sha256": "71fbdd3eb132a79ca319de73086dfabaa0f3f667b0a3bdd7fe0cff41346fb113"
+      }
+    ]
+  }
+}

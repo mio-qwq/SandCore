@@ -1,0 +1,543 @@
+/* =====================================================================
+ *  SandCore 窗口管理器 v2 (kernel/wm.c)
+ *  ---------------------------------------------------------------------
+ *  【M6 质变】窗口成为系统调用提供的资源:
+ *    用户程序 (ring3) 经 SYS_WINOPEN 开窗口 → 内核分配"画布"
+ *    (客户区像素缓冲) → 程序用 SYS_TXT/FILL 在画布上作画 →
+ *    合成器把画布 blit 到屏幕; SYS_GETKEY/SYS_MOUSE 送输入。
+ *    程序退出时其窗口自动回收 (owner 检查)。
+ *
+ *  【桌面】开机即桌面: 图标来自 SandFS 的 desk/ 快捷方式 (文本:
+ *    第1行=显示名, 第2行=目标 SCX 路径, 第3行=图标 SCF 路径),
+ *    单击图标 → 运行目标程序。图标本体 = SCF1MIO 16x16 文件。
+ * ===================================================================== */
+#include "io.h"
+#include "palette.h"
+#include "gfx.h"
+#include "mouse.h"
+#include "timer.h"
+#include "task.h"
+#include "fs.h"
+#include "wm.h"
+#include "font.h"
+
+extern void scene_paint(void);        /* main.c: 沙漠壁纸 (画进后台缓冲) */
+
+#define TITLE_H 13
+#define BORDER  1
+#define WMAX 6
+#define CANVAS_W 304
+#define CANVAS_H 150
+
+typedef struct {
+    int used;
+    int owner;                        /* 创建者 pid (退出自动回收) */
+    int handle;                       /* 句柄独立于 z 序，置顶不会串窗口 */
+    i32 x, y, w, h;                   /* 外框 */
+    char title[12];
+    u8 *canvas;                       /* 客户区像素缓冲 */
+    i32 cw, ch;                       /* 画布尺寸 */
+    u8 keys[16];                      /* 按键队列 */
+    u8 kq, kt;
+    i32 tx, ty;
+} win_t;
+
+static win_t wins[WMAX];
+static int nwins;
+static int next_handle;
+static int wallpaper_mode;
+static int dirty = 1;
+
+static u8 canvas_pool[WMAX][CANVAS_W * CANVAS_H];   /* ~292KB BSS */
+
+static int  drag = -1;
+static i32  drag_ox, drag_oy;
+
+void wm_request_compose(void) { dirty = 1; }
+int  wm_dirty(void)           { return dirty; }
+
+/* ---------------- 桌面图标 (desk/ 下的 .lnk) ----------------
+ * lnk 文本: 第1行 显示名 / 第2行 目标SCX路径 / 第3行 图标SCF路径 */
+typedef struct {
+    int used;
+    char label[12];
+    char target[32];
+    u8 icon[3000];                    /* 图标 SCF 文件本体 */
+} dicon_t;
+
+static dicon_t dicons[4];
+
+static void icn_draw(i32 x, i32 y, const u8 *icn, u8 fg)
+{
+    /* SCF1MIO: 取第 0 个字形的 16 行点阵直接画 */
+    int n = icn[8] | (icn[9] << 8);
+    if (n < 1)
+        return;
+    const u8 *rows = icn + 12 + 4;    /* 跳过第 0 字的 utf8+NUL 槽 */
+    for (int r = 0; r < 16; r++)
+        for (int c = 0; c < 16; c++)
+            if (rows[r * 17 + c] == '#')
+                gfx_pset(x + c, y + r, fg);
+}
+
+static void load_desktop(void)
+{
+    int di = 0;
+    for (int i = 0; i < fs_count() && di < 4; i++) {
+        const char *n = fs_name(i);
+        int len = 0;
+        while (n[len]) len++;
+        if (len < 9 || n[0] != 'd' || n[1] != 'e' || n[2] != 's' || n[3] != 'k' || n[4] != '/'
+         || n[len-4] != '.' || n[len-3] != 'l' || n[len-2] != 'n' || n[len-1] != 'k')
+            continue;                 /* 只要 desk/ 下的 .lnk */
+
+        static u8 lnkbuf[4][512];     /* 每个图标一份 lnk 本体 */
+        u8 *lnk = lnkbuf[di];
+        int bytes = fs_read(n, lnk, 511);
+        if (bytes <= 0)
+            continue;
+        lnk[bytes] = 0;
+
+        dicon_t *d = &dicons[di];
+        char icp[32] = {0};
+        int c = 0, line = 0, k = 0;
+        d->label[0] = 0;
+        d->target[0] = 0;
+        for (k = 0; k < bytes && lnk[k] && line < 3; k++) {
+            if (lnk[k] == '\r') continue;
+            if (lnk[k] == '\n') {     /* 行结束 */
+                if (line == 0) d->label[c] = 0;
+                if (line == 1) d->target[c] = 0;
+                if (line == 2) icp[c] = 0;
+                line++;
+                c = 0;
+                continue;
+            }
+            if (line == 0 && c < 11) d->label[c++] = (char)lnk[k];
+            if (line == 1 && c < 30) d->target[c++] = (char)lnk[k];
+            if (line == 2 && c < 30) icp[c++] = (char)lnk[k];
+        }
+        if (line == 0) d->label[c] = 0;
+        if (line == 1) d->target[c] = 0;
+        if (line == 2) icp[c] = 0;
+        int count = fs_read(icp, d->icon, sizeof(d->icon));
+        if (count >= 288 && d->icon[0] == 'S' && d->icon[1] == 'C'
+         && d->icon[2] == 'F' && d->icon[3] == '1' && d->icon[4] == 'M'
+         && d->icon[5] == 'I' && d->icon[6] == 'O' && d->icon[8] == 1) {
+            d->used = 1;
+            di++;
+        }
+    }
+}
+
+/* ---------------- 窗口句柄 API (系统调用落地) ---------------- */
+static int win_create(int owner, const char *title, i32 x, i32 y, i32 w, i32 h)
+{
+    if (nwins >= WMAX || w < 48 || h < 32 || w > CANVAS_W + 2 || h > CANVAS_H + TITLE_H + 1)
+        return -1;
+    win_t *np = &wins[nwins];          /* 注意: 不能叫 w, 与宽度参数重名 */
+    np->used = 1;
+    np->owner = owner;
+    np->handle = next_handle++;
+    np->x = x; np->y = y; np->w = w; np->h = h;
+    for (int k = 0; k < 11; k++) {
+        np->title[k] = title[k];
+        if (!title[k]) break;
+    }
+    np->title[11] = 0;
+    /* 找空闲画布；窗口结构移动时保留指针，内容始终跟随窗口。 */
+    for (int c = 0; c < WMAX; c++) {
+        int busy = 0;
+        for (int i = 0; i < nwins; i++)
+            if (wins[i].canvas == canvas_pool[c]) busy = 1;
+        if (!busy) { np->canvas = canvas_pool[c]; break; }
+    }
+    np->cw = (w - 2 * BORDER > CANVAS_W) ? CANVAS_W : (w - 2 * BORDER);
+    np->ch = h - TITLE_H - BORDER;
+    for (u32 i = 0; i < (u32)(np->cw * np->ch); i++)
+        np->canvas[i] = PAL_CON_BG;
+    np->kq = np->kt = 0;
+    np->tx = np->ty = 4;
+    nwins++;
+    return np->handle;
+}
+
+static void win_close(int idx)
+{
+    if (idx < 0 || idx >= nwins)
+        return;
+    for (int i = idx; i < nwins - 1; i++) {
+        wins[i] = wins[i + 1];
+    }
+    nwins--;
+    if (drag == idx) drag = -1;
+    else if (drag > idx) drag--;
+}
+
+static void win_raise(int idx)
+{
+    win_t top = wins[idx];
+    for (int i = idx; i < nwins - 1; i++) {
+        wins[i] = wins[i + 1];
+    }
+    wins[nwins - 1] = top;
+}
+
+/* ---------------- 用户窗口 API (系统调用落地) ---------------- */
+int wm_open_user_window(int pid, const char *title, int w, int h)
+{
+    if (h > CANVAS_H + TITLE_H + 1) h = CANVAS_H + TITLE_H + 1;
+    if (w > CANVAS_W + 2) w = CANVAS_W + 2;
+    i32 x = (320 - w) / 2, y = (184 - h) / 2;
+    int hnd = win_create(pid, title, x, y, w, h);
+    if (hnd >= 0) dirty = 1;
+    return hnd;
+}
+
+void wm_close_user_window(int pid, int handle)
+{
+    for (int i = 0; i < nwins; i++)
+        if (wins[i].handle == handle && wins[i].owner == pid) { win_close(i); break; }
+    dirty = 1;
+}
+
+void wm_close_owner(int pid)
+{
+    for (int i = nwins - 1; i >= 0; i--)
+        if (wins[i].owner == pid) win_close(i);
+    dirty = 1;
+}
+
+static win_t *owned_window(int pid, int handle)
+{
+    /* 句柄不是 wins 下标：数组只承担 z 序，点击置顶会移动结构。
+     * 每次调用同时匹配稳定 ID 和 owner，既防止画进别人的窗口，
+     * 也防止关闭中间窗口后老句柄误指向补位的新窗口。 */
+    for (int i = 0; i < nwins; i++)
+        if (wins[i].owner == pid && wins[i].handle == handle) return &wins[i];
+    return 0;
+}
+
+int wm_user_info(int pid,int handle,i32 *out)
+{
+    /* 鼠标 ABI 给出屏幕绝对坐标；应用需要外框位置才能转换为客户区。
+     * 拖动由内核负责，应用每轮查询当前位置，不能缓存最初的居中位置。
+     * focused 使后台游戏不会响应全局鼠标点击，避免点击穿透前景窗口。 */
+    win_t *w=owned_window(pid,handle);
+    if(!w) return -1;
+    out[0]=w->x; out[1]=w->y; out[2]=w->cw; out[3]=w->ch;
+    out[4]=(w==&wins[nwins-1]);
+    return 0;
+}
+
+int wm_wallpaper(void) { return wallpaper_mode; }
+int wm_set_wallpaper(int mode)
+{
+    if(mode<0 || mode>2) return -1;
+    u8 value=(u8)('0'+mode);
+    /* 设置先落盘，失败时保留当前壁纸；应用可据返回值显示保存失败。
+     * 仅保存模式号，重启时仍用同一套 palette 槽位生成像素，无 64KB
+     * 图片缓冲占用低端 BSS，也没有新增自定义魔数或裸 RGB 色号。 */
+    if(fs_write("sys/wall.cfg",&value,1)!=1) return -1;
+    wallpaper_mode=mode; dirty=1;
+    return 0;
+}
+
+static void canvas_char(win_t *w, int x, int y, char ch, u8 color)
+{
+    /* 字形数据仍取工程自制 SCF-8；这里只更换绘制目的地。
+     * SYS_TXT 是透明底绘制，字形的零位保持画布原像素，适合覆盖图形。
+     * 退格因此不能靠画一个空格完成，流式文字接口必须另行清整格。
+     * 客户区坐标和屏幕坐标分开，拖动只变外框位置，不会重画字形。 */
+    const u8 *g = glyph_of(ch);
+    for (int r = 0; r < 8; r++)
+        for (int c = 0; c < 8; c++)
+            if (x+c >= 0 && x+c < w->cw && y+r >= 0 && y+r < w->ch
+             && ((g[r] >> (7-c)) & 1)) w->canvas[(y+r)*w->cw+x+c] = color;
+}
+
+void wm_user_text(int pid, int handle, int x, int y, const char *s, u8 color)
+{
+    win_t *w = owned_window(pid, handle);
+    if (!w) return;
+    int start = x;
+    while (*s) {
+        if (*s == '\n') { x = start; y += 10; }
+        else { canvas_char(w, x, y, *s, color); x += 8; }
+        s++;
+    }
+    dirty = 1;
+}
+
+void wm_user_fill(int pid, int handle, int x, int y, int w2, int h2, u8 color)
+{
+    win_t *w = owned_window(pid, handle);
+    if (!w || w2 <= 0 || h2 <= 0) return;
+    for (int j = 0; j < w->ch; j++)
+        for (int i = 0; i < w->cw; i++)
+            if ((i32)(i-x) >= 0 && (u32)(i-x) < (u32)w2
+             && (i32)(j-y) >= 0 && (u32)(j-y) < (u32)h2)
+                w->canvas[j*w->cw+i] = color;
+    if (x == 0 && y == 0 && w2 >= w->cw && h2 >= w->ch) w->tx = w->ty = 4;
+    dirty = 1;
+}
+
+int wm_user_puts(int pid, const char *s)
+{
+    /* 【流式输出属于哪个窗口】
+     * 一个应用可以开多窗口：选 handle 最大的本人窗口，即最近创建的窗口，
+     * 而不是 z 序最顶的窗口。点别人的窗口不会把本应用的输出重定向过去。
+     * tx/ty 存在窗口结构里，程序之间、窗口之间都不共享文字游标。
+     * ASCII 字宽 8px、行步长 10px，四边留 4px；滚动源偏移必须是
+     * 10*cw 字节（完整像素行），不是 cw 字节（只移动 1px）。 */
+    win_t *w = 0;
+    for (int i = 0; i < nwins; i++)
+        if (wins[i].owner == pid && (!w || wins[i].handle > w->handle)) w = &wins[i];
+    if (!w) return -1;
+    while (*s) {
+        char c = *s++;
+        if (c == '\r') { w->tx = 4; continue; }
+        if (c == '\b') {
+            if (w->tx >= 12) w->tx -= 8;
+            else if (w->ty >= 14) {
+                /* 上一行末格由客户区可用列数算出，不硬写 38 或 40。
+                 * Shell 自己的长度守卫决定是否允许退格，窗口只负责像素
+                 * 和游标回退；长命令折行后也能逐字删除而不留上下半截。 */
+                w->ty -= 10;
+                w->tx = 4 + ((w->cw-8)/8-1)*8;
+            }
+            for (int r = 0; r < 8; r++)
+                for (int x = 0; x < 8; x++) w->canvas[(w->ty+r)*w->cw+w->tx+x] = PAL_CON_BG;
+            continue;
+        }
+        if (c == '\n' || w->tx + 8 > w->cw - 4) { w->tx = 4; w->ty += 10; }
+        if (w->ty + 8 > w->ch - 4) {
+            for (int i = 4*w->cw; i < (w->ch-14)*w->cw; i++) w->canvas[i] = w->canvas[i+10*w->cw];
+            for (int i = (w->ch-14)*w->cw; i < (w->ch-4)*w->cw; i++) w->canvas[i] = PAL_CON_BG;
+            w->ty -= 10;
+        }
+        if (c != '\n') { canvas_char(w, w->tx, w->ty, c, PAL_TITLE); w->tx += 8; }
+    }
+    dirty = 1;
+    return 0;
+}
+
+/* ---------------- 绘制 ---------------- */
+static void draw_window(int i)
+{
+    win_t *w = &wins[i];
+    int focused = (i == nwins - 1);
+
+    gfx_fill(w->x, w->y, w->w, w->h, focused ? PAL_CON_TINT : PAL_WIN_TITLE);
+    gfx_fill(w->x + BORDER, w->y + TITLE_H, w->w - 2 * BORDER,
+             w->h - TITLE_H - BORDER, PAL_CON_BG);
+    gfx_fill(w->x + BORDER, w->y + BORDER, w->w - 2 * BORDER, TITLE_H - 2,
+             focused ? PAL_CON_TINT : PAL_WIN_TITLE);
+    gfx_text8(w->x + 4, w->y + 3, w->title, PAL_CON_BG, 1, 1);
+    gfx_fill(w->x + w->w - 12, w->y + 2, 10, 10, PAL_PANIC);
+    gfx_line(w->x + w->w - 10, w->y + 4, w->x + w->w - 4, w->y + 10, PAL_TITLE);
+    gfx_line(w->x + w->w - 10, w->y + 10, w->x + w->w - 4, w->y + 4, PAL_TITLE);
+
+    /* 画布 blit: 客户区像素逐点贴到后台缓冲 */
+    for (int r = 0; r < w->ch; r++)
+        for (int c = 0; c < w->cw; c++)
+            gfx_pset(w->x + BORDER + c, w->y + TITLE_H + r, w->canvas[r * w->cw + c]);
+}
+
+static void draw_taskbar(void)
+{
+    gfx_fill(0, 184, 320, 16, PAL_TASKBAR);
+    gfx_text16(4, 184, "沙核", PAL_TITLE, 0);
+    gfx_text8(238, 188, "UP ", PAL_CON_TINT, 1, 1);
+    u32 s = sc_ticks / 100;
+    char b[11];
+    i32 n = 0;
+    do { b[n++] = (char)('0' + s % 10); s /= 10; } while (s);
+    i32 x = 263;
+    while (n--) {
+        gfx_char8(x, 188, b[n], PAL_CON_TINT, 1);
+        x += 8;
+    }
+    gfx_text8(x + 8, 188, "S", PAL_CON_TINT, 1, 1);
+}
+
+static const char *cursor_art[13] = {
+    "#.......",
+    "##......",
+    "#o#.....",
+    "#oo#....",
+    "#ooo#...",
+    "#oooo#..",
+    "#ooooo#.",
+    "#oooooo#",
+    "#oooooo#",
+    "#ooo####",
+    "#o#.#...",
+    "#..#.#..",
+    "....#...",
+};
+
+static void draw_cursor(void)
+{
+    i32 x = mouse_x(), y = mouse_y();
+    for (int r = 0; r < 13; r++)
+        for (int c = 0; c < 8; c++) {
+            char a = cursor_art[r][c];
+            if (a == '#')
+                gfx_pset(x + c, y + r, PAL_TITLE);
+            else if (a == 'o')
+                gfx_pset(x + c, y + r, PAL_SHADOW);
+        }
+}
+
+static void draw_icons(void)
+{
+    for (int i = 0; i < 4; i++) {
+        if (!dicons[i].used)
+            continue;
+        i32 x = 8, y = 8 + i * 44;
+        icn_draw(x, y, dicons[i].icon, PAL_TITLE);
+        gfx_text8(x + 20, y + 4, dicons[i].label, PAL_TITLE, 1, 1);
+    }
+}
+
+/* ---------------- 合成 ---------------- */
+void wm_compose(void)
+{
+    scene_paint();
+    draw_icons();
+    for (int i = 0; i < nwins; i++)
+        draw_window(i);
+    draw_taskbar();
+    draw_cursor();
+    gfx_swap();
+    dirty = 0;
+}
+
+/* ---------------- 鼠标交互 ---------------- */
+static int hit_window(i32 x, i32 y)
+{
+    for (int i = nwins - 1; i >= 0; i--)
+        if (x >= wins[i].x && x < wins[i].x + wins[i].w
+         && y >= wins[i].y && y < wins[i].y + wins[i].h)
+            return i;
+    return -1;
+}
+
+void wm_mouse_poll(void)
+{
+    static i32 pmx = -1, pmy = -1;
+    static u8  pbtn = 0;
+
+    i32 x = mouse_x(), y = mouse_y();
+    u8  b = mouse_buttons();
+    if (x == pmx && y == pmy && b == pbtn)
+        return;
+
+    if ((b & 1) && !(pbtn & 1)) {     /* 左键按下沿 */
+        int w = hit_window(x, y);
+        /* 图标命中? (桌面层, 优先级最低但在最上面画 —— 这里先查图标) */
+        for (int i = 0; i < 4; i++) {
+            if (w >= 0 || !dicons[i].used) continue;
+            i32 ix = 8, iy = 8 + i * 44;
+            if (x >= ix && x < ix + 24 && y >= iy && y < iy + 18) {
+                task_exec_scx(dicons[i].target);
+                pmx = x; pmy = y; pbtn = b;
+                dirty = 1;
+                return;
+            }
+        }
+        if (w >= 0) {
+            win_raise(w);
+            w = nwins - 1;
+            if (x >= wins[w].x + wins[w].w - 12 && x < wins[w].x + wins[w].w - 2
+             && y >= wins[w].y + 2 && y < wins[w].y + 12) {
+                int owner = wins[w].owner;
+                task_stop(owner);   /* 最后一个窗口关闭意味着 GUI 任务结束 */
+                drag = -1;
+            } else if (y < wins[w].y + TITLE_H) {
+                drag = nwins - 1;
+                drag_ox = x - wins[drag].x;
+                drag_oy = y - wins[drag].y;
+            }
+        }
+    }
+    if (!(b & 1) && (pbtn & 1))
+        drag = -1;
+
+    if (drag >= 0 && (b & 1)) {
+        i32 nx = x - drag_ox, ny = y - drag_oy;
+        if (nx < 0) nx = 0;
+        if (ny < 0) ny = 0;
+        if (nx > 320 - wins[drag].w) nx = 320 - wins[drag].w;
+        if (ny > 184 - wins[drag].h) ny = 184 - wins[drag].h;
+        wins[drag].x = nx;
+        wins[drag].y = ny;
+    }
+
+    pmx = x; pmy = y; pbtn = b;
+    dirty = 1;
+}
+
+/* ---------------- 键盘路由 ----------------
+ * keyboard.c 的队列由这里消费: 按键进"聚焦窗口"(最顶) 的队列 */
+void wm_key_input(char c)
+{
+    if (!nwins) return;
+    win_t *w = &wins[nwins - 1];
+    if (!nwins || !w->used)
+        return;
+    u8 n = (u8)((w->kq + 1) % 16);
+    if (n != w->kt) {
+        w->keys[w->kq] = (u8)c;
+        w->kq = n;
+    }
+}
+
+static int win_popkey(win_t *w)
+{
+    if (w->kq == w->kt)
+        return -1;
+    u8 c = w->keys[w->kt];
+    w->kt = (u8)((w->kt + 1) % 16);
+    return c;
+}
+
+int wm_user_getkey(int pid)
+{
+    if (nwins == 0 || wins[nwins-1].owner != pid)
+        return -1;
+    return win_popkey(&wins[nwins - 1]);
+}
+
+/* ---------------- 初始化 ---------------- */
+void wm_init(void)
+{
+    nwins = 0;
+    next_handle = 1;
+    for (int i = 0; i < 4; i++)
+        dicons[i].used = 0;
+    load_desktop();                   /* 读 desk/ 快捷方式 + 图标 */
+    u8 mode=0;
+    wallpaper_mode=0;
+    if(fs_read("sys/wall.cfg",&mode,1)==1 && mode>='0' && mode<='2') wallpaper_mode=mode-'0';
+    dirty = 1;
+}
+
+void wm_open_about(void)              /* 兼容保留: about 命令开中文页窗口 */
+{
+    /* v2: 关于页内容由应用自己画, 这里不再内置 */
+}
+
+/* ---------------- 异常红屏 (interrupts.c 调) ---------------- */
+void panic_screen(const char *reason, u32 vec)
+{
+    gfx_fill(0, 0, 320, 200, PAL_PANIC);
+    gfx_text8(16, 16, "== SANDCORE PANIC ==", PAL_SHADOW, 1, 1);
+    gfx_text8(16, 32, reason, PAL_SHADOW, 1, 1);
+    gfx_text8(16, 48, "VEC 0x", PAL_SHADOW, 1, 1);
+    gfx_char8(70, 48, "0123456789ABCDEF"[(vec >> 4) & 0xF], PAL_SHADOW, 1);
+    gfx_char8(78, 48, "0123456789ABCDEF"[vec & 0xF], PAL_SHADOW, 1);
+    gfx_text8(16, 64, "----", PAL_SHADOW, 1, 1);
+    gfx_swap();
+}
