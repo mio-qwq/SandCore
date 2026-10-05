@@ -1,8 +1,8 @@
 # SandCore / 沙核
 
 自研32位x86操作系统：内核、SandFS、图形桌面、SCX用户程序、SKM零环扩展、
-原生编译器和命令行开发环境。当前为M9验收候选，Windows QEMU验证通过，
-待用户验收；M8a成果及原M8未完成内容继续按原决定封存。
+原生编译器和命令行开发环境。M9已于2026-10-05由用户验收通过并正式发布；
+M8a成果及原M8未完成内容继续按原决定封存。
 
 | 能力 | 当前范围 |
 |---|---|
@@ -18,6 +18,10 @@
 [设计](sandcore/docs/M9-DESIGN.md)、[构建](sandcore/docs/BUILD.md)、
 [第三方源码/许可](sandcore/docs/THIRD-PARTY.md)、[完整CLI对照](sandcore/docs/M9-CLI-MATRIX.tsv)。
 项目源码在`sandcore/`，工作区规则在`AGENTS.md`，当前接力状态在`HANDOFF.md`。
+
+根目录提供自写C宿主工具[sanddata_editor.exe](sanddata_editor.exe)，
+像压缩包一样浏览SandFS镜像，支持文件/文件夹拖入拖出、删除、重命名与备份保存；
+用法与源码入口见[sanddata_editor.md](sanddata_editor.md)。
 
 在 Windows 安装 WSL Ubuntu 工具链和 Python/Pillow 后，根目录运行 `build.bat`
 构建 M9；历史版本运行 `build-version.bat M6a`、`M6`、`M7` 或 `M8a`。
@@ -35,3 +39,4 @@ M6/M6a/M7/M8a的历史源码，`releases/`仅保存M6/M7/M8a/M9各一份精简�
 
 修订：2026-10-05，M9验收候选；按用户最新范围保存完整工程代码与每版本一份构建产物。
 修订：2026-10-05，补齐历史源码输入与字体，五版干净构建及M9客体运行通过；建立轻量Releases页面。
+修订：2026-10-05，用户明确验收M9通过；增加根目录自写C/Win32 SandFS镜像编辑器。

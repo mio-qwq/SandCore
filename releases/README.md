@@ -10,10 +10,12 @@
 | M9 | [SandCore-M9-build.zip](SandCore-M9-build.zip) | 11.224 |
 
 解压后运行包内BAT，需要Windows QEMU；M9另需Python 3.12。
-M9仍待用户验收；M8a是用户批准的部分发布，原M8未完成目标继续封存。
+M9已于2026-10-05由用户验收通过；M8a是用户批准的部分发布，原M8未完成目标继续封存。
 
 [全部摘要/来源](MANIFEST.json)、[ZIP校验表](SHA256SUMS.txt)、
 [完整备份范围及复现条件](../sandcore/docs/SOURCE-BACKUP.md)。
 
 源码在仓库`sandcore/`；历史源码在`snapshots/`。
 全部盘字节来自既有交付，不重编旧版本；重新打开精简ZIP校验全部CRC和SHA256通过。
+
+修订：2026-10-05，用户明确验收M9通过；原验收包字节/摘要保持，正式状态见M9-RELEASE.md。

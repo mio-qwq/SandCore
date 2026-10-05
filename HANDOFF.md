@@ -1,5 +1,7 @@
 # HANDOFF.md —— 沙核 OS (SandCore) 交接文档
 
+> 2026-10-05最新：用户明确“M9验收通过”。M9正式发布，验收记录M9-ACCEPTANCE.md、发布M9-RELEASE.md；后文候选/待验为历史。按用户新要求在根目录新增独立自写C/Win32 SandFS镜像编辑器sanddata_editor.exe：浏览、多选、双向拖放、目录导入/导出、删除、F2改名、保存/另存、同目录原盘备份及外部改动拒绝覆盖；支持v1..v5并保留原格式/UID/GID/rw。原1022项独立Python解析逐字节/元数据核对通过，实际导入/改名/删除/Unicode/空文件/导出和原盘备份通过。该工具为宿主工具，不改变M9客体镜像，网络/GPU及原M8冻结合同继续。
+
 > 2026-10-05备份复现最终：私有GitHub已保留完整当前/历史源码、字体输入、历史build/试玩源码及影片工程输入，并只保留M6/M7/M8a/M9每版一套精简镜像（共19.913MiB）。根build.bat默认M9，build-version.bat重建M6a/M6/M7/M8a独立快照。五版干净克隆宿主构建通过，M9启动盘与验收盘相同，串口17项、客体SCCC编译执行及HMP截图通过；旧快照逐文件摘要不变。仓库内精简基线读取替代本机原M7/M8a大ZIP依赖；四个可见Releases只链接Git构建包，0附件。范围与宿主/原生发布区别见SOURCE-BACKUP.md和REBUILD-VERIFICATION.md。保留GitHub用户删除.zcodeignore的提交。M9仍待用户验收，M8未完目标继续封存。
 
 > 2026-10-05最终：M9本轮Windows QEMU验证通过，待用户验收。CLI按用户确认本地140/171（81.9%）公开支持子集，完整310原表/31本地缺项保留。build31内核213240B；最后内核92项、播放器92项、40个连续生命周期/82项、随包工具17项通过。报告sandcore/docs/M9-ACCEPTANCE.md；独立入口temp miotest/run-m9-acceptance.bat。下文旧“当前/待验”均是阶段记录。

@@ -1,8 +1,8 @@
 {
   "format": "SandCoreHistoricalSources1",
   "scope": "historical source/doc/project only; no images/video/rendered frames; not new product code",
-  "unique_extra_objects": 773,
-  "extra_bytes": 30900432,
+  "unique_extra_objects": 777,
+  "extra_bytes": 31002119,
   "objects": [
     {
       "path": "history/objects/003cb34e92cd3265f816234b2396a9cac50edeae55061f8b0c6c96d31f1543c4.sh",
@@ -335,6 +335,11 @@
       "sha256": "191c04b0bb8cc3703bbcf501455f8a88e43963831a65dd661b38086708f7e16d"
     },
     {
+      "path": "history/objects/1a9d6853223a48687a551f4c08705e21691cec15144a0c0cb7b5f116916c2c7f.md",
+      "size": 25533,
+      "sha256": "1a9d6853223a48687a551f4c08705e21691cec15144a0c0cb7b5f116916c2c7f"
+    },
+    {
       "path": "history/objects/1b49a6f7e7cdc97462a12fc235d5a4faa7ea5fbb7aa66e8f0266e6f6ddcf9bfb.c",
       "size": 5240,
       "sha256": "1b49a6f7e7cdc97462a12fc235d5a4faa7ea5fbb7aa66e8f0266e6f6ddcf9bfb"
@@ -613,6 +618,11 @@
       "path": "history/objects/2f240205ba2894dde4e37fd6a13ffbd3f155b19ed5973d8d5c481d670be035dd.py",
       "size": 16496,
       "sha256": "2f240205ba2894dde4e37fd6a13ffbd3f155b19ed5973d8d5c481d670be035dd"
+    },
+    {
+      "path": "history/objects/2f399fc38515c6e1c81f035dd170251e0e09a4582a6a70adf5998c19ad8f9b79.md",
+      "size": 16301,
+      "sha256": "2f399fc38515c6e1c81f035dd170251e0e09a4582a6a70adf5998c19ad8f9b79"
     },
     {
       "path": "history/objects/2f5902225afe4e4d8dd7151df5b7b986e715d32ab526182587985816bf1aaf6a.json",
@@ -1263,6 +1273,11 @@
       "path": "history/objects/59fa571ed71657cb86fe026bf2b918dd8fe946ed3d93889e27cd3fbc279cd609.c",
       "size": 19316,
       "sha256": "59fa571ed71657cb86fe026bf2b918dd8fe946ed3d93889e27cd3fbc279cd609"
+    },
+    {
+      "path": "history/objects/5a131576d638685879ee71cb11173b809463e6d9c7c9f1a1d4b03c8f08546917.md",
+      "size": 10018,
+      "sha256": "5a131576d638685879ee71cb11173b809463e6d9c7c9f1a1d4b03c8f08546917"
     },
     {
       "path": "history/objects/5a6475f1b7dc2dee1937d853a840249f6ec3987896d69fd2c9a5b12da29dc607.json",
@@ -2933,6 +2948,11 @@
       "path": "history/objects/c4d875fb14fc5041c89dce620136545ef0e33a45d8d988f47f07d3a3dc3c0211.h",
       "size": 26956,
       "sha256": "c4d875fb14fc5041c89dce620136545ef0e33a45d8d988f47f07d3a3dc3c0211"
+    },
+    {
+      "path": "history/objects/c4db0fcd179e803c1d14cd6fa58a2367fc6b45910ca40513fbb0e1cee5f39899.md",
+      "size": 49835,
+      "sha256": "c4db0fcd179e803c1d14cd6fa58a2367fc6b45910ca40513fbb0e1cee5f39899"
     },
     {
       "path": "history/objects/c4ec00578bb1e105a9a6b5720f88999305ccc88c01ba72325fb7e2a80534ed4f.py",
@@ -23901,7 +23921,7 @@
     },
     {
       "original": "sandcore/build/SandCore-M9-acceptance-2026-10-05.zip::M9-ACCEPTANCE/docs/GFX.md",
-      "stored": "sandcore/docs/GFX.md",
+      "stored": "history/objects/1a9d6853223a48687a551f4c08705e21691cec15144a0c0cb7b5f116916c2c7f.md",
       "size": 25533,
       "sha256": "1a9d6853223a48687a551f4c08705e21691cec15144a0c0cb7b5f116916c2c7f"
     },
@@ -24021,13 +24041,13 @@
     },
     {
       "original": "sandcore/build/SandCore-M9-acceptance-2026-10-05.zip::M9-ACCEPTANCE/docs/M9-IMPLEMENTATION.md",
-      "stored": "sandcore/docs/M9-IMPLEMENTATION.md",
+      "stored": "history/objects/5a131576d638685879ee71cb11173b809463e6d9c7c9f1a1d4b03c8f08546917.md",
       "size": 10018,
       "sha256": "5a131576d638685879ee71cb11173b809463e6d9c7c9f1a1d4b03c8f08546917"
     },
     {
       "original": "sandcore/build/SandCore-M9-acceptance-2026-10-05.zip::M9-ACCEPTANCE/docs/M9-VERIFICATION.md",
-      "stored": "sandcore/docs/M9-VERIFICATION.md",
+      "stored": "history/objects/2f399fc38515c6e1c81f035dd170251e0e09a4582a6a70adf5998c19ad8f9b79.md",
       "size": 16301,
       "sha256": "2f399fc38515c6e1c81f035dd170251e0e09a4582a6a70adf5998c19ad8f9b79"
     },
@@ -24231,7 +24251,7 @@
     },
     {
       "original": "sandcore/build/SandCore-M9-acceptance-2026-10-05.zip::M9-ACCEPTANCE/source/sandcore/README.md",
-      "stored": "sandcore/README.md",
+      "stored": "history/objects/c4db0fcd179e803c1d14cd6fa58a2367fc6b45910ca40513fbb0e1cee5f39899.md",
       "size": 49835,
       "sha256": "c4db0fcd179e803c1d14cd6fa58a2367fc6b45910ca40513fbb0e1cee5f39899"
     },
@@ -24399,7 +24419,7 @@
     },
     {
       "original": "sandcore/build/SandCore-M9-acceptance-2026-10-05.zip::M9-ACCEPTANCE/source/sandcore/docs/GFX.md",
-      "stored": "sandcore/docs/GFX.md",
+      "stored": "history/objects/1a9d6853223a48687a551f4c08705e21691cec15144a0c0cb7b5f116916c2c7f.md",
       "size": 25533,
       "sha256": "1a9d6853223a48687a551f4c08705e21691cec15144a0c0cb7b5f116916c2c7f"
     },
@@ -24519,13 +24539,13 @@
     },
     {
       "original": "sandcore/build/SandCore-M9-acceptance-2026-10-05.zip::M9-ACCEPTANCE/source/sandcore/docs/M9-IMPLEMENTATION.md",
-      "stored": "sandcore/docs/M9-IMPLEMENTATION.md",
+      "stored": "history/objects/5a131576d638685879ee71cb11173b809463e6d9c7c9f1a1d4b03c8f08546917.md",
       "size": 10018,
       "sha256": "5a131576d638685879ee71cb11173b809463e6d9c7c9f1a1d4b03c8f08546917"
     },
     {
       "original": "sandcore/build/SandCore-M9-acceptance-2026-10-05.zip::M9-ACCEPTANCE/source/sandcore/docs/M9-VERIFICATION.md",
-      "stored": "sandcore/docs/M9-VERIFICATION.md",
+      "stored": "history/objects/2f399fc38515c6e1c81f035dd170251e0e09a4582a6a70adf5998c19ad8f9b79.md",
       "size": 16301,
       "sha256": "2f399fc38515c6e1c81f035dd170251e0e09a4582a6a70adf5998c19ad8f9b79"
     },
@@ -51393,7 +51413,7 @@
     },
     {
       "original": "temp miotest/M9-ACCEPTANCE/docs/GFX.md",
-      "stored": "sandcore/docs/GFX.md",
+      "stored": "history/objects/1a9d6853223a48687a551f4c08705e21691cec15144a0c0cb7b5f116916c2c7f.md",
       "size": 25533,
       "sha256": "1a9d6853223a48687a551f4c08705e21691cec15144a0c0cb7b5f116916c2c7f"
     },
@@ -51513,13 +51533,13 @@
     },
     {
       "original": "temp miotest/M9-ACCEPTANCE/docs/M9-IMPLEMENTATION.md",
-      "stored": "sandcore/docs/M9-IMPLEMENTATION.md",
+      "stored": "history/objects/5a131576d638685879ee71cb11173b809463e6d9c7c9f1a1d4b03c8f08546917.md",
       "size": 10018,
       "sha256": "5a131576d638685879ee71cb11173b809463e6d9c7c9f1a1d4b03c8f08546917"
     },
     {
       "original": "temp miotest/M9-ACCEPTANCE/docs/M9-VERIFICATION.md",
-      "stored": "sandcore/docs/M9-VERIFICATION.md",
+      "stored": "history/objects/2f399fc38515c6e1c81f035dd170251e0e09a4582a6a70adf5998c19ad8f9b79.md",
       "size": 16301,
       "sha256": "2f399fc38515c6e1c81f035dd170251e0e09a4582a6a70adf5998c19ad8f9b79"
     },
@@ -51723,7 +51743,7 @@
     },
     {
       "original": "temp miotest/M9-ACCEPTANCE/source/sandcore/README.md",
-      "stored": "sandcore/README.md",
+      "stored": "history/objects/c4db0fcd179e803c1d14cd6fa58a2367fc6b45910ca40513fbb0e1cee5f39899.md",
       "size": 49835,
       "sha256": "c4db0fcd179e803c1d14cd6fa58a2367fc6b45910ca40513fbb0e1cee5f39899"
     },
@@ -51891,7 +51911,7 @@
     },
     {
       "original": "temp miotest/M9-ACCEPTANCE/source/sandcore/docs/GFX.md",
-      "stored": "sandcore/docs/GFX.md",
+      "stored": "history/objects/1a9d6853223a48687a551f4c08705e21691cec15144a0c0cb7b5f116916c2c7f.md",
       "size": 25533,
       "sha256": "1a9d6853223a48687a551f4c08705e21691cec15144a0c0cb7b5f116916c2c7f"
     },
@@ -52011,13 +52031,13 @@
     },
     {
       "original": "temp miotest/M9-ACCEPTANCE/source/sandcore/docs/M9-IMPLEMENTATION.md",
-      "stored": "sandcore/docs/M9-IMPLEMENTATION.md",
+      "stored": "history/objects/5a131576d638685879ee71cb11173b809463e6d9c7c9f1a1d4b03c8f08546917.md",
       "size": 10018,
       "sha256": "5a131576d638685879ee71cb11173b809463e6d9c7c9f1a1d4b03c8f08546917"
     },
     {
       "original": "temp miotest/M9-ACCEPTANCE/source/sandcore/docs/M9-VERIFICATION.md",
-      "stored": "sandcore/docs/M9-VERIFICATION.md",
+      "stored": "history/objects/2f399fc38515c6e1c81f035dd170251e0e09a4582a6a70adf5998c19ad8f9b79.md",
       "size": 16301,
       "sha256": "2f399fc38515c6e1c81f035dd170251e0e09a4582a6a70adf5998c19ad8f9b79"
     },

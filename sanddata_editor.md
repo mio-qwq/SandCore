@@ -1,0 +1,32 @@
+# SandFS 镜像编辑器
+
+双击根目录的`sanddata_editor.exe`，打开`sanddata.img`；也可以把镜像拖到窗口，
+或者将镜像文件拖到EXE上。左侧选目录，右侧双击文件夹进入，支持多选。
+
+- 从Windows资源管理器拖入文件/整个文件夹：添加到当前目录，同名文件替换正文并保留权限。
+- 从列表拖到资源管理器：导出选中项目；也可Ctrl+C后在资源管理器Ctrl+V。
+- Delete删除选中项目（含子目录）；F2重命名；可以新建文件夹。
+- Ctrl+S保存；“另存为”生成独立镜像。每次覆盖已有镜像都会保留同目录`.bak-日期时间`备份。
+- 先退出使用目标镜像的QEMU，再编辑；保存时拒绝覆盖已经被外部修改的源盘。
+
+支持历史SandFS v1..v5，保留原磁盘大小及格式；v5保留UID/GID/rw、对象代数与根权限，
+重新生成双目录bank及CRC。v1..v3没有显式空目录，因此不能保存新的空文件夹。
+SandFS名称本身不允许空格，完整路径上限为63个UTF-8字节（早期卷为31字节）；
+超限或空间不足时整批拖入撤销。导出不会覆盖Windows已有文件。
+
+这是宿主离线工具，按实际持有镜像文件的Windows访问权限编辑；不模拟客体用户登录。
+拖出通过Windows标准文件拖放，暂存文件位于系统临时目录的`SandFS-export-*`下；
+保留暂存供Explorer异步复制，必要时可由Windows清理临时文件。
+
+源码均在根目录：`sanddata_editor.c`、`sanddata_editor_fs.c`、`sanddata_editor.h`及资源/manifest。
+全部应用代码自写C，使用Windows系统接口。构建用已安装MinGW GCC/windres，
+执行`build-sanddata-editor.bat`；不把编译器或下载工具随包发布。
+
+实际核对：M9原盘1022项全部正文、UID/GID/rw及未修改对象代数保持一致；
+导入、重命名、删除、中文名、空文件、导出、同目录备份与独立Python解析回读通过。
+M6/M7/M8a旧盘同样实际读改存并逐项保留原内容；Windows原生列表选中、
+拖出的CF_HDROP数据/格式枚举以及真实导出二进制/空文件回读通过。
+
+![编辑器实际窗口](sandcore/docs/assets/sanddata-editor.png)
+
+修订：2026-10-05，新增独立宿主SandFS浏览/双向拖放/编辑/备份保存工具。
