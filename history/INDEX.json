@@ -1,8 +1,8 @@
 {
   "format": "SandCoreHistoricalSources1",
   "scope": "historical source/doc/project only; no images/video/rendered frames; not new product code",
-  "unique_extra_objects": 772,
-  "extra_bytes": 30890392,
+  "unique_extra_objects": 773,
+  "extra_bytes": 30900432,
   "objects": [
     {
       "path": "history/objects/003cb34e92cd3265f816234b2396a9cac50edeae55061f8b0c6c96d31f1543c4.sh",
@@ -268,6 +268,11 @@
       "path": "history/objects/15b2c51b18bdc5570447a3963420b58d88f152d9578c9d8650e7f41f9eaa9ab1.inc",
       "size": 37527,
       "sha256": "15b2c51b18bdc5570447a3963420b58d88f152d9578c9d8650e7f41f9eaa9ab1"
+    },
+    {
+      "path": "history/objects/165b9b6e015a0db45d32ed67e751d7631eb7be75b453d53e6765ef0b377112d2.md",
+      "size": 10040,
+      "sha256": "165b9b6e015a0db45d32ed67e751d7631eb7be75b453d53e6765ef0b377112d2"
     },
     {
       "path": "history/objects/1718bea42823426ebae305fb265f8548f651c5b327aacf6a6ff7bb1c86a9019c.c",
@@ -23998,7 +24003,7 @@
     },
     {
       "original": "sandcore/build/SandCore-M9-acceptance-2026-10-05.zip::M9-ACCEPTANCE/docs/M9-ACCEPTANCE.md",
-      "stored": "sandcore/docs/M9-ACCEPTANCE.md",
+      "stored": "history/objects/165b9b6e015a0db45d32ed67e751d7631eb7be75b453d53e6765ef0b377112d2.md",
       "size": 10040,
       "sha256": "165b9b6e015a0db45d32ed67e751d7631eb7be75b453d53e6765ef0b377112d2"
     },
@@ -24496,7 +24501,7 @@
     },
     {
       "original": "sandcore/build/SandCore-M9-acceptance-2026-10-05.zip::M9-ACCEPTANCE/source/sandcore/docs/M9-ACCEPTANCE.md",
-      "stored": "sandcore/docs/M9-ACCEPTANCE.md",
+      "stored": "history/objects/165b9b6e015a0db45d32ed67e751d7631eb7be75b453d53e6765ef0b377112d2.md",
       "size": 10040,
       "sha256": "165b9b6e015a0db45d32ed67e751d7631eb7be75b453d53e6765ef0b377112d2"
     },
@@ -51490,7 +51495,7 @@
     },
     {
       "original": "temp miotest/M9-ACCEPTANCE/docs/M9-ACCEPTANCE.md",
-      "stored": "sandcore/docs/M9-ACCEPTANCE.md",
+      "stored": "history/objects/165b9b6e015a0db45d32ed67e751d7631eb7be75b453d53e6765ef0b377112d2.md",
       "size": 10040,
       "sha256": "165b9b6e015a0db45d32ed67e751d7631eb7be75b453d53e6765ef0b377112d2"
     },
@@ -51988,7 +51993,7 @@
     },
     {
       "original": "temp miotest/M9-ACCEPTANCE/source/sandcore/docs/M9-ACCEPTANCE.md",
-      "stored": "sandcore/docs/M9-ACCEPTANCE.md",
+      "stored": "history/objects/165b9b6e015a0db45d32ed67e751d7631eb7be75b453d53e6765ef0b377112d2.md",
       "size": 10040,
       "sha256": "165b9b6e015a0db45d32ed67e751d7631eb7be75b453d53e6765ef0b377112d2"
     },
