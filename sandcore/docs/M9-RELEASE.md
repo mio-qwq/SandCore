@@ -13,7 +13,8 @@ CLI按用户选定的本地140/171参考名及公开支持子集验收；完整3
 
 继续使用`releases/SandCore-M9-build.zip`原验收镜像，不改原字节或摘要。
 五份源码独立重建及当前仓库输入自足性见[REBUILD-VERIFICATION.md](REBUILD-VERIFICATION.md)。
-根目录另外提供用户要求的自写C/Win32宿主SandFS镜像编辑器，
-见[使用说明](../../sanddata_editor.md)，支持浏览、双向拖放、删除、改名和备份保存。
+根目录的`sanddata_editor/`子项目另外提供用户要求的自写C/Win32宿主SandFS镜像编辑器，
+见[使用说明](../../sanddata_editor/README.md)，支持浏览、双向拖放、删除、改名和备份保存。
 
 修订：2026-10-05，记录用户明确验收与M9正式发布状态，保留完整证据边界。
+修订：2026-10-06，更新独立宿主镜像编辑器的子项目入口。
