@@ -1,14 +1,11 @@
 #include "../SCIO.H"
 #include "../IMAGECLIENT.inc"
 #include "cover.h"
-#include "../codec/CODEC.H"
 /* 封面元数据是独立的可选输入：坏封面不破坏已确认的音频流。
- * 内嵌图片复用已有三环CODEC的内存解码，不建立临时文件。
- * 只在换曲时读取、解码；画面刷新复用私有像素，不反复读盘。 */
+ * 大图解码复用已有三环IMAGE服务，不在内核/播放器重复塞一套解码器。
+ * 只在换曲时读取元数据、建立私有临时源，画面刷新不反复写盘/解码。 */
 #define COVER_LIMIT (1024u*1024u)
-/* FLAC原生图片块允许较大封面；与既有IMAGE服务16MiB输入上限一致。
- * MP3帧和目录旁置封面的原1MiB限制不变。 */
-#define FLAC_COVER_LIMIT (16u*1024u*1024u)
+static u32 sequence;
 static u32 big(const u8 *p){return (u32)p[0]<<24|(u32)p[1]<<16|(u32)p[2]<<8|p[3];}
 static u32 little(const u8 *p){return (u32)p[3]<<24|(u32)p[2]<<16|(u32)p[1]<<8|p[0];}
 static u32 syncsafe(const u8 *p){return (u32)p[0]<<21|(u32)p[1]<<14|(u32)p[2]<<7|p[3];}
@@ -49,108 +46,59 @@ static void text(char *out,const u8 *input,u32 size,int encoding)
     /* UTF8显示副本在完整标量边界停，不能因127B预算截断汉字。 */
     out[n]=0;
 }
-static int extract(sc_album_art *art,int source,u32 at,u32 size,u32 end,const u8 *memory)
+static int extract(sc_album_art *art,int source,u32 at,u32 size,u32 end)
 {
-    if(!size || size>FLAC_COVER_LIMIT || at>end || size>end-at)return -1;
-    u8 *owned=0;const u8 *bytes=memory?memory+at:0;int result=-1;
-    if(!bytes){
-        owned=sc_alloc(size);if(!owned)return -5;bytes=owned;
-        for(u32 used=0;used<size;){u32 chunk=size-used;if(chunk>65536)chunk=65536;
-            if(exact(source,at+used,owned+used,chunk,end)<0)goto done;
+    if(!size || size>COVER_LIMIT || at>end || size>end-at)return -1;
+    u32 self[8];if(sc_process_self(self)<0)return -1;char a[12],b[12],c[12];
+    decimal(a,(int)self[1]);decimal(b,(int)self[2]);decimal(c,(int)++sequence);
+    copy(art->temporary,"/TMP/SC-COVER-",64);append(art->temporary,a,64);append(art->temporary,"-",64);
+    append(art->temporary,b,64);append(art->temporary,"-",64);append(art->temporary,c,64);append(art->temporary,".BIN",64);
+    if(sc_create_ex(art->temporary,1,3)<0){art->temporary[0]=0;return -1;}
+    int fd=sc_stream_open(art->temporary,2,0),result=-1;
+    if(fd>=0){
+        u8 buffer[4096];u32 used=0;
+        while(used<size){u32 chunk=size-used;if(chunk>sizeof(buffer))chunk=sizeof(buffer);
+            if(exact(source,at+used,buffer,chunk,end)<0 || cli_write(fd,buffer,chunk)!=(int)chunk)break;
             used+=chunk;sc_yield();}
+        result=sc_stream_close(fd,used==size?1:0);
+        if(used!=size)result=-1;
     }
-    u32 *pixels=0;int width=0,height=0;
-    result=codec_decode(bytes,size,&pixels,&width,&height);
-    if(!result){
-        u32 length=(u32)width*(u32)height*4,*copy=sc_alloc(length);
-        if(!copy)result=-5;
-        else {
-            /* CODEC像素属于其arena；显示缓存必须独立持有SCAPI页，
-             * 否则清理解码临时内存后会悬空，也不能对arena内部指针sc_free。 */
-            for(u32 i=0;i<length/4;i++)copy[i]=pixels[i];art->image.pixels=copy;art->image.error=0;
-            for(int i=0;i<8;i++)art->image.info[i]=0;
-            art->image.info[0]=1;art->image.info[1]=(u32)width;art->image.info[2]=(u32)height;
-            art->image.info[3]=length;art->image.info[4]=2;
-        }
-    }
-    codec_release_all();
-done:
-    if(owned)sc_free(owned);return result;
-}
-static int base64_value(u8 c)
-{
-    if(c>='A' && c<='Z')return c-'A';if(c>='a' && c<='z')return c-'a'+26;
-    if(c>='0' && c<='9')return c-'0'+52;if(c=='+')return 62;if(c=='/')return 63;
-    return c=='='?-2:-1;
-}
-static int flac_comment_picture(sc_album_art *art,int fd,u32 at,u32 size,u32 end)
-{
-    /* METADATA_BLOCK_PICTURE是完整PICTURE块的Base64，不是图片本身。
-     * 分块读标签，避免按字符seek；解码后直接传内存，不落盘。 */
-    if(!size || (size&3) || size>((FLAC_COVER_LIMIT+8192u)/3+1)*4)return -1;
-    u8 *body=sc_alloc(size/4*3);if(!body)return -1;
-    u8 input[4096];u32 used=0,decoded=0,p=8,bytes=0;int result=-1;
-    while(used<size){u32 count=size-used;if(count>sizeof(input))count=sizeof(input);
-        if(exact(fd,at+used,input,count,end)<0)goto done;
-        for(u32 i=0;i<count;i+=4){int a=base64_value(input[i]),b=base64_value(input[i+1]);
-            int c=base64_value(input[i+2]),d=base64_value(input[i+3]);
-            if(a<0 || b<0 || c==-1 || d==-1 || (c==-2 && d!=-2)
-                || ((c==-2 || d==-2) && used+i+4!=size))goto done;
-            if((c==-2 && (b&15)) || (d==-2 && c>=0 && (c&3)))goto done;
-            body[decoded++]=(u8)((a<<2)|(b>>4));
-            if(c>=0){body[decoded++]=(u8)((b<<4)|(c>>2));if(d>=0)body[decoded++]=(u8)((c<<6)|d);}
-        }
-        used+=count;sc_yield();
-    }
-    if(decoded<32)goto done;u32 mime=big(body+4);
-    if(mime>decoded-p)goto done;p+=mime;
-    if(decoded-p<4)goto done;u32 description=big(body+p);p+=4;
-    if(description>decoded-p)goto done;p+=description;
-    if(decoded-p<20)goto done;bytes=big(body+p+16);p+=20;
-    if(bytes && bytes<=FLAC_COVER_LIMIT && bytes<=decoded-p)result=extract(art,fd,p,bytes,decoded,body);
-done:
-    sc_free(body);return result;
+    if(result>=0)result=image_client_begin(&art->image,art->temporary);
+    if(result<0){sc_remove(art->temporary);art->temporary[0]=0;}
+    return result;
 }
 static int flac(sc_album_art *art,int fd,u32 end)
 {
-    u32 at=4;int last=0,selected=-1;u32 picture=0,picture_size=0,comment_at=0,comment_size=0;
-    while(!last && at<=end && end-at>=4){
+    u32 at=4;int last=0,selected=-1;u32 picture=0,picture_size=0;
+    for(int block=0;block<128 && !last && at<=end && end-at>=4;block++){
         u8 h[8];if(exact(fd,at,h,4,end)<0)return -1;
         last=h[0]&128;int kind=h[0]&127;u32 size=(u32)h[1]<<16|(u32)h[2]<<8|h[3];at+=4;
         if(size>end-at)return -1;u32 limit=at+size;
         if(kind==6 && size>=32){
             u32 p=at;if(exact(fd,p,h,8,limit)<0)return -1;u32 type=big(h),mime=big(h+4);p+=8;
-            if(mime>limit-p)return -1;p+=mime;
+            if(mime>limit-p || mime>127)return -1;p+=mime;
             if(exact(fd,p,h,4,limit)<0)return -1;u32 description=big(h);p+=4;
             if(description>limit-p)return -1;p+=description;
             u8 fields[20];if(exact(fd,p,fields,20,limit)<0)return -1;p+=20;
             u32 bytes=big(fields+16);if(bytes>limit-p)return -1;
-            if(bytes && bytes<=FLAC_COVER_LIMIT && (selected<0 || type==3)){
+            if(bytes && bytes<=COVER_LIMIT && (selected<0 || type==3)){
                 selected=(int)type;picture=p;picture_size=bytes;
             }
-        }else if(kind==4 && size>=8){
-            /* 带封面的评论块通常超过8KiB，只读字段头和所需内容，
-             * 不再整块压入栈，也不因封面大而跳过标题、歌手。 */
-            u32 p=at;if(exact(fd,p,h,4,limit)<0)return -1;u32 vendor=little(h);p+=4;
-            if(vendor>limit-p || limit-p-vendor<4)return -1;p+=vendor;
-            if(exact(fd,p,h,4,limit)<0)return -1;u32 count=little(h);p+=4;
-            if(count>(limit-p)/4)return -1;
+        }else if(kind==4 && size<=8192 && size>=8){
+            u8 comments[8192];if(exact(fd,at,comments,size,limit)<0)return -1;
+            u32 vendor=little(comments),p=4;if(vendor>size-p || size-p-vendor<4)return -1;p+=vendor;
+            u32 count=little(comments+p);p+=4;
+            if(count>128)return -1;
             for(u32 i=0;i<count;i++){
-                if(exact(fd,p,h,4,limit)<0)return -1;u32 n=little(h);p+=4;if(n>limit-p)return -1;
-                u8 value[512];u32 part=n<sizeof(value)?n:sizeof(value);
-                if(exact(fd,p,value,part,limit)<0)return -1;
-                if(field(value,part,"TITLE="))text(art->title,value+6,part-6,3);
-                if(field(value,part,"ARTIST="))text(art->artist,value+7,part-7,3);
-                if(!comment_size && field(value,part,"METADATA_BLOCK_PICTURE=")){
-                    comment_at=p+23;comment_size=n-23;
-                }
-                p+=n;sc_yield();
+                if(size-p<4)return -1;u32 n=little(comments+p);p+=4;if(n>size-p)return -1;
+                if(field(comments+p,n,"TITLE="))text(art->title,comments+p+6,n-6,3);
+                if(field(comments+p,n,"ARTIST="))text(art->artist,comments+p+7,n-7,3);
+                p+=n;
             }
         }
-        at=limit;sc_yield();
+        at=limit;
     }
-    if(picture)return extract(art,fd,picture,picture_size,end,0);
-    return comment_size?flac_comment_picture(art,fd,comment_at,comment_size,end):-1;
+    return picture?extract(art,fd,picture,picture_size,end):-1;
 }
 static int mp3(sc_album_art *art,int fd,const u8 *header,u32 end)
 {
@@ -180,12 +128,12 @@ static int mp3(sc_album_art *art,int fd,const u8 *header,u32 end)
         }
         at+=n;
     }
-    return picture?extract(art,fd,picture,picture_size,end,0):-1;
+    return picture?extract(art,fd,picture,picture_size,end):-1;
 }
 void sc_album_close(sc_album_art *art)
 {
     image_client_cancel(&art->image);if(art->image.pixels)sc_free(art->image.pixels);
-    art->image.pixels=0;art->temporary[0]=0;
+    art->image.pixels=0;if(art->temporary[0])sc_remove(art->temporary);art->temporary[0]=0;
     art->source[0]=art->sidecar[0]=0;art->source_generation=art->sidecar_generation=0;
 }
 int sc_album_current(sc_album_art *art,const char *name)
@@ -224,5 +172,6 @@ int sc_album_step(sc_album_art *art)
     int result=image_client_step(&art->image);
     if(result==1 && (u32)((u32)sc_tick()-art->began)<1000)return 1;
     if(result==1){image_client_cancel(&art->image);result=-1;}
+    if(art->temporary[0]){sc_remove(art->temporary);art->temporary[0]=0;}
     return result;
 }

@@ -8,7 +8,6 @@ VP8随机初始化的幅度参数是IEEE754单精度，解码器仅传1.0f；原
 """
 import hashlib
 import json
-import os
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -39,7 +38,7 @@ def main():
     rg->amp = shift >= 32 ? 0 : (int)(((bits & 0x7fffffu) | 0x800000u) >> shift);
   }'''
     assert text.count(old) == 1, '固定适配点缺失或重复，停止而不是猜测'
-    output = ROOT / os.environ.get('SANDCORE_CODEC_ADAPT_DIR', 'build/codec/webp-adapt') / 'random_utils.c'
+    output = ROOT / 'build/codec/webp-adapt/random_utils.c'
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(text.replace(old, new), encoding='utf-8', newline='\n')
     record = dict(author='mio', source=relative, source_sha256=hashlib.sha256(raw).hexdigest(),

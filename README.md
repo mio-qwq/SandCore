@@ -14,6 +14,9 @@ M8a成果及原M8未完成内容继续按原决定封存。
 | SSE2 | 整数编码、CPU检测、抢占/异常/复用状态隔离与回退 |
 | CLI参考覆盖 | 用户确认M9本地140/171（81.9%），只承诺公开支持子集，完整310行/缺项保留 |
 
+2026-10-06内存封面补丁已由用户测试通过，见[音频记录](sandcore/docs/AUDIO.md)。
+本次仅提交源码，随M10大版本一起发布；`temp_miotest/`试玩文件不纳入Git。
+
 [验收与截图](sandcore/docs/M9-ACCEPTANCE.md)、[实现清单](sandcore/docs/M9-IMPLEMENTATION.md)、
 [设计](sandcore/docs/M9-DESIGN.md)、[构建](sandcore/docs/BUILD.md)、
 [第三方源码/许可](sandcore/docs/THIRD-PARTY.md)、[完整CLI对照](sandcore/docs/M9-CLI-MATRIX.tsv)。
@@ -41,3 +44,4 @@ M6/M6a/M7/M8a的历史源码，`releases/`仅保存M6/M7/M8a/M9各一份精简�
 修订：2026-10-05，补齐历史源码输入与字体，五版干净构建及M9客体运行通过；建立轻量Releases页面。
 修订：2026-10-05，用户明确验收M9通过；增加根目录自写C/Win32 SandFS镜像编辑器。
 修订：2026-10-06，镜像编辑器统一迁入sanddata_editor子目录并更新入口。
+修订：2026-10-06，用户通过内存封面补丁；仅提交源码，暂不发布，排除试玩目录。

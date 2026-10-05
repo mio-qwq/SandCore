@@ -175,7 +175,15 @@ $(BUILD)/audio-cli.o: user/m9/soundplay.c user/audio/player.c $(wildcard user/*.
 	$(CC) $(CFLAGS) -Os -ffunction-sections -fdata-sections -Iuser -c $< -o $@
 $(BUILD)/audio-gui.o: user/audio/player.c $(wildcard user/*.H user/*.inc) $(STAMP)
 	$(CC) $(CFLAGS) -Os -ffunction-sections -fdata-sections -Iuser -c $< -o $@
-$(BUILD)/audio-gui.$(KOUT): $(BUILD)/audio-cover.o
+# 内嵌封面在播放器私有内存解码，复用原CODEC，不启动服务或写临时盘。
+# 两个私有运行时都有64位除法助手，仅重命名本副本的定义避免链接冲突。
+M9_COVER_CODEC_OBJS := $(filter-out $(BUILD)/codec/service.o $(BUILD)/codec/runtime.o,$(CODEC_OBJS)) $(BUILD)/cover-codec-runtime.o
+# M9私有输出目录也要能从源码生成既有WebP适配，不能依赖旧build缓存。
+export SANDCORE_CODEC_ADAPT_DIR := $(BUILD)/codec/webp-adapt
+$(BUILD)/cover-codec-runtime.o: user/codec/runtime.c $(CODEC_HEADERS) $(STAMP)
+	$(CC) $(CODEC_CFLAGS) -D__udivdi3=cover_udivdi3 -D__umoddi3=cover_umoddi3 -D__divdi3=cover_divdi3 -D__moddi3=cover_moddi3 -c $< -o $@
+$(BUILD)/audio-gui.$(KOUT): $(BUILD)/audio-cover.o $(M9_COVER_CODEC_OBJS)
+$(BUILD)/m9-playertest.$(KOUT): $(M9_COVER_CODEC_OBJS)
 $(BUILD)/audio-%.$(KOUT): $(BUILD)/user-start.o $(BUILD)/audio-%.o $(BUILD)/audio-decoder.o $(BUILD)/audio-flac.o $(BUILD)/audio-runtime.o user/linker.ld
 	$(LD) $(LDFLAGS) --gc-sections -T user/linker.ld $(filter %.o,$^) -o $@
 	nm -n $@ > $(BUILD)/audio-$*.sym

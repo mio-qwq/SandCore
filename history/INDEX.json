@@ -1,8 +1,8 @@
 {
   "format": "SandCoreHistoricalSources1",
   "scope": "historical source/doc/project only; no images/video/rendered frames; not new product code",
-  "unique_extra_objects": 777,
-  "extra_bytes": 31002119,
+  "unique_extra_objects": 780,
+  "extra_bytes": 31024207,
   "objects": [
     {
       "path": "history/objects/003cb34e92cd3265f816234b2396a9cac50edeae55061f8b0c6c96d31f1543c4.sh",
@@ -2090,6 +2090,11 @@
       "sha256": "8b237df93a0431f16d5a3dcde76df95ec2a4f547ecea081e802604184f368a1b"
     },
     {
+      "path": "history/objects/8b2f48bc48205c9fdf3c745761605db76af3889804aa7af8c862dff5b4f7a282.c",
+      "size": 10213,
+      "sha256": "8b2f48bc48205c9fdf3c745761605db76af3889804aa7af8c862dff5b4f7a282"
+    },
+    {
       "path": "history/objects/8b3a0f517530528bbf958363f19f3e6754d51b77ed9ad7e1d21d53497a09f8d7.json",
       "size": 1447,
       "sha256": "8b3a0f517530528bbf958363f19f3e6754d51b77ed9ad7e1d21d53497a09f8d7"
@@ -3010,6 +3015,11 @@
       "sha256": "c60c0e3ed0a1a52a8b9e866363e0b595a20e0a39678a17867d1c1c1480a74eab"
     },
     {
+      "path": "history/objects/c6518f66e8136e104199b7decf4c63839c2d5e85febfe4052926a819f13372eb.md",
+      "size": 8057,
+      "sha256": "c6518f66e8136e104199b7decf4c63839c2d5e85febfe4052926a819f13372eb"
+    },
+    {
       "path": "history/objects/c66488427e8837e858f0aa448e3c7af9c32c5e2d127dc30922d14daddcb911cd.py",
       "size": 8413,
       "sha256": "c66488427e8837e858f0aa448e3c7af9c32c5e2d127dc30922d14daddcb911cd"
@@ -3218,6 +3228,11 @@
       "path": "history/objects/d2e587597e91f38f1e91b40826f627f53a1d49b8b45196ae86cd9d119183b1bb.md",
       "size": 2674,
       "sha256": "d2e587597e91f38f1e91b40826f627f53a1d49b8b45196ae86cd9d119183b1bb"
+    },
+    {
+      "path": "history/objects/d2f38f23a9f866681c40e94cef28b2a8f108a32aba92ed48bf61cb2b76c38eb8.py",
+      "size": 3818,
+      "sha256": "d2f38f23a9f866681c40e94cef28b2a8f108a32aba92ed48bf61cb2b76c38eb8"
     },
     {
       "path": "history/objects/d32304533be4c7962293e2203e2ae5404335bb7b328c7cc9a7f562c140691ea8.h",
@@ -22715,7 +22730,7 @@
     },
     {
       "original": "sandcore/build/SandCore-M8a-2026-10-04.zip::sandcore/tools/adapt_webp.py",
-      "stored": "sandcore/tools/adapt_webp.py",
+      "stored": "history/objects/d2f38f23a9f866681c40e94cef28b2a8f108a32aba92ed48bf61cb2b76c38eb8.py",
       "size": 3818,
       "sha256": "d2f38f23a9f866681c40e94cef28b2a8f108a32aba92ed48bf61cb2b76c38eb8"
     },
@@ -23813,7 +23828,7 @@
     },
     {
       "original": "sandcore/build/SandCore-M9-acceptance-2026-10-05.zip::M9-ACCEPTANCE/docs/AUDIO.md",
-      "stored": "sandcore/docs/AUDIO.md",
+      "stored": "history/objects/c6518f66e8136e104199b7decf4c63839c2d5e85febfe4052926a819f13372eb.md",
       "size": 8057,
       "sha256": "c6518f66e8136e104199b7decf4c63839c2d5e85febfe4052926a819f13372eb"
     },
@@ -24311,7 +24326,7 @@
     },
     {
       "original": "sandcore/build/SandCore-M9-acceptance-2026-10-05.zip::M9-ACCEPTANCE/source/sandcore/docs/AUDIO.md",
-      "stored": "sandcore/docs/AUDIO.md",
+      "stored": "history/objects/c6518f66e8136e104199b7decf4c63839c2d5e85febfe4052926a819f13372eb.md",
       "size": 8057,
       "sha256": "c6518f66e8136e104199b7decf4c63839c2d5e85febfe4052926a819f13372eb"
     },
@@ -26279,7 +26294,7 @@
     },
     {
       "original": "sandcore/build/SandCore-M9-acceptance-2026-10-05.zip::M9-ACCEPTANCE/source/sandcore/tools/adapt_webp.py",
-      "stored": "sandcore/tools/adapt_webp.py",
+      "stored": "history/objects/d2f38f23a9f866681c40e94cef28b2a8f108a32aba92ed48bf61cb2b76c38eb8.py",
       "size": 3818,
       "sha256": "d2f38f23a9f866681c40e94cef28b2a8f108a32aba92ed48bf61cb2b76c38eb8"
     },
@@ -27527,7 +27542,7 @@
     },
     {
       "original": "sandcore/build/SandCore-M9-acceptance-2026-10-05.zip::M9-ACCEPTANCE/source/sandcore/user/audio/cover.c",
-      "stored": "sandcore/user/audio/cover.c",
+      "stored": "history/objects/8b2f48bc48205c9fdf3c745761605db76af3889804aa7af8c862dff5b4f7a282.c",
       "size": 10213,
       "sha256": "8b2f48bc48205c9fdf3c745761605db76af3889804aa7af8c862dff5b4f7a282"
     },
@@ -33281,7 +33296,7 @@
     },
     {
       "original": "sandcore/build/m8-games-phase1-20261003-01/source-only.zip::sandcore/tools/adapt_webp.py",
-      "stored": "sandcore/tools/adapt_webp.py",
+      "stored": "history/objects/d2f38f23a9f866681c40e94cef28b2a8f108a32aba92ed48bf61cb2b76c38eb8.py",
       "size": 3818,
       "sha256": "d2f38f23a9f866681c40e94cef28b2a8f108a32aba92ed48bf61cb2b76c38eb8"
     },
@@ -43373,7 +43388,7 @@
     },
     {
       "original": "sandcore/build/m8-phase2-resume-20261003-01/source-inputs.zip::sandcore/tools/adapt_webp.py",
-      "stored": "sandcore/tools/adapt_webp.py",
+      "stored": "history/objects/d2f38f23a9f866681c40e94cef28b2a8f108a32aba92ed48bf61cb2b76c38eb8.py",
       "size": 3818,
       "sha256": "d2f38f23a9f866681c40e94cef28b2a8f108a32aba92ed48bf61cb2b76c38eb8"
     },
@@ -46391,7 +46406,7 @@
     },
     {
       "original": "sandcore/build/m9-work/fs/SYS/SRC/audio/cover.c",
-      "stored": "sandcore/user/audio/cover.c",
+      "stored": "history/objects/8b2f48bc48205c9fdf3c745761605db76af3889804aa7af8c862dff5b4f7a282.c",
       "size": 10213,
       "sha256": "8b2f48bc48205c9fdf3c745761605db76af3889804aa7af8c862dff5b4f7a282"
     },
@@ -51305,7 +51320,7 @@
     },
     {
       "original": "temp miotest/M9-ACCEPTANCE/docs/AUDIO.md",
-      "stored": "sandcore/docs/AUDIO.md",
+      "stored": "history/objects/c6518f66e8136e104199b7decf4c63839c2d5e85febfe4052926a819f13372eb.md",
       "size": 8057,
       "sha256": "c6518f66e8136e104199b7decf4c63839c2d5e85febfe4052926a819f13372eb"
     },
@@ -51803,7 +51818,7 @@
     },
     {
       "original": "temp miotest/M9-ACCEPTANCE/source/sandcore/docs/AUDIO.md",
-      "stored": "sandcore/docs/AUDIO.md",
+      "stored": "history/objects/c6518f66e8136e104199b7decf4c63839c2d5e85febfe4052926a819f13372eb.md",
       "size": 8057,
       "sha256": "c6518f66e8136e104199b7decf4c63839c2d5e85febfe4052926a819f13372eb"
     },
@@ -55469,7 +55484,7 @@
     },
     {
       "original": "temp miotest/M9-ACCEPTANCE/source/sandcore/tools/adapt_webp.py",
-      "stored": "sandcore/tools/adapt_webp.py",
+      "stored": "history/objects/d2f38f23a9f866681c40e94cef28b2a8f108a32aba92ed48bf61cb2b76c38eb8.py",
       "size": 3818,
       "sha256": "d2f38f23a9f866681c40e94cef28b2a8f108a32aba92ed48bf61cb2b76c38eb8"
     },
@@ -56717,7 +56732,7 @@
     },
     {
       "original": "temp miotest/M9-ACCEPTANCE/source/sandcore/user/audio/cover.c",
-      "stored": "sandcore/user/audio/cover.c",
+      "stored": "history/objects/8b2f48bc48205c9fdf3c745761605db76af3889804aa7af8c862dff5b4f7a282.c",
       "size": 10213,
       "sha256": "8b2f48bc48205c9fdf3c745761605db76af3889804aa7af8c862dff5b4f7a282"
     },

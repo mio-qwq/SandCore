@@ -1,5 +1,7 @@
 # HANDOFF.md —— 沙核 OS (SandCore) 交接文档
 
+> 2026-10-06最新：用户明确通过内存封面补丁，要求只commit、暂不创建Release，随M10大版本一起发布；本轮只做本地提交，不push。FLAC PICTURE及METADATA_BLOCK_PICTURE直接内存解码，16MiB编码正文上限；MP3 APIC复用内存解码，旁置图片原服务保留，Ogg-FLAC封面未加入。仅封面源码、构建接线及同步记录，内核/SCAPI不变；代理只构建，运行验收由用户完成。temp_miotest/整体忽略，用户音乐与试玩镜像不纳入Git，原M9发布包保持。
+
 > 2026-10-06最新：按用户要求将宿主镜像编辑器全部迁入根目录sanddata_editor/，分为src、resources、docs、tests及忽略上传的build输出。入口sanddata_editor/sanddata_editor.exe，独立构建sanddata_editor/build.bat；旧根目录散文件已移动，源码与功能保持，原编译与验证输出一并保留。
 
 > 2026-10-05最新：用户明确“M9验收通过”。M9正式发布，验收记录M9-ACCEPTANCE.md、发布M9-RELEASE.md；后文候选/待验为历史。按用户新要求在根目录新增独立自写C/Win32 SandFS镜像编辑器sanddata_editor.exe：浏览、多选、双向拖放、目录导入/导出、删除、F2改名、保存/另存、同目录原盘备份及外部改动拒绝覆盖；支持v1..v5并保留原格式/UID/GID/rw。原1022项独立Python解析逐字节/元数据核对通过，实际导入/改名/删除/Unicode/空文件/导出和原盘备份通过。该工具为宿主工具，不改变M9客体镜像，网络/GPU及原M8冻结合同继续。

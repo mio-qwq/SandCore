@@ -4,6 +4,7 @@ __pycache__/
 *.pyc
 /sandcore/build/
 /temp miotest/
+/temp_miotest/
 /*.zip
 !/vonwaon-bitmap.ttf.zip
 /backup-output/
