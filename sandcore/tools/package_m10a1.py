@@ -98,7 +98,7 @@ def main():
     for path in sorted((REPO/'sanddata_editor/build/m10a1-final-check').glob('*')):
         if path.is_file() and path.suffix.lower() in ('.json', '.log', '.txt'):
             add('evidence/editor/'+path.name, path)
-    manifest = dict(status='DEVELOPMENT_ACCEPTANCE_PACKAGE', user_acceptance='PENDING',
+    manifest = dict(status='DEVELOPMENT_ACCEPTANCE_PACKAGE', user_acceptance='PASSED_2026_10_07',
                     release_created=False, private_key_included=False,
                     git_commit=subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=REPO).decode().strip(),
                     core_sha256=curl['core_sha256'], curl_declared_checks=len(curl['cases']),
