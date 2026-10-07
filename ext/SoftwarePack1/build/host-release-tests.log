@@ -1,0 +1,6 @@
+utils/pcalc/audio: 69 checks passed (ASan + UBSan)
+sheet: 55 checks passed (ASan + UBSan)
+blocks: 119 checks passed (ASan + UBSan)
+hex: 20 checks passed (ASan + UBSan)
+raider: 137 checks passed (ASan + UBSan)
+installer/payload: 42 checks passed (ASan + UBSan)

@@ -1,0 +1,62 @@
+mkdir -p build
+mkdir -p dist
+nasm -f elf32  -o build/start.o ../libex/start.asm
+cc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Os -minline-all-stringops -Wall -Wno-unused-function -Wno-misleading-indentation -I../libex -Iinstaller -MMD -MP -c pcalc/pcalc.c -o build/pcalc.o
+cc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Os -minline-all-stringops -Wall -Wno-unused-function -Wno-misleading-indentation -I../libex -Iinstaller -MMD -MP -c ../libex/exutil.c -o build/exutil.o
+cc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Os -minline-all-stringops -Wall -Wno-unused-function -Wno-misleading-indentation -I../libex -Iinstaller -MMD -MP -c ../libex/exaudio.c -o build/exaudio.o
+python3 ../tools/mkicon.py icons/pcalc.txt build/pcalc.scb
+mkicon: icons/pcalc.txt -> build/pcalc.scb (32x32, 4128B)
+cc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Os -minline-all-stringops -Wall -Wno-unused-function -Wno-misleading-indentation -I../libex -Iinstaller -MMD -MP -c sheet/sheet.c -o build/sheet.o
+python3 ../tools/mkicon.py icons/sheet.txt build/sheet.scb
+mkicon: icons/sheet.txt -> build/sheet.scb (32x32, 4128B)
+cc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Os -minline-all-stringops -Wall -Wno-unused-function -Wno-misleading-indentation -I../libex -Iinstaller -MMD -MP -c hexed/hexed.c -o build/hexed.o
+python3 ../tools/mkicon.py icons/hexed.txt build/hexed.scb
+mkicon: icons/hexed.txt -> build/hexed.scb (32x32, 4128B)
+cc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Os -minline-all-stringops -Wall -Wno-unused-function -Wno-misleading-indentation -I../libex -Iinstaller -MMD -MP -c blocks/blocks.c -o build/blocks.o
+python3 ../tools/mkicon.py icons/blocks.txt build/blocks.scb
+mkicon: icons/blocks.txt -> build/blocks.scb (32x32, 4128B)
+cc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Os -minline-all-stringops -Wall -Wno-unused-function -Wno-misleading-indentation -I../libex -Iinstaller -MMD -MP -c raider/raider.c -o build/raider.o
+python3 ../tools/mkicon.py icons/raider.txt build/raider.scb
+mkicon: icons/raider.txt -> build/raider.scb (32x32, 4128B)
+python3 ../tools/mkicon.py icons/installer.txt build/installer.scb
+ld -m elf_i386 -T ../libex/linker.ld build/start.o build/pcalc.o build/exutil.o build/exaudio.o -o build/pcalc.pe
+mkicon: icons/installer.txt -> build/installer.scb (32x32, 4128B)
+ld -m elf_i386 -T ../libex/linker.ld build/start.o build/sheet.o build/exutil.o build/exaudio.o -o build/sheet.pe
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: build/pcalc.pe has a LOAD segment with RWX permissions
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: build/sheet.pe has a LOAD segment with RWX permissions
+ld -m elf_i386 -T ../libex/linker.ld build/start.o build/hexed.o build/exutil.o build/exaudio.o -o build/hexed.pe
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: objcopy  -O binary build/pcalc.pe build/pcalc.bin
+build/hexed.pe has a LOAD segment with RWX permissions
+nm -n build/pcalc.pe > build/pcalc.sym
+objcopy  -O binary build/sheet.pe build/sheet.bin
+nm -n build/sheet.pe > build/sheet.sym
+ld -m elf_i386 -T ../libex/linker.ld build/start.o build/blocks.o build/exutil.o build/exaudio.o -o build/blocks.pe
+python3 ../tools/mkscx.py build/pcalc.bin build/pcalc.scx 0 0x400000 build/pcalc.sym --icon build/pcalc.scb
+objcopy  -O binary build/hexed.pe build/hexed.bin
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: build/blocks.pe has a LOAD segment with RWX permissions
+nm -n build/hexed.pe > build/hexed.sym
+python3 ../tools/mkscx.py build/sheet.bin build/sheet.scx 0 0x400000 build/sheet.sym --icon build/sheet.scb
+python3 ../tools/mkscx.py build/hexed.bin build/hexed.scx 0 0x400000 build/hexed.sym --icon build/hexed.scb
+mkscx: build/pcalc.bin -> build/pcalc.scx (entry=0x0 base=0x400000 load=15845B)
+objcopy  -O binary build/blocks.pe build/blocks.bin
+nm -n build/blocks.pe > build/blocks.sym
+mkscx: build/sheet.bin -> build/sheet.scx (entry=0x0 base=0x400000 load=25565B)
+python3 ../tools/mkscx.py build/blocks.bin build/blocks.scx 0 0x400000 build/blocks.sym --icon build/blocks.scb
+mkscx: build/hexed.bin -> build/hexed.scx (entry=0x0 base=0x400000 load=20957B)
+mkscx: build/blocks.bin -> build/blocks.scx (entry=0x0 base=0x400000 load=20077B)
+ld -m elf_i386 -T ../libex/linker.ld build/start.o build/raider.o build/exutil.o build/exaudio.o -o build/raider.pe
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: build/raider.pe has a LOAD segment with RWX permissions
+objcopy  -O binary build/raider.pe build/raider.bin
+nm -n build/raider.pe > build/raider.sym
+python3 ../tools/mkscx.py build/raider.bin build/raider.scx 0 0x400000 build/raider.sym --icon build/raider.scb
+mkscx: build/raider.bin -> build/raider.scx (entry=0x0 base=0x400000 load=41077B)
+python3 tools/pack_payload.py manifest.txt installer/payload.h installer/payload.c
+Packed and verified 5 applications and icons
+cc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Os -minline-all-stringops -Wall -Wno-unused-function -Wno-misleading-indentation -I../libex -Iinstaller -MMD -MP -c installer/installer.c -o build/installer.o
+cc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Os -minline-all-stringops -Wall -Wno-unused-function -Wno-misleading-indentation -I../libex -Iinstaller -MMD -MP -c installer/payload.c -o build/payload.o
+ld -m elf_i386 -T ../libex/linker.ld build/start.o build/installer.o build/payload.o build/exutil.o build/exaudio.o -o build/SandCore_ExtraSoftware_Pack_1.pe
+objcopy  -O binary build/SandCore_ExtraSoftware_Pack_1.pe build/SandCore_ExtraSoftware_Pack_1.bin
+nm -n build/SandCore_ExtraSoftware_Pack_1.pe > build/SandCore_ExtraSoftware_Pack_1.sym
+python3 ../tools/mkscx.py build/SandCore_ExtraSoftware_Pack_1.bin dist/SandCore_ExtraSoftware_Pack_1.scx 0 0x400000 build/SandCore_ExtraSoftware_Pack_1.sym \
+      --icon build/installer.scb
+mkscx: build/SandCore_ExtraSoftware_Pack_1.bin -> dist/SandCore_ExtraSoftware_Pack_1.scx (entry=0x0 base=0x400000 load=120661B)

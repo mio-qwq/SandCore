@@ -1,0 +1,7 @@
+pcalc: 18825 B / load 14661 B / BSS 13815 B / SCX, icon, roundtrip, symbols OK
+sheet: 28937 B / load 24773 B / BSS 112471 B / SCX, icon, roundtrip, symbols OK
+hexed: 24041 B / load 19877 B / BSS 112311 B / SCX, icon, roundtrip, symbols OK
+blocks: 23249 B / load 19085 B / BSS 12143 B / SCX, icon, roundtrip, symbols OK
+raider: 44417 B / load 40253 B / BSS 121311 B / SCX, icon, roundtrip, symbols OK
+SandCore_ExtraSoftware_Pack_1: 120377 B / load 116213 B / BSS 12199 B / SCX, icon, roundtrip, symbols OK
+Platform ABI and UI fragments unchanged; all checks passed. No guest boot.

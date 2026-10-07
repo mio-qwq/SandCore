@@ -1,0 +1,7 @@
+# SandCore_ExtraSoftware_Pack_1 载荷清单（tools/mkpayload.py 消费）
+# 名字 应用SCX 图标SCB2 配置模板 描述 标签 配置文件名
+PCALC  build/pcalc.scx  build/pcalc.scb  cfg/PCALX.CFG  "Expression and programmer calculator" PCalc PCALX.CFG
+SHEET  build/sheet.scx  build/sheet.scb  cfg/SHEETX.CFG "Formula spreadsheet with CSV" SandSheet SHEETX.CFG
+HEXED  build/hexed.scx  build/hexed.scb  cfg/HEXED.CFG  "Binary hex editor with undo" SandHex HEXED.CFG
+BLOCKS build/blocks.scx build/blocks.scb cfg/BLOCKS.CFG "Falling-block arcade game" SandBlocks BLOCKS.CFG
+RAIDER build/raider.scx build/raider.scb cfg/RAIDER.CFG "Retro raycast shooter" SandRaider RAIDER.CFG
