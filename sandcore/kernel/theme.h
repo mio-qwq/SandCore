@@ -1,6 +1,8 @@
 #ifndef SANDCORE_THEME_H
 #define SANDCORE_THEME_H
 #include "io.h"
+void theme_session_destroy(u32 id);
+int theme_session_prepare(u32 id);
 
 /* mio：主题是语义颜色和组件样式的有效快照，不是替换全局DAC。
  * 这样旧应用的沙丘/赛车材质不因换主题变色，新工具按角色重新取色。

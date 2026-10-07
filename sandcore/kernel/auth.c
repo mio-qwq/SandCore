@@ -6,6 +6,7 @@
 #include "timer.h"
 #include "process.h"
 #include "streams.h"
+#include "session.h"
 
 #define PASSWORD_ITERATIONS 100000u
 #define USER_ENABLED 1u
@@ -16,15 +17,41 @@ typedef struct {i32 uid,gid,subject_uid,subject_gid;u32 realm,session,generation
 typedef struct {
     u32 ticket,generation,created,state,action,database_generation;
     i32 target;pbkdf256_t derive;u8 salt[16];
+    int queue_prev,queue_next,queued;
 } login_t;
 static user_t users[AUTH_USER_MAX];
 static u32 user_count,database_generation;
 static u8 database[32+AUTH_USER_MAX*sizeof(user_t)],boot_token[32];
-static credential_t credentials[NTASK],launch;
-static login_t logins[NTASK];
-static u32 launch_set,serial_session,serial_counter,poll_tick,poll_cursor;
+static credential_t empty_credentials;
+static credential_t *credentials_at(int pid)
+{void *p=task_data(pid,TASK_DATA_AUTH);return p?p:&empty_credentials;}
+#define CREDENTIAL(pid) (*credentials_at(pid))
+u32 auth_task_bytes(void){return sizeof(credential_t);}
+static credential_t launch;
+static login_t empty_logins;
+static login_t *logins_at(int pid)
+{void *p=task_data(pid,TASK_DATA_LOGIN);return p?p:&empty_logins;}
+#define LOGIN(pid) (*logins_at(pid))
+u32 auth_login_bytes(void){return sizeof(login_t);}
+static u32 launch_set,launch_desktop,serial_session,serial_counter,poll_tick;
+static int login_head=-1,login_tail=-1;
 static i32 active_uid=AUTH_DEFAULT,active_gid=AUTH_DEFAULT;
 static u32 next_attempt[AUTH_USER_MAX+1];
+
+static void login_unqueue(int pid)
+{
+    login_t *j=task_data(pid,TASK_DATA_LOGIN);if(!j || !j->queued)return;
+    if(j->queue_prev>=0)LOGIN(j->queue_prev).queue_next=j->queue_next;else login_head=j->queue_next;
+    if(j->queue_next>=0)LOGIN(j->queue_next).queue_prev=j->queue_prev;else login_tail=j->queue_prev;
+    j->queued=0;j->queue_prev=j->queue_next=-1;
+}
+static void login_clear(int pid)
+{login_unqueue(pid);crypto_zero(&LOGIN(pid),sizeof(login_t));}
+static void login_enqueue(int pid)
+{
+    login_t *j=&LOGIN(pid);j->queue_prev=login_tail;j->queue_next=-1;j->queued=1;
+    if(login_tail>=0)LOGIN(login_tail).queue_next=pid;else login_head=pid;login_tail=pid;
+}
 
 static char fold(char c){return c>='a' && c<='z'?c-32:c;}
 static int same(const char *a,const char *b)
@@ -68,8 +95,8 @@ static void defaults(void)
 }
 void auth_init(void)
 {
-    defaults();crypto_zero(credentials,sizeof(credentials));crypto_zero(logins,sizeof(logins));
-    serial_session=serial_counter=launch_set=poll_cursor=0;poll_tick=0xFFFFFFFF;
+    defaults();crypto_zero(&CREDENTIAL(0),sizeof(credential_t));crypto_zero(&LOGIN(0),sizeof(login_t));
+    serial_session=serial_counter=launch_set=0;poll_tick=0xFFFFFFFF;login_head=login_tail=-1;
     crypto_zero(next_attempt,sizeof(next_attempt));
     random_init();crypto_zero(boot_token,sizeof(boot_token));
     if(random_ready())(void)random_bytes(boot_token,sizeof(boot_token));
@@ -104,30 +131,33 @@ void auth_init(void)
     else if(default_row<0 || !(users[default_row].flags&USER_ENABLED)){active_uid=active_gid=-2;}
     else {active_uid=users[default_row].uid;active_gid=users[default_row].gid;}
     crypto_zero(database,sizeof(database));
-    credentials[0].uid=credentials[0].gid=AUTH_SYSTEM;
-    credentials[0].subject_uid=credentials[0].subject_gid=AUTH_SYSTEM;
-    credentials[0].realm=AUTH_KERNEL;credentials[0].generation=task_generation(0);
+    CREDENTIAL(0).uid=CREDENTIAL(0).gid=AUTH_SYSTEM;
+    CREDENTIAL(0).subject_uid=CREDENTIAL(0).subject_gid=AUTH_SYSTEM;
+    CREDENTIAL(0).realm=AUTH_KERNEL;CREDENTIAL(0).generation=task_generation(0);
+    session_init(active_uid,active_gid,default_row>=0?users[default_row].name:"Locked",default_row>=0?users[default_row].home:"SYS");
 }
 static credential_t *credential(int pid)
 {
-    if(pid<0 || pid>=NTASK || !tasks[pid].state || tasks[pid].state==2
-        || credentials[pid].generation!=task_generation(pid))return 0;
-    return &credentials[pid];
+    if(pid<0 || pid>=NTASK || !TASK(pid).state || TASK(pid).state==2
+        || CREDENTIAL(pid).generation!=task_generation(pid))return 0;
+    return &CREDENTIAL(pid);
 }
 void auth_spawn(int pid,int parent)
 {
-    crypto_zero(&logins[pid],sizeof(logins[pid]));
-    if(launch_set)credentials[pid]=launch;
-    else if(parent>0 && credential(parent))credentials[pid]=credentials[parent];
+    login_clear(pid);
+    if(launch_set)CREDENTIAL(pid)=launch;
+    else if(parent>0 && credential(parent))CREDENTIAL(pid)=CREDENTIAL(parent);
     else {
-        crypto_zero(&credentials[pid],sizeof(credentials[pid]));
-        credentials[pid].uid=credentials[pid].subject_uid=active_uid;
-        credentials[pid].gid=credentials[pid].subject_gid=active_gid;
+        crypto_zero(&CREDENTIAL(pid),sizeof(CREDENTIAL(pid)));
+        session_t *s=session_get(session_active());
+        CREDENTIAL(pid).uid=CREDENTIAL(pid).subject_uid=s?s->uid:-2;
+        CREDENTIAL(pid).gid=CREDENTIAL(pid).subject_gid=s?s->gid:-2;
     }
-    credentials[pid].generation=task_generation(pid);
+    CREDENTIAL(pid).generation=task_generation(pid);
+    (void)session_bind(pid,launch_set?launch_desktop:parent>0?session_task(parent):session_active());
 }
 void auth_stop(int pid)
-{if(pid>0 && pid<NTASK){crypto_zero(&credentials[pid],sizeof(credentials[pid]));crypto_zero(&logins[pid],sizeof(logins[pid]));}}
+{if(pid>0 && task_owned(pid)){crypto_zero(&CREDENTIAL(pid),sizeof(CREDENTIAL(pid)));login_clear(pid);session_unbind(pid);}}
 int auth_uid(int pid){credential_t *c=credential(pid);return c?c->uid:-2;}
 int auth_gid(int pid){credential_t *c=credential(pid);return c?c->gid:-2;}
 int auth_subject_uid(int pid){credential_t *c=credential(pid);return c?c->subject_uid:-2;}
@@ -153,31 +183,32 @@ static u32 ticket(void)
 {
     for(u32 tries=0;tries<16;tries++){
         u32 result;if(random_bytes(&result,4))return 0;result&=0x7FFFFFFF;if(!result)continue;
-        int duplicate=0;for(int i=1;i<NTASK;i++)if(logins[i].ticket==result)duplicate=1;
+        int duplicate=0;for(int i=task_next(0);i>=0;i=task_next(i))if(LOGIN(i).ticket==result)duplicate=1;
         if(!duplicate)return result;
     }
     return 0;
 }
 static login_t *job(int pid,u32 token)
 {
-    if(!credential(pid) || !token || logins[pid].ticket!=token
-        || logins[pid].generation!=task_generation(pid))return 0;
-    if(sc_ticks-logins[pid].created>60000u || logins[pid].database_generation!=database_generation){
-        crypto_zero(&logins[pid],sizeof(logins[pid]));return 0;
+    if(!credential(pid) || !token || LOGIN(pid).ticket!=token
+        || LOGIN(pid).generation!=task_generation(pid))return 0;
+    if(sc_ticks-LOGIN(pid).created>60000u || LOGIN(pid).database_generation!=database_generation){
+        login_clear(pid);return 0;
     }
-    return &logins[pid];
+    return &LOGIN(pid);
 }
 static int begin(int pid,int target,const char *password,u32 action)
 {
     if(!credential(pid) || !random_ready() || !password || length(password,129)>128)return -1;
-    login_t *j=&logins[pid];crypto_zero(j,sizeof(*j));
+    login_clear(pid);login_t *j=&LOGIN(pid);
     j->ticket=ticket();if(!j->ticket)return -1;
     j->target=target;j->action=action;j->created=sc_ticks;j->generation=task_generation(pid);
     j->database_generation=database_generation;j->state=1;
-    if(action){if(random_bytes(j->salt,16))return -1;}
+    if(action){if(random_bytes(j->salt,16)){login_clear(pid);return -1;}}
     else for(u32 i=0;i<16;i++)j->salt[i]=target>=0?users[target].salt[i]:boot_token[i];
     if(!action && auth_can_manage(pid)){j->state=target>=0?2:3;return (int)j->ticket;}
     pbkdf256_init(&j->derive,password,length(password,129),j->salt,PASSWORD_ITERATIONS);
+    login_enqueue(pid);
     return (int)j->ticket;
 }
 int auth_login(int pid,const char *name,const char *password)
@@ -196,23 +227,24 @@ int auth_status(int pid,u32 token,u32 out[8])
     out[5]=j->action;return j->state==1?AUTH_PENDING:j->state==2?0:-5;
 }
 int auth_cancel(int pid,u32 token)
-{if(!job(pid,token))return -1;crypto_zero(&logins[pid],sizeof(logins[pid]));return 0;}
-static int execute(const char *command,int uid,int gid,u32 realm,u32 session,int subject_uid,int subject_gid)
+{if(!job(pid,token))return -1;login_clear(pid);return 0;}
+static int execute(const char *command,int uid,int gid,u32 realm,u32 session,int subject_uid,int subject_gid,u32 desktop)
 {
     if(launch_set)return -1;
     crypto_zero(&launch,sizeof(launch));launch.uid=uid;launch.gid=gid;launch.realm=realm;
     launch.session=session;launch.subject_uid=subject_uid;launch.subject_gid=subject_gid;
-    launch_set=1;int result=task_exec_scx(command);launch_set=0;crypto_zero(&launch,sizeof(launch));return result;
+    launch_desktop=desktop;launch_set=1;int result=task_exec_scx(command);launch_set=launch_desktop=0;crypto_zero(&launch,sizeof(launch));return result;
 }
 int auth_exec_ticket(int pid,u32 token,const char *command,int activate)
 {
     login_t *j=job(pid,token);
     if(!j || j->state!=2 || j->action || j->target<0 || !(users[j->target].flags&USER_ENABLED))return -5;
     user_t *u=&users[j->target];
-    if(activate){active_uid=u->uid;active_gid=u->gid;return 0;}
+    u32 desktop=session_create(u->uid,u->gid,SESSION_NORMAL,u->name,u->home);if(!desktop)return -4;
+    if(activate){int result=session_switch_trusted(desktop);if(result)session_discard(desktop);return result;}
     credential_t *parent=credential(pid);u32 session=parent?parent->session:0;
-    int child=execute(command,u->uid,u->gid,AUTH_NORMAL,session,u->uid,u->gid);
-    if(child>0)streams_login_terminal(pid,child);return child;
+    int child=execute(command,u->uid,u->gid,AUTH_NORMAL,session,u->uid,u->gid,desktop);
+    if(child>0)streams_login_terminal(pid,child);else session_discard(desktop);return child;
 }
 u32 auth_serial_begin(void)
 {
@@ -224,14 +256,14 @@ void auth_serial_end(void)
     u32 previous=serial_session;serial_session=0;
     if(!previous)return;
     /* 断开先撤授权再停止管理链进程；常驻模块仍按用户合同留到重启。 */
-    for(int pid=1;pid<NTASK;pid++)if(credentials[pid].session==previous && tasks[pid].state){
+    for(int pid=task_next(0);pid>=0;pid=task_next(pid))if(CREDENTIAL(pid).session==previous && TASK(pid).state){
         process_exit(pid,130);task_stop(pid);
     }
 }
 int auth_serial_exec(u32 session,const char *command)
 {
     if(!session || session!=serial_session || !random_ready())return -5;
-    return execute(command,AUTH_SYSTEM,AUTH_SYSTEM,AUTH_SERIAL,session,AUTH_SYSTEM,AUTH_SYSTEM);
+    return execute(command,AUTH_SYSTEM,AUTH_SYSTEM,AUTH_SERIAL,session,AUTH_SYSTEM,AUTH_SYSTEM,session_system());
 }
 int auth_service_exec(const char *command,int delegate)
 {
@@ -243,15 +275,39 @@ int auth_service_exec(const char *command,int delegate)
     const char *prefix="SYS/CORE/";for(n=0;prefix[n];n++)if(fold(normalized[n])!=prefix[n])return -5;
     int uid=delegate>0?auth_subject_uid(delegate):AUTH_SYSTEM;
     int gid=delegate>0?auth_subject_gid(delegate):AUTH_SYSTEM;if(uid<-1)return -5;
-    return execute(command,AUTH_SYSTEM,AUTH_SYSTEM,AUTH_SERVICE,0,uid,gid);
+    return execute(command,AUTH_SYSTEM,AUTH_SYSTEM,AUTH_SERVICE,0,uid,gid,session_system());
+}
+int auth_login_screen_exec(u32 desktop)
+{
+    session_t *s=session_get(desktop);if(!s || s->kind!=SESSION_LOCKED)return -1;
+    /* 仅此固定登录程序显示在锁屏会话。服务UID不带串口授权；文件
+     * 主体为无权限哨兵，不能借登录窗读写其它用户文档或执行任意程序。 */
+    return execute("SYS/CORE/LOGIN.SCX",AUTH_SYSTEM,AUTH_SYSTEM,AUTH_SERVICE,0,-2,-2,desktop);
 }
 int auth_launch_access(const char *path,u32 access)
 {
     int uid,gid;
     if(launch_set){uid=launch.uid;gid=launch.gid;}
     else if(task_pid()>0){uid=auth_subject_uid(task_pid());gid=auth_subject_gid(task_pid());}
-    else {uid=active_uid;gid=active_gid;}
+    else {session_t *s=session_get(session_active());uid=s?s->uid:-2;gid=s?s->gid:-2;}
     return fs_access_identity(path,uid,gid,access);
+}
+int auth_network_exec(int pid,const char *command,const i32 fds[3])
+{
+    credential_t *parent=credential(pid);
+    if(!parent || launch_set || !streams_pipe_descriptors(pid,fds))return -13;
+    /* nc -e新进程有独立网络启动合同，旧SPAWN2继承语义不改。
+     * 普通账户/root取本人文件主体；外部SYSTEM显式启动时落为root。
+     * 服务只能取其受委托的普通主体，不能以SYSTEM服务伪造root。
+     * 无UART端点/外部会话票据，也不能在remote子孙重新得到AUTH_SERIAL。
+     * task_exec与三个标准描述符接线全在IF=0内，孩子不会抢先运行。 */
+    int uid=parent->subject_uid,gid=parent->subject_gid;
+    if(uid==AUTH_SYSTEM){if(!auth_can_mod(pid))return -13;uid=gid=AUTH_ROOT;}
+    if(uid<0 || gid<0)return -13;
+    crypto_zero(&launch,sizeof(launch));launch.uid=launch.subject_uid=uid;launch.gid=launch.subject_gid=gid;
+    launch.realm=AUTH_NORMAL;launch_desktop=session_task(pid);launch_set=1;
+    int result=streams_exec(pid,command,fds,0);
+    launch_set=launch_desktop=0;crypto_zero(&launch,sizeof(launch));return result;
 }
 int auth_user_add(int pid,const char *name,const char *home,int uid,int gid)
 {
@@ -284,12 +340,13 @@ int auth_password(int pid,const char *name,const char *password,u32 proof)
 void auth_poll(void)
 {
     if(poll_tick==sc_ticks)return;poll_tick=sc_ticks;
-    /* 总预算256次HMAC/客体tick，多申请者轮转；不会随账户数倍增。 */
-    for(u32 scan=0;scan<NTASK;scan++){
-        poll_cursor=(poll_cursor+1)%NTASK;if(!poll_cursor)continue;
-        login_t *j=&logins[poll_cursor];if(j->state!=1)continue;
-        if(!job((int)poll_cursor,j->ticket))continue;
-        if(!pbkdf256_step(&j->derive,256))return;
+    /* 只轮转真正进行派生的登录请求；空闲桌面有几千个任务时也不
+     * 扫几千份凭据。每tick总计256次HMAC，失效项清理另限8个。 */
+    for(int discarded=0;login_head>=0 && discarded<8;discarded++){
+        int pid=login_head;login_t *j=&LOGIN(pid);
+        if(j->state!=1 || !job(pid,j->ticket)){login_clear(pid);continue;}
+        login_unqueue(pid);
+        if(!pbkdf256_step(&j->derive,256)){login_enqueue(pid);return;}
         if(j->action){
             user_t old=users[j->target];
             for(u32 n=0;n<16;n++)users[j->target].salt[n]=j->salt[n];
@@ -300,7 +357,7 @@ void auth_poll(void)
             crypto_zero(&old,sizeof(old));
         }else j->state=j->target>=0 && (users[j->target].flags&3)==3
             && crypto_equal(j->derive.value,users[j->target].hash,32)?2:3;
-        crypto_zero(&j->derive,sizeof(j->derive));crypto_zero(j->salt,sizeof(j->salt));return;
+        crypto_zero(&j->derive,sizeof(j->derive));crypto_zero(j->salt,sizeof(j->salt));task_notify_generation(pid,j->generation,TASK_EVENT_AUTH);return;
     }
 }
 int auth_users(int pid,char *out,u32 capacity)

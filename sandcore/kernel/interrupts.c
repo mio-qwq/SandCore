@@ -14,6 +14,7 @@
 #include "io.h"
 #include "interrupts.h"
 #include "timer.h"
+#include "module.h"
 #include "keyboard.h"
 #include "mouse.h"
 #include "wm.h"
@@ -22,6 +23,9 @@
 #include "serial.h"
 #include "ringdebug.h"
 #include "audio.h"
+#ifdef M10_DISK_CORE
+#include "e1000.h"
+#endif
 
 /* ---- IDT 门描述符: 8 字节, 位域见 docs/INTR.md ----
  * M5: 门数扩到 125 (0x7C 系统调用门需要 DPL=3, 其余 0x8E) */
@@ -124,6 +128,11 @@ void irq_c_common(u32 vec,u32 *frame)
     if (irq < 16 && irq_handlers[irq])
         irq_handlers[irq]();
     audio_irq(irq); /* PCI可能共享IRQ；检查本设备status，仅清自己的W1C位。 */
+#ifdef M10_DISK_CORE
+    e1000_irq(irq); /* 只读清本设备ICR/标记待服务，协议栈永远不进IRQ。 */
+#endif
+    modules_irq(irq); /* 扩展只投递/确认硬件，EOI和调度仍由公共出口负责。 */
+    if(irq!=0)task_kernel_wake(); /* 驱动只唤醒设备服务上下文，调度统一走IRQ出口。 */
     pic_eoi(irq);
     if(irq==4)ringdebug_irq(frame); /* EOI后允许物理调试机停在任意被打断任务。 */
 }

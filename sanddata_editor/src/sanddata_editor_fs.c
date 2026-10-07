@@ -11,6 +11,13 @@
 #include <stdarg.h>
 
 wchar_t sfs_error[1024];
+/* 整盘快照和新导入正文引用计数。拖入的整批撤销只复制目录，不复制
+ * 256MiB快照或所有正文；工作副本修改的对象另分配，旧对象始终不改。 */
+struct SfsBuffer {uint32_t refs;unsigned char *data;size_t size;};
+static SfsBuffer *buffer_new(unsigned char *data,size_t size)
+{SfsBuffer *b=malloc(sizeof(*b));if(b){b->refs=1;b->data=data;b->size=size;}return b;}
+static void buffer_release(SfsBuffer *b)
+{if(b && !--b->refs){free(b->data);free(b);}}
 static int fail(const wchar_t *format,...) {
     va_list args;va_start(args,format);vswprintf(sfs_error,1024,format,args);va_end(args);return 0;
 }
@@ -54,14 +61,16 @@ int sfs_valid_name(const char *s,uint32_t limit) {
     }return 1;
 }
 int sfs_find(const SfsImage *fs,const char *name){for(uint32_t i=0;i<fs->count;i++)if(same(fs->entries[i].name,name))return (int)i;return -1;}
-void sfs_free(SfsImage *fs){if(fs->entries)for(uint32_t i=0;i<fs->count;i++)free(fs->entries[i].data);free(fs->entries);free(fs->original);free(fs->path);memset(fs,0,sizeof(*fs));}
+void sfs_free(SfsImage *fs){if(fs->entries)for(uint32_t i=0;i<fs->count;i++)buffer_release(fs->entries[i].content);free(fs->entries);
+    if(fs->snapshot)buffer_release(fs->snapshot);else free(fs->original);free(fs->path);memset(fs,0,sizeof(*fs));}
 static int parse(SfsImage *fs,unsigned char *raw,size_t length) {
     memset(fs,0,sizeof(*fs));fs->original=raw;fs->image_size=length;
+    fs->snapshot=buffer_new(raw,length);if(!fs->snapshot)return fail(L"内存不足。");
     if(length<512||length%512||memcmp(raw,"SANDFSMIO",9))return fail(L"不是有效的 SandFS 镜像。请选择 sanddata.img。");
     fs->count=get32(raw+12);fs->dir_sectors=get32(raw+16);fs->version=get32(raw+20);
     if(!fs->dir_sectors)fs->dir_sectors=1;
     uint32_t stride,names;
-    if(fs->version==5&&(fs->dir_sectors==192||fs->dir_sectors==384)&&get32(raw+28)==96){
+    if(fs->version==5&&(fs->dir_sectors==192||fs->dir_sectors==384||fs->dir_sectors==768||fs->dir_sectors==1536)&&get32(raw+28)==96){
         if(crc32(raw,508)!=get32(raw+508))return fail(L"超级块校验失败，拒绝编辑损坏的镜像。");
         stride=96;names=64;fs->capacity=fs->dir_sectors*512/96;
         fs->bank=get32(raw+48);fs->commit_generation=get32(raw+52);fs->object_generation=get32(raw+56);
@@ -72,7 +81,7 @@ static int parse(SfsImage *fs,unsigned char *raw,size_t length) {
     if(fs->count>fs->capacity)return fail(L"目录项目数超过容量。");
     fs->data_start=1+fs->dir_sectors*(fs->version==5?2:1);
     fs->sectors=fs->version>=4?get32(raw+24):16384;if(!fs->sectors)fs->sectors=16384;
-    if(fs->sectors<fs->data_start||fs->sectors>131072||fs->sectors>length/512)return fail(L"镜像容量声明非法。");
+    if(fs->sectors<fs->data_start||fs->sectors>524288||fs->sectors>length/512)return fail(L"镜像容量声明非法。");
     size_t offset=(size_t)(1+fs->bank*fs->dir_sectors)*512;
     if(offset+(size_t)fs->dir_sectors*512>length)return fail(L"目录超出镜像。");
     if(fs->version==5&&crc32(raw+offset,(size_t)fs->dir_sectors*512)!=get32(raw+44))return fail(L"活动目录校验失败，拒绝编辑损坏的镜像。");
@@ -93,7 +102,7 @@ static int parse(SfsImage *fs,unsigned char *raw,size_t length) {
         uint32_t blocks=(r->size+511)/512;
         if(r->size>fs->sectors*512||at<fs->data_start||at>fs->sectors||blocks>fs->sectors-at){free(used);return fail(L"文件数据超出磁盘容量。");}
         for(uint32_t b=at;b<at+blocks;b++){if(used[b]){free(used);return fail(L"文件数据互相重叠。");}used[b]=1;}
-        if(r->size){r->data=malloc(r->size);if(!r->data){free(used);return fail(L"内存不足。");}memcpy(r->data,raw+(size_t)at*512,r->size);}
+        if(r->size)r->data=raw+(size_t)at*512;
     }
     free(used);
     if(fs->version==5)for(uint32_t i=0;i<fs->count;i++){
@@ -112,16 +121,16 @@ static unsigned char *read_file(const wchar_t *path,size_t max,size_t *size) {
 }
 int sfs_load(SfsImage *fs,const wchar_t *path) {
     wchar_t absolute[HOST_PATH];DWORD n=GetFullPathNameW(path,HOST_PATH,absolute,NULL);if(!n||n>=HOST_PATH)return fail(L"镜像路径无效或过长。");
-    size_t size;unsigned char *raw=read_file(absolute,64u*1024*1024,&size);if(!raw)return 0;
+    size_t size;unsigned char *raw=read_file(absolute,256u*1024*1024,&size);if(!raw)return 0;
     SfsImage fresh;if(!parse(&fresh,raw,size)){sfs_free(&fresh);return 0;}
     fresh.path=_wcsdup(absolute);if(!fresh.path){sfs_free(&fresh);return fail(L"内存不足。");}sfs_free(fs);*fs=fresh;return 1;
 }
 int sfs_clone(SfsImage *dest,const SfsImage *src) {
-    *dest=*src;dest->entries=NULL;dest->original=NULL;dest->path=NULL;
-    dest->entries=calloc(src->capacity,sizeof(*dest->entries));dest->original=malloc(src->image_size);dest->path=src->path?_wcsdup(src->path):NULL;
-    if(!dest->entries||!dest->original||(src->path&&!dest->path)){sfs_free(dest);return fail(L"内存不足。");}
-    memcpy(dest->original,src->original,src->image_size);
-    for(uint32_t i=0;i<src->count;i++){dest->entries[i]=src->entries[i];dest->entries[i].data=NULL;if(src->entries[i].size){dest->entries[i].data=malloc(src->entries[i].size);if(!dest->entries[i].data){sfs_free(dest);return fail(L"内存不足。");}memcpy(dest->entries[i].data,src->entries[i].data,src->entries[i].size);}}
+    *dest=*src;dest->entries=NULL;dest->original=NULL;dest->path=NULL;dest->snapshot=NULL;
+    dest->entries=calloc(src->capacity,sizeof(*dest->entries));dest->path=src->path?_wcsdup(src->path):NULL;
+    if(!dest->entries||(src->path&&!dest->path)){sfs_free(dest);return fail(L"内存不足。");}
+    dest->original=src->original;dest->snapshot=src->snapshot;if(dest->snapshot)dest->snapshot->refs++;
+    for(uint32_t i=0;i<src->count;i++){dest->entries[i]=src->entries[i];if(dest->entries[i].content)dest->entries[i].content->refs++;}
     return 1;
 }
 static uint32_t next_generation(SfsImage *fs){if(fs->version!=5)return 1;if(fs->object_generation==UINT32_MAX){fail(L"对象代数已经耗尽。");return 0;}return ++fs->object_generation;}
@@ -167,13 +176,14 @@ int sfs_add_path(SfsImage *fs,const wchar_t *host,const char *dest) {
     size_t size;unsigned char *data=read_file(host,(size_t)fs->sectors*512,&size);if(!data)return 0;
     if(at>=0&&fs->entries[at].size==size&&(!size||!memcmp(fs->entries[at].data,data,size))){free(data);return 1;}
     uint32_t gen=next_generation(fs);if(!gen){free(data);return 0;}
-    SfsEntry *e;if(at<0){e=fs->entries+fs->count++;memset(e,0,sizeof(*e));strcpy(e->name,dest);defaults(e);}else{e=fs->entries+at;free(e->data);}
-    e->data=data;e->size=(uint32_t)size;e->generation=gen;fs->dirty=1;return room(fs);
+    SfsBuffer *content=buffer_new(data,size);if(!content){free(data);return fail(L"内存不足。");}
+    SfsEntry *e;if(at<0){e=fs->entries+fs->count++;memset(e,0,sizeof(*e));strcpy(e->name,dest);defaults(e);}else{e=fs->entries+at;buffer_release(e->content);}
+    e->content=content;e->data=data;e->size=(uint32_t)size;e->generation=gen;fs->dirty=1;return room(fs);
 }
 int sfs_remove(SfsImage *fs,const char *name) {
     uint32_t out=0;int removed=0;
     for(uint32_t i=0;i<fs->count;i++){
-        if(same(fs->entries[i].name,name)||sfs_child(fs->entries[i].name,name)){free(fs->entries[i].data);removed=1;}
+        if(same(fs->entries[i].name,name)||sfs_child(fs->entries[i].name,name)){buffer_release(fs->entries[i].content);removed=1;}
         else fs->entries[out++]=fs->entries[i];
     }fs->count=out;if(removed)fs->dirty=1;return 1;
 }
@@ -237,6 +247,14 @@ static unsigned char *serialize(const SfsImage *fs) {
         put32(out+52,fs->commit_generation==UINT32_MAX?1:fs->commit_generation+1);put32(out+56,fs->object_generation);put32(out+508,crc32(out,508));
     }return out;
 }
+static int file_equal(HANDLE file,const unsigned char *expected,size_t size)
+{
+    LARGE_INTEGER length;if(!GetFileSizeEx(file,&length)||(uint64_t)length.QuadPart!=size)return 0;
+    unsigned char *block=malloc(1048576);if(!block)return 0;int ok=1;
+    for(size_t at=0;at<size;){DWORD count=(DWORD)(size-at>1048576?1048576:size-at),got=0;
+        if(!ReadFile(file,block,count,&got,NULL)||got!=count||memcmp(block,expected+at,count)){ok=0;break;}at+=count;}
+    free(block);return ok;
+}
 int sfs_save(SfsImage *fs,const wchar_t *target) {
     unsigned char *out=serialize(fs);if(!out)return 0;
     /* 回读同一份序列化结果；父目录、重叠范围和CRC不合格就不碰原镜像。 */
@@ -250,9 +268,7 @@ int sfs_save(SfsImage *fs,const wchar_t *target) {
         guard=CreateFileW(target,GENERIC_READ,FILE_SHARE_READ|FILE_SHARE_DELETE,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
         if(guard==INVALID_HANDLE_VALUE){sfs_free(&check);return winfail(L"镜像正在使用，无法保存");}
         if(fs->path&&!_wcsicmp(fs->path,target)){
-            LARGE_INTEGER n;DWORD got=0;unsigned char *prior=malloc(fs->image_size);
-            int equal=prior&&GetFileSizeEx(guard,&n)&&(uint64_t)n.QuadPart==fs->image_size&&ReadFile(guard,prior,(DWORD)fs->image_size,&got,NULL)&&got==fs->image_size&&!memcmp(prior,fs->original,fs->image_size);
-            free(prior);if(!equal){CloseHandle(guard);sfs_free(&check);return fail(L"镜像已被其他程序修改。请另存为新文件，避免覆盖外部修改。");}
+            if(!file_equal(guard,fs->original,fs->image_size)){CloseHandle(guard);sfs_free(&check);return fail(L"镜像已被其他程序修改。请另存为新文件，避免覆盖外部修改。");}
         }
     }
     size_t cap=wcslen(target)+96;wchar_t *temp=malloc(cap*sizeof(wchar_t)),*backup=malloc(cap*sizeof(wchar_t));
@@ -262,7 +278,9 @@ int sfs_save(SfsImage *fs,const wchar_t *target) {
     int ok=1;DWORD done=0;
     if(file==INVALID_HANDLE_VALUE)ok=winfail(L"无法创建保存副本");
     else{if(!WriteFile(file,out,(DWORD)fs->image_size,&done,NULL)||done!=fs->image_size||!FlushFileBuffers(file))ok=winfail(L"写入保存副本失败");CloseHandle(file);}
-    if(ok){size_t size;unsigned char *reread=read_file(temp,64u*1024*1024,&size);if(!reread||size!=fs->image_size||memcmp(reread,out,size))ok=fail(L"磁盘保存副本回读失败，原镜像未替换。");free(reread);}
+    if(ok){HANDLE reread=CreateFileW(temp,GENERIC_READ,FILE_SHARE_READ,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
+        if(reread==INVALID_HANDLE_VALUE||!file_equal(reread,out,fs->image_size))ok=fail(L"磁盘保存副本回读失败，原镜像未替换。");
+        if(reread!=INVALID_HANDLE_VALUE)CloseHandle(reread);}
     if(ok&&guard!=INVALID_HANDLE_VALUE){
         for(unsigned k=0;k<100;k++){swprintf(backup,cap,L"%ls.bak-%04u%02u%02u-%02u%02u%02u-%u",target,time.wYear,time.wMonth,time.wDay,time.wHour,time.wMinute,time.wSecond,k);if(GetFileAttributesW(backup)==INVALID_FILE_ATTRIBUTES)break;}
         if(!ReplaceFileW(target,temp,backup,REPLACEFILE_IGNORE_MERGE_ERRORS,NULL,NULL))ok=winfail(L"无法替换镜像，保存副本和备份保留在原目录");

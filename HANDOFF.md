@@ -1,5 +1,81 @@
 # HANDOFF.md —— 沙核 OS (SandCore) 交接文档
 
+> **2026-10-07 开发验收包已提交：** M10a1约定实现与收尾完成，等待用户验收。动态任务/独立会话/隐藏停画、磁盘主核与用户签名扩展、原始凤凰TTF、256MiB盘与编辑器、e1000/IPv4和19个网络工具已接线。新增curl系统内编译及14项定向检查通过，包含最终镜像启动/联网/桌面截图；已有有效双来源证据按实际源码影响复用，停止新增测试。原18对应18/55，curl单列追加；HTTP可用，HTTPS/TLS尚未实现。入口见[M10a1验收说明](sandcore/docs/M10A1-ACCEPTANCE.md)，不创建Release。
+
+以下旧阶段状态与失败记录是历史沿革，不能作为当前待办清单；最新结果以验收说明为准。
+
+> **2026-10-07清理已完成：** 用户授权build除代码外无用产物全删。已删14034份/118.631GiB，14318份源码保留，错误和缺失均0；项目现14.518GiB，sandcore/build6.837GiB。当前候选双盘、MAIN/符号/完整fs、引导与编辑器保留；原盘、正式版本、代码归档和公开签名保留。历史重复镜像/部分截图已明确授权删除，旧路径仅为历史记录；清单/result在build/cleanup-approved-build-20261007-*.json。未运行新QEMU，不恢复已停止的扩展测试队列。
+
+> **2026-10-07用户最新指令，优先执行：** M10a1约定功能实现和资源接线已写齐，用户要求停止画蛇添足的验证。AGENTS第十二节已持久化：复用未受影响组件证据；仅明确故障、实质交付缺项和必要最终检查，不继续扩夹具/组合、复制完整测试盘或因主核摘要变化重跑全部矩阵。当前无QEMU运行；普通mio/root三故障卡双盘24项已通过。目录133.145GiB，sandcore/build125.182GiB，其中1493个镜像113.868GiB；未删除历史或接触私钥。接下来优先整理实际可用交付入口并处理具体问题，下方历次待验清单不是无限追加测试授权。
+
+> **2026-10-07当前：** M10a1完整Goal继续，尚未整体验收。用户公钥/六份签名有效，迟交未导致返工或重签。新MAIN981ee90b…修隐藏故障桌面清理后的模态残留：同字节双盘HMP夹具22项通过；session12双盘各两轮65会话全部通过，冷PID历史页5→11/其余回收，暖PF与记录/旁表页无增长，12张完整工作区逐字节保留。preserved-recovery01两盘真实坏主核回退到原fa9f0d39…核，原ELF/载荷重包装一致、同用户签名初始化与常驻服务通过；非用新核替代恢复核。原盘/全部历史/权限/公开签名保留；新候选其它完整键鼠、多卡/多普通会话异常、真实GUI、设备/存储/字体边界等合同继续待验。当前无运行VM，无私钥访问/commit/push/Release。详细证据和范围见M10A1-VERIFICATION.md；以下旧接力记录保留为历史。
+
+> **2026-10-07最新接力：** dhcp-fix02独立build03退出0，648份构建输入及实际产物冻结；MAIN正文381584B/BSS332840B、完整SHA35084bcd37178b5c68377574caa4ba6b73629dd71e7a6bd36d1cfb7d3f23ff7b，默认T2派生只替换一处表达式，上游原件/全部声明原字节保持。publish03两份256MiB盘退出0，各437份当前文件精确核对，225/167固定归档及实际派生/生成工具齐全，原恢复CORE保持。唯一runner long03/PID18032运行四模式×双来源；第一来源四模式全部18项通过，最大有限默认T1/T2、86400秒、显式无限及有限→无限自动续期/计数清零/6500tick越过旧到期时段保持/实际ping全部通过，源盘摘要保持；第二来源与完整双盘矩阵未收齐。旧short02双来源22项通过保留，不覆盖新MAIN；short03/core10/font06/network13脚本已匹配新CORE/inputs03准备，未启动。公钥/六份签名再次独立验证，无私钥访问或重新签署；完整Goal active，无commit/push/Release。
+
+> **2026-10-07租约边界当前：** dhcp-lifecycle02退出0，两来源全部三策略共22声明检查通过，独立线缆/PIT/CPU/源盘不变审计已保存，实际1920×1080桌面已查看。long01夹具误用不存在的sc_sleep而原生链接失败，已用旧公开timed event wait修正；long02原生编译通过，在真实0xFFFFFFFE租约、省略T1/T2时读到t2=536870910而正确值3758096382，t1_timeout错误归零，完整FAIL已保存。现补固定BSD原件生成的一处无溢出默认T2派生与完整实际源码归档，dhcp-fix02正在准备独立构建，尚未验证。公钥和六份签名再次独立验证通过，无私钥访问；完整Goal active，无commit/push/Release。
+
+> **2026-10-07 DHCP修复候选当前：** 原desktop02的短租约续期实际FAIL已保存。独立构建01因SINGLE_NETIF宏内continue失败，修正后build02退出0，完整643份输入冻结保留；新CORE SHA64da4e2e9615b771a4187b0d89f79f13821e104ca61cf527f63f46a9df421b59。第一次迁移因许可证汇总文档陈旧在运行前拒绝；补完整归档后publish02退出0，两份256MiB来源各434份当前文件逐字节一致，M9/M10固定归档225/167份通过，恢复CORE原字节保留。公钥嵌入主核，WALL100用用户公钥再次验签通过，无私钥访问或重新签署。唯一runner dhcp-lifecycle02/PID8576正在新候选执行续期/重绑定/到期三模式×双来源，尚无终态；旧network12的308项/资源01的16项/其它旧主核证据不覆盖新主核。完整Goal active，无commit/push/Release。
+
+> **2026-10-07资源01终态：** 退出0，双来源16声明/20原生检查全部PASS，创建未绑定UDP388125/388349后真实-12，八失败重试稳定；回收后PF54808/54838各精确回原值，协议页2→2，旧句柄无效，真实ping/零逻辑对象正常。两来源fixture SHA75dc2749122f44640ae1a454a3da904deffcc662fd7b81ab62b4d7552667add3，完整冻结01保留；之后只修未绑定PCB尚不进入udp_pcbs链这一原因注释，无行为变化。network12两来源308声明终态保持。当前唯一runner dhcp-lifecycle01/PID15596已启动原desktop02候选60秒租约/T1=20/T2=40自动续期/丢续期重绑定/完全断应答到期恢复，尚无终态，未改内核粒度。终态审计在sandcore/build/m10a1-network-resources-01/declared-audit.json；完整Goal active，无commit/push/Release。
+
+> **2026-10-07 network12已退出0：** 两来源三profile全部收齐，matrix=DECLARED_NETWORK_CASES_PASS，隔离57/应用93/无网卡4各两份，总308项全部PASS/native_required/complete_profiles/源摘要保持已经审计，入口sandcore/build/m10a1-network-12/declared-audit.json。第二来源应用桌面1920×1080实际查看，字体/图标/原壁纸正常，无SYSTEM管理窗口进入mio桌面。新的唯一runner resources01/PID17616正在同一desktop02/desktop-inputs02双盘验证，两个探针客体编译及静态配置已通过；终态待收齐。DHCP lifecycle01的三份新原创源码/20文件冻结/runner只准备未运行；先观察资源终态，再按单VM顺序实测。完整Goal active，主核/公钥/签名不变，无commit/push/Release。
+
+> **2026-10-07网络资源接线：** 唯一运行runner为network12/PID18348，第一来源三个profile已通过，第二来源正在隔离链路；以最终JSON/exit为准。新M10NRES.C/verify_m10_network_resources.py在当前desktop02候选补跨PID权限、隐藏普通mio实际UDP、未close退出、真正socket耗尽/八次失败回滚/完整关闭后真实PF账与旧句柄失效。夹具失败恢复stdio/票据/管道/孩子；关闭等待内核真实完成，逆序撤销UDP避免测试人为尾链二次方扫描。AST/21文件冻结通过，resources-run01只准备，尚未启动。冻结入口build/m10a1-network-resources01-source-freeze/manifest.json；输入仍desktop-inputs02，签名结果不变。短DHCP租约生命周期待独立实测，完整Goal active，无commit/push/Release。
+
+> **2026-10-07原始TCP终态：** tcp-faults01退出0，两来源各9项声明检查通过。原创隔离对端真实丢首SYN/首数据、0窗口后重新打开；两盘各实见2次SYN、丢段再次发送、零窗口期间1个包、完整16384B上行SHA6c946c0a9501d2a9fb9dc65bb931071233fb28a2820a8be06344e1482f5e6bfc，客体4097B乱序/重复/32位序号回绕全部精确一次接收/EOF/半关闭、拒绝连接RST与建立后RST及64B状态护栏均通过。源盘保持；netstat项仅查询不充物理页回收或全部拥塞/吞吐。当前CORE仍desktop02。font-edges02双盘18启动、Notes03双盘22项、sessions09/10及最终12图均声明通过。network12已启动完整三profile/双盘/18原生工具重测，唯一当前VM；原network11租约前置失败保持。完整Goal active，无commit/push/Release。
+
+> **2026-10-07字体拒绝终态：** font-edges02退出0，两来源各九种原文件/缺12/缺16/双缺/截断12/坏目录/cmap/loca/轮廓16全部实际启动、客体编译与声明ABI/原子激活/页归零/原脸保留通过，18副本及两原来源摘要不变。已实际查看第二来源双缺TTF的桌面：旧ASCII与Start字形仍可辨识。01的FONT8夹具错误失败保留，内核ABI保持1024B/返回1024。Notes03双来源22项声明通过、sessions09/10和12最终像素证据保持；网络11短租约撤地址失败保持，network12准备但未启动。tcp-faults01 PID3256在当前desktop02主核双盘进行原创原始TCP线缆故障实测，未有终态。当前只此VM；Goal active，无commit/push/Release。
+
+> **2026-10-07当前：** desktop02主核不变。sessions-09双来源22项及两轮65桌面声明通过，sessions-10两来源12张完整原尺寸工作区与原同步06逐字节一致。Notes03退出0，两来源各11项原生/六编辑/启动注销恢复通过；GET代数变化仅重开完整下载3/2次，七张实际中文/光标/滚动图已审阅。network11退出1：60000B发送前短租约到期，PIT6012、地址0/状态CHECKING8，无60000B帧、DMA/驱动/ATA/坏释放均未报错；不称分片通过。分片矩阵新增明确静态地址前置，短租约续期/到期仍待单验，network12未启动。font-edges01首原文件八项新脸/旧GLYPH16通过，测试错误把FONT8写成760B/返回0；旧合同及基线均1024B/返回1024，内核保持。已改夹具1026B护栏，font-edges02 PID13904执行九类×双盘。原创有限三连接TCP故障对端/探针已写并冻结，仅静态检查，tcp01尚未运行。Goal active，无commit/push/Release。
+
+> **2026-10-07最终画面已核：** sessions-10退出0，两来源各11阶段/22项通过；desktop-pixels-03的12張1920×1032完整工作区与原同步06逐字节相同。之前09前三张确实过早取到程序壁纸，原证据保持。当前CORE仍desktop-fix-02/完整SHA94e7833c3638d9edf318dbac13862ce7e051c51379db60e89e57e64fb3c9ef4f，原用户公钥/扩展签名保持。Notes03 PID9700首来源原生编译和六编辑保存/注销均通过、GET换代重开3次，第二来源RUNNING；中文/混合字宽/滚动图实际已看。network11/font-edges01 runner准备但未启动；先等Notes终态，单VM诊断。Goal active，无commit/push/Release。
+
+> **2026-10-07当前终态：** sessions-09退出0，两来源各11阶段/22项检查、同进程两轮65个桌面创建/分页/注销全部通过。冷PF各减少6页，精确对应PID历史记录5→11页；暖轮PF与记录页数不再增长，旁表45→45/所有者4→4。此范围不是全部会话/资源验收。原同步sessions-06与09六工作区比较，前3张两来源均不同、后3张一致；目前未宣布旧/新最终画面等价，sessions-10只重测控制器并观察pending归零之后真正完成的新帧（不冒充完整65资源矩阵）。Notes02原生编译及普通mio启动通过，但首次保存期间GET_DATA -8使宿主失败；内核拒绝读混代数据符合合同。仅针对该精确错误重开完整GET的新宿主逻辑尚待Notes03实测。用户公开签名有效且无需重签，无commit/push/Release，Goal active。
+
+> **2026-10-07最新：** desktop-build/publish-02均退出0，正文381584B/BSS332840B，完整CORE SHA94e7833c3638d9edf318dbac13862ce7e051c51379db60e89e57e64fb3c9ef4f；两新256MiB盘1514/1476项，原inputs-03保持。session-run-09 PID14480正在双来源完整重测：首来源11阶段/22项会话检查通过，真实65桌面同进程两轮均全部就绪与注销通过，旁表45页两轮前后相等；冷PF减少6页精确对应已提交PID历史记录5→11页，暖PF55929→55929/历史11→11不再增长。第一来源六个1920×1032完整工作区的候选01/02像素全字节一致，排除的只有48行任务栏时钟；IO批次最大观察由96tick降至4tick，仅此夹具，不代表整机/全部GUI长尾达标。第二来源和完整矩阵仍RUNNING，不提前PASS。网络host脚本新增公开时钟/服务前后观察和超时具名失败记录，原40秒/ACK超时不变，尚未在新主核上执行。Notes02、字体拒绝/缩放/缓存、CORE新体和其它完整合同继续；无commit/push/Release，Goal active。
+
+> **2026-10-07 desktop候选01实际：** build/publish-01均退出0，两副本各431份归档/当前候选字节审计通过，完整CORE SHA7ae416aa3aec53ff429cc10de5f6ea242d7ee116af45d35e6f4e72ff1ee24f4a。sessions-08首来源11阶段实际全部走完、客体22项PASS/session_failures=0/exit0，管理心跳持续；宿主错误要求22个名称都不同，而三普通任务身份检查名称实际重复3次，因此runner仍退出1，65冷暖未执行，原FAIL保留。现按20个明确声明名称及各自真实次数（合计22）核对，不改客体行为。新计数显示最终壁纸透明合成仍一次96tick；现将原整数alpha公式按读完的完整像素同步分批，不显示半幅、不降低像素。独立desktop-build-02 PID15992执行中；下一轮源码/符号/新CORE另冻结，08旧体数据不当新体PASS。完整Goal active，无commit/push/Release。
+
+> **2026-10-07当前终态与修复：** network-10已退出1：第一来源isolated56/applications93/no-nic4声明通过，第二来源controlled-DHCP的40秒宿主标记等待超时，随后实际BOUND且命令退出0，完整矩阵仍FAIL。sessions-07退出1，首来源原生编译/初始隔离通过，initial后管理ACK超时，冷暖页账尚未执行。QMP两次均看到task0在读盘、时钟推进、render_hold=1、UART接收待处理、无ATA失败；读盘LBA精确落在6,293,440B的SYS/WALL/AURORA.SCB。当前将桌面原始图片改为每服务轮16KiB/两PIT tick软预算、候选原子交付/代数与rw复核/隐藏暂停/退出取消；不改图片分辨率和原像素，不放宽协议超时。新增源码尚未构建/实测，旧PASS不覆盖；网络计时问题仍须独立核对。用户签名已接入且有效，晚提交只延后正向验证。完整Goal active，无commit/push/Release，原盘与失败证据保留。
+
+> **2026-10-07 Shell真实回归通过：** shell-run-01退出0，两只读来源盘各31项、共62項stdin回归通过，源盘摘要保持。文件/管道EOF、无末尾LF、连接未结束时exit、跨行引号/循环/heredoc、CRLF/Tab、read及子进程保留后续输入、坏控制/NUL/未结束语法拒绝、旧脚本/-c和显式-i都有精确输出/退出码/错误/日志。此范围不冒充全部Shell或整机验收。publish-03双来源各429文件归档/当前SRC头逐字节核对通过，network-10 PID8632正在完整三profile/双来源/18原生工具重测，未收齐终态。新65会话冷暖资源页账探针已补，尚待执行；Goal active。
+
+> **2026-10-07 network-09终态：** runner退出1。首来源isolated56项通过，新增地址复用/旧选项21项检查全部PASS；客体编译前15工具通过，nc源码第22行unknown identifier失败。只读输入确认SYS/INC/SCNET.H已更新，NETCLI相对包含的SYS/SRC/SCNET.H仍旧，故本次应用未继续，不能算全部网络通过。现补SRC副本并给网络SCX/源码增加双目录三份头的资源依赖，不改候选主核。publish-03新双盘退出0；network-10待当前独立Shell stdin回归结束后运行。shell-run-01 PID3964执行中，正常EOF/引号/循环/heredoc/read等已有分项，完整终态未收齐。全部原失败和原盘保留，Goal active。
+
+> **2026-10-07最新终态：** sessions-06在net-reuse-fix-01新主核/inputs-02两个只读来源完成声明矩阵，runner退出0。两来源各11阶段/22项真实NUI检查通过，65个同UID独立登录会话和真实窗口全部就绪，分页查询含全部65个普通隐藏桌面，全部注销后的原会话ID被拒绝。隐藏窗口无新增客户帧、像素保持且后台推进；回到会话/恢复最小化窗口实际重画。每个输入源摘要不变；65回收后PF页数各少6页，缓存与完整资源总账待验，不能称全部页回收达标。普通密码/F12锁屏、鼠标/拖动/相对输入/故障卡、全部内置应用后台与隐藏生成、其它旁表和历史兼容仍待验。network-09 PID5420正在同一候选上完整三profile/双来源/18原生工具重测，并新增真实bind/listen地址复用与旧选项边界探针。完整Goal active；旧core10/font04证据不当作新主核验收。
+
+> **2026-10-07当前验证状态：** 用户公钥和六份签名已经收到并验证，晚提供仅延后正向验签，不影响其它实现。冻结core10的core-08两来源12项声明profile、font-04全部30160映射记录通过；这些旧证据不作为新主核整体验收。network-08首来源三profile通过、第二来源隔离链路通过；第二来源应用在已完成47项后因nc连续监听返回-98而失败。现场PIT推进、UART/ATA无错误、坏释放记录全零，未复现此前tcp_free重复释放。当前已补socket选项5 REUSEADDR及nc TCP监听接线，保留TIME_WAIT；net-reuse-fix-01构建退出0，主核正文379536B/BSS327432B，正文SHA a33bf9f9cb18f7b82136cc87195ddb86541b195471ca8200bde7fd3601c4c4a5。完整第三方167份固定归档已核对，补最新声明后独立双盘publish-02退出0，两个盘各428份归档/候选文件逐字节核对通过。sessions-05真实NUI的11阶段/22项隔离、输入和隐藏停画检查通过，65任务创建但夹具窗口尺寸不合法而未就绪；已改128×96并要求真实65个ID，session-06 PID1276已在新net-reuse-inputs-02双盘单独重测，未收齐终态。完整Goal active，未commit/push/Release；当前新主核尚未获得整体验收，下方旧运行状态保留沿革。
+
+> **2026-10-07 02:51更新：** 用户晚提供公开签名不影响既有实现，原待验项已用用户结果接入，core-08声明双来源12项已通过，无需用户重签。network-run-05与session-run-03均已退出1，前文“执行中”为沿革。05实际nc-e sh只回7B `M10-SH\n`、原Shell取得退出7、普通root网络子程序权限检查通过，随后等待原作业时INPUT及PING ACK超时，完整网络矩阵失败；03真实会话走到initial阶段后管理ACK超时，完整会话未通过。已增加独立于UART的只读QMP失败现场、保留原异常并单列清理错误。当前只启动session-run-04 PID15136，独立sessions-04；不与网络VM并跑，先取得失败CPU/队列/ATA现场，再安排网络诊断。Goal active，无commit/push/Release；不放宽协议超时、不归因于签名。
+
+> **2026-10-07最新接力：** core-run-08/font-run-04均退出0：两来源各六CORE声明profile完整PASS/失败初始化活资源对照相同/ATA失败超时0；两盘两脸各7540原生映射逐像素相同、源盘不变，当前WSL参考版本2.14.2/lib SHA de0b38b01924302a7fa7bfbaee47afcb9468ad2f8a22b4a8cca56ad54f64569c。formal-build-01及formal-migrate-02均退出0，默认用户公开键与WALL100已接，MAIN和冻结10全字节相同，输出formal-01/02两盘256MiB、1489/1451项，仅正常WALL100。旧原M10盘仍05、M9源保持。network-04首盘isolated完整声明PASS、18原生工具编译/启动与nc-e cat原Shell等待退出PASS；nc-e sh实收58B欢迎语/提示符/回显而非7B正文，整轮失败，保存JSON/pcap。user/m9/sh.c现非终端stdin逐行执行、EOF收齐语法/-i显式交互；定向build/m10a1-shell-fix-01已退出0，新shell-inputs-01双盘迁移退出0，network-run-05 PID3224正在全部三profile×两来源重测。sessions-01缺私有NUI include失败，原样上传NUI/SCMEM/GLYPHS后02原生编译PASS，但夹具错误用29..31描述符/误猜AUTH_PENDING；已按旧0..15域改13..15、AUTH_PENDING=1，不改内核ABI，session-run-03 PID8844/独立sessions-03执行中。真实会话和65同UID完整行为无PASS前不算完成。最新终态查新.log/.exit.txt与矩阵JSON；每项原子持久化。Goal active，无commit/push/Release；Notes/缩放坏字体/磁盘异常/网络完整故障/其它旁表与缓存/历史兼容全部继续，旧段落为沿革。
+
+> **2026-10-07 02:07最新接力：** 宿主LastBootUpTime为01:52:31，core-run-07/font-run-03进程确实消失且无runner退出文件，不能继续等待旧PID。07第一来源六profile、第二来源前四profile的JSON有效且声明PASS；第二来源recovery的9778B报告全零，完整矩阵未收齐，旧文件全部保留。font-03第一来源两脸各7540实际映射/ABI边界及明确无hint FreeType逐像素PASS，第二来源未收齐。公钥32B SHA fc0f26d1b2f3cfea86ca19f3d5d37acd2fea932f683307887ace3bda7200e4f7与已签WALL100完整SHA 4ba998a48e72b623e078ba07de6d699081fc8462dc456bd0a6fe53091ddd7ea4重启后保持；源码文本无NUL。10主核已归档ata-batch-core-01，ATA改每次多扇区调用末尾统一FLUSH、正周期服务从回调返回计时；旧盘仍05，默认公开键/壁纸已接仓库但默认整包重建/发布尚待验。新报告每项完成原子替换并fsync保存RUNNING检查点，不把中断标PASS。已启动全新core-run-08 PID6592与font-run-04 PID5676、独立core-08/font-04重新收齐，两轮均使用冻结10主核与原用户签名；终态查新.log/.exit.txt及矩阵JSON，不凭PID旧记录重开。Goal active，无commit/push/Release，完整其它合同继续。下方旧“正在运行/尚无公钥/默认拒绝”仅保留沿革。
+
+> **2026-10-07更新接力：** after-03完整双盘退出0，两盘16真实HMP键确认15..32毫秒；初始及16键后共34张1920×1032真实工作区逐字节相同，实际截图完成78..141毫秒，数据只代表冻结夹具。用户六份公开签名独立验证完成，core-build-08用户公钥MAIN退出0并归档m10a1-user-key-core-01，两原开发盘仍是05。core-02首盘positive及without-failed-init完整通过，编号/常驻IRQ服务/旧32B边界/无手工热重载和14页实际模块账有证据；core-01周期GET代数变化、02宿主篡改错偏移、03管理心跳超时、04HELLO过早失败全部保留。04现场CPU仍在gfx_argb_pset，COM2收77B未消费、无丢字节/线错、管理last_sequence=0；测试工具现在只读匹配符号boot_stage/wm_frames，正常HMP ESC通过欢迎页，等实际桌面首帧后才HELLO，不改内核权限/租约/正常协议超时。core-run-05隐藏进程9796正在完整重测并只复用core-02两项摘要匹配的实际PASS；字体原生全量字形双来源测试font-run-01也已启动。最新终态查各runner .log/.exit.txt/.pid.txt和矩阵JSON，不能照下方旧进程状态继续。Goal active，无commit/push/Release；其余网络/身份/会话/坏字体/磁盘/编辑器/兼容完整合同继续。
+
+> **2026-10-07当前接力：** 用户已独立保存加密私钥，仅交公开结果`build/m10a1-signing-01/user-signatures-20261006-225411`。public-receipt-01六份原正文/64B签名经独立Git OpenSSL实际验证、六份翻字节拒绝、摘要匹配通过；四正常与两故意坏格式分目录，未读取/执行私钥或签署流程。新verify_m10_core.py/M10CORE.C已写真实编号排序/冲突/篡改/ABI/重定位/失败回滚/常驻IRQ服务/外部COM1池账/恢复矩阵，刚静态检查，尚未运行。core-build-06/07均退出0；after-01双盘有界唤醒对照收齐，p50均0.672秒但首盘最大2.125秒。07修局部壁纸计算和RGB填充/文字精确损伤；after-02首盘16键15..32毫秒、131计算/回收通过，第二盘中断且handle/VM确实消失，证据保留；after-03完整双盘重新测量在独立隐藏PowerShell进程17528运行，路径build/m10a1-scheduling-run-03.log/.exit.txt/.pid.txt，不要同时启动其它QEMU/重构建影响性能。两精确输入盘在m10a1-scheduling-inputs-02，仅MAIN追加尾部，其它内容/身份/位置保持。待after-03终态后做1920×1032真实工作区字节比较，再归档07 CORE/符号并用M10_PUBLIC_KEY构建用户公钥主核，执行双盘签名/恢复、网络原Shell wait重测及完整剩余合同。Goal active，无commit/push/Release；以下旧“尚无公钥/调度未优化/无活跃VM”仅沿革。
+
+> **同轮测量收齐：** scheduling-before-03退出0、两来源各16真实HMP键/17原生截图、131计算任务/私有管道/作业均正确，任务5→136→5、原输入不变；创建17752/17535tick，公平6153/6151tick，每孩子分派35..36。按键确认p95/最大2.203/2.156秒（含宿主注入/UART观察），全项239.438/237.203秒，PF各少13页/记录各多12页，冷缓存完整总账未验；不得称性能达标。第二盘实际截图已查看。修后没有活跃VM/terminal session，产品调度器尚未优化；下一步用此冻结夹具做有界唤醒响应/公平调度定位与匹配前后测量，网络应用需重测原Shell wait修复，完整身份/会话/TTF/恢复/编辑器/历史兼容等继续。人类签署步骤已清楚给出，尚无公开结果；只允许读其公开结果目录，不扫描私钥。Goal active，无commit/push/Release。
+
+> **2026-10-06本轮接力：** network-03首盘isolated全部声明用例通过，applications首盘18工具实际S3C编译/启动通过，TCP/UDP/端口扫描及nc -e cat实传16402B通过；随后等待错误跨Shell造成127，新增m10_guest_jobs在原交互Shell wait，修后退出/身份/HTTP/TFTP待重测。02 DNS错误为宿主event(name)参数与详情name冲突，已改event_name；失败/抓包保留。scheduling-before-01真实131计算/16键像素均有证据但脚本提前关GUI破坏任务基点；02窗口输出与Shell标记逐段交错超时，现已修为整行提交并保持GUI到负载回收后关闭，before-03正在双来源重测。无调度产品性能改动/达标声明。用户“还没有，需要操作步骤”，已明确双击sign-m10a1-yourself.bat→已有私钥选否→仓库外保存/设置密码→粘贴公开结果目录；代理未运行签署、不读取私钥。无commit/push/Release，Goal active，以下旧运行状态属沿革。
+
+> **同日重测接力：** build-05已退出0，MAIN正文377808B/BSS327272B，两迁移盘更新且旧候选/日志/测试副本保留。network-diagnostic-03真实state2/link1/error0/DMA130、累计3146B报文；3秒DHCP诊断等待超时后ACD完成为BOUND10/10.23.0.2，不能将该短命令标PASS。已启动network-02完整20秒DHCP/双来源三网络profile矩阵，结果待收齐。network-diagnostic-01新增探针误用sc_write_fd导致原生链接失败，改既有cli_write后02/03实际编译通过，失败截图保留。签署工具已向用户说明4步，尚未收到公开结果目录；不读取任何私钥位置，不代跑。Goal active，以下旧“05执行中”现已过时。
+
+> **2026-10-06最新接力：** lifecycle-01两来源盘各9项顶层用例/合计18项已收齐通过，原输入未变，真实耗尽分别1134/1135孩子后失败并回滚/再创建；18窗口、9截图68,702,760B、12事务、131并发/复用与旧票据检查有日志/HMP截图。计算公平分派22..23/23..24，但整项234.109/222.656秒，性能尚未验收。network-01首DHCP超时/双方无帧；diagnostic-02公开状态FAILED3/error5/DMA0确认启动复位先于字体/欢迎页、首次服务超过25tick，已补START_PENDING5延后实际提交及先读完成位再判超时，build-05正在WSL整包重建，修后未验。用户回答尚无Ed25519私钥，需要步骤；已提供sign-m10a1-yourself.bat/tools/user_sign_m10.py，仅用户亲自双击生成加密私钥并签六份消息，私钥只能仓库外保存，不联网、不记录其位置/密码，代理只静态检查，未代跑。待用户提供公开结果目录再独立验签；不得扫描用户私钥目录。Goal active，无commit/push/Release。最新实测入口M10A1-VERIFICATION.md，旧段落属沿革。
+
+> **2026-10-06最新实测：** 统一build-04退出0；MAIN正文377680B/BSS327272B，loader7008B，18网络SCX全部打包；两个不同只读M9来源迁移为256MiB盘，原内容/权限/代数回读及源摘要保持，编辑器独立EXE构建通过且原EXE摘要不变。build/m10a1-lifecycle-01正在TCG/Windows QEMU双盘运行；首VM已真实CORE START/S3C编译，18窗口/超过64MiB截图、12事务、131并发任务作业私有管道、回滚/复用/再创建分项PASS。公平/真实耗尽/第二盘与其它完整矩阵未收齐，仍不得宣布完成；见M10A1-VERIFICATION.md/IMPLEMENTATION。无commit/push/Release，用户签名正向仍待输入，Goal active。下方早期构建状态为沿革。
+
+> **2026-10-06统一构建实况：** 已启动WSL整包make m10a1，独立build/m10a1-work，源盘选固定发布M9基线。build-01/02失败日志与退出码保留；已修网络回调与lwIP宏重名、DHCP状态头文件、内核私有SYS_DEBUG名字冲突及Monocypher包含路径，build-03正在执行。尚无整包成功或客体运行PASS，用户原盘/旧编辑器EXE未覆盖；完整Goal继续active，不commit/push/Release。后续按实际构建结果修复并进入Windows双来源盘验收。
+
+> **2026-10-06当前阶段：** 已按M10A1-DESIGN核对全产品实现、资源、规则与规范入口，进入已有授权覆盖的统一构建/客体编译/Windows双来源盘验收，不另请阶段审批。核对表sandcore/docs/M10A1-READINESS.md；首次构建还无成功证据。编辑器build.bat独立输出build/m10a1/sanddata_editor.exe，保留原M9 EXE。签名正向仍待用户公钥/签名，继续其它独立工作；完整Goal active。下方“禁止构建/未收齐”属于实现阶段沿革，不能作为继续停留静态阶段的理由，也不能把转阶段当成完成。
+
+> **2026-10-06本次静态接力：** Monitor八任务列表改动态PROCESSPAGE并保留旧CPU/MONITOR缓冲；失败/Freeze/Resume基点核对。新增M10LIFE.C与双盘生命周期脚本：131任务/作业/私有管道、真实EOF退出/回收/复用、创建失败/耗尽/公平测量；M10RES.C补18原生窗口、超过8份/64MiB截图、12事务及显式PF回收。只是待执行源码。nc -e身份探针改按公开终端端点类型检查管道及无UART能力。全轮仍未构建未运行，继续完整实现收齐；可见性始终由内核决定，用户态仅据结果停画。见sandcore/docs/M10-LIFECYCLE.md、MONITOR.md、M10A1-IMPLEMENTATION.md。
+
+> **2026-10-06当前任务：执行完整M10a1，Codex详细goal保持active，无额外token预算。** 基线24797e0，分支codex/m10a1；先全量源码/资源/规范，禁止提前构建/项目生成器/夹具/QEMU。动态任务/旁表/关联流作业/事务/窗口/截图、就绪/事件等待、分页工具、独立会话/隐藏停画、端点订阅和预算化退出已有源码；SKM2磁盘MAIN/只读loader/恢复、固定Monocypher公开验签与编号排序/92B动态常驻服务、256MiB内核/流式迁移/编辑器共享正文/独立构建链已写，均未构建未运行。初始恢复是待验候选，旧EXE/旧PASS不覆盖。原TTF/Notes及自写e1000/lwIP IPv4/动态socket/0x250..263已接线，18独立网络工具初版源码18/18，构建/行为0/18；用户追加nc -e已补两管道/程序作业与不继承UART授权的新入口。继续全轮静态审阅、启动/错误/验收接线，NETWORK.md/CLI-M10.md及新55行表记录精确范围。只收用户公钥/签名，不接触私钥，无用户键全部CORE扩展拒绝。无Release/未push/未commit，M9产物/M8封存及原盘保留。精确状态M10A1-IMPLEMENTATION.md、格式CORE.md；不能因本段源码进展宣布完成。
+
+> **同日最新源码补充：** 原凤凰12/16 TTF原样归third_party/vonwaon与M10摘要表，自写整数加载/完整映射/直线轮廓扫描线、0x248/249与版本缓存已接线；旧GLYPH16既有字节、FONTINFO四字计数保留，新GUI/内核文字用统一TTF基线，Notes列宽/原Tab展开使用同源宽度。FONT.md定义实际支持的字体配置（这份原字体全部直线/无复合，不宣称任意TTF），font_coverage.py只写未执行。每脸原7543glyph静态事实不能代替客体覆盖。网络及18工具初版源码已补；独立run-m10a1.bat/private QMP/UART、双来源Ethernet/user/无网卡网络验收、原创对端服务及M10NET公开ABI探针已写。nc -e包括破管保留尾部、等待真实作业退出码；迁移INDEX自归档和编辑器目录插入失败提示已修。全轮仍未构建未运行，完整TCP故障/耗尽/身份/性能及其它矩阵待补；最新状态见首段。
+
 > 2026-10-06最新：用户明确通过内存封面补丁，要求只commit、暂不创建Release，随M10大版本一起发布；本轮只做本地提交，不push。FLAC PICTURE及METADATA_BLOCK_PICTURE直接内存解码，16MiB编码正文上限；MP3 APIC复用内存解码，旁置图片原服务保留，Ogg-FLAC封面未加入。仅封面源码、构建接线及同步记录，内核/SCAPI不变；代理只构建，运行验收由用户完成。temp_miotest/整体忽略，用户音乐与试玩镜像不纳入Git，原M9发布包保持。
 
 > 2026-10-06最新：按用户要求将宿主镜像编辑器全部迁入根目录sanddata_editor/，分为src、resources、docs、tests及忽略上传的build输出。入口sanddata_editor/sanddata_editor.exe，独立构建sanddata_editor/build.bat；旧根目录散文件已移动，源码与功能保持，原编译与验证输出一并保留。
@@ -690,3 +766,18 @@ native-08/build-19后端0b50ea3b与SCMEM能力宏经真正历史M7→G1→G2→G
 2026-10-04 M9阶段顺序：用户最新要求先写齐全部代码，再统一调试。目前只有serial.c/h双UART队列/IRQ/main/Makefile接线、tools/scserial.py本机双串口/QMP工具初版和M9文档；没有执行构建、编译、Python工具或QEMU。后续继续身份/SandFS权限/CLI/零环调试与打包/传输截图/SSE2音频全部实现，源码仅静态审阅。实现收齐后进入统一调试，用户未要求另加审批；不继承M8旧PASS。
 
 2026-10-04 M9第一阶段持续实现：现已写auth/强熵/PBKDF2内核票据与固定UID、SandFS v5权限/COW双bank/流式事务/持久对象序号/mkfs_m9、32任务和保留旧8行快照、新字节流/管道/长参数/作业/终端Ctrl-C及EOF、COW环境、COM2管理帧/CRC32/SHA256/host put/get/会话撤销、COM1真实INT3/TF调试、SCCC CLI/SKM生成与即时/常驻模块/辅助页回收、SCCC与SandAsm整数SSE2及FXSAVE/FNSAVE任务状态、窗口原生快照/BMP、AC97整数混音/重采样/PCM/开关机音效生成源码及固定dr_mp3许可的GUI/CLI MP3/WAV播放器。user/m9里自写独立文件/文本/账户/开发工具与AST Shell持续增加，ed可串口编辑源码；80%行为覆盖尚未达成，不能宣称全量实现收齐。m9.mk独立构建链已写且不触发冻结游戏/影片，320KiB内核容量三处+BOOT同步。状态/合同已同步M9-IMPLEMENTATION、CLI-M9、AUDIO、SIMD、FS、SERIAL、SYSCALL等文档。**仍没有任何M9构建、编译、Python工具执行、音效资源生成、QEMU或测试**。继续补齐命令矩阵/完整CLI行为、Shell扩展、构建源接线与全路径安全静态审阅后，才统一调试；不增加用户未要求的审批门槛。
+## 2026-10-06 M10a1 已批准开工
+
+用户已批准完整规划并要求按规矩开工；最高优先级取消固定多任务上限，隐藏会话停止图形绘制。基线24797e0，分支codex/m10a1。合同与状态见sandcore/docs/M10A1-DESIGN.md、M10A1-IMPLEMENTATION.md；先写齐全部实现/资源/规范，再统一构建/客体编译/Windows双盘无头QEMU，授权已覆盖验证，不另加阶段审批。正式私钥仅用户持有；代理只收公钥/签名，正向签名测试等用户结果，不能设开发信任入口。
+
+M10a1开发版可commit无Release；e1000+IPv4+18/55工具、原始完整凤凰TTF、256MiB盘、会话隔离、最小loader+磁盘CORE主内核、有序验签扩展均保留。M9正式产物/M8封存保留，不能擅自减目标。当前已开始动态任务源码实现，只做静态审阅，没有新构建/QEMU；开工前既有未跟踪.zcodeignore不纳入代理提交。
+
+修订：2026-10-07，记录network-08真实终态、TCP地址复用构建和65会话夹具修正；区分旧主核通过与新主核待验。
+
+修订：2026-10-07，记录sessions-06双来源全部声明用例通过和65真实桌面范围；保留6页差额及完整其它合同待验。
+
+修订：2026-10-07，记录network-09新增选项实际PASS子项与客体nc编译失败；补SRC/INC双处头文件的定向资源依赖。
+
+修订：2026-10-07，登记Shell stdin双来源62项真实PASS及network-10重测，资源总账和其它完整合同继续。
+
+2026-10-07：curl与必要收尾验证完成，19工具开发验收包提交；停止新增测试，等待用户验收。

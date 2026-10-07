@@ -9,6 +9,13 @@ import time
 import zlib
 
 
+class ManagementResultError(RuntimeError):
+    """保留原错误文案与RuntimeError兼容，同时给调用者精确协议字段。"""
+    def __init__(self,kind,result):
+        self.kind,self.result=kind,result
+        super().__init__(f'客体请求 {kind} 返回 {result}')
+
+
 def frame(kind, sequence, payload=b''):
     if len(payload) > 512 or not 0 <= sequence <= 0xffffffff:
         raise ValueError('帧超出协议边界')
@@ -143,7 +150,7 @@ class ManagementClient:
     def checked(self, kind, payload=b''):
         result, body = self.request(kind, payload)
         if result < 0:
-            raise RuntimeError(f'客体请求 {kind} 返回 {result}')
+            raise ManagementResultError(kind,result)
         return result, body
 
     def hello(self):

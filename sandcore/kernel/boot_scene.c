@@ -14,7 +14,7 @@ static void boot_text(int x,int y,const char *text,int multiplier,u32 color)
 {
     while(*text){
         u32 scalar;u16 rows[16];gfx_utf8_next(&text,&scalar);
-        int advance=gfx_glyph16(scalar,rows);if(!advance)advance=16;
+        int advance=gfx_layout_glyph16(scalar,rows);if(!advance)advance=16;
         for(int r=0;r<16;r++)for(int c=0;c<advance;c++)if(rows[r]&(0x8000u>>c))
             gfx_rgb_fill(x+boot_unit(c*multiplier),y+boot_unit(r*multiplier),
                 boot_unit((c+1)*multiplier)-boot_unit(c*multiplier),

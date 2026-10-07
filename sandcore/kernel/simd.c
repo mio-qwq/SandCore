@@ -3,7 +3,9 @@
 /* 内核普通C仍-msoft-float/-mno-sse。扩展现场独立于task_t/19字陷入
  * 帧；每次真正换任务才保存恢复，避免每个绘图系统调用重复搬512B。
  * 不用lazy #NM，生命周期更直接，退出/槽复用不会泄露上一用户向量。 */
-static u8 contexts[NTASK][512] __attribute__((aligned(16)));
+typedef struct {u8 bytes[512];} simd_context_t;
+#define SIMD_CONTEXT(pid) (((simd_context_t *)task_data(pid,TASK_DATA_SIMD))->bytes)
+u32 simd_task_bytes(void){return sizeof(simd_context_t);}
 static u8 initial[512] __attribute__((aligned(16)));
 static u32 features,fxsr,sse2,ready,switches;
 static int cpuid_available(void)
@@ -42,21 +44,21 @@ void simd_init(void)
         __asm__ __volatile__("fnsave %0":"=m"(initial));
         __asm__ __volatile__("frstor %0"::"m"(initial):"memory");
     }
-    ready=1;for(int pid=0;pid<NTASK;pid++)simd_spawn(pid);
+    ready=1;for(int pid=task_next(-1);pid>=0;pid=task_next(pid))simd_spawn(pid);
 }
-void simd_spawn(int pid){for(u32 i=0;i<512;i++)contexts[pid][i]=initial[i];}
-void simd_stop(int pid){for(u32 i=0;i<512;i++)contexts[pid][i]=0;}
+void simd_spawn(int pid){for(u32 i=0;i<512;i++)SIMD_CONTEXT(pid)[i]=initial[i];}
+void simd_stop(int pid){for(u32 i=0;i<512;i++)SIMD_CONTEXT(pid)[i]=0;}
 void simd_switch(int previous,int next)
 {
     if(!ready)return;
     if(fxsr){
-        __asm__ __volatile__("fxsave %0":"=m"(contexts[previous]));
-        __asm__ __volatile__("fxrstor %0"::"m"(contexts[next]):"memory");
+        __asm__ __volatile__("fxsave %0":"=m"(SIMD_CONTEXT(previous)));
+        __asm__ __volatile__("fxrstor %0"::"m"(SIMD_CONTEXT(next)):"memory");
     }else{
-        __asm__ __volatile__("fnsave %0":"=m"(contexts[previous]));
-        __asm__ __volatile__("frstor %0"::"m"(contexts[next]):"memory");
+        __asm__ __volatile__("fnsave %0":"=m"(SIMD_CONTEXT(previous)));
+        __asm__ __volatile__("frstor %0"::"m"(SIMD_CONTEXT(next)):"memory");
     }
-    switches++;if(tasks[previous].state==2)simd_stop(previous);
+    switches++;if(TASK(previous).state==2)simd_stop(previous);
 }
 int simd_sse2(void){return ready && sse2;}
 void simd_info(u32 out[8])

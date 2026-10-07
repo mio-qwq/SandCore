@@ -103,15 +103,19 @@ static int system_command(const char *name)
         sc_puts("\nFree means append capacity; deleted data holes are not reclaimed.\n");return 0;
     }
     if(equal(name,"ps")) {
-        u32 tasks[48],cpu[SC_CPU_WORDS];if(sc_monitor(tasks)<0 || sc_cpu(cpu)<0)return error("task query",-1);
+        u32 page[SC_PROCESS_PAGE_WORDS],cursor=0xFFFFFFFFu;
         const char *states[]={"empty","runnable","zombie","paused"};
         sc_puts("PID  STATE     NAME         RUN SAMPLES  DISPATCHES  GENERATION\n");
-        for(int i=0;i<8;i++)if(tasks[8+i*5+1]) {
-            u32 *row=tasks+8+i*5,*sample=cpu+16+i*6;char label[13];
-            for(int j=0;j<12;j++)label[j]=((char *)(row+2))[j];label[12]=0;
-            number(row[0]);sc_puts("    ");sc_puts(row[1]<4?states[row[1]]:"unknown");sc_puts("  ");sc_puts(i?label:"kernel");sc_puts("   ");
-            number(sample[3]);sc_puts("          ");number(sample[4]);sc_puts("          ");number(sample[2]);sc_puts("\n");
-        }
+        do{
+            if(sc_process_page(page,SC_PROCESS_PAGE_WORDS,cursor)<0)return error("task query",-1);
+            for(u32 i=0;i<page[3];i++){
+                u32 *row=page+16+i*16;char label[13];
+                for(int j=0;j<12;j++)label[j]=((char *)(row+8))[j];label[12]=0;
+                number(row[0]);sc_puts("    ");sc_puts(row[1]<4?states[row[1]]:"unknown");sc_puts("  ");sc_puts(row[0]?label:"kernel");sc_puts("   ");
+                number(row[5]);sc_puts("          ");number(row[6]);sc_puts("          ");number(row[2]);sc_puts("\n");
+            }
+            cursor=page[4];
+        }while(cursor!=0xFFFFFFFFu);
         sc_puts("Samples are cumulative guest PIT states, not exact cycles.\n");return 0;
     }
     if(equal(name,"cpu")) {

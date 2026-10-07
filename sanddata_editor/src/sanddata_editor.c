@@ -28,13 +28,20 @@ typedef struct {char name[64];int directory,index;} View;
 typedef struct {char name[64];HTREEITEM item;} TreeNode;
 static HINSTANCE instance;static HWND window,list,tree,pathbar,status,buttons[8];
 static HFONT font,title_font;static HBRUSH paper_brush,ice_brush;static SfsImage image;
-static char current[64];static View views[2048];static int view_count,refreshing;
-static TreeNode nodes[8192];static int node_count;static int dpi=96;
+static char current[64];static View *views;static uint32_t view_capacity;static int view_count,refreshing;
+static TreeNode *nodes;static uint32_t node_capacity;static int node_count;static int dpi=96;
 static wchar_t *input_value;static const wchar_t *input_title;static int input_ok;
 static int scale(int n){return MulDiv(n,dpi,96);}
 static void error_box(void){MessageBoxW(window,sfs_error,L"SandFS 镜像编辑器",MB_OK|MB_ICONERROR);}
 static int same(const char *a,const char *b){for(;*a&&*b;a++,b++){int x=*a,y=*b;if(x>='a'&&x<='z')x-=32;if(y>='a'&&y<='z')y-=32;if(x!=y)return 0;}return *a==*b;}
 static int selected(void){return ListView_GetSelectedCount(list);}
+static int reserve_items(void **array,uint32_t *capacity,uint32_t need,size_t stride)
+{
+    if(need<=*capacity)return 1;uint32_t count=*capacity?*capacity:16;
+    while(count<need){if(count>UINT32_MAX/2)return 0;count*=2;}
+    if(count>SIZE_MAX/stride)return 0;void *grown=realloc(*array,count*stride);if(!grown)return 0;
+    *array=grown;*capacity=count;return 1;
+}
 static void refresh_all(void);
 static int save_image(int save_as);
 static void import_drop(HDROP drop,int force_import);
@@ -46,7 +53,7 @@ static int prompt_unsaved(void){
 static void set_status(void){
     wchar_t text[512];uint32_t used=image.data_start;
     for(uint32_t i=0;i<image.count;i++)used+=(image.entries[i].size+511)/512;
-    if(image.entries)swprintf(text,512,L"SandFS v%u   ·   %u / %u 项   ·   可用 %.2f MiB%s    |    拖入添加 · 拖出提取 · Delete 删除 · Ctrl+S 保存",image.version,image.count,image.capacity,(double)(image.sectors-used)/2048,image.dirty?L"   ·   有未保存修改":L"");
+    if(image.entries)swprintf(text,512,L"SandFS v%u   ·   %u / %u 项   ·   %.0f MiB · 可用 %.2f MiB%s    |    拖入添加 · 拖出提取 · Ctrl+S 保存",image.version,image.count,image.capacity,(double)image.sectors/2048,(double)(used<=image.sectors?image.sectors-used:0)/2048,image.dirty?L"   ·   有未保存修改":L"");
     else wcscpy(text,L"打开或拖入 sanddata.img 开始编辑；文件和文件夹均可拖入拖出。");
     SetWindowTextW(status,text);
     wchar_t caption[HOST_PATH];if(image.path)swprintf(caption,HOST_PATH,L"%ls%ls — SandFS 镜像编辑器",image.dirty?L"* ":L"",image.path);else wcscpy(caption,L"SandFS 镜像编辑器");SetWindowTextW(window,caption);
@@ -58,6 +65,8 @@ static int icon_for(const wchar_t *name,int directory){
 static int view_compare(const void *pa,const void *pb){const View *a=pa,*b=pb;if(a->directory!=b->directory)return b->directory-a->directory;return _stricmp(a->name,b->name);}
 static void refresh_list(void){
     view_count=0;SendMessageW(list,WM_SETREDRAW,FALSE,0);ListView_DeleteAllItems(list);
+    if(image.entries&&!reserve_items((void **)&views,&view_capacity,image.count+1,sizeof(*views))){
+        SendMessageW(list,WM_SETREDRAW,TRUE,0);wcscpy(sfs_error,L"列表资源不足，镜像内容仍保留。");error_box();return;}
     if(image.entries)for(uint32_t i=0;i<image.count;i++){
         const SfsEntry *entry=image.entries+i;
         if(current[0]&&!sfs_child(entry->name,current))continue;
@@ -65,7 +74,7 @@ static void refresh_list(void){
         const char *slash=strchr(rel,'/');size_t length=slash?(size_t)(slash-entry->name):strlen(entry->name);
         char full[64];memcpy(full,entry->name,length);full[length]=0;
         int at=-1;for(int j=0;j<view_count;j++)if(same(views[j].name,full)){at=j;break;}
-        if(at<0&&view_count<2048){View *v=views+view_count++;strcpy(v->name,full);v->directory=slash!=NULL||entry->directory;v->index=slash?sfs_find(&image,full):(int)i;}
+        if(at<0){View *v=views+view_count++;strcpy(v->name,full);v->directory=slash!=NULL||entry->directory;v->index=slash?sfs_find(&image,full):(int)i;}
     }
     qsort(views,(size_t)view_count,sizeof(*views),view_compare);
     for(int i=0;i<view_count;i++){
@@ -81,22 +90,29 @@ static void refresh_list(void){
 }
 static int tree_find(const char *name){for(int i=0;i<node_count;i++)if(same(nodes[i].name,name))return i;return -1;}
 static HTREEITEM tree_ensure(const char *name){
-    int at=tree_find(name);if(at>=0)return nodes[at].item;if(node_count>=8192)return NULL;
+    int at=tree_find(name);if(at>=0)return nodes[at].item;
     char parent[64];strcpy(parent,name);char *slash=strrchr(parent,'/');HTREEITEM par=nodes[0].item;
-    if(slash){*slash=0;par=tree_ensure(parent);}const char *leaf=strrchr(name,'/');leaf=leaf?leaf+1:name;
-    at=node_count++;strcpy(nodes[at].name,name);wchar_t *label=sfs_wide(leaf);
+    if(slash){*slash=0;par=tree_ensure(parent);if(!par)return NULL;}
+    if(!reserve_items((void **)&nodes,&node_capacity,(uint32_t)node_count+1,sizeof(*nodes)))return NULL;
+    const char *leaf=strrchr(name,'/');leaf=leaf?leaf+1:name;
+    at=node_count;wchar_t *label=sfs_wide(leaf);if(!label)return NULL;
     TVINSERTSTRUCTW insert={0};insert.hParent=par;insert.hInsertAfter=TVI_SORT;insert.item.mask=TVIF_TEXT|TVIF_PARAM;insert.item.pszText=label;insert.item.lParam=at;
-    nodes[at].item=TreeView_InsertItem(tree,&insert);free(label);return nodes[at].item;
+    HTREEITEM item=TreeView_InsertItem(tree,&insert);free(label);if(!item)return NULL;
+    strcpy(nodes[at].name,name);nodes[at].item=item;node_count++;return item;
 }
 static void refresh_all(void){
+    if(!reserve_items((void **)&nodes,&node_capacity,1,sizeof(*nodes))){wcscpy(sfs_error,L"目录树资源不足，镜像内容仍保留。");error_box();return;}
     refreshing=1;SendMessageW(tree,WM_SETREDRAW,FALSE,0);TreeView_DeleteAllItems(tree);node_count=1;nodes[0].name[0]=0;
     TVINSERTSTRUCTW root={0};root.hParent=TVI_ROOT;root.hInsertAfter=TVI_FIRST;root.item.mask=TVIF_TEXT|TVIF_PARAM;root.item.pszText=L"镜像根目录";root.item.lParam=0;nodes[0].item=TreeView_InsertItem(tree,&root);
-    if(image.entries)for(uint32_t i=0;i<image.count;i++){
+    int complete=nodes[0].item!=NULL;
+    if(complete&&image.entries)for(uint32_t i=0;i<image.count;i++){
         char path[64];strcpy(path,image.entries[i].name);
-        if(!image.entries[i].directory){char *last=strrchr(path,'/');if(!last)continue;*last=0;}tree_ensure(path);
+        if(!image.entries[i].directory){char *last=strrchr(path,'/');if(!last)continue;*last=0;}
+        if(!tree_ensure(path)){complete=0;break;}
     }
     int at=tree_find(current);if(at<0){current[0]=0;at=0;}TreeView_SelectItem(tree,nodes[at].item);TreeView_EnsureVisible(tree,nodes[at].item);TreeView_Expand(tree,nodes[0].item,TVE_EXPAND);
     SendMessageW(tree,WM_SETREDRAW,TRUE,0);InvalidateRect(tree,NULL,TRUE);refreshing=0;refresh_list();
+    if(!complete){wcscpy(sfs_error,L"目录树显示资源不足，部分目录暂未显示；镜像内容仍完整保留。");error_box();}
 }
 static void navigate(const char *name){strcpy(current,name);int at=tree_find(current);if(at>=0)TreeView_SelectItem(tree,nodes[at].item);refresh_list();}
 static void go_up(void){char parent[64];strcpy(parent,current);char *slash=strrchr(parent,'/');if(slash)*slash=0;else parent[0]=0;navigate(parent);}
@@ -276,7 +292,7 @@ static LRESULT CALLBACK wndproc(HWND hwnd,UINT msg,WPARAM wp,LPARAM lp){
     case WM_ERASEBKGND:{RECT r;GetClientRect(hwnd,&r);FillRect((HDC)wp,&r,paper_brush);return 1;}
     case WM_PAINT:{PAINTSTRUCT ps;HDC dc=BeginPaint(hwnd,&ps);RECT client;GetClientRect(hwnd,&client);RECT header={0,0,client.right,scale(58)};FillRect(dc,&header,ice_brush);SetBkMode(dc,TRANSPARENT);SetTextColor(dc,ACCENT);HFONT old=SelectObject(dc,title_font);RECT title={scale(22),scale(12),scale(220),scale(52)};DrawTextW(dc,L"SandFS",-1,&title,DT_SINGLELINE|DT_VCENTER);SelectObject(dc,font);SetTextColor(dc,MUTED);RECT sub={scale(150),scale(18),client.right-scale(20),scale(48)};DrawTextW(dc,L"镜像编辑器   /   打开 · 拖入 · 拖出 · 保存",-1,&sub,DT_SINGLELINE|DT_VCENTER);SelectObject(dc,old);EndPaint(hwnd,&ps);return 0;}
     case WM_CLOSE:if(prompt_unsaved())DestroyWindow(hwnd);return 0;
-    case WM_DESTROY:sfs_free(&image);DeleteObject(font);DeleteObject(title_font);PostQuitMessage(0);return 0;
+    case WM_DESTROY:sfs_free(&image);free(views);free(nodes);views=NULL;nodes=NULL;view_capacity=node_capacity=0;DeleteObject(font);DeleteObject(title_font);PostQuitMessage(0);return 0;
     }return DefWindowProcW(hwnd,msg,wp,lp);
 }
 int WINAPI wWinMain(HINSTANCE inst,HINSTANCE previous,LPWSTR command_line,int show){

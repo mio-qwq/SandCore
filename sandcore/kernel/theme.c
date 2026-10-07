@@ -11,13 +11,22 @@
 #include "gfx.h"
 #include "wm.h"
 #include "desktop.h"
+#include "session.h"
+#include "objpool.h"
+#include "interrupts.h"
+#include "task.h"
 
 typedef struct {
     u32 colors[TH_ROLES],generation;
     int classic,radius;
     char name[32],iconroot[64],wallpaper[64];
 } theme_t;
-static theme_t active;
+static objpool_t themes;
+static theme_t emergency;
+static theme_t *selected_theme;
+static u32 selected_id;
+static theme_t *theme_current(void);
+#define active (*theme_current())
 static char config[4096];
 static const char *const keys[TH_ROLES]={
     "face","face_alt","paper","text","muted","line","accent","accent_deep",
@@ -137,6 +146,8 @@ static int parse(theme_t *out,int bytes)
 }
 static int read_candidate(const char *path,theme_t *out)
 {
+    session_t *s=session_get(session_current());
+    if(!s || !fs_access_identity(path,s->uid,s->gid,FS_ACCESS_READ))return -2;
     u32 info[2];
     if(fs_stat(path,info) || info[0]!=1 || !info[1] || info[1]>=sizeof(config))return -2;
     int n=fs_read(path,config,sizeof(config)-1);
@@ -147,27 +158,53 @@ static int read_candidate(const char *path,theme_t *out)
 }
 void theme_init(void)
 {
-    theme_t candidate;
-    defaults(&active,0);
-    if(!read_candidate("SYS/THEME.CFG",&candidate))active=candidate;
-    active.generation=1;
+    defaults(&emergency,0);emergency.generation=1;
+    if(objpool_init(&themes,sizeof(theme_t),0) || theme_session_prepare(session_active()))panic("THEME MEMORY",0);
 }
+int theme_session_prepare(u32 id)
+{
+    if(objpool_get(&themes,(int)id))return 0;
+    if(!session_get(id) || objpool_claim(&themes,(int)id))return -4;
+    theme_t *theme=objpool_get(&themes,(int)id),candidate;defaults(theme,0);
+    char path[64];
+    session_t *s=session_get(id);
+    /* 候选初始化可能为隐藏会话准备；权限按该会话身份，而非任务0。 */
+    if(session_config_path_for(id,"THEME.CFG",path)>=0 && fs_access_identity(path,s->uid,s->gid,FS_ACCESS_READ)){
+        u32 info[2];int n=fs_stat(path,info)?-1:fs_read(path,config,sizeof(config)-1);
+        if(n>0 && (u32)n==info[1] && info[1]<sizeof(config)){
+            int valid=1;for(int i=0;i<n;i++)if(!config[i])valid=0;
+            config[n]=0;if(valid && !parse(&candidate,n))*theme=candidate;
+        }
+    }
+    theme->generation=1;return 0;
+}
+static theme_t *theme_current(void)
+{
+    u32 id=session_current();if(selected_theme && selected_id==id)return selected_theme;
+    if(!themes.stride || theme_session_prepare(id))return &emergency;
+    selected_id=id;selected_theme=objpool_get(&themes,(int)id);return selected_theme;
+}
+void theme_session_destroy(u32 id){if(selected_id==id){selected_theme=0;selected_id=0;}if(themes.stride)objpool_release(&themes,(int)id);}
 int theme_check(const char *path)
 {theme_t candidate;return read_candidate(path,&candidate);}
 int theme_load(const char *path,int action)
 {
     if(action<0 || action>2 || (action!=2 && !path))return -1;
+    char saved[64];if(session_config_path("THEME.CFG",saved)<0)return -5;
+    if(theme_session_prepare(session_current()))return -4;
     theme_t candidate;
-    int result=read_candidate(action==2?"SYS/THEME.CFG":path,&candidate);
+    int result=read_candidate(action==2?saved:path,&candidate);
     if(result)return result;
     if(action==1){
+        int prepared=session_config_prepare(task_pid());if(prepared<0)return prepared;
+        if(!fs_user_mutable(saved,0) || !fs_access(task_pid(),saved,FS_ACCESS_WRITE))return -5;
         u32 n=0;while(config[n])n++;
-        if(fs_write("SYS/THEME.CFG",(const u8 *)config,n)!=(int)n)return -3;
+        if(fs_write(saved,(const u8 *)config,n)!=(int)n)return -3;
     }
     candidate.generation=active.generation+1;
     if(!candidate.generation)candidate.generation=1;
     active=candidate;
-    desktop_reload();wm_request_compose();
+    desktop_reload();wm_session_repaint(session_current());
     return 0;
 }
 void theme_info(u32 *out)

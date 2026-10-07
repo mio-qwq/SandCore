@@ -12,8 +12,11 @@ int main(void)
     int child=sc_auth_exec((u32)ticket,"/BIN/SH.SCX",0);sc_auth_cancel((u32)ticket);if(child<1)return cli_error("login",child);
     /* AUTHEXEC的历史返回是PID而非SPAWN2作业票据，用进程代数确认
      * 终止，不能把随后复用同一PID的任务误当此登录Shell。 */
-    u32 table[520],generation=0;for(;;){if(sc_processes2(table,520)<0)return 1;int alive=0;
-        for(u32 i=0;i<table[1];i++){u32 *row=table+8+i*table[2];if(row[0]==(u32)child && row[1] && row[1]!=2){
-            if(!generation)generation=row[2];if(generation==row[2])alive=1;}}
-        if(!alive)break;sc_yield();}return 0;
+    u32 table[SC_PROCESS_PAGE_WORDS],generation=0;for(;;){int alive=0;u32 cursor=0xFFFFFFFFu;
+        do{if(sc_process_page(table,SC_PROCESS_PAGE_WORDS,cursor)<0)return 1;
+            for(u32 i=0;i<table[3];i++){u32 *row=table+16+i*16;if(row[0]==(u32)child && row[1] && row[1]!=2){
+                if(!generation)generation=row[2];if(generation==row[2])alive=1;}}
+            cursor=table[4];
+        }while(!alive && cursor!=0xFFFFFFFFu);
+        if(!alive)break;sc_event_wait(SC_EVENT_JOB,10);}return 0;
 }

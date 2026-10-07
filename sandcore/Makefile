@@ -36,7 +36,7 @@
 SHELL := sh
 BUILD := build
 
-.DEFAULT_GOAL := m9
+.DEFAULT_GOAL := m10a1
 
 # ---------------- 环境探测与工具链选择 ----------------
 ifeq ($(OS),Windows_NT)
@@ -122,7 +122,7 @@ $(BUILD)/font8_data.h: assets/font/phoenix-ascii.json tools/mkfont8.py | $(BUILD
 # ---------------- 产物规则 ----------------
 # 内核参与链接的全部目标文件。entry.o 必须排第一 (链接脚本里 _start 在前)。
 OBJS := entry.o main.o boot_scene.o idt.o interrupts.o timer.o keyboard.o mouse.o \
-        memory.o heap.o paging.o gfx.o display.o theme.o image.o image_service.o userspace.o desktop.o wm.o task.o process.o module.o ata.o fs.o serial.o auth.o crypto.o random.o crc.o streams.o management.o simd.o ringdebug.o audio.o rtc.o
+        memory.o heap.o objpool.o task_store.o session.o core_boot.o paging.o gfx.o ttf.o display.o theme.o image.o image_service.o userspace.o desktop.o wm.o task.o process.o module.o ata.o fs.o serial.o auth.o crypto.o random.o crc.o streams.o management.o simd.o ringdebug.o audio.o rtc.o
 
 # mio：全部普通三环C源与私有include一并上盘，让Notes/计算器/
 # 游戏和通用客户端也能在系统内编辑编译。第三方解码服务单独由
@@ -132,7 +132,7 @@ SCCC_SOURCE := $(patsubst user/%,$(BUILD)/fs/SYS/SRC/%,$(wildcard user/*.c user/
                $(BUILD)/fs/SYS/SRC/api.h \
                $(patsubst user/%,$(BUILD)/fs/SYS/INC/%,$(wildcard user/*.H))
 
-USER_APPS := files note palette calc mines probe ide debugger lumen race world settings lens canvas monitor rgbprobe themeprobe imageprobe sysprobe
+USER_APPS := files note palette calc mines probe ide debugger lumen race world settings lens canvas monitor rgbprobe themeprobe imageprobe sysprobe session
 USER_SCX := $(addprefix $(BUILD)/fs/apps/,$(addsuffix .scx,$(USER_APPS)))
 CLI_NAMES := ls pwd cat echo stat cp mkdir rm mv mem uptime help whoami env lsblk partitions df ps cpu
 CLI_SCX := $(addprefix $(BUILD)/fs/bin/,$(addsuffix .scx,$(CLI_NAMES)))
@@ -140,13 +140,17 @@ DESKTOP_LINKS := shell files notes palette
 DESKTOP_ASSETS := $(addprefix $(BUILD)/fs/desk/,$(addsuffix .lnk,$(DESKTOP_LINKS))) \
                   $(addprefix $(BUILD)/fs/sys/,$(addsuffix .scf,$(DESKTOP_LINKS)))
 
+ifeq ($(M10_BUILD),1)
+all: m10a1-publish
+else
 all: $(BUILD)/sandcore.img $(BUILD)/sanddata.img
+endif
 
 $(BUILD):
 	mkdir -p $@
 
 $(BUILD)/boot.bin: boot/boot.asm | $(BUILD)
-	$(NASM) -f bin $< -o $@
+	$(NASM) $(if $(filter 1,$(M10_BUILD)),-DM10_LOADER=1) -f bin $< -o $@
 
 $(BUILD)/entry.o: kernel/entry.asm $(STAMP)
 	$(NASM) -f $(ENTFMT) $< -o $@
@@ -213,6 +217,15 @@ $(BUILD)/memory.o: kernel/memory.c kernel/memory.h kernel/io.h $(STAMP)
 $(BUILD)/heap.o: kernel/heap.c kernel/heap.h kernel/memory.h kernel/io.h $(STAMP)
 	$(CC) $(CFLAGS) -c $< -o $@
 
+$(BUILD)/objpool.o: kernel/objpool.c kernel/objpool.h kernel/memory.h $(STAMP)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILD)/task_store.o: kernel/task_store.c kernel/task_store.h kernel/task.h kernel/objpool.h $(STAMP)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILD)/session.o: kernel/session.c kernel/session.h kernel/task_store.h kernel/wm.h kernel/theme.h kernel/desktop.h kernel/auth.h $(STAMP)
+	$(CC) $(CFLAGS) -c $< -o $@
+
 $(BUILD)/gfx.o: kernel/gfx.c kernel/gfx.h kernel/font.h kernel/font16.h \
                 kernel/io.h $(BUILD)/font16_data.h $(BUILD)/font8_data.h $(STAMP)
 	$(CC) $(CFLAGS) -c $< -o $@
@@ -241,15 +254,17 @@ $(BUILD)/userspace.o: kernel/userspace.c kernel/userspace.h kernel/task.h kernel
 $(BUILD)/term.o: kernel/term.c kernel/term.h kernel/io.h kernel/palette.h $(STAMP)
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(BUILD)/wm.o: kernel/wm.c kernel/wm_terminal.inc kernel/wm.h kernel/gfx.h kernel/term.h kernel/mouse.h \
-               kernel/timer.h kernel/palette.h kernel/io.h kernel/font.h $(BUILD)/font8_data.h $(STAMP)
+$(BUILD)/wm.o: kernel/wm.c kernel/wm_native.inc kernel/wm_terminal.inc kernel/wm.h kernel/gfx.h kernel/term.h kernel/mouse.h \
+               kernel/timer.h kernel/palette.h kernel/io.h kernel/font.h kernel/session.h kernel/task_store.h kernel/objpool.h $(BUILD)/font8_data.h $(STAMP)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(BUILD)/paging.o: kernel/paging.c kernel/paging.h kernel/memory.h kernel/io.h $(STAMP)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(BUILD)/task.o: kernel/task.c kernel/task.h kernel/memory.h kernel/term.h \
-                 kernel/timer.h kernel/fs.h kernel/io.h kernel/gfx.h kernel/font.h $(BUILD)/font8_data.h $(STAMP)
+                 kernel/timer.h kernel/fs.h kernel/io.h kernel/gfx.h kernel/font.h kernel/task_store.h \
+                 kernel/auth.h kernel/userspace.h kernel/process.h kernel/streams.h kernel/simd.h \
+                 kernel/image_service.h kernel/wm.h kernel/session.h $(BUILD)/font8_data.h $(STAMP)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(BUILD)/ata.o: kernel/ata.c kernel/ata.h kernel/io.h $(STAMP)
@@ -270,12 +285,24 @@ $(BUILD)/module-core.elf: $(BUILD)/module-core.o modules/linker.ld
 $(BUILD)/module-core.bin: $(BUILD)/module-core.elf
 	$(OBJCOPY) -O binary $< $@
 
+ifeq ($(M10_BUILD),1)
+$(BUILD)/module-wall-v1.skm: $(BUILD)/module-core.elf $(BUILD)/module-core.bin tools/mkskm.py
+	$(PY) tools/mkskm.py $(BUILD)/module-core.elf $(BUILD)/module-core.bin $@
+else
 $(BUILD)/fs/SYS/CORE/CORE.SKM: $(BUILD)/module-core.elf $(BUILD)/module-core.bin tools/mkskm.py
 	$(PY) tools/mkskm.py $(BUILD)/module-core.elf $(BUILD)/module-core.bin $@
+endif
 
 $(BUILD)/fs.o: kernel/fs.c kernel/fs.h kernel/ata.h kernel/io.h $(STAMP)
 	$(CC) $(CFLAGS) -c $< -o $@
 
+$(BUILD)/core_boot.o: kernel/core_boot.c kernel/core_image.h kernel/memory.h kernel/crc.h kernel/interrupts.h $(STAMP)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILD)/ttf.o: kernel/ttf.c kernel/ttf.h kernel/memory.h kernel/fs.h kernel/crypto.h $(STAMP)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+ifneq ($(M10_BUILD),1)
 $(BUILD)/$(KOUT): $(addprefix $(BUILD)/,$(OBJS)) linker.ld | $(BUILD)
 	$(LD) $(LDFLAGS) -T linker.ld $(addprefix $(BUILD)/,$(OBJS)) -o $@
 	nm -n $@ > $(BUILD)/kernel.sym
@@ -285,17 +312,22 @@ $(BUILD)/kernel.bin: $(BUILD)/$(KOUT)
 
 $(BUILD)/sandcore.img: $(BUILD)/boot.bin $(BUILD)/kernel.bin tools/mkimg.py
 	$(PY) tools/mkimg.py $(BUILD)/boot.bin $(BUILD)/kernel.bin $@
+endif
 
 # SandFS 数据盘: 字体 + 用户程序上盘 (独立于引导软盘, 挂 IDE)
+ifneq ($(M10_BUILD),1)
 $(BUILD)/sanddata.img: tools/mkfs.py \
                        $(BUILD)/fs/bin/shell.scx $(BUILD)/fs/apps/hello.scx \
                        $(BUILD)/fs/sys/font.scf $(BUILD)/fs/sys/shell.scf \
                        $(BUILD)/fs/desk/shell.lnk $(BUILD)/fs/apps/panic.scx \
                        $(USER_SCX) $(CLI_SCX) $(BUILD)/fs/bin/asm.scx $(DESKTOP_ASSETS) \
                        $(BUILD)/fs/home/demo.asm $(BUILD)/fs/home/notes.txt $(BUILD)/fs/home/FEATURE.C $(BUILD)/fs/SYS/CORE/CORE.SKM \
-                       $(BUILD)/fs/bin/s3c.scx $(BUILD)/fs/SYS/CORE/IMAGE.SCX $(BUILD)/fs/SYS/CORE/IMAGE.LIC \
+                       $(BUILD)/fs/bin/s3c.scx $(BUILD)/fs/SYS/CORE/IMAGE.SCX $(BUILD)/fs/SYS/CORE/LOGIN.SCX $(BUILD)/fs/SYS/CORE/IMAGE.LIC \
                        $(SCCC_SOURCE) $(BUILD)/m8-assets.stamp $(BUILD)/legacy.stamp
 	$(PY) tools/mkfs.py
+else
+$(BUILD)/sanddata.img: m10a1-publish
+endif
 
 $(BUILD)/hello.bin: user/hello.asm | $(BUILD)
 	$(NASM) -f bin $< -o $@
@@ -358,6 +390,10 @@ $(BUILD)/user-%.bin: $(BUILD)/user-%.$(KOUT)
 $(BUILD)/fs/apps/%.scx: $(BUILD)/user-%.bin tools/mkscx.py
 	mkdir -p $(BUILD)/fs/apps
 	$(PY) tools/mkscx.py $< $@ 0 0x400000 $(BUILD)/user-$*.sym
+
+$(BUILD)/fs/SYS/CORE/LOGIN.SCX: $(BUILD)/user-session.bin tools/mkscx.py
+	mkdir -p $(BUILD)/fs/SYS/CORE
+	$(PY) tools/mkscx.py $< $@ 0 0x400000 $(BUILD)/user-session.sym
 
 # include 内容改变必须重编编译器，否则启动版本会保留旧后端。
 $(BUILD)/user-s3c.o: user/s3c.c $(wildcard user/*.H user/*.inc) $(STAMP)
@@ -479,5 +515,6 @@ clean:
 
 .PHONY: all run run-headless clean
 include m9.mk
+include m10.mk
 
 -include $(wildcard $(BUILD)/*.d $(BUILD)/codec/*.d $(BUILD)/codec/webp/src/dec/*.d $(BUILD)/codec/webp/src/dsp/*.d $(BUILD)/codec/webp/src/utils/*.d)

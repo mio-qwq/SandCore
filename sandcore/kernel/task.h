@@ -7,8 +7,8 @@
  * v2: 分页上线, 每任务独立页目录 (用户区 0x400000 私有),
  * 多个用户程序可并发; 内核主循环 = 任务 0。 */
 
-#define NTASK 32
 #define LEGACY_TASK_ROWS 8
+#define LEGACY_TASK_ROWS2 32
 
 typedef struct {
     u32 pd;                /* 页目录物理地址 */
@@ -22,12 +22,40 @@ typedef struct {
     char args[128];         /* EXEC 分开程序路径与参数，命令行在任务槽内持久化 */
 } task_t;
 
-extern task_t tasks[NTASK];
+/* 公共168B任务前缀保留；内部通过稳定对象访问，禁止重新引入固定数组。
+ * NTASK现在仅是历史编号高水位，不能用它限定新任务创建或旧快照大小。
+ * 热路径用就绪队列，需枚举活任务时用task_next，避免扫已回收历史槽。 */
+u32 task_slot_count(void);
+#define NTASK task_slot_count()
+task_t *task_at(int pid);
+#define TASK(pid) (*task_at(pid))
+int task_next(int after);
+int task_owned(int pid);
+enum {
+    TASK_DATA_AUTH,TASK_DATA_LOGIN,TASK_DATA_USERSPACE,TASK_DATA_PROCESS,
+    TASK_DATA_STREAMS,TASK_DATA_SIMD,TASK_DATA_IMAGE,TASK_DATA_FAULT,TASK_DATA_COUNT
+};
+void *task_data(int pid,int kind);
+void task_state_set(int pid,int state); /* 同步调度队列；调试器不能直接改state。 */
+void task_kernel_wake(void); /* IRQ只置待处理标记，不在驱动内部换栈。 */
+#define TASK_EVENT_INPUT 1u
+#define TASK_EVENT_VISIBILITY 2u
+#define TASK_EVENT_STREAM 4u
+#define TASK_EVENT_JOB 8u
+#define TASK_EVENT_NETWORK 16u
+#define TASK_EVENT_AUDIO 32u
+#define TASK_EVENT_IMAGE 64u
+#define TASK_EVENT_AUTH 128u
+#define TASK_EVENT_TIMEOUT 0x40000000u
+void task_notify(int pid,u32 events); /* IF=0；同步拥有者事件。 */
+void task_notify_generation(int pid,u32 generation,u32 events);
 
 void task_init(void);                /* 分页 + GDT/TSS + 内核任务 0 */
 int  task_spawn(const char *name, u32 pd, u32 entry, u32 user_esp);
 int  task_exec_scx(const char *path);/* 读 SCX → 建页目录 → 建任务 (SYS_EXEC) */
 void task_stop(int pid);            /* 关窗口并置僵尸，下次调度安全回收 */
+void task_cleanup_poll(void);       /* 仅主循环IF=0：分阶段撤引用，再允许僵尸页回收。 */
+int task_cleanup_pending(void);
 int task_pid(void);                 /* 当前调用者；用户不能通过寄存器伪造身份 */
 u32 task_generation(int pid);       /* 内部只读代数，跨异步票据防PID复用 */
 /* mio：仅可信零环在IF=0调用。hold=1固定当前任务/CR3与共享画布
@@ -101,7 +129,8 @@ void syscall_c_common(u32 vec, u32 *frame);   /* int 0x7C 分发 */
 #define SYS_FSREADAT 0x38
 #define SYS_EXEC     0x40
 #define SYS_DBGEXEC  0x50
-#define SYS_DEBUG    0x51
+/* 私有名字避免与lwIP的SYS_DEBUG日志开关冲突；旧调用号仍是0x51。 */
+#define SC_SYS_DEBUG 0x51
 #define SYS_USERQUERY 0x70
 #define SYS_USERCONFIG 0x71
 #define SYS_CHDIR 0x72
@@ -176,5 +205,35 @@ void syscall_c_common(u32 vec, u32 *frame);   /* int 0x7C 分发 */
 #define SYS_JOBINFO2 0x23A
 #define SYS_MODULELIST 0x23B
 #define SYS_WINDOWPLACE 0x23C
+#define SYS_PROCESSPAGE 0x240
+#define SYS_EVENTWAIT 0x241
+#define SYS_SESSIONPAGE 0x242
+#define SYS_SESSIONCONTROL 0x243
+#define SYS_VISIBILITY 0x244
+#define SYS_WINDOWPAGE 0x245
+#define SYS_SESSIONPATH 0x246
+#define SYS_STREAMREADY 0x247
+#define SYS_FONTINFO2 0x248
+#define SYS_GLYPHBITMAP 0x249
+#define SYS_NETINFO 0x250
+#define SYS_NETCONTROL 0x251
+#define SYS_SOCKET 0x252
+#define SYS_SOCKETBIND 0x253
+#define SYS_SOCKETCONNECT 0x254
+#define SYS_SOCKETLISTEN 0x255
+#define SYS_SOCKETACCEPT 0x256
+#define SYS_SOCKETSEND 0x257
+#define SYS_SOCKETRECEIVE 0x258
+#define SYS_SOCKETSHUTDOWN 0x259
+#define SYS_SOCKETCLOSE 0x25A
+#define SYS_SOCKETSTATUS 0x25B
+#define SYS_SOCKETOPTION 0x25C
+#define SYS_SOCKETPAGE 0x25D
+#define SYS_ROUTEPAGE 0x25E
+#define SYS_ARPPAGE 0x25F
+#define SYS_DNSSTART 0x260
+#define SYS_DNSSTATUS 0x261
+#define SYS_DNSCANCEL 0x262
+#define SYS_NETEXEC 0x263
 
 #endif /* SANDCORE_TASK_H */

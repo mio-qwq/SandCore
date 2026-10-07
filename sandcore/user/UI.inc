@@ -8,12 +8,15 @@
 #define UI_H 170
 static u8 ui_pixels[UI_W*UI_H],ui_font[1024];
 static int ui_win,ui_last_tick,ui_frames;
+static int ui_visible=1;
+static u32 ui_visibility_epoch;
 static inline int ui_abs(int x) { return x<0?-x:x; }
 static inline int ui_clamp(int x,int lo,int hi) { return x<lo?lo:x>hi?hi:x; }
 static inline void ui_pixel(int x,int y,int color)
-{ if(x>=0 && x<UI_W && y>=0 && y<UI_H) ui_pixels[y*UI_W+x]=(u8)color; }
+{ if(ui_visible && x>=0 && x<UI_W && y>=0 && y<UI_H) ui_pixels[y*UI_W+x]=(u8)color; }
 static inline void ui_span(int x,int y,int w,int color)
 {
+    if(!ui_visible)return;
     if(y<0 || y>=UI_H || w<=0 || x>=UI_W) return;
     if(x<0) { w+=x;
         x=0; } if(x+w>UI_W) w=UI_W-x;
@@ -21,14 +24,16 @@ static inline void ui_span(int x,int y,int w,int color)
 }
 static inline void ui_rect(int x,int y,int w,int h,int color)
 {
+    if(!ui_visible)return;
     int bottom=ui_clamp(y+h,0,UI_H);
     if(y<0) y=0;
     for(int row=y;row<bottom;row++) ui_span(x,row,w,color);
 }
 static inline void ui_gradient(int x,int y,int w,int h,int base)
-{ for(int i=0;i<h;i++) ui_span(x,y+i,w,base+i*7/(h?h:1)); }
+{ if(!ui_visible)return;for(int i=0;i<h;i++) ui_span(x,y+i,w,base+i*7/(h?h:1)); }
 static inline void ui_line(int x,int y,int xx,int yy,int color)
 {
+    if(!ui_visible)return;
     int dx=ui_abs(xx-x),sx=x<xx?1:-1,dy=-ui_abs(yy-y),sy=y<yy?1:-1,error=dx+dy;
     for(;;) {
         ui_pixel(x,y,color);
@@ -41,6 +46,7 @@ static inline void ui_line(int x,int y,int xx,int yy,int color)
 }
 static inline void ui_circle(int x,int y,int radius,int color,int filled)
 {
+    if(!ui_visible)return;
     int a=radius,b=0,error=1-radius;
     while(a>=b) {
         if(filled) {
@@ -75,6 +81,8 @@ static inline void ui_panel(int x,int y,int w,int h)
 }
 static inline void ui_text(int x,int y,const char *s,int color)
 {
+    if(!ui_visible)return;
+    if(!ui_visible)return;
     for(int i=0;s[i] && x<UI_W;i++,x+=8) {
         int c=(u8)s[i];
         if(c>=128) c='?';
@@ -88,15 +96,12 @@ static inline void ui_number(int x,int y,int value,int color)
 { char text[12];
     decimal(text,value);
     ui_text(x,y,text,color); }
-/* mio：逐帧应用使用 GLYPH16 的副本，避免 sc_text16 先画窗口后又
- * 被 FRAME 覆盖。64 项固定缓存只保存本进程数据；查不到的码点
- * 也缓存空框，循环短片不会每帧重复陷入。所有行仍来自系统字库。
- */
-static u32 ui_glyph_codes[64];
-static u16 ui_glyph_rows[64][16];
-static int ui_glyph_width[64],ui_glyph_count;
+/* 每帧只用本人缓存的同源位图，避免窗口直画又被FRAME覆盖。
+ * 新完整字库与旧API回退统一在GLYPHS；满缓存轮转且按版本失效。 */
+#include "GLYPHS.inc"
 static inline void ui_text16(int x,int y,const char *text,int color)
 {
+    if(!ui_visible)return;
     int left=x;
     while(*text) {
         u32 scalar=(u8)*text++;
@@ -109,15 +114,7 @@ static inline void ui_text16(int x,int y,const char *text,int color)
                 scalar=(scalar<<6)|((u8)*text++&63);
             }
         } else if(scalar>=128) scalar=0xFFFD;
-        int slot=0;
-        while(slot<ui_glyph_count && ui_glyph_codes[slot]!=scalar) slot++;
-        if(slot==ui_glyph_count) {
-            if(slot==64) slot=63;
-            else ui_glyph_count++;
-            ui_glyph_codes[slot]=scalar;
-            int width=sc_glyph16(scalar,ui_glyph_rows[slot]);
-            ui_glyph_width[slot]=width>0?width:16;
-        }
+        int slot=ui_glyph_slot(scalar);
         for(int r=0;r<16;r++) for(int c=0;c<ui_glyph_width[slot];c++)
             if(ui_glyph_rows[slot][r]&(0x8000u>>c)) ui_pixel(x+c,y+r,color);
         x+=ui_glyph_width[slot];
@@ -146,6 +143,7 @@ static inline void ui_button(int x,int y,int w,const char *text,int active)
 }
 static inline void ui_triangle(int x0,int y0,int x1,int y1,int x2,int y2,int color)
 {
+    if(!ui_visible)return;
     /* 按 y 排序，再逐扫描行插值两条边；每行只算两次除法，内部跨度
      * 直接写像素，避免每个像素重新算三次叉积。顶点越界也先裁 y。 */
     int temp;
@@ -194,14 +192,19 @@ static inline int ui_open(const char *title)
 {
     ui_win=sc_open(title,320,184);
     if(ui_win<0) return -1;
+    u32 visibility[8];if(sc_visibility(ui_win,visibility)>=0){ui_visible=(int)visibility[1];ui_visibility_epoch=visibility[2];}
     if(sc_font8(ui_font)!=1024) return -1;
     ui_last_tick=sc_tick();
     return ui_win;
 }
-static inline void ui_present(void) { sc_frame(ui_win,ui_pixels,sizeof(ui_pixels));
+static inline void ui_present(void) { if(!ui_visible)return;sc_frame(ui_win,ui_pixels,sizeof(ui_pixels));
     ui_frames++; }
 static inline int ui_frame_due(void)
 {
+    if(ui_font_refresh()){sc_font8(ui_font);ui_last_tick=sc_tick()-4;}
+    u32 visibility[8];if(sc_visibility(ui_win,visibility)>=0){ui_visible=(int)visibility[1];
+        if(!ui_visible){sc_event_wait(SC_EVENT_VISIBILITY,0xFFFFFFFFu);return 0;}
+        if(ui_visibility_epoch!=visibility[2] || visibility[4]){ui_visibility_epoch=visibility[2];ui_last_tick=sc_tick()-4;}}
     /* PIT=100Hz，游戏/动画以最多 25fps 前进，帧慢时也不空转补几十帧。
      * 后台仍可合成，但输入接口只对聚焦窗口有效，切窗不偷操作。 */
     int tick=sc_tick();
@@ -223,6 +226,8 @@ static inline int ui_edit_path(char *path,int capacity,const char *title)
 {
     int n=length(path);
     for(;;) {
+        u32 visibility[8];if(sc_visibility(ui_win,visibility)>=0){ui_visible=(int)visibility[1];
+            if(!ui_visible){sc_event_wait(SC_EVENT_VISIBILITY,0xFFFFFFFFu);continue;}}
         ui_panel(12,48,294,65);
         ui_text(22,58,title,PAL_UI_CYAN+7);
         ui_rect(22,77,274,15,PAL_UI_INK);

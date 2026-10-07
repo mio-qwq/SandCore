@@ -158,6 +158,7 @@ int main(void)
     if(!filename[0])return cli_error("soundplay: path.mp3, path.wav or path.flac",-1);
 #else
     if(ui_open("SandAudio / mio")<0)return 1;ui_followup=1;
+    ui_background_events=SC_EVENT_AUDIO|SC_EVENT_IMAGE;ui_background_interval=1;
 #endif
     if(filename[0]){error_code=start(filename);if(error_code<0)copy(status_text,"Unable to open audio",sizeof(status_text));}
     u32 last_draw=0xFFFFFFFFu,drain_tick=0xFFFFFFFFu;

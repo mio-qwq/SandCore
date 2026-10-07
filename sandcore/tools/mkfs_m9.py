@@ -72,12 +72,22 @@ def defaults(name, directory=False):
     return 0, 0, 23
 
 
-def read_image(blob):
+def read_image(blob, copy_payload=True):
+    views = []
+    try:
+        return _read_image(blob, copy_payload, views)
+    except BaseException:
+        for view in views:
+            view.release()
+        raise
+
+
+def _read_image(blob, copy_payload, views):
     if len(blob) < 512 or len(blob) % 512 or blob[:9] != MAGIC:
         raise ValueError('不是有效SandFS整盘')
     count, sectors, version = struct.unpack_from('<III', blob, 12)
     if version == 5:
-        if sectors not in (192,DIRECTORY_SECTORS) or struct.unpack_from('<I', blob, 28)[0] != ENTRY.size:
+        if sectors not in (192,384,768,1536) or struct.unpack_from('<I', blob, 28)[0] != ENTRY.size:
             raise ValueError('v5目录布局不匹配')
         if zlib.crc32(blob[:508]) != struct.unpack_from('<I', blob, 508)[0]:
             raise ValueError('v5超级块CRC失败')
@@ -102,7 +112,7 @@ def read_image(blob):
         raise ValueError('目录计数越界')
     declared = struct.unpack_from('<I', blob, 24)[0] if version >= 4 else 0
     declared = declared or 16384
-    if not data_start <= declared <= 131072 or declared > len(blob) // 512:
+    if not data_start <= declared <= 524288 or declared > len(blob) // 512:
         raise ValueError('源盘声明容量与实际容量不符')
     records, extents = {}, []
     for i in range(count):
@@ -122,7 +132,10 @@ def read_image(blob):
         else:
             if at < data_start or at > declared or (size + 511) // 512 > declared - at:
                 raise ValueError('源盘数据范围越界')
-            payload = blob[at * 512:at * 512 + size]
+            payload = (blob[at * 512:at * 512 + size] if copy_payload else
+                       memoryview(blob)[at * 512:at * 512 + size])
+            if not copy_payload:
+                views.append(payload)
             extent = (at, at + (size + 511) // 512)
             if size:
                 extents.append(extent)
@@ -136,6 +149,13 @@ def read_image(blob):
     extents.sort()
     if any(left[1] > right[0] for left, right in zip(extents, extents[1:])):
         raise ValueError('源盘重叠数据，拒绝将普通文件别名迁入核心范围')
+    if version == 5:
+        for record in records.values():
+            parts = record.name.split('/')
+            for index in range(1, len(parts)):
+                parent = records.get(fold('/'.join(parts[:index])))
+                if parent is None or parent.payload is not None:
+                    raise ValueError('v5源盘缺失显式父目录或把普通文件作为父目录')
     return records
 
 

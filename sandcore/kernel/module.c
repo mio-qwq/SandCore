@@ -56,7 +56,7 @@ static void reclaim(u32 owner)
     }
 }
 static u32 ticks(void){return sc_ticks;}
-static const module_api_t api={1,sizeof(module_api_t),gfx_pset,gfx_fill,gfx_circle,wm_wallpaper,install_scene,screen_width,screen_height,
+static const module_api_t api={1,56,gfx_pset,gfx_fill,gfx_circle,wm_wallpaper,install_scene,screen_width,screen_height,
     allocate_bytes,release_bytes,ticks,fs_read_at,fs_write};
 
 static int load(const char *name,int resident)
@@ -129,6 +129,9 @@ int modules_paint(void)
     if(!scene_callback) return 0;
     active_owner=scene_owner;scene_callback();active_owner=0;return 1;
 }
+/* 历史M9单体构建不宣称实现M10新增尾服务；新CORE使用module2.c。 */
+void modules_irq(u32 line){(void)line;}
+void modules_poll(void){}
 int modules_execute(int pid,const char *path,int resident)
 {
     if((resident!=0 && resident!=1) || !auth_can_mod(pid))return -5;

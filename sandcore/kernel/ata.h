@@ -15,4 +15,15 @@ int  ata_read_sectors(u32 lba, u32 count, void *buf);   /* 0=成功 -1=失败 */
 int  ata_write_sectors(u32 lba, u32 count, const void *buf);
 int  ata_flush(void);                     /* 有界FLUSH CACHE；不发布用户未提交事务 */
 
+#ifndef BOOT_READ_ONLY
+/* 内核诊断只保存命令阶段/设备状态与计数，不包含正文或地址指针。
+ * 最近失败保留到下次失败，随后成功IO不能抹掉现场；旧用户ABI不变。 */
+typedef struct {
+    u32 version,reads,writes,flushes,failures,timeouts;
+    u32 failed_command,failed_lba,failed_need_data,failed_status,failed_error,failed_tries;
+    u32 active_command,active_lba,reserved[2];
+} ata_diagnostic_t;
+extern volatile ata_diagnostic_t ata_diagnostic;
+#endif
+
 #endif /* SANDCORE_ATA_H */

@@ -11,6 +11,7 @@
 typedef signed short s16;
 typedef struct {
     u32 token,generation,rate,channels,head,tail,phase,step,volume,paused,finished,consumed,starved;
+    u32 notified_tail,notified_finished;
     int owner;s16 samples[QUEUE*2];
 } voice_t;
 typedef struct {u32 address,length;} descriptor_t;
@@ -72,7 +73,7 @@ failed:
 }
 void audio_irq(u32 irq)
 {
-    if(!ready || irq!=irq_line)return;u16 status=inw((u16)(master+0x16));if(status&0x1C){outw((u16)(master+0x16),status&0x1C);irq_events++;}
+    if(!ready || irq!=irq_line)return;u16 status=inw((u16)(master+0x16));if(status&0x1C){outw((u16)(master+0x16),status&0x1C);irq_events++;task_kernel_wake();}
 }
 static s16 clip(int sample)
 {if(sample>32767){total_clipped++;return 32767;}if(sample<-32768){total_clipped++;return -32768;}return (s16)sample;}
@@ -141,6 +142,12 @@ void audio_poll(void)
     }
     if(!engine_running && dma_queued){last_civ=completed&31u;outb((u16)(master+0x1B),0x1D);engine_running=1;}
     if(engine_running && !dma_queued){outb((u16)(master+0x1B),0);engine_running=0;}
+    for(int i=0;i<VOICES;i++){
+        voice_t *v=&voices[i];if(v->token && v->owner && (v->tail!=v->notified_tail || v->finished!=v->notified_finished)){
+            v->notified_tail=v->tail;v->notified_finished=v->finished;
+            task_notify_generation(v->owner,v->generation,TASK_EVENT_AUDIO);
+        }
+    }
     power_poll();
 }
 int audio_open(int pid,u32 rate,u32 channels)
@@ -171,10 +178,10 @@ int audio_control(int pid,u32 token,u32 command,u32 value)
     if(!ready)return -2;
     if(command==5){if(!auth_can_manage(pid) || value>256)return -5;master_volume=value;return 0;}
     voice_t *v=voice(pid,token);if(!v)return -1;
-    if(command==0){v->token=0;return 0;}if(command==1){v->paused=value!=0;return 0;}
+    if(command==0){v->token=0;task_notify(pid,TASK_EVENT_AUDIO);return 0;}if(command==1){v->paused=value!=0;task_notify(pid,TASK_EVENT_AUDIO);return 0;}
     if(command==2 && value<=256){v->volume=value;return 0;}
-    if(command==3){v->head=v->tail=v->phase=v->finished=v->consumed=0;return 0;}
-    if(command==4){v->finished=1;return 0;}return -1;
+    if(command==3){v->head=v->tail=v->phase=v->finished=v->consumed=0;task_notify(pid,TASK_EVENT_AUDIO);return 0;}
+    if(command==4){v->finished=1;task_notify(pid,TASK_EVENT_AUDIO);return 0;}return -1;
 }
 int audio_status(int pid,u32 token,u32 out[16])
 {

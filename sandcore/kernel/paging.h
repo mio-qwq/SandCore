@@ -25,6 +25,9 @@ void paging_init(void);          /* 建内核页目录, 开启 CR0.PG */
 u32  paging_new_task_dir(void);  /* 建任务页目录: 拷共享项 + 私有用户 PT (全零) */
 void paging_map_user(u32 pd, u32 vaddr, u32 paddr);   /* 用户区映射一页 (带 US|RW) */
 void paging_switch(u32 pd);      /* 换 CR3 */
+/* PCI寄存器窗口仍是supervisor恒等别名，但禁止CPU缓存。拒绝RAM、
+ * 私有用户窗口、未对齐/回绕区间；共享PTE在任务换CR3时同样生效。 */
+int paging_map_device(u32 base,u32 bytes);
 u32  paging_kernel_pd(void);     /* 内核页目录物理地址 (任务 0 用) */
 void paging_free_task_dir(u32 pd); /* 只释放私有用户页与页表 */
 int  paging_user_range(u32 pd, u32 ptr, u32 size); /* 确认每页都已映射 */

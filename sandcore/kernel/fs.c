@@ -22,10 +22,12 @@
 #include "memory.h"
 #include "auth.h"
 #include "task.h"
+#include "task_store.h"
+#include "objpool.h"
 #include "crc.h"
-#define FS_MAX_FILES 2048
 #define FS_LEGACY_SECTS 16384u
-#define FS_MAX_SECTS 131072u
+#define FS_MAX_SECTS 524288u
+#define ALLOCATION_LEAF_SECTORS 512u
 
 typedef struct { char name[64]; u32 start_lba,size;i32 uid,gid;u32 mode,flags,generation,reserved; } entry_t;
 /* mio：目录常驻页在验证超级块后按实际容量分配，不能把512项加
@@ -41,14 +43,28 @@ static i32 root_uid,root_gid;
 static u32 root_mode;
 static u32 fs_data_start,metadata_generation,active_bank,allocation_pages,fs_faulted;
 static u8 *allocation;
+/* 每512扇区一个叶摘要，父节点合并前缀/后缀/最大连续空闲与总空闲。
+ * 256MiB卷的树只需32KiB；找空闲区间O(log N)+最多512位，统计读根。
+ * COW保留/提交/撤销都经allocated更新，不缓存尚未提交的目录内容。 */
+typedef struct {u32 prefix,suffix,best,free;} space_node_t;
+static space_node_t *space_tree;
+static u32 space_pages,space_leaves,live_sectors,live_bytes;
+static int live_dirty;
+static void fs_space_rebuild(void);
+static void live_refresh(void)
+{
+    if(!live_dirty)return;live_sectors=live_bytes=0;
+    for(int i=0;i<nfiles;i++)if(dirents[i].start_lba){live_sectors+=(dirents[i].size+511)/512;live_bytes+=dirents[i].size;}
+    live_dirty=0;
+}
 static u32 object_generation;
-#define FS_TRANSACTIONS 8
 typedef struct {
     u32 token,start,capacity,used,original,failed;
     int owner,uid,gid;
+    u32 owner_generation,previous,next;
     char name[64];
 } transaction_t;
-static transaction_t transactions[FS_TRANSACTIONS];
+static objpool_t transaction_pool;
 static u32 transaction_counter;
 static u32 new_generation(void)
 {
@@ -104,12 +120,15 @@ static int find(const char *name)
 { for(int i=0;i<nfiles;i++) if(same(name,dirents[i].name)) return i; return -1; }
 static int busy(const char *name)
 {
-    for(u32 i=0;i<FS_TRANSACTIONS;i++)if(transactions[i].token
-        && (same(name,transactions[i].name) || child(transactions[i].name,name)))return 1;
+    for(int i=objpool_next(&transaction_pool,-1);i>=0;i=objpool_next(&transaction_pool,i)){
+        transaction_t *t=objpool_get(&transaction_pool,i);
+        if(same(name,t->name) || child(t->name,name))return 1;
+    }
     return 0;
 }
 static int protected(const char *name)
-{ return same(name,"SYS/CORE") || child(name,"SYS/CORE") || same(name,"SYS/AUTH") || child(name,"SYS/AUTH"); }
+{ return same(name,"SYS/CORE") || child(name,"SYS/CORE") || same(name,"SYS/AUTH") || child(name,"SYS/AUTH")
+    || same(name,"SYS/RECOVERY") || child(name,"SYS/RECOVERY"); }
 static int module_path(const char *name)
 {return same(name,"SYS/MOD") || child(name,"SYS/MOD");}
 int fs_user_mutable(const char *path,int descendants)
@@ -165,21 +184,25 @@ static void release_directory(void)
     if(dirents)pframe_free_run((u32)dirents,dir_pages);
     if(meta)pframe_free_run((u32)meta,meta_pages);
     if(allocation)pframe_free_run((u32)allocation,allocation_pages);
+    if(space_tree)pframe_free_run((u32)space_tree,space_pages);
+    space_tree=0;space_pages=space_leaves=live_sectors=live_bytes=0;live_dirty=1;
     allocation=0;allocation_pages=fs_data_start=active_bank=metadata_generation=fs_faulted=0;
     object_generation=0;
-    for(u32 i=0;i<FS_TRANSACTIONS;i++)transactions[i].token=0;
+    objpool_destroy(&transaction_pool);
+    for(int pid=task_next(-1);pid>=0;pid=task_next(pid))task_record(pid)->transactions=0;
     dirents=0;meta=0;dir_pages=meta_pages=0;
     nfiles=0;dir_sectors=version=fs_disk_sectors=dir_capacity=fs_data_end=0;
 }
 void fs_init(void)
 {
     release_directory();
+    if(objpool_init(&transaction_pool,sizeof(transaction_t),0))return;
     if(ata_read_sectors(0,1,sector)) return;
     const char *magic="SANDFSMIO";
     for(int i=0;i<9;i++) if(sector[i]!=(u8)magic[i]) return;
     u32 ds=*(u32 *)(sector+16),ver=*(u32 *)(sector+20),count=*(u32 *)(sector+12);
     if(!ds) ds=1;
-    if(ver==5 && (ds==192 || ds==384) && *(u32 *)(sector+28)==96
+    if(ver==5 && (ds==192 || ds==384 || ds==768 || ds==1536) && *(u32 *)(sector+28)==96
         && *(u32 *)(sector+508)==crc32_update(0,sector,508))entry_size=96;
     else if(ver==4 && (ds==32 || ds==80)) entry_size=72;
     else if(ver<=3 && (ds==1 || ds==8)) entry_size=40;
@@ -261,7 +284,13 @@ void fs_init(void)
             }
         }
     }
-    return;
+    if(ver==5){
+        space_leaves=1;while(space_leaves<(sectors+511)/512)space_leaves<<=1;
+        space_pages=(space_leaves*2*sizeof(space_node_t)+4095)/4096;
+        space_tree=(space_node_t *)pframe_alloc_run(space_pages);if(!space_tree)goto failed;
+        fs_space_rebuild();
+    }
+    live_dirty=1;return;
 failed:
     release_directory();
 }
@@ -274,9 +303,7 @@ void fs_storage_info(u32 *out)
     out[6]=1;out[7]=version;out[8]=fs_disk_sectors;out[9]=fs_data_start;
     out[10]=fs_data_end;out[11]=fs_disk_sectors-fs_data_end;
     out[12]=dir_capacity;out[13]=(u32)nfiles;out[14]=dir_sectors;
-    for(int i=0;i<nfiles;i++)if(dirents[i].start_lba){
-        out[15]+=(dirents[i].size+511)/512;out[16]+=dirents[i].size;
-    }
+    live_refresh();out[15]=live_sectors;out[16]=live_bytes;
     /* 现有卷没有数据洞回收；不能用总减活跃字节冒充还能写的空间。
      * 防止损坏重叠记录让只读统计无符号下溢；此值不是分区号。 */
     u32 used=fs_data_end-fs_data_start;
@@ -287,29 +314,68 @@ void fs_storage_info2(u32 out[16])
 {
     for(u32 i=0;i<16;i++)out[i]=0;out[0]=1;out[1]=dir_sectors!=0;if(!dir_sectors)return;
     out[2]=version;out[3]=fs_disk_sectors;out[4]=fs_data_start;out[5]=fs_data_end;out[6]=dir_capacity;out[7]=(u32)nfiles;
-    for(int i=0;i<nfiles;i++)if(dirents[i].start_lba)out[8]+=(dirents[i].size+511)/512;
-    if(version==5 && allocation){
-        u32 run=0,occupied=0;for(u32 i=fs_data_start;i<fs_disk_sectors;i++){
-            if(allocation[i>>3]&(1u<<(i&7))){occupied++;run=0;}
-            else {out[10]++;run++;if(run>out[11])out[11]=run;}
-        }out[9]=occupied>=out[8]?occupied-out[8]:0;
+    live_refresh();
+    out[8]=live_sectors;
+    if(version==5 && space_tree){
+        out[10]=space_tree[1].free;out[11]=space_tree[1].best;
+        u32 occupied=fs_disk_sectors-fs_data_start-out[10];out[9]=occupied>=out[8]?occupied-out[8]:0;
     }else out[10]=out[11]=fs_disk_sectors-fs_data_end;
     out[12]=object_generation;out[13]=active_bank;out[14]=metadata_generation;out[15]=(u32)fs_faulted;
 }
+static void space_leaf(u32 index)
+{
+    space_node_t *node=space_tree+space_leaves+index;node->prefix=node->suffix=node->best=node->free=0;
+    u32 run=0;int initial=1;
+    for(u32 i=0;i<512;i++){
+        u32 at=index*512+i;int available=at>=fs_data_start && at<fs_disk_sectors && !(allocation[at>>3]&(1u<<(at&7)));
+        if(available){node->free++;run++;if(initial)node->prefix++;if(run>node->best)node->best=run;}
+        else {initial=0;run=0;}
+    }node->suffix=run;
+}
+static void space_parent(u32 index,u32 span)
+{
+    space_node_t *node=space_tree+index,*left=space_tree+index*2,*right=left+1;u32 half=span/2;
+    node->free=left->free+right->free;
+    node->prefix=left->prefix==half?half+right->prefix:left->prefix;
+    node->suffix=right->suffix==half?half+left->suffix:right->suffix;
+    node->best=left->best>right->best?left->best:right->best;
+    if(left->suffix+right->prefix>node->best)node->best=left->suffix+right->prefix;
+}
+static void fs_space_rebuild(void)
+{
+    for(u32 i=0;i<space_leaves;i++)space_leaf(i);
+    for(u32 start=space_leaves/2,span=1024;start;start/=2,span*=2)
+        for(u32 i=start;i<start*2;i++)space_parent(i,span);
+}
 static void allocated(u32 at,u32 count,int used)
-{if(allocation)for(u32 i=0;i<count;i++){u32 n=at+i;u8 bit=(u8)(1u<<(n&7));if(used)allocation[n>>3]|=bit;else allocation[n>>3]&=(u8)~bit;}}
+{
+    if(!allocation || !count)return;
+    for(u32 i=0;i<count;i++){u32 n=at+i;u8 bit=(u8)(1u<<(n&7));if(used)allocation[n>>3]|=bit;else allocation[n>>3]&=(u8)~bit;}
+    if(space_tree){u32 first=at/512,last=(at+count-1)/512;
+        for(u32 i=first;i<=last;i++)space_leaf(i);
+        first+=space_leaves;last+=space_leaves;
+        for(u32 span=1024;first>1;span*=2){first/=2;last/=2;for(u32 i=first;i<=last;i++)space_parent(i,span);}
+    }
+    live_dirty=1;
+}
 static u32 allocate(u32 count)
 {
     if(!count)return fs_data_start;
-    u32 run=0;
-    for(u32 at=fs_data_start;at<fs_disk_sectors;at++){
-        if(allocation[at>>3]&(1u<<(at&7)))run=0;else run++;
-        if(run==count){u32 start=at+1-count;allocated(start,count,1);return start;}
+    if(!space_tree || space_tree[1].best<count)return 0;
+    u32 index=1,start=0,span=space_leaves*512,selected=0;
+    while(index<space_leaves){space_node_t *left=space_tree+index*2,*right=left+1;
+        if(left->best>=count){index*=2;span/=2;continue;}
+        if(left->suffix+right->prefix>=count){selected=start+span/2-left->suffix;break;}
+        start+=span/2;span/=2;index=index*2+1;
     }
-    return 0;
+    if(!selected){u32 run=0;for(u32 i=0;i<span;i++){u32 at=start+i;
+        if(at<fs_data_start || at>=fs_disk_sectors || allocation[at>>3]&(1u<<(at&7)))run=0;else run++;
+        if(run==count){selected=at+1-count;break;}}}
+    if(!selected)return 0;allocated(selected,count,1);return selected;
 }
 static void highwater(void)
 {
+    live_dirty=1;
     fs_data_end=fs_data_start;
     for(int i=0;i<nfiles;i++)if(dirents[i].start_lba){
         u32 end=dirents[i].start_lba+(dirents[i].size+511)/512;if(end>fs_data_end)fs_data_end=end;
@@ -580,15 +646,25 @@ int fs_permissions(int pid,const char *path,int uid,int gid,u32 mode)
 
 static transaction_t *stream(int owner,u32 token)
 {
-    if(!token)return 0;
-    for(u32 i=0;i<FS_TRANSACTIONS;i++)if(transactions[i].token==token
-        && transactions[i].owner==owner)return &transactions[i];
-    return 0;
+    if(!token || token>0x7FFFFFFFu || !task_owned(owner))return 0;
+    transaction_t *t=objpool_get(&transaction_pool,(int)token);
+    return t && t->token==token && t->owner==owner && t->owner_generation==task_generation(owner)?t:0;
+}
+static void transaction_release(transaction_t *t)
+{
+    /* 临时扇区归属独立于PID编号。先从真实拥有者的链上撤销，
+     * 退出只处理本人的事务，不在每个子进程结束时扫描全部写入者。 */
+    if(task_owned(t->owner) && task_generation(t->owner)==t->owner_generation){
+        if(t->previous)((transaction_t *)objpool_get(&transaction_pool,(int)t->previous))->next=t->next;
+        else task_record(t->owner)->transactions=t->next;
+        if(t->next)((transaction_t *)objpool_get(&transaction_pool,(int)t->next))->previous=t->previous;
+    }
+    objpool_release(&transaction_pool,(int)t->token);
 }
 int fs_stream_begin(int owner,const char *path,u32 capacity)
 {
     char name[64];u32 info[2];
-    if(version!=5 || fs_faulted || capacity>fs_disk_sectors*512
+    if(!task_owned(owner) || version!=5 || fs_faulted || capacity>fs_disk_sectors*512
         || fs_normalize(path,name)<=0 || protected(name) || busy(name))return -1;
     if(owner && (!fs_user_mutable(name,0) || !fs_access(owner,name,FS_ACCESS_WRITE)))return -5;
     if(!fs_stat(name,info) && info[0]!=1)return -1;
@@ -598,13 +674,18 @@ int fs_stream_begin(int owner,const char *path,u32 capacity)
     while(n && parent[n-1]!='/')n--;if(n)parent[n-1]=0;else parent[0]=0;
     if(fs_stat(parent,info) || info[0]!=2)return -1;
     int index=find(name);if(index<0 && (u32)nfiles>=dir_capacity)return -1;
-    transaction_t *t=0;for(u32 i=0;i<FS_TRANSACTIONS;i++)if(!transactions[i].token){t=&transactions[i];break;}
-    if(!t || transaction_counter==0x7FFFFFFFu)return -6;
-    u32 at=allocate((capacity+511)/512);if(!at)return -4;
+    if(transaction_counter==0x7FFFFFFFu)return -6;
+    int token=(int)(transaction_counter+1);
+    if(objpool_claim(&transaction_pool,token))return -4;
+    transaction_t *t=objpool_get(&transaction_pool,token);
+    u32 at=allocate((capacity+511)/512);if(!at){objpool_release(&transaction_pool,token);return -4;}
     t->token=++transaction_counter;t->start=at;t->capacity=capacity;t->used=t->failed=0;
     t->original=index>=0?dirents[index].generation:0;t->owner=owner;
     t->uid=owner?auth_subject_uid(owner):AUTH_SYSTEM;
     t->gid=owner?auth_subject_gid(owner):AUTH_SYSTEM;copy(t->name,name);
+    t->owner_generation=task_generation(owner);t->next=task_record(owner)->transactions;
+    if(t->next)((transaction_t *)objpool_get(&transaction_pool,(int)t->next))->previous=t->token;
+    task_record(owner)->transactions=t->token;
     return (int)t->token;
 }
 int fs_stream_write(int owner,u32 token,const void *data,u32 length)
@@ -627,10 +708,23 @@ int fs_stream_write(int owner,u32 token,const void *data,u32 length)
 int fs_stream_abort(int owner,u32 token)
 {
     transaction_t *t=stream(owner,token);if(!t)return -1;
-    allocated(t->start,(t->capacity+511)/512,0);t->token=0;return 0;
+    allocated(t->start,(t->capacity+511)/512,0);transaction_release(t);return 0;
 }
 void fs_stream_stop(int owner)
-{for(u32 i=0;i<FS_TRANSACTIONS;i++)if(transactions[i].token && transactions[i].owner==owner)fs_stream_abort(owner,transactions[i].token);}
+{
+    if(!task_owned(owner))return;
+    while(task_record(owner)->transactions){
+        u32 token=task_record(owner)->transactions;
+        if(fs_stream_abort(owner,token)){task_record(owner)->transactions=0;break;}
+    }
+}
+int fs_stream_stop_step(int owner)
+{
+    if(!task_owned(owner) || !task_record(owner)->transactions)return 1;
+    u32 token=task_record(owner)->transactions;
+    if(fs_stream_abort(owner,token)){task_record(owner)->transactions=0;return 1;}
+    return !task_record(owner)->transactions;
+}
 int fs_stream_commit(int owner,u32 token)
 {
     transaction_t *t=stream(owner,token);if(!t || t->failed || fs_faulted)return -1;
@@ -653,5 +747,5 @@ int fs_stream_commit(int owner,u32 token)
     if(write_meta()){if(fresh)nfiles--;dirents[index]=previous;return -1;}
     if(!fresh)allocated(previous.start_lba,(previous.size+511)/512,0);
     u32 live=(t->used+511)/512,reserved=(t->capacity+511)/512;
-    allocated(t->start+live,reserved-live,0);int result=(int)t->used;t->token=0;highwater();return result;
+    allocated(t->start+live,reserved-live,0);int result=(int)t->used;transaction_release(t);highwater();return result;
 }

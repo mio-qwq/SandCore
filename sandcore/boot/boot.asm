@@ -29,7 +29,11 @@
 ; ---------------------------------------------------------------------
 KERNEL_SEG    equ 0x1000  ; 内核装载段地址 -> 线性地址 0x1000*16 = 0x10000
 KERNEL_LBA    equ 1       ; 内核从磁盘 LBA 1 开始 (LBA 0 = 引导扇区自己)
-KERNEL_SECTS  equ 640     ; M9：最多320KiB，身份/流/串口/音频底座；ES逐扇前移
+%ifdef M10_LOADER
+KERNEL_SECTS  equ 128     ; M10a1：只读最小loader64KiB，磁盘主核另从IDE装入
+%else
+KERNEL_SECTS  equ 640     ; 旧单体构建容量保留，不改历史引导媒体
+%endif
 
 SPT           equ 18      ; 1.44MB 软盘几何: 每磁道 18 扇区
 HPC           equ 2       ;                  两个磁头(盘的两面)

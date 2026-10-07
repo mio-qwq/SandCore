@@ -360,6 +360,7 @@ int main(void)
     if(equal(args,"legacy")){race_legacy=1;race_mode=race_menu=race_setup=0;}
     race_records_load();textures();reset();
     for(;;){
+        if(!ui_visibility_ready()){sim_tick=sc_tick();continue;}
         /* 静止菜单/结果卡与驾驶帧生命周期不同。暂停期间每轮把
          * 仿真基点移到现在，恢复时不能追算暂停的秒数；无视觉
          * 状态改变沿NUI事件门槛让出，避免菜单持续复制数MB。 */

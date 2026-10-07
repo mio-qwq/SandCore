@@ -21,6 +21,26 @@ static char status[96]="Display changes need confirmation",menu_text[8192];
 static char labels[32][32],commands[32][128],icons[32][64];
 static int tab,mode,scale_choice,count,selected,first,loaded;
 static u32 display[8];
+static char settings_paths[5][64],settings_desk[64];
+static void settings_paths_init(void)
+{
+    const char *leaves[]={"USER.CFG","ENV.CFG","THEME.CFG","MENU.CFG","WALL.CFG"};
+    for(int i=0;i<5;i++)if(sc_session_path(leaves[i],settings_paths[i],64)<0)settings_paths[i][0]=0;
+    u32 identity[8];if(sc_auth_info(identity)>=0 && identity[1]==1000)copy(settings_desk,"DESK/",64);
+    else if(sc_session_path("DESK/",settings_desk,64)<0)settings_desk[0]=0;
+}
+static void settings_make_directory(void)
+{
+    u32 identity[8];char path[64];
+    if(sc_auth_info(identity)>=0 && identity[1]!=1000 && sc_session_path("",path,64)>=0)sc_create_ex(path,2,3);
+}
+static void settings_temporary(char path[64])
+{
+    char home[64],number[12];path[0]=0;
+    if(sc_user(1,0,home,64)<0)return;decimal(number,ui_win);
+    if(length(home)+length(number)+16>63)return;
+    copy(path,home,64);append(path,"/.SETTINGS-",64);append(path,number,64);append(path,".CFG",64);
+}
 static inline void show_result(int r,const char *success)
 {
     copy(status,r>=0?success:"Operation failed: ",sizeof(status));
@@ -34,7 +54,8 @@ static inline void show_result(int r,const char *success)
 static inline int menus_read(void)
 {
 
-    int n=sc_read("SYS/MENU.CFG",menu_text,sizeof(menu_text)-1);
+    int n=sc_read(settings_paths[3],menu_text,sizeof(menu_text)-1);
+    if(n<0)n=sc_read("SYS/MENU.CFG",menu_text,sizeof(menu_text)-1);
     count=0;
     loaded=0;
     if(n<10){
@@ -97,13 +118,12 @@ static inline int menus_save(void)
     /* mio：菜单消费者现在提供独立纯检查。先验证临时正文，再写
      * 固定文件；过去“先写坏菜单、重载失败还留在盘上”的路径不能
      * 留给普通用户。候选按窗口handle区分，关闭窗口也不共享草稿。 */
-    char candidate[64]="HOME/.SETTINGS-",number[12];
-    decimal(number,ui_win);append(candidate,number,64);append(candidate,".CFG",64);
+    char candidate[64];settings_temporary(candidate);settings_make_directory();
     int n=length(menu_text),r=sc_write(candidate,menu_text,n);
     if(r==n)r=sc_config_check(0,candidate);else if(r>=0)r=-3;
     sc_remove(candidate);
     if(r<0){show_result(r,"");return 0;}
-    r=sc_write("SYS/MENU.CFG",menu_text,n);
+    r=sc_write(settings_paths[3],menu_text,n);
     if(r!=n){
         show_result(r<0?r:-1,"");
         return 0;
@@ -158,7 +178,7 @@ static inline void shortcut(void)
 {
 
     if(!count||selected>=count)return;
-    char path[64]="DESK/MYAPP.LNK",body[256];
+    char path[64],body[256];copy(path,settings_desk,64);append(path,"MYAPP.LNK",64);
     if(!ui_edit_path(path,64,"Save desktop shortcut"))return;
     copy(body,labels[selected],sizeof(body));
     append(body,"\n",sizeof(body));
@@ -166,8 +186,8 @@ static inline void shortcut(void)
     append(body,"\n",sizeof(body));
     append(body,icons[selected],sizeof(body));
     append(body,"\n",sizeof(body));
-    char candidate[64]="HOME/.SETTINGS-",number[12];
-    decimal(number,ui_win);append(candidate,number,64);append(candidate,".CFG",64);
+    char candidate[64];settings_temporary(candidate);settings_make_directory();
+    u32 identity[8];if(sc_auth_info(identity)>=0 && identity[1]!=1000)sc_create_ex(settings_desk,2,3);else sc_mkdir(settings_desk);
     int n=length(body),r=sc_write(candidate,body,n);
     if(r==n)r=sc_config_check(1,candidate);else if(r>=0)r=-3;
     sc_remove(candidate);
@@ -264,7 +284,8 @@ static void draw(void)
         ui_panel(24,y,w,32);settings_value(32,y+8,user_home,w-16);y+=40;
         settings_control(81,24,y,112,"Edit home",0);y+=step+12;
         const int ids[]={82,83};const char *labels[]={"Save user","Reload user"};y=ui_toolbar(ids,labels,2,y);
-        ui_text(24,y,user_dirty?"Draft / press Save user":"Single user / no login or password",PAL_UI_MUTED);y+=28;
+        ui_text(24,y,user_dirty?"Draft / press Save user":"Display profile; login identity remains fixed",PAL_UI_MUTED);y+=28;
+        settings_control(84,24,y,144,"Login / sessions",0);y+=step+12;
     }else if(tab==4){
         const int ids[]={90,91,92,93,94};const char *actions[]={"Add","Edit","Remove","Save env","Reload env"};
         y=ui_toolbar(ids,actions,5,y);
@@ -369,6 +390,7 @@ static void choose_wallpaper(void)
 int main(void)
 {
     if(ui_open("Settings")<0)return 1;
+    settings_paths_init();copy(cfg_path,settings_paths[0],64);
     sc_display(display);scale_choice=display[2];
     for(int i=0;i<6;i++)if(widths[i]==(int)display[0]&&heights[i]==(int)display[1])mode=i;
     menus_read();cfg_user_read();cfg_env_read();
@@ -435,10 +457,11 @@ int main(void)
         if(a==95&&env_selected)env_selected--;
         if(a==96&&env_selected+1<env_count)env_selected++;
         if(a>=100&&a<=106){
-            const char *paths[]={"SYS/USER.CFG","SYS/ENV.CFG","SYS/DISPLAY.CFG","SYS/THEME.CFG","SYS/MENU.CFG","SYS/WALL.CFG"};
+            const char *paths[]={settings_paths[0],settings_paths[1],"SYS/DISPLAY.CFG",settings_paths[2],settings_paths[3],settings_paths[4]};
             char path[64];copy(path,a<106?paths[a-100]:cfg_path,64);
             if(a<106||ui_edit_path(path,64,"Open configuration text"))cfg_open(path);
         }
-        if(a==107){char path[64]="HOME/CONFIG.CFG";if(ui_edit_path(path,64,"New configuration text")){copy(cfg_path,path,64);cfg_text[0]=0;cfg_used=cfg_cursor=cfg_first=cfg_left=0;cfg_dirty=cfg_editing=1;}}
+        if(a==84)show_result(sc_exec("APPS/SESSION.SCX"),"Session panel opened");
+        if(a==107){char path[64];if(sc_user(1,0,path,64)<0)path[0]=0;append(path,"/CONFIG.CFG",64);if(ui_edit_path(path,64,"New configuration text")){copy(cfg_path,path,64);cfg_text[0]=0;cfg_used=cfg_cursor=cfg_first=cfg_left=0;cfg_dirty=cfg_editing=1;}}
     }
 }

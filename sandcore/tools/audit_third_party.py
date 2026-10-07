@@ -27,9 +27,9 @@ def relative_files(directory):
     return result
 
 
-def component_files(component):
+def component_files(component, catalog_path=CATALOG):
     if 'hash_catalog' in component:
-        catalog = json.loads((CATALOG.parent / component['hash_catalog']).read_text(encoding='utf-8'))
+        catalog = json.loads((catalog_path.parent / component['hash_catalog']).read_text(encoding='utf-8'))
         prefix = component['catalog_prefix']
         hashes = {name[len(prefix):]: value for name, value in catalog['files'].items() if name.startswith(prefix)}
         key = 'stb' if prefix == 'stb/' else 'libwebp'
@@ -42,8 +42,8 @@ def component_files(component):
     return hashes
 
 
-def audit(tree=None):
-    catalog = json.loads(CATALOG.read_text(encoding='utf-8'))
+def audit(tree=None, catalog_path=CATALOG):
+    catalog = json.loads(catalog_path.read_text(encoding='utf-8'))
     if catalog.get('version') != 1:
         raise ValueError('不支持的来源登记版本')
     allowed = set(catalog['allowed_licenses'])
@@ -55,7 +55,7 @@ def audit(tree=None):
             if embedded['license'] not in allowed or not embedded.get('upstream') or not embedded.get('revision'):
                 raise ValueError(f'{component["name"]}: 内含组件许可/来源不完整')
         source = ROOT / component['source']
-        hashes = component_files(component)
+        hashes = component_files(component, catalog_path)
         expected = set(hashes) | set(component.get('local_files', []))
         actual = relative_files(source)
         if set(actual) != expected:
@@ -93,20 +93,23 @@ def audit(tree=None):
             'MINIZ.MD': [ROOT / 'user/compress/vendor/PROVENANCE.md'],
             'VONWAON.LIC': [ROOT / 'assets/licenses/VONWAON.LIC']
         }
+        if catalog_path != CATALOG:
+            notices = {'THIRDPARTY.MD': [ROOT / 'docs/THIRD-PARTY.md'], 'M10.JSON': [catalog_path]}
         for name, originals in notices.items():
             path = tree / 'SYS/LICENSE' / name
             if not path.is_file() or path.read_bytes() != b''.join(p.read_bytes() for p in originals):
                 raise ValueError(f'声明文件缺失或被改写: {path}')
     return dict(status='SOURCE-ARCHIVE-CHECKED', source_files=count,
-                product_tests_run=False, catalog_sha256=digest(CATALOG))
+                product_tests_run=False, catalog_sha256=digest(catalog_path))
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--tree', type=Path, help='已生成的M9文件树；额外核对完整源码/声明副本')
+    parser.add_argument('--catalog', type=Path, default=CATALOG, help='新增版本固定来源表；旧M9表继续独立核对')
     args = parser.parse_args()
     try:
-        print(json.dumps(audit(args.tree.resolve() if args.tree else None), ensure_ascii=False))
+        print(json.dumps(audit(args.tree.resolve() if args.tree else None, args.catalog.resolve()), ensure_ascii=False))
     except (OSError, ValueError, KeyError) as error:
         raise SystemExit(f'第三方归档检查失败: {error}') from error
 

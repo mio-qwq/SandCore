@@ -445,6 +445,43 @@ static inline int sc_spawn2(const char *command,const int *fds,u32 flags){return
 static inline int sc_wait2(u32 job,u32 *out){return sc_call(0x219,job,(int)out,0,0,0,0);}
 static inline int sc_kill2(int pid){return sc_call(0x21A,pid,0,0,0,0,0);}
 static inline int sc_processes2(u32 *out,u32 words){return sc_call(0x21B,(int)out,words,0,0,0,0);}
+/* M10a1分页：16字头+每行16字，32..1040字；after=0xFFFFFFFF开始。
+ * 头[3]本页行数，[4]后续游标或0xFFFFFFFF结束。一次调用身份/代数/
+ * CPU样本来自同一快照；跨页进程可能退出或新增，调用者不缓存旧指针。
+ * 老PROCESSINFO2仍固定520字、CPUINFO2固定200字，不扩写旧缓冲。 */
+#define SC_PROCESS_PAGE_WORDS 528
+static inline int sc_process_page(u32 *out,u32 words,u32 after){return sc_call(0x240,(int)out,words,after,0,0,0);}
+#define SC_EVENT_INPUT 1u
+#define SC_EVENT_VISIBILITY 2u
+#define SC_EVENT_STREAM 4u
+#define SC_EVENT_JOB 8u
+#define SC_EVENT_NETWORK 16u
+#define SC_EVENT_AUDIO 32u
+#define SC_EVENT_IMAGE 64u
+#define SC_EVENT_AUTH 128u
+#define SC_EVENT_TIMEOUT 0x40000000u
+/* 事件合并保留至消费；timeout为PIT tick，FFFFFFFF无限等待。
+ * 睡眠仍是存活任务，历史state字段不借用新的数字改变旧ABI。 */
+static inline int sc_event_wait(u32 mask,u32 timeout){return sc_call(0x241,mask,timeout,0,0,0,0);}
+/* 会话不是UID；仅自己的普通登录会话可切换/注销。SYSTEM桌面需要
+ * 外部串口管理凭据。visible不因失焦变0，epoch用于切回后完整重画。 */
+static inline int sc_session_page(u32 *out,u32 words,u32 after){return sc_call(0x242,(int)out,words,after,0,0,0);}
+static inline int sc_session_control(u32 id,u32 action){return sc_call(0x243,id,action,0,0,0,0);}
+static inline int sc_visibility(int handle,u32 out[8]){return sc_call(0x244,handle,(int)out,0,0,0,0);}
+static inline int sc_session_path(const char *leaf,char *out,u32 capacity){return sc_call(0x246,(int)leaf,(int)out,capacity,0,0,0);}
+/* 窗口分页沿截图权限；空页仍可能有后续游标，不能以count=0判断结束。 */
+static inline int sc_window_page(u32 *out,u32 words,u32 after){return sc_call(0x245,(int)out,words,after,0,0,0);}
+/* 8字快照：版本/流类型/可读/可写/错误/EOF/可读字节/控制事件序号。
+ * 查询后等待STREAM，再重查本人fd；事件是状态变化提示，不能代替IO返回。 */
+static inline int sc_stream_ready(int fd,u32 out[8]){return sc_call(0x247,fd,(int)out,0,0,0,0);}
+/* 原TTF脸编号12/16，完整16字信息；旧FONTINFO四字合同不变。 */
+static inline int sc_fontinfo2(u32 face,u32 out[16]){return sc_call(0x248,face,(int)out,0,0,0,0);}
+#define SC_FONT_BITMAP_WORDS 400
+/* 请求像素1..64，输出400字：16字指标头＋96行×4字(每字bit31在左)。
+ * 返回真实前进宽，缺字0且仍输出同脸.notdef；负数不写输出。
+ * 头字段/旧字形兼容合同见FONT.md，words是完整缓冲容量。 */
+static inline int sc_glyph_bitmap(u32 scalar,u32 face,u32 pixels,u32 *out,u32 words)
+{return sc_call(0x249,scalar,face,pixels,(int)out,words,0);}
 static inline int sc_arguments2(char *out,u32 capacity){return sc_call(0x21C,(int)out,capacity,0,0,0,0);}
 static inline int sc_simd_info(u32 *out){return sc_call(0x21D,(int)out,0,0,0,0,0);}
 static inline int sc_module_exec(const char *path,int resident){return sc_call(0x21E,(int)path,resident,0,0,0,0);}
@@ -465,4 +502,44 @@ static inline int sc_power2(int restart){return sc_call(0x236,restart,0,0,0,0,0)
 /* 独立新增调用，不借旧WINDOWCTRL忽略的寄存器修改公开语义。 */
 static inline int sc_window_place(int handle,int x,int y,int width,int height)
 {return sc_call(0x23C,handle,x,y,width,height,0);}
+/* M10a1追加网络入口，不重定义旧功能号/忽略寄存器/旧缓冲。
+ * 地址为4xu32:1,主机序IPv4数,主机序端口,0；每次数据调用≤65536B。
+ * -11是暂时不可用，-115连接进行中，错误为负；没有内核阻塞socket。
+ * 各对象固定归创建PID及代数，不能靠同UID或猜句柄共享。 */
+#define SC_NET_INFO_WORDS 96u
+#define SC_NET_CONTROL_WORDS 32u
+#define SC_NET_TCP 1u
+#define SC_NET_UDP 2u
+#define SC_NET_ICMP 3u
+#define SC_NET_ARP 4u
+#define SC_NET_READ 1u
+#define SC_NET_WRITE 2u
+#define SC_NET_ERROR 4u
+#define SC_NET_HUP 8u
+#define SC_NET_ACCEPT 16u
+static inline int sc_net_info(u32 out[96]){return sc_call(0x250,(int)out,0,0,0,0,0);}
+static inline int sc_net_control(u32 operation,const u32 in[32]){return sc_call(0x251,operation,(int)in,0,0,0,0);}
+static inline int sc_socket(u32 type,u32 protocol){return sc_call(0x252,type,protocol,0,0,0,0);}
+static inline int sc_socket_bind(u32 handle,const u32 address[4]){return sc_call(0x253,handle,(int)address,0,0,0,0);}
+static inline int sc_socket_connect(u32 handle,const u32 address[4]){return sc_call(0x254,handle,(int)address,0,0,0,0);}
+static inline int sc_socket_listen(u32 handle,u32 backlog){return sc_call(0x255,handle,backlog,0,0,0,0);}
+static inline int sc_socket_accept(u32 handle,u32 address[4]){return sc_call(0x256,handle,(int)address,0,0,0,0);}
+static inline int sc_socket_send(u32 handle,const void *data,u32 bytes,const u32 *address){return sc_call(0x257,handle,(int)data,bytes,(int)address,0,0);}
+static inline int sc_socket_receive(u32 handle,void *data,u32 bytes,u32 *address){return sc_call(0x258,handle,(int)data,bytes,(int)address,0,0);}
+static inline int sc_socket_shutdown(u32 handle,u32 how){return sc_call(0x259,handle,how,0,0,0,0);}
+static inline int sc_socket_close(u32 handle){return sc_call(0x25A,handle,0,0,0,0,0);}
+static inline int sc_socket_status(u32 handle,u32 out[16]){return sc_call(0x25B,handle,(int)out,0,0,0,0);}
+static inline int sc_socket_option(u32 handle,u32 option,u32 value){return sc_call(0x25C,handle,option,value,0,0,0);}
+static inline int sc_socket_page(u32 cursor,u32 *out,u32 words){return sc_call(0x25D,(int)out,words,cursor,0,0,0);}
+static inline int sc_route_page(u32 cursor,u32 *out,u32 words){return sc_call(0x25E,(int)out,words,cursor,0,0,0);}
+static inline int sc_arp_page(u32 cursor,u32 *out,u32 words){return sc_call(0x25F,(int)out,words,cursor,0,0,0);}
+static inline int sc_dns_start(const char *name){return sc_call(0x260,(int)name,0,0,0,0,0);}
+static inline int sc_dns_status(u32 ticket,u32 out[8]){return sc_call(0x261,ticket,(int)out,0,0,0,0);}
+static inline int sc_dns_cancel(u32 ticket){return sc_call(0x262,ticket,0,0,0,0,0);}
+/* 新网络执行入口：三个描述符必须是stdin读管道、stdout/stderr写
+ * 管道。返回可wait的作业票据。普通身份不提升；外部SYSTEM明确
+ * 调用时子进程为root，绝不继承UART端点或串口零环管理票据。
+ * 老SPAWN2的flags/权限/继承语义保持。 */
+static inline int sc_net_exec(const char *command,const int descriptors[3])
+{return sc_call(0x263,(int)command,(int)descriptors,0,0,0,0);}
 #endif

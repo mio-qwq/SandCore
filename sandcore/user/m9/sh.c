@@ -27,8 +27,9 @@ static char source[32768],expanded[1024],launch[1024];
 static u8 expansion_mask[32768];static int expansion_quoted,heredoc_expanding;
 static shell_heredoc heredocs[16];static int heredoc_count;
 static char interactive_source[32768];
-static u32 background[16];
-static u32 background_pid[16],last_background_pid;
+typedef struct {u32 ticket,pid;} shell_background;
+static shell_background *background;
+static u32 background_capacity,last_background_pid;
 static int background_count;
 static char pending_input[1024];
 static int pending_count,pending_at;
@@ -38,6 +39,17 @@ static int expand_token(int,char *,int);
 static int expand_token_mode(int,char *,int,int);
 static int quote_argument(char *,int *,const char *);
 static int wait_job(u32,int);
+static int background_reserve(void)
+{
+    if((u32)background_count<background_capacity)return 0;
+    /* 后台作业跟真实用户私有页一起增长。先申请完整候选再拷贝，
+     * 失败保留旧票据；不能到第17个时偷偷改成前台wait。 */
+    u32 capacity=background_capacity?background_capacity*2:16;
+    if(capacity<background_capacity || capacity>0x7FFFFFFFu/sizeof(shell_background))return -1;
+    shell_background *fresh=sc_alloc(capacity*sizeof(shell_background));if(!fresh)return -1;
+    for(int i=0;i<background_count;i++)fresh[i]=background[i];
+    if(background)sc_free(background);background=fresh;background_capacity=capacity;return 0;
+}
 static int substitution(int,int,char *,int);
 static int spawn_text(const char *,u32,int *);
 static int execute_with_fds(const char *,int *);
@@ -437,13 +449,13 @@ static int builtin(char **args,int count,int fds[3],int *handled)
                 variables[found]=variables[--var_count];}else if(sc_env_set(args[i],0,1)<0)return 1;}return 0;
     }
     if(equal(args[0],"jobs")){
-        if(count!=1)return 2;for(int i=0;i<background_count;i++){u32 status[8];int r=sc_job_info2(background[i],status);
-            cli_number(fds[1],(int)background_pid[i]);cli_text(fds[1],r>0?" running\n":" finished\n");}return 0;
+        if(count!=1)return 2;for(int i=0;i<background_count;i++){u32 status[8];int r=sc_job_info2(background[i].ticket,status);
+            cli_number(fds[1],(int)background[i].pid);cli_text(fds[1],r>0?" running\n":" finished\n");}return 0;
     }
-    if(equal(args[0],"wait")){if(count==1){for(int i=0;i<background_count;i++)wait_job(background[i],0);background_count=0;return 0;}
+    if(equal(args[0],"wait")){if(count==1){for(int i=0;i<background_count;i++)wait_job(background[i].ticket,0);background_count=0;return 0;}
         int result=0;for(int a=1;a<count;a++){int pid;if(cli_integer(args[a],&pid)<0 || pid<=0)return 2;int found=-1;
-            for(int i=background_count-1;i>=0;i--)if(background_pid[i]==(u32)pid){found=i;break;}
-            if(found<0){result=127;continue;}result=wait_job(background[found],0);for(int i=found;i+1<background_count;i++){background[i]=background[i+1];background_pid[i]=background_pid[i+1];}background_count--;}
+            for(int i=background_count-1;i>=0;i--)if(background[i].pid==(u32)pid){found=i;break;}
+            if(found<0){result=127;continue;}result=wait_job(background[found].ticket,0);for(int i=found;i+1<background_count;i++){background[i].ticket=background[i+1].ticket;background[i].pid=background[i+1].pid;}background_count--;}
         return result;}
     if(equal(args[0],".") || equal(args[0],"source")){
         if(count<2)return 2;int fd=sc_stream_open(args[1],1,0);if(fd<0)return 1;u32 bytes;char *text=cli_slurp(fd,32767,&bytes);sc_stream_close(fd,0);if(!text)return 1;
@@ -577,9 +589,10 @@ static int command(int index,int defaults[3],int asynchronous)
     /* 程序名不带引号交给内核PATH解析；后续参数保留引号和转义。 */
     int length_used=0;copy(launch,args[first],sizeof(launch));length_used=length(launch);
     for(int i=first+1;i<count;i++)if(quote_argument(launch,&length_used,args[i])<0){result=2;goto done;}
+    if(asynchronous && background_reserve()){result=cli_error("background memory",-4);goto done;}
     int job=sc_spawn2(launch,fds,0);if(job<0){result=cli_error(args[first],job);goto done;}
     if(asynchronous){u32 state[8];if(sc_job_info2((u32)job,state)<0){result=1;goto done;}last_background_pid=state[5];
-        if(background_count==16){result=wait_job((u32)job,0);}else{background_pid[background_count]=state[5];background[background_count++]=(u32)job;result=0;}}
+        background[background_count++]=(shell_background){(u32)job,state[5]};result=0;}
     else result=wait_job((u32)job,defaults[0]==0);
 done:
     /* exec创建时环境快照已归子进程；前缀赋值不污染父Shell下一条命令。
@@ -673,11 +686,12 @@ static int evaluate_inner(int node,int fds[3])
     else if(n->kind==NEGATE)result=!evaluate(n->a,fds);
     else if(n->kind==PIPELINE)result=run_pipeline(node,fds);
     else if(n->kind==BACKGROUND){
+        if(background_reserve())return cli_error("background memory",-4);
         int child_fds[3]={fds[0],fds[1],fds[2]},null_input=-1;
         if(fds[0]==0){null_input=sc_stream_open("/DEV/NULL",4,0);if(null_input<0)return 1;child_fds[0]=null_input;}
         int job=spawn_fragment(n->a,child_fds);if(null_input>=0)sc_stream_close(null_input,0);if(job<0)result=1;
         else {u32 state[8];if(sc_job_info2((u32)job,state)<0)result=1;else {last_background_pid=state[5];
-            if(background_count==16)result=wait_job((u32)job,0);else {background_pid[background_count]=state[5];background[background_count++]=(u32)job;}}}
+            background[background_count++]=(shell_background){(u32)job,state[5]};}}
     }else if(n->kind==SUBSHELL){int job=spawn_fragment(n->a,fds);result=job<0?1:wait_job((u32)job,fds[0]==0);}
     else if(n->kind==CONDITION)result=evaluate(n->a,fds)?evaluate(n->c,fds):evaluate(n->b,fds);
     else if(n->kind==FUNCTION){char name[32];if(expand_token(n->b,name,32)<=0)return 2;
@@ -727,6 +741,27 @@ static void prompt(void)
     char user[32],cwd[64];u32 identity[8];sc_user(0,"",user,32);sc_user(2,"",cwd,64);sc_auth_info(identity);
     cli_text(1,user);cli_text(1," ");cli_text(1,cwd);cli_text(1,(int)identity[1]==-1?" [SYSTEM] # ":identity[1]==0?" # ":" $ ");
 }
+static int run_input_script(void)
+{
+    /* 管道/文件/网络程序输入是脚本流，不输出欢迎语、提示符或输入
+     * 回显。逐行执行而不是等整个流EOF，才能让nc -e sh在连接仍
+     * 开着时执行命令/exit；不预读孩子或read内建还要消费的stdin。
+     * 未结束的引号/复合块继续收齐，EOF再按正式语法报告错误。 */
+    int used=0;collecting=1;
+    while(!leaving){int c=take_input();
+        if(c==-1){sc_event_wait(SC_EVENT_STREAM,0xFFFFFFFFu);continue;}
+        if(c==-3)return cli_error("sh: stdin",-1);
+        if(c==-2){if(used){if(used+1>=(int)sizeof(interactive_source))return 2;
+                interactive_source[used++]='\n';interactive_source[used]=0;}
+            if(used){collecting=0;last_status=execute_source(interactive_source);}break;}
+        if(!c || (c<32 && c!='\t' && c!='\r' && c!='\n'))return cli_error("sh: script control byte",-1);
+        if(c=='\r')continue;
+        if(used+1>=(int)sizeof(interactive_source))return cli_error("sh: script capacity",-1);
+        interactive_source[used++]=(char)c;interactive_source[used]=0;
+        if(c=='\n'){last_status=execute_source(interactive_source);if(!incomplete)used=0;}
+    }
+    return leaving?exit_status:last_status;
+}
 int main(void)
 {
     if(cli_parse()<0)return 2;
@@ -741,7 +776,7 @@ int main(void)
         positional_count=cli_argc>3?cli_argc-3:0;for(int i=0;i<positional_count;i++)positional[i]=cli_argv[i+3];
         int result=execute_source(cli_argv[1]);return leaving?exit_status:result;
     }
-    if(cli_argc && !equal(cli_argv[0],"--serial")){
+    if(cli_argc && !equal(cli_argv[0],"--serial") && !equal(cli_argv[0],"-i")){
         script_name=cli_argv[0];positional_count=cli_argc-1;for(int i=0;i<positional_count;i++)positional[i]=cli_argv[i+1];
         int fd=sc_stream_open(cli_argv[0],1,0);if(fd<0)return cli_error("sh",fd);
         u32 n;char *text=cli_slurp(fd,32767,&n);sc_stream_close(fd,0);if(!text)return cli_error("sh: script size/read",-1);
@@ -751,6 +786,9 @@ int main(void)
     u8 probe;int input=sc_stream_read(0,&probe,0);
     if(input<0){int window=sc_open_rgb("SandShell",720,430);if(window<0)return 1;
         if(sc_terminal(window,0)<0 || sc_tty(window)<0)return 1;}
+    u32 terminal[8];int explicit_interactive=cli_argc && (equal(cli_argv[0],"--serial") || equal(cli_argv[0],"-i"));
+    if(!explicit_interactive){if(sc_terminal_info2(0,terminal)<0)return cli_error("sh: stdin info",-1);
+        if(terminal[1]!=4u && terminal[1]!=5u)return run_input_script();}
     cli_text(1,"SandShell M9\n");char line[1024];int used=0,source_used=0;collecting=1;prompt();
     while(!leaving){
         int c=take_input();if(c==-1){sc_yield();continue;}if(c<0)break;

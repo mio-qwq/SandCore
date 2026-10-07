@@ -7,17 +7,26 @@
 static char cli_argument_text[1024];
 static char *cli_argv[CLI_ARGS];
 static int cli_argc;
+static void cli_wait_io(int fd,int writing)
+{
+    u32 ready[8];
+    if(sc_stream_ready(fd,ready)<0)return;
+    if(ready[writing?3:2])return;
+    /* 检查与等待间的变化保留为sticky事件；共享管道/TTY按实际订阅链
+     * 唤醒。返回后仍重试IO，另一个读者先消费不会把提示当成正文。 */
+    sc_event_wait(SC_EVENT_STREAM|SC_EVENT_INPUT,0xFFFFFFFFu);
+}
 static int cli_write(int fd,const void *bytes,u32 n)
 {
     u32 at=0;while(at<n){u32 chunk=n-at;if(chunk>65536)chunk=65536;int result=sc_stream_write(fd,(const u8 *)bytes+at,chunk);
-        if(result==-6){sc_yield();continue;}if(result<=0)return result?result:-1;at+=(u32)result;}return (int)at;
+        if(result==-6){cli_wait_io(fd,1);continue;}if(result<=0)return result?result:-1;at+=(u32)result;}return (int)at;
 }
 static int cli_text(int fd,const char *text){return cli_write(fd,text,(u32)length(text));}
 static void cli_number(int fd,int value){char text[12];decimal(text,value);cli_text(fd,text);}
 static int cli_error(const char *what,int code)
 {cli_text(2,what);cli_text(2,": ");cli_number(2,code);cli_text(2,"\n");return 1;}
 static int cli_read(int fd,void *bytes,u32 n)
-{if(n>65536)n=65536;for(;;){int result=sc_stream_read(fd,bytes,n);if(result!=-6)return result;sc_yield();}}
+{if(n>65536)n=65536;for(;;){int result=sc_stream_read(fd,bytes,n);if(result!=-6)return result;cli_wait_io(fd,0);}}
 static int cli_parse(void)
 {
     if(sc_arguments2(cli_argument_text,sizeof(cli_argument_text))<0)return -1;

@@ -4,7 +4,7 @@
 #include "io.h"
 
 /* SandFS v5权限/事务接口 —— 完整合同见docs/FS.md。
- * 独立IDE盘LBA0超级块，两个192扇区目录bank，数据385起；1024个
+ * 独立IDE盘LBA0超级块，v5目录bank支持192/384/768/1536扇区；每个
  * 96B记录包含UID/GID/rw及持久对象代数，所有父目录显式记录。
  * 历史v1..v4兼容读；三环修改须先迁移副本。不会在旧数据区覆盖
  * 新目录，旧STAT仍8B。新盘COW/回收/CRC检测，不承诺扇区撕裂原子性。 */
@@ -28,6 +28,7 @@ int fs_stream_write(int owner,u32 token,const void *data,u32 length);
 int fs_stream_commit(int owner,u32 token);
 int fs_stream_abort(int owner,u32 token);
 void fs_stream_stop(int owner);
+int fs_stream_stop_step(int owner);
 
 void fs_init(void);                            /* 校验超级块/目录/范围，失败呈现空盘 */
 void fs_storage_info(u32 *out);                 /* 固定32字只读；STORAGE.md字段表 */

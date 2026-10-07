@@ -1,6 +1,12 @@
 #ifndef SANDCORE_DESKTOP_H
 #define SANDCORE_DESKTOP_H
 #include "io.h"
+void desktop_session_destroy(u32 id);
+int desktop_session_prepare(u32 id);
+void desktop_session_activate(u32 id);
+/* 只推进可见桌面原始图片，task0每轮统一16KiB/两tick软预算。
+ * 隐藏会话保留自己的候选并停止IO，切回继续；注销释放未完成页。 */
+void desktop_poll(void);
 /* mio：桌面和开始菜单的条目来自文件。内核只负责注册表的尺寸/语法
  * 与命中，不硬编码应用名称列表；command 可带 EXEC 已支持的参数。 */
 typedef struct {char label[32],command[128],link[64],iconspec[64];int used;} desk_item_t;

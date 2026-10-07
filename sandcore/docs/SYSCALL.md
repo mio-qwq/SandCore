@@ -492,3 +492,42 @@ x/y为物理像素外框左上角，宽高为物理客户区尺寸。定位原�
 
 
 修订：2026-10-05，本轮播放器07双盘88项、整数无FPU20项、身份/旧程序54项、默认音效/关机和宿主进度17项通过，范围与全部失败见M9-VERIFICATION.md；独立FLAC试玩包保留旧基线/会话，完整M9仍未验收。
+
+### M10a1分页任务查询（新增源码，未构建/未运行）
+
+| 号 | 名称 | 入参 | 返回/合同 |
+|---|---|---|---|
+| 0x240 | PROCESSPAGE / sc_process_page | EBX=输出，ECX=容量u32数32..1040，EDX=上次游标；0xFFFFFFFF开始 | EAX=本页行数，-1非法；ESI/EDI/EBP继续忽略 |
+
+头16个u32：`1,16,16,count,cursor,owned_count,high_water,tick,total,idle,kernel,user,graphics,100,record_pages,all_task_pages`。
+`cursor`是本页最后PID（还有后续时），0xFFFFFFFF表示结束。每行16个u32：`pid,state,generation,uid,gid,running_samples,dispatches,session,name[12B],detail_allowed,exit_code,waiting,wait_mask,pending_events`；name占第8..10字。每次最多64行，只是单页容量，循环查询可枚举全部已持有任务。任务0/本人/同UID/管理者可读名称、样本、会话、等待和僵尸退出码；其它行相应字段清零。会话为独立登录会话编号，等待不改变旧state编码。返回的内存统计仅计任务记录与旁表，不包括程序私有页、流全局池、定时堆或图形资源。
+
+内核验证完整声明缓冲，但只写`16+floor((words-16)/16)*16`字，尾部不足一行的余数不写。一次调用在IF=0取同代状态/CPU信息；跨页不冻结任务创建/退出，PID复用须核对代数，不把游标当内核地址。SCAPI提供528字（32行）的便捷缓冲常量。
+
+旧0x26 MONITOR=48字/8行、0x79 CPUINFO=64字/8行、0x21B PROCESSINFO2=520字/32行、0x237 CPUINFO2=200字/32行完全保留，不能随动态编号高水位扩大写入、要求更大缓冲或使用旧忽略寄存器加入分页。新增ps/pidof/killall源码使用0x240；旧编译程序仍走旧缓冲合同。
+
+修订：2026-10-06，冻结旧8/32行任务快照，追加0x240分页/同次CPU样本合同与SCAPI包装；未构建/未运行，旧证据不覆盖。
+
+## M10a1 会话与等待新增入口（源码未验证）
+
+0x241 EVENTWAIT、0x242 SESSIONPAGE、0x243 SESSIONCONTROL、0x244 VISIBILITY、0x245 WINDOWPAGE、0x246 SESSIONPATH、0x247 STREAMREADY的精确寄存器、缓冲、事件位和权限表见[SESSION.md](SESSION.md)。窗口分页保留截图权限，流就绪只查本人描述符，二者均有实际源码而未构建/运行。旧调用忽略的寄存器继续忽略，所有历史快照仍原长度；新入口验证完整用户范围，分页尾不足一行不写。
+
+AUTHEXEC保留旧activate返回值、忽略参数和票据取消语义，身份不会原地改变；登录建立独立桌面。历史未声明可见性的GUI保留未执行绘制陷入，恢复后在本人CR3走原分发；这是新增会话隔离的兼容路径，不能丢弃已接受的增量调用。所有路径尚无本轮运行证据。
+
+修订：2026-10-06，补0x245窗口分页与0x247流就绪的真实源码合同、缓冲及权限；未构建未运行。
+
+0x248 FONTINFO2为独立16字指标快照，0x249 GLYPHBITMAP为独立400字位图/指标输出；参数、缺字及错误语义见[FONT.md](FONT.md)。0x1A/1B/1D的1024B/32B/16B历史缓冲、字形前缀和SCF统计不改，完整字体覆盖数只在新入口报告。新代码未构建未运行。
+
+修订：2026-10-06，追加原TTF完整指标/位图0x248/249，旧字形/API缓冲冻结。
+
+修订：2026-10-06，追加会话/可见性/事件等待与任务分页等待字段，未构建/未运行。
+
+## M10a1 网络新增入口（源码未验证）
+
+0x250..262提供独立INFO96字/CONTROL32字、TCP/UDP/ICMP/ARP socket、创建/绑定/连接/监听/接受/收发/半关闭/关闭/状态/选项、16字头分页及DNS票据。0x263 NETEXEC以EBX=命令、ECX=三个i32管道描述符12B返回作业票据，供用户明确要求的nc -e；普通身份不提升，外部SYSTEM明确调用的新孩子为root/AUTH_NORMAL，无串口会话票据/UART端点。旧0x218 SPAWN2不增加flags、不改继承。其余寄存器仍忽略，非法用户范围-14，先完整验证再变更。
+
+精确寄存器、字布局、分配/就绪/负返回值、文件主体权限和生命周期见[NETWORK.md](NETWORK.md)。Socket/ARP/route分页0开始/0结束，socket扫描预算导致空页仍可有非零游标。SCAPI页面包装为(cursor,out,words)，不将包装参数序误作寄存器序。接口为SandCore专用ABI，不引入BSD socket/libc缓冲约定。
+
+2026-10-07：0x25C SOCKETOPT新增选项5 REUSEADDR，值仅0/1、TCP或UDP，默认0。nc的TCP监听在绑定前使用1，保留真实TIME_WAIT并按四元组处理旧报文；不扩大其它身份权限。原调用号/寄存器、选项1TTL/2UDP广播/3TCP keepalive/4TCP NODELAY及所有旧返回/缓冲布局不变，SCNET.H仅增加具名常量。构建通过，双来源重用/其它选项边界及旧程序回归仍待验。
+
+修订：2026-10-06，追加0x250..263实际源码/ABI及nc -e新管道程序合同；18工具源码18、构建/行为0，全部未运行。

@@ -1,7 +1,7 @@
 /* =====================================================================
- * mio：Monitor的M8实现，第一阶段整合；当前整合版本尚未验证。
+ * mio：Monitor沿用M8原生布局，M10任务分页候选尚未构建/验证。
  * 合同先见docs/MONITOR.md、CPU.md、STORAGE.md。图形、分页、
- * 历史均在三环私有页，所有数据来自原有只读快照，不改变ABI。
+ * 历史均在三环私有页；M10任务列表来自新增分页，旧快照ABI不变。
  *
  * 充足空间保留CPU/RAM历史和任务总览，紧凑窗口优先真实数据行，
  * 细分/历史另有页面；不能用固定坐标挤出高缩放客户区。Freeze只
@@ -12,7 +12,11 @@
 #include "NUI.inc"
 static u32 snapshot[48],storage[SC_STORAGE_WORDS],cpu[SC_CPU_WORDS],before[SC_CPU_WORDS];
 static u32 history[120],memory_history[120],memory_history_valid[120];
-static int task_percent[8],cursor,samples,last_sample,frozen,view,first_task,first_volume,first_metric;
+typedef struct {u32 row[16],total;int percentage,valid;} monitor_task;
+typedef struct {monitor_task *rows;u32 count,capacity;} monitor_task_snapshot;
+static monitor_task_snapshot tasks,task_staging;
+static int task_valid,task_baseline_valid;
+static int cursor,samples,last_sample,frozen,view,first_task,first_volume,first_metric;
 static int cpu_valid,baseline_valid,monitor_valid,storage_valid;
 static int cpu_busy,cpu_idle,cpu_kernel,cpu_user,cpu_graphics;
 static int monitor_y,monitor_bottom,task_y,visible_tasks,volume_rows,metric_rows,small_window;
@@ -23,22 +27,66 @@ static int percent(u32 value,u32 total)
 {
     if(!total)return 0;
     if(value>=total)return 100;
-    /* value*100可能先溢出而最终比例仍合法。累加100次并取模得到
-     * 同一向下取整结果。rest<total；只有rest<total-value才相加，
-     * 因此加法也不会溢出。不依赖浮点/64位运行库，成本有界。
-     * 复用槽取新代计数，不能减上一代；超本窗口的值夹100。 */
+    /* 按100的七个二进制位做精确乘除，避免value*100先溢出。
+     * rest始终小于total：翻倍和加value先减补数，32位无溢出，
+     * 不引入浮点/64位运行库。动态任务列表不能逐行累加100次。
+     * 超出本窗口的值夹100；实际耗时仍需同配置对照验证。 */
     int result=0;u32 rest=0;
-    for(int i=0;i<100;i++){
-        if(rest>=total-value){rest-=total-value;result++;}
-        else rest+=value;
+    for(int bit=6;bit>=0;bit--){
+        result*=2;
+        if(rest>=total-rest){rest-=total-rest;result++;}else rest*=2;
+        if(100u&(1u<<bit)){
+            if(rest>=total-value){rest-=total-value;result++;}else rest+=value;
+        }
     }
     return result;
+}
+static int task_reserve(monitor_task_snapshot *target)
+{
+    if(target->count<target->capacity)return 0;
+    u32 capacity=target->capacity?target->capacity*2:32;
+    if(capacity<target->capacity || capacity>0x7FFFFFFFu/sizeof(monitor_task))return -1;
+    monitor_task *rows=sc_alloc(capacity*sizeof(monitor_task));if(!rows)return -1;
+    for(u32 i=0;i<target->count;i++)rows[i]=target->rows[i];
+    if(target->rows)sc_free(target->rows);target->rows=rows;target->capacity=capacity;return 0;
+}
+static int task_collect(void)
+{
+    u32 page[SC_PROCESS_PAGE_WORDS],after=0xFFFFFFFFu,old=0;task_staging.count=0;
+    do{
+        if(sc_process_page(page,SC_PROCESS_PAGE_WORDS,after)<0 || page[0]!=1 || page[1]!=16 || page[2]!=16 || page[3]>(SC_PROCESS_PAGE_WORDS-16)/16)return -1;
+        for(u32 i=0;i<page[3];i++){
+            u32 *source=page+16+i*16;if(!source[1])continue;
+            if(task_staging.count && source[0]<=task_staging.rows[task_staging.count-1].row[0])return -1;
+            if(task_reserve(&task_staging))return -1;monitor_task *row=task_staging.rows+task_staging.count++;
+            for(u32 j=0;j<16;j++)row->row[j]=source[j];row->total=page[8];row->percentage=row->valid=0;
+            /* PID顺序两链线性匹配，名称/代数/样本来自同一个行快照。
+             * 每行用本页PIT总样本求差，不把跨页采样当全局原子快照。
+             * 第一见、新代数或无权明细显示--，不继承旧槽的百分比。 */
+            while(old<tasks.count && tasks.rows[old].row[0]<source[0])old++;
+            if(old<tasks.count){monitor_task *previous=tasks.rows+old;
+                u32 elapsed=row->total-previous->total;
+                if(task_baseline_valid && previous->row[0]==source[0] && previous->row[2]==source[2] && previous->row[11] && source[11] && elapsed){
+                    row->percentage=percent(source[5]-previous->row[5],elapsed);row->valid=1;
+                }
+            }
+        }
+        u32 next=page[4];if(next!=0xFFFFFFFFu && (!page[3] || (after!=0xFFFFFFFFu && next<=after)))return -1;
+        after=next;
+    }while(after!=0xFFFFFFFFu);
+    /* 完整收集才交换；OOM或非法页保留最后正文，界面明确报告不可用。
+     * staging复用自己的页，不在每次采样重新分配全部任务记录。 */
+    monitor_task_snapshot swap=tasks;tasks=task_staging;task_staging=swap;return 0;
 }
 static void baseline(void)
 {
     u32 next[SC_CPU_WORDS];
     baseline_valid=!sc_cpu(next)&&next[0]==1&&next[8]==8;
     if(baseline_valid)for(int i=0;i<SC_CPU_WORDS;i++)before[i]=next[i];
+    for(u32 i=0;i<tasks.count;i++)tasks.rows[i].valid=0;
+    /* Refresh/Resume先读新任务页。只有该次完整成功才以它建立基点；
+     * 若此时OOM，后续第一页不能减冻结前留下的正文/CPU计数。 */
+    task_baseline_valid=task_valid;
     last_sample=sc_tick();cpu_valid=0;
 }
 static void snapshots(void)
@@ -46,8 +94,11 @@ static void snapshots(void)
     u32 next[48],disk[SC_STORAGE_WORDS];
     monitor_valid=!sc_monitor(next)&&next[0]==1&&next[5]==8;
     storage_valid=!sc_storage(disk)&&disk[0]==1;
+    task_valid=task_collect()==0;
+    task_baseline_valid=task_valid;
     /* 每类完整成功才提交；失败保留原副本和历史但明确标不可用。
-     * 三次调用不构成原子全系统快照，不能声称名字与CPU同周期。 */
+     * 独立调用不构成原子全系统快照；每个任务行的名字/代数/CPU
+     * 同次复制，整表与全局CPU/磁盘并非同一采样时刻。 */
     if(monitor_valid)for(int i=0;i<48;i++)snapshot[i]=next[i];
     if(storage_valid)for(int i=0;i<SC_STORAGE_WORDS;i++)storage[i]=disk[i];
 }
@@ -62,10 +113,6 @@ static void sample(void)
     if(total){
         cpu_idle=percent(cpu[4]-before[4],total);cpu_kernel=percent(cpu[5]-before[5],total);
         cpu_user=percent(cpu[6]-before[6],total);cpu_graphics=percent(cpu[7]-before[7],total);cpu_busy=100-cpu_idle;
-        for(int i=0;i<8;i++){
-            u32 *a=cpu+16+i*6,*b=before+16+i*6;
-            task_percent[i]=percent(a[2]==b[2]?a[3]-b[3]:a[3],total);
-        }
         history[cursor]=(u32)cpu_busy;memory_history_valid[cursor]=(u32)monitor_valid;
         if(monitor_valid)memory_history[cursor]=snapshot[3]/1024;
         cursor=(cursor+1)%120;if(samples<120)samples++;
@@ -149,21 +196,22 @@ static void overview(void)
      * 图，不能把工具条后的monitor_y直接当任务列表；这个私有
      * 值也让只读验收在同一帧定位，绝不成为外部写入口。 */
     task_y=y+heading;
-    visible_tasks=(monitor_bottom-y-heading-2)/22;if(visible_tasks>8)visible_tasks=8;
+    visible_tasks=(monitor_bottom-y-heading-2)/22;if(visible_tasks>(int)tasks.count)visible_tasks=(int)tasks.count;
     ui_panel(16,y,UI_W-32,monitor_bottom-y);
-    ui_clip_set(24,y+2,UI_W-48,heading);ui_text(24,y+2,"TASKS / CPU %",PAL_UI_TEXT);ui_clip_clear();
-    if(!monitor_valid){ui_clip_set(24,y+heading,UI_W-48,monitor_bottom-y-heading);
+    char task_title[64],task_number[12];copy(task_title,"TASKS / CPU % / ",sizeof(task_title));decimal(task_number,(int)tasks.count);append(task_title,task_number,sizeof(task_title));
+    ui_clip_set(24,y+2,UI_W-48,heading);ui_text(24,y+2,task_title,PAL_UI_TEXT);ui_clip_clear();
+    if(!task_valid){ui_clip_set(24,y+heading,UI_W-48,monitor_bottom-y-heading);
         ui_text(24,y+heading,"Task snapshot unavailable",PAL_UI_ALERT);ui_clip_clear();return;}
     if(visible_tasks<1)return;
-    first_task=ui_clamp(first_task,0,8-visible_tasks);
-    const char *states[]={"empty","run","zombie","paused"};
+    first_task=ui_clamp(first_task,0,(int)tasks.count-visible_tasks);
+    const char *states[]={"empty","run","exit","paused"};
     ui_clip_set(24,task_y,UI_W-60,visible_tasks*22);
     for(int n=0;n<visible_tasks;n++){
-        int i=first_task+n,ty=task_y+n*22;u32 *row=snapshot+8+i*5;
+        int i=first_task+n,ty=task_y+n*22;monitor_task *entry=tasks.rows+i;u32 *row=entry->row;
         ui_number(24,ty,row[0],PAL_UI_MUTED);ui_text(64,ty,row[1]<4?states[row[1]]:"unknown",row[1]==3?PAL_UI_GOLD+7:PAL_UI_MUTED);
-        char name[13],label[13];task_name(name,(char *)(row+2));
-        ui_copy_utf8(label,i?name:"kernel",ui_clamp((UI_W-230)/8,2,13));ui_text(136,ty,label,PAL_UI_TEXT);
-        if(cpu_valid&&row[1])ui_number(UI_W-76,ty,task_percent[i],PAL_UI_CYAN+7);else ui_text(UI_W-76,ty,"--",PAL_UI_MUTED);
+        char name[13],label[13];task_name(name,(char *)(row+8));
+        ui_copy_utf8(label,!row[0]?"kernel":row[11]?name:"(private)",ui_clamp((UI_W-230)/8,2,13));ui_text(136,ty,label,PAL_UI_TEXT);
+        if(entry->valid)ui_number(UI_W-76,ty,entry->percentage,PAL_UI_CYAN+7);else ui_text(UI_W-76,ty,"--",PAL_UI_MUTED);
     }
     ui_clip_clear();arrows(UI_W-36,task_y,visible_tasks);
 }
@@ -230,6 +278,7 @@ static void menu_geometry(void)
 }
 static void draw(void)
 {
+    if(!ui_visible)return;
     visible_tasks=volume_rows=metric_rows=0;small_window=UI_W<276||UI_H<172;
     if(small_window){
         monitor_menu=0;ui_background(SC_THEME_FACE_ALT);int h=UI_H<22?UI_H:22;
@@ -257,7 +306,7 @@ static void draw(void)
 static void scroll(int down)
 {
     int step=down?1:-1;
-    if(view==0)first_task=ui_clamp(first_task+step,0,8-visible_tasks);
+    if(view==0)first_task=ui_clamp(first_task+step,0,(int)tasks.count-visible_tasks);
     else if(view==1)first_volume=ui_clamp(first_volume+step,0,8-volume_rows);
     else if(view==2)first_metric=ui_clamp(first_metric+step,0,8-metric_rows);
     else view=view==3?4:3;
@@ -267,7 +316,7 @@ int main(void)
     if(ui_open("Monitor / mio")<0)return 1;
     snapshots();baseline();ui_pointer();draw();ui_present();
     for(;;){
-        sample();if(!ui_frame_due())continue;
+        if(!ui_frame_due())continue;sample();
         ui_pointer();int was_menu=monitor_menu;draw();ui_present();
         int action=ui_action,key=(action||(was_menu&&(ui_pressed&1)))?-1:sc_key();
         if(action==98){sc_window(ui_win,1);continue;}
@@ -280,7 +329,7 @@ int main(void)
         if(action==5){view=0;int rows=visible_tasks>0?visible_tasks:1;
             /* Next循环真实可滚动的起点。不能先增到不可见起点
              * 再被draw夹回尾页，否则两行以上的尾页永远不回首。 */
-            first_task++;if(first_task>8-rows)first_task=0;}
+            first_task++;if(first_task>(int)tasks.count-rows)first_task=0;}
         if(action==20||key==0x80)scroll(0);if(action==21||key==0x81)scroll(1);
         if(key==0x82)view=(view+4)%5;if(key==0x83)view=(view+1)%5;
         if(!small_window&&(ui_pressed&2)){monitor_menu=!monitor_menu;menu_x=ui_x;menu_y=ui_y;}

@@ -2,7 +2,7 @@
 rem ============================================================
 rem  SandCore one-click build: WSL ELF first, MinGW fallback.
 rem  e.g.  build.bat   /  build.bat clean
-rem  Default target is M9. Output: build\m9-work.
+rem  Default target is M10a1. Output: build\m10a1-work.
 rem  (kept pure ASCII on purpose - see run.bat notes)
 rem ============================================================
 cd /d "%~dp0"
@@ -17,5 +17,5 @@ if errorlevel 1 (
     echo BUILD FAILED - see messages above.
     exit /b 1
 )
-echo M9 output: build\m9-work\sandcore.img and sanddata.img
+echo Default M10a1 output: build\m10a1-work\sandcore.img and sanddata.img
 exit /b 0

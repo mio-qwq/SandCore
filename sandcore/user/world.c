@@ -455,6 +455,7 @@ int main(void)
     else if(equal(args,"creative"))world_mode=2;
     generate();load_world();prepare_materials();world_sim_tick=sc_tick();aim();
     for(;;){
+        if(!ui_visibility_ready()){world_sim_tick=sc_tick();continue;}
         for(int key=sc_key();key>=0;key=sc_key()){
             ui_followup=1;
             if(key==27){

@@ -8,6 +8,7 @@ static int build_view_active,build_view_failed,build_view_done,build_view_total;
 static int build_view_tick,build_view_cancel;
 static void build_view_draw(void)
 {
+    if(!ui_visible)return;
     ui_header("Build tools","Native compiler / source to machine code");
     if(UI_W<260||UI_H<172){
         ui_text(16,36,"Enlarge for build details",PAL_UI_MUTED);
@@ -58,7 +59,7 @@ static int build_view_poll(const char *phase,int done,int total,int force)
     int tick=sc_tick();
     if(!force&&tick-build_view_tick<10)return build_view_cancel;
     build_view_tick=tick;
-    if(ui_win<0||!ui_pixels)return build_view_cancel;
+    if(ui_win<0||!ui_pixels||!ui_visibility_sample())return build_view_cancel;
     ui_pointer();build_view_draw();ui_present();
     int key=ui_action?-1:sc_key();
     if(ui_action==98){sc_window(ui_win,1);ui_followup=1;}

@@ -70,6 +70,25 @@ void paging_switch(u32 pd)
     __asm__ __volatile__("mov %0, %%cr3" :: "r"(pd) : "memory");
 }
 
+int paging_map_device(u32 base,u32 bytes)
+{
+    if(!paging_on || !bytes || (base&4095u) || (bytes&4095u) || bytes>0xFFFFFFFFu-base)return -1;
+    u32 end=base+bytes;
+    if(base<0x10000000u || (base<USER_HEAP_TOP && end>USER_HEAP_BASE))return -1;
+    for(u32 i=0;i<e820_count();i++){
+        e820_entry_t *entry=e820_entry(i);if(entry->type_lo!=E820_TYPE_USABLE || entry->type_hi)continue;
+        u64 lo=((u64)entry->base_hi<<32)|entry->base_lo;
+        u64 length=((u64)entry->len_hi<<32)|entry->len_lo,hi=lo+length;
+        if(hi<lo || (lo<(u64)end && hi>(u64)base))return -1;
+    }
+    for(u32 address=base;address<end;address+=4096u){
+        u32 *pt=(u32 *)(kernel_pd[address>>22]&~4095u);
+        pt[(address>>12)&1023u]=address|PTE_P|PTE_RW|0x018u;
+        __asm__ __volatile__("invlpg (%0)"::"r"(address):"memory");
+    }
+    return 0;
+}
+
 u32 paging_new_task_dir(void)
 {
     u32 pd = pt_alloc();                   /* 页目录 (新页, 全零) */

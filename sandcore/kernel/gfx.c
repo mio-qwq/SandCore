@@ -10,6 +10,7 @@
 #include "gfx.h"
 #include "memory.h"
 #include "display.h"
+#include "ttf.h"
 
 #define VGA_FB ((volatile u8 *)0xA0000)
 
@@ -329,7 +330,7 @@ void gfx_swap_rect(int x,int y,int w,int h)
 /* SCF-8 单字符 (font.h 的直角表, 0x20..0x7E), 透明底 */
 void gfx_char8(i32 x, i32 y, char ch, u8 color, i32 scale)
 {
-    const unsigned char *g = glyph_of(ch);
+    u8 g[8];gfx_font8((u8)ch,g);
     for (int r = 0; r < 8; r++)
         for (int c = 0; c < 8; c++)
             if ((g[r] >> (7 - c)) & 1)
@@ -390,6 +391,9 @@ int gfx_glyph16(u32 scalar,u16 *rows)
         name[2]=(char)(0x80|(scalar&63)); name[3]=0;
         glyph=zh16_find(name);
     }
+    if(!glyph && scalar>=32 && !(scalar>=127 && scalar<=159)){
+        int width=ttf_glyph16(scalar,rows);if(width>0)return width;
+    }
     for(int r=0;r<16;r++) {
         u16 bits=0;
         if(glyph) {
@@ -398,6 +402,13 @@ int gfx_glyph16(u32 scalar,u16 *rows)
         rows[r]=bits;
     }
     return glyph?16:0;
+}
+int gfx_layout_glyph16(u32 scalar,u16 *rows)
+{int width=ttf_glyph16(scalar,rows);return width>0?width:gfx_glyph16(scalar,rows);}
+void gfx_font8(u32 scalar,u8 rows[8])
+{
+    if(scalar>=32 && scalar<=126 && ttf_font8(scalar,rows)>=0)return;
+    const u8 *source=glyph_of((char)scalar);for(u32 i=0;i<8;i++)rows[i]=source[i];
 }
 void gfx_font_info(u32 *info)
 {
@@ -408,7 +419,7 @@ void gfx_char16(i32 x,i32 y,const char *utf8,u8 fg,u8 bg)
 {
     u32 scalar=0xFFFD; u16 rows[16];
     gfx_utf8_next(&utf8,&scalar);
-    int width=gfx_glyph16(scalar,rows); if(!width) width=16;
+    int width=gfx_layout_glyph16(scalar,rows); if(!width) width=16;
     for(int r=0;r<16;r++) for(int c=0;c<width;c++) {
         if(rows[r]&(0x8000u>>c)) gfx_pset(x+c,y+r,fg);
         else if(bg) gfx_pset(x+c,y+r,bg);
@@ -421,7 +432,7 @@ void gfx_text16(i32 x,i32 y,const char *text,u8 fg,u8 bg)
         gfx_utf8_next(&text,&scalar);
         if(scalar=='\n') { x=left; y+=18; continue; }
         if(scalar=='\r') { x=left; continue; }
-        int width=gfx_glyph16(scalar,rows); if(!width) width=16;
+        int width=gfx_layout_glyph16(scalar,rows); if(!width) width=16;
         for(int r=0;r<16;r++) for(int c=0;c<width;c++) {
             if(rows[r]&(0x8000u>>c)) gfx_pset(x+c,y+r,fg);
             else if(bg) gfx_pset(x+c,y+r,bg);

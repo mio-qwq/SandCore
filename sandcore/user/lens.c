@@ -198,6 +198,9 @@ static void prepare_fit(int width,int height)
 }
 static void draw(void)
 {
+    /* 首帧也可在其它登录会话创建；图像预览直接写用户画布，必须
+     * 在这个入口止住，不能只依赖NUI控件的隐藏像素保护。 */
+    if(!ui_visible)return;
     small_window=UI_W<276||UI_H<148;
     viewport_w=viewport_h=0;
     if(small_window){

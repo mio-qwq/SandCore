@@ -47,7 +47,7 @@ static int cfg_text_valid(const char *p,int n)
     return 1;
 }
 static void cfg_candidate_path(char *path)
-{char number[12];copy(path,"HOME/.SETTINGS-",64);decimal(number,ui_win);append(path,number,64);append(path,".CFG",64);}
+{settings_temporary(path);settings_make_directory();}
 static int cfg_staged_save(int kind,const char *body,int n)
 {
     char candidate[64];cfg_candidate_path(candidate);
@@ -61,15 +61,21 @@ static int cfg_staged_save(int kind,const char *body,int n)
 }
 static void cfg_user_read(void)
 {
-    sc_user(0,0,user_name,sizeof(user_name));sc_user(1,0,user_home,sizeof(user_home));user_dirty=0;
+    sc_user(0,0,user_name,sizeof(user_name));sc_user(4,"HOME",user_home,sizeof(user_home));user_dirty=0;
 }
 static char *cfg_trim(char *p)
 {while(*p==' '||*p=='\t')p++;int n=length(p);while(n&&(p[n-1]=='\r'||p[n-1]==' '||p[n-1]=='\t'))p[--n]=0;return p;}
 static void cfg_env_read(void)
 {
     u32 info[2];env_loaded=0;
-    if(sc_stat("SYS/ENV.CFG",info)||info[0]!=1||info[1]>=4096){copy(status,"ENV.CFG unavailable; use Config files",sizeof(status));return;}
-    int n=sc_read("SYS/ENV.CFG",cfg_scratch,(int)info[1]);
+    if(sc_stat(settings_paths[1],info)){
+        /* 新账户默认环境已由内核建立，首份配置尚未保存时仍可编辑PATH。
+         * 不复制其它会话的运行时环境，也不在打开表单时自动写入磁盘。 */
+        copy(env_names[0],"PATH",32);copy(env_values[0],"/BIN:/APPS",256);
+        env_count=1;env_selected=env_first=env_dirty=0;env_loaded=1;return;
+    }
+    if(info[0]!=1||info[1]>=4096){copy(status,"ENV.CFG invalid; use Config files",sizeof(status));return;}
+    int n=sc_read(settings_paths[1],cfg_scratch,(int)info[1]);
     if(n!=(int)info[1]||!cfg_text_valid(cfg_scratch,n))return;
     cfg_scratch[n]=0;char *p=cfg_scratch;int row=0,count=0;
     while(*p){
@@ -129,8 +135,8 @@ static int cfg_save(void)
      * 仍能编辑，但不借此绕过核心写保护。显示只存下次启动，当前
      * 模式继续由Display页的15秒预览流程管理。 */
     int r=0,n=cfg_used,kind=-1,known_user=-1;u32 info[2];
-    if(cfg_equal(cfg_path,"SYS/USER.CFG"))known_user=0;
-    if(cfg_equal(cfg_path,"SYS/ENV.CFG"))known_user=1;
+    if(cfg_equal(cfg_path,settings_paths[0]))known_user=0;
+    if(cfg_equal(cfg_path,settings_paths[1]))known_user=1;
     if(known_user>=0){
         if(!cfg_staged_save(known_user,cfg_text,n))return 0;
         cfg_dirty=0;
@@ -139,21 +145,21 @@ static int cfg_save(void)
         if(known_user==0)cfg_user_read();else cfg_env_read();
         return 1;
     }
-    if(cfg_equal(cfg_path,"SYS/MENU.CFG"))kind=0;
+    if(cfg_equal(cfg_path,settings_paths[3]))kind=0;
     int size=length(cfg_path);
-    if(cfg_prefix(cfg_path,"DESK/")&&size>=4&&cfg_equal(cfg_path+size-4,".LNK"))kind=1;
-    if(cfg_equal(cfg_path,"SYS/THEME.CFG")||cfg_prefix(cfg_path,"SYS/THEMES/"))kind=2;
+    if(cfg_prefix(cfg_path,settings_desk)&&size>=4&&cfg_equal(cfg_path+size-4,".LNK"))kind=1;
+    if(cfg_equal(cfg_path,settings_paths[2])||cfg_prefix(cfg_path,"SYS/THEMES/"))kind=2;
     if(cfg_equal(cfg_path,"SYS/DISPLAY.CFG"))kind=3;
-    if(cfg_equal(cfg_path,"SYS/WALL.CFG"))kind=4;
+    if(cfg_equal(cfg_path,settings_paths[4]))kind=4;
     char candidate[64];
     if(kind>=0){
         cfg_candidate_path(candidate);r=sc_write(candidate,cfg_text,n);
         if(r==n)r=sc_config_check(kind,candidate);else if(r>=0)r=-3;
-        if(!r&&kind==2&&cfg_equal(cfg_path,"SYS/THEME.CFG"))r=sc_theme_load(candidate,1);
+        if(!r&&kind==2&&cfg_equal(cfg_path,settings_paths[2]))r=sc_theme_load(candidate,1);
         sc_remove(candidate);
         if(r<0){show_result(r,"");return 0;}
     }
-    if(!(kind==2&&cfg_equal(cfg_path,"SYS/THEME.CFG"))){
+    if(!(kind==2&&cfg_equal(cfg_path,settings_paths[2]))){
         r=sc_write(cfg_path,cfg_text,n);
         if(r!=n){show_result(r<0?r:-3,"");return 0;}
     }

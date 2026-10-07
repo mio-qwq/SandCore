@@ -20,8 +20,11 @@
 #include "ata.h"
 #include "fs.h"
 #include "task.h"
+#include "streams.h"
 #include "wm.h"
+#include "desktop.h"
 #include "module.h"
+#include "ttf.h"
 #include "display.h"
 #include "theme.h"
 #include "userspace.h"
@@ -32,6 +35,10 @@
 #include "management.h"
 #include "ringdebug.h"
 #include "audio.h"
+#include "core_image.h"
+#ifdef M10_DISK_CORE
+#include "network.h"
+#endif
 
 /* mio：只读验收可观察的启动阶段，属于内核私有诊断，不扩旧ABI。
  * 1初始化，2真实欢迎画面已提交且等待键，3人类/测试键后桌面。
@@ -136,11 +143,17 @@ void scene_paint(void)
     if(GFX_W!=320)gfx_fill(0,0,GFX_W,GFX_H,PAL_SKY);
     if(modules_paint()) return;       /* M7：实际场景可来自已重定位的 CORE.SKM */
     int wallpaper=wm_wallpaper();
-    for (i32 px = 0; px < GFX_W; px++) {
+    /* 主核内置回退也必须服从实际损伤范围。gfx_pset原本会拒绝
+     * 视口外写入，却仍为1080p整屏做坐标除法/地形和调色计算；在
+     * 等待用户签署壁纸扩展时，每次小字更新因此仍拖慢输入。直接
+     * 跳过不会被写出的坐标，视口内所有旧整数运算与颜色原样保留。
+     * VGA无损伤视口时边界仍是完整320×200，旧模块字节不修改。 */
+    i32 clip[4];gfx_clip_bounds(clip);
+    for (i32 px = clip[0]; px < clip[0]+clip[2]; px++) {
         i32 x=px*320/GFX_W;
         i32 rb = ridge_back(x);
         i32 rf = ridge_front(x);
-        for (i32 py = 0; py < GFX_H; py++) {
+        for (i32 py = clip[1]; py < clip[1]+clip[3]; py++) {
             i32 y=py*200/GFX_H;
             u8 c;
             if (y < rb) {
@@ -210,9 +223,12 @@ void kmain(void)
 
     /* ---- 桌面化初始化 (M6) ---- */
     memory_init();                    /* E820 + 位图分配器 */
+    core_boot_reserve();              /* 主核从IDE装入，先保留实际映像/BSS，再申请任意页。 */
     heap_init();                      /* 内核堆 (2-3MB) */
     pf_reserve(0x300000, 0x500000);   /* 页表区+任务槽保护区 (3-8MB) */
-    pf_reserve(MODULE_BASE,MODULE_BYTES); /* 在任何用户帧分配前预留永久零环模块区 */
+#ifndef M10_DISK_CORE
+    pf_reserve(MODULE_BASE,MODULE_BYTES); /* 历史单体核心仍按SKM1固定装载合同预留。 */
+#endif
     task_init();                      /* 分页开启 + GDT/TSS/调度器 */
     ata_init();                       /* ATA PIO 驱动 */
     fs_init();                        /* SandFS 超级块+目录表 */
@@ -220,21 +236,26 @@ void kmain(void)
     management_init();                /* 外部UART管理器在身份初始化之后。 */
     ringdebug_init();                 /* 独立COM1，暂停后不依赖任务0轮询。 */
     audio_init();                     /* QEMU AC97；缺设备不影响图形/串口。 */
+#ifdef M10_DISK_CORE
+    cli();network_init();sti();       /* 驱动复位异步推进，缺网卡不妨碍桌面/串口。 */
+#endif
     theme_init();                     /* 配置快照先于桌面，坏配置用白色极光 */
     userspace_init();                 /* 用户/环境只读取有效快照，首个程序取默认家目录 */
     wm_init();                        /* 桌面图标 + 窗口表 */
     cli();
     modules_init();                  /* CORE 先于 MOD，安装真实零环回调 */
-    sti();
+    task_render_hold(1);sti();
 
-    /* 字体文件上盘策略: SandFS 里的 font.scf 优先为默认字体,
-     * 读不到回落编译在内核里的内置表 (渲染器零改动) */
+    /* SCF保留旧字形副本/旧快照字数，不能拿完整TTF计数改旧缓冲语义。
+     * TTF单独完整验证、按真实PF页保留原字节；此时尚无开机音频流，
+     * IRQ仍收输入而用户绘图不与字体提交/暂存轮廓重入。 */
     static u8 fbuf[65536];
     int fn = fs_read("sys/font.scf", fbuf, sizeof(fbuf));
     if (fn > 0)
         gfx_font_load(fbuf, (u32)fn);
+    ttf_init();
 
-    cli();
+    cli();task_render_hold(0);
     display_init();                  /* 设备/配置有效才进入原生模式，否则保留13h */
     /* 任意键门槛仍只有一次，但先让显示/主题/用户字体就绪再画最终
      * 欢迎页。早期VGA画面保留用于初始化等待和不支持显卡的兜底。
@@ -254,12 +275,18 @@ void kmain(void)
         u32 began=sc_ticks;
         while(audio_busy() && (u32)(sc_ticks-began)<250){
             audio_poll();ringdebug_poll();
+#ifdef M10_DISK_CORE
+            network_poll();          /* 欢迎音频期间也处理链路与DHCP。 */
+#endif
             sti();halt();cli();
         }
     }
     sti();
     for(;;){
         cli();management_poll();ringdebug_poll();auth_poll();audio_poll();
+#ifdef M10_DISK_CORE
+        network_poll();              /* 任意键门槛不阻断租约和硬件复位。 */
+#endif
         int candidate=key_peek();
         if(candidate>=0){boot_key=(u32)key_pop();sti();break;}
         if(management_connected()){boot_key=0;sti();break;}
@@ -285,10 +312,17 @@ void kmain(void)
         management_poll();           /* 双机管理收发/租约；无网络后端。 */
         ringdebug_poll();            /* 外部暂停请求仅进入真实CPL0陷入。 */
         audio_poll();                /* DMA进度/有限混音；静止音频不持续填零。 */
+        modules_poll();              /* 常驻扩展按tick与注册预算轮转，不在IRQ里执行重活。 */
         image_service_poll();        /* 压缩图片异步启动，解码不阻塞桌面 */
+        desktop_poll();              /* 原始桌面图片分批读，不堵住输入/管理/网络。 */
         wm_mouse_poll();              /* 图标/拖拽/关闭/置顶 */
         int key;
         while((key=key_peek())>=0 && wm_key_input((char)key))key_pop();
+        streams_poll();               /* 输入/管道状态按订阅链分批唤醒，避免全任务扫描。 */
+#ifdef M10_DISK_CORE
+        network_poll();              /* 输入先入状态，再做有限网卡/协议批次。 */
+#endif
+        task_cleanup_poll();          /* 先撤稳定旁表引用，再给调度器回收页与内核栈。 */
         if (wm_dirty()) {
             /* 1080p整帧拷贝/透明混合不能长时间cli，否则8042容量
              * 有限的字节FIFO会丢包，PIT也会丢秒。只暂缓任务切换：
@@ -304,6 +338,7 @@ void kmain(void)
          * 任务0睡掉。沿安全换栈出口交回剩余时间，恢复后continue
          * 重新检查输入，不能直接落到HALT把下一轮事件又延后一拍。
          * 旧YIELD轮询仍按当前tick节流，静止工具不会变成CPU满载。 */
+        if(task_cleanup_pending()){sti();continue;}
         if(task_idle_yield())continue;
         task_idle(1);                /* IF=0设置，紧接STI/HALT，不能提前标空闲 */
         sti();

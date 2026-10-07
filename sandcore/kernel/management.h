@@ -6,4 +6,5 @@ void management_poll(void);
 int management_console_write(const void *bytes,u32 length);
 int management_console_write_atomic(const void *bytes,u32 length);
 int management_connected(void);
+u32 management_console_capacity(void);
 #endif

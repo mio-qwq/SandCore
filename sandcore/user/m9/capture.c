@@ -3,7 +3,17 @@ static void word(u8 *p,u32 value){for(int i=0;i<4;i++)p[i]=(u8)(value>>(i*8));}
 int main(void)
 {
     if(cli_parse()<0)return 2;
-    if(!cli_argc){char list[4096];int n=sc_capture_list(list,sizeof(list));return n<0?cli_error("capture",n):cli_write(1,list,(u32)n)<0?1:0;}
+    if(!cli_argc){
+        u32 page[528],after=0xFFFFFFFFu;
+        do{int result=sc_window_page(page,528,after);if(result<0)return cli_error("capture",result);
+            for(u32 i=0;i<page[3];i++){u32 *row=page+16+i*16;
+                cli_number(1,(int)row[0]);cli_text(1," ");cli_number(1,(int)row[1]);cli_text(1," ");
+                cli_number(1,(int)row[4]);cli_text(1," ");cli_number(1,(int)row[5]);cli_text(1," ");
+                char title[13];for(u32 j=0;j<12;j++)title[j]=((char *)(row+13))[j];title[12]=0;
+                cli_text(1,title);cli_text(1,"\n");
+            }after=page[4];
+        }while(after!=0xFFFFFFFFu);return 0;
+    }
     int handle;if(cli_argc!=2 || cli_integer(cli_argv[0],&handle)<0)return 2;
     u32 info[8];int token=sc_capture_open(handle,info);if(token<0)return cli_error("capture",token);
     int fd=sc_stream_open(cli_argv[1],2,info[6]+122);if(fd<0){sc_capture_close((u32)token);return cli_error("capture",fd);}

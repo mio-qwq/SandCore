@@ -1,5 +1,17 @@
 # SandCore 构建系统文档 v0.7
 
+> **2026-10-07最新：** 默认公开键/已签WALL100的整包构建formal-build-01退出0，独立输出build/m10a1-formal-01；MAIN与冻结10全字节相同，正文SHA 3e57a363f5164cc69485a67dfab9f08c76bd1af5426375cc2c2100d5a23f3170。两原M9来源新迁移formal-01/02均256MiB、目录容量2048、1489/1451项，正常扩展只有WALL100，原盘/原M10开发盘不覆盖。M9的225份与M10的167份固定源码/声明归档审计通过。Shell管道修正定向构建输出shell-fix-01，再迁移独立shell-inputs-01双盘；网络/会话与全部其它合同继续，普通入口整体验收未完成。下方早期“默认接线尚未重新构建”仅属沿革。
+
+> **2026-10-06 M10a1当前入口：** 实现/资源/构建规则/规范已按完整合同核对收齐，进入统一构建与实际验收，依据AGENTS第十一节已有授权，无新阶段审批。根build.bat转发sandcore/build.bat，默认WSL make m10a1，独立输出build/m10a1-work；build-04退出0，磁盘MAIN/loader/18网络SCX及256MiB盘实际生成，Windows QEMU验收开始。见M10A1-READINESS.md与M10A1-VERIFICATION.md。下文早期禁构建/M9“已构建”是历史记录，不覆盖当前M10状态。
+
+M10用ELF32 core.ld生成磁盘MAIN、loader.ld生成只读启动器、mkimg --sectors 128生成软盘；MAIN必须进入SYS/CORE/CORE.SKM。m10.mk复用M9成熟独立CLI/固定基线资源接线，不重启M8冻结资源生成。源盘默认已有build/m9-work/sanddata.img，否则只读固定M9精简发布包并核摘要提取到build/baselines；可用M10_SOURCE_IMAGE指定另一只读来源，迁移器拒绝输入输出同一路径。生成盘默认256MiB，已有输出不覆盖，显式M10_REPLACE=1才保留备份后替换。
+
+M10_PUBLIC_KEY只接受32B用户公钥；收到用户公开结果后，默认读取assets/trust/M10-OWNER-ED25519.PUB，M10_SIGNED_DIR默认modules/signed，仅含用户签署的WALL100.SKM。公钥与完整扩展的SHA256分别为fc0f26d1b2f3cfea86ca19f3d5d37acd2fea932f683307887ace3bda7200e4f7和4ba998a48e72b623e078ba07de6d699081fc8462dc456bd0a6fe53091ddd7ea4；明确设置M10_PUBLIC_KEY为空则默认不安装扩展、生成无信任键的拒绝配置。可显式指定其它公开键/已签目录；只安装通过宿主验签的SKM2，不安装10/20/30验收夹具或坏格式样本。WALL待签消息仍可生成，正式签署始终由用户独立完成，见CORE.md与assets/trust/README.md。默认公开结果接线已写，普通整包入口的重新构建/发布验证仍待执行；不以验收盘通过代替它。Monocypher及其它选用源码/声明通过固定清单审计并完整复制SYS/LICENSE。当前MinGW备用不能构建新MAIN格式，M10明确要求WSL ELF。独立历史重建入口保持。
+
+修订：2026-10-06，新增M10独立磁盘核心/最小loader/只读基线迁移与公开签名接线，全部规则未执行。
+修订：2026-10-06，统一build-04通过；补Monocypher头搜索与完整上游依赖头，独立编辑器EXE构建退出0，原M9 EXE摘要保持。
+修订：2026-10-07，归档用户公开键与已签壁纸，默认入口接公开结果并保留显式无键回退；代理不接触私钥，默认入口新整包验收待执行。
+
 > **2026-10-05仓库复现入口**：根目录`build.bat`默认M9；
 > `build-version.bat M6a|M6|M7|M8a`重建对应历史快照到独立目录。
 > 五版均已从干净克隆构建通过。M9读取仓库内精简M7/M8a基线，不再依赖
@@ -335,3 +347,27 @@ SYSTEM窗口拒绝、SKM/BSS、COM1真实断点、HMP输入/截屏及客体截�
 build31退出0，内核仍为30原字节，164产品ELF无未解析符号/动态TLS、内核213240B/BSS末端0x1ca194，225份第三方归档及两盘SCX布局通过。m9-artifacts包含动态尺寸CORE.SKM。原版M7/M8a固定ZIP复用要求与摘要见audit_m9_compat.py，源包/旧盘不覆盖。
 
 修订：2026-10-05，记录实际范围与证据，待用户验收；前述早期未验证叙述保留为历史。
+
+## M10a1源码接线（未执行）
+
+m10.mk在M10_BUILD=1追加自写e1000/network/net_socket、私有port/timeouts/loopback与固定lwIP公共/IPv4/Ethernet原翻译单元。原timeouts单元由预算适配包含、不重复链接；头文件/依赖跟踪覆盖私有配置与上游头，不编译IPv6/PPP/TLS/上游应用。仍无内核libc/浮点。全部实际原文件/声明归SYS/LICENSE/LWIP，私有源归SYS/NETSRC。
+
+18个user/net/*.c独立编译链接打SCX，M10_NET_NAMES显式列名，复用user-start/linker/mkscx，不用多调用分派。独立源码/NETCLI.inc归SYS/SRC/net，SCNET.H归原SRC/INC规则；NETWORK.md/CLI-M10.md归SYS/MAN。nc -e新增0x263，旧SPAWN2不改。M10独立build/m10a1-work及256MiB迁移规则不覆盖M9/原盘；所有规则仍未调用。
+
+修订：2026-10-06，补网络原核心/私有适配/18独立工具及完整来源/开发手册构建接线；全部实现收齐前不构建，不以本记录宣布收齐全轮或PASS。
+
+tests/m10/M10NET.C以源码归SYS/TEST，统一阶段由客体s3c编译；只用公开网络/流/身份接口，不向内核加入测试入口。verify_m10_network.py、独立Ethernet对端/HTTP/TFTP/echo服务已写，均未执行。根目录run-m10a1.bat调用run_m10a1.py，创建新会话副本并复用私有QMP/UART与IPv4 e1000；不使用旧启动器的TCP监控口。来源镜像仍为独立build/m10a1-work两盘，目前尚不存在本轮新构建产物。
+
+修订：2026-10-06，补M10独立启动器/私有控制通道、客体网络探针与统一验收脚本源码；编辑器目录OOM提示/迁移索引自归档接线，未构建未运行。
+
+M10测试源码通配规则同样安装新增M10LIFE.C。统一阶段由客体s3c
+编译至/TMP/M10LIFE.SCX，verify_m10_lifecycle.py在两个不同来源
+新盘副本上执行并发/回收/复用/公平/真实耗尽，默认无NIC；详细
+边界见M10-LIFECYCLE.md。当前只写接线，脚本与探针均未执行。
+
+同规则安装M10RES.C，统一脚本先客体编译并执行18原生窗口、
+超过旧8份/64MiB截图和12并发事务用例；M10LIFE.MD手册同批
+归SYS/MAN。两份探针不会覆盖M9旧配额/回收历史源码。
+
+修订：2026-10-06，补动态任务公开ABI生命周期探针与双盘执行源码，
+仍未构建/运行，不能把验证代码已经写好当作验证通过。

@@ -5,7 +5,8 @@
  * 文档/备用缓冲/行索引/ARGB帧都在本任务用户页，内核不包含编辑
  * 业务。65535B正文与终止符分开；失败不把内存作品或路径截断。
  * 任意位置编辑与可见行索引沿已实测Studio模型，未收字符仅显示
- * 凤凰缺字框，保存原字节。不加入私有字体、颜色或系统调用号。
+ * 同源缺字框，保存原字节。M10直接取原TTF完整位图与宽度，
+ * 不按“非ASCII就两格”误算拉丁扩展/希腊字母和标点的光标位置。
  *
  * 本文件已接入M8第一阶段源码；用户批准第二阶段后再进行
  * 真正历史G2生成/运行与完整矩阵，当前不宣称原生验收通过。
@@ -56,16 +57,28 @@ static int line_at(int n)
 static int line_start(int at){return line_at(line_number(at));}
 static int line_end(int at)
 {int n=line_number(at);return n+1<line_count?line_at(n+1)-1:used;}
+static int character_cells(int at)
+{
+    u32 scalar=(u8)source[at];int end=utf8_next(at),bytes=end-at;
+    if(scalar<128)return scalar==9?4:1;
+    int extra=scalar>=0xC2 && scalar<=0xDF?1:scalar>=0xE0 && scalar<=0xEF?2:scalar>=0xF0 && scalar<=0xF4?3:0;
+    if(!extra || bytes!=extra+1)return 2;
+    scalar&=extra==1?31:extra==2?15:7;
+    for(int i=1;i<=extra;i++)scalar=(scalar<<6)|((u8)source[at+i]&63);
+    if(scalar<(extra==1?0x80u:extra==2?0x800u:0x10000u) || scalar>0x10FFFFu
+        || (scalar>=0xD800 && scalar<=0xDFFF))scalar=0xFFFD;
+    return ui_scalar_width(scalar)/8;
+}
 static int column(int at)
 {
     int n=0;
-    for(int i=line_start(at);i<at;i=utf8_next(i))n+=(u8)source[i]>=128?2:1;
+    for(int i=line_start(at);i<at;i=utf8_next(i))n+=character_cells(i);
     return n;
 }
 static int move_column(int at,int col)
 {
     /* 点击宽字第二格也落在整个编码之后；始终不返回续字节位置。 */
-    while(col>0&&at<used&&source[at]!='\n'){col-=(u8)source[at]>=128?2:1;at=utf8_next(at);}
+    while(col>0&&at<used&&source[at]!='\n'){col-=character_cells(at);at=utf8_next(at);}
     return at;
 }
 static void changed(void){follow_cursor=1;}
@@ -171,6 +184,7 @@ static void scrollbar(void)
 }
 static void draw(void)
 {
+    if(!ui_visible)return;
     small_window=UI_W<276||UI_H<160;editor_rows=0;
     if(small_window){
         edit_menu=scroll_drag=0;ui_background(SC_THEME_FACE_ALT);
@@ -205,13 +219,15 @@ static void draw(void)
             /* 横向视口可能从宽字第二格开始。跳过整个编码后保留
              * 一格空白，不能把后面的字向左压一格导致光标错位。 */
             int skipped=0;
-            while(at<used&&source[at]!='\n'&&skipped<left_column){skipped+=(u8)source[at]>=128?2:1;at=utf8_next(at);}
+            while(at<used&&source[at]!='\n'&&skipped<left_column){skipped+=character_cells(at);at=utf8_next(at);}
             int padding=skipped-left_column;if(padding<0)padding=0;
             char text[513];int n=0,cells=padding;
             while(at<used&&source[at]!='\n'&&cells<editor_columns){
-                int next=utf8_next(at),width=(u8)source[at]>=128?2:1;
-                if(cells+width>editor_columns||n+next-at>512)break;
-                for(int j=at;j<next;j++)text[n++]=source[j]=='\r'?' ':source[j];
+                int next=utf8_next(at),width=character_cells(at);
+                int bytes=source[at]==9?4:next-at;
+                if(cells+width>editor_columns||n+bytes>512)break;
+                if(source[at]==9){for(int j=0;j<4;j++)text[n++]=' ';}
+                else for(int j=at;j<next;j++)text[n++]=source[j]=='\r'?' ':source[j];
                 cells+=width;at=next;
             }
             text[n]=0;ui_selected_text(69+padding*8,y,text,selected);

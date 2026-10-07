@@ -2,6 +2,14 @@
 #define SANDCORE_WM_H
 
 #include "io.h"
+/* M10a1：会话桌面资源不依赖固定会话数组，核心只在切换时通知WM。 */
+int wm_session_prepare(u32 id);
+void wm_session_switched(u32 previous,u32 current);
+void wm_session_destroy(u32 id);
+void wm_session_repaint(u32 id);
+int wm_user_visibility(int pid,int handle,u32 out[8]);
+int wm_task_hidden_gui(int pid);
+int wm_defer_draw(int pid,int handle,int format); /* 旧程序绘制调用的可见性等待。 */
 #define SC_CANVAS_W 318
 #define SC_CANVAS_H 170
 
@@ -28,6 +36,7 @@ void wm_open_about(void);            /* 历史内核关于页接口，当前 San
 int  wm_open_user_window(int pid, const char *title, int w, int h);
 void wm_close_user_window(int pid, int handle);
 void wm_close_owner(int pid);        /* 任务退出时回收全部窗口 */
+int wm_close_owner_step(int pid);
 int  wm_user_puts(int pid, const char *s); /* 最近创建的窗口维护独立文字游标 */
 /* M8终端只为本人ARGB窗口启用。历史按需分配4页，窗口关闭时释放；
  * 重绘按当前宽度/缩放/主题重新排版，不能把旧像素放大当清晰文字。
@@ -67,7 +76,7 @@ int wm_user_pointer(int pid,int handle,i32 *out); /* 客户坐标/按住/按下�
 int wm_user_pointer_peek(int pid,int handle,i32 *out);
 int wm_user_peekkey(int pid); /* 与GETKEY同样聚焦检查，但不消费队首 */
 u32 wm_legacy_mouse(int pid); /* 高分辨率下为旧画布虚拟化9位鼠标坐标 */
-/* 卡片不占 WMAX 槽，窗口满也能诊断；暂停保留画布，关闭卡片才结束任务。 */
+/* 卡片按任务分配，画布不足也能诊断；暂停保留画布，关闭卡片才结束任务。 */
 void panic_screen(const char *reason, u32 vec);   /* 异常红屏 */
 /* M9截图复制真实客户画布，不依赖宿主screendump。snapshot在打开时
  * 冻结像素/尺寸，窗口之后关闭、重排或调整均不影响已有快照。 */
@@ -75,6 +84,10 @@ int wm_capture_open(int pid,int handle,u32 out[8]);
 int wm_capture_read(int pid,u32 token,u32 offset,void *out,u32 length);
 int wm_capture_close(int pid,u32 token);
 int wm_capture_list(int pid,char *out,u32 capacity);
+int wm_window_page(int pid,u32 *out,u32 words,u32 after);
 void wm_capture_stop(int pid);
+int wm_capture_stop_step(int pid);
 
+/* M10a1：仅内核任务存储器使用，资源按真实任务申请。 */
+u32 wm_task_bytes(void);
 #endif /* SANDCORE_WM_H */

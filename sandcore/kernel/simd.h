@@ -7,4 +7,5 @@ void simd_switch(int previous,int next);
 void simd_stop(int pid);
 void simd_info(u32 out[8]);
 int simd_sse2(void);
+u32 simd_task_bytes(void);
 #endif

@@ -16,6 +16,7 @@ int process_exception_return(u32 *frame,u32 context);
 int process_debug_bind(int pid,int owner);
 int process_debug(int owner,int pid,int command,u32 address,void *buffer,u32 length);
 void process_detach_owner(int owner);
+int process_detach_owner_step(int owner);
 
 /* 调试命令：INFO 输出 88 字节（19 双字现场 + state/CR2/event）。
  * READ 的长度上限 256B；BREAK/UNBREAK 参数 address；STEP/CONTINUE
@@ -29,4 +30,6 @@ void process_detach_owner(int owner);
 #define DBG_UNBREAK 5
 #define DBG_KILL 6
 #define DBG_PAUSE 7
+/* M10a1：仅内核任务存储器使用，资源按真实任务申请。 */
+u32 process_task_bytes(void);
 #endif

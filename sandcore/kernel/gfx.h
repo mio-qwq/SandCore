@@ -80,6 +80,9 @@ int  gfx_font_load(const void *buf, u32 size);   /* SCF1MIO 字体文件 → 激
 int gfx_utf8_next(const char **text,u32 *scalar);
 int gfx_utf8_valid(const char *text);
 int gfx_glyph16(u32 scalar,u16 *rows);
+/* 新内核画面走TTF统一基线；旧GLYPH16原有SCF字节/缺字框保留。 */
+int gfx_layout_glyph16(u32 scalar,u16 *rows);
+void gfx_font8(u32 scalar,u8 rows[8]);
 void gfx_font_info(u32 *info); /* ABI 版本/汉字数/原生高度/磁盘激活 */
 
 #endif /* SANDCORE_GFX_H */

@@ -109,7 +109,13 @@ static const char map_shift[0x80] = {
 static u8 shift_l, shift_r, caps;
 static u8 extended;
 static u8 held[256];
+static u8 scan_down[256],scan_suppressed[256];
 int keyboard_down(u32 key) { return key<256 ? held[key] : 0; }
+void keyboard_session_switch(void)
+{
+    qh=qt=0;shift_l=shift_r=0;
+    for(u32 i=0;i<256;i++){held[i]=0;scan_suppressed[i]=scan_down[i];}
+}
 
 /* ---------------- IRQ1 处理 ---------------- */
 void keyboard_isr(void)
@@ -122,6 +128,9 @@ void keyboard_isr(void)
 
     if(sc==0xE0) { extended=1; return; }
     if(sc==0xE1) return;
+    u32 physical=(sc&0x7F)+(extended?128u:0u);scan_down[physical]=!(sc&0x80);
+    if(scan_suppressed[physical]){if(sc&0x80)scan_suppressed[physical]=0;extended=0;return;}
+    if(sc==0x58){kpush((char)0x8C);return;} /* F12：新增全局登录/会话入口。 */
     if(extended) {
         /* E0 后的一字节属于扩展扫描码，不能再落入普通 ASCII 表。
          * 方向键使用 0x80..0x83 的沙核事件码；松开只清状态不送事件。

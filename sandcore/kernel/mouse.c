@@ -22,6 +22,7 @@
 
 static i32 mx, my;                /* 光标位置 */
 static u8  mbtn;                  /* 按键位图 */
+static u8 blocked_buttons;
 static u8  pkt[3];                /* 当前包积累 */
 static u8  cycle;                 /* 包内字节序号 0..2 */
 static u8  suppress;              /* init 期间丢弃一切数据 */
@@ -33,6 +34,8 @@ static u32 relative_x,relative_y;
 static int relative_mode;
 void mouse_relative_totals(u32 *x,u32 *y){*x=relative_x;*y=relative_y;}
 void mouse_relative_mode(int enabled){relative_mode=enabled!=0;}
+void mouse_session_switch(void)
+{blocked_buttons|=mbtn;mbtn=0;event_head=event_tail=0;relative_mode=0;}
 
 static void event_push(void)
 {
@@ -153,7 +156,7 @@ void mouse_isr(void)
     relative_x+=(u32)dx;relative_y-=(u32)dy;
     if(!relative_mode){mx+=dx;my-=dy;}
     clamp_pos();
-    mbtn = pkt[0] & 0x07;
+    u8 physical=pkt[0]&7;blocked_buttons&=physical;mbtn=physical&~blocked_buttons;
     event_push();
 }
 

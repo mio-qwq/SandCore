@@ -1,5 +1,48 @@
 # 凤凰字体与三环 Unicode 文字接口
 
+> 2026-10-07新增待验坏TTF矩阵：M10FBAD.C与verify_m10_font_edges.py已接，九种独立副本为原文件、缺12/缺16/双缺、截断12、越界目录16、越界cmap16、坏loca16、负轮廓16。深层损坏重新计算被改表校验和，避免只在checksum处拒绝却误称结构边界已验。实际启动后核预期脸掩码、另一张完整脸、拒绝脸暂存/字形/epoch/页归零、旧ASCII/GLYPH16/FONT8精确缓冲护栏与真实回退像素；每副本完整回读原其它内容和身份。当前仅源码/静态检查，尚无这九类客体PASS，旧全映射30160记录证据不覆盖坏文件/缩放/OOM/Notes布局。
+
+> **2026-10-07 M10a1：直接读取完整原12px/16px TTF。** 此授权覆盖下文M7“只从font16.txt收字”的历史策略；该表/原SCF/旧ASCII仅保留同源恢复和历史ABI字节。font-04两来源盘两脸各7540个实际映射字形与独立无hint FreeType逐像素一致，合计30160字形记录，公开缓冲边界检查通过，源盘不变。当前参考实际报告版本2.14.2、加载标志163850、共享库SHA de0b38b01924302a7fa7bfbaee47afcb9468ad2f8a22b4a8cca56ad54f64569c。font-03重启中断证据保留；缩放/坏资源/Notes/缓存与旧字形合同仍待验。7543是每份原文件的静态glyph数，不是全部Unicode覆盖数。下方早期未构建叙述保留为历史。
+
+## M10a1 直接 TTF 合同（完整验收未收齐）
+
+用户原包1.02的两份TTF原样保存third_party/vonwaon；逐文件摘要见M10-SOURCES.json，license.txt原声明与完整CC0法律文本/PROVENANCE一起归SYS/LICENSE/VONWAON。运行副本为SYS/FONT/PHOENIX12.TTF及PHOENIX16.TTF。没有生成另一份中文点阵子集，没有移植其它字体引擎；kernel/ttf.c直接解析原字节。
+
+每脸先核SFNT表范围/对齐/重叠/表校验和、head/maxp/hhea/hmtx/loca/glyf/cmap、全部glyph边界与轮廓，再提交完整脸。字库文件≤8MiB，单glyph点/轮廓≤4096作为坏资源预算；它们不是用户任务数量门槛。支持Unicode cmap4与12、长短loca、hmtx尾部重复advance及各glyph左轴承。实际两份字体各7543个glyph，均为on-curve直线且无复合字形；此配置明确拒绝off-curve或复合轮廓，**完整支持这份字库不等于任意TrueType引擎**。字体指令只检查完整长度并跳过，不执行字节码；本字体原生网格像素一致性仍须独立参考实测。布局参照官方[OpenType glyf](https://learn.microsoft.com/en-us/typography/opentype/spec/glyf)、[cmap](https://learn.microsoft.com/en-us/typography/opentype/spec/cmap)、[hmtx](https://learn.microsoft.com/en-us/typography/opentype/spec/hmtx)；这些规范不代替本轮运行证据。
+
+栅格化采用26.6整数坐标、扫描线中心采样、排序交点与非零绕数，保留洞/重叠。真实基线来自hhea、前进/左轴承来自hmtx；原12px的完整行框会保留下降区而不强行裁成12行，原16px为16行。新版NUI/UI从新位图入口取完整脸统一基线；内核新画面用同源布局路径。Notes光标、上下移动、鼠标命中与水平裁剪用同一字宽，非ASCII不再无条件算两格。文件原UTF-8字节与缺字显示分开，仍不包含输入法。
+
+每脸原字节和解析暂存归独立PF页，缓存为64组×4路，按脸/代数/glyph/请求像素键，满组按填入顺序替换；最多256项是缓存预算，不能截断字符覆盖。缓存懒申请真实PF页，失败用单结果暂存，查询不把未申请页计成已占用；新脸提交使旧缓存失效，旧字体页完整释放。三环私有256项副本轮转替换并按版本清空；隐藏GUI不生成帧，不能在后台借字体缓存持续栅格化。
+
+旧FONTINFO四字/SCF字数与激活语义不改。旧GLYPH16已有ASCII/SCF字形、32B行布局、8/16正返回域和未收字0＋空框保留；原表以外可从完整TTF补齐。旧FONT8仍1024B，ASCII继续以原16px相邻两行合并。完整字库统计/缩放用新增调用，不改旧忽略寄存器。
+
+| 新调用 | 寄存器 | 结果 |
+|---|---|---|
+| 0x248 FONTINFO2 | EBX脸12/16，ECX完整16字输出 | 0成功；无效脸/映射-1。头0..15：版本1、代数、脸、已激活、glyph数、已映射标量数、unitsPerEm、ascent、descent、lineGap、原字节数、脸/暂存真实页数、全局缓存真实页数、命中、未命中、水平长指标数 |
+| 0x249 GLYPHBITMAP | EBX标量，ECX脸12/16，EDX请求像素1..64，ESI输出，EDI容量≥400字且≤4096 | 正返回真实整数前进宽；未映射0但给同脸.notdef，非法-1/资源-4均不写输出 |
+
+位图固定400字：16字头＋96行×4个u32，每字bit31为左端。头0..12为版本1、代数、glyph ID、映射成功、请求像素、整数前进宽、画布宽/高、基线、画布相对笔尖左偏移、脸、左轴承26.6、前进26.6；13..15为0。画布≤128×96，未用行/列为0。新入口独立验证完整1600B输出，超出的容量尾不写。负指标按有符号i32解释，无公开内部地址。
+
+实际Unicode映射数量、项目源码仍缺字符/具体位置、全映射glyph绘制、12/16原生及缩放、损坏/截断/重复表、OOM/缓存回收和旧probe逐行兼容须在全量实现后统一验证并统计。当前不得把原文件7543个glyph称为全部中文/全部Unicode，也不得把旧探针PASS当本轮证据。
+
+2026-10-07：font-02首盘实际S3C编译/全部7540原生12px映射和400字
+缓冲哨兵/未用行列检查通过，935040B真实转储完整取回。Pillow默认
+hint模式只有四个重音字符各差2像素；原轮廓无指令，直接FreeType
+2.13.2的同源无hint模式对全部7540字逐像素相同，启用hint又重现
+同四字符差异。旧失败报告不改，独立结果freetype-unhinted.json及
+freetype-hinted.json保留。当前正式对照明确FT_LOAD_NO_HINTING、
+NO_AUTOHINT、NO_BITMAP与FT_RENDER_MODE_MONO，符合前述不执行
+字体指令/不自动改轮廓的既有合同；不是为四个字符设例外。参考只
+动态调用已安装WSL共享库，记录实际版本/库摘要，不移植进客体。
+接口与默认hint行为依据[FreeType官方加载说明](https://freetype.org/freetype2/docs/reference/ft2-glyph_retrieval.html#ft_load_xxx)。
+两脸/两来源、缩放/缺字/坏资源/Notes/缓存等完整验收继续，不能凭
+一张12px转储宣布字体完成。字体原字节/内核轮廓本轮没有修改。
+
+修订：2026-10-07，记录实际12px全映射/边界转储和无hint独立逐像素
+对照；保留默认hint差异证据，完整两脸/两盘及其它字体合同待验。
+
+修订：2026-10-06，依据用户新合同接原TTF整数全轮廓/映射与指标、版本缓存、NUI/Notes和0x248/249；保持历史缓冲/字形，未构建未运行。
+
 > 作者 mio。唯一汉字源为 kernel/font16.txt，必须遵守其完整头注释；
 > 本文说明 M7 的编码、字形与绘制合同。直接构建与系统内 SCCC 构建的
 > 两个探针均已通过 QEMU；用户可以按 TESTING.md 的联合指南查看效果。
@@ -90,3 +133,33 @@ verify_modules.py 在副本盘注入坏行数据，实测整张 SCF 不激活且
 |---|---|
 | 2026-10-02 | 统一凤凰 ASCII/汉字来源，新增 Unicode 字形/UTF-8 绘制/字体信息 ABI；实现与本轮上机验证同步推进 |
 | 2026-10-02 | 两条真实三环调用路径、36 字逐行对照/UTF-8/缺字/地址/owner 与坏 SCF 同源兜底通过；六幕短片使用同一正式文字接口 |
+
+修订：2026-10-07，登记九类独立坏TTF/缺文件真实启动与原子拒绝、旧字体缓冲回退矩阵源码；尚未实际运行。
+
+font-edges01仅首original执行，TTF/中文/GLYPH16检查通过；新夹具误猜FONT8为760B且返回0而失败。旧FONT8实际一直1024B/返回1024，已以原代码核对并仅修新夹具；font-edges02完整九类双来源执行中，无终态PASS。
+
+修订：2026-10-07，保留真实原文件测试失败，纠正夹具的FONT8旧ABI误用，不改内核已发布合同。
+
+### 2026-10-07 font-edges02双来源九类真实终态
+
+runner退出0，font-edges-matrix.json为DECLARED_CASES_PASS。两份来源
+各original/missing12/missing16/both-missing/truncated12/bad-table16/
+bad-cmap16/bad-loca16/bad-outline16，共18个真实启动副本全部完成。
+每副本实际S3C编译探针，核预期脸激活、被拒脸epoch/glyph/映射/
+字节/暂存页归零、另一原脸完整7540映射和真实中文位图、新16字
+快照/400字输出护栏、旧GLYPH16的32B边界/ASCII像素及旧FONT8的
+1024B/返回1024/两端护栏。坏深层表的checksum已重新计算，不能
+以目录checksum早退冒充cmap/loca/负轮廓边界验证。所有其它原盘
+正文/UID/GID/rw/代数逐项回读保持，18输入和两原来源摘要不变。
+
+已实际查看第二来源both-missing/font-rejection-desktop.png：旧
+ASCII文件名/图标/Start文字仍正常辨识。该图只是回退检查，不充
+正常字体/最终壁纸/全部GUI验收。01错误的760B测试护栏失败保留，
+只修新测试而不改旧1024B内核ABI。缩放/缓存OOM/重初始化/原SCX
+及当前新主核全映射参考仍继续，完整字体目标尚未全部验收。
+
+tcp-faults01在同一desktop02主核执行新的原始线缆三连接声明
+矩阵，尚无终态；network12明确静态分片前置后待运行。单VM，
+全部原失败/源盘保留，完整M10a1 Goal active，不创建Release。
+
+修订：2026-10-07，补当前主核双来源18个坏/缺TTF启动及旧精确ABI回退实际通过、双缺字体桌面人工查看，保留未覆盖字体/网络/整机范围。

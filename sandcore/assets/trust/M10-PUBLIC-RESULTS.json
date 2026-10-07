@@ -1,0 +1,10 @@
+{
+  "public_key_sha256": "fc0f26d1b2f3cfea86ca19f3d5d37acd2fea932f683307887ace3bda7200e4f7",
+  "wall_file_sha256": "4ba998a48e72b623e078ba07de6d699081fc8462dc456bd0a6fe53091ddd7ea4",
+  "received_public_results": "user-signatures-20261006-225411",
+  "signer": "USER_ONLY",
+  "private_key_access": "NONE",
+  "number": 100,
+  "payload_sha256": "f44c8e9f45be4929073a1f4ed32c2a5d8f65c2d56a456bab304ec4799c793f2d",
+  "source": "M9 original wallpaper via tools/mkext.py --legacy --number 100"
+}

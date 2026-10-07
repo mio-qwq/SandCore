@@ -11,6 +11,7 @@ void streams_init(void);
  * -6让出后重试，0为EOF；管道无读者写入=-7。公开owner永远取真实PID。 */
 void streams_spawn(int pid,int parent);
 void streams_stop(int pid,int code);
+int streams_stop_step(int pid,int code);
 int streams_open(int pid,const char *path,u32 mode,u32 capacity);
 int streams_read(int pid,int fd,void *data,u32 length);
 int streams_write(int pid,int fd,const void *data,u32 length);
@@ -24,6 +25,7 @@ int streams_terminal_info(int pid,int fd,u32 out[8]);
 int streams_terminal_clear(int pid,int fd);
 int streams_event(int pid,int fd,u32 action);
 int streams_exec(int parent,const char *command,const i32 descriptors[3],u32 flags);
+int streams_pipe_descriptors(int parent,const i32 descriptors[3]);
 int streams_exec_buffer(int parent,const void *script,u32 bytes,const i32 descriptors[3],const char *arguments);
 int streams_wait(int parent,u32 ticket,u32 out[8]);
 int streams_job_snapshot(int parent,u32 ticket,u32 out[8]);
@@ -37,4 +39,11 @@ void streams_login_terminal(int parent,int child);
 int streams_serial_attach(int pid,u32 session);
 int streams_serial_input(const void *data,u32 length);
 void streams_serial_reset(void);
+void streams_serial_writable(void);
+/* M10a1：IRQ只记录输入，主循环预算内分发；订阅节点就在稳定任务旁表。 */
+void streams_poll(void);
+void streams_terminal_input(int owner,int handle);
+void streams_terminal_closed(int owner,int handle);
+int streams_ready(int pid,int fd,u32 out[8]);
+u32 streams_task_bytes(void);
 #endif

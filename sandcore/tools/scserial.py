@@ -306,10 +306,31 @@ class StdioQmp:
 
 class QemuSession:
     """拥有自己启动的VM及副本；错误时只关闭这一个进程。"""
-    def __init__(self, boot, data, out, accel='tcg', headless=False, audio=True, cpu='qemu32', no_shutdown=False, disk_debug=None):
+    def __init__(self, boot, data, out, accel='tcg', headless=False, audio=True, cpu='qemu32', no_shutdown=False, disk_debug=None,
+                 network='none', network_peer=None, host_forwards=(), network_capture=False, memory=128):
         profiles=('qemu32','qemu32,-sse2','qemu32,-fxsr,-sse,-sse2','qemu32,-fpu,-fxsr,-sse,-sse2')
         if cpu not in profiles:
             raise ValueError('CPU只允许固定兼容回退测试配置')
+        if network not in ('none','user','socket') or memory not in (128,256):
+            raise ValueError('未登记的网络/内存配置')
+        if network=='socket' and (not isinstance(network_peer,int) or network_peer<1024 or network_peer>65535):
+            raise ValueError('隔离以太网对端必须是本机显式1024..65535端口')
+        if network!='socket' and network_peer is not None:
+            raise ValueError('只有socket以太网模式接受对端端口')
+        if network!='user' and host_forwards:
+            raise ValueError('只有user网络接受显式应用端口转发')
+        forwards=[]
+        for value in host_forwards:
+            parts=value.split(':')
+            if len(parts)!=3 or parts[0] not in ('tcp','udp') or not parts[1].isdigit() or not parts[2].isdigit():
+                raise ValueError('转发格式为tcp|udp:宿主端口:客体端口')
+            source,target=int(parts[1]),int(parts[2])
+            if not 1024<=source<=65535 or not 1<=target<=65535:
+                raise ValueError('转发端口越界')
+            key=(parts[0],source)
+            if key in {(p[0],p[1]) for p in forwards}:
+                raise ValueError('转发端口重复')
+            forwards.append((parts[0],source,target))
         self.out = Path(out).resolve()
         self.out.mkdir(parents=True, exist_ok=False)
         self.pipes, self.process, self.log = {}, None, None
@@ -338,7 +359,7 @@ class QemuSession:
             entropy = self.out / 'entropy.bin'
             entropy.write_bytes(secrets.token_bytes(32))
             names = {role: name + '-' + role for role in ('debug', 'management')}
-            command += ['-m', '128', '-vga', 'std', '-boot', 'a', '-S',
+            command += ['-m', str(memory), '-vga', 'std', '-boot', 'a', '-S',
                         '-monitor', 'none', '-parallel', 'none', '-nic', 'none', '-rtc', 'base=utc',
                         '-fw_cfg', f'name=opt/sandcore/entropy,file={entropy}',
                         '-drive', f'format=raw,if=floppy,file={self.out / "sandcore.img"}',
@@ -361,6 +382,24 @@ class QemuSession:
                 configuration.write_text(text,encoding='ascii')
                 command[-1]=f'format=raw,if=ide,werror=report,rerror=report,file.driver=blkdebug,file.config={configuration.as_posix()},file.image.driver=file,file.image.filename={(self.out / "sanddata.img").as_posix()}'
                 self.report['disk_debug']=dict(disk_debug,configuration=str(configuration))
+            # M9默认none参数不改。M10只增加明确e1000；QMP仍为匿名父子
+            # 管道，UART仍在-S期间完成本机ACL/进程核对，没有NAT能连接
+            # 的管理TCP端口。socket对端仅收以太网帧，不能作为QMP/HMP。
+            if network=='user':
+                options='user,id=sc-net,ipv6=off'
+                for protocol,source,target in forwards:
+                    options+=f',hostfwd={protocol}:127.0.0.1:{source}-:{target}'
+                command+=['-netdev',options,'-device','e1000,netdev=sc-net,mac=52:54:00:12:34:56']
+            elif network=='socket':
+                command+=['-netdev',f'socket,id=sc-net,connect=127.0.0.1:{network_peer}',
+                          '-device','e1000,netdev=sc-net,mac=52:54:00:12:34:56']
+            if network!='none' and network_capture:
+                capture=self.out/'network.pcap'
+                command+=['-object',f'filter-dump,id=sc-net-capture,netdev=sc-net,file={capture.as_posix()}']
+            self.report.update(network=dict(mode=network,device='e1000' if network!='none' else None,
+                               peer=network_peer,forwards=forwards,capture=bool(network_capture and network!='none')),
+                               memory_megabytes=memory)
+            if network!='none':self.report['scope']='M10_EXTERNAL_SERIAL_AND_IPV4_TRANSPORT'
             for role in ('debug', 'management'):
                 command += ['-chardev', f'pipe,id={role},path={names[role]}',
                             '-serial', f'chardev:{role}']
@@ -419,8 +458,17 @@ class QemuSession:
             self.qmp('cont')
             self.report['status'] = 'TRANSPORT_CONNECTED'
             self.persist()
-        except BaseException:
+        except BaseException as error:
             self.report['status'] = 'START_FAILED'
+            # 清理可能TerminateProcess，最终exit_code不能反推最初失败
+            # 时QEMU是否仍活着。先存进程状态及CONT请求事实，保持原
+            # 管道期限、ACL、服务端PID核对和异常，不把初始化失败归内核。
+            self.report['startup_failure'] = dict(
+                type=type(error).__name__,message=str(error),
+                process_exit_before_cleanup=self.process.poll() if self.process is not None else None,
+                connected_roles=list(self.pipes),
+                guest_cont_requested=any(item.get('send',{}).get('execute')=='cont'
+                                         for item in self.report['qmp_trace']))
             # 初始化失败时客体还没有上层读取器。保留真实UART启动字节，
             # 避免把QMP/后端问题误认成内核启动完成或没有输出。
             for role in ('debug', 'management'):
@@ -632,15 +680,23 @@ def main():
     parser.add_argument('--boot', required=True, help='启动镜像，运行时使用新副本')
     parser.add_argument('--data', required=True, help='数据镜像，运行时使用新副本')
     parser.add_argument('--out', required=True, help='本次新会话目录，不可已存在')
-    parser.add_argument('--accel', choices=['tcg', 'whpx'], default='tcg')
+    parser.add_argument('--accel', choices=['tcg', 'whpx','auto'], default='tcg')
+    parser.add_argument('--network',choices=['none','user','socket'],default='none')
+    parser.add_argument('--network-peer',type=int)
+    parser.add_argument('--forward',action='append',default=[],help='显式应用tcp|udp:宿主端口:客体端口，仅127.0.0.1')
+    parser.add_argument('--network-capture',action='store_true')
+    parser.add_argument('--memory',type=int,choices=[128,256],default=128)
     parser.add_argument('--headless', action='store_true', help='无头验收；缺省显示QEMU窗口')
+    parser.add_argument('--core-symbols',type=Path,help='匹配磁盘主核符号；等首个桌面帧后再握手')
     parser.add_argument('--debug-only', action='store_true', help='只用COM1调试；无需数据盘Shell能启动')
     args = parser.parse_args()
     selected, stop, errors = ['management'], threading.Event(), []
     if args.debug_only:
         selected[0]='debug'
     connected=not args.debug_only
-    with QemuSession(args.boot, args.data, args.out, args.accel, args.headless) as vm:
+    with QemuSession(args.boot, args.data, args.out, args.accel, args.headless,
+                     network=args.network,network_peer=args.network_peer,host_forwards=args.forward,
+                     network_capture=args.network_capture,memory=args.memory) as vm:
         logs = {role: (vm.out / (role + '.bin')).open('wb')
                 for role in ('debug', 'management')}
         output_lock = threading.RLock()
@@ -746,6 +802,13 @@ def main():
         heart = None
         try:
             if connected:
+                if args.core_symbols:
+                    # M10会先验签、读TTF和原生壁纸；早发HELLO会把正常
+                    # 开机时间当作传输故障。复用已实际验证的只读首帧判据。
+                    from types import SimpleNamespace
+                    from m10_guest_boot import unique_symbols,wait_first_desktop
+                    wait_first_desktop(SimpleNamespace(vm=vm,errors=errors),
+                                       unique_symbols(args.core_symbols),vm.report)
                 client.hello()
                 heart = threading.Thread(target=heartbeat, name='SandCore-serial-heartbeat')
                 heart.start()

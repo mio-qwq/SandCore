@@ -188,6 +188,7 @@ int main(void)
     start_tick=sc_tick();char args[128];sc_args(args,sizeof(args));
     if(args[0]>='1'&&args[0]<='6')jump_to(args[0]-'1');
     for(;;){
+        if(!ui_visibility_ready())continue;
         int key=sc_key(),now=sc_tick();
         if(key==27||film_exit)return 0;
         if(key==' '){if(paused){start_tick+=now-pause_tick;paused=0;}else{pause_tick=now;paused=1;}ui_followup=1;}

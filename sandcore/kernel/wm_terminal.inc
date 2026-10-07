@@ -18,7 +18,7 @@ static void terminal_layout(win_t *w,terminal_t *t,int first,int draw)
         gfx_utf8_next(&p,&scalar);
         if(scalar=='\r'){x=margin;continue;}
         if(scalar=='\n'){x=margin;row++;continue;}
-        int width=gfx_glyph16(scalar,bits);if(!width)width=16;
+        int width=gfx_layout_glyph16(scalar,bits);if(!width)width=16;
         width=terminal_unit(scalar=='\t'?32:width,scale);
         int right=w->cw-margin-(GFX_W==320?0:terminal_unit(16,scale));
         if(x+width>right && x>margin){x=margin;row++;}
@@ -61,6 +61,7 @@ static void terminal_track(win_t *w,terminal_t *t,int *out)
 static void terminal_redraw(win_t *w)
 {
     terminal_t *t=terminal_of(w->handle);if(!t)return;
+    if(!window_visible(w)){t->width=0;return;}
     int scale=terminal_scale(),margin=GFX_W==320?4:terminal_unit(12,scale);
     int step=terminal_unit(20,scale),height=terminal_unit(16,scale);
     int visible=(w->ch-2*margin-height)/step+1;if(visible<1)visible=1;
@@ -106,11 +107,11 @@ int wm_terminal_control(int pid,int handle,int command)
     terminal_t *t=terminal_of(handle);
     if(!t) {
         if(command)return -1;
-        for(int i=0;i<WMAX;i++)if(!terminals[i].handle){t=&terminals[i];break;}
+        t=&window_record(handle)->terminal;
         char *history=(char *)pframe_alloc_run(4);if(!history)return -4;
         *t=(terminal_t){0};t->handle=handle;t->text=history;history[0]=0;t->follow=1;
     }else if(command==1){t->used=0;t->text[0]=0;t->first=0;t->follow=1;}
-    t->width=0;wm_request_compose();return 0;
+    t->width=0;window_changed(w);return 0;
 }
 int wm_terminal_puts(int pid,int handle,const char *text)
 {
@@ -143,13 +144,13 @@ int wm_terminal_puts(int pid,int handle,const char *text)
     }
     /* 只改逻辑历史，在合成时一次重排。连续键入/CLI连续多行输出
      * 不再每个PUTS都在IF=0清整个大画布，减少抢占延迟和重复绘制。 */
-    t->width=0;wm_request_compose();return 0;
+    t->width=0;window_changed(w);return 0;
 }
 static void terminal_refresh_all(void)
 {
     u32 info[32];theme_info(info);
     for(int i=0;i<nwins;i++) {
-        win_t *w=&wins[i];terminal_t *t=terminal_of(w->handle);
+        win_t *w=&WINDOW(i);terminal_t *t=terminal_of(w->handle);
         if(t && (t->theme!=info[2] || t->width!=w->cw || t->height!=w->ch || t->scale!=terminal_scale()))terminal_redraw(w);
     }
 }
@@ -160,7 +161,7 @@ static int terminal_mouse(int x,int y,u8 buttons,u8 previous)
      * 位移不改变first时不制造整帧dirty，静止鼠标不能烧满客体CPU。 */
     if(GFX_W==320)return 0;
     for(int i=nwins-1;i>=0;i--){
-        win_t *w=&wins[i];terminal_t *t=terminal_of(w->handle);
+        win_t *w=&WINDOW(i);terminal_t *t=terminal_of(w->handle);
         if(!t || extra_of(w->handle)->hidden)continue;
         int cx=x-w->x-1,cy=y-w->y-TITLE_H,b[6];terminal_track(w,t,b);
         int hit=cx>=b[0] && cx<b[0]+b[2] && cy>=0 && cy<w->ch;

@@ -188,6 +188,7 @@ static void scrollbar(void)
 }
 static void draw(void)
 {
+    if(!ui_visible)return;
     small_window=UI_W<276||UI_H<160;editor_rows=0;
     if(small_window){
         edit_menu=scroll_drag=0;ui_background(SC_THEME_FACE_ALT);

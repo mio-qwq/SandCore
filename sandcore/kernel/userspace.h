@@ -1,6 +1,7 @@
 #ifndef SANDCORE_USERSPACE_H
 #define SANDCORE_USERSPACE_H
 #include "io.h"
+void userspace_session_destroy(u32 id);
 
 /* mio：M8单用户配置、任务目录和CLI作业的公共内核合同。
  * 元数据独立于168B task_t，旧调试器/验收脚本不必猜新增字段偏移。
@@ -32,4 +33,6 @@ int userspace_job_status(int parent,u32 ticket);
 int userspace_puts(int pid,const char *text);
 int userspace_env_set(int pid,const char *name,const char *value,int remove);
 int userspace_env_list(int pid,char *out,u32 capacity);
+/* M10a1：仅内核任务存储器使用，资源按真实任务申请。 */
+u32 userspace_task_bytes(void);
 #endif

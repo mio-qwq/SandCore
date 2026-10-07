@@ -17,8 +17,13 @@
 #include "gfx.h"
 #include "wm.h"
 #include "memory.h"
+#include "session.h"
+#include "objpool.h"
+#include "interrupts.h"
 
-typedef struct { char username[32],home[64]; } user_config_t;
+/* 63字节根相对HOME再加斜杠/NUL需要65字节。旧查询仍按调用者容量
+ * 完整检查并可返回-1，不把最长账户HOME复制失败悄悄变成根目录。 */
+typedef struct { char username[32],home[65]; } user_config_t;
 typedef struct { char name[32],value[256]; } env_item_t;
 typedef struct { env_item_t items[16]; int count; } env_config_t;
 typedef struct {env_config_t values;u32 refs;} env_snapshot_t;
@@ -32,9 +37,19 @@ typedef struct {
     int child,result;
     env_snapshot_t *env;
 } user_context_t;
-static user_config_t user_config,user_candidate;
-static env_config_t environment,env_candidate;
-static user_context_t contexts[NTASK];
+static user_config_t user_candidate;
+static env_config_t baseline_environment,env_candidate;
+typedef struct {user_config_t user;env_config_t environment;} session_profile_t;
+typedef struct {session_profile_t *profile;u32 pages;} profile_slot_t;
+static objpool_t profiles;
+static session_profile_t *profile_for(u32 id);
+static const env_config_t *default_environment(int pid)
+{session_profile_t *p=profile_for(session_task(pid));return p?&p->environment:&baseline_environment;}
+static user_context_t empty_contexts;
+static user_context_t *contexts_at(int pid)
+{void *p=task_data(pid,TASK_DATA_USERSPACE);return p?p:&empty_contexts;}
+#define USER_CONTEXT(pid) (*contexts_at(pid))
+u32 userspace_task_bytes(void){return sizeof(user_context_t);}
 static char config_text[4096];
 static u32 next_ticket;
 
@@ -142,68 +157,91 @@ static int candidate(int kind,const char *path)
 }
 void userspace_init(void)
 {
-    copy(user_config.username,"mio",32);copy(user_config.home,"/HOME",64);
-    environment=(env_config_t){0};environment.count=1;
-    copy(environment.items[0].name,"PATH",32);copy(environment.items[0].value,"/BIN:/APPS",256);
-    if(!candidate(0,"SYS/USER.CFG"))user_config=user_candidate;
-    if(!candidate(1,"SYS/ENV.CFG"))environment=env_candidate;
-    contexts[0].generation=1;
+    baseline_environment=(env_config_t){0};baseline_environment.count=1;
+    copy(baseline_environment.items[0].name,"PATH",32);copy(baseline_environment.items[0].value,"/BIN:/APPS",256);
+    if(objpool_init(&profiles,sizeof(profile_slot_t),0))panic("PROFILE MEMORY",0);
+    (void)profile_for(session_active());
+    USER_CONTEXT(0).generation=1;
+}
+static session_profile_t *profile_for(u32 id)
+{
+    if(!profiles.stride || !session_get(id))return 0;
+    profile_slot_t *slot=objpool_get(&profiles,(int)id);if(slot)return slot->profile;
+    if(objpool_claim(&profiles,(int)id))return 0;slot=objpool_get(&profiles,(int)id);
+    slot->pages=(sizeof(session_profile_t)+4095)/4096;slot->profile=(session_profile_t *)pframe_alloc_run(slot->pages);
+    if(!slot->profile){objpool_release(&profiles,(int)id);return 0;}
+    u8 *bytes=(u8 *)slot->profile;for(u32 i=0;i<sizeof(session_profile_t);i++)bytes[i]=0;
+    session_t *s=session_get(id);session_profile_t *p=slot->profile;
+    copy(p->user.username,s->name,32);p->user.home[0]='/';(void)copy(p->user.home+1,s->home,64);p->environment=baseline_environment;
+    char path[64];
+    if(session_config_path_for(id,"USER.CFG",path)>=0 && fs_access_identity(path,s->uid,s->gid,FS_ACCESS_READ)
+        && !candidate(0,path))p->user=user_candidate;
+    if(session_config_path_for(id,"ENV.CFG",path)>=0 && fs_access_identity(path,s->uid,s->gid,FS_ACCESS_READ)
+        && !candidate(1,path))p->environment=env_candidate;
+    return p;
+}
+void userspace_session_destroy(u32 id)
+{
+    profile_slot_t *slot=profiles.stride?objpool_get(&profiles,(int)id):0;if(!slot)return;
+    pframe_free_run((u32)slot->profile,slot->pages);objpool_release(&profiles,(int)id);
 }
 int userspace_config(int kind,const char *path,int action)
 {
     if(kind<0 || kind>1 || action<0 || action>2 || (action!=2 && !path))return -1;
-    const char *fixed=kind==0?"SYS/USER.CFG":"SYS/ENV.CFG";
+    char fixed[64];if(session_config_path(kind==0?"USER.CFG":"ENV.CFG",fixed)<0)return -5;
+    session_profile_t *profile=profile_for(session_current());if(!profile)return -4;
     if(!fs_access(task_pid(),action==2?fixed:path,FS_ACCESS_READ))return -5;
     if(action==1 && (!fs_user_mutable(fixed,0) || !fs_access(task_pid(),fixed,FS_ACCESS_WRITE)))return -5;
     int result=candidate(kind,action==2?fixed:path);if(result)return result;
     if(!action)return 0; /* 验证不提交，普通编辑器可在覆盖固定配置之前校验 */
+    if(action==1){result=session_config_prepare(task_pid());if(result<0)return result;}
     if(action==1 && fs_write(fixed,(const u8 *)config_text,(u32)length(config_text))!=length(config_text))return -3;
-    if(kind==0)user_config=user_candidate;else environment=env_candidate;
+    if(kind==0)profile->user=user_candidate;else profile->environment=env_candidate;
     return 0;
 }
 void userspace_spawn(int pid,int parent)
 {
-    u32 generation=contexts[pid].generation+1;if(!generation)generation=1;
-    contexts[pid]=(user_context_t){0};contexts[pid].generation=generation;
-    contexts[pid].parent=-1;
-    if(parent>0 && parent<NTASK && auth_uid(pid)==auth_uid(parent)){
-        copy(contexts[pid].cwd,contexts[parent].cwd,64);
-        contexts[pid].env=contexts[parent].env;if(contexts[pid].env)contexts[pid].env->refs++;
+    u32 generation=task_generation(pid);
+    USER_CONTEXT(pid)=(user_context_t){0};USER_CONTEXT(pid).generation=generation;
+    USER_CONTEXT(pid).parent=-1;
+    if(parent>0 && parent<NTASK && auth_uid(pid)==auth_uid(parent) && session_task(pid)==session_task(parent)){
+        copy(USER_CONTEXT(pid).cwd,USER_CONTEXT(parent).cwd,64);
+        USER_CONTEXT(pid).env=USER_CONTEXT(parent).env;if(USER_CONTEXT(pid).env)USER_CONTEXT(pid).env->refs++;
     }
     else {
         u32 info[2];
         const char *home=auth_home(pid);
-        if(!fs_stat(home,info) && info[0]==2)fs_normalize(home,contexts[pid].cwd);
+        if(!fs_stat(home,info) && info[0]==2)fs_normalize(home,USER_CONTEXT(pid).cwd);
     }
 }
 void userspace_executable(int pid,const char *path)
-{fs_normalize(path,contexts[pid].executable);}
+{fs_normalize(path,USER_CONTEXT(pid).executable);}
 int userspace_query(int pid,int kind,const char *name,char *out,u32 capacity)
 {
-    if(pid<1 || pid>=NTASK || !capacity || capacity>256)return -1;
+    if(pid<1 || !task_owned(pid) || !capacity || capacity>256)return -1;
     const char *value;char rooted[65];
     if(kind==0)value=auth_name(pid);
     else if(kind==1)value=auth_home(pid);
     else if(kind==2 || kind==3) {
-        rooted[0]='/';copy(rooted+1,kind==2?contexts[pid].cwd:contexts[pid].executable,64);value=rooted;
+        rooted[0]='/';copy(rooted+1,kind==2?USER_CONTEXT(pid).cwd:USER_CONTEXT(pid).executable,64);value=rooted;
     }else if(kind==4 && name) {
         if(equal(name,"USER"))value=auth_name(pid);
         else if(equal(name,"HOME")){rooted[0]='/';copy(rooted+1,auth_home(pid),64);value=rooted;}
-        else if(equal(name,"PWD")){rooted[0]='/';copy(rooted+1,contexts[pid].cwd,64);value=rooted;}
-        else {const env_config_t *env=contexts[pid].env?&contexts[pid].env->values:&environment;
+        else if(equal(name,"PWD")){rooted[0]='/';copy(rooted+1,USER_CONTEXT(pid).cwd,64);value=rooted;}
+        else {const env_config_t *env=USER_CONTEXT(pid).env?&USER_CONTEXT(pid).env->values:default_environment(pid);
             int found=env_find(env,name);if(found<0)return -2;value=env->items[found].value;}
     }else return -1;
     return copy(out,value,(int)capacity);
 }
 int userspace_resolve(int pid,const char *path,char *out,u32 capacity)
 {
-    if(pid<=0 || pid>=NTASK || !path || !capacity || capacity>64)return -1;
+    if(pid<=0 || !task_owned(pid) || !path || !capacity || capacity>64)return -1;
     /* 中间连接串最多127B；输入不截断。先拼当前目录再解析..，因此
      * HOME/../BIN有明确含义，越过根则沿用SandFS的拒绝规则。返回
      * 不带根斜杠，直接可传旧FS接口，根目录以空字符串表示。 */
     char combined[128],normal[64];int at=0,n=length(path);
     if(path[0]!='/') {
-        at=length(contexts[pid].cwd);copy(combined,contexts[pid].cwd,128);
+        at=length(USER_CONTEXT(pid).cwd);copy(combined,USER_CONTEXT(pid).cwd,128);
         if(at && n)combined[at++]='/';
     }
     if(n+at>=128)return -1;
@@ -217,7 +255,7 @@ int userspace_chdir(int pid,const char *path)
     if(userspace_resolve(pid,path,normal,64)<0)return -1;
     if(fs_stat(normal,info) || info[0]!=2)return -2;
     if(!fs_access(pid,normal,FS_ACCESS_READ))return -5;
-    copy(contexts[pid].cwd,normal,64);return 0;
+    copy(USER_CONTEXT(pid).cwd,normal,64);return 0;
 }
 static int suffix(const char *path)
 {
@@ -240,9 +278,10 @@ static int executable(int parent,const char *name,char *out)
         if(userspace_resolve(parent,with_suffix,out,64)<0)return -1;
         return fs_stat(out,info) || info[0]!=1?-2:0;
     }
-    int index=env_find(&environment,"PATH");
+    const env_config_t *env=USER_CONTEXT(parent).env?&USER_CONTEXT(parent).env->values:default_environment(parent);
+    int index=env_find(env,"PATH");
     if(index<0)return -2;
-    const char *path=environment.items[index].value;
+    const char *path=env->items[index].value;
     while(*path) {
         char combined[128];int used=0;
         while(*path && *path!=':')combined[used++]=*path++;
@@ -255,7 +294,7 @@ static int executable(int parent,const char *name,char *out)
 }
 int userspace_cli_run(int parent,const char *command,int terminal)
 {
-    user_context_t *p=&contexts[parent];
+    user_context_t *p=&USER_CONTEXT(parent);
     if(!wm_terminal_owned(parent,terminal))return -1;
     if(p->job_ticket && p->child>0)return -6;
     char name[64],path[64],launch[192];int n=0;
@@ -268,66 +307,70 @@ int userspace_cli_run(int parent,const char *command,int terminal)
     if(*command){launch[at++]=' ';copy(launch+at,command,192-at);}
     int child=task_exec_scx(launch);if(child<1)return child;
     u32 ticket=(++next_ticket)&0x3FFFFFFFu;if(!ticket)ticket=(++next_ticket)&0x3FFFFFFFu;
-    p->job_ticket=ticket;p->child=child;p->child_generation=contexts[child].generation;p->result=0;
-    user_context_t *c=&contexts[child];
+    p->job_ticket=ticket;p->child=child;p->child_generation=USER_CONTEXT(child).generation;p->result=0;
+    user_context_t *c=&USER_CONTEXT(child);
     c->parent=parent;c->parent_generation=p->generation;c->terminal=terminal;c->ticket=ticket;
     return (int)ticket;
 }
 int userspace_job_status(int parent,u32 ticket)
 {
-    user_context_t *p=&contexts[parent];
+    user_context_t *p=&USER_CONTEXT(parent);
     if(!ticket || ticket!=p->job_ticket)return -1;
     if(!p->child)return p->result;
     int child=p->child;
-    if(contexts[child].generation!=p->child_generation)return -1; /* 正常停止必须先交结果 */
-    return tasks[child].state==3?0x40000001:0x40000000;
+    if(USER_CONTEXT(child).generation!=p->child_generation)return -1; /* 正常停止必须先交结果 */
+    return TASK(child).state==3?0x40000001:0x40000000;
 }
 int userspace_puts(int pid,const char *text)
 {
-    user_context_t *c=&contexts[pid];int parent=c->parent;
-    if(parent<1 || parent>=NTASK || tasks[parent].state!=1)return -1;
-    user_context_t *p=&contexts[parent];
+    user_context_t *c=&USER_CONTEXT(pid);int parent=c->parent;
+    if(parent<1 || parent>=NTASK || TASK(parent).state!=1)return -1;
+    user_context_t *p=&USER_CONTEXT(parent);
     if(c->parent_generation!=p->generation || c->ticket!=p->job_ticket
        || p->child!=pid || p->child_generation!=c->generation)return -1;
     return wm_terminal_puts(parent,c->terminal,text);
 }
 void userspace_stop(int pid,int code)
 {
-    user_context_t *c=&contexts[pid];int parent=c->parent;
+    user_context_t *c=&USER_CONTEXT(pid);int parent=c->parent;
     if(c->env){env_snapshot_t *env=c->env;c->env=0;if(!--env->refs)pframe_free_run((u32)env,(sizeof(*env)+4095)/4096);}
     if(parent>0 && parent<NTASK) {
-        user_context_t *p=&contexts[parent];
+        user_context_t *p=&USER_CONTEXT(parent);
         if(c->parent_generation==p->generation && c->ticket==p->job_ticket
            && p->child==pid && p->child_generation==c->generation) {
             p->result=code;p->child=0;
+            task_notify_generation(parent,c->parent_generation,TASK_EVENT_JOB);
         }
     }
     c->parent=-1;c->ticket=0;
     /* 父任务停止只取消经CLIRUN附着的作业，原EXEC的GUI子进程不受
      * 影响。先撤授权再停止子进程，递归task_stop不会重复进入本父槽。 */
     int child=c->child;c->child=0;
-    if(child>0 && contexts[child].generation==c->child_generation
-       && contexts[child].parent==pid) {
-        contexts[child].parent=-1;process_exit(child,130);task_stop(child);
+    if(child>0 && USER_CONTEXT(child).generation==c->child_generation
+       && USER_CONTEXT(child).parent==pid) {
+        USER_CONTEXT(child).parent=-1;process_exit(child,130);task_stop(child);
     }
 }
 void userspace_terminal_closed(int owner,int handle)
 {
-    for(int i=1;i<NTASK;i++) {
-        user_context_t *c=&contexts[i];
-        if(c->parent==owner && c->terminal==handle) {
-            process_exit(i,130);task_stop(i);
+    /* CLIRUN合同始终只有一个附着孩子，直接核对父子代数与句柄即可。
+     * 多作业SPAWN2的终端能力另由streams撤销；不能在每关一窗扫全任务。 */
+    if(!task_owned(owner))return;user_context_t *p=&USER_CONTEXT(owner);int child=p->child;
+    if(child>0 && task_owned(child) && task_generation(child)==p->child_generation){
+        user_context_t *c=&USER_CONTEXT(child);
+        if(c->parent==owner && c->parent_generation==p->generation && c->terminal==handle){
+            process_exit(child,130);task_stop(child);
         }
     }
 }
 int userspace_env_set(int pid,const char *name,const char *value,int remove)
 {
-    if(pid<1 || pid>=NTASK || !identifier(name) || (remove!=0 && remove!=1)
+    if(pid<1 || !task_owned(pid) || !identifier(name) || (remove!=0 && remove!=1)
         || (!remove && (!value || length(value)>255)))return -1;
     if(equal(name,"USER") || equal(name,"HOME") || equal(name,"PWD"))return -5;
     if(!remove && equal(name,"PATH") && path_value(value))return -1;
-    user_context_t *c=&contexts[pid];
-    const env_config_t *prior=c->env?&c->env->values:&environment;
+    user_context_t *c=&USER_CONTEXT(pid);
+    const env_config_t *prior=c->env?&c->env->values:default_environment(pid);
     int index=env_find(prior,name);if(remove && index<0)return 0;
     if(!remove && index<0 && prior->count==16)return -4;
     if(!c->env || c->env->refs>1){
@@ -341,7 +384,7 @@ int userspace_env_set(int pid,const char *name,const char *value,int remove)
 }
 int userspace_env_list(int pid,char *out,u32 capacity)
 {
-    const env_config_t *env=contexts[pid].env?&contexts[pid].env->values:&environment;u32 used=0;
+    const env_config_t *env=USER_CONTEXT(pid).env?&USER_CONTEXT(pid).env->values:default_environment(pid);u32 used=0;
     for(int i=0;i<env->count+3;i++){
         const char *name=i<env->count?env->items[i].name:i==env->count?"USER":i==env->count+1?"HOME":"PWD";
         if(i<env->count && (equal(name,"USER") || equal(name,"HOME") || equal(name,"PWD")))continue;

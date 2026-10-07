@@ -39,6 +39,7 @@ void management_init(void)
     session=transfer_token=download_generation=console_head=console_tail=0;shell_pid=-1;
 }
 int management_connected(void){return session!=0;}
+u32 management_console_capacity(void){return session?CONSOLE_BYTES-(console_head-console_tail):0;}
 int management_console_write(const void *data,u32 length)
 {
     if(!session)return -5;
@@ -168,6 +169,6 @@ void management_poll(void)
     if(console_head!=console_tail && session){
         u32 count=console_head-console_tail;if(count>512)count=512;
         for(u32 i=0;i<count;i++)reply[i]=console[(console_tail+i)&(CONSOLE_BYTES-1)];
-        console_tail+=count;send(0x100,0,reply,count);
+        console_tail+=count;streams_serial_writable();send(0x100,0,reply,count);
     }
 }

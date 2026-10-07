@@ -41,5 +41,10 @@ u32 auth_serial_begin(void);
 void auth_serial_end(void);
 int auth_serial_exec(u32 session,const char *command);
 int auth_service_exec(const char *command,int delegate);
+int auth_login_screen_exec(u32 desktop); /* 可信内核仅启动固定、受保护的登录程序。 */
 int auth_launch_access(const char *path,u32 access);
+int auth_network_exec(int pid,const char *command,const i32 descriptors[3]);
+/* M10a1：仅内核任务存储器使用，资源按真实任务申请。 */
+u32 auth_task_bytes(void);
+u32 auth_login_bytes(void);
 #endif

@@ -4,14 +4,17 @@
 #include <stdint.h>
 #define SFS_PATH 64
 #define HOST_PATH 32768
+typedef struct SfsBuffer SfsBuffer;
 typedef struct {
     char name[SFS_PATH]; unsigned char *data; uint32_t size;
     int32_t uid,gid; uint32_t mode,generation; int directory;
+    SfsBuffer *content; /* 新导入正文共享；盘内正文借不可变snapshot，不复制。 */
 } SfsEntry;
 typedef struct {
     SfsEntry *entries; uint32_t count,capacity,version,dir_sectors,data_start,sectors;
     uint32_t bank,commit_generation,object_generation;
     unsigned char *original; size_t image_size; wchar_t *path; int dirty;
+    SfsBuffer *snapshot;
 } SfsImage;
 extern wchar_t sfs_error[1024];
 int sfs_load(SfsImage *image,const wchar_t *path);

@@ -19,4 +19,6 @@ int image_service_cancel(int owner,u32 ticket);
 int image_service_take(u32 ticket,image_surface_t *out);
 void image_service_poll(void);
 void image_service_owner_stopped(int owner);
+/* M10a1：仅内核任务存储器使用，资源按真实任务申请。 */
+u32 image_service_task_bytes(void);
 #endif

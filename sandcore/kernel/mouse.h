@@ -16,5 +16,6 @@ int mouse_next_event(i32 *x,i32 *y,u8 *buttons); /* IF=0主循环按包取事件
  * 调用者在IF=0记录差值；屏幕边缘不会截断原始PS/2位移。 */
 void mouse_relative_totals(u32 *x,u32 *y);
 void mouse_relative_mode(int enabled);
+void mouse_session_switch(void); /* IF=0；清队列并抑制旧会话持有的按钮。 */
 
 #endif /* SANDCORE_MOUSE_H */

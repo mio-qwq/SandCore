@@ -17,6 +17,11 @@ static int ui_win,ui_width,ui_height,ui_scale=100,UI_W,UI_H,ui_last_tick,ui_fram
 static int ui_x,ui_y,ui_buttons,ui_pressed,ui_released,ui_focus,ui_action;
 static int ui_compact;
 static int ui_followup;
+static u32 ui_visibility_epoch;
+static int ui_visible=1;
+/* 需要后台流处理的GUI主动声明唤醒来源/周期。普通编辑器只等可见
+ * 事件；播放器不能因为不画窗口而停止向音频设备续数据。 */
+static u32 ui_background_events,ui_background_interval;
 /* mio：鼠标每个坐标都不是视觉变化。过去鼠标在同一按钮/空白内
  * 移动也完整重绘和复制数MB，Monitor快速移动时把客体烧到约87%。
  * 记录上一张实际提交帧的按钮命中矩形和hover状态，只在进入/离开
@@ -37,9 +42,7 @@ static int ui_clip_enabled,ui_clip_x,ui_clip_y,ui_clip_right,ui_clip_bottom;
 static inline void ui_clip_clear(void){ui_clip_enabled=0;}
 static inline void ui_clip_set(int x,int y,int w,int h)
 {ui_clip_enabled=1;ui_clip_x=x;ui_clip_y=y;ui_clip_right=x+w;ui_clip_bottom=y+h;}
-static u32 ui_glyph_codes[128];
-static u16 ui_glyph_rows[128][16];
-static int ui_glyph_width[128],ui_glyph_count;
+#include "GLYPHS.inc"
 static inline int ui_abs(int x){
     return x<0?-x:x;
 }
@@ -87,6 +90,7 @@ static inline void ui_theme_update(void)
 }
 static inline void ui_physical_rgb(int x,int y,int w,int h,u32 rgb)
 {
+    if(!ui_visible)return;
     int right=ui_clamp(x+w,0,ui_width),bottom=ui_clamp(y+h,0,ui_height);
     x=ui_clamp(x,0,ui_width);y=ui_clamp(y,0,ui_height);
     if(ui_clip_enabled){
@@ -123,6 +127,7 @@ static inline void ui_physical(int x,int y,int w,int h,int color)
  * 用逻辑端点，只有整页底图清除裁剪并覆盖实际ui_width/height。 */
 static inline void ui_background(int role)
 {
+    if(!ui_visible)return;
     ui_clip_clear();
     ui_physical_rgb(0,0,ui_width,ui_height,ui_role(role));
 }
@@ -130,6 +135,7 @@ static inline void ui_rect_rgb(int x,int y,int w,int h,u32 rgb)
 { ui_physical_rgb(ui_px(x),ui_px(y),ui_px(x+w)-ui_px(x),ui_px(y+h)-ui_px(y),rgb); }
 static inline void ui_round_rgb(int x,int y,int w,int h,int radius,u32 rgb)
 {
+    if(!ui_visible)return;
     if(radius>w/2)radius=w/2;
     if(radius>h/2)radius=h/2;
     /* 整数圆弧逐行求覆盖段。布局坐标放大以后仍按真实像素边界绘制，
@@ -200,8 +206,9 @@ static inline int ui_hit(int x,int y,int w,int h)
 }
 static inline void ui_text(int x,int y,const char *text,int color)
 {
+    if(!ui_visible)return;
 
-    /* Unicode字形通过GLYPH16复制，128项缓存是本进程私有数据。
+    /* Unicode字形通过完整TTF位图复制，256项缓存是本进程私有数据。
      * ASCII和汉字均来自凤凰字库；150%按像素边界分配1/2宽交替，
      * 而非插值模糊。输入源码保持原始UTF-8，显示缺字不破坏字节。 */
     int left=x;
@@ -227,16 +234,7 @@ static inline void ui_text(int x,int y,const char *text,int color)
             }
         }
         else if(c>=128)c=0xFFFD;
-        int slot=0;
-        while(slot<ui_glyph_count&&ui_glyph_codes[slot]!=c)slot++;
-        if(slot==ui_glyph_count){
-            if(slot==128)slot=127;
-            else ui_glyph_count++;
-            ui_glyph_codes[slot]=c;
-            int width=sc_glyph16(c,ui_glyph_rows[slot]);
-            ui_glyph_width[slot]=width>0?width:16;
-
-        }
+        int slot=ui_glyph_slot(c);
         for(int r=0;r<16;r++)for(int col=0;col<ui_glyph_width[slot];col++)
         if(ui_glyph_rows[slot][r]&(0x8000u>>col))ui_rect(x+col,y+r,1,1,color);
         x+=ui_glyph_width[slot];
@@ -281,6 +279,7 @@ static inline void ui_geometry(void)
     UI_H=ui_height*100/ui_scale;
     ui_compact=UI_H<350;
     ui_theme_update();
+    if(ui_font_refresh())ui_followup=1;
 }
 static inline int ui_open(const char *title)
 {
@@ -297,6 +296,7 @@ static inline int ui_open(const char *title)
     if(h>900)h=900;
     ui_win=sc_open_rgb(title,w,h);
     if(ui_win<0)return -1;
+    u32 visibility[8];if(sc_visibility(ui_win,visibility)>=0){ui_visible=(int)visibility[1];ui_visibility_epoch=visibility[2];}
     ui_pixels=sc_alloc(1920u*1080u*4u);
     if(!ui_pixels){sc_call(0x11,ui_win,0,0,0,0,0);return -1;}
     ui_geometry();
@@ -306,9 +306,19 @@ static inline int ui_open(const char *title)
     ui_followup=1;
     return ui_win;
 }
+static inline int ui_visibility_sample(void)
+{
+    u32 visibility[8];if(sc_visibility(ui_win,visibility)<0)return 1;
+    ui_visible=(int)visibility[1];
+    if(!ui_visible){ui_followup=1;return 0;}
+    if(ui_visibility_epoch!=visibility[2] || visibility[4]){ui_visibility_epoch=visibility[2];ui_followup=1;ui_hover_count=0;}
+    return 1;
+}
 static inline void ui_pointer(void)
 {
-
+    /* 编译器等后台回调也会调用pointer。这里只采样，不等待可见，
+     * 避免为停止状态窗口绘制而把真正的后台编译一并暂停。 */
+    if(!ui_visibility_sample()){ui_action=ui_focus=ui_pressed=ui_released=ui_buttons=0;return;}
     int p[6];
     ui_geometry();
     ui_action=0;
@@ -410,6 +420,7 @@ static inline int ui_toolbar(const int *ids,const char **labels,int count,int y)
 }
 static inline void ui_present(void)
 {
+    if(!ui_visible)return;
     sc_frame32(ui_win,ui_pixels,(u32)ui_width*ui_height*4);
     ui_hover_recording=0;
     /* 点击帧展示的是操作前标签，随后分发动作。补一帧以立即
@@ -417,9 +428,17 @@ static inline void ui_present(void)
     if(ui_action)ui_followup=1;
     ui_frames++;
 }
+static inline int ui_visibility_ready(void)
+{
+    if(!ui_visibility_sample()){sc_event_wait(SC_EVENT_VISIBILITY|ui_background_events,ui_background_interval?ui_background_interval:0xFFFFFFFFu);return 0;}
+    return 1;
+}
 static inline int ui_frame_due_interval(int refresh_ticks)
 {
+    if(!ui_visibility_ready())return 0;
+    if(ui_font_refresh())ui_followup=1;
     int tick=sc_tick();
+    u32 elapsed=(u32)tick-(u32)ui_last_tick;
     int p[6],info[5];u32 display[8],theme[32];
     if(sc_pointer_peek(ui_win,p) || sc_info(ui_win,info) || sc_display(display) || sc_theme(theme)){
         sc_yield();return 0;
@@ -443,8 +462,10 @@ static inline int ui_frame_due_interval(int refresh_ticks)
      * 随后的ui_pointer/sc_key仍收到同一个事件。动作之后补一帧，
      * 让更新的标签/页面当即可见，不能等待下一秒才显示保存结果。 */
     if(!ui_followup && key<0 && !p[3] && !p[4] && !changed
-       && (refresh_ticks<=0 || tick-ui_last_tick<refresh_ticks)) {
-        sc_yield();return 0;
+       && (refresh_ticks<=0 || elapsed<(u32)refresh_ticks)) {
+        u32 timeout=refresh_ticks<=0?0xFFFFFFFFu:(u32)refresh_ticks-elapsed;
+        if(ui_background_interval && timeout>ui_background_interval)timeout=ui_background_interval;
+        sc_event_wait(SC_EVENT_INPUT|SC_EVENT_VISIBILITY|ui_background_events,timeout);return 0;
     }
     if(changed && key<0 && !p[3] && !p[4] && !ui_followup && tick==ui_last_tick) {
         sc_yield();return 0;
@@ -494,6 +515,7 @@ static inline int ui_edit_path(char *path,int capacity,const char *title)
     int n=length(path),select_all=1,selected=0,first=0,count=0,reload=1;
     ui_followup=1;
     for(;;){
+        if(!ui_visibility_ready())continue;
         if(!reload && !ui_frame_due())continue;
         ui_pointer();
         /* 改窗口尺寸会改变物理stride，不能把旧宽度的像素排列当新

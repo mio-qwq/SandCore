@@ -59,7 +59,17 @@ Windows功能状态和真实探测。`probe-03.json`为实际成功的TCP QMP
 旧VGA模式、PIC和MMIO兼容仍实际验证，必要时用原TCG；不为了
 加速删设备或开放内核浮点，也不把SIMD直接写MMIO的兼容限制忽略。
 
+## M10a1独立入口与网络（源码，未运行）
+
+根目录`run-m10a1.bat`调用`tools/run_m10a1.py`，读取独立`build/m10a1-work`两盘，新建带时间/随机尾码的会话目录并复制来源盘。缺省有窗、auto、256MiB、IPv4 user e1000；可传`--accel tcg|whpx|auto`、`--headless`、`--network none|user|socket`、`--network-peer PORT`、`--network-capture`。socket对端仅127.0.0.1显式端口。user关闭后端IPv6；显式`--forward tcp|udp:宿主端口:客体端口`只绑定127.0.0.1，属于应用端口。
+
+正式M10会话继续复用scserial：先`-S`暂停、建立本机Windows双串口管道/服务PID核对和SID ACL、握手父子匿名stdio QMP，再cont。HMP经过QMP human-monitor-command，没有客体经NAT网关可接入的TCP控制监听。最高管理仍来自外部硬件模型串口；应用转发不提供管理票据。无NIC auto能力探测与正式VM分列，不复用历史TCP HMP启动器来开启M10网络。
+
+`verify_m10_network.py`用两个不同来源盘，每盘分别启动隔离Ethernet、user服务与无NIC三会话；服务只监听本人127.0.0.1临时端口、结束关闭本人连接。QEMU PCAP、原创对端PCAP/JSON、串口、逐项字节/退出码/CPU/耗时及HMP截图分别保存。用例源码未运行，也不能代表完整性能/兼容/故障矩阵已经收齐。原M9默认无网络128MiB入口保持，旧记录只是历史证据。
+
 ## 修订记录
+
+2026-10-06：新增M10独立IPv4/e1000启动与私有控制通道、双来源网络验收入口源码；未构建未运行。
 
 2026-10-04：接口NoRestart启用、宿主文件能力识别、auto/明确模式、
 同文件TCG对照和可复现启动身份接线；完整双盘/游戏性能继续。

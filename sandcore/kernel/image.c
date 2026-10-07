@@ -11,6 +11,7 @@
 #include "memory.h"
 #include "display.h"
 #include "palette.h"
+#include "timer.h"
 
 static u32 le32(const u8 *p)
 {return (u32)p[0]|((u32)p[1]<<8)|((u32)p[2]<<16)|((u32)p[3]<<24);}
@@ -39,6 +40,69 @@ void image_release(image_surface_t *surface)
 {
     if(surface->pixels)pframe_free_run((u32)surface->pixels,surface->pages);
     *surface=(image_surface_t){0};
+}
+void image_reader_cancel(image_reader_t *reader)
+{
+    image_release(&reader->candidate);*reader=(image_reader_t){0};
+}
+int image_reader_begin(image_reader_t *reader,const char *path,u32 offset,u32 length,int icon)
+{
+    image_reader_cancel(reader);
+    if(fs_normalize(path,reader->path)<=0 || fs_metadata(reader->path,reader->metadata)
+       || reader->metadata[1]!=1 || offset>reader->metadata[2]
+       || length>reader->metadata[2]-offset)return -1;
+    reader->offset=offset;reader->length=length;reader->icon=icon;reader->phase=1;return 0;
+}
+int image_reader_step(image_reader_t *reader,u32 budget,image_surface_t *out)
+{
+    u32 metadata[8],started=sc_ticks;
+    if(!reader->phase || !budget || !out)return -1;
+    if(fs_metadata(reader->path,metadata))goto failed;
+    for(u32 i=0;i<8;i++)if(metadata[i]!=reader->metadata[i])goto failed;
+    if(reader->phase==1){
+        if(image_info(reader->path,reader->offset,reader->length,reader->icon,&reader->info))goto failed;
+        reader->candidate.width=reader->info.width;reader->candidate.height=reader->info.height;
+        reader->candidate.pages=(reader->info.width*reader->info.height*4+4095)/4096;
+        reader->candidate.pixels=(u32 *)pframe_alloc_run(reader->candidate.pages);
+        if(!reader->candidate.pixels)goto failed;
+        reader->phase=2;
+    }
+    /* 只在任务0服务保护内读一个有限块；共享FS扇区中转不与三环
+     * 系统调用交叉。每扇后的PIT检查使慢PIO设备也能及时交还主循环，
+     * 管理心跳、输入与网络定时器不再等整幅6MiB壁纸完成。 */
+    u8 indexed[512];
+    do{
+        u32 count=512-((reader->info.body+reader->position)&511u);
+        if(count>reader->info.bytes-reader->position)count=reader->info.bytes-reader->position;
+        if(count>budget)count=budget;
+        void *target=reader->info.format==2?(u8 *)reader->candidate.pixels+reader->position:indexed;
+        if(fs_read_at(reader->path,target,count,reader->info.body+reader->position)!=(int)count)goto failed;
+        if(reader->info.format==1)for(u32 i=0;i<count;i++){
+            u8 color=indexed[i];if(color>PAL_UI_LINE)goto failed;
+            reader->candidate.pixels[reader->position+i]=reader->icon && !color?0:0xFF000000u|display_rgb(color);
+        }
+        reader->position+=count;budget-=count;
+        if(reader->flatten){
+            /* 背景的透明度合成与读盘使用同一个候选生命周期和预算。
+             * 只处理完整像素；半个ARGB留到下批，不读未初始化正文。
+             * 固定face随主题重载取消，计算与旧wall_accept逐位相同。 */
+            u32 complete=reader->info.format==2?reader->position/4:reader->position;
+            for(u32 i=reader->prepared_pixels;i<complete;i++){
+                u32 pixel=reader->candidate.pixels[i],alpha=pixel>>24,result=0;
+                if(alpha==255)result=pixel&0xFFFFFFu;
+                else if(!alpha)result=reader->background;
+                else for(u32 shift=0;shift<24;shift+=8)
+                    result|=(((((pixel>>shift)&255)*alpha+((reader->background>>shift)&255)*(255-alpha)+127)/255)<<shift);
+                reader->candidate.pixels[i]=result;
+            }
+            reader->prepared_pixels=complete;
+        }
+    }while(reader->position<reader->info.bytes && budget && sc_ticks-started<2u);
+    if(reader->position<reader->info.bytes)return 1;
+    image_release(out);*out=reader->candidate;reader->candidate=(image_surface_t){0};
+    reader->phase=0;return 0;
+failed:
+    image_reader_cancel(reader);return -1;
 }
 int image_load(const char *path,u32 offset,u32 length,int icon,image_surface_t *out)
 {
