@@ -10,6 +10,7 @@ import zipfile
 ROOT = Path(__file__).resolve().parents[1]
 REPO = ROOT.parent
 EVIDENCE = (
+    'm10a1-launch-fix-01',
     'm10a1-curl-final-01', 'm10a1-network-13', 'm10a1-dhcp-lifecycle-03',
     'm10a1-dhcp-long-03', 'm10a1-core-11', 'm10a1-preserved-recovery-01',
     'm10a1-font-06', 'm10a1-font-edges-02', 'm10a1-notes-03',
@@ -82,6 +83,7 @@ def main():
                 add('evidence/'+directory+'/'+entry.relative_to(path).as_posix(), entry)
     # 只选代表图，不把所有旧截图再次压包。
     selected = {
+        'screenshots/launcher-default.png': ROOT/'build/m10a1-launch-fix-01/desktop.png',
         'screenshots/desktop.png': ROOT/'build/m10a1-curl-final-01/desktop.png',
         'screenshots/notes-chinese.png': ROOT/'build/m10a1-notes-03/disk-1/Notes-original-Chinese-source.png',
     }

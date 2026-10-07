@@ -807,7 +807,8 @@ def main():
                     # 开机时间当作传输故障。复用已实际验证的只读首帧判据。
                     from types import SimpleNamespace
                     from m10_guest_boot import unique_symbols,wait_first_desktop
-                    wait_first_desktop(SimpleNamespace(vm=vm,errors=errors),
+                    # 与串口泵共用停止事件，等待首帧也遵守同一退出生命周期。
+                    wait_first_desktop(SimpleNamespace(vm=vm,errors=errors,stop=stop),
                                        unique_symbols(args.core_symbols),vm.report)
                 client.hello()
                 heart = threading.Thread(target=heartbeat, name='SandCore-serial-heartbeat')
