@@ -1,0 +1,2 @@
+raider: 135 checks passed (ASan + UBSan)
+installer/payload: 39 checks passed (ASan + UBSan)

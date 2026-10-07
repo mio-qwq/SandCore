@@ -1,0 +1,44 @@
+[
+  {
+    "name": "pcalc",
+    "bytes": 20009,
+    "load": 15845,
+    "bss": 13815,
+    "sha256": "021018a265eb0fe7c0d6c4b0452224d8f29f65c6c87ea34a1ce8523623c038ce"
+  },
+  {
+    "name": "sheet",
+    "bytes": 29729,
+    "load": 25565,
+    "bss": 112447,
+    "sha256": "7501c682cba46faa674900ff73e12d2a94b6a674978f6b6931eca0f1c0e85a42"
+  },
+  {
+    "name": "hexed",
+    "bytes": 25121,
+    "load": 20957,
+    "bss": 112287,
+    "sha256": "c40210660882ca0e6414570d519f59c2896ee37ac13f5e48cc9b8d9b8fedceb6"
+  },
+  {
+    "name": "blocks",
+    "bytes": 24241,
+    "load": 20077,
+    "bss": 12143,
+    "sha256": "3afa344f65844b2fee19b68b07b513e5fa4432748a4bcabc4b066fb5d550da96"
+  },
+  {
+    "name": "raider",
+    "bytes": 45241,
+    "load": 41077,
+    "bss": 121319,
+    "sha256": "980f716e2c1c1e5627920af0db4002fafe161052a8a05577b4a99ee2c01290da"
+  },
+  {
+    "name": "SandCore_ExtraSoftware_Pack_1",
+    "bytes": 124825,
+    "load": 120661,
+    "bss": 12199,
+    "sha256": "e9b5623511e7a5f62085cdb8c712076d9e2e71bd9d2bec00b80dc4c796a4034b"
+  }
+]

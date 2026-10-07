@@ -11,3 +11,14 @@ __pycache__/
 /backup/
 /rebuild-output/
 /sanddata_editor/build/
+# 扩展工作区完整保留在本机；Git收录源码、正式包、基线及已有日志/预览。
+# 可重新生成的链接中间物、宿主测试程序和原始PPM不作为交付内容。
+/ext/**/build/host/
+/ext/**/build/*.o
+/ext/**/build/*.d
+/ext/**/build/*.pe
+/ext/**/build/*.bin
+/ext/**/build/*.sym
+/ext/**/build/*.scb
+/ext/**/build/*.scx
+/ext/**/build/*.ppm
