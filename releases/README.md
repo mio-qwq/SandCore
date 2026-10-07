@@ -1,5 +1,7 @@
 # 各版本一次构建产物
 
+M10a1 按用户2026-10-07最新决定作为 [GitHub Preview 预发布](https://github.com/mio-qwq/SandCore/releases/tag/M10a1)提供，附件为原 `SandCore-M10a1-acceptance.zip`。包不在本目录重复保存，发布来源见[M10A1-PREVIEW.md](../sandcore/docs/M10A1-PREVIEW.md)，附件摘要见[SandCore-M10a1-SHA256SUMS.txt](SandCore-M10a1-SHA256SUMS.txt)。
+
 每个ZIP只有一套原启动盘/数据盘和运行工具；四包共19.913MiB。
 
 | 版本 | 文件 | MiB |
@@ -19,3 +21,5 @@ M9已于2026-10-05由用户验收通过；M8a是用户批准的部分发布，�
 全部盘字节来自既有交付，不重编旧版本；重新打开精简ZIP校验全部CRC和SHA256通过。
 
 修订：2026-10-05，用户明确验收M9通过；原验收包字节/摘要保持，正式状态见M9-RELEASE.md。
+
+修订：2026-10-07，新增M10a1 Preview外部附件与摘要入口，历史四份精简包保持。

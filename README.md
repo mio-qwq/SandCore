@@ -4,11 +4,12 @@
 
 SandCore 由 [mio](https://github.com/mio-qwq/) 开发。工程包含 BIOS 引导、分页与抢占式多任务、SandFS 文件系统、多用户桌面、图形应用、音频、IPv4 网络、自有可执行格式，以及可以在系统内编译和运行程序的 C 编译器、汇编器和调试器。
 
-当前开发版本为 **M10a1**，已于 **2026-10-07 用户验收通过**。M10a1 是 M10a 的开发版本，以 Git 提交交付；M9 是已验收的正式发布版本，M8a 与更早版本保留源码和运行镜像。完整 M10 尚未宣布完成，基础内核尚未冻结。
+当前开发版本为 **M10a1**，已于 **2026-10-07 用户验收通过**。按用户最新发布决定，M10a1 作为 M10a 的 **GitHub Preview 预发布版**交付，后续统一在 `main` 开发；M9 是已验收的正式发布版本，M8a 与更早版本保留源码和运行镜像。完整 M10 尚未宣布完成，基础内核尚未冻结。
 
 | 入口 | 内容 |
 |---|---|
 | [当前开发验收](sandcore/docs/M10A1-ACCEPTANCE.md) | M10a1 功能、运行方法、实际证据和限制 |
+| [M10a1 Preview 下载](https://github.com/mio-qwq/SandCore/releases/tag/M10a1) | 已验收的开发运行包；[发布说明](sandcore/docs/M10A1-PREVIEW.md) |
 | [构建与运行](#构建与运行) | 从源码构建当前系统、启动已有版本 |
 | [架构](#系统架构) | 启动链、内核、用户态、会话和扩展 |
 | [目录](#项目目录) | 主工程、扩展包、镜像编辑器和历史档案 |
@@ -239,7 +240,7 @@ $repo = (Get-Location).Path
 
 ### 启动已有运行包
 
-本机已经有最新 M10a1 验收镜像时，运行根目录 `run-m10a1.bat`。独立验收 ZIP 交付于本机构建目录，使用方法见 [M10A1-ACCEPTANCE.md](sandcore/docs/M10A1-ACCEPTANCE.md)；M10a1 未创建 GitHub Release。
+本机已经有最新 M10a1 验收镜像时，运行根目录 `run-m10a1.bat`。新用户可以从 [M10a1 Preview](https://github.com/mio-qwq/SandCore/releases/tag/M10a1) 下载 `SandCore-M10a1-acceptance.zip`，解压后运行包内 BAT；包的摘要和发布边界见 [M10A1-PREVIEW.md](sandcore/docs/M10A1-PREVIEW.md)，使用方法见 [M10A1-ACCEPTANCE.md](sandcore/docs/M10A1-ACCEPTANCE.md)。
 
 从 Git 获取可直接运行的历史基线时，解压 [`releases/`](releases/README.md) 中对应 ZIP 并运行包内 BAT。M9 需要 Windows QEMU 和 Python；镜像、工具与来源摘要见 [MANIFEST.json](releases/MANIFEST.json)。
 
@@ -355,6 +356,7 @@ env -u OS make -j4
 | 文档 | 内容 |
 |---|---|
 | [M10A1-ACCEPTANCE](sandcore/docs/M10A1-ACCEPTANCE.md) | 当前开发版本验收、启动、功能和限制 |
+| [M10A1-PREVIEW](sandcore/docs/M10A1-PREVIEW.md) | Preview 下载、包摘要和发布来源 |
 | [M10A1-DESIGN](sandcore/docs/M10A1-DESIGN.md) | 已批准的完整开发合同 |
 | [M10A1-IMPLEMENTATION](sandcore/docs/M10A1-IMPLEMENTATION.md) | 实现与阶段状态 |
 | [M10A1-READINESS](sandcore/docs/M10A1-READINESS.md) | 收齐核对与验证入口 |
@@ -447,7 +449,7 @@ env -u OS make -j4
 
 | 版本 | 状态 |
 |---|---|
-| M10a1 | 2026-10-07 用户验收通过，开发版本 Git 交付，含追加 curl |
+| M10a1 | 2026-10-07 用户验收通过，GitHub Preview 预发布，含追加 curl；统一使用 main |
 | M9 | 2026-10-05 用户验收通过，正式发布 |
 | M8a | 用户批准的部分正式发布；原 M8 未完成部分继续封存 |
 | M7 / M6 | 保留已交付运行包及历史源码 |
@@ -458,3 +460,5 @@ env -u OS make -j4
 ---
 
 修订：2026-10-07，建立项目总 README，原根 README 改名为开发阶段记录；纳入 ext 原工程/成品/基线，补齐架构、目录、镜像编辑器、工具与文档索引。
+
+修订：2026-10-07，按用户最新授权发布 M10a1 Preview，登记原验收 ZIP 与下载入口；整合已有分支后统一 main。
