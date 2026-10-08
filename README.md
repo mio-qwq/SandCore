@@ -1,6 +1,6 @@
 # SandCore / 沙核
 
-> 🌐 **Language / 语言：** 简体中文（当前）｜**[English README →](README_EN.md)**
+> 🌐 **Language / 语言：** 简体中文（当前） | [English README →](README_EN.md)
 
 **从引导器、内核到桌面和原生开发工具的 32 位 x86 操作系统。**
 
