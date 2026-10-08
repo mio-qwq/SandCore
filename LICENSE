@@ -24,8 +24,8 @@ Without prior written permission from the copyright holder, you may not:
 2. Copy or reproduce the Materials except as reasonably necessary for the permitted personal learning and research purposes described above.
 3. Modify, adapt, merge, translate, or create derivative works for publication, redistribution, or other use.
 4. Publish, redistribute, sublicense, sell, or otherwise make the Materials or substantial portions thereof available to third parties.
-5. Incorporate the Materials into any product, service, software, system, project, competition, challenge, or other work.
-6. Use the Materials, in whole or in substantial part, to create or operate another CTF challenge, contest problem, training platform, or similar activity.
+5. Incorporate the Materials into any product, service, software, system, project, or other work.
+6. Use the Materials, in whole or in substantial part, to create, replicate, or operate another project, product, service, or platform.
 7. Use the Materials as part of a commercial dataset or for training a commercial artificial intelligence or machine learning system, except where such rights are independently granted under applicable GitHub Terms of Service.
 8. Remove, obscure, or alter any copyright, authorship, or licensing notice contained in the Materials.
 9. Claim the Materials, or substantial portions or derivatives thereof, as your own work.
@@ -34,7 +34,7 @@ All rights not expressly granted are reserved by the copyright holder.
 
 ## Additional Permission
 
-If you wish to use the Materials in a manner not expressly permitted by this license, including modification, redistribution, publication, commercial use, integration into another project, or use in another competition or CTF challenge, you may request additional permission from the copyright holder.
+If you wish to use the Materials in a manner not expressly permitted by this license, including modification, redistribution, publication, commercial use, or integration into another project, you may request additional permission from the copyright holder.
 
 Contact:
 
@@ -94,8 +94,8 @@ Copyright (c) 2026 mio-qwq
 2. 除上述个人学习与研究所合理必需的情况外，复制或再制本材料；
 3. 为发布、传播或其他用途修改、改编、合并、翻译本材料或制作衍生作品；
 4. 发布、重新发布、分发、再许可、出售本材料，或以其他方式向第三方提供本材料或其实质性部分；
-5. 将本材料整合、嵌入或用于任何产品、服务、软件、系统、项目、比赛、题目或其他作品；
-6. 使用本材料的全部或实质性部分制作、运营或改编其他 CTF 题目、竞赛题目、训练平台或类似活动；
+5. 将本材料整合、嵌入或用于任何产品、服务、软件、系统、项目或其他作品；
+6. 使用本材料的全部或实质性部分创建、仿制或运营其他项目、产品、服务或平台；
 7. 将本材料用于商业数据集，或用于训练商业人工智能、机器学习模型或系统，但 GitHub 服务条款独立授予 GitHub 或相关主体的权利除外；
 8. 删除、隐藏或修改本材料中的版权、作者身份或许可证声明；
 9. 将本材料或其实质性部分、衍生内容宣称为自己的原创作品。
@@ -106,7 +106,7 @@ Copyright (c) 2026 mio-qwq
 
 如果你希望以本许可证未明确允许的方式使用本材料，包括但不限于：
 
-修改、重新发布、分发、商业使用、整合到其他项目，以及用于其他比赛或 CTF 题目，
+修改、重新发布、分发、商业使用或整合到其他项目，
 
 可以直接联系版权所有者申请额外授权。
 
