@@ -8,6 +8,10 @@
 void timer_init(u32 hz);             /* 配置通道0为方波, 每 1/hz 秒触发 IRQ0 */
 void timer_tick(void);               /* IRQ0 处理 (由 interrupts.c 分发), 别手动调 */
 u32  timer_uptime(void);             /* 开机以来的百分之一秒数 */
+/* 宽单调值直接由每个IRQ0的进位维护，不能由偶尔的查询猜lo回绕。
+ * 只向可信零环的两字缓冲写快照，内部短CLI保留调用前IF状态。 */
+void timer_monotonic(u32 out[2]);
+u32 timer_frequency_hz(void);        /* 当前PIT配置的逻辑tick频率；正常启动100Hz。 */
 
 extern volatile u32 sc_ticks;        /* 心跳计数 (中断里自增) */
 

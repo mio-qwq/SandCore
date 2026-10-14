@@ -2,7 +2,7 @@
 
 正式名称：**SandCore M10a2 — The Application Platform Era**。
 
-2026-10-14 已按用户要求开工；用户随后明确设立持续完整目标，直到完全完成M10a2，目标状态active。开工基线 `main@8e1c27abfe1b0c14ddff6d23464a961eabfd8cc0`；完整范围见根 `M10a2RULE.MD` 和 `M10A2-DESIGN.md`。最新已推送验证检查点为`d43bdd10ee859a72e120eed6eebec6a4f95d0cef`，整个M10a2尚未完成，不能以阶段提交关闭目标。
+2026-10-14 已按用户要求开工；用户随后明确设立持续完整目标，直到完全完成M10a2，目标状态active。开工基线 `main@8e1c27abfe1b0c14ddff6d23464a961eabfd8cc0`；完整范围见根 `M10a2RULE.MD` 和 `M10A2-DESIGN.md`。最新已推送验证检查点为`72783199e3d2e987d4124a89b45913a4290937a2`，整个M10a2尚未完成，不能以阶段提交关闭目标。
 
 ## 当前状态
 
@@ -13,7 +13,7 @@
 | SCLDR | 真正文件装载、迭代依赖/环检测、函数/数据导入、ABS/PC 回填、初始化/回滚、引用/地址固定寿命与独立三环启动根已写 | 宿主算法及真实两库/自动导入/并发进程隔离/显式卸载/正常及异常退出回收通过；进入SC32API基础 |
 | 模块分页 | 独立 VA 区、0x280..282 分配/保护/释放、syscall 输出 RW、授权调试特例、退出回收接线已写 | 定向 WSL 构建与单次双盘 QEMU 保护原子性/只读写回拒绝/显式和退出回收通过 |
 | SCCC 动态编译/动态 SCX 启动 | SCL与SCD1动态应用模式、自动64B CRT、SYS0x283固定根、包内导入和同一进程运行时已接通 | SCCC0及实际执行G1都生成并运行动态SCX，输出字节一致；原生根库已客体生成，尚未执行该生成文件 |
-| SC32API / SCCLIB / SCLIB / SCUI | SC32API完整设计已落盘，首批公共头/私有桥/typed-query与文件底座开始实现 | 新SC32源码未构建/未运行；完整四库尚未达成 |
+| SC32API / SCCLIB / SCLIB / SCUI | SC32首批85真实导出、typed-query、更新文件与消息GUI源已收齐；SCCLIB/SCLIB实际实现与受控终止/标准头前置增量开始 | SC32公开应用、实际客体根/SC32库、三窗口27个约定行为与精确暖态回收通过；剪贴板/IPC/共享映射等后续范围和完整四库未达成 |
 | Desktop/Shell/主要应用重制 | 完整范围保留，平台成熟后按次序推进 | 尚未实施重制/验收 |
 | SDK/性能/统一验收 | 出口标准已明确 | 待平台及应用完成 |
 
@@ -90,7 +90,23 @@ Windows双盘`dynamic-guest-02`在同一启动内实际完成自动HOST应用、
 
 **下一项为SC32API基础与stdio底座。** Runtime基础/自动导入出口已有真实证据，完整GUI调试模块流程、四库、控件、桌面/应用/SDK和系统级性能仍未完成；不标记整个M10a2或基础内核冻结。
 
+## 2026-10-14 SC32基础/有序GUI实施中
+
+自动启动检查点`72783199e3d2e987d4124a89b45913a4290937a2`已提交并通过WSL推送main，远端API核对同一SHA。后续工作树是新Phase2实现，不能把此检查点的运行结果改称新代码通过。
+
+CORE新增typed-query与整区RO/RW检查、真实PIT高字计数；SC32API首批65个公开函数、私有cdecl桥/稳定错误/高层对象源码已收齐。新版file正在接通动态句柄、真实定位/更新/保持打开flush、64KiB迁移与零洞续进、16扇区目录发布、完成结果按handle缓存、STD真实native-ref/弱legacy proxy和EOF；没有以旧顺序replace冒充stdio。
+
+GUI新增消息窗口及owner/modal关系、CREATING→R3 CREATE→ACTIVATE、窗口过程表、可取消CLOSE/单窗销毁、按几何epoch提交矩形和独立EndPaint确认；ROOT负责键鼠共用64B事实FIFO，真实Ctrl/Alt/Shift/KEYUP/重复，按下位置与运动不能互相覆盖。主task已接0x300分发、GUI等待返回模式（旧EVENTWAIT不变）、退出owner清理；main接raw泵和文件后台短批次。公开API探针SC32PROBE/SC32GUARD只包含SC32API.H，检查只读输出/输入、PID代数、标准流继承、跨工具链cdecl、页计数、更新流和零洞，尚未构建/运行。
+
+SCCC的通用cdecl调用只保证4B栈，新增官方GCC SCL flags接受4B入口并内部对齐，CRT继续16B引导。完整SC32八头静态已有340个distinct宏，超出320；MACRO_MAX增至384以容纳实际输入，输出/栈/代码预算保持。新增编译器尚未自编译或运行，不把静态计数当PASS。
+
+最近中断已通过collaboration工具确认三个子代理均interrupted，从原文件和相同ownership恢复；没有假定后台仍运行或重新初始化覆盖落盘源码。Root拥有task/main/Make/公共API探针和raw/keyboard/mouse；GUIagent拥有WM/GUIkernel/header，SC32agent拥有R3 GUI与SC32 aggregator，FILEagent拥有fs/streams/filewire；全部GPT-6.1 Sol+max。源收齐冻结后统一针对本批构建/客体编译/真实Windows键鼠及回收，完整目标继续active。
+
 ## 修订
+
+2026-10-15：GUI03实际执行前轮客体根/SC32库与本轮SCCC三窗口应用，27个约定行为通过。先实测父Shell背景表+1页，再GUI暖PF6878→6878，GUI/窗口池归零；保留首次FAIL与脚本basename拒绝，进入真正SCCLIB/SCLIB实现和R1/C1..C5增量，完整目标继续。
+
+2026-10-15：SC32 build03退出0，真实公开探针/原生动态应用/更新零洞与标准流继承通过；SCCC实际生成85导出SC32库、退出暖页8894→8894。证据见evidence/m10a2-sc32；该生成库与消息GUI下一轮实际运行，完整目标继续active。
 
 2026-10-14：持久化真实开工源码、基线、文件归属、模型设置及未验证边界，便于会话中断后恢复。
 
@@ -101,3 +117,5 @@ Windows双盘`dynamic-guest-02`在同一启动内实际完成自动HOST应用、
 2026-10-14：用户建立完整持续目标，开始自动SCX启动根/导入链及下一阶段合同审计；此批自动启动新代码尚未验证，目标保持active。
 
 2026-10-14：自动SCX/G1/两并发进程/系统根保护/正常与真实异常退出通过，记录30个定向步骤和首次故障流程修正，进入SC32API基础，完整目标继续active。
+
+2026-10-14：保存新SC32/文件/有序GUI接线、声明式公开探针、跨工具链栈与实际宏容量修正；新批仍未验证，中断后按真实状态恢复相同文件所有权。

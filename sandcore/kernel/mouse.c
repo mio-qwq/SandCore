@@ -16,6 +16,8 @@
 #include "io.h"
 #include "mouse.h"
 #include "gfx.h"
+#include "keyboard.h"
+#include "sc32_raw.h"
 
 #define PS2_DATA 0x60
 #define PS2_STAT 0x64
@@ -61,6 +63,7 @@ int mouse_next_event(i32 *x,i32 *y,u8 *buttons)
     mouse_event_t *e=&events[event_tail];*x=e->x;*y=e->y;*buttons=e->buttons;
     event_tail=(u8)((event_tail+1)&63);return 1;
 }
+int mouse_events_pending(void){return event_tail!=event_head;}
 
 static void ps2_wait_in(void)     /* 等控制器输入缓冲空 (可写) */
 {
@@ -157,7 +160,8 @@ void mouse_isr(void)
     if(!relative_mode){mx+=dx;my-=dy;}
     clamp_pos();
     u8 physical=pkt[0]&7;blocked_buttons&=physical;mbtn=physical&~blocked_buttons;
-    event_push();
+    if(sc32_raw_active())sc32_raw_mouse(mx,my,mbtn,keyboard_modifiers());
+    else event_push();
 }
 
 i32 mouse_x(void)       { clamp_pos();return mx; }

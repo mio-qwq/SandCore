@@ -1,5 +1,9 @@
 # 首个SCL引导切片；不调用全应用/冻结游戏目标，不覆盖M10a1验收盘。
 M10A2_BUILD_DIR ?= build/m10a2-bootstrap
+# SCCC的通用cdecl调用保证4B入口栈，GCC库必须接受该入口条件。
+# 库内部仍偏好16B；incoming=2让需要更强对齐的函数自行重排栈，
+# 不以“禁SSE所以碰巧能跑”冒充跨工具链调用合同。
+M10A2_SCL_CFLAGS := -mincoming-stack-boundary=2 -mpreferred-stack-boundary=4
 .PHONY: m10a2-bootstrap m10a2-scl-artifacts
 m10a2-bootstrap:
 	$(MAKE) BUILD=$(M10A2_BUILD_DIR) M9_BUILD=1 M10_BUILD=1 $(M10A2_BUILD_DIR)/sandcore.img $(M10A2_BUILD_DIR)/fs/SYS/CORE/CORE.SKM m10a2-scl-artifacts
@@ -50,7 +54,7 @@ M10A2_DYNAMIC_DIR ?= build/m10a2-dynamic-bootstrap
 m10a2-dynamic-bootstrap:
 	$(MAKE) BUILD=$(M10A2_DYNAMIC_DIR) M9_BUILD=1 M10_BUILD=1 $(M10A2_DYNAMIC_DIR)/sandcore.img $(M10A2_DYNAMIC_DIR)/fs/SYS/CORE/CORE.SKM $(M10A2_DYNAMIC_DIR)/fs/bin/sccc.scx m10a2-dynamic-artifacts
 $(BUILD)/scl-root.o: user/runtime/SCLROOT.C user/runtime/SCLDR.H user/runtime/SCLFMT.H user/runtime/SCDYN.H user/runtime/SCLPRIVATE.H $(STAMP)
-	$(CC) $(CFLAGS) -Werror -x c -Iuser/runtime -c $< -o $@
+	$(CC) $(CFLAGS) $(M10A2_SCL_CFLAGS) -Werror -x c -Iuser/runtime -c $< -o $@
 $(BUILD)/SCLDR.SCL: $(BUILD)/scl-root.o user/runtime/SCLROOT.json tools/mkscl.py tools/scl_format.py
 	$(PY) tools/mkscl.py $< $@ --manifest user/runtime/SCLROOT.json
 $(BUILD)/dynapp.o: tests/m10a2/DYNAPP.C $(STAMP)
@@ -58,3 +62,37 @@ $(BUILD)/dynapp.o: tests/m10a2/DYNAPP.C $(STAMP)
 $(BUILD)/DYNAPP.SCX: $(BUILD)/dynapp.o tests/m10a2/DYNAPP.json tools/mkdscx.py tools/scd_format.py tools/mkscl.py
 	$(PY) tools/mkdscx.py $< $@ --manifest tests/m10a2/DYNAPP.json
 m10a2-dynamic-artifacts: $(BUILD)/SCLDR.SCL $(BUILD)/DYNAPP.SCX
+
+$(BUILD)/sc32_core.o: kernel/sc32_core.c kernel/sc32_core.h user/SC32API.H user/sc32/SC32WIRE.H $(STAMP)
+	$(CC) $(CFLAGS) -Werror -c $< -o $@
+$(BUILD)/sc32_file.o: kernel/sc32_file.c kernel/sc32_file.h user/sc32/SC32FILEWIRE.H $(STAMP)
+	$(CC) $(CFLAGS) -Werror -c $< -o $@
+$(BUILD)/sc32_gui.o: kernel/sc32_gui.c kernel/sc32_gui.h user/SC32GUI.H user/sc32/SC32GUIWIRE.H $(STAMP)
+	$(CC) $(CFLAGS) -Werror -c $< -o $@
+$(BUILD)/sc32_raw.o: kernel/sc32_raw.c kernel/sc32_raw.h $(STAMP)
+	$(CC) $(CFLAGS) -Werror -c $< -o $@
+
+M10A2_SC32_DIR ?= build/m10a2-sc32-bootstrap
+.PHONY: m10a2-sc32-bootstrap m10a2-sc32-artifacts
+m10a2-sc32-bootstrap:
+	$(MAKE) BUILD=$(M10A2_SC32_DIR) M9_BUILD=1 M10_BUILD=1 $(M10A2_SC32_DIR)/sandcore.img $(M10A2_SC32_DIR)/fs/SYS/CORE/CORE.SKM $(M10A2_SC32_DIR)/fs/bin/sccc.scx m10a2-sc32-artifacts
+$(BUILD)/sc32-library.o: user/sc32/SC32API.C user/SC32API.H user/SCTYPES.H user/runtime/SCLDR.H $(STAMP)
+	$(CC) $(CFLAGS) $(M10A2_SCL_CFLAGS) -Werror -x c -Iuser -c $< -o $@
+$(BUILD)/SC32API.SCL: $(BUILD)/sc32-library.o user/sc32/SC32API.json tools/mkscl.py tools/scl_format.py
+	$(PY) tools/mkscl.py $< $@ --manifest user/sc32/SC32API.json
+$(BUILD)/sc32-guard.o: tests/m10a2/SC32GUARD.C user/SC32API.H $(STAMP)
+	$(CC) $(CFLAGS) $(M10A2_SCL_CFLAGS) -Werror -x c -Iuser -c $< -o $@
+$(BUILD)/SC32GUARD.SCL: $(BUILD)/sc32-guard.o tests/m10a2/SC32GUARD.json tools/mkscl.py tools/scl_format.py
+	$(PY) tools/mkscl.py $< $@ --manifest tests/m10a2/SC32GUARD.json
+$(BUILD)/sc32-probe.o: tests/m10a2/SC32PROBE.C user/SC32API.H $(STAMP)
+	$(CC) $(CFLAGS) $(M10A2_SCL_CFLAGS) -Werror -x c -Iuser -c $< -o $@
+$(BUILD)/SC32PROBE.SCX: $(BUILD)/sc32-probe.o tests/m10a2/SC32PROBE.json tools/mkdscx.py tools/scd_format.py
+	$(PY) tools/mkdscx.py $< $@ --manifest tests/m10a2/SC32PROBE.json
+m10a2-sc32-artifacts: $(BUILD)/SCLDR.SCL $(BUILD)/SC32API.SCL $(BUILD)/SC32GUARD.SCL $(BUILD)/SC32PROBE.SCX
+
+# 实际R3窗口过程应用；像素/模型/回调位于应用，内核只投递事实。
+$(BUILD)/sc32-twin.o: tests/m10a2/SC32TWIN.C user/SC32API.H user/SC32GUI.H $(STAMP)
+	$(CC) $(CFLAGS) $(M10A2_SCL_CFLAGS) -Werror -x c -Iuser -c $< -o $@
+$(BUILD)/SC32TWIN.SCX: $(BUILD)/sc32-twin.o tests/m10a2/SC32TWIN.json tools/mkdscx.py tools/scd_format.py
+	$(PY) tools/mkdscx.py $< $@ --manifest tests/m10a2/SC32TWIN.json
+m10a2-sc32-artifacts: $(BUILD)/SC32TWIN.SCX

@@ -2,6 +2,8 @@
 #define SANDCORE_WM_H
 
 #include "io.h"
+#include "../user/sc32/SC32GUIWIRE.H"
+#include "sc32_raw.h"
 /* M10a1：会话桌面资源不依赖固定会话数组，核心只在切换时通知WM。 */
 int wm_session_prepare(u32 id);
 void wm_session_switched(u32 previous,u32 current);
@@ -90,4 +92,36 @@ int wm_capture_stop_step(int pid);
 
 /* M10a1：仅内核任务存储器使用，资源按真实任务申请。 */
 u32 wm_task_bytes(void);
+
+/* SC32消息窗口与旧窗口共享合成/画布，接口只接受可信局部请求。
+ * 用户缓冲完整前检由sc32_gui执行；任何函数都不执行三环过程。 */
+int wm_sc32_create(int pid,const Sc32WindowCreate *input,const char *title,Sc32WindowRef *out);
+int wm_sc32_activate(int pid,u32 handle,u32 generation);
+int wm_sc32_destroy(int pid,u32 handle,u32 generation);
+int wm_sc32_query(int pid,u32 handle,u32 generation,ScWindowInfo *out);
+int wm_sc32_place(int pid,const Sc32WindowPlace *input,ScWindowInfo *out);
+int wm_sc32_control(int pid,const Sc32WindowAction *input,ScWindowInfo *out);
+int wm_sc32_owner(int pid,const Sc32WindowOwner *input,ScWindowInfo *out);
+int wm_sc32_title(int pid,u32 handle,u32 generation,const char *title);
+int wm_sc32_capture(int pid,u32 handle,u32 generation,u32 enabled);
+int wm_sc32_input(int pid,u32 handle,u32 generation,ScInputSnapshot *out);
+int wm_sc32_invalidate(int pid,const Sc32Invalidate *input);
+int wm_sc32_paint_begin(int pid,u32 handle,u32 generation,ScPaintInfo *out);
+int wm_sc32_paint_end(int pid,const Sc32PaintEnd *input);
+int wm_sc32_submit(int pid,const ScSubmitDesc *input,const ScSubmitRect *rectangles);
+int wm_sc32_cancel_close(int pid,u32 handle,u32 generation);
+int wm_sc32_owner_has_windows(int pid);
+u32 wm_sc32_change_count(int pid,u32 handle,u32 generation);
+int wm_sc32_focus_pid(void);
+int wm_sc32_pending(int pid,ScMessage *message,int consume);
+u32 wm_sc32_pending_count(int pid);
+int wm_sc32_message_valid(int pid,const ScMessage *message);
+void wm_sc32_loss_owner(int pid);
+void wm_sc32_input_revoked(int pid,const ScMessage *message);
+void wm_sc32_loss_epoch(void);
+void wm_sc32_owner_stopped(int pid);
+int wm_sc32_attention_stop(int pid); /* 每调用仅解绑一窗，退出预算由GUI清理器控制。 */
+u32 wm_sc32_route_epoch(void);
+u32 wm_sc32_session_id(void);
+int wm_sc32_route(const Sc32RawEvent *event);
 #endif /* SANDCORE_WM_H */

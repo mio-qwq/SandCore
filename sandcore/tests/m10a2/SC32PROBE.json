@@ -1,0 +1,32 @@
+{
+  "kind": "application",
+  "name": "SC32PROBE.SCX",
+  "dependencies": [{"name":"SC32API.SCL","abi_major":1,"min_minor":0,"min_version":1}],
+  "imports": [
+    {"name":"ScFileGetStandard","dependency":"SC32API.SCL","kind":"function","size":1},
+    {"name":"ScFileWrite","dependency":"SC32API.SCL","kind":"function","size":1},
+    {"name":"ScSystemCapabilities","dependency":"SC32API.SCL","kind":"function","size":1},
+    {"name":"ScProcessSelf","dependency":"SC32API.SCL","kind":"function","size":1},
+    {"name":"ScProcessQuery","dependency":"SC32API.SCL","kind":"function","size":1},
+    {"name":"ScLoadLibrary","dependency":"SC32API.SCL","kind":"function","size":1},
+    {"name":"ScGetSymbol","dependency":"SC32API.SCL","kind":"function","size":1},
+    {"name":"ScErrorQuery","dependency":"SC32API.SCL","kind":"function","size":1},
+    {"name":"ScFreeLibrary","dependency":"SC32API.SCL","kind":"function","size":1},
+    {"name":"ScSystemMemory","dependency":"SC32API.SCL","kind":"function","size":1},
+    {"name":"ScMemoryAllocatePages","dependency":"SC32API.SCL","kind":"function","size":1},
+    {"name":"ScMemoryFreePages","dependency":"SC32API.SCL","kind":"function","size":1},
+    {"name":"ScSystemMonotonic","dependency":"SC32API.SCL","kind":"function","size":1},
+    {"name":"ScProcessSleep","dependency":"SC32API.SCL","kind":"function","size":1},
+    {"name":"ScPathCreate","dependency":"SC32API.SCL","kind":"function","size":1},
+    {"name":"ScFileOpen","dependency":"SC32API.SCL","kind":"function","size":1},
+    {"name":"ScFileFlush","dependency":"SC32API.SCL","kind":"function","size":1},
+    {"name":"ScFileSeek","dependency":"SC32API.SCL","kind":"function","size":1},
+    {"name":"ScFileRead","dependency":"SC32API.SCL","kind":"function","size":1},
+    {"name":"ScFileClose","dependency":"SC32API.SCL","kind":"function","size":1},
+    {"name":"ScDirectoryOpen","dependency":"SC32API.SCL","kind":"function","size":1},
+    {"name":"ScDirectoryNext","dependency":"SC32API.SCL","kind":"function","size":1},
+    {"name":"ScDirectoryClose","dependency":"SC32API.SCL","kind":"function","size":1},
+    {"name":"ScProcessSpawn","dependency":"SC32API.SCL","kind":"function","size":1},
+    {"name":"ScJobWait","dependency":"SC32API.SCL","kind":"function","size":1}
+  ]
+}

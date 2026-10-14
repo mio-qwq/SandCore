@@ -16,6 +16,9 @@
 #include "task.h"
 #include "task_store.h"
 #include "scl_boot.h"
+#include "sc32_core.h"
+#include "sc32_file.h"
+#include "sc32_gui.h"
 #ifdef M10_DISK_CORE
 #include "network.h"
 #endif
@@ -186,12 +189,13 @@ static int wait_reserve(void)
     if(wait_heap)pframe_free_run((u32)wait_heap,wait_pages);wait_heap=fresh;wait_pages=pages;wait_capacity=capacity;return 0;
 }
 static void wait_cancel(int pid)
-{task_record_t *p=task_record(pid);wait_remove(pid);p->waiting=0;p->wait_mask=p->wait_frame=0;}
+{task_record_t *p=task_record(pid);wait_remove(pid);p->waiting=0;p->wait_mask=p->wait_frame=0;p->wait_result_mode=0;}
 static void wait_resume(int pid,u32 events)
 {
     task_record_t *p=task_record(pid);if(!p->waiting)return;
     if(p->task.state==3){p->events|=events;return;}
-    u32 frame=p->wait_frame;p->events&=~events;wait_cancel(pid);if(frame)((u32 *)frame)[11]=events;
+    u32 frame=p->wait_frame,mode=p->wait_result_mode;p->events&=~events;wait_cancel(pid);
+    if(frame)((u32 *)frame)[11]=mode?(u32)sc32_gui_wait_result(pid,events):events;
     if(p->task.state==1)ready_wake(pid);
 }
 static void wait_poll(void)
@@ -214,9 +218,9 @@ void task_notify(int pid,u32 events)
 }
 void task_notify_generation(int pid,u32 generation,u32 events)
 {if(task_owned(pid) && task_generation(pid)==generation)task_notify(pid,events);}
-static int task_event_wait(u32 *frame)
+static int task_wait_install(u32 *frame,u32 mask,u32 timeout)
 {
-    task_record_t *p=task_record(current);u32 mask=frame[8],timeout=frame[10];
+    task_record_t *p=task_record(current);
     if(current<=0 || (mask&~255u) || (timeout>0x7FFFFFFFu && timeout!=0xFFFFFFFFu)
         || (!mask && timeout==0xFFFFFFFFu))return -1;
     u32 events=p->events&mask;if(events){p->events&=~events;return (int)events;}
@@ -225,6 +229,24 @@ static int task_event_wait(u32 *frame)
     wait_poll();ready_remove(current);p->waiting=1;p->wait_mask=mask;p->wait_frame=(u32)frame;p->wait_heap=-1;
     if(timeout!=0xFFFFFFFFu){p->wait_deadline=wait_clock+timeout;(void)wait_up(wait_count++,current);}
     return 0;
+}
+static int task_event_wait(u32 *frame)
+{
+    task_record(current)->wait_result_mode=0;
+    return task_wait_install(frame,frame[8],frame[10]);
+}
+static int task_gui_wait(u32 *frame)
+{
+    u32 ticks;int result=sc32_gui_wait_check(current,frame[10],frame[9],&ticks);
+    if(result!=SC32_PENDING)return result;
+    /* queue-ready检查与等待安装在同一IF=0临界区。仅保存可信陷入
+     * 帧，不保存应用消息out指针；唤醒后库重新GET并完整预验输出。 */
+    task_record_t *p=task_record(current);p->wait_result_mode=1;
+    int events=task_wait_install(frame,TASK_EVENT_INPUT,ticks);
+    if(p->waiting)return 0;
+    p->wait_result_mode=0;
+    if(events<0)return events==-4?SC32_E_MEMORY:SC32_E_INVALID;
+    return sc32_gui_wait_result(current,(u32)events);
 }
 void task_kernel_wake(void){kernel_pending=1;}
 int task_pid(void) { return current; }
@@ -398,6 +420,7 @@ int task_spawn(const char *name, u32 pd, u32 entry, u32 user_esp)
         record->deferred_draw=0;record->visibility_aware=0;record->cleanup_phase=0;
         scl_boot_reset(i);
         record->scx_load_size=record->scx_bss_size=0;
+        record->wait_result_mode=0;
         process_reset(i);
         task_record(i)->generation++;if(!task_record(i)->generation)task_record(i)->generation=1;
         task_record(i)->running=task_record(i)->dispatch=0;
@@ -550,24 +573,26 @@ void task_cleanup_poll(void)
         if(cleanup_head<0)cleanup_tail=-1;p->cleanup_next=-1;int advance=1;
         switch(p->cleanup_phase){
         case 0:image_service_owner_stopped(owner);userspace_stop(owner,process_status(owner));audio_stop_owner(owner);break;
-        case 1:advance=streams_stop_step(owner,process_status(owner));break;
-        case 2:advance=process_detach_owner_step(owner);break;
-        case 3:advance=wm_close_owner_step(owner);break;
-        case 4:advance=wm_capture_stop_step(owner);break;
+        case 1:advance=sc32_file_stop_step(owner);break;
+        case 2:advance=sc32_gui_stop_step(owner);break;
+        case 3:advance=streams_stop_step(owner,process_status(owner));break;
+        case 4:advance=process_detach_owner_step(owner);break;
+        case 5:advance=wm_close_owner_step(owner);break;
+        case 6:advance=wm_capture_stop_step(owner);break;
 #ifdef M10_DISK_CORE
-        case 5:advance=network_stop_owner_step(owner);break;
-        case 6:auth_stop(owner);break;
+        case 7:advance=network_stop_owner_step(owner);break;
+        case 8:auth_stop(owner);break;
 #else
-        case 5:auth_stop(owner);break;
+        case 7:auth_stop(owner);break;
 #endif
         default:break;
         }
         if(advance)p->cleanup_phase++;
         if(p->cleanup_phase>=
 #ifdef M10_DISK_CORE
-            7
+            9
 #else
-            6
+            8
 #endif
         ){p->queue=QUEUE_ZOMBIE;p->zombie_next=zombie_head;zombie_head=owner;}
         else{
@@ -638,6 +663,14 @@ void syscall_c_common(u32 vec, u32 *frame)
     }
     case SYS_SCLBOOT:
         frame[11]=(u32)scl_boot_map(frame[8],frame[10]);break;
+    case SYS_SC32:
+        if(frame[8]==SC32_GUI_WAIT)frame[11]=(u32)task_gui_wait(frame);
+        else if(frame[8]>=SC32_WIRE_GUI_FIRST && frame[8]<SC32_WIRE_FILE_FIRST)
+            frame[11]=(u32)sc32_gui_call(current,frame[8],frame[10],frame[9]);
+        else if(frame[8]>=SC32_WIRE_FILE_FIRST && frame[8]<SC32_WIRE_CLIPBOARD_FIRST)
+            frame[11]=(u32)sc32_file_call(current,frame[8],frame[10],frame[9]);
+        else frame[11]=(u32)sc32_core_call(current,frame[8],frame[10],frame[9]);
+        break;
     case SYS_STATUS:
         frame[11]=(u32)process_status((int)frame[8]); break;
     case SYS_YIELD:

@@ -5,6 +5,9 @@
 #include "io.h"
 int keyboard_down(u32 key); /* 物理按住状态，用户查询另由 WM 检查焦点 */
 void keyboard_session_switch(void); /* IF=0；旧按住键释放后才能在新会话生效。 */
+u32 keyboard_modifiers(void);
+void keyboard_physical_snapshot(u32 out[8]); /* IF=0的可信缓冲，真实256键位。 */
+int keyboard_legacy_pending(void);
 
 void keyboard_isr(void);             /* IRQ1 处理, 由 interrupts.c 分发 */
 int  getkey(void);                   /* 阻塞取一键: 可打印字符/'\n'/'\b'/Esc(27) */

@@ -137,6 +137,8 @@ PC32 ：写入 (S + A - P) mod 2^32
 
 v1 引导路径使用 i386 cdecl：参数从栈传递，调用方清栈，EBX/ESI/EDI/EBP 由被调用方保留，整型/指针返回值在 EAX。指针与 int 均为 32 位。库不能链接 SCX `_start` 或调用 EXIT 终结所在应用；调用返回应用原调用栈。
 
+通用库入口保证至少4B栈对齐，匹配SCCC的现有cdecl生成器。GCC宿主SCL须用`-mincoming-stack-boundary=2 -mpreferred-stack-boundary=4`接受4B入口，并按需要在函数内部重新建立16B对齐；官方SDK沿用这组参数。不能只依靠暂时没有SSE来掩盖入口对齐假设。自动CRT仍为独立引导入口提供16B对齐，库与普通回调遵守此通用最低合同；没有改变参数栈偏移或旧SCAPI/SCX。
+
 初始化入口为 `int init(void)`，返回 0 成功；结束入口为 `void fini(void)`。依赖先初始化，使用它的库随后初始化；正常关闭按相反依赖方向结束。初始化函数须自行清理由它产生且在失败时需要撤销的外部副作用；未成功返回的初始化不承诺调用其 fini。回调运行时禁止重入同一 SCLDR，重入返回 BUSY。
 
 `SCLDR.H` 定义 `ScRuntimeCreate/Open/Close/Symbol/Query/Destroy`。当前实例、可写数据及 BSS 均属于一个进程；当前不提供跨进程物理代码页共享。模块列表与依赖工作栈不使用固定模块数或固定递归深度；实际空间不足返回 MEMORY/RANGE 并回滚。

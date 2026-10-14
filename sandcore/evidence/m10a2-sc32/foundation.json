@@ -1,0 +1,211 @@
+{
+  "status": "DECLARED_SC32_FOUNDATION_CASES_PASS",
+  "scope": "SC32_PUBLIC_API_NATIVE_BUILD_AND_FILE_FOUNDATION",
+  "cases": [
+    {
+      "name": "public-API-host-app-real-calls",
+      "status": "PASS",
+      "command": "/HOME/M10P/SC32PROBE.SCX",
+      "exit_code": 0,
+      "expected_exit": 0,
+      "output": "/HOME/M10P/SC32PROBE.SCX; _m9_status=$?; printf \"\\n\"; echo __M9_4ccf204fcc2dabf3035a23dc:$_m9_status\nSC32_CHILD_OK\nSC32_FOUNDATION_PASS\n",
+      "wall_seconds": 2.3590000000040163,
+      "qemu_cpu_seconds": 2.9375
+    },
+    {
+      "name": "native-output-directory",
+      "status": "PASS",
+      "command": "mkdir /HOME/M10P/NATIVE",
+      "exit_code": 0,
+      "expected_exit": 0,
+      "output": "mkdir /HOME/M10P/NATIVE; _m9_status=$?; printf \"\\n\"; echo __M9_fba67bf26500c4ef43868777:$_m9_status\n",
+      "wall_seconds": 0.26599999999598367,
+      "qemu_cpu_seconds": 0.234375
+    },
+    {
+      "name": "native-plugin-copy",
+      "status": "PASS",
+      "command": "cp /HOME/M10P/SC32GUARD.SCL /HOME/M10P/NATIVE/SC32GUARD.SCL",
+      "exit_code": 0,
+      "expected_exit": 0,
+      "output": "cp /HOME/M10P/SC32GUARD.SCL /HOME/M10P/NATIVE/SC32GUARD.SCL; _m9_status=$?; printf \"\\n\"; echo __M9_8ee0e328037be72bc6c50475:$_m9_status\n",
+      "wall_seconds": 0.23400000000401633,
+      "qemu_cpu_seconds": 0.265625
+    },
+    {
+      "name": "guest-SCCC-public-header-app",
+      "status": "PASS",
+      "command": "/TMP/S32-eddca1/SCCC0.SCX /TMP/S32-eddca1/SC32PROBE.C /HOME/M10P/NATIVE/SC32PROBE.SCX --dynamic /TMP/S32-eddca1/SC32PROBE.json",
+      "exit_code": 0,
+      "expected_exit": 0,
+      "output": "/TMP/S32-eddca1/SCCC0.SCX /TMP/S32-eddca1/SC32PROBE.C /HOME/M10P/NATIVE/SC32PROBE.SCX --dynamic /TMP/S32-eddca1/SC32PROBE.json; _m9_status=$?; printf \"\\n\"; echo __M9_0dabfabe0b7105865e8cfd1c:$_m9_status\nSCCC / mio\nTMP/S32-eddca1/SC32PROBE.C -> HOME/M10P/NATIVE/SC32PROBE.SCX\nValidating application manifest\nSCCC: preprocess -> C -> x86\nPreprocessing source and includes\nParsing C and generating x86\nLinking and writing SCX\nSCCC OK SCX DYNAMIC\nCompilation complete\n",
+      "wall_seconds": 0.7350000000005821,
+      "qemu_cpu_seconds": 0.78125
+    },
+    {
+      "name": "native-caller-to-GCC-library-ABI",
+      "status": "PASS",
+      "command": "/HOME/M10P/NATIVE/SC32PROBE.SCX",
+      "exit_code": 0,
+      "expected_exit": 0,
+      "output": "/HOME/M10P/NATIVE/SC32PROBE.SCX; _m9_status=$?; printf \"\\n\"; echo __M9_e0d81b70fda9121aae9e14a6:$_m9_status\nSC32_CHILD_OK\nSC32_FOUNDATION_PASS\n",
+      "wall_seconds": 1.875,
+      "qemu_cpu_seconds": 1.9375
+    },
+    {
+      "name": "guest-SCCC-builds-SC32-library",
+      "status": "PASS",
+      "command": "/TMP/S32-eddca1/SCCC0.SCX /TMP/S32-eddca1/SRC/sc32/SC32API.C /HOME/M10P/NATIVE/SC32API.SCL --scl /TMP/S32-eddca1/SRC/sc32/SC32API.json",
+      "exit_code": 0,
+      "expected_exit": 0,
+      "output": "/TMP/S32-eddca1/SCCC0.SCX /TMP/S32-eddca1/SRC/sc32/SC32API.C /HOME/M10P/NATIVE/SC32API.SCL --scl /TMP/S32-eddca1/SRC/sc32/SC32API.json; _m9_status=$?; printf \"\\n\"; echo __M9_874471c2fe89ed2f755a8a8b:$_m9_status\nSCCC / mio\nTMP/S32-eddca1/SRC/sc32/SC32API.C -> HOME/M10P/NATIVE/SC32API.SCL\nValidating SCL manifest\nSCCC: preprocess -> C -> x86\nPreprocessing source and includes\nParsing C and generating x86\nLinking and writing SCL\nSCCC OK SCL NATIVE\nCompilation complete\n",
+      "wall_seconds": 2.2660000000032596,
+      "qemu_cpu_seconds": 2.390625
+    },
+    {
+      "name": "native-library-all-declared-exports",
+      "status": "PASS",
+      "bytes": 81686,
+      "sha256": "1856bc475ec79ec9b3921a6096365633d1c682d630c7f58ab4b7bec29f32bda1",
+      "executed_this_generated_file": false
+    },
+    {
+      "name": "warm-public-API-exit",
+      "status": "PASS",
+      "command": "/HOME/M10P/NATIVE/SC32PROBE.SCX",
+      "exit_code": 0,
+      "expected_exit": 0,
+      "output": "/HOME/M10P/NATIVE/SC32PROBE.SCX; _m9_status=$?; printf \"\\n\"; echo __M9_258d3a15083e8249a0e4bf6d:$_m9_status\nSC32_CHILD_OK\nSC32_FOUNDATION_PASS\n",
+      "wall_seconds": 1.2189999999973224,
+      "qemu_cpu_seconds": 1.28125
+    },
+    {
+      "name": "warm-exit-physical-page-recovery",
+      "status": "PASS",
+      "before": 8894,
+      "after": 8894,
+      "observations": [
+        8894,
+        8894,
+        8894,
+        8894,
+        8894
+      ]
+    },
+    {
+      "name": "legacy-SCX-after-new-STD-and-file",
+      "status": "PASS",
+      "command": "ls /HOME/M10P",
+      "exit_code": 0,
+      "expected_exit": 0,
+      "output": "ls /HOME/M10P; _m9_status=$?; printf \"\\n\"; echo __M9_7bb87c9f0903774eea27a345:$_m9_status\nNATIVE\nP2G1\nP2G13\nP2G19\nSC32GUARD.SCL\nSC32PROBE.SCX\n",
+      "wall_seconds": 0.11000000000058208,
+      "qemu_cpu_seconds": 0.03125
+    }
+  ],
+  "source_data_sha256": "3db2e3cd9262343204e8c19af02847e98244732c5b5ad4397dd334be84fe7e64",
+  "input_sha256": {
+    "user/COMPILECLI.inc": "f2d0cf982365b0eab60ff60c48d5531fece70c2a70cf2bf235055bead3f9cb1e",
+    "user/SC32API.H": "77888a139be50a53a481c3c6d1cb87d7fff1c18da7d0611d27314021d5455b4f",
+    "user/SC32GUI.H": "470cb56da856c79630c3621e5f765641db798456fcb0bd643e9fa615cbc051a6",
+    "user/SCAPI.H": "81a730450fcb3d310ed841ad3e5c70a3fed32aa7fbd10acac8b888ac7da9ffc1",
+    "user/SCIO.H": "f0843c3702fb2ab28276c2da0ac9f7f8139d705c8a043d67b7f5b343ed11a7dd",
+    "user/SCTYPES.H": "f705794dfb569a00241613b1e19b5bd0c8875fdd68e074c72c5fb9bbf6a690d2",
+    "user/guiapi/sc32_gui.c": "0e3f03da1b03dfaba328d71210285aa71f8b833c2bf78bfac182b0dd6b45c3ac",
+    "user/runtime/SCDYN.H": "9fe728833ddddf4e8b7a4a6a21e8b5abc787926e32e6b68127860a05e8e613b1",
+    "user/runtime/SCLDR.H": "73e08cb6d65b4fe595fc93b229c5457433e6283d18968357141be4e34707e863",
+    "user/runtime/SCLFMT.H": "f040266a9d13f513d4cc6ec7fe8ac43175287e2c484abd150607387043053611",
+    "user/runtime/SCLPRIVATE.H": "ad1c41821883f884f569200030aafc68c7aa13f9f36a26e568a5a4295647a854",
+    "user/runtime/SCLROOT.C": "b1c5a691f9d2b27486b635e7a5c13297d5942fb8a6886fc252ed7d5cc2484f8c",
+    "user/runtime/SCLROOT.json": "77c64721670c2d8f78023afb3ef0a2be32bf2b45e6b564ac7afdf6b82d525f42",
+    "user/runtime/scd_format.c": "952db60181b9eddb4b32da97509c2767e7fabfaba40f5423084690c47f01421d",
+    "user/runtime/scl_application.c": "714361b36497bf64e6bc8e2a471daf6b2961f6dd8936acd62459838a752b12df",
+    "user/runtime/scl_format.c": "72910926be9da4ee90466945e4ac42a9ac2bacb2d83ff3e7cf51a6611894187f",
+    "user/runtime/scl_platform.c": "03120e218bc18ad94578bb1bfe61813627c44ee45a5462600e96fb2d00ece027",
+    "user/runtime/scldr.c": "0bb8ad1d58e5948a721a14b61ef44bb83bfa99d35571cceddbe660463c0178a5",
+    "user/s3c.c": "e59583f3a1bae8aed53d19e4384a5baba3cb36e4a9b9f56a9e018bb9f013e91b",
+    "user/s3c_emit.inc": "6b125aa0d42f32cce848193057f51d3663a5f69df3c3d84a43a348ff78470a2c",
+    "user/s3c_lex.inc": "daac00f4c34383cbb47ec2dfce8fa3e959ef2813c66f647284ab2ab4b75becfc",
+    "user/s3c_parse.inc": "5b7cde7a6f4af652e485e5aff8fe7df97a25ffa4ff60339c5d4107db262ba815",
+    "user/s3c_pp.inc": "9ebde1119c4cf4d67d681b79bb51cae79c1a7d79b3682c4a09d977ec83acb871",
+    "user/s3c_scl.inc": "14b6066e184fc3c845f9402181cb1df309b62ffde091f98af298ac5145408a27",
+    "user/sc32/SC32API.C": "6525470914798f58406c5a9904a530bb2871c5bf5e244c4254d9e17ac587d9c6",
+    "user/sc32/SC32API.json": "e93e30f53f9ec2e157256bddefb24ee788cdbb9d3cb1bf772e6d1b0626191ff2",
+    "user/sc32/SC32FILEWIRE.H": "ee14d085aa5c3adb0c3283eceff11fa33e94effb14f24b803184670cd8df5655",
+    "user/sc32/SC32GUIWIRE.H": "9b6b2a979778d323ec5a81546aa1ba98ee3e6fb0ac9e4a5e1875d049aea8f046",
+    "user/sc32/SC32PRIVATE.H": "d3033e433a4686c2452d5da6b60792c4fe8d288a8231284da94c7de497c6cbf1",
+    "user/sc32/SC32WIRE.H": "8b327411c06e252c0fb814d9428b74a955ac549cedc4dc21355f96f4e56a602b",
+    "user/sc32/sc32_bridge.c": "e648e160907499e1a805ea75da5044fd9f2f32006e5b2aecf2e4bf92c1b6fa49",
+    "user/sc32/sc32_file.c": "01426109d22d722b699924eff57f01f30fe07ad1b31854db351c278fa21c2072",
+    "user/sc32/sc32_objects.c": "eb10f5b7631274eb24f22665414280a906df907202e15e8c7a08ecddf487bbcb",
+    "user/sc32/sc32_path.c": "8741700f63b22121181e8c26791df46b0d2b3636d35f5f4ae70616120656d2bf",
+    "user/sc32/sc32_process.c": "53aee91d0dce998bcc3dbeb76fbb294b04b136971923405ae37db9e4de89ee34",
+    "user/sc32/sc32_support.c": "faa7b3df51e0b0dd4ae7334a416dc30769aa09a5f9e2c0ac2b175dab533bdd18",
+    "user/sc32/sc32_system.c": "ea5f34d8507864030557f6827324757828da5020f6bc82204dcbc90debd2b19f",
+    "user/sccc.c": "57b0b9bd0a607fc4b4c5d87b6c2af0c952b8675d6f282c02c1e3545aca013ae1",
+    "tests/m10a2/SC32PROBE.C": "10582d51e4933cedd2ff28fa2c791508fbc73eba4e9842c077ea8f9ea4621478",
+    "tests/m10a2/SC32PROBE.json": "3245f04207bef26d9265d13819d85229795c6c3b7239cce3ecbe6cbacf5d5912",
+    "tests/m10a2/SC32GUARD.C": "cbb280cffc5bd81fcaecc127aec5fac8fb6b5c673977c9942d7e5bfc835cd094",
+    "tests/m10a2/SC32GUARD.json": "1d4212e4a6c33fa4170f5e669d24d1eb3f59b5b8e8fb76dec30427386eab1078"
+  },
+  "build_report_sha256": "4ac81f248f390377f549723e5e50e374c11ab30fba9b877e8447e8de07506c92",
+  "installed_libraries_source": "HOST_GCC_BOOTSTRAP",
+  "core_sha256": "396dcfa17a8e3d4c85cec32420c97e71fcef4a8a53d673c4c865b9335d98f663",
+  "screenshots": [
+    {
+      "path": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-sc32-guest-01\\desktop.png",
+      "width": 1920,
+      "height": 1080,
+      "sha256": "7d7de866dcc241073fdbcc89e398ce1ce986cac87ed1079144c82ec1d946b6fa"
+    }
+  ],
+  "gui_behavior_verified": false,
+  "full_Phase2": false,
+  "full_M10a2": false,
+  "startup_readiness": {
+    "status": "ACTUAL_FIRST_DESKTOP_COMPLETED",
+    "method": "READ_ONLY_HMP_COUNTERS_AND_PHYSICAL_ESC",
+    "symbols": {
+      "boot_stage": 8843268,
+      "sc_ticks": 8909864,
+      "wm_frames": 9080372
+    },
+    "observations": [
+      {
+        "seconds": 0.014999999999417923,
+        "boot_stage": 0,
+        "completed_frames": 0,
+        "ticks": 0
+      },
+      {
+        "seconds": 0.48399999999674037,
+        "boot_stage": 1,
+        "completed_frames": 0,
+        "ticks": 17
+      },
+      {
+        "seconds": 1.6560000000026776,
+        "boot_stage": 2,
+        "completed_frames": 0,
+        "ticks": 132
+      },
+      {
+        "seconds": 1.9060000000026776,
+        "boot_stage": 3,
+        "completed_frames": 1,
+        "ticks": 157
+      }
+    ],
+    "input_sent": true,
+    "input": "esc",
+    "input_seconds": 1.6869999999980791,
+    "seconds": 1.9210000000020955
+  },
+  "native_application": {
+    "bytes": 10223,
+    "sha256": "15e05af18c9578fb5a2dbee66e4f2b15bf2134d4537480050e1aef115b8d8a83",
+    "guest_compiled": true
+  },
+  "source_disk_unchanged": true,
+  "current_inputs_unchanged": true
+}

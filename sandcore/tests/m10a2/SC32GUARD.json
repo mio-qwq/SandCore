@@ -1,0 +1,16 @@
+{
+  "name": "SC32GUARD.SCL",
+  "abi_major": 1,
+  "abi_minor": 0,
+  "library_version": 1,
+  "init": null,
+  "fini": null,
+  "exports": [
+    {"name": "readonly_capabilities", "kind": "data"},
+    {"name": "readonly_self", "kind": "data"},
+    {"name": "readonly_bytes", "kind": "data"},
+    {"name": "check_cdecl", "kind": "function"}
+  ],
+  "imports": [],
+  "dependencies": []
+}

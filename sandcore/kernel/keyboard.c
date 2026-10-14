@@ -11,6 +11,8 @@
  * ===================================================================== */
 #include "io.h"
 #include "keyboard.h"
+#include "sc32_raw.h"
+#include "../user/SC32GUI.H"
 
 #define KBD_DATA 0x60                 /* 数据口: 读扫描码 */
 #define KBD_STAT 0x64                 /* 状态口: bit0=输出缓冲有数据 */
@@ -110,11 +112,94 @@ static u8 shift_l, shift_r, caps;
 static u8 extended;
 static u8 held[256];
 static u8 scan_down[256],scan_suppressed[256];
+static u8 pause_step,num_lock;
 int keyboard_down(u32 key) { return key<256 ? held[key] : 0; }
+int keyboard_legacy_pending(void){return qt!=qh;}
+static int physical_down(u32 key){return scan_down[key] && !scan_suppressed[key];}
+u32 keyboard_modifiers(void)
+{
+    return (physical_down(0x2a)||physical_down(0x36)?SC32_MOD_SHIFT:0u)
+        |(physical_down(0x1d)||physical_down(0x9d)?SC32_MOD_CONTROL:0u)
+        |(physical_down(0x38)||physical_down(0xb8)?SC32_MOD_ALT:0u)
+        |(caps?SC32_MOD_CAPS:0u)|(num_lock?SC32_MOD_NUM:0u);
+}
+void keyboard_physical_snapshot(u32 out[8])
+{
+    for(u32 i=0;i<8;i++)out[i]=0;
+    for(u32 i=0;i<255;i++)if(physical_down(i))out[i/32]|=1u<<(i&31u);
+}
 void keyboard_session_switch(void)
 {
     qh=qt=0;shift_l=shift_r=0;
+    extended=pause_step=0;
     for(u32 i=0;i<256;i++){held[i]=0;scan_suppressed[i]=scan_down[i];}
+}
+
+static u32 navigation_symbol(u32 code)
+{
+    if(code==0x48)return SC32_KEY_UP;if(code==0x50)return SC32_KEY_DOWN;
+    if(code==0x4b)return SC32_KEY_LEFT;if(code==0x4d)return SC32_KEY_RIGHT;
+    if(code==0x47)return SC32_KEY_HOME;if(code==0x4f)return SC32_KEY_END;
+    if(code==0x49)return SC32_KEY_PAGEUP;if(code==0x51)return SC32_KEY_PAGEDOWN;
+    if(code==0x52)return SC32_KEY_INSERT;if(code==0x53)return SC32_KEY_DELETE;
+    return 0;
+}
+static void modern_scan(u8 scan)
+{
+    /* E1 Pause含假的Ctrl通断；E0 Print含假的Shift。必须按真实协议
+     * 解码，不能把它们交给普通修饰状态。Pause只有make脉冲，不造KEYUP。 */
+    static const u8 pause_bytes[5]={0x1d,0x45,0xe1,0x9d,0xc5};
+    if(pause_step){
+        if(scan==pause_bytes[pause_step-1]){
+            if(++pause_step==6){pause_step=0;
+                sc32_raw_key(255,SC32_KEY_PAUSE,0,keyboard_modifiers(),1,0,0);}
+            return;
+        }
+        pause_step=0; /* 错包重新以当前字节同步，不吞随后的真实按键。 */
+    }
+    if(scan==0xe1){pause_step=1;extended=0;return;}
+    if(scan==0xe0){extended=1;return;}
+    u32 ext=extended,code=scan&127u,physical=code+(ext?128u:0u);extended=0;
+    if(ext && code==0x2a)return;
+    u32 down=(scan&128u)==0,repeat=down && scan_down[physical];scan_down[physical]=(u8)down;
+    if(scan_suppressed[physical]){if(!down)scan_suppressed[physical]=0;return;}
+    u32 legacy=0,symbol=0,text=0;
+    if(!ext){
+        if(code==0x2a)shift_l=(u8)down;if(code==0x36)shift_r=(u8)down;
+        /* 锁定键按一次切换一次；硬件重复通码不应反复翻转状态。 */
+        if(code==0x3a && down && !repeat)caps^=1;
+        if(code==0x45 && down && !repeat)num_lock^=1;
+    }
+    if(ext){
+        symbol=navigation_symbol(code);
+        if(symbol>=SC32_KEY_UP && symbol<=SC32_KEY_RIGHT){
+            legacy=0x80u+(symbol-SC32_KEY_UP);held[legacy]=(u8)down;
+        }else if(code==0x1c)symbol='\n';
+        else if(code==0x35)symbol='/';
+        else if(code==0x37)symbol=SC32_KEY_PRINT;
+        if(symbol=='\n' || symbol=='/')legacy=symbol;
+    }else if(code>=0x3b && code<=0x44){
+        symbol=SC32_KEY_F1+code-0x3b;legacy=code-0x3a;if(legacy>=8)legacy+=128;
+    }else if(code==0x57 || code==0x58){
+        symbol=SC32_KEY_F1+10u+(code==0x58);if(code==0x58)legacy=0x8c;
+    }else{
+        symbol=(u8)map_base[code];
+        if(symbol){held[symbol]=(u8)down;
+            u32 shifted=shift_l|shift_r;text=(u8)(shifted?map_shift[code]:map_base[code]);
+            if(text>='a' && text<='z' && (shifted^caps))text=text-'a'+'A';
+            else if(text>='A' && text<='Z' && !(shifted^caps))text=text-'A'+'a';
+            legacy=text;
+        }else if(code>=0x47 && code<=0x53){
+            static const u8 keypad[13]={'7','8','9','-','4','5','6','+','1','2','3','0','.'};
+            if(code==0x4a || code==0x4e || (num_lock^((shift_l|shift_r)!=0)))symbol=text=keypad[code-0x47];
+            else symbol=navigation_symbol(code);
+            /* 新数字键盘事实不偷偷加入旧字符协议。 */
+        }
+    }
+    u32 modifiers=keyboard_modifiers();
+    if(ext && symbol>=32 && symbol<=126)text=symbol;
+    if(!down || text<32 || (modifiers&(SC32_MOD_CONTROL|SC32_MOD_ALT)))text=0;
+    sc32_raw_key(physical,symbol,text,modifiers,down,repeat,down?legacy:0);
 }
 
 /* ---------------- IRQ1 处理 ---------------- */
@@ -125,6 +210,7 @@ void keyboard_isr(void)
         return;                       /* 不是我们的数据 (防御性) */
 
     u8 sc = inb(KBD_DATA);
+    if(sc32_raw_active()){modern_scan(sc);return;}
 
     if(sc==0xE0) { extended=1; return; }
     if(sc==0xE1) return;

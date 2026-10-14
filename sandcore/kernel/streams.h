@@ -46,4 +46,14 @@ void streams_terminal_input(int owner,int handle);
 void streams_terminal_closed(int owner,int handle);
 int streams_ready(int pid,int fd,u32 out[8]);
 u32 streams_task_bytes(void);
+/* M10a2私有native引用：首次take转移旧标准slot的真实引用；dup不
+ * 占旧16fd槽。每个ref owner/PIDgen固定，最后reader/writer真实退出。 */
+int streams_native_take(int pid,int fd,u32 *reference);
+int streams_native_duplicate(int pid,u32 reference,u32 *copy);
+int streams_native_read(int pid,u32 reference,void *data,u32 bytes);
+int streams_native_write(int pid,u32 reference,const void *data,u32 bytes);
+int streams_native_seek(int pid,u32 reference,u32 offset);
+int streams_native_query(int pid,u32 reference,u32 out[8]);
+int streams_native_flush(int pid,u32 reference);
+int streams_native_close(int pid,u32 reference);
 #endif

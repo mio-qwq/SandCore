@@ -3,7 +3,7 @@
 
 /* M10a2 的用户态引导接口。平台回调只用于引导/验证适配；普通应用
  * 后续通过 SC32API 使用它们，不复制 syscall 桥或内核结构。 */
-typedef unsigned int ScU32;
+#include "../SCTYPES.H"
 typedef ScU32 ScModule;
 typedef struct ScRuntime ScRuntime;
 

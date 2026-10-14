@@ -27,6 +27,7 @@ int fs_stream_begin(int owner,const char *path,u32 capacity);
 int fs_stream_write(int owner,u32 token,const void *data,u32 length);
 int fs_stream_commit(int owner,u32 token);
 int fs_stream_abort(int owner,u32 token);
+int fs_stream_snapshot(int owner,u32 token,u32 out[4]);
 void fs_stream_stop(int owner);
 int fs_stream_stop_step(int owner);
 
@@ -55,5 +56,47 @@ int fs_mkdir(const char *path);
 int fs_create_ex(int owner,const char *path,u32 kind,u32 mode);
 int fs_remove(const char *path);       /* 仅文件或空目录，非空目录拒绝 */
 int fs_rename(const char *oldname,const char *newname); /* 目录整组前缀修改 */
+
+/* M10a2：独立普通文件对象，不借旧16fd/顺序事务。这里只接收已经
+ * 按cwd解析一次的rootless名字；磁盘v5记录与旧generation语义不变。 */
+#define FS_NATIVE_READ 1u
+#define FS_NATIVE_WRITE 2u
+#define FS_NATIVE_CREATE 4u
+#define FS_NATIVE_TRUNCATE 8u
+#define FS_NATIVE_APPEND 16u
+#define FS_NATIVE_DIRTY 1u
+#define FS_NATIVE_FAULTED 2u
+#define FS_NATIVE_UNCERTAIN 4u
+#define FS_NATIVE_GROWING 8u
+#define FS_NATIVE_OPEN_OPERATION 1u
+#define FS_NATIVE_WRITE_OPERATION 2u
+#define FS_NATIVE_TRUNCATE_OPERATION 3u
+#define FS_NATIVE_FLUSH_OPERATION 4u
+#define FS_N_INVALID (-1)
+#define FS_N_NOT_FOUND (-2)
+#define FS_N_ACCESS (-3)
+#define FS_N_MEMORY (-4)
+#define FS_N_NO_SPACE (-5)
+#define FS_N_STALE (-6)
+#define FS_N_BUSY (-7)
+#define FS_N_RANGE (-8)
+#define FS_N_IO (-9)
+#define FS_N_AGAIN (-10)
+#define FS_N_NOT_SUPPORTED (-11)
+typedef struct {u32 length,object,revision,flags;i32 uid,gid;u32 mode,reserved;} fs_native_info_t;
+typedef struct {char name[64];u32 length,generation;i32 uid,gid;u32 mode,kind;} fs_native_row_t;
+/* object是可信in/out：首调用0，AGAIN保留候选供同owner/writer续进。
+ * 所有长迁移/缺口清零按128扇区预算，metadata发布按16扇区预算。 */
+int fs_native_open(int pid,u32 writer,const char *name,u32 flags,u32 mode,u32 *object);
+int fs_native_info(int pid,u32 object,u32 access,fs_native_info_t *out);
+int fs_native_read(int pid,u32 object,void *out,u32 bytes,u32 offset,u32 *done);
+int fs_native_write(int pid,u32 object,u32 writer,const void *data,u32 bytes,u32 offset,int append,u32 *done,u32 *position);
+int fs_native_truncate(int pid,u32 object,u32 writer,u32 length);
+int fs_native_flush(int pid,u32 object,u32 writer);
+void fs_native_cancel(u32 object,u32 writer);
+void fs_native_close(u32 object,u32 writer);
+void fs_native_poll(void);
+u32 fs_native_directory_epoch(void);
+int fs_native_directory_read(int pid,const char *name,u32 epoch,u32 cursor,fs_native_row_t *out,u32 *next);
 
 #endif /* SANDCORE_FS_H */

@@ -22,6 +22,8 @@ typedef struct {
     u32 scl_root_metadata_size,scl_root_bytes,scl_root_image_size;
     /* 精确容器长度只存可信尾部，动态描述符不能凭映射页数伪造它。 */
     u32 scx_load_size,scx_bss_size;
+    /* 新GUI WAIT只转换自己的返回域；旧EVENTWAIT仍返回原事件位。 */
+    u32 wait_result_mode;
 } task_record_t;
 
 int task_store_init(const u32 sizes[TASK_DATA_COUNT]);

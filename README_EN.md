@@ -8,7 +8,7 @@
 
 SandCore is developed by [mio](https://github.com/mio-qwq/). The project includes BIOS boot support, paging and preemptive multitasking, the SandFS filesystem, a multi-user desktop, graphical applications, audio, IPv4 networking, custom executable formats, and an in-system C compiler, assembler, and debugger capable of compiling and running programs within SandCore itself.
 
-Current development is **SandCore M10a2 — The Application Platform Era**, started on **October 14, 2026**. SCL, SCCC and automatically linked dynamic SCX applications have guest execution, compiler bootstrap, concurrent isolation and resource recovery evidence. SC32API and the complete application platform remain under development. See the [design](sandcore/docs/M10A2-DESIGN.md) and [implementation and recovery record](sandcore/docs/M10A2-IMPLEMENTATION.md). The accepted runnable baseline remains **M10a1**, accepted on **October 7, 2026** and distributed as a **GitHub Preview pre-release** of M10a. Development is consolidated on `main`. M9 is the accepted stable release; source code and runnable images for M8a and earlier versions are retained. The full M10 milestone has not been declared complete, and the base kernel has not yet been frozen.
+Current development is **SandCore M10a2 — The Application Platform Era**, started on **October 14, 2026**. SCL/SCCC bootstrap and isolation, the SC32 foundation, guest-generated libraries, three-window keyboard/mouse behavior and precise resource recovery have execution evidence. SCCLIB, SCLIB and the complete GUI application platform remain under development. See the [design](sandcore/docs/M10A2-DESIGN.md) and [implementation and recovery record](sandcore/docs/M10A2-IMPLEMENTATION.md). The accepted runnable baseline remains **M10a1**, accepted on **October 7, 2026** and distributed as a **GitHub Preview pre-release** of M10a. Development is consolidated on `main`. M9 is the accepted stable release; source code and runnable images for M8a and earlier versions are retained. The full M10 milestone has not been declared complete, and the base kernel has not yet been frozen.
 
 | Entry point | Description |
 |---|---|
@@ -458,7 +458,7 @@ The official Ed25519 private signing key is retained exclusively by its owner. T
 
 | Version | Status |
 |---|---|
-| M10a2 — The Application Platform Era | Started October 14, 2026; SCL and the user application platform are under development; not yet accepted |
+| M10a2 — The Application Platform Era | SCL and the SC32 foundation, native libraries and message windows have run; the complete platform is under development and not yet accepted |
 | M10a1 | Accepted on October 7, 2026; GitHub Preview pre-release, including the separately added curl; development unified on main |
 | M9 | Accepted on October 5, 2026; stable release |
 | M8a | Approved partial stable release; unfinished goals of the original M8 remain archived |
@@ -476,3 +476,5 @@ Revision (2026-10-07): Published M10a1 Preview under the latest authorization; d
 Translation note (2026-10-08): Added this English main README. Technical content follows the Chinese README; the licensing paragraph reflects the root `LICENSE` file already present. Other documentation remains untranslated.
 
 Revision (2026-10-14): Retained the existing English README and license history while adding the M10a2 development and recovery links.
+
+Revision (2026-10-15): Recorded executed SC32/native libraries, three-window input and exact recovery evidence; continued the complete runtime, GUI and component scope.

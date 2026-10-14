@@ -9,6 +9,7 @@
 #include "memory.h"
 #include "interrupts.h"
 #include "objpool.h"
+#include "ata.h"
 #define FD_MAX 16
 #define PIPE_SIZE 4096u
 enum { END_FILE=1,END_REPLACE,END_PIPE,END_SERIAL,END_TTY,END_NULL,END_MEMORY };
@@ -23,20 +24,23 @@ typedef struct {
     u32 event_epoch,event_walk_epoch;
     int index,event_previous,event_next,event_queued,owner_previous,owner_next;
 } endpoint_t;
-struct descriptor {int endpoint;u32 direction,controls;int owner;u32 generation;descriptor_t *previous,*next;};
+struct descriptor {int endpoint;u32 direction,controls;int owner;u32 generation;descriptor_t *previous,*next;u32 weak;};
 typedef struct { u8 bytes[PIPE_SIZE];u32 head,tail,readers,writers; } pipe_t;
 typedef struct {
     u32 ticket,parent_generation,child_generation;
     int parent,child,result,original_child,parent_prev,parent_next;
 } job_t;
-static objpool_t endpoint_pool,pipe_pool,job_pool;
+static objpool_t endpoint_pool,pipe_pool,job_pool,native_pool;
 #define ENDPOINT(index) (*(endpoint_t *)objpool_get(&endpoint_pool,index))
 #define PIPE(index) (*(pipe_t *)objpool_get(&pipe_pool,index))
-typedef struct {descriptor_t fds[FD_MAX];char arguments[1024];int jobs_head,owned_job,terminal_head,stop_phase;} stream_task_t;
+typedef struct {descriptor_t fds[FD_MAX];char arguments[1024];int jobs_head,owned_job,terminal_head,stop_phase,native_head;
+    u32 standard_refs[3];} stream_task_t;
 #define STREAM_CONTEXT(pid) (*(stream_task_t *)task_data(pid,TASK_DATA_STREAMS))
 u32 streams_task_bytes(void){return sizeof(stream_task_t);}
 
 static u32 job_counter;
+typedef struct {descriptor_t descriptor;u32 token;int previous,next,standard;} native_reference_t;
+static u32 native_counter;
 static u8 serial_input[4096];
 static u32 serial_head,serial_tail,serial_session;
 static int serial_endpoint=-1,event_head=-1,event_tail=-1;
@@ -66,17 +70,19 @@ void streams_init(void)
     /* 三个全局池没有预设数量；每任务描述符仍按已发布的16项合同。
      * 池节点/正文直接借物理页，不能把固定内核小堆变成替代任务上限。 */
     if(objpool_init(&endpoint_pool,sizeof(endpoint_t),0) || objpool_init(&pipe_pool,sizeof(pipe_t),0)
-        || objpool_init(&job_pool,sizeof(job_t),0))panic("STREAM MEMORY",0);
+        || objpool_init(&job_pool,sizeof(job_t),0) || objpool_init(&native_pool,sizeof(native_reference_t),0))panic("STREAM MEMORY",0);
     for(int pid=task_next(-1);pid>=0;pid=task_next(pid)){
         STREAM_CONTEXT(pid).jobs_head=-1;STREAM_CONTEXT(pid).owned_job=-1;
-        STREAM_CONTEXT(pid).terminal_head=-1;
+        STREAM_CONTEXT(pid).terminal_head=STREAM_CONTEXT(pid).native_head=-1;
         for(int fd=0;fd<FD_MAX;fd++)STREAM_CONTEXT(pid).fds[fd].endpoint=-1;
     }
 }
 static endpoint_t *endpoint(int pid,int fd)
 {
     if(pid<1 || !task_owned(pid) || fd<0 || fd>=FD_MAX)return 0;
-    int index=STREAM_CONTEXT(pid).fds[fd].endpoint;
+    descriptor_t *d=&STREAM_CONTEXT(pid).fds[fd];
+    if(d->weak && (fd>2 || !STREAM_CONTEXT(pid).standard_refs[fd]))return 0;
+    int index=d->endpoint;
     endpoint_t *e=objpool_get(&endpoint_pool,index);return e && e->refs?e:0;
 }
 static int vacant(int pid,int first)
@@ -101,6 +107,12 @@ static void reference(descriptor_t *d,int add)
 {
     if(d->endpoint<0)return;
     endpoint_t *e=objpool_get(&endpoint_pool,d->endpoint);if(!e || (!add && !e->refs))return;
+    if(d->weak){
+        /* 弱proxy只承担旧slot的控制订阅和默认继承路由，不计reader/
+         * writer。不放入成员链，避免成为隐形EOF保活引用。 */
+        if(!add && d->controls){e->controls-=d->controls;d->controls=0;}
+        return;
+    }
     if(add){d->previous=0;d->next=e->members;if(d->next)d->next->previous=d;e->members=d;}
     else{
         if(e->event_cursor==d)e->event_cursor=d->next;
@@ -125,7 +137,7 @@ static void attach(int pid,int fd,int index,u32 direction)
 {
     descriptor_t *d=&STREAM_CONTEXT(pid).fds[fd];
     if(d->endpoint>=0)reference(d,0);
-    d->endpoint=index;d->direction=direction;d->controls=0;d->owner=pid;d->generation=task_generation(pid);reference(d,1);
+    d->endpoint=index;d->direction=direction;d->controls=0;d->weak=0;d->owner=pid;d->generation=task_generation(pid);reference(d,1);
     task_notify(pid,TASK_EVENT_STREAM);
 }
 void streams_spawn(int pid,int parent)
@@ -133,7 +145,8 @@ void streams_spawn(int pid,int parent)
     for(int fd=0;fd<FD_MAX;fd++)STREAM_CONTEXT(pid).fds[fd]=(descriptor_t){-1,0};
     STREAM_CONTEXT(pid).arguments[0]=0;
     STREAM_CONTEXT(pid).jobs_head=STREAM_CONTEXT(pid).owned_job=-1;
-    STREAM_CONTEXT(pid).terminal_head=-1;
+    STREAM_CONTEXT(pid).terminal_head=STREAM_CONTEXT(pid).native_head=-1;
+    for(int i=0;i<3;i++)STREAM_CONTEXT(pid).standard_refs[i]=0;
     if(parent>0 && parent<NTASK && auth_uid(pid)==auth_uid(parent))
         for(int fd=0;fd<3;fd++)if(endpoint(parent,fd)){
             descriptor_t d=STREAM_CONTEXT(parent).fds[fd];attach(pid,fd,d.endpoint,d.direction);
@@ -160,6 +173,10 @@ static void release_job(job_t *j)
 }
 void streams_stop(int pid,int code)
 {
+    while(STREAM_CONTEXT(pid).native_head>=0){
+        native_reference_t *r=objpool_get(&native_pool,STREAM_CONTEXT(pid).native_head);
+        if(!r)break;streams_native_close(pid,r->token);
+    }
     while(STREAM_CONTEXT(pid).terminal_head>=0){
         endpoint_t *e=&ENDPOINT(STREAM_CONTEXT(pid).terminal_head);terminal_unlink(e);events_changed(e);
     }
@@ -181,6 +198,8 @@ int streams_stop_step(int pid,int code)
 {
     stream_task_t *c=&STREAM_CONTEXT(pid);
     if(!c->stop_phase){
+        if(c->native_head>=0){native_reference_t *r=objpool_get(&native_pool,c->native_head);
+            if(r)streams_native_close(pid,r->token);else c->native_head=-1;return 0;}
         if(c->terminal_head>=0){endpoint_t *e=&ENDPOINT(c->terminal_head);terminal_unlink(e);events_changed(e);return 0;}
         for(int fd=0;fd<FD_MAX;fd++)streams_close(pid,fd,0);
         c->stop_phase=1;return 0;
@@ -277,12 +296,12 @@ int streams_event(int pid,int fd,u32 action)
     else if(action==2){if(!d->controls)return -1;d->controls--;e->controls--;}
     if(e->type==END_TTY)tty_poll(e);return (int)(e->event&0x7FFFFFFFu);
 }
-int streams_read(int pid,int fd,void *data,u32 length)
+static int endpoint_read(int pid,endpoint_t *e,u32 direction,void *data,u32 length)
 {
-    endpoint_t *e=endpoint(pid,fd);if(!e || !(STREAM_CONTEXT(pid).fds[fd].direction&STREAM_READ) || length>65536)return -1;
+    if(!e || !(direction&STREAM_READ) || length>65536)return -1;
     if(!length)return 0;u8 *out=(u8 *)data;
     if(e->type==END_NULL)return 0;
-    if(e->type==END_MEMORY){u32 count=e->bytes-e->position;if(count>length)count=length;
+    if(e->type==END_MEMORY){if(e->position>=e->bytes)return 0;u32 count=e->bytes-e->position;if(count>length)count=length;
         for(u32 i=0;i<count;i++)out[i]=((const u8 *)e->memory)[e->position+i];e->position+=count;return (int)count;}
     if(e->type==END_FILE){
         u32 info[8];if(!fs_access(pid,e->path,FS_ACCESS_READ))return -5;
@@ -309,9 +328,11 @@ int streams_read(int pid,int fd,void *data,u32 length)
     }
     return -1;
 }
-int streams_write(int pid,int fd,const void *data,u32 length)
+int streams_read(int pid,int fd,void *data,u32 length)
+{endpoint_t *e=endpoint(pid,fd);return endpoint_read(pid,e,e?STREAM_CONTEXT(pid).fds[fd].direction:0,data,length);}
+static int endpoint_write(int pid,endpoint_t *e,u32 direction,const void *data,u32 length)
 {
-    endpoint_t *e=endpoint(pid,fd);if(!e || !(STREAM_CONTEXT(pid).fds[fd].direction&STREAM_WRITE) || length>65536)return -1;
+    if(!e || !(direction&STREAM_WRITE) || length>65536)return -1;
     const u8 *in=(const u8 *)data;if(!length)return 0;
     if(e->type==END_NULL)return (int)length;
     if(e->type==END_REPLACE){
@@ -358,14 +379,18 @@ int streams_write(int pid,int fd,const void *data,u32 length)
     }
     return -1;
 }
-int streams_seek(int pid,int fd,u32 offset)
+int streams_write(int pid,int fd,const void *data,u32 length)
+{endpoint_t *e=endpoint(pid,fd);return endpoint_write(pid,e,e?STREAM_CONTEXT(pid).fds[fd].direction:0,data,length);}
+static int endpoint_seek(int pid,endpoint_t *e,u32 offset)
 {
-    endpoint_t *e=endpoint(pid,fd);if(!e)return -1;
+    if(!e)return -1;
     if(e->type==END_MEMORY){if(offset>e->bytes)return -1;e->position=offset;return (int)offset;}if(e->type!=END_FILE)return -1;
     u32 info[8];if(!fs_access(pid,e->path,FS_ACCESS_READ))return -5;
     if(fs_metadata(e->path,info) || info[7]!=e->generation || offset>info[2])return -8;
     e->position=offset;return (int)offset;
 }
+int streams_seek(int pid,int fd,u32 offset)
+{return endpoint_seek(pid,endpoint(pid,fd),offset);}
 int streams_tty(int pid,int window)
 {
     if(!wm_terminal_owned(pid,window))return -5;
@@ -586,5 +611,126 @@ int streams_processes(int caller,u32 *out,u32 words)
         if(i==caller || auth_can_manage(caller) || auth_uid(i)==auth_uid(caller))
             for(u32 j=0;j<12;j++)((char *)(row+8))[j]=TASK(i).name[j];
     }
+    return 0;
+}
+
+/* native标准流引用与旧slot分离；take明确转移引用，不在fd0/1/2留
+ * 一个隐形writer令fclose(stdout)后对端永远等不到EOF。未调用take的
+ * 旧程序仍使用原来的16fd、重定向及owner/generation合同。 */
+static native_reference_t *native_reference(int pid,u32 token)
+{
+    if(!task_owned(pid) || !token || token>0x7fffffffu)return 0;
+    native_reference_t *r=objpool_get(&native_pool,(int)token);
+    return r && r->token==token && r->descriptor.owner==pid
+        && r->descriptor.generation==task_generation(pid)?r:0;
+}
+static native_reference_t *native_allocate(int pid)
+{
+    if(native_counter==0x7fffffffu)return 0;
+    u32 token=native_counter+1;if(objpool_claim(&native_pool,(int)token))return 0;
+    native_reference_t *r=objpool_get(&native_pool,(int)token);r->token=++native_counter;
+    r->descriptor.endpoint=-1;r->descriptor.owner=pid;r->descriptor.generation=task_generation(pid);r->standard=-1;
+    r->previous=-1;r->next=STREAM_CONTEXT(pid).native_head;
+    if(r->next>=0)((native_reference_t *)objpool_get(&native_pool,r->next))->previous=(int)token;
+    STREAM_CONTEXT(pid).native_head=(int)token;return r;
+}
+int streams_native_take(int pid,int fd,u32 *token)
+{
+    endpoint_t *e=fd>=0 && fd<=2?endpoint(pid,fd):0;if(!e)return -1;
+    if(e->refs==0xffffffffu)return -4;
+    native_reference_t *r=native_allocate(pid);if(!r)return -4;
+    descriptor_t *d=&STREAM_CONTEXT(pid).fds[fd];r->descriptor=*d;r->descriptor.weak=0;r->descriptor.controls=0;
+    r->standard=fd;STREAM_CONTEXT(pid).standard_refs[fd]++;
+    /* 先新引用再撤旧引用，不能在唯一ref的过渡时销毁endpoint。
+     * 控制订阅一并转移；dup只增加字节端点，不复制Ctrl-C订阅。 */
+    if(d->weak){reference(&r->descriptor,1);}
+    else{
+        u32 controls=d->controls;d->controls=0;
+        reference(&r->descriptor,1);reference(d,0);
+        *d=(descriptor_t){r->descriptor.endpoint,r->descriptor.direction,controls,pid,task_generation(pid),0,0,1};
+    }
+    *token=r->token;return 0;
+}
+int streams_native_duplicate(int pid,u32 token,u32 *copy_token)
+{
+    native_reference_t *original=native_reference(pid,token);if(!original)return -8;
+    endpoint_t *e=objpool_get(&endpoint_pool,original->descriptor.endpoint);if(!e || !e->refs)return -8;
+    if(e->refs==0xffffffffu)return -4;
+    native_reference_t *r=native_allocate(pid);if(!r)return -4;
+    r->descriptor.endpoint=original->descriptor.endpoint;r->descriptor.direction=original->descriptor.direction;
+    r->descriptor.controls=0;r->standard=original->standard;
+    if(r->standard>=0)STREAM_CONTEXT(pid).standard_refs[r->standard]++;
+    reference(&r->descriptor,1);*copy_token=r->token;return 0;
+}
+int streams_native_close(int pid,u32 token)
+{
+    native_reference_t *r=native_reference(pid,token);if(!r)return -8;
+    if(r->standard>=0 && STREAM_CONTEXT(pid).standard_refs[r->standard]){
+        if(!--STREAM_CONTEXT(pid).standard_refs[r->standard]){
+            descriptor_t *proxy=&STREAM_CONTEXT(pid).fds[r->standard];
+            if(proxy->weak && proxy->endpoint==r->descriptor.endpoint){reference(proxy,0);*proxy=(descriptor_t){-1,0};}
+        }
+    }
+    if(r->previous>=0)((native_reference_t *)objpool_get(&native_pool,r->previous))->next=r->next;
+    else STREAM_CONTEXT(pid).native_head=r->next;
+    if(r->next>=0)((native_reference_t *)objpool_get(&native_pool,r->next))->previous=r->previous;
+    reference(&r->descriptor,0);objpool_release(&native_pool,(int)token);return 0;
+}
+static endpoint_t *native_endpoint(native_reference_t *r)
+{
+    endpoint_t *e=r?objpool_get(&endpoint_pool,r->descriptor.endpoint):0;
+    return e && e->refs?e:0;
+}
+int streams_native_read(int pid,u32 token,void *data,u32 bytes)
+{
+    native_reference_t *r=native_reference(pid,token);endpoint_t *e=native_endpoint(r);if(!e)return -8;
+    if(bytes>65536u || !(r->descriptor.direction&STREAM_READ))return -1;
+    /* 新seek允许二进制stdin的EOF外位置；旧read分支原字节逻辑
+     * 仍保留，新视图在EOF处返回0，不让无符号剩余长度下溢。 */
+    if(e->type==END_MEMORY && e->position>=e->bytes)return 0;
+    if(e->type==END_FILE){u32 info[8];if(!fs_access(pid,e->path,FS_ACCESS_READ))return -5;
+        if(fs_metadata(e->path,info) || info[7]!=e->generation)return -8;if(e->position>=info[2])return 0;}
+    return endpoint_read(pid,e,r->descriptor.direction,data,bytes);
+}
+int streams_native_write(int pid,u32 token,const void *data,u32 bytes)
+{
+    native_reference_t *r=native_reference(pid,token);endpoint_t *e=native_endpoint(r);if(!e)return -8;
+    return endpoint_write(pid,e,r->descriptor.direction,data,bytes);
+}
+int streams_native_query(int pid,u32 token,u32 out[8])
+{
+    native_reference_t *r=native_reference(pid,token);endpoint_t *e=native_endpoint(r);if(!e)return -8;
+    clear(out,32);out[0]=1;out[1]=e->type;out[2]=e->position;out[4]=e->generation;out[5]=r->descriptor.direction;
+    if(e->type==END_FILE){u32 info[8];if(!fs_access(pid,e->path,FS_ACCESS_READ))return -5;
+        if(fs_metadata(e->path,info) || info[7]!=e->generation)return -8;out[3]=info[2];out[6]=3;}
+    else if(e->type==END_MEMORY){out[3]=e->bytes;out[6]=3;}
+    else if(e->type==END_REPLACE){
+        if(auth_uid(pid)!=auth_uid(e->owner))return -5;
+        u32 info[4];int error=fs_stream_snapshot(e->owner,e->token,info);if(error)return error;
+        out[2]=out[3]=info[0];out[4]=info[2];out[6]=2|8;out[7]=info[3]?(u32)-1:0;
+    }
+    else if(e->type==END_TTY){if(e->generation!=task_generation(e->owner) || !wm_terminal_owned(e->owner,e->window))return -8;}
+    else if(e->type==END_SERIAL){if(e->generation!=serial_session)return -5;}
+    out[6]|=4;
+    return 0;
+}
+int streams_native_seek(int pid,u32 token,u32 offset)
+{
+    native_reference_t *r=native_reference(pid,token);endpoint_t *e=native_endpoint(r);if(!e)return -8;
+    u32 info[8];int error=streams_native_query(pid,token,info);if(error)return error;
+    if(!(info[6]&1u))return -12;e->position=offset;return 0;
+}
+int streams_native_flush(int pid,u32 token)
+{
+    native_reference_t *r=native_reference(pid,token);endpoint_t *e=native_endpoint(r);if(!e)return -8;
+    u32 snapshot[8];int checked=streams_native_query(pid,token,snapshot);if(checked)return checked;
+    if(e->type==END_REPLACE){
+        /* Shell父事务的目录发布仍由父commit拥有；新stdio只保证
+         * 缓冲已送端点并刷新ATA，不替child取得父事务管理权。 */
+        if(auth_uid(pid)!=auth_uid(e->owner))return -5;
+        u32 info[4];int error=fs_stream_snapshot(e->owner,e->token,info);if(error)return error;
+        if(info[3])return -1;return ata_flush()?-1:0;
+    }
+    if(e->type==END_FILE)return ata_flush()?-1:0;
     return 0;
 }

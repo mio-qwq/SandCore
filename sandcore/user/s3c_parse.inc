@@ -45,13 +45,16 @@ static int new_type(int kind,int size,int base,int count,int fields,int flags)
     t->count=count;
     t->fields=fields;
     t->flags=flags;
+    aggregate_identity[i]=(kind==TY_STRUCT || kind==TY_UNION)?i:0;
     return i;
 }
 static int qualified(int type,int flags)
 {
     if((types[type].flags|flags)==types[type].flags) return type;
     Type *t=types+type;
-    return new_type(t->kind,t->size,t->base,t->count,t->fields,t->flags|flags);
+    int result=new_type(t->kind,t->size,t->base,t->count,t->fields,t->flags|flags);
+    if(t->kind==TY_STRUCT || t->kind==TY_UNION)aggregate_identity[result]=aggregate_identity[type];
+    return result;
 }
 static int pointer_to(int base)
 {
@@ -161,6 +164,13 @@ static int aggregate(int kind)
     types[type].base=max_align;
     types[type].fields=first;
     types[type].count=1;
+    /* const ScMessage*可以先于struct定义出现。限定副本不是另一个
+     * 类型，完成后要取得同一字段/尺寸；只同步身份相同的副本，
+     * 不能因两个标签暂时同为fields=0就把它们合并。 */
+    for(int i=0;i<type_count;i++)if(i!=type && aggregate_identity[i]==aggregate_identity[type]){
+        types[i].size=types[type].size;types[i].base=types[type].base;
+        types[i].fields=types[type].fields;types[i].count=1;
+    }
     (void)tag;
     return type;
 }
@@ -556,7 +566,11 @@ static int initialize(int type,int symbol,int offset,int global)
     } else {
         if(t->kind==TY_ARRAY) fatal("array initializer needs braces or string");
         int value=expression(2);
-        if((t->kind==TY_STRUCT || t->kind==TY_UNION) && nodes[value].type!=type) fatal("aggregate initializer type mismatch");
+        if(t->kind==TY_STRUCT || t->kind==TY_UNION){
+            int source=nodes[value].type;
+            if(types[source].kind!=t->kind || aggregate_identity[source]!=aggregate_identity[type])
+                fatal("aggregate initializer type mismatch");
+        }
         chain(&first,&last,node_new(N_INIT,type,symbol,offset,value,0));
     }
     (void)global;

@@ -243,5 +243,6 @@ void syscall_c_common(u32 vec, u32 *frame);   /* int 0x7C 分发 */
 #define SYS_MODULEPROTECT 0x281
 #define SYS_MODULEFREE 0x282
 #define SYS_SCLBOOT 0x283
+#define SYS_SC32 0x300
 
 #endif /* SANDCORE_TASK_H */

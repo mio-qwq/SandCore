@@ -632,3 +632,28 @@ MODULEFREE成功释放这个精确根块时清除私有根缓存，下次才重�
 
 修订：2026-10-14，新增0x283固定用户态根引导、精确SCD/SCX启动校验、
 32B本人虚址输出及复用/失败回滚/退出寿命；本批仍未构建或客体运行。
+
+## SC32私有协调门（0x300）
+
+新门独立于冻结SCAPI.H，应用从SC32API.SCL调用正式cdecl函数；只有
+库私有桥处理EAX=0x300、EBX=selector、ECX=request、EDX=output。
+新状态域为SC32_E_* -101..-116，OK/PENDING/TIMEOUT/RESIDENT=0/1/2/3，
+不将旧事件位或SCL错误值直接当新状态。公开与私有字布局分别在
+SC32API.H/SC32GUI.H、SC32WIRE.H/SC32GUIWIRE.H/SC32FILEWIRE.H。
+
+0x01..05为整区访问Probe、能力、本人/受权限约束的带代数进程、真实
+物理页/私有映射与PIT宽单调查询；0x100..113为新消息窗口/输入/队列/
+PAINT/矩形提交；0x200..222为动态普通文件与目录。旧0x241 EVENTWAIT
+仍返回原bitmask。新GUI WAIT10a在同一IF=0范围检查queue-ready并安装
+INPUT等待，私有task尾部只标本次返回模式；唤醒返回新状态，没有
+保存应用消息输出指针，随后的GET仍完整核验缓冲再消费。
+
+新记录输入精确size/version，输出先验规范前缀和整个声明RW范围，
+成功只复制已定义字节、未知尾保持；RO输入合法，RO输出拒绝。
+新CORE/FILE/GUI实际语义与资源/权限见[SC32-CORE](SC32-CORE.md)、
+[SC32-FILE](SC32-FILE.md)、[SC32-GUI](SC32-GUI.md)。SYS0x300不会因为
+库来自系统目录就授予SYSTEM或执行用户回调。当前本批仍在统一构建，
+实际QEMU证据未到达。
+
+修订：2026-10-15，接通SC32独立gate、原子消息等待及owner退出胶水，
+保留旧API/等待返回域；首次构建因新源误缩进-Werror拒绝，定向修正中。

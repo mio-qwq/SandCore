@@ -32,9 +32,9 @@
 #define FILE_MAX 32
 #define LINE_MAX 1024
 #define DEPTH_MAX 16
-/* SCD1与SCL的正式偏移/启动宏同属真实自编译输入：256项在
- * runtime/SCDYN.H中耗尽。保留有界诊断，扩到320项供当前261余项。 */
-#define MACRO_MAX 320
+/* SCD1自编译曾在256项耗尽；SC32完整公开/私有八头已有340个不同
+ * 宏，另需实现及预定义宏。384容纳当前真实输入，输出/栈限制不放宽。 */
+#define MACRO_MAX 384
 #define MACRO_BODY_MAX 8192
 #define MACRO_ARGS 8
 #define MACRO_ARG_TOKENS 128
@@ -102,6 +102,8 @@ static Tok replacements[DEPTH_MAX][LINE_MAX],condition_tokens[LINE_MAX];
 static Tok raw_chunk[16384];
 static int raw_used;
 static Type types[TYPE_MAX];
+/* const/volatile副本仍属于同一聚合身份；前向声明完成后同步副本。 */
+static int aggregate_identity[TYPE_MAX];
 static Symbol symbols[SYMBOL_MAX];
 static Parameter parameters[PARAM_MAX];
 static Node nodes[NODE_MAX];

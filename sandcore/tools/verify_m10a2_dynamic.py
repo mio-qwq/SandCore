@@ -17,7 +17,7 @@ from scl_format import validate
 from scd_format import validate_scx
 
 ROOT=Path(__file__).resolve().parents[1]
-SOURCE_NAMES=('sccc.c','s3c.c','SCAPI.H','SCIO.H','COMPILECLI.inc','s3c_lex.inc',
+SOURCE_NAMES=('sccc.c','s3c.c','SCAPI.H','SCTYPES.H','SCIO.H','COMPILECLI.inc','s3c_lex.inc',
     's3c_pp.inc','s3c_parse.inc','s3c_emit.inc','s3c_scl.inc','runtime/SCLFMT.H',
     'runtime/scl_format.c','runtime/SCDYN.H','runtime/scd_format.c','runtime/SCLDR.H',
     'runtime/SCLPRIVATE.H','runtime/SCLROOT.C','runtime/SCLROOT.json','runtime/scldr.c',

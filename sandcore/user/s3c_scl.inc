@@ -291,7 +291,7 @@ static int sclc_type_same(int a,int b,int depth,int parameter)
     if(x->kind!=y->kind || (x->flags&mask)!=(y->flags&mask))return 0;
     if(x->kind==TY_PTR)return sclc_type_same(x->base,y->base,depth+1,0);
     if(x->kind==TY_ARRAY)return (!x->count || !y->count || x->count==y->count) && sclc_type_same(x->base,y->base,depth+1,0);
-    if(x->kind==TY_STRUCT || x->kind==TY_UNION)return x->fields==y->fields && x->size==y->size;
+    if(x->kind==TY_STRUCT || x->kind==TY_UNION)return aggregate_identity[a]==aggregate_identity[b];
     if(x->kind==TY_FUNC){
         if(!sclc_type_same(x->base,y->base,depth+1,0))return 0;
         if(x->count<0 || y->count<0)return 1;

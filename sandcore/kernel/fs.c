@@ -25,6 +25,7 @@
 #include "task_store.h"
 #include "objpool.h"
 #include "crc.h"
+#include "sc32_file.h"
 #define FS_LEGACY_SECTS 16384u
 #define FS_MAX_SECTS 524288u
 #define ALLOCATION_LEAF_SECTORS 512u
@@ -66,11 +67,37 @@ typedef struct {
 } transaction_t;
 static objpool_t transaction_pool;
 static u32 transaction_counter;
+/* 活跃modern open使用独立身份，磁盘generation仍是内容/权限版本。
+ * pin阻止旧replace/remove/rename接管同名对象；chmod不撤身份，逐次
+ * 权限复验。候选只有内核extent/进度，绝不持有用户buffer跨陷入。 */
+typedef struct {
+    char name[64];entry_t candidate,previous;
+    u32 id,refs,ready,index,pending,writer,owner,owner_generation;
+    u32 position,length,target,copy_sector,zero_offset,reserved_start,reserved_count;
+    u32 relocated,complete,accepted,uncertain;
+    int result;
+} native_file_t;
+static objpool_t native_pool;
+static u32 native_counter,native_meta_owner,native_meta_sector,published_object_generation;
+static u32 native_meta_bank,native_meta_generation,native_meta_count,native_meta_sequence,native_meta_crc;
+static u32 native_directory_sequence=1;
+static u8 native_super[512];
+enum { N_OPEN=1,N_WRITE,N_TRUNCATE,N_FLUSH };
+static int same(const char *a,const char *b);
+static int child(const char *name,const char *parent);
+static int native_busy(const char *name)
+{
+    for(int i=objpool_next(&native_pool,-1);i>=0;i=objpool_next(&native_pool,i)){
+        native_file_t *n=objpool_get(&native_pool,i);
+        if(n->refs && (same(name,n->name) || child(n->name,name)))return 1;
+    }
+    return 0;
+}
 static u32 new_generation(void)
 {
     /* 持久化的单调序号防止删除后同名重建被旧文件句柄误认；耗尽即
      * 拒绝修改，不能在32位回绕时把旧对象再次当成同一个文件。 */
-    if(object_generation==0xFFFFFFFFu)return 0;
+    if(object_generation==0xFFFFFFFFu || native_directory_sequence==0xffffffffu)return 0;
     return ++object_generation;
 }
 
@@ -118,7 +145,7 @@ int fs_normalize(const char *path,char *out)
 }
 static int find(const char *name)
 { for(int i=0;i<nfiles;i++) if(same(name,dirents[i].name)) return i; return -1; }
-static int busy(const char *name)
+static int transaction_busy(const char *name)
 {
     for(int i=objpool_next(&transaction_pool,-1);i>=0;i=objpool_next(&transaction_pool,i)){
         transaction_t *t=objpool_get(&transaction_pool,i);
@@ -126,6 +153,8 @@ static int busy(const char *name)
     }
     return 0;
 }
+static int busy(const char *name)
+{return transaction_busy(name) || native_busy(name);}
 static int protected(const char *name)
 { return same(name,"SYS/CORE") || child(name,"SYS/CORE") || same(name,"SYS/AUTH") || child(name,"SYS/AUTH")
     || same(name,"SYS/RECOVERY") || child(name,"SYS/RECOVERY")
@@ -147,7 +176,7 @@ int fs_user_mutable(const char *path,int descendants)
 }
 static int write_meta(void)
 {
-    if(fs_faulted)return -1;
+    if(fs_faulted || native_meta_owner || native_directory_sequence==0xffffffffu)return -1;
     if(ata_read_sectors(0,1,sector)) return -1;
     for(u32 i=0;i<dir_sectors*512;i++) meta[i]=0;
     u32 names=name_bytes();
@@ -176,11 +205,11 @@ static int write_meta(void)
         /* 先新数据/备用目录，最后切换超级块。提交IO报错可能结果不明，
          * 停止后续写入，保留原数据；不以“恢复内存”谎称磁盘已回滚。 */
         if(ata_write_sectors(0,1,sector)){fs_faulted=1;return -1;}
-        active_bank=next;metadata_generation=generation;return 0;
+        active_bank=next;metadata_generation=generation;published_object_generation=object_generation;native_directory_sequence++;return 0;
     }
     *(u32 *)(sector+12)=(u32)nfiles;
     if(ata_write_sectors(0,1,sector))return -1;
-    return ata_write_sectors(1,dir_sectors,meta);
+    int result=ata_write_sectors(1,dir_sectors,meta);if(!result)native_directory_sequence++;return result;
 }
 static void release_directory(void)
 {
@@ -191,6 +220,7 @@ static void release_directory(void)
     space_tree=0;space_pages=space_leaves=live_sectors=live_bytes=0;live_dirty=1;
     allocation=0;allocation_pages=fs_data_start=active_bank=metadata_generation=fs_faulted=0;
     object_generation=0;
+    objpool_destroy(&native_pool);native_meta_owner=native_meta_sector=published_object_generation=0;
     objpool_destroy(&transaction_pool);
     for(int pid=task_next(-1);pid>=0;pid=task_next(pid))task_record(pid)->transactions=0;
     dirents=0;meta=0;dir_pages=meta_pages=0;
@@ -199,7 +229,7 @@ static void release_directory(void)
 void fs_init(void)
 {
     release_directory();
-    if(objpool_init(&transaction_pool,sizeof(transaction_t),0))return;
+    if(objpool_init(&transaction_pool,sizeof(transaction_t),0) || objpool_init(&native_pool,sizeof(native_file_t),0))return;
     if(ata_read_sectors(0,1,sector)) return;
     const char *magic="SANDFSMIO";
     for(int i=0;i<9;i++) if(sector[i]!=(u8)magic[i]) return;
@@ -293,7 +323,7 @@ void fs_init(void)
         space_tree=(space_node_t *)pframe_alloc_run(space_pages);if(!space_tree)goto failed;
         fs_space_rebuild();
     }
-    live_dirty=1;return;
+    published_object_generation=object_generation;live_dirty=1;return;
 failed:
     release_directory();
 }
@@ -426,7 +456,8 @@ int fs_read_at(const char *path,void *buf,u32 capacity,u32 offset)
 int fs_write(const char *path,const u8 *buf,u32 size)
 {
     char name[64];
-    if(fs_normalize(path,name)<=0 || !dir_sectors || fs_faulted || size>fs_disk_sectors*512 || busy(name)) return -1;
+    if(fs_normalize(path,name)<=0 || !dir_sectors || fs_faulted || size>fs_disk_sectors*512)return -1;
+    if(native_meta_owner || busy(name))return -6;
     u32 generation=version==5?new_generation():1;if(!generation)return -1;
     if(len(name)>=(int)name_bytes()) return -1; /* 旧盘保持旧名字上限。 */
     u32 info[2];
@@ -465,6 +496,7 @@ int fs_write(const char *path,const u8 *buf,u32 size)
 }
 int fs_mkdir(const char *path)
 {
+    if(native_meta_owner)return -6;
     char name[64]; u32 info[2];
     if(version<4 || fs_normalize(path,name)<=0 || !fs_stat(name,info)) return -1;
     if((u32)nfiles>=dir_capacity)return -1;
@@ -480,7 +512,7 @@ int fs_mkdir(const char *path)
 int fs_remove(const char *path)
 {
     char name[64]; if(fs_normalize(path,name)<=0) return -1;
-    int i=find(name); if(i<0 || busy(name)) return -1;
+    int i=find(name);if(i<0)return -1;if(native_meta_owner || busy(name))return -6;
     for(int j=0;j<nfiles;j++) if(child(dirents[j].name,name)) return -1;
     entry_t removed=dirents[i];
     for(int j=i;j<nfiles-1;j++) dirents[j]=dirents[j+1];
@@ -494,7 +526,7 @@ int fs_rename(const char *oldpath,const char *newpath)
 {
     char old[64],next[64]; u32 info[2];
     if(fs_normalize(oldpath,old)<=0 || fs_normalize(newpath,next)<=0 || fs_stat(old,info)) return -1;
-    if(busy(old) || busy(next))return -6;
+    if(native_meta_owner || busy(old) || busy(next))return -6;
     if(same(old,next)) return 0;
     if(child(next,old) || !fs_stat(next,info)) return -1;
     for(int i=0;i<nfiles;i++)
@@ -555,6 +587,7 @@ int fs_list_dir(const char *path,char *out,u32 capacity)
 }
 int fs_create_ex(int owner,const char *path,u32 kind,u32 mode)
 {
+    if(native_meta_owner)return -6;
     char name[64];u32 info[2];if(version!=5 || !dir_sectors || fs_faulted || (kind!=1 && kind!=2) || mode>63 || fs_normalize(path,name)<=0)return -1;
     if(!fs_user_mutable(name,0) || !fs_access_parent(owner,name))return -5;
     if(!fs_stat(name,info))return -8;if(busy(name))return -6;if((u32)nfiles>=dir_capacity)return -4;
@@ -632,6 +665,7 @@ int fs_metadata(const char *path,u32 out[8])
 }
 int fs_permissions(int pid,const char *path,int uid,int gid,u32 mode)
 {
+    if(native_meta_owner)return -6;
     char name[64];if(version<5 || fs_normalize(path,name)<=0 || (mode&~63u))return -1;
     if(!fs_user_mutable(name,0) || !fs_access(pid,name,FS_ACCESS_META))return -5;
     int index=find(name);if(index<0)return -1;
@@ -653,6 +687,11 @@ static transaction_t *stream(int owner,u32 token)
     transaction_t *t=objpool_get(&transaction_pool,(int)token);
     return t && t->token==token && t->owner==owner && t->owner_generation==task_generation(owner)?t:0;
 }
+int fs_stream_snapshot(int owner,u32 token,u32 out[4])
+{
+    transaction_t *t=stream(owner,token);if(!t)return -8;
+    out[0]=t->used;out[1]=t->capacity;out[2]=t->original;out[3]=t->failed|fs_faulted;return 0;
+}
 static void transaction_release(transaction_t *t)
 {
     /* 临时扇区归属独立于PID编号。先从真实拥有者的链上撤销，
@@ -668,7 +707,8 @@ int fs_stream_begin(int owner,const char *path,u32 capacity)
 {
     char name[64];u32 info[2];
     if(!task_owned(owner) || version!=5 || fs_faulted || capacity>fs_disk_sectors*512
-        || fs_normalize(path,name)<=0 || protected(name) || busy(name))return -1;
+        || fs_normalize(path,name)<=0 || protected(name))return -1;
+    if(native_meta_owner || busy(name))return -6;
     if(owner && (!fs_user_mutable(name,0) || !fs_access(owner,name,FS_ACCESS_WRITE)))return -5;
     if(!fs_stat(name,info) && info[0]!=1)return -1;
     /* 内部串口路径也必须有真实父目录，不能接收一个悬空后代使卷下次
@@ -731,6 +771,7 @@ int fs_stream_stop_step(int owner)
 int fs_stream_commit(int owner,u32 token)
 {
     transaction_t *t=stream(owner,token);if(!t || t->failed || fs_faulted)return -1;
+    if(native_meta_owner || native_busy(t->name))return -6;
     if(owner && (!fs_user_mutable(t->name,0) || !fs_access(owner,t->name,FS_ACCESS_WRITE)))return -5;
     int index=find(t->name),fresh=index<0;
     if((!fresh && dirents[index].generation!=t->original) || (fresh && t->original))return -6;
@@ -751,4 +792,402 @@ int fs_stream_commit(int owner,u32 token)
     if(!fresh)allocated(previous.start_lba,(previous.size+511)/512,0);
     u32 live=(t->used+511)/512,reserved=(t->capacity+511)/512;
     allocated(t->start+live,reserved-live,0);int result=(int)t->used;transaction_release(t);highwater();return result;
+}
+
+/* 以下为独立modern文件底座。旧replace仍是全文件COW，旧fd仍按
+ * generation失效；新接口不会把它们改造成另一种隐式事务。 */
+static native_file_t *native_object(u32 id)
+{
+    if(!id || id>0x7fffffffu)return 0;
+    native_file_t *n=objpool_get(&native_pool,(int)id);
+    return n && n->id==id && n->refs?n:0;
+}
+static int native_index(native_file_t *n)
+{
+    int i=find(n->name);
+    if(i<0 || !dirents[i].start_lba)return FS_N_STALE;
+    /* 其它文件删除会压缩目录，不能永久缓存旧数组下标当对象身份。 */
+    n->index=(u32)i;return i;
+}
+static int native_access(int pid,native_file_t *n,u32 access)
+{
+    if(!task_owned(pid) || !n || !n->ready)return FS_N_STALE;
+    if(native_index(n)<0)return FS_N_STALE;
+    if(access&FS_NATIVE_WRITE){
+        if(version!=5)return FS_N_NOT_SUPPORTED;
+        if(fs_faulted)return FS_N_IO;
+        if(!fs_user_mutable(n->name,0))return FS_N_ACCESS;
+    }
+    if(!fs_access(pid,n->name,access?access:FS_ACCESS_META))return FS_N_ACCESS;
+    return 0;
+}
+int fs_native_info(int pid,u32 object,u32 access,fs_native_info_t *out)
+{
+    native_file_t *n=native_object(object);int error=native_access(pid,n,access);
+    if(error)return error;
+    entry_t *e=dirents+n->index;
+    out->length=e->size;out->object=n->id;out->revision=e->generation;
+    out->flags=(e->generation>published_object_generation?FS_NATIVE_DIRTY:0)
+        |(fs_faulted?FS_NATIVE_FAULTED:0)|(n->uncertain?FS_NATIVE_UNCERTAIN:0)
+        |(n->pending && !n->complete?FS_NATIVE_GROWING:0);
+    out->uid=e->uid;out->gid=e->gid;out->mode=e->mode;out->reserved=0;return 0;
+}
+static void native_pending_clear(native_file_t *n)
+{
+    n->pending=n->writer=n->owner=n->owner_generation=0;n->complete=0;n->result=0;
+    n->position=n->length=n->target=n->copy_sector=n->zero_offset=0;
+    n->reserved_start=n->reserved_count=n->relocated=n->accepted=0;
+}
+void fs_native_cancel(u32 object,u32 writer)
+{
+    native_file_t *n=native_object(object);if(!n || !n->pending || n->writer!=writer)return;
+    if(native_meta_owner==n->id)native_meta_owner=native_meta_sector=0;
+    /* 未发布候选只在内存位图保留。元数据已成功提交时reserved已清零，
+     * 不能把关闭/退出伪装成回滚一个已经对其他句柄可见的写入。 */
+    if(n->reserved_count)allocated(n->reserved_start,n->reserved_count,0);
+    native_pending_clear(n);
+}
+void fs_native_close(u32 object,u32 writer)
+{
+    native_file_t *n=native_object(object);if(!n)return;
+    fs_native_cancel(object,writer);
+    if(--n->refs)return;
+    if(native_meta_owner==n->id)native_meta_owner=native_meta_sector=0;
+    if(n->reserved_count)allocated(n->reserved_start,n->reserved_count,0);
+    objpool_release(&native_pool,(int)object);
+}
+static void native_completed(native_file_t *n)
+{
+    /* 元数据完成与用户领取分开：结果留在动态writer句柄，当前file
+     * pending键立即可释放。否则并发append会等一个已经完成的ACK，
+     * 或原调用会重放而重复append。这里绝不复制到用户out。 */
+    if(sc32_file_complete((int)n->owner,n->owner_generation,n->writer,n->pending,
+        n->position,n->length,n->id,n->result,n->result?0:n->accepted))native_pending_clear(n);
+}
+static void native_failed(native_file_t *n,int error,int uncertain)
+{
+    if(native_meta_owner==n->id)native_meta_owner=native_meta_sector=0;
+    if(uncertain){n->uncertain=1;fs_faulted=1;}
+    if(n->reserved_count)allocated(n->reserved_start,n->reserved_count,0);
+    n->reserved_start=n->reserved_count=0;n->result=error;n->complete=1;
+}
+static void native_serialize(u8 *p,const entry_t *e)
+{
+    for(u32 j=0;j<64;j++)p[j]=(u8)e->name[j];
+    *(u32 *)(p+64)=e->start_lba;*(u32 *)(p+68)=e->size;
+    *(i32 *)(p+72)=e->uid;*(i32 *)(p+76)=e->gid;
+    *(u32 *)(p+80)=e->mode;*(u32 *)(p+84)=e->flags;*(u32 *)(p+88)=e->generation;
+}
+static int native_publish_start(native_file_t *n)
+{
+    if(native_meta_owner)return native_meta_owner==n->id?FS_N_AGAIN:FS_N_BUSY;
+    if(fs_faulted)return FS_N_IO;
+    if(native_directory_sequence==0xffffffffu)return FS_N_RANGE;
+    if(ata_read_sectors(0,1,native_super))return FS_N_IO;
+    native_meta_count=(u32)nfiles+(!n->ready?1u:0u);
+    if(native_meta_count>dir_capacity)return FS_N_NO_SPACE;
+    for(u32 i=0;i<dir_sectors*512u;i++)meta[i]=0;
+    for(u32 i=0;i<native_meta_count;i++)native_serialize(meta+i*96u,i==n->index?&n->candidate:dirents+i);
+    native_meta_bank=active_bank^1u;native_meta_generation=metadata_generation+1u;
+    if(!native_meta_generation)native_meta_generation=1;
+    native_meta_sequence=object_generation;
+    *(u32 *)(native_super+12)=native_meta_count;
+    *(u32 *)(native_super+48)=native_meta_bank;*(u32 *)(native_super+52)=native_meta_generation;
+    *(u32 *)(native_super+56)=native_meta_sequence;*(u32 *)(native_super+508)=crc32_update(0,native_super,508);
+    /* bank快照只占已有内核meta缓冲。短锁冻结所有目录修改，正文
+     * 读取与WM仍能运行；每次最多16扇区，绝不在一个gate写完整大bank。 */
+    native_meta_owner=n->id;native_meta_sector=native_meta_crc=0;task_kernel_wake();return FS_N_AGAIN;
+}
+static int native_publish_step(native_file_t *n)
+{
+    if(n->complete)return n->result;
+    if(native_meta_owner!=n->id)return FS_N_BUSY;
+    int pid=(int)n->owner;
+    if(!task_owned(pid) || task_generation(pid)!=n->owner_generation || protected(n->name)
+       || (module_path(n->name) && !auth_can_mod(pid))
+       || (n->ready?!fs_access(pid,n->name,FS_ACCESS_WRITE):!fs_access_parent(pid,n->name))){
+        native_failed(n,FS_N_ACCESS,0);native_completed(n);return FS_N_ACCESS;
+    }
+    if(native_meta_sector<dir_sectors){
+        u32 count=dir_sectors-native_meta_sector;if(count>16)count=16;
+        if(ata_write_sectors(1+native_meta_bank*dir_sectors+native_meta_sector,count,meta+native_meta_sector*512u)){
+            native_failed(n,FS_N_IO,0);native_completed(n);return FS_N_IO;
+        }
+        /* CRC也按同一8KiB批量续进，不在一次陷入遍历整个最大目录。
+         * 现CRC为查表算法，已写batch的数据在meta锁期间不变。 */
+        native_meta_crc=crc32_update(native_meta_crc,meta+native_meta_sector*512u,count*512u);
+        native_meta_sector+=count;task_kernel_wake();return FS_N_AGAIN;
+    }
+    /* 超级块错误是结果不明，保留卷故障状态；不说恢复旧内存等于
+     * 磁盘回滚。启动时仍按旧v5 CRC和active-bank合同拒绝坏卷。 */
+    *(u32 *)(native_super+44)=native_meta_crc;*(u32 *)(native_super+508)=crc32_update(0,native_super,508);
+    if(ata_write_sectors(0,1,native_super)){native_failed(n,FS_N_IO,1);native_completed(n);return FS_N_IO;}
+    if(!n->ready)nfiles++;
+    dirents[n->index]=n->candidate;n->ready=1;
+    u32 old=(n->previous.size+511u)/512u,next=(n->candidate.size+511u)/512u;
+    if(n->previous.start_lba && n->previous.start_lba!=n->candidate.start_lba)allocated(n->previous.start_lba,old,0);
+    else if(old>next)allocated(n->previous.start_lba+next,old-next,0);
+    n->reserved_start=n->reserved_count=0;n->complete=1;n->result=0;
+    active_bank=native_meta_bank;metadata_generation=native_meta_generation;
+    published_object_generation=native_meta_sequence;native_meta_owner=native_meta_sector=0;native_directory_sequence++;highwater();
+    task_notify_generation((int)n->owner,n->owner_generation,TASK_EVENT_STREAM);native_completed(n);return 0;
+}
+void fs_native_poll(void)
+{
+    native_file_t *n=native_object(native_meta_owner);if(!n)return;
+    if(!task_owned((int)n->owner) || task_generation((int)n->owner)!=n->owner_generation || TASK(n->owner).state==2){
+        fs_native_cancel(n->id,n->writer);return;
+    }
+    /* 用户可暂时停止续调，但不能因此无限期霸占全卷元数据锁。
+     * 此阶段所有正文已在内核/磁盘，poll不借用户指针或切用户CR3。 */
+    native_publish_step(n);
+}
+static int native_pending_match(native_file_t *n,int pid,u32 writer,u32 kind,u32 position,u32 length)
+{
+    return n->pending==kind && n->writer==writer && n->owner==(u32)pid
+        && n->owner_generation==task_generation(pid) && n->position==position && n->length==length;
+}
+static void native_pending_start(native_file_t *n,int pid,u32 writer,u32 kind,u32 position,u32 length)
+{
+    n->pending=kind;n->writer=writer;n->owner=(u32)pid;n->owner_generation=task_generation(pid);
+    n->position=position;n->length=length;n->complete=n->accepted=n->relocated=0;n->result=0;
+    n->copy_sector=0;n->reserved_start=n->reserved_count=0;
+    n->previous=n->candidate=dirents[n->index];n->zero_offset=n->previous.size;
+}
+int fs_native_open(int pid,u32 writer,const char *name,u32 flags,u32 mode,u32 *object)
+{
+    if(!dir_sectors)return FS_N_IO;
+    if(!task_owned(pid) || !writer || !name || !name[0] || (flags&~31u) || !(flags&3u) || mode>63u
+       || ((flags&(FS_NATIVE_CREATE|FS_NATIVE_TRUNCATE|FS_NATIVE_APPEND)) && !(flags&FS_NATIVE_WRITE)))return FS_N_INVALID;
+    if(flags&FS_NATIVE_WRITE){if(version!=5)return FS_N_NOT_SUPPORTED;if(fs_faulted)return FS_N_IO;
+        if(!fs_user_mutable(name,0))return FS_N_ACCESS;}
+    native_file_t *n=*object?native_object(*object):0;
+    if(n){
+        if(!native_pending_match(n,pid,writer,N_OPEN,flags,mode))return FS_N_BUSY;
+        int result=n->complete?n->result:native_publish_step(n);
+        if(result!=FS_N_AGAIN && result!=FS_N_BUSY)native_pending_clear(n);
+        return result;
+    }
+    if(transaction_busy(name))return FS_N_BUSY;
+    int index=find(name),fresh=index<0;
+    if(fresh && !(flags&FS_NATIVE_CREATE))return FS_N_NOT_FOUND;
+    if(!fresh && !dirents[index].start_lba)return FS_N_INVALID;
+    if(!fs_access(pid,name,FS_ACCESS_META))return FS_N_ACCESS;
+    if(!fresh && !fs_access(pid,name,flags&3u))return FS_N_ACCESS;
+    if(fresh && !fs_access_parent(pid,name))return FS_N_ACCESS;
+    if(fresh && (u32)nfiles>=dir_capacity)return FS_N_NO_SPACE;
+    if((fresh || (flags&FS_NATIVE_TRUNCATE)) && native_meta_owner)return FS_N_AGAIN;
+    for(int i=objpool_next(&native_pool,-1);i>=0;i=objpool_next(&native_pool,i)){
+        native_file_t *candidate=objpool_get(&native_pool,i);
+        if(!same(name,candidate->name))continue;
+        if(!candidate->ready || candidate->pending)return FS_N_AGAIN;
+        n=candidate;break;
+    }
+    if(n){if(n->refs==0xffffffffu)return FS_N_RANGE;n->refs++;}
+    else{
+        if(native_counter==0x7fffffffu)return FS_N_RANGE;
+        u32 id=native_counter+1;if(objpool_claim(&native_pool,(int)id))return FS_N_MEMORY;
+        n=objpool_get(&native_pool,(int)id);n->id=++native_counter;n->refs=1;copy(n->name,name);
+    }
+    n->index=fresh?(u32)nfiles:(u32)index;n->ready=!fresh;*object=n->id;
+    if(!fresh && !(flags&FS_NATIVE_TRUNCATE))return 0;
+    if(fresh){
+        for(u32 i=0;i<sizeof(n->previous);i++)((u8 *)&n->previous)[i]=0;
+        n->candidate=n->previous;copy(n->candidate.name,name);n->candidate.start_lba=fs_data_start;
+        n->candidate.uid=module_path(name)?AUTH_SYSTEM:auth_subject_uid(pid);
+        n->candidate.gid=module_path(name)?AUTH_SYSTEM:auth_subject_gid(pid);n->candidate.mode=mode;
+        n->pending=N_OPEN;n->writer=writer;n->owner=(u32)pid;n->owner_generation=task_generation(pid);
+        n->position=flags;n->length=mode;
+    }else{
+        native_pending_start(n,pid,writer,N_OPEN,flags,mode);
+        n->candidate.size=0;n->candidate.start_lba=fs_data_start;
+    }
+    n->candidate.generation=new_generation();if(!n->candidate.generation){native_failed(n,FS_N_RANGE,0);return FS_N_RANGE;}
+    int result=native_publish_start(n);
+    if(result!=FS_N_AGAIN)native_failed(n,result,0);
+    return result;
+}
+int fs_native_read(int pid,u32 object,void *out,u32 bytes,u32 offset,u32 *done)
+{
+    if(bytes>65536u){*done=0;return FS_N_RANGE;}
+    *done=0;native_file_t *n=native_object(object);int error=native_access(pid,n,FS_NATIVE_READ);if(error)return error;
+    entry_t *e=dirents+n->index;
+    if(offset>=e->size || !bytes)return 0;
+    u32 count=e->size-offset;if(count>bytes)count=bytes;
+    while(*done<count){
+        u32 pos=offset+*done,within=pos&511u,take=512u-within;if(take>count-*done)take=count-*done;
+        if(ata_read_sectors(e->start_lba+pos/512u,1,sector))return FS_N_IO;
+        for(u32 j=0;j<take;j++)((u8 *)out)[*done+j]=sector[within+j];*done+=take;
+    }
+    return 0;
+}
+static int native_growth_start(native_file_t *n,u32 target,int overwrite_old)
+{
+    u32 old=(n->previous.size+511u)/512u,next=(target+511u)/512u;n->target=target;
+    if(next<=old && !overwrite_old){n->candidate.start_lba=n->previous.start_lba;return 0;}
+    int adjacent=!overwrite_old;
+    u32 tail=n->previous.start_lba+old,extra=next-old;
+    if(tail>fs_disk_sectors || extra>fs_disk_sectors-tail)adjacent=0;
+    /* 整叶使用现空闲摘要，只有至多两个边叶逐bit检查；不为大扩展
+     * 在IF=0逐个扫描几十万扇区。空间只保留，不预分配整份文件RAM。 */
+    for(u32 at=tail,left=extra;adjacent && left;){
+        u32 count=512u-(at&511u);if(count>left)count=left;
+        if(count==512u){if(space_tree[space_leaves+at/512u].free!=512u)adjacent=0;}
+        else for(u32 i=0;adjacent && i<count;i++)if(allocation[(at+i)>>3]&(1u<<((at+i)&7)))adjacent=0;
+        at+=count;left-=count;
+    }
+    if(adjacent){
+        allocated(tail,extra,1);n->reserved_start=tail;n->reserved_count=extra;
+        n->candidate.start_lba=n->previous.start_lba;n->copy_sector=old;
+    }else{
+        u32 at=allocate(next);if(!at)return FS_N_NO_SPACE;
+        n->candidate.start_lba=at;n->reserved_start=at;n->reserved_count=next;n->relocated=1;
+    }
+    return 0;
+}
+static int native_growth_step(native_file_t *n)
+{
+    u32 budget=128,old=(n->previous.size+511u)/512u;
+    /* 只因真实扩展才迁移extent，单步最多64KiB。已复制旧正文不被
+     * 其它writer修改（pending键锁），无关文件与WM不需要等待这次复制。 */
+    while(n->relocated && n->copy_sector<old && budget){
+        if(ata_read_sectors(n->previous.start_lba+n->copy_sector,1,sector)
+           || ata_write_sectors(n->candidate.start_lba+n->copy_sector,1,sector)){native_failed(n,FS_N_IO,0);return FS_N_IO;}
+        n->copy_sector++;budget--;
+    }
+    while(n->zero_offset<n->target && budget){
+        u32 pos=n->zero_offset,within=pos&511u,count=512u-within;
+        if(count>n->target-pos)count=n->target-pos;
+        if(within){if(ata_read_sectors(n->candidate.start_lba+pos/512u,1,sector)){native_failed(n,FS_N_IO,0);return FS_N_IO;}}
+        else for(u32 j=0;j<512u;j++)sector[j]=0;
+        for(u32 j=0;j<count;j++)sector[within+j]=0;
+        if(ata_write_sectors(n->candidate.start_lba+pos/512u,1,sector)){
+            native_failed(n,FS_N_IO,!n->relocated && pos/512u<old);return FS_N_IO;
+        }
+        n->zero_offset+=count;budget--;
+    }
+    return (n->relocated && n->copy_sector<old) || n->zero_offset<n->target?FS_N_AGAIN:0;
+}
+static int native_bytes_write(native_file_t *n,const void *data,u32 bytes,u32 offset,u32 *done,int candidate)
+{
+    *done=0;u32 at=candidate?n->candidate.start_lba:dirents[n->index].start_lba;
+    while(*done<bytes){
+        u32 pos=offset+*done,within=pos&511u,count=512u-within;if(count>bytes-*done)count=bytes-*done;
+        if(within || count<512u){if(ata_read_sectors(at+pos/512u,1,sector))return FS_N_IO;}
+        for(u32 j=0;j<count;j++)sector[within+j]=((const u8 *)data)[*done+j];
+        if(ata_write_sectors(at+pos/512u,1,sector)){
+            /* 已完成prefix可计数，失败扇区不能推测是否部分落盘。原位
+             * 正文有不确定影响时冻结卷，明确UNCERTAIN，不伪造rollback。 */
+            if(!candidate || (!n->relocated && pos/512u<(n->previous.size+511u)/512u)){
+                n->uncertain=1;fs_faulted=1;
+            }
+            return FS_N_IO;
+        }
+        *done+=count;
+    }
+    return 0;
+}
+int fs_native_write(int pid,u32 object,u32 writer,const void *data,u32 bytes,u32 offset,int append,u32 *done,u32 *position)
+{
+    *done=0;native_file_t *n=native_object(object);int error=native_access(pid,n,FS_NATIVE_WRITE);
+    if(error){if(n && n->writer==writer && !n->complete)fs_native_cancel(object,writer);return error;}
+    entry_t *e=dirents+n->index;u32 pos=append?(n->pending?n->position:e->size):offset;*position=pos;
+    if(!bytes)return 0;if(bytes>65536u || pos>fs_disk_sectors*512u || bytes>fs_disk_sectors*512u-pos)return FS_N_RANGE;
+    if(n->pending){
+        if(!native_pending_match(n,pid,writer,N_WRITE,pos,bytes))return n->writer!=writer?FS_N_AGAIN:FS_N_BUSY;
+        if(n->complete){error=n->result;*done=error?0:n->accepted;native_pending_clear(n);return error;}
+        if(native_meta_owner==n->id){
+            error=native_publish_step(n);if(error==FS_N_AGAIN)return error;
+            *done=error?0:n->accepted;native_pending_clear(n);return error;
+        }
+        if(native_meta_owner)return FS_N_AGAIN;
+    }else{
+        if(native_meta_owner)return FS_N_AGAIN;
+        if(pos+bytes<=e->size){
+            /* 为后续Flush的目录epoch还留一次提交空间，不能接受正文
+             * 后才发现版本域已无法发布。两种计数均不回绕复用。 */
+            if(native_directory_sequence>=0xfffffffeu)return FS_N_RANGE;
+            u32 generation=new_generation();if(!generation)return FS_N_RANGE;
+            error=native_bytes_write(n,data,bytes,pos,done,0);
+            if(*done || n->uncertain){e->generation=generation;live_dirty=1;native_directory_sequence++;}
+            return error;
+        }
+        native_pending_start(n,pid,writer,N_WRITE,pos,bytes);
+        error=native_growth_start(n,pos+bytes,pos<e->size);
+        if(error){native_failed(n,error,0);native_pending_clear(n);return error;}
+    }
+    error=native_growth_step(n);if(error){if(error!=FS_N_AGAIN)native_pending_clear(n);return error;}
+    u32 written=0;error=native_bytes_write(n,data,bytes,pos,&written,1);
+    if(error){native_failed(n,error,n->uncertain);native_pending_clear(n);return error;}
+    /* 候选正文已完成，之后只保留内核状态，不留data虚址。发布期间
+     * caller可被调度，返回AGAIN代表owned操作未完成而非虚假写成功。 */
+    n->accepted=written;n->candidate.size=n->target;
+    n->candidate.uid=e->uid;n->candidate.gid=e->gid;n->candidate.mode=e->mode;
+    n->candidate.generation=new_generation();if(!n->candidate.generation){native_failed(n,FS_N_RANGE,0);return FS_N_RANGE;}
+    error=native_publish_start(n);if(error!=FS_N_AGAIN){native_failed(n,error,0);native_pending_clear(n);}return error;
+}
+int fs_native_truncate(int pid,u32 object,u32 writer,u32 length)
+{
+    native_file_t *n=native_object(object);int error=native_access(pid,n,FS_NATIVE_WRITE);
+    if(error){if(n && n->writer==writer && !n->complete)fs_native_cancel(object,writer);return error;}
+    if(length>fs_disk_sectors*512u)return FS_N_RANGE;
+    if(n->pending){
+        if(!native_pending_match(n,pid,writer,N_TRUNCATE,0,length))return n->writer!=writer?FS_N_AGAIN:FS_N_BUSY;
+        if(n->complete){error=n->result;native_pending_clear(n);return error;}
+        if(native_meta_owner==n->id){error=native_publish_step(n);if(error!=FS_N_AGAIN)native_pending_clear(n);return error;}
+        if(native_meta_owner)return FS_N_AGAIN;
+    }else{
+        if(native_meta_owner)return FS_N_AGAIN;
+        if(length==dirents[n->index].size)return 0;
+        native_pending_start(n,pid,writer,N_TRUNCATE,0,length);
+        if(length>n->previous.size){error=native_growth_start(n,length,0);if(error){native_failed(n,error,0);native_pending_clear(n);return error;}}
+        else n->target=length;
+    }
+    if(length>n->previous.size){error=native_growth_step(n);if(error){if(error!=FS_N_AGAIN)native_pending_clear(n);return error;}}
+    entry_t *e=dirents+n->index;n->candidate.size=length;if(!length)n->candidate.start_lba=fs_data_start;
+    n->candidate.uid=e->uid;n->candidate.gid=e->gid;n->candidate.mode=e->mode;
+    n->candidate.generation=new_generation();if(!n->candidate.generation){native_failed(n,FS_N_RANGE,0);return FS_N_RANGE;}
+    error=native_publish_start(n);if(error!=FS_N_AGAIN){native_failed(n,error,0);native_pending_clear(n);}return error;
+}
+int fs_native_flush(int pid,u32 object,u32 writer)
+{
+    native_file_t *n=native_object(object);int error=native_access(pid,n,FS_NATIVE_WRITE);
+    if(error){if(n && n->writer==writer && !n->complete)fs_native_cancel(object,writer);return error;}
+    if(n->pending){
+        if(!native_pending_match(n,pid,writer,N_FLUSH,0,0))return n->writer!=writer?FS_N_AGAIN:FS_N_BUSY;
+        if(n->complete){error=n->result;native_pending_clear(n);return error;}
+        error=native_publish_step(n);if(error!=FS_N_AGAIN)native_pending_clear(n);return error;
+    }
+    if(native_meta_owner)return FS_N_AGAIN;
+    if(dirents[n->index].generation<=published_object_generation)return ata_flush()?FS_N_IO:0;
+    native_pending_start(n,pid,writer,N_FLUSH,0,0);
+    error=native_publish_start(n);if(error!=FS_N_AGAIN){native_failed(n,error,0);native_pending_clear(n);}return error;
+}
+u32 fs_native_directory_epoch(void){return native_directory_sequence;}
+int fs_native_directory_read(int pid,const char *name,u32 epoch,u32 cursor,fs_native_row_t *out,u32 *next)
+{
+    if(epoch!=fs_native_directory_epoch())return FS_N_STALE;
+    if(!fs_access(pid,name,FS_ACCESS_READ))return FS_N_ACCESS;
+    u32 info[2];if(fs_stat(name,info) || info[0]!=2)return FS_N_NOT_FOUND;
+    if(cursor>=(u32)nfiles){*next=0xffffffffu;return 1;}
+    int prefix=len(name)+(name[0]!=0);
+    for(u32 i=cursor;i<(u32)nfiles;i++){
+        if(!child(dirents[i].name,name))continue;
+        const char *p=dirents[i].name+prefix;u32 count=0;while(p[count] && p[count]!='/')count++;
+        if(version==5 && p[count])continue; /* v5有显式父目录，不回看去重。 */
+        if(version<5){
+            int repeated=0;
+            for(u32 j=0;j<i && !repeated;j++)if(child(dirents[j].name,name)){
+                const char *q=dirents[j].name+prefix;u32 k=0;
+                while(k<count && fold(q[k])==fold(p[k]))k++;
+                if(k==count && (!q[k] || q[k]=='/'))repeated=1;
+            }
+            if(repeated)continue;
+        }
+        for(u32 k=0;k<64u;k++)out->name[k]=k<count?p[k]:0;
+        out->kind=p[count] || !dirents[i].start_lba?2u:1u;out->length=out->kind==2?0:dirents[i].size;
+        out->generation=dirents[i].generation;out->uid=dirents[i].uid;out->gid=dirents[i].gid;out->mode=dirents[i].mode;
+        *next=i+1u;return 0;
+    }
+    *next=0xffffffffu;return 1;
 }

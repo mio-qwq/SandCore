@@ -1,0 +1,200 @@
+{
+  "kind": "application",
+  "name": "SC32TWIN.SCX",
+  "dependencies": [
+    {
+      "name": "SC32API.SCL",
+      "abi_major": 1,
+      "min_minor": 0,
+      "min_version": 1
+    }
+  ],
+  "imports": [
+    {
+      "name": "ScDefaultWindowProc",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScDisplayQuery",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScErrorQuery",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScFileClose",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScFileFlush",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScFileGetStandard",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScFileOpen",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScFileWrite",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScInputQuery",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScMemoryAllocatePages",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScMemoryFreePages",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScMessageDispatch",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScMessageGet",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScPaintBegin",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScPaintEnd",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScPathCreate",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScPathStat",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScPointerCapture",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScProcessSelf",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScSystemMemory",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScSystemMonotonic",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScThemeQuery",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScWindowControl",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScWindowCreate",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScWindowDestroy",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScWindowInvalidate",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScWindowPlace",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScWindowQuery",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScWindowRejectClose",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScWindowSetTitle",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScWindowSubmit",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    }
+  ]
+}
