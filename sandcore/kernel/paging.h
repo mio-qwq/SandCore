@@ -11,6 +11,7 @@
  *   0x800000-0xFFFFFFFF 恒等映射, 所有任务共享（含 RAM/MMIO 地址）
  *
  *  恒等映射为 supervisor；ring3 只能摸到本任务带 US 的私有页。
+ *  M10a2另保留0x50000000..0x53FFFFFF作私有用户模块区，不覆盖物理别名。
  *  换任务 = 换 CR3 (私有 PT#1)，内核公共映射保持不变；是否可分配
  *  RAM 仍以 E820 为准，不能因为某个 PTE 存在就分配不存在的物理内存。 */
 
@@ -20,6 +21,8 @@
 #define USER_EXCEPTION_TOP 0x7E0000u /* 独立异常栈一页，位于最大 128KB 普通栈之前 */
 #define USER_HEAP_BASE 0x40000000u
 #define USER_HEAP_TOP  0x44000000u /* 64MB 私有图形堆，不能占用低端物理恒等别名 */
+#define USER_MODULE_BASE 0x50000000u
+#define USER_MODULE_TOP  0x54000000u /* 64MB私有SCL映像，和旧图形堆分别管理 */
 
 void paging_init(void);          /* 建内核页目录, 开启 CR0.PG */
 u32  paging_new_task_dir(void);  /* 建任务页目录: 拷共享项 + 私有用户 PT (全零) */
@@ -31,14 +34,26 @@ int paging_map_device(u32 base,u32 bytes);
 u32  paging_kernel_pd(void);     /* 内核页目录物理地址 (任务 0 用) */
 void paging_free_task_dir(u32 pd); /* 只释放私有用户页与页表 */
 int  paging_user_range(u32 pd, u32 ptr, u32 size); /* 确认每页都已映射 */
+int paging_user_write_range(u32 pd,u32 ptr,u32 size); /* 输出还须每页可写 */
 int paging_user_copy(u32 pd,u32 address,void *buffer,u32 size,int write);
 /* 页级图形堆只返回本任务虚址，成功区间按页清零；失败完整回滚。
  * free 只接受 alloc 返回的块首地址，拒绝中间页/代码页/重复释放。
  * 大图内存不放进 SCX BSS，否则一张1080p的RGBA图已超过旧4MB地址域。 */
 u32 paging_user_alloc(u32 pd,u32 bytes);
 int paging_user_free(u32 pd,u32 base);
+/* 模块初始为清零RW页，重定位后可按页保护。权限仅1=只读、3=读写；
+ * 完整区间先验证再提交，普通图形堆不能借此改权限或释放模块页。
+ * 当前非PAE分页没有NX，不把代码只读保护称为完整W^X。 */
+u32 paging_module_alloc(u32 pd,u32 bytes);
+int paging_module_protect(u32 pd,u32 base,u32 bytes,u32 access);
+int paging_module_free(u32 pd,u32 base);
+u32 paging_module_size(u32 pd,u32 base);
 /* 调试器访问另一任务时不能切 CR3 后继续使用调用者缓冲。
  * 此接口逐页取物理帧，经 supervisor 恒等别名拷贝；先检查完整范围，
  * 失败不部分写入。只允许本任务 US 页，不能把调试变成内核写原语。 */
+/* 仅process.c在核对真实调试拥有者/代数后插入或恢复单字节断点。
+ * 此受控特例可以修补目标的只读代码页，普通输出复制必须尊重RW。
+ * 目前每任务独立物理页；将来共享代码必须先私有化再允许此修补。 */
+int paging_debug_patch(u32 pd,u32 address,u8 value);
 
 #endif /* SANDCORE_PAGING_H */

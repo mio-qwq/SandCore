@@ -307,7 +307,7 @@ class StdioQmp:
 class QemuSession:
     """拥有自己启动的VM及副本；错误时只关闭这一个进程。"""
     def __init__(self, boot, data, out, accel='tcg', headless=False, audio=True, cpu='qemu32', no_shutdown=False, disk_debug=None,
-                 network='none', network_peer=None, host_forwards=(), network_capture=False, memory=128):
+                 network='none', network_peer=None, host_forwards=(), network_capture=False, memory=128, data_prepare=None):
         profiles=('qemu32','qemu32,-sse2','qemu32,-fxsr,-sse,-sse2','qemu32,-fpu,-fxsr,-sse,-sse2')
         if cpu not in profiles:
             raise ValueError('CPU只允许固定兼容回退测试配置')
@@ -347,6 +347,13 @@ class QemuSession:
                     raise RuntimeError('镜像副本校验失败')
                 self.report['sources'][label] = dict(path=str(source), sha256=digest,
                                                        copy=str(destination))
+            if data_prepare is not None:
+                if not callable(data_prepare):
+                    raise ValueError('data_prepare必须为本次任务的宿主准备回调')
+                # 在启动QEMU前只修改已经校验的本会话副本，避免先生成
+                # 一份准备盘、启动器又复制一份256MiB盘的重复增长。
+                self.report['data_preparation'] = data_prepare(self.out/'sanddata.img')
+                self.report['prepared_data_sha256'] = sha(self.out/'sanddata.img')
             import qemu_config
             command, selected = qemu_config.prefix(accel)
             if command.count('-cpu')!=1 or command[command.index('-cpu')+1]!='qemu32':

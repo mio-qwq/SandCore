@@ -1,5 +1,7 @@
 # SandCore 构建系统文档 v0.7
 
+> **2026-10-14 M10a2引导切片：** 新增 `make m10a2-bootstrap`，只构建独立 `build/m10a2-bootstrap` 的 core/loader、SCLDR探针和 BASE/UPPER；不依赖全应用目标。实际 WSL 构建及 Windows QEMU 验证见 M10A2-IMPLEMENTATION，默认完整系统入口仍为已验收的 M10a1。
+
 > **2026-10-07最新：** 默认公开键/已签WALL100的整包构建formal-build-01退出0，独立输出build/m10a1-formal-01；MAIN与冻结10全字节相同，正文SHA 3e57a363f5164cc69485a67dfab9f08c76bd1af5426375cc2c2100d5a23f3170。两原M9来源新迁移formal-01/02均256MiB、目录容量2048、1489/1451项，正常扩展只有WALL100，原盘/原M10开发盘不覆盖。M9的225份与M10的167份固定源码/声明归档审计通过。Shell管道修正定向构建输出shell-fix-01，再迁移独立shell-inputs-01双盘；网络/会话与全部其它合同继续，普通入口整体验收未完成。下方早期“默认接线尚未重新构建”仅属沿革。
 
 > **2026-10-06 M10a1当前入口：** 实现/资源/构建规则/规范已按完整合同核对收齐，进入统一构建与实际验收，依据AGENTS第十一节已有授权，无新阶段审批。根build.bat转发sandcore/build.bat，默认WSL make m10a1，独立输出build/m10a1-work；build-04退出0，磁盘MAIN/loader/18网络SCX及256MiB盘实际生成，Windows QEMU验收开始。见M10A1-READINESS.md与M10A1-VERIFICATION.md。下文早期禁构建/M9“已构建”是历史记录，不覆盖当前M10状态。
@@ -371,3 +373,15 @@ M10测试源码通配规则同样安装新增M10LIFE.C。统一阶段由客体s3
 
 修订：2026-10-06，补动态任务公开ABI生命周期探针与双盘执行源码，
 仍未构建/运行，不能把验证代码已经写好当作验证通过。
+
+## M10a2 SCL定向引导
+
+`m10a2.mk` 由主 Makefile 加载，但不更改缺省完整构建目标。WSL 执行 `make m10a2-bootstrap` 只构建匹配 core/loader、SCLPROBE.SCX 和两个独立 SCL；不生成新的完整产品树，也不自动重编冻结的 M8 游戏/影片。CORE/loader仍用既有M10 ELF格式、用户探针保留旧36B SCX容器。
+
+记录构建时使用 `wsl.exe -e python3 /mnt/c/Users/Administrator/Desktop/projectos/sandcore/tools/build_m10a2_bootstrap.py --tag bootstrap-build-01`；新轮更换tag，既有日志拒绝覆盖。该脚本保存真实make退出码/时间、依赖文件SHA256和产物SHA256，避免Windows到WSL的多层shell引号使包装退出码丢失。最初core-build.log中make已生成CORE，外层shell退出码记录失败，保留为失败记录；正式bootstrap-build-01由无shell插值的包装器退出0。
+
+`mkscl.py input.o output.SCL --manifest manifest.json` 将 freestanding ELF32 ET_REL 的受支持段、符号与 R_386_32/PC32 转成正式SCL；不链接用户start.asm。SCLPROBE只链接最小SCLDR引导代码，库正文保持独立磁盘文件且在运行期回填。当前均为HOST_BOOTSTRAP，SCCC动态输出仍待接通。
+
+定向客体命令：`python sandcore/tools/verify_m10a2_scl.py --out sandcore/build/m10a2-scl-guest-01 --accel tcg`（从仓库根目录）。输出目录必须不存在；scserial 的可选 data_prepare 在启动VM前仅准备已校验的本会话盘，原基盘不变；默认其它启动器行为保持。准备后回读全部对象正文/权限/代数，正常运行只保留这一个实际会话盘，截图/JSON/日志留证。
+
+修订：2026-10-14，新增SCL宿主引导定向链、无shell退出码记录和单会话盘准备；首次构建与两库实际调用通过，完整SCCC/SDK/平台构建不以此冒充完成。

@@ -1,5 +1,7 @@
 # SandCore OS（沙核）
 
+> **2026-10-14 M10a2 开工：SandCore M10a2 — The Application Platform Era。** 用户已授权完整应用平台建设，当前首个 SCL 引导切片已定向构建与 Windows 双盘真实调用/保护/回收通过；SCCC 动态输出和完整四库/SCUI/桌面组件仍在后续范围。设计见 [M10A2-DESIGN](docs/M10A2-DESIGN.md)，真实状态与恢复见 [M10A2-IMPLEMENTATION](docs/M10A2-IMPLEMENTATION.md)。SCAPI.H 冻结；已验收运行基线保持 M10a1，原 M8 封存保留。下方各旧阶段记录仍属历史。
+
 > **2026-10-07最新发布决定：** 用户授权将已验收的M10a1包发布为GitHub Preview，后续统一main；原“不创建Release”约定由本次明确授权更新。下载与原包摘要见[M10a1 Preview](docs/M10A1-PREVIEW.md)，项目总介绍见[根README](../README.md)。下方旧状态继续保留为阶段记录。
 
 > **2026-10-07 用户验收通过：** 用户明确“验收通过，提交GitHub，用wsl的gh”。M10a1保持M10a开发版本，19个网络工具（含curl/nc -e）的实际支持与HTTP/TLS边界不变；停止新增验证。验收结果同批持久化后推送代码，不创建Release，不宣称M10已完成或基础内核冻结。

@@ -787,3 +787,11 @@ M10a1开发版可commit无Release；e1000+IPv4+18/55工具、原始完整凤凰T
 2026-10-07：curl与必要收尾验证完成，19工具开发验收包提交；停止新增测试，等待用户验收。
 
 2026-10-07：用户明确验收通过，授权通过WSL gh认证将M10a1提交GitHub；保留实际证据与开发版本口径。
+
+## 2026-10-14 M10a2 The Application Platform Era 开工
+
+用户要求完整阅读并严格遵守M10a2RULE.MD且实际开工；正式名称已改为SandCore M10a2 — The Application Platform Era，Sub-agent统一GPT-6.1 Sol + max。基线main@8e1c27a，SCAPI.H冻结SHA256 81a73045…，历史/原盘保留，不重启M8封存任务。完整路线M10A2-DESIGN.md，精确恢复/未完成范围M10A2-IMPLEMENTATION.md。
+
+首个真实SCL引导切片已写格式、C/Python校验、ELF32宿主打包、SCLDR依赖/重定位/引用/回滚/清理、独立0x50000000模块VA及0x280..282、所有输出RW检查。静态发现的DAG fini顺序和模块VA复用残留断点已修。build/m10a2-bootstrap/bootstrap-build-01构建退出0，新CORE完整SHA256 30928d3d…；host runtime/format定向通过，Windows双盘m10a2-scl-guest-01两库真实调用/不同基址/只读写回拒绝/显式及EXIT/#PF回收通过，原基盘SHA不变，1920×1080截图已查看。全局首次+6暖态页保留，未解释成已核对缓存；后两退出暖基点精确不变。
+
+全部SCL产物目前HOST_BOOTSTRAP，不是SCCC客体编译。Phase1仍需SCCC动态输出/动态SCX启动、独立多进程与调试模块等实际出口；完整四库/SCUI/Desktop/Shell/主要组件/SDK/性能和最终验收尚未完成。当前继续工具链下一项，代码/证据位于工作区；会话中断后核对Git与文件摘要再恢复，不假定子Agent或VM仍后台运行。

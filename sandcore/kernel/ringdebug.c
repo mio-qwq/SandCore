@@ -29,7 +29,10 @@ static int ram(u32 address,u32 length)
 {
     if(!length || address<0x10000u || length>256 || length>0xFFFFFFFFu-address)return 0;
     u32 end=address+length;
-    if((address<USER_TOP && end>USER_BASE) || (address<USER_HEAP_TOP && end>USER_HEAP_BASE))return 0;
+    /* 暂停仍沿用被调试任务的CR3；三个私有虚址窗口不再是物理恒等
+     * 地址，不能因E820包含该数值就当成外部调试器可直读的RAM。 */
+    if((address<USER_TOP && end>USER_BASE) || (address<USER_HEAP_TOP && end>USER_HEAP_BASE)
+        || (address<USER_MODULE_TOP && end>USER_MODULE_BASE))return 0;
     for(u32 i=0;i<e820_count();i++){
         e820_entry_t *e=e820_entry(i);if(e->type_lo!=1 || e->base_hi || e->len_hi)continue;
         if(address>=e->base_lo && address-e->base_lo<=e->len_lo && length<=e->len_lo-(address-e->base_lo))return 1;

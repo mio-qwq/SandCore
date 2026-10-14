@@ -9,6 +9,9 @@
  * 文档：MEM.md / INTR.md / SYSCALL.md / M7.md。 */
 void process_reset(int pid);
 void process_exit(int pid,int code);
+/* 同进程卸载后虚址可被新库复用，旧断点/异常入口必须同时失效；
+ * PID代数只能隔离不同进程寿命，不能代替这一段内存的寿命。 */
+void process_unmap(int pid,u32 base,u32 bytes);
 int process_status(int pid);
 void process_exception(u32 vector,u32 *frame);
 int process_handler(int vector,u32 entry);

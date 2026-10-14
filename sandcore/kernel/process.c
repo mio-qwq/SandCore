@@ -5,6 +5,8 @@
  * 断点真正写入 INT3；命中后恢复原字节并退 EIP，再以 TF 执行原指令，
  * 在 #DB 重插断点。这样继续/单步都不会漏掉被断点替换的那条指令。
  * 所有入口在 IF=0 的临界区，现场/页表不会一边复制一边被调度改写。
+ * M10a2断点是经真实调试拥有者/代数授权的单字节只读代码修补特例；
+ * 其它内核输出必须检查RW，不复用这个接口绕过用户模块的页权限。
  * ===================================================================== */
 #include "process.h"
 #include "task.h"
@@ -43,6 +45,22 @@ void process_reset(int pid)
 }
 void process_exit(int pid,int code)
 {if(task_owned(pid)){PROCESS(pid).exit_code=code;task_record(pid)->exit_code=code;}}
+void process_unmap(int pid,u32 base,u32 bytes)
+{
+    if(!task_owned(pid) || !bytes)return;
+    process_t *p=&PROCESS(pid);
+    /* 释放已通过分页整块验证，IF=0期间不会并发重用。这里不恢复
+     * 原字节：映像即将消失；保留旧original反而会污染复用的新库。 */
+    for(int i=0;i<BREAKPOINTS;i++){
+        breakpoint_t *b=&p->breaks[i];
+        if(b->used && b->address>=base && b->address-base<bytes){
+            b->used=0;
+            if(p->pending==i){p->pending=-1;p->auto_continue=0;}
+        }
+    }
+    for(int i=0;i<32;i++)
+        if(p->handlers[i]>=base && p->handlers[i]-base<bytes)p->handlers[i]=0;
+}
 int process_status(int pid)
 {
     if(pid<=0 || pid>=NTASK) return -1;
@@ -76,7 +94,7 @@ void process_exception(u32 vector,u32 *frame)
     if(vector==1 && p->debug_owner>0) {
         if(p->pending>=0) {
             breakpoint_t *b=&p->breaks[p->pending]; u8 opcode=0xCC;
-            if(b->used) paging_user_copy(TASK(pid).pd,b->address,&opcode,1,1);
+            if(b->used) paging_debug_patch(TASK(pid).pd,b->address,opcode);
             p->pending=-1;
             if(p->auto_continue) { p->auto_continue=0; return; }
         }
@@ -86,7 +104,7 @@ void process_exception(u32 vector,u32 *frame)
         for(int i=0;i<BREAKPOINTS;i++) {
             breakpoint_t *b=&p->breaks[i];
             if(b->used && b->address==frame[14]-1) {
-                paging_user_copy(TASK(pid).pd,b->address,&b->original,1,1);
+                paging_debug_patch(TASK(pid).pd,b->address,b->original);
                 frame[14]--; p->pending=i; break;
             }
         }
@@ -98,7 +116,7 @@ void process_exception(u32 vector,u32 *frame)
          * 现场副本，可调整 EIP/寄存器后 EXCRETURN。普通 return 会跳到
          * 故意无映射的 0 地址，并因 in_handler=1 回到暂停而非递归调用。 */
         u32 ctx=USER_EXCEPTION_TOP-80,sp=ctx-8;
-        if(paging_user_range(TASK(pid).pd,sp,88)) {
+        if(paging_user_write_range(TASK(pid).pd,sp,88)) {
             for(int i=0;i<19;i++) { p->saved_fault[i]=frame[i]; ((u32 *)ctx)[i]=frame[i]; }
             ((u32 *)sp)[0]=0; ((u32 *)sp)[1]=ctx;
             p->context=ctx; p->in_handler=1; p->cr2=cr2;
@@ -112,7 +130,7 @@ int process_exception_return(u32 *frame,u32 context)
     int pid=task_pid(); process_t *p=&PROCESS(pid);
     if(!p->in_handler || context!=p->context || !paging_user_range(TASK(pid).pd,context,76)) return -1;
     u32 *f=(u32 *)context;
-    if(!paging_user_range(TASK(pid).pd,f[14],1) || !paging_user_range(TASK(pid).pd,f[17]-4,4)) return -1;
+    if(!paging_user_range(TASK(pid).pd,f[14],1) || !paging_user_write_range(TASK(pid).pd,f[17]-4,4)) return -1;
     /* 只开放通用寄存器/EIP/ESP/普通算术标志。选择子从可信原帧恢复，
      * 不能借返回现场改变 CPL、IOPL、NT、VM，不能关闭 IF 或偷开 TF。 */
     for(int i=0;i<19;i++) frame[i]=p->saved_fault[i];
@@ -175,14 +193,14 @@ int process_debug(int owner,int pid,int command,u32 address,void *buffer,u32 len
             breakpoint_t *b=&p->breaks[i]; u8 op=0xCC;
             if(paging_user_copy(TASK(pid).pd,address,&b->original,1,0)) return -1;
             if(b->original==0xCC) return -1; /* 不能接管目标自身的 INT3 语义 */
-            if(paging_user_copy(TASK(pid).pd,address,&op,1,1)) return -1;
+            if(paging_debug_patch(TASK(pid).pd,address,op)) return -1;
             b->address=address; b->used=1; return 0;
         }
         return -3;
     }
     if(command==DBG_UNBREAK) for(int i=0;i<BREAKPOINTS;i++) if(p->breaks[i].used && p->breaks[i].address==address) {
         breakpoint_t *b=&p->breaks[i];
-        if(p->pending!=i) paging_user_copy(TASK(pid).pd,address,&b->original,1,1); else p->pending=-1;
+        if(p->pending!=i) paging_debug_patch(TASK(pid).pd,address,b->original); else p->pending=-1;
         b->used=0; return 0;
     }
     return -1;

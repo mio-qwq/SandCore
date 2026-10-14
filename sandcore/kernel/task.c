@@ -593,7 +593,11 @@ void syscall_c_common(u32 vec, u32 *frame)
     }
     if(defer){task_record_t *p=task_record(current);ready_remove(current);p->waiting=1;p->wait_mask=TASK_EVENT_VISIBILITY;
         p->wait_heap=-1;p->wait_frame=(u32)frame;p->deferred_draw=call;frame[11]=0;return;}
-    /* pusha 布局对应的 u32 下标: EDI=4 ESI=5 EBP=6 旧ESP=7
+    /* 新模块页可以只读，故所有用户输出都检查RW，输入仍只检查P/US。
+     * 若读写共用一个功能分支，必须按实际方向区分，避免内核输出借
+     * supervisor权限改写只读代码，也避免拒绝只读库里的合法输入表。
+     * 旧SCX/图形堆仍是RW，旧输出长度、忽略寄存器与错误码保持原样。
+     * pusha 布局对应的 u32 下标: EDI=4 ESI=5 EBP=6 旧ESP=7
      * EBX=8 EDX=9 ECX=10 EAX=11 */
     switch (frame[11]) {                  /* EAX = 功能号 */
     case SYS_PUTS: {
@@ -612,6 +616,19 @@ void syscall_c_common(u32 vec, u32 *frame)
         frame[11]=paging_user_alloc(TASK(current).pd,frame[8]);break;
     case SYS_USERFREE:
         frame[11]=(u32)paging_user_free(TASK(current).pd,frame[8]);break;
+    case SYS_MODULEALLOC:
+        frame[11]=paging_module_alloc(TASK(current).pd,frame[8]);break;
+    case SYS_MODULEPROTECT:
+        frame[11]=(u32)paging_module_protect(TASK(current).pd,frame[8],frame[10],frame[9]);break;
+    case SYS_MODULEFREE: {
+        u32 bytes=paging_module_size(TASK(current).pd,frame[8]);
+        if(!bytes)frame[11]=(u32)-1;
+        else {
+            process_unmap(current,frame[8],bytes);
+            frame[11]=(u32)paging_module_free(TASK(current).pd,frame[8]);
+        }
+        break;
+    }
     case SYS_STATUS:
         frame[11]=(u32)process_status((int)frame[8]); break;
     case SYS_YIELD:
@@ -629,7 +646,7 @@ void syscall_c_common(u32 vec, u32 *frame)
          * 调用者显式提供容量；复制最多 max-1 字节，始终保留末尾 NUL。
          * 返回实际复制长度，便于 CLI 在空参数时显示用法。 */
         u32 max = frame[9], used = 0;
-        if (!max || !paging_user_range(TASK(current).pd, frame[8], max)) {
+        if (!max || !paging_user_write_range(TASK(current).pd, frame[8], max)) {
             frame[11] = (u32)-1; break;
         }
         char *out = uptr(frame[8]);
@@ -683,14 +700,14 @@ void syscall_c_common(u32 vec, u32 *frame)
     case SYS_KEYDOWN:
         frame[11]=wm_focused(current)?(u32)keyboard_down(frame[8]):0; break;
     case SYS_FONT8:
-        if(!paging_user_range(TASK(current).pd,frame[8],1024)) { frame[11]=(u32)-1; break; }
+        if(!paging_user_write_range(TASK(current).pd,frame[8],1024)) { frame[11]=(u32)-1; break; }
         for(int c=0;c<128;c++)gfx_font8((u32)c,(u8 *)frame[8]+c*8);
         frame[11]=1024; break;
     case SYS_GLYPH16:
         /* 返回行是位图副本，不泄露 SCF 字符串或 supervisor 指针。
          * 标量和完整输出区都先检查，错误调用不写任何半个字形。 */
         if(frame[8]>0x10FFFF || (frame[8]>=0xD800 && frame[8]<=0xDFFF)
-           || !paging_user_range(TASK(current).pd,frame[10],32)) frame[11]=(u32)-1;
+           || !paging_user_write_range(TASK(current).pd,frame[10],32)) frame[11]=(u32)-1;
         else frame[11]=(u32)gfx_glyph16(frame[8],(u16 *)frame[10]);
         break;
     case SYS_UTF8TEXT: {
@@ -705,7 +722,7 @@ void syscall_c_common(u32 vec, u32 *frame)
         break;
     }
     case SYS_FONTINFO:
-        if(!paging_user_range(TASK(current).pd,frame[8],16)) frame[11]=(u32)-1;
+        if(!paging_user_write_range(TASK(current).pd,frame[8],16)) frame[11]=(u32)-1;
         else { gfx_font_info((u32 *)frame[8]); frame[11]=0; }
         break;
     case SYS_WALLPAPER: {
@@ -713,11 +730,11 @@ void syscall_c_common(u32 vec, u32 *frame)
             ?(u32)wm_set_wallpaper((int)frame[8]):(u32)-5;break;
     }
     case SYS_WININFO:
-        if(!paging_user_range(TASK(current).pd,frame[10],20)) { frame[11]=(u32)-1; break; }
+        if(!paging_user_write_range(TASK(current).pd,frame[10],20)) { frame[11]=(u32)-1; break; }
         frame[11]=(u32)wm_user_info(current,(int)frame[8],(i32 *)frame[10]);
         break;
     case SYS_FSREAD:                      /* EBX=名 ECX=缓冲 EDX=上限 */
-        if (!ustr(frame[8]) || !paging_user_range(TASK(current).pd, frame[10], frame[9])) {
+        if (!ustr(frame[8]) || !paging_user_write_range(TASK(current).pd, frame[10], frame[9])) {
             frame[11] = (u32)-1; break;
         }
         if(!fs_access(current,ustr(frame[8]),FS_ACCESS_READ)){frame[11]=(u32)-5;break;}
@@ -726,21 +743,21 @@ void syscall_c_common(u32 vec, u32 *frame)
     /* 以下M8调用先检查完整输出映射，才交给各子系统；新增原生接口
      * 不改变旧WINOPEN/MOUSE布局，旧应用无需重新编译才能启动。 */
     case SYS_FSREADAT:
-        if(!ustr(frame[8]) || !paging_user_range(TASK(current).pd,frame[10],frame[9]))frame[11]=(u32)-1;
+        if(!ustr(frame[8]) || !paging_user_write_range(TASK(current).pd,frame[10],frame[9]))frame[11]=(u32)-1;
         else if(!fs_access(current,ustr(frame[8]),FS_ACCESS_READ))frame[11]=(u32)-5;
         else frame[11]=(u32)fs_read_at(ustr(frame[8]),(void *)frame[10],frame[9],frame[5]);
         break;
     case SYS_DISPLAYINFO:
-        if(!paging_user_range(TASK(current).pd,frame[8],32))frame[11]=(u32)-1;
+        if(!paging_user_write_range(TASK(current).pd,frame[8],32))frame[11]=(u32)-1;
         else {display_info((u32 *)frame[8]);frame[11]=0;}break;
     case SYS_DISPLAYAPPLY:
         if(!fs_user_mutable("SYS/DISPLAY.CFG",0) || !fs_access(current,"SYS/DISPLAY.CFG",FS_ACCESS_WRITE))frame[11]=(u32)-5;
         else frame[11]=(u32)display_apply((int)frame[8],(int)frame[10],(int)frame[9],(int)frame[5]);break;
     case SYS_PALETTEINFO:
-        if(!paging_user_range(TASK(current).pd,frame[8],1024))frame[11]=(u32)-1;
+        if(!paging_user_write_range(TASK(current).pd,frame[8],1024))frame[11]=(u32)-1;
         else {display_palette((u32 *)frame[8]);frame[11]=0;}break;
     case SYS_THEMEINFO:
-        if(!paging_user_range(TASK(current).pd,frame[8],128))frame[11]=(u32)-1;
+        if(!paging_user_write_range(TASK(current).pd,frame[8],128))frame[11]=(u32)-1;
         else {theme_info((u32 *)frame[8]);frame[11]=0;}break;
     case SYS_THEMELOAD: {
         /* action=2重读固定配置不使用用户字符串；其它动作先复制验证
@@ -751,19 +768,19 @@ void syscall_c_common(u32 vec, u32 *frame)
         else frame[11]=frame[10]!=2 && !path?(u32)-1:(u32)theme_load(path,(int)frame[10]);break;
     }
     case SYS_THEMEPATH:
-        if(!frame[9] || frame[9]>64 || !paging_user_range(TASK(current).pd,frame[10],frame[9]))frame[11]=(u32)-1;
+        if(!frame[9] || frame[9]>64 || !paging_user_write_range(TASK(current).pd,frame[10],frame[9]))frame[11]=(u32)-1;
         else frame[11]=(u32)theme_path((int)frame[8],(char *)frame[10],frame[9]);
         break;
     case SYS_POINTER:
     case SYS_POINTERPEEK:
-        if(!paging_user_range(TASK(current).pd,frame[10],24))frame[11]=(u32)-1;
+        if(!paging_user_write_range(TASK(current).pd,frame[10],24))frame[11]=(u32)-1;
         else frame[11]=(u32)(frame[11]==SYS_POINTERPEEK?wm_user_pointer_peek(current,(int)frame[8],(i32 *)frame[10])
                             :wm_user_pointer(current,(int)frame[8],(i32 *)frame[10]));
         break;
     case SYS_MOUSECAPTURE:
         frame[11]=(u32)wm_user_mouse_capture(current,(int)frame[8],(int)frame[10]);break;
     case SYS_MOUSERELATIVE:
-        if(!paging_user_range(TASK(current).pd,frame[10],32))frame[11]=(u32)-1;
+        if(!paging_user_write_range(TASK(current).pd,frame[10],32))frame[11]=(u32)-1;
         else frame[11]=(u32)wm_user_mouse_relative(current,(int)frame[8],(i32 *)frame[10]);
         break;
     case SYS_WINOPEN2: {
@@ -794,7 +811,7 @@ void syscall_c_common(u32 vec, u32 *frame)
     case SYS_MONITOR: {
         /* 统计是只读快照，绝不包含内核指针；已用页不是CPU利用率。
          * 8个头字段+8行20B任务，空槽同样记录，便于观测退出回收。 */
-        if(!paging_user_range(TASK(current).pd,frame[8],192)){frame[11]=(u32)-1;break;}
+        if(!paging_user_write_range(TASK(current).pd,frame[8],192)){frame[11]=(u32)-1;break;}
         u32 *out=(u32 *)frame[8];for(int i=0;i<48;i++)out[i]=0;
         out[0]=1;out[1]=sc_ticks;out[2]=memory_managed_bytes();
         out[3]=memory_used_bytes();out[4]=memory_free_bytes();out[5]=LEGACY_TASK_ROWS;out[6]=fs_count();
@@ -806,10 +823,10 @@ void syscall_c_common(u32 vec, u32 *frame)
         frame[11]=0;break;
     }
     case SYS_CPUINFO:
-        if(!paging_user_range(TASK(current).pd,frame[8],256))frame[11]=(u32)-1;
+        if(!paging_user_write_range(TASK(current).pd,frame[8],256))frame[11]=(u32)-1;
         else {task_cpu_info((u32 *)frame[8]);frame[11]=0;}break;
     case SYS_STORAGEINFO:
-        if(!paging_user_range(TASK(current).pd,frame[8],128))frame[11]=(u32)-1;
+        if(!paging_user_write_range(TASK(current).pd,frame[8],128))frame[11]=(u32)-1;
         else {fs_storage_info((u32 *)frame[8]);frame[11]=0;}break;
     case SYS_FSWRITE:                     /* EBX=名 ECX=数据 EDX=长度 */
         if (!ustr(frame[8]) || !paging_user_range(TASK(current).pd, frame[10], frame[9])) {
@@ -822,7 +839,7 @@ void syscall_c_common(u32 vec, u32 *frame)
     case SYS_FSLIST: {                    /* EBX=缓冲 EDX=上限；每行“路径 空格 大小 LF” */
         char *out = uptr(frame[8]);
         u32 max = frame[9], used = 0;
-        if (!max || !paging_user_range(TASK(current).pd, frame[8], max)) {
+        if (!max || !paging_user_write_range(TASK(current).pd, frame[8], max)) {
             frame[11] = (u32)-1; break;
         }
         for (int i = 0; i < fs_count() && used + 80 < max; i++) {
@@ -844,7 +861,7 @@ void syscall_c_common(u32 vec, u32 *frame)
         break;
     case SYS_USERQUERY: {
         const char *name=frame[8]==4?ustr(frame[10]):0;
-        if(!frame[5] || frame[5]>256 || !paging_user_range(TASK(current).pd,frame[9],frame[5])
+        if(!frame[5] || frame[5]>256 || !paging_user_write_range(TASK(current).pd,frame[9],frame[5])
            || (frame[8]==4 && !name))frame[11]=(u32)-1;
         else frame[11]=(u32)userspace_query(current,(int)frame[8],name,(char *)frame[9],frame[5]);
         break;
@@ -877,11 +894,11 @@ void syscall_c_common(u32 vec, u32 *frame)
     case SYS_IMAGERESULT:
         /* 独立新快照只写32B，不复用旧图形/监控的预留槽。像素范围
          * 由服务在宽高已知后再全量检查；无像素指针时只允许容量0。 */
-        if(!paging_user_range(TASK(current).pd,frame[10],32))frame[11]=(u32)-1;
+        if(!paging_user_write_range(TASK(current).pd,frame[10],32))frame[11]=(u32)-1;
         else frame[11]=(u32)image_service_result(current,frame[8],(u32 *)frame[10],(void *)frame[9],frame[5]);
         break;
     case SYS_IMAGECLAIM:
-        if(!frame[9] || frame[9]>64 || !paging_user_range(TASK(current).pd,frame[10],frame[9]))frame[11]=(u32)-1;
+        if(!frame[9] || frame[9]>64 || !paging_user_write_range(TASK(current).pd,frame[10],frame[9]))frame[11]=(u32)-1;
         else frame[11]=(u32)image_service_claim(current,frame[8],(char *)frame[10],frame[9]);
         break;
     case SYS_IMAGESUBMIT:
@@ -894,7 +911,7 @@ void syscall_c_common(u32 vec, u32 *frame)
     }
     case SYS_RESOLVE: {
         const char *path=ustr(frame[8]);
-        if(!path || !frame[9] || frame[9]>64 || !paging_user_range(TASK(current).pd,frame[10],frame[9]))frame[11]=(u32)-1;
+        if(!path || !frame[9] || frame[9]>64 || !paging_user_write_range(TASK(current).pd,frame[10],frame[9]))frame[11]=(u32)-1;
         else frame[11]=(u32)userspace_resolve(current,path,(char *)frame[10],frame[9]);
         break;
     }
@@ -907,7 +924,7 @@ void syscall_c_common(u32 vec, u32 *frame)
     case SYS_TERMINAL:
         frame[11]=(u32)wm_terminal_control(current,(int)frame[8],(int)frame[10]);break;
     case SYS_FSDIR:
-        if(!ustr(frame[8]) || !frame[9] || !paging_user_range(TASK(current).pd,frame[10],frame[9])) frame[11]=(u32)-1;
+        if(!ustr(frame[8]) || !frame[9] || !paging_user_write_range(TASK(current).pd,frame[10],frame[9])) frame[11]=(u32)-1;
         else if(!fs_access(current,ustr(frame[8]),FS_ACCESS_READ))frame[11]=(u32)-5;
         else frame[11]=(u32)fs_list_dir(ustr(frame[8]),(char *)frame[10],frame[9]);
         break;
@@ -923,7 +940,7 @@ void syscall_c_common(u32 vec, u32 *frame)
             || !fs_access_parent(current,ustr(frame[8])) || !fs_access_parent(current,ustr(frame[10]))) { frame[11]=(u32)-5; break; }
         frame[11]=(u32)fs_rename(ustr(frame[8]),ustr(frame[10])); break;
     case SYS_STAT:
-        if(!ustr(frame[8]) || !paging_user_range(TASK(current).pd,frame[10],8)) frame[11]=(u32)-1;
+        if(!ustr(frame[8]) || !paging_user_write_range(TASK(current).pd,frame[10],8)) frame[11]=(u32)-1;
         else if(!fs_access(current,ustr(frame[8]),FS_ACCESS_META))frame[11]=(u32)-5;
         else frame[11]=(u32)fs_stat(ustr(frame[8]),(u32 *)frame[10]);
         break;
@@ -935,25 +952,25 @@ void syscall_c_common(u32 vec, u32 *frame)
         /* 先检查调用者缓冲，再检查调试拥有关系，不能借目标 pid
          * 把 supervisor 恒等映射当成任意地址读写入口。 */
         if((frame[10]==DBG_INFO || frame[10]==DBG_READ)
-           && !paging_user_range(TASK(current).pd,frame[5],frame[4])) frame[11]=(u32)-1;
+           && !paging_user_write_range(TASK(current).pd,frame[5],frame[4])) frame[11]=(u32)-1;
         else frame[11]=(u32)process_debug(current,(int)frame[8],(int)frame[10],frame[9],(void *)frame[5],frame[4]);
         break;
     case SYS_AUTHINFO:
-        if(!paging_user_range(TASK(current).pd,frame[8],32))frame[11]=(u32)-1;
+        if(!paging_user_write_range(TASK(current).pd,frame[8],32))frame[11]=(u32)-1;
         else frame[11]=(u32)auth_info(current,(u32 *)frame[8]);break;
     case SYS_AUTHLOGIN: {
         const char *name=ustr(frame[8]),*password=ustr(frame[10]);
         frame[11]=name && password?(u32)auth_login(current,name,password):(u32)-1;break;
     }
     case SYS_AUTHSTATUS:
-        if(!paging_user_range(TASK(current).pd,frame[10],32))frame[11]=(u32)-1;
+        if(!paging_user_write_range(TASK(current).pd,frame[10],32))frame[11]=(u32)-1;
         else frame[11]=(u32)auth_status(current,frame[8],(u32 *)frame[10]);break;
     case SYS_AUTHEXEC: {
         const char *command=frame[9]==1?"":ustr(frame[10]);
         frame[11]=command && frame[9]<=1?(u32)auth_exec_ticket(current,frame[8],command,(int)frame[9]):(u32)-1;break;
     }
     case SYS_AUTHUSERS:
-        if(!frame[10] || frame[10]>4096 || !paging_user_range(TASK(current).pd,frame[8],frame[10]))frame[11]=(u32)-1;
+        if(!frame[10] || frame[10]>4096 || !paging_user_write_range(TASK(current).pd,frame[8],frame[10]))frame[11]=(u32)-1;
         else frame[11]=(u32)auth_users(current,(char *)frame[8],frame[10]);break;
     case SYS_AUTHACCOUNT: {
         const char *name=ustr(frame[10]),*home=frame[8]==0?ustr(frame[9]):0;
@@ -968,7 +985,7 @@ void syscall_c_common(u32 vec, u32 *frame)
     }
     case SYS_FSMETA: {
         const char *path=ustr(frame[8]);
-        if(!path || !paging_user_range(TASK(current).pd,frame[10],32))frame[11]=(u32)-1;
+        if(!path || !paging_user_write_range(TASK(current).pd,frame[10],32))frame[11]=(u32)-1;
         else if(!fs_access(current,path,FS_ACCESS_META))frame[11]=(u32)-5;
         else frame[11]=(u32)fs_metadata(path,(u32 *)frame[10]);break;
     }
@@ -987,17 +1004,19 @@ void syscall_c_common(u32 vec, u32 *frame)
     case SYS_STREAMREAD:
     case SYS_STREAMWRITE: {
         u32 call=frame[11];
-        if(frame[9]>65536 || !paging_user_range(TASK(current).pd,frame[10],frame[9]))frame[11]=(u32)-1;
+        if(frame[9]>65536 || !(call==SYS_STREAMREAD
+            ?paging_user_write_range(TASK(current).pd,frame[10],frame[9])
+            :paging_user_range(TASK(current).pd,frame[10],frame[9])))frame[11]=(u32)-1;
         else frame[11]=call==SYS_STREAMREAD?(u32)streams_read(current,(int)frame[8],(void *)frame[10],frame[9])
             :(u32)streams_write(current,(int)frame[8],(const void *)frame[10],frame[9]);break;
     }
     case SYS_STREAMCLOSE:frame[11]=frame[10]<=1?(u32)streams_close(current,(int)frame[8],(int)frame[10]):(u32)-1;break;
     case SYS_STREAMEVENT:frame[11]=(u32)streams_event(current,(int)frame[8],frame[10]);break;
     case SYS_STORAGEINFO2:
-        if(!paging_user_range(TASK(current).pd,frame[8],64))frame[11]=(u32)-1;
+        if(!paging_user_write_range(TASK(current).pd,frame[8],64))frame[11]=(u32)-1;
         else {fs_storage_info2((u32 *)frame[8]);frame[11]=0;}break;
     case SYS_PROCESSSELF: {
-        if(!paging_user_range(TASK(current).pd,frame[8],32)){frame[11]=(u32)-1;break;}
+        if(!paging_user_write_range(TASK(current).pd,frame[8],32)){frame[11]=(u32)-1;break;}
         u32 *out=(u32 *)frame[8];for(int i=0;i<8;i++)out[i]=0;out[0]=1;out[1]=(u32)current;out[2]=task_generation(current);
         out[3]=(u32)auth_uid(current);out[4]=(u32)auth_gid(current);u32 identity[8];auth_info(current,identity);out[5]=identity[3];frame[11]=0;break;
     }
@@ -1023,7 +1042,7 @@ void syscall_c_common(u32 vec, u32 *frame)
     }
     case SYS_STREAMDUP:frame[11]=(u32)streams_dup(current,(int)frame[8],(int)frame[10]);break;
     case SYS_STREAMPIPE:
-        frame[11]=paging_user_range(TASK(current).pd,frame[8],8)?(u32)streams_pipe(current,(int *)frame[8]):(u32)-1;break;
+        frame[11]=paging_user_write_range(TASK(current).pd,frame[8],8)?(u32)streams_pipe(current,(int *)frame[8]):(u32)-1;break;
     case SYS_STREAMSEEK:frame[11]=(u32)streams_seek(current,(int)frame[8],frame[10]);break;
     case SYS_STREAMMEMORY:
         frame[11]=frame[10]<=32768 && paging_user_range(TASK(current).pd,frame[8],frame[10])
@@ -1036,7 +1055,7 @@ void syscall_c_common(u32 vec, u32 *frame)
     }
     case SYS_STREAMTTY:frame[11]=(u32)streams_tty(current,(int)frame[8]);break;
     case SYS_TERMINALINFO2:
-        frame[11]=paging_user_range(TASK(current).pd,frame[10],32)?(u32)streams_terminal_info(current,(int)frame[8],(u32 *)frame[10]):(u32)-1;break;
+        frame[11]=paging_user_write_range(TASK(current).pd,frame[10],32)?(u32)streams_terminal_info(current,(int)frame[8],(u32 *)frame[10]):(u32)-1;break;
     case SYS_TERMINALCLEAR:frame[11]=(u32)streams_terminal_clear(current,(int)frame[8]);break;
     case SYS_SPAWN2: {
         const char *command=ustr(frame[8]);
@@ -1044,46 +1063,46 @@ void syscall_c_common(u32 vec, u32 *frame)
         else frame[11]=(u32)streams_exec(current,command,(const i32 *)frame[10],frame[9]);break;
     }
     case SYS_WAIT2:
-        frame[11]=paging_user_range(TASK(current).pd,frame[10],32)?(u32)streams_wait(current,frame[8],(u32 *)frame[10]):(u32)-1;break;
+        frame[11]=paging_user_write_range(TASK(current).pd,frame[10],32)?(u32)streams_wait(current,frame[8],(u32 *)frame[10]):(u32)-1;break;
     case SYS_JOBINFO2:
-        frame[11]=paging_user_range(TASK(current).pd,frame[10],32)?(u32)streams_job_snapshot(current,frame[8],(u32 *)frame[10]):(u32)-1;break;
+        frame[11]=paging_user_write_range(TASK(current).pd,frame[10],32)?(u32)streams_job_snapshot(current,frame[8],(u32 *)frame[10]):(u32)-1;break;
     case SYS_KILL2:frame[11]=(u32)streams_kill(current,(int)frame[8]);break;
     case SYS_PROCESSINFO2:
-        frame[11]=frame[10]>=8+LEGACY_TASK_ROWS2*16 && frame[10]<=1024 && paging_user_range(TASK(current).pd,frame[8],frame[10]*4)
+        frame[11]=frame[10]>=8+LEGACY_TASK_ROWS2*16 && frame[10]<=1024 && paging_user_write_range(TASK(current).pd,frame[8],frame[10]*4)
             ?(u32)streams_processes(current,(u32 *)frame[8],frame[10]):(u32)-1;break;
     case SYS_ARGUMENTS2:
-        frame[11]=frame[10]>0 && frame[10]<=1024 && paging_user_range(TASK(current).pd,frame[8],frame[10])
+        frame[11]=frame[10]>0 && frame[10]<=1024 && paging_user_write_range(TASK(current).pd,frame[8],frame[10])
             ?(u32)streams_arguments(current,(char *)frame[8],frame[10]):(u32)-1;break;
     case SYS_SIMDINFO:
-        if(!paging_user_range(TASK(current).pd,frame[8],32))frame[11]=(u32)-1;
+        if(!paging_user_write_range(TASK(current).pd,frame[8],32))frame[11]=(u32)-1;
         else {simd_info((u32 *)frame[8]);frame[11]=0;}break;
     case SYS_MODULEEXEC: {
         const char *path=ustr(frame[8]);frame[11]=path?(u32)modules_execute(current,path,(int)frame[10]):(u32)-1;break;
     }
     case SYS_MODULEINFO:
-        if(!paging_user_range(TASK(current).pd,frame[8],32))frame[11]=(u32)-1;
+        if(!paging_user_write_range(TASK(current).pd,frame[8],32))frame[11]=(u32)-1;
         else {modules_info((u32 *)frame[8]);frame[11]=0;}break;
     case SYS_MODULELIST:
-        frame[11]=frame[10]>0 && frame[10]<=4096 && paging_user_range(TASK(current).pd,frame[8],frame[10])?(u32)modules_list(current,(char *)frame[8],frame[10]):(u32)-1;break;
+        frame[11]=frame[10]>0 && frame[10]<=4096 && paging_user_write_range(TASK(current).pd,frame[8],frame[10])?(u32)modules_list(current,(char *)frame[8],frame[10]):(u32)-1;break;
     case SYS_WINDOWPLACE:
         frame[11]=(u32)wm_user_place(current,(int)frame[8],(int)frame[10],(int)frame[9],(int)frame[5],(int)frame[4]);break;
     case SYS_CAPTUREOPEN:
-        frame[11]=paging_user_range(TASK(current).pd,frame[10],32)?(u32)wm_capture_open(current,(int)frame[8],(u32 *)frame[10]):(u32)-1;break;
+        frame[11]=paging_user_write_range(TASK(current).pd,frame[10],32)?(u32)wm_capture_open(current,(int)frame[8],(u32 *)frame[10]):(u32)-1;break;
     case SYS_CAPTUREREAD:
-        frame[11]=frame[5]<=65536 && paging_user_range(TASK(current).pd,frame[9],frame[5])
+        frame[11]=frame[5]<=65536 && paging_user_write_range(TASK(current).pd,frame[9],frame[5])
             ?(u32)wm_capture_read(current,frame[8],frame[10],(void *)frame[9],frame[5]):(u32)-1;break;
     case SYS_CAPTURECLOSE:frame[11]=(u32)wm_capture_close(current,frame[8]);break;
     case SYS_CAPTURELIST:
-        frame[11]=frame[10]>0 && frame[10]<=4096 && paging_user_range(TASK(current).pd,frame[8],frame[10])
+        frame[11]=frame[10]>0 && frame[10]<=4096 && paging_user_write_range(TASK(current).pd,frame[8],frame[10])
             ?(u32)wm_capture_list(current,(char *)frame[8],frame[10]):(u32)-1;break;
     case SYS_WINDOWPAGE:
-        frame[11]=frame[10]>=32 && frame[10]<=1040 && paging_user_range(TASK(current).pd,frame[8],frame[10]*4)
+        frame[11]=frame[10]>=32 && frame[10]<=1040 && paging_user_write_range(TASK(current).pd,frame[8],frame[10]*4)
             ?(u32)wm_window_page(current,(u32 *)frame[8],frame[10],frame[9]):(u32)-1;break;
     case SYS_STREAMREADY:
-        frame[11]=paging_user_range(TASK(current).pd,frame[10],32)?(u32)streams_ready(current,(int)frame[8],(u32 *)frame[10]):(u32)-1;break;
+        frame[11]=paging_user_write_range(TASK(current).pd,frame[10],32)?(u32)streams_ready(current,(int)frame[8],(u32 *)frame[10]):(u32)-1;break;
 #ifdef M10_DISK_CORE
     case SYS_NETINFO:
-        frame[11]=paging_user_range(TASK(current).pd,frame[8],NET_INFO_WORDS*4)?(u32)network_info((u32 *)frame[8]):(u32)-14;break;
+        frame[11]=paging_user_write_range(TASK(current).pd,frame[8],NET_INFO_WORDS*4)?(u32)network_info((u32 *)frame[8]):(u32)-14;break;
     case SYS_NETCONTROL:
         frame[11]=paging_user_range(TASK(current).pd,frame[10],NET_CONTROL_WORDS*4)?(u32)network_control(current,frame[8],(const u32 *)frame[10]):(u32)-14;break;
     case SYS_SOCKET:frame[11]=(u32)network_socket_create(current,frame[8],frame[10]);break;
@@ -1092,23 +1111,27 @@ void syscall_c_common(u32 vec, u32 *frame)
         else frame[11]=(u32)(call==SYS_SOCKETBIND?network_socket_bind(current,frame[8],(const u32 *)frame[10]):network_socket_connect(current,frame[8],(const u32 *)frame[10]));break;
     case SYS_SOCKETLISTEN:frame[11]=(u32)network_socket_listen(current,frame[8],frame[10]);break;
     case SYS_SOCKETACCEPT:
-        frame[11]=!frame[10] || paging_user_range(TASK(current).pd,frame[10],16)?(u32)network_socket_accept(current,frame[8],(u32 *)frame[10]):(u32)-14;break;
+        frame[11]=!frame[10] || paging_user_write_range(TASK(current).pd,frame[10],16)?(u32)network_socket_accept(current,frame[8],(u32 *)frame[10]):(u32)-14;break;
     case SYS_SOCKETSEND:case SYS_SOCKETRECEIVE:
-        if(frame[9]>65536u || (frame[9] && !paging_user_range(TASK(current).pd,frame[10],frame[9])) || (frame[5] && !paging_user_range(TASK(current).pd,frame[5],16)))frame[11]=(u32)-14;
+        if(frame[9]>65536u || (frame[9] && !(call==SYS_SOCKETRECEIVE
+            ?paging_user_write_range(TASK(current).pd,frame[10],frame[9])
+            :paging_user_range(TASK(current).pd,frame[10],frame[9]))) || (frame[5] && !(call==SYS_SOCKETRECEIVE
+            ?paging_user_write_range(TASK(current).pd,frame[5],16)
+            :paging_user_range(TASK(current).pd,frame[5],16))))frame[11]=(u32)-14;
         else frame[11]=(u32)(call==SYS_SOCKETSEND?network_socket_send(current,frame[8],(const void *)frame[10],frame[9],(const u32 *)frame[5]):network_socket_receive(current,frame[8],(void *)frame[10],frame[9],(u32 *)frame[5]));break;
     case SYS_SOCKETSHUTDOWN:frame[11]=(u32)network_socket_shutdown(current,frame[8],frame[10]);break;
     case SYS_SOCKETCLOSE:frame[11]=(u32)network_socket_close(current,frame[8]);break;
     case SYS_SOCKETSTATUS:
-        frame[11]=paging_user_range(TASK(current).pd,frame[10],64)?(u32)network_socket_status(current,frame[8],(u32 *)frame[10]):(u32)-14;break;
+        frame[11]=paging_user_write_range(TASK(current).pd,frame[10],64)?(u32)network_socket_status(current,frame[8],(u32 *)frame[10]):(u32)-14;break;
     case SYS_SOCKETOPTION:frame[11]=(u32)network_socket_option(current,frame[8],frame[10],frame[9]);break;
     case SYS_SOCKETPAGE:
-        frame[11]=frame[10]>=32 && frame[10]<=1040 && paging_user_range(TASK(current).pd,frame[8],frame[10]*4)?(u32)network_socket_page(current,frame[9],(u32 *)frame[8],frame[10]):(u32)-14;break;
+        frame[11]=frame[10]>=32 && frame[10]<=1040 && paging_user_write_range(TASK(current).pd,frame[8],frame[10]*4)?(u32)network_socket_page(current,frame[9],(u32 *)frame[8],frame[10]):(u32)-14;break;
     case SYS_ROUTEPAGE:case SYS_ARPPAGE:
-        if(frame[10]<24 || frame[10]>528 || !paging_user_range(TASK(current).pd,frame[8],frame[10]*4))frame[11]=(u32)-14;
+        if(frame[10]<24 || frame[10]>528 || !paging_user_write_range(TASK(current).pd,frame[8],frame[10]*4))frame[11]=(u32)-14;
         else frame[11]=(u32)(call==SYS_ROUTEPAGE?network_route_page(frame[9],(u32 *)frame[8],frame[10]):network_arp_page(frame[9],(u32 *)frame[8],frame[10]));break;
     case SYS_DNSSTART:{const char *name=ustr(frame[8]);frame[11]=name?(u32)network_dns_start(current,name):(u32)-14;break;}
     case SYS_DNSSTATUS:
-        frame[11]=paging_user_range(TASK(current).pd,frame[10],32)?(u32)network_dns_status(current,frame[8],(u32 *)frame[10]):(u32)-14;break;
+        frame[11]=paging_user_write_range(TASK(current).pd,frame[10],32)?(u32)network_dns_status(current,frame[8],(u32 *)frame[10]):(u32)-14;break;
     case SYS_DNSCANCEL:frame[11]=(u32)network_dns_cancel(current,frame[8]);break;
     case SYS_NETEXEC:{
         const char *command=ustr(frame[8]);
@@ -1116,23 +1139,23 @@ void syscall_c_common(u32 vec, u32 *frame)
     }
 #endif
     case SYS_FONTINFO2:
-        frame[11]=paging_user_range(TASK(current).pd,frame[10],64)?(u32)ttf_info(frame[8],(u32 *)frame[10]):(u32)-1;break;
+        frame[11]=paging_user_write_range(TASK(current).pd,frame[10],64)?(u32)ttf_info(frame[8],(u32 *)frame[10]):(u32)-1;break;
     case SYS_GLYPHBITMAP:
         frame[11]=frame[4]>=TTF_BITMAP_WORDS && frame[4]<=4096
-            && paging_user_range(TASK(current).pd,frame[5],TTF_BITMAP_WORDS*4)
+            && paging_user_write_range(TASK(current).pd,frame[5],TTF_BITMAP_WORDS*4)
             ?(u32)ttf_bitmap(frame[8],frame[10],frame[9],(u32 *)frame[5]):(u32)-1;break;
     case SYS_ENVSET: {
         const char *name=ustr(frame[8]),*value=frame[9]?0:ustr(frame[10]);
         frame[11]=name && frame[9]<=1 && (frame[9] || value)?(u32)userspace_env_set(current,name,value,(int)frame[9]):(u32)-1;break;
     }
     case SYS_ENVLIST:
-        frame[11]=frame[10]>0 && frame[10]<=8192 && paging_user_range(TASK(current).pd,frame[8],frame[10])
+        frame[11]=frame[10]>0 && frame[10]<=8192 && paging_user_write_range(TASK(current).pd,frame[8],frame[10])
             ?(u32)userspace_env_list(current,(char *)frame[8],frame[10]):(u32)-1;break;
     case SYS_AUDIOINFO:
-        if(!paging_user_range(TASK(current).pd,frame[8],64))frame[11]=(u32)-1;
+        if(!paging_user_write_range(TASK(current).pd,frame[8],64))frame[11]=(u32)-1;
         else {audio_info((u32 *)frame[8]);frame[11]=0;}break;
     case SYS_CLOCK2:
-        frame[11]=paging_user_range(TASK(current).pd,frame[8],32)?(u32)rtc_snapshot((u32 *)frame[8]):(u32)-1;break;
+        frame[11]=paging_user_write_range(TASK(current).pd,frame[8],32)?(u32)rtc_snapshot((u32 *)frame[8]):(u32)-1;break;
     case SYS_AUDIOOPEN:frame[11]=(u32)audio_open(current,frame[8],frame[10]);break;
     case SYS_AUDIOSUBMIT: {
         u32 info[16];int result=audio_status(current,frame[8],info);
@@ -1142,12 +1165,12 @@ void syscall_c_common(u32 vec, u32 *frame)
     }
     case SYS_AUDIOCONTROL:frame[11]=(u32)audio_control(current,frame[8],frame[10],frame[9]);break;
     case SYS_AUDIOSTATUS:
-        frame[11]=paging_user_range(TASK(current).pd,frame[10],64)?(u32)audio_status(current,frame[8],(u32 *)frame[10]):(u32)-1;break;
+        frame[11]=paging_user_write_range(TASK(current).pd,frame[10],64)?(u32)audio_status(current,frame[8],(u32 *)frame[10]):(u32)-1;break;
     case SYS_AUDIOEFFECT:frame[11]=(u32)audio_effect((int)frame[8]);break;
     case SYS_POWER2:frame[11]=(u32)audio_power(current,(int)frame[8]);break;
     case SYS_STORAGEFLUSH:frame[11]=(u32)ata_flush();break;
     case SYS_CPUINFO2: {
-        if(!paging_user_range(TASK(current).pd,frame[8],(8+LEGACY_TASK_ROWS2*6)*4)){frame[11]=(u32)-1;break;}
+        if(!paging_user_write_range(TASK(current).pd,frame[8],(8+LEGACY_TASK_ROWS2*6)*4)){frame[11]=(u32)-1;break;}
         u32 *out=(u32 *)frame[8];for(int i=0;i<8+LEGACY_TASK_ROWS2*6;i++)out[i]=0;
         out[0]=1;out[1]=100;out[2]=cpu_total;out[3]=cpu_idle;out[4]=cpu_kernel;out[5]=cpu_user;out[6]=cpu_graphics;out[7]=LEGACY_TASK_ROWS2;
         for(int i=0;i<LEGACY_TASK_ROWS2;i++){u32 *row=out+8+i*6;row[0]=(u32)i;row[1]=(u32)TASK(i).state;row[2]=task_record(i)->generation;
@@ -1155,20 +1178,20 @@ void syscall_c_common(u32 vec, u32 *frame)
         frame[11]=0;break;
     }
     case SYS_PROCESSPAGE:
-        frame[11]=frame[10]>=32 && frame[10]<=1040 && paging_user_range(TASK(current).pd,frame[8],frame[10]*4)
+        frame[11]=frame[10]>=32 && frame[10]<=1040 && paging_user_write_range(TASK(current).pd,frame[8],frame[10]*4)
             ?(u32)task_page(current,(u32 *)frame[8],frame[10],frame[9]):(u32)-1;break;
     case SYS_EVENTWAIT:
         frame[11]=(u32)task_event_wait(frame);break;
     case SYS_SESSIONPAGE:
-        frame[11]=frame[10]>=32 && frame[10]<=1040 && paging_user_range(TASK(current).pd,frame[8],frame[10]*4)
+        frame[11]=frame[10]>=32 && frame[10]<=1040 && paging_user_write_range(TASK(current).pd,frame[8],frame[10]*4)
             ?(u32)session_page(current,(u32 *)frame[8],frame[10],frame[9]):(u32)-1;break;
     case SYS_SESSIONCONTROL:
         frame[11]=(u32)session_control(current,frame[8],frame[10]);break;
     case SYS_VISIBILITY:
-        frame[11]=paging_user_range(TASK(current).pd,frame[10],32)?(u32)wm_user_visibility(current,(int)frame[8],(u32 *)frame[10]):(u32)-1;break;
+        frame[11]=paging_user_write_range(TASK(current).pd,frame[10],32)?(u32)wm_user_visibility(current,(int)frame[8],(u32 *)frame[10]):(u32)-1;break;
     case SYS_SESSIONPATH: {
         char *leaf=ustr(frame[8]),path[64];
-        if(!leaf || !frame[9] || frame[9]>64 || !paging_user_range(TASK(current).pd,frame[10],frame[9]))frame[11]=(u32)-1;
+        if(!leaf || !frame[9] || frame[9]>64 || !paging_user_write_range(TASK(current).pd,frame[10],frame[9]))frame[11]=(u32)-1;
         else {int n=session_config_path(leaf,path);if(n<0 || (u32)n>=frame[9])frame[11]=(u32)-1;
             else {for(int i=0;i<=n;i++)((char *)frame[10])[i]=path[i];frame[11]=(u32)n;}}
         break;

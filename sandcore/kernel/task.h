@@ -235,5 +235,8 @@ void syscall_c_common(u32 vec, u32 *frame);   /* int 0x7C 分发 */
 #define SYS_DNSSTATUS 0x261
 #define SYS_DNSCANCEL 0x262
 #define SYS_NETEXEC 0x263
+#define SYS_MODULEALLOC 0x280
+#define SYS_MODULEPROTECT 0x281
+#define SYS_MODULEFREE 0x282
 
 #endif /* SANDCORE_TASK_H */

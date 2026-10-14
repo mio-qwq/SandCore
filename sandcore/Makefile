@@ -516,5 +516,6 @@ clean:
 .PHONY: all run run-headless clean
 include m9.mk
 include m10.mk
+include m10a2.mk
 
 -include $(wildcard $(BUILD)/*.d $(BUILD)/codec/*.d $(BUILD)/codec/webp/src/dec/*.d $(BUILD)/codec/webp/src/dsp/*.d $(BUILD)/codec/webp/src/utils/*.d)

@@ -1,0 +1,12 @@
+test_dump_cli_is_machine_readable (__main__.SclFormatTests.test_dump_cli_is_machine_readable) ... ok
+test_elf_subset_and_manifest_fail_closed (__main__.SclFormatTests.test_elf_subset_and_manifest_fail_closed) ... ok
+test_format_rejection_agrees_in_both_languages (__main__.SclFormatTests.test_format_rejection_agrees_in_both_languages) ... ok
+test_import_sort_preserves_original_relocation_indices (__main__.SclFormatTests.test_import_sort_preserves_original_relocation_indices) ... ok
+test_loaded_pointer_bytes_at_two_bases (__main__.SclFormatTests.test_loaded_pointer_bytes_at_two_bases) ... ok
+test_real_elf_and_c_validator (__main__.SclFormatTests.test_real_elf_and_c_validator) ... ok
+test_recursive_dependency_check_and_diagnostics (__main__.SclFormatTests.test_recursive_dependency_check_and_diagnostics) ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 1.105s
+
+OK

@@ -123,7 +123,7 @@ int image_service_result(int owner,u32 ticket,u32 *info,void *pixels,u32 capacit
     if(!pixels && capacity)return -1;
     /* 先验全缓冲再写快照/像素。失败不能把最后一页未映射的缓冲
      * 写成一幅看似成功、实际尾部损坏的照片。 */
-    if(pixels && !paging_user_range(TASK(owner).pd,(u32)pixels,bytes))return -1;
+    if(pixels && !paging_user_write_range(TASK(owner).pd,(u32)pixels,bytes))return -1;
     info[0]=1;info[1]=job->image.width;info[2]=job->image.height;info[3]=bytes;
     info[4]=2;info[5]=ticket;info[6]=info[7]=0;
     if(!pixels)return 0;
