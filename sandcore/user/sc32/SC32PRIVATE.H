@@ -93,5 +93,6 @@ static int sc32_overlap(const void *a,ScU32 a_bytes,const void *b,ScU32 b_bytes)
 #define SC32_OP_SYMBOL 0x601u
 #define SC32_OP_FREE_LIBRARY 0x602u
 #define SC32_OP_LIBRARY_QUERY 0x603u
+#define SC32_OP_CALLBACK_PIN 0x604u
 #define SC32_OP_FILE_BASE 0x700u
 #endif

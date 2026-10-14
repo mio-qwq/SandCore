@@ -1,0 +1,247 @@
+#ifndef SANDCORE_SCLIB_H
+#define SANDCORE_SCLIB_H
+#include "SCTYPES.H"
+#include <stdarg.h>
+#include <stdio.h>
+
+/* 通用对象在Ring3拥有SCCLIB内存。公开头不含实现、系统桥或内核指针。
+ * 对象不透明；View是带代数的借用，任何成功修改后都须重新取得。 */
+enum {
+    SC_UTIL_ABI_MAJOR=1,SC_UTIL_ABI_MINOR=0,SC_UTIL_VERSION=1,
+    SC_UTIL_OK=0,SC_UTIL_END=1,SC_UTIL_STOP=2,
+    SC_UTIL_E_INVALID=-201,SC_UTIL_E_RANGE=-202,SC_UTIL_E_MEMORY=-203,
+    SC_UTIL_E_UTF8=-204,SC_UTIL_E_STALE=-205,SC_UTIL_E_NOT_FOUND=-206,
+    SC_UTIL_E_EXISTS=-207,SC_UTIL_E_BUSY=-208,SC_UTIL_E_IO=-209,
+    SC_UTIL_E_CANCELLED=-210,SC_UTIL_E_SYNTAX=-211,SC_UTIL_E_AGAIN=-212,SC_UTIL_E_NOT_SUPPORTED=-213
+};
+typedef struct ScArray ScArray;
+typedef struct ScList ScList;
+typedef struct ScHash ScHash;
+typedef struct ScString ScString;
+typedef struct ScBuffer ScBuffer;
+typedef struct ScStream ScStream;
+typedef struct ScConfig ScConfig;
+typedef struct ScErrorObject ScErrorObject;
+typedef struct ScLogger ScLogger;
+typedef struct ScEventHub ScEventHub;
+typedef struct ScModel ScModel;
+typedef struct ScResourceCache ScResourceCache;
+typedef void (*ScDropProc)(void *item,void *context);
+typedef struct {ScU32 size,version;const void *data;ScU32 bytes,generation;} ScView;
+typedef struct {ScU32 size,version,length,capacity,item_bytes,generation,flags,reserved;} ScContainerInfo;
+typedef struct {ScU32 size,version;void *owner;ScU32 position,generation,limit;} ScIterator;
+typedef struct {ScU32 size,version,item_bytes,initial_capacity;ScDropProc drop;void *context;ScU32 reserved[2];} ScArrayDesc;
+typedef struct {ScU32 size,version,token;const void *data;ScU32 bytes,generation;} ScListEntry;
+typedef ScStatus (*ScListVisitProc)(const ScListEntry *entry,void *context);
+typedef struct {ScU32 size,version,item_bytes;ScDropProc drop;void *context;ScU32 reserved[3];} ScListDesc;
+typedef struct {ScU32 size,version,token;const void *key;ScU32 key_bytes;const void *value;ScU32 value_bytes,generation;} ScHashEntry;
+typedef ScStatus (*ScHashVisitProc)(const ScHashEntry *entry,void *context);
+typedef struct {ScU32 size,version,value_bytes,initial_capacity;ScDropProc drop;void *context;ScU32 reserved[2];} ScHashDesc;
+enum {SC_HASH_INSERT_ONLY=1,SC_HASH_REPLACE_ONLY=2,SC_STRING_BORROWED=1};
+
+ScStatus ScArrayCreate(const ScArrayDesc *desc,ScArray **out);
+ScStatus ScArrayRetain(ScArray *array);
+void ScArrayRelease(ScArray *array);
+ScStatus ScArrayQuery(const ScArray *array,ScContainerInfo *out);
+ScStatus ScArrayReserve(ScArray *array,ScU32 capacity);
+ScStatus ScArrayInsert(ScArray *array,ScU32 index,const void *items,ScU32 count);
+ScStatus ScArrayErase(ScArray *array,ScU32 index,ScU32 count);
+ScStatus ScArrayResize(ScArray *array,ScU32 count);
+ScStatus ScArrayView(const ScArray *array,ScView *out);
+ScStatus ScArrayGet(const ScArray *array,ScU32 index,void *out);
+ScStatus ScArraySet(ScArray *array,ScU32 index,const void *item);
+ScStatus ScArrayClear(ScArray *array);
+ScStatus ScListCreate(const ScListDesc *desc,ScList **out);
+ScStatus ScListRetain(ScList *list);
+void ScListRelease(ScList *list);
+ScStatus ScListQuery(const ScList *list,ScContainerInfo *out);
+ScStatus ScListInsert(ScList *list,ScU32 before,const void *item,ScU32 *token);
+ScStatus ScListRemove(ScList *list,ScU32 token);
+ScStatus ScListGet(const ScList *list,ScU32 token,ScListEntry *out);
+ScStatus ScListIterate(const ScList *list,ScIterator *iterator);
+ScStatus ScListNext(ScIterator *iterator,ScListEntry *out);
+ScStatus ScListVisit(ScList *list,ScListVisitProc procedure,void *context);
+ScStatus ScListClear(ScList *list);
+ScStatus ScHashCreate(const ScHashDesc *desc,ScHash **out);
+ScStatus ScHashRetain(ScHash *hash);
+void ScHashRelease(ScHash *hash);
+ScStatus ScHashQuery(const ScHash *hash,ScContainerInfo *out);
+ScStatus ScHashReserve(ScHash *hash,ScU32 entries);
+ScStatus ScHashSet(ScHash *hash,const void *key,ScU32 key_bytes,const void *value,ScU32 flags);
+ScStatus ScHashGet(const ScHash *hash,const void *key,ScU32 key_bytes,ScHashEntry *out);
+ScStatus ScHashRemove(ScHash *hash,const void *key,ScU32 key_bytes);
+ScStatus ScHashIterate(const ScHash *hash,ScIterator *iterator);
+ScStatus ScHashNext(ScIterator *iterator,ScHashEntry *out);
+ScStatus ScHashVisit(ScHash *hash,ScHashVisitProc procedure,void *context);
+ScStatus ScHashClear(ScHash *hash);
+ScU32 ScHashBytes(const void *bytes,ScU32 count);
+
+ScStatus ScStringCreate(const void *bytes,ScU32 count,ScString **out);
+ScStatus ScStringBorrow(const void *bytes,ScU32 count,ScString **out);
+ScStatus ScStringRetain(ScString *string);
+void ScStringRelease(ScString *string);
+ScStatus ScStringQuery(const ScString *string,ScContainerInfo *out);
+ScStatus ScStringView(const ScString *string,ScView *out);
+ScStatus ScStringCStr(ScString *string,const char **out);
+ScStatus ScStringAssign(ScString *string,const void *bytes,ScU32 count);
+ScStatus ScStringInsert(ScString *string,ScU32 position,const void *bytes,ScU32 count);
+ScStatus ScStringErase(ScString *string,ScU32 position,ScU32 count);
+ScStatus ScStringAppend(ScString *string,const void *bytes,ScU32 count);
+ScStatus ScStringFormat(ScString *string,const char *format,...);
+ScStatus ScStringVFormat(ScString *string,const char *format,va_list arguments);
+ScStatus ScStringAppendFormat(ScString *string,const char *format,...);
+ScStatus ScStringAppendVFormat(ScString *string,const char *format,va_list arguments);
+ScStatus ScUtf8Decode(const void *bytes,ScU32 count,ScU32 *offset,ScU32 *scalar);
+ScStatus ScUtf8Previous(const void *bytes,ScU32 count,ScU32 *offset,ScU32 *scalar);
+ScStatus ScUtf8Encode(ScU32 scalar,void *out,ScU32 capacity,ScU32 *written);
+ScStatus ScUtf8Validate(const void *bytes,ScU32 count,ScU32 *bad_offset);
+ScStatus ScUtf8Count(const void *bytes,ScU32 count,ScU32 *scalars);
+ScStatus ScUtf8Offset(const void *bytes,ScU32 count,ScU32 scalar_index,ScU32 *byte_offset);
+ScU32 ScUnicodeIsScalar(ScU32 scalar);
+ScU32 ScUnicodeIsNoncharacter(ScU32 scalar);
+ScU32 ScUnicodeIsWhitespace(ScU32 scalar);
+ScU32 ScUnicodeIsControl(ScU32 scalar);
+ScStatus ScUtf8Trim(ScString *string);
+enum {SC_PATH_BACKSLASH=1,SC_PATH_REQUIRE_ABSOLUTE=2,SC_PATH_REJECT_ABOVE_ROOT=4};
+typedef struct {ScU32 size,version,rooted,directory_bytes,name_offset,name_bytes,extension_offset,extension_bytes;} ScPathParts;
+ScStatus ScPathNormalize(const char *path,const char *base,ScU32 flags,ScString **out);
+ScStatus ScPathJoin(const char *directory,const char *leaf,ScU32 flags,ScString **out);
+ScStatus ScPathSplit(const char *path,ScPathParts *out);
+ScStatus ScPathRelative(const char *base,const char *path,ScU32 flags,ScString **out);
+ScStatus ScFormatHex(const void *bytes,ScU32 count,ScU32 uppercase,ScString **out);
+ScStatus ScFormatEscape(const void *utf8,ScU32 count,ScString **out);
+ScStatus ScFormatBytes(ScU32 bytes,ScString **out);
+
+ScStatus ScBufferCreate(ScU32 initial_capacity,ScBuffer **out);
+ScStatus ScBufferBorrow(const void *bytes,ScU32 count,ScBuffer **out);
+ScStatus ScBufferRetain(ScBuffer *buffer);
+void ScBufferRelease(ScBuffer *buffer);
+ScStatus ScBufferQuery(const ScBuffer *buffer,ScContainerInfo *out);
+ScStatus ScBufferView(const ScBuffer *buffer,ScView *out);
+ScStatus ScBufferReserve(ScBuffer *buffer,ScU32 capacity);
+ScStatus ScBufferResize(ScBuffer *buffer,ScU32 bytes);
+ScStatus ScBufferWrite(ScBuffer *buffer,ScU32 offset,const void *bytes,ScU32 count);
+ScStatus ScBufferAppend(ScBuffer *buffer,const void *bytes,ScU32 count);
+ScStatus ScBufferConsume(ScBuffer *buffer,ScU32 count);
+ScStatus ScBufferClear(ScBuffer *buffer);
+typedef ScStatus (*ScStreamReadProc)(void *context,void *out,ScU32 bytes,ScU32 *transferred);
+typedef ScStatus (*ScStreamWriteProc)(void *context,const void *input,ScU32 bytes,ScU32 *transferred);
+typedef ScStatus (*ScStreamSeekProc)(void *context,ScI32 offset,ScU32 whence,ScU32 *position);
+typedef ScStatus (*ScStreamFlushProc)(void *context);
+typedef void (*ScStreamCloseProc)(void *context);
+enum {SC_STREAM_READ=1,SC_STREAM_WRITE=2,SC_STREAM_SEEK=4,SC_STREAM_OWN_CONTEXT=8,SC_STREAM_OWN_FILE=16};
+typedef struct {
+    ScU32 size,version,flags;void *context;ScStreamReadProc read;ScStreamWriteProc write;
+    ScStreamSeekProc seek;ScStreamFlushProc flush;ScStreamCloseProc close;ScU32 reserved[3];
+} ScStreamDesc;
+typedef struct {ScU32 size,version,flags,position,bytes_read_lo,bytes_read_hi,bytes_written_lo,bytes_written_hi;} ScStreamInfo;
+ScStatus ScStreamCreate(const ScStreamDesc *desc,ScStream **out);
+ScStatus ScStreamFromBuffer(ScBuffer *buffer,ScU32 flags,ScStream **out);
+ScStatus ScStreamFromFile(FILE *file,ScU32 flags,ScStream **out);
+ScStatus ScStreamRetain(ScStream *stream);
+void ScStreamRelease(ScStream *stream);
+ScStatus ScStreamRead(ScStream *stream,void *out,ScU32 bytes,ScU32 *transferred);
+ScStatus ScStreamWrite(ScStream *stream,const void *bytes,ScU32 count,ScU32 *transferred);
+ScStatus ScStreamSeek(ScStream *stream,ScI32 offset,ScU32 whence,ScU32 *position);
+ScStatus ScStreamFlush(ScStream *stream);
+ScStatus ScStreamQuery(const ScStream *stream,ScStreamInfo *out);
+typedef struct {ScU32 size,version;const void *data;ScU32 bytes,position,reserved[3];} ScBinaryReader;
+ScStatus ScBinaryReaderInit(ScBinaryReader *reader,const void *bytes,ScU32 count);
+ScStatus ScBinaryRead(ScBinaryReader *reader,void *out,ScU32 bytes);
+ScStatus ScBinaryReadU8(ScBinaryReader *reader,ScU32 *out);
+ScStatus ScBinaryReadU16LE(ScBinaryReader *reader,ScU32 *out);
+ScStatus ScBinaryReadU32LE(ScBinaryReader *reader,ScU32 *out);
+ScStatus ScBinaryReadCounterLE(ScBinaryReader *reader,ScWideCounter *out);
+ScStatus ScBinaryReadVarU32(ScBinaryReader *reader,ScU32 *out);
+ScStatus ScBinaryReadUtf8(ScBinaryReader *reader,ScView *out);
+ScStatus ScBinarySkip(ScBinaryReader *reader,ScU32 bytes);
+ScStatus ScBinaryWriteU8(ScBuffer *buffer,ScU32 value);
+ScStatus ScBinaryWriteU16LE(ScBuffer *buffer,ScU32 value);
+ScStatus ScBinaryWriteU32LE(ScBuffer *buffer,ScU32 value);
+ScStatus ScBinaryWriteCounterLE(ScBuffer *buffer,const ScWideCounter *value);
+ScStatus ScBinaryWriteVarU32(ScBuffer *buffer,ScU32 value);
+ScStatus ScBinaryWriteUtf8(ScBuffer *buffer,const void *utf8,ScU32 bytes);
+
+enum {SC_VALUE_NULL=0,SC_VALUE_BOOL=1,SC_VALUE_I32=2,SC_VALUE_U32=3,SC_VALUE_COUNTER=4,SC_VALUE_UTF8=5,SC_VALUE_BYTES=6};
+typedef struct {ScU32 size,version,type,flags,lo,hi;const void *data;ScU32 bytes;} ScValue;
+typedef struct {ScU32 size,version,byte_offset,line,column;ScI32 code;ScU32 reserved[2];} ScParseIssue;
+enum {SC_CONFIG_REPLACE_DUPLICATES=1,SC_CONFIG_SORT_KEYS=2};
+ScStatus ScConfigCreate(ScConfig **out);
+ScStatus ScConfigRetain(ScConfig *config);
+void ScConfigRelease(ScConfig *config);
+ScStatus ScConfigParse(ScConfig *config,const void *utf8,ScU32 bytes,ScU32 flags,ScParseIssue *issue);
+ScStatus ScConfigSerialize(const ScConfig *config,ScU32 flags,ScString **out);
+ScStatus ScConfigSet(ScConfig *config,const char *section,const char *key,const ScValue *value);
+ScStatus ScConfigGet(const ScConfig *config,const char *section,const char *key,ScValue *out);
+ScStatus ScConfigRemove(ScConfig *config,const char *section,const char *key);
+ScStatus ScConfigQuery(const ScConfig *config,ScContainerInfo *out);
+typedef struct {ScU32 size,version;ScI32 code;ScU32 domain;ScI32 raw;ScU32 operation,byte_offset,line,column,reserved[3];} ScUtilErrorInfo;
+typedef struct {ScU32 size,version;ScI32 code;ScU32 domain;ScI32 raw;ScU32 operation;const char *message;ScU32 reserved;} ScErrorDesc;
+ScStatus ScErrorObjectCreate(const ScErrorDesc *desc,ScErrorObject **out);
+ScStatus ScErrorObjectRetain(ScErrorObject *error);
+void ScErrorObjectRelease(ScErrorObject *error);
+ScStatus ScErrorObjectQuery(const ScErrorObject *error,ScUtilErrorInfo *out);
+ScStatus ScErrorObjectMessage(const ScErrorObject *error,ScView *out);
+ScStatus ScErrorObjectFormat(const ScErrorObject *error,ScString **out);
+enum {SC_LOG_TRACE=0,SC_LOG_INFO=1,SC_LOG_WARNING=2,SC_LOG_ERROR=3,SC_LOG_CLOCK=1};
+typedef struct {ScU32 size,version,minimum_level,max_records,flags;ScStream *sink;ScU32 reserved[2];} ScLogDesc;
+typedef struct {ScU32 size,version,level;ScI32 code;ScWideCounter tick;ScU32 sequence_lo,sequence_hi;ScView text;} ScLogEntry;
+ScStatus ScLogCreate(const ScLogDesc *desc,ScLogger **out);
+ScStatus ScLogRetain(ScLogger *logger);
+void ScLogRelease(ScLogger *logger);
+ScStatus ScLogWrite(ScLogger *logger,ScU32 level,ScI32 code,const void *utf8,ScU32 bytes);
+ScStatus ScLogFormat(ScLogger *logger,ScU32 level,ScI32 code,const char *format,...);
+ScStatus ScLogVFormat(ScLogger *logger,ScU32 level,ScI32 code,const char *format,va_list arguments);
+ScStatus ScLogGet(const ScLogger *logger,ScU32 index,ScLogEntry *out);
+ScStatus ScLogFlush(ScLogger *logger);
+ScStatus ScLogQuery(const ScLogger *logger,ScContainerInfo *out);
+ScStatus ScLogClear(ScLogger *logger);
+
+typedef struct {ScU32 size,version,type,flags,source,sequence_lo,sequence_hi;const void *data;ScU32 bytes,reserved[3];} ScEvent;
+typedef ScStatus (*ScEventProc)(const ScEvent *event,void *context);
+typedef struct {ScU32 size,version,type,flags;ScI32 priority;ScEventProc procedure;void *context;ScDropProc context_drop;ScU32 reserved[2];} ScSubscriptionDesc;
+typedef struct {ScU32 size,version,called;ScI32 first_error;ScU32 stopped,reserved[3];} ScEventResult;
+enum {SC_EVENT_ONCE=1,SC_EVENT_STOP_ON_ERROR=1};
+ScStatus ScEventHubCreate(ScEventHub **out);
+ScStatus ScEventHubRetain(ScEventHub *hub);
+void ScEventHubRelease(ScEventHub *hub);
+ScStatus ScEventConnect(ScEventHub *hub,const ScSubscriptionDesc *desc,ScU32 *token);
+ScStatus ScEventDisconnect(ScEventHub *hub,ScU32 token);
+ScStatus ScEventEmit(ScEventHub *hub,const ScEvent *event,ScU32 flags,ScEventResult *out);
+ScStatus ScEventHubQuery(const ScEventHub *hub,ScContainerInfo *out);
+ScStatus ScEventHubClear(ScEventHub *hub);
+enum {SC_MODEL_INSERT=1,SC_MODEL_REMOVE=2,SC_MODEL_MOVE=3,SC_MODEL_VALUE=4};
+typedef struct {ScU32 size,version,id,parent,first_child,next_sibling,revision,property_count;} ScModelNodeInfo;
+typedef struct {ScU32 size,version,kind,node,parent,revision;const char *property;ScU32 reserved;} ScModelChange;
+typedef ScStatus (*ScModelVisitProc)(ScU32 node,const ScModelNodeInfo *info,void *context);
+ScStatus ScModelCreate(ScModel **out);
+ScStatus ScModelRetain(ScModel *model);
+void ScModelRelease(ScModel *model);
+ScStatus ScModelInsert(ScModel *model,ScU32 parent,ScU32 before,ScU32 *node);
+ScStatus ScModelRemove(ScModel *model,ScU32 node);
+ScStatus ScModelMove(ScModel *model,ScU32 node,ScU32 parent,ScU32 before);
+ScStatus ScModelNodeQuery(const ScModel *model,ScU32 node,ScModelNodeInfo *out);
+ScStatus ScModelSet(ScModel *model,ScU32 node,const char *property,const ScValue *value);
+ScStatus ScModelGet(const ScModel *model,ScU32 node,const char *property,ScValue *out);
+ScStatus ScModelUnset(ScModel *model,ScU32 node,const char *property);
+ScStatus ScModelVisit(ScModel *model,ScU32 root,ScModelVisitProc procedure,void *context);
+ScStatus ScModelConnect(ScModel *model,const ScSubscriptionDesc *desc,ScU32 *token);
+ScStatus ScModelDisconnect(ScModel *model,ScU32 token);
+ScStatus ScModelQuery(const ScModel *model,ScContainerInfo *out);
+ScStatus ScModelNotificationStatus(const ScModel *model,ScStatus *out);
+typedef struct {ScU32 size,version,namespace_id,object_id,object_generation,theme_epoch,display_epoch,user_generation;} ScCacheStamp;
+typedef ScStatus (*ScCacheLoadProc)(const ScView *key,const ScCacheStamp *stamp,void *context,void **resource,ScU32 *cost);
+typedef void (*ScCacheDropProc)(void *resource,void *context);
+typedef struct {ScU32 size,version,budget_bytes;ScCacheLoadProc load;ScCacheDropProc drop;void *context;ScU32 reserved[2];} ScCacheDesc;
+typedef struct {ScU32 size,version,budget_bytes,used_bytes,entries,leases,revision;ScWideCounter hits,misses,evictions;ScU32 reserved[3];} ScCacheInfo;
+ScStatus ScCacheCreate(const ScCacheDesc *desc,ScResourceCache **out);
+ScStatus ScCacheRetain(ScResourceCache *cache);
+void ScCacheRelease(ScResourceCache *cache);
+ScStatus ScCacheAcquire(ScResourceCache *cache,const void *key,ScU32 key_bytes,const ScCacheStamp *stamp,void **resource,ScU32 *lease);
+ScStatus ScCacheReleaseLease(ScResourceCache *cache,ScU32 lease);
+ScStatus ScCacheInvalidate(ScResourceCache *cache,const void *key,ScU32 key_bytes);
+ScStatus ScCacheClear(ScResourceCache *cache);
+ScStatus ScCacheSetBudget(ScResourceCache *cache,ScU32 bytes);
+ScStatus ScCacheQuery(const ScResourceCache *cache,ScCacheInfo *out);
+
+#endif

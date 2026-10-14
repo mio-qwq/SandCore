@@ -18,10 +18,10 @@ from scd_format import validate_scx
 
 ROOT=Path(__file__).resolve().parents[1]
 SOURCE_NAMES=('sccc.c','s3c.c','SCAPI.H','SCTYPES.H','SCIO.H','COMPILECLI.inc','s3c_lex.inc',
-    's3c_pp.inc','s3c_parse.inc','s3c_emit.inc','s3c_scl.inc','runtime/SCLFMT.H',
+    's3c_pp.inc','s3c_parse.inc','s3c_std_parse.inc','s3c_emit.inc','s3c_std_emit.inc','s3c_scl.inc','runtime/SCLFMT.H',
     'runtime/scl_format.c','runtime/SCDYN.H','runtime/scd_format.c','runtime/SCLDR.H',
     'runtime/SCLPRIVATE.H','runtime/SCLROOT.C','runtime/SCLROOT.json','runtime/scldr.c',
-    'runtime/scl_platform.c','runtime/scl_application.c')
+    'runtime/scl_platform.c','runtime/scl_application.c','runtime/SCLJUMPPRIVATE.H','runtime/scl_termination.c')
 
 def manifest(name,dependencies,imports,library=False):
     item=dict(name=name,dependencies=[dict(name=n,abi_major=1,min_minor=0,min_version=1) for n in dependencies],

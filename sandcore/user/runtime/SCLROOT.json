@@ -1,13 +1,16 @@
 {
   "name": "SCLDR.SCL",
   "abi_major": 1,
-  "abi_minor": 0,
-  "library_version": 1,
+  "abi_minor": 1,
+  "library_version": 2,
   "init": null,
   "fini": null,
   "exports": [
     {"name": "ScApplicationStart", "kind": "function"},
     {"name": "ScApplicationRuntime", "kind": "function"},
+    {"name": "ScApplicationRegisterPrepare", "kind": "function"},
+    {"name": "ScApplicationPinCallback", "kind": "function"},
+    {"name": "ScApplicationExit", "kind": "function"},
     {"name": "ScRuntimeCreate", "kind": "function"},
     {"name": "ScRuntimeOpen", "kind": "function"},
     {"name": "ScRuntimeClose", "kind": "function"},

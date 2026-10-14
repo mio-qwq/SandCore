@@ -1,0 +1,770 @@
+{
+  "kind": "application",
+  "name": "UTILPROBE.SCX",
+  "dependencies": [
+    {
+      "name": "SC32API.SCL",
+      "abi_major": 1,
+      "min_minor": 1,
+      "min_version": 2
+    },
+    {
+      "name": "SCCLIB.SCL",
+      "abi_major": 1,
+      "min_minor": 0,
+      "min_version": 1
+    },
+    {
+      "name": "SCLIB.SCL",
+      "abi_major": 1,
+      "min_minor": 0,
+      "min_version": 1
+    }
+  ],
+  "imports": [
+    {
+      "name": "ScArrayCreate",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScArrayErase",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScArrayGet",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScArrayInsert",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScArrayQuery",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScArrayRelease",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScArrayView",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScBinaryReadCounterLE",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScBinaryReadU16LE",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScBinaryReadU32LE",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScBinaryReadU8",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScBinaryReadUtf8",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScBinaryReadVarU32",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScBinaryReaderInit",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScBinaryWriteCounterLE",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScBinaryWriteU16LE",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScBinaryWriteU32LE",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScBinaryWriteU8",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScBinaryWriteUtf8",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScBinaryWriteVarU32",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScBufferBorrow",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScBufferCreate",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScBufferRelease",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScBufferView",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScBufferWrite",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScCacheAcquire",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScCacheCreate",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScCacheInvalidate",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScCacheQuery",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScCacheRelease",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScCacheReleaseLease",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScCacheSetBudget",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScCallbackPin",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScConfigCreate",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScConfigGet",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScConfigParse",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScConfigQuery",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScConfigRelease",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScConfigSerialize",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScErrorObjectCreate",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScErrorObjectFormat",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScErrorObjectQuery",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScErrorObjectRelease",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScEventConnect",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScEventDisconnect",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScEventEmit",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScEventHubCreate",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScEventHubRelease",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScHashCreate",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScHashGet",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScHashIterate",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScHashNext",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScHashRelease",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScHashSet",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScHashVisit",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScListCreate",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScListInsert",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScListIterate",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScListNext",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScListRelease",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScListRemove",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScListVisit",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScLogCreate",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScLogFlush",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScLogFormat",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScLogGet",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScLogQuery",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScLogRelease",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScLogWrite",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScModelConnect",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScModelCreate",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScModelDisconnect",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScModelGet",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScModelInsert",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScModelMove",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScModelNodeQuery",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScModelNotificationStatus",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScModelRelease",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScModelRemove",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScModelSet",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScModelVisit",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScPathJoin",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScPathNormalize",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScPathRelative",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScPathSplit",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScProcessWorkingDirectory",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScStreamFlush",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScStreamFromBuffer",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScStreamFromFile",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScStreamQuery",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScStreamRead",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScStreamRelease",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScStreamSeek",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScStreamWrite",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScStringAppend",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScStringBorrow",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScStringCStr",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScStringRelease",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScStringView",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScSystemMemory",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUnicodeIsNoncharacter",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUnicodeIsScalar",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUnicodeIsWhitespace",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUtf8Count",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUtf8Decode",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUtf8Encode",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUtf8Previous",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "__scc_errno_location",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "__scc_standard",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "fclose",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "fflush",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "fopen",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "free",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "malloc",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "memcmp",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "memcpy",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "memset",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "printf",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "puts",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "snprintf",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "strcmp",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "strlen",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "strncmp",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "strstr",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    }
+  ]
+}

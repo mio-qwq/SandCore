@@ -56,6 +56,14 @@ int ScRuntimeResolve(ScRuntime *runtime, ScModule module, const char *name,
 int ScRuntimeAdoptBootstrap(ScRuntime *runtime, void *image,
                            const void *metadata, ScU32 metadata_size);
 ScRuntime *ScApplicationRuntime(void);
+/* ABI1.1 / library_version2：正常终止只由自动应用ROOT协调。
+ * prepare仅在SCCLIB真实init期间登记，成功init后提交；callback pin
+ * 接受主映像或READY库的内部函数地址，失败不留下新resident引用。 */
+int ScApplicationRegisterPrepare(void (*prepare)(void));
+int ScApplicationPinCallback(void (*callback)(void));
+/* 实际永不返回；脱离应用/库帧后prepare→fini→CRT原EXIT。
+ * 初始化尚未提交、递归终止或不合法控制点走明确异常失败。 */
+void ScApplicationExit(int status);
 int ScRuntimeQuery(ScRuntime *runtime, ScRuntimeStats *stats);
 /* 仅在 main 已返回、没有任何库调用栈/回调时关闭运行时。异常退出
  * 由内核直接回收私有页，不承诺执行可能已经损坏的用户态析构。 */

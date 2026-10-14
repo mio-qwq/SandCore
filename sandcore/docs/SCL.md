@@ -4,6 +4,8 @@
 
 本规范定义真正装入 Ring 3 地址空间的 `.SCL` 库文件。SCL 与 SKM 的权限和装载路径独立，不获得 Ring 0 权限，不替代已有 SCX、SCAPI.H 或历史程序 ABI。
 
+2026-10-15当前：自动启动、原生SCCC与R1终止已实际运行；ROOT ABI1.1/v2保留九项原导出并新增三项应用prepare/pin/exit，四库本批证据见[m10a2-stdlib](../evidence/m10a2-stdlib/README.md)。SCL文件布局未变，宿主打包与客体生成来源仍分别登记。
+
 当前文件头、表布局与验证合同由 `user/runtime/SCLFMT.H`、`scl_format.c` 和 `tools/scl_format.py` 实现。`mkscl.py` 是 **HOST_BOOTSTRAP**：输入机器码来自宿主 ELF 工具链；它不是客体 SCCC 的动态库输出，也不证明系统内编译已实现。SCCC、自动依赖 SCX 和正式 SDK 的后续接线须分别记录证据。
 
 ## 1. 数值、名称与规范化布局
@@ -135,7 +137,7 @@ PC32 ：写入 (S + A - P) mod 2^32
 
 ## 6. 调用、装载与生命周期
 
-v1 引导路径使用 i386 cdecl：参数从栈传递，调用方清栈，EBX/ESI/EDI/EBP 由被调用方保留，整型/指针返回值在 EAX。指针与 int 均为 32 位。库不能链接 SCX `_start` 或调用 EXIT 终结所在应用；调用返回应用原调用栈。
+v1 引导路径使用 i386 cdecl：参数从栈传递，调用方清栈，EBX/ESI/EDI/EBP 由被调用方保留，整型/指针返回值在 EAX。指针与 int 均为 32 位。库不能链接 SCX `_start` 或把低层 EXIT 当作普通函数返回；标准库的显式正常终止沿下述应用根协议，不能在自己的调用栈上 Destroy。
 
 通用库入口保证至少4B栈对齐，匹配SCCC的现有cdecl生成器。GCC宿主SCL须用`-mincoming-stack-boundary=2 -mpreferred-stack-boundary=4`接受4B入口，并按需要在函数内部重新建立16B对齐；官方SDK沿用这组参数。不能只依靠暂时没有SSE来掩盖入口对齐假设。自动CRT仍为独立引导入口提供16B对齐，库与普通回调遵守此通用最低合同；没有改变参数栈偏移或旧SCAPI/SCX。
 
@@ -145,11 +147,21 @@ v1 引导路径使用 i386 cdecl：参数从栈传递，调用方清栈，EBX/ES
 
 重复打开同名兼容库只增加显式引用，不重复初始化。每条依赖边另计引用。`ScRuntimeSymbol` 一旦把地址返回给调用方，就把该模块固定至运行时结束：任意函数指针可能已被保存，运行时不能猜测所有调用栈并强制卸载。此时 `Close` 释放显式引用并返回 RESIDENT；没有显式引用、依赖边和地址固定的模块才能安全立即释放。
 
-`Destroy` 只在应用 main 已返回且没有任何库栈/回调仍在执行时调用，执行逆序 fini 并回收全部模块。进程异常退出由内核回收私有映射及其他任务资源，不承诺运行可能已损坏的用户态 fini。
+`Destroy` 只在应用 main 已返回或经受控 continuation 离开应用/库栈、没有库调用帧/回调仍在执行时调用，执行逆序 fini 并回收全部模块。自动应用 runtime 由ROOT内部终止路径授权，其普通main/prepare中的Destroy返回BUSY；独立runtime原有合法关闭前置条件保持。进程异常退出由内核回收私有映射及其他任务资源，不承诺运行可能已损坏的用户态 fini。
 
 当前默认平台将系统名称 `SC32API/SCCLIB/SCLIB/SCUI/SCSHELL/SCGFX/SCRES/SCLDR.SCL` 固定解析到 `/SYS/LIB/`；其余库从调用方显式绝对包目录读取，目录为空时同样使用系统目录。没有 CWD/PATH 隐式搜索。目录与文件权限仍由现有内核检查；第三方 SCL 不因属于库文件而被视为可信。受保护系统名称列表的版本扩展须同批更新公开规范。
 
 基础错误码：FORMAT=-1、RANGE=-2、SYMBOL=-3、VERSION=-4；SCLDR 另有 NOT_FOUND=-5、MEMORY=-6、CYCLE=-7、INIT=-8、HANDLE=-9、BUSY=-10、IO=-11。成功为 0，释放引用但仍驻留为 1。失败不向调用方交付半装载模块。
+
+### 6.1 应用根 ABI1.1 正常终止
+
+源码新增 `ScApplicationRegisterPrepare(void (*)(void))`、`ScApplicationPinCallback(void (*)(void))` 和实际永不返回的 `ScApplicationExit(int)`；原九个ROOT exports只增不改，ROOT minor=1 / library_version=2，磁盘SCL v1、64B动态CRT和SCAPI.H不变。新SCCLIB声明ROOT ABI1 / min_minor1 / min_version2；旧库/应用仍满足原最低版本。
+
+RegisterPrepare仅接受当前自动runtime中真实SCCLIB init的X段函数，先申请128KiB终止栈候选，init返回0后才提交hook并pin provider。失败init/rollback在映像释放前撤候选或解绑，失败注册不留resident引用。PinCallback允许RUNNING/PREPARING且loader非busy，接受已回填主正文或READY模块X段中的内部static/导出函数；排除CRT/metadata/BSS/heap，失败返回FORMAT/RANGE/HANDLE/BUSY不pin。
+
+ROOT私有单调用runner覆盖依赖bootstrap与main；普通返回、SCCLIB提交后的真实init exit及main exit都先离开相关调用帧，再在独立终止栈执行一次prepare（atexit），随后逆成功初始化顺序fini。被exit中断且未成功返回的init不调用fini。SCCLIB.fini在依赖者之后drain/flush/close所有FILE并回收allocator，SC32API随后收束；全部callback结束后才释放模块，恢复原ROOT栈后最后归还终止栈并返回CRT旧EXIT。显式exit时借用的主栈setvbuf缓冲不会被清理栈覆盖。
+
+prepare/fini递归exit、provider未提交、非法continuation或非init busy边界走固定小诊断与异常EXIT_FAILURE1，不返回普通C、不在忙事务栈Destroy。初始化返回错误不执行atexit。低层ScProcessExit/_Exit/abort/真实异常保持跳过用户收尾。Start用原0x283、ECX=0核对cached bootinfo八字段及本函数entry，独立ROOT副本/Create对象不能冒充自动退出上下文。完整状态/48B adapter合同见 [SCL-TERMINATION-DESIGN.md](SCL-TERMINATION-DESIGN.md)。本批ROOT源码已落，compiler/SCCLIB由对应owner接线，**尚未构建或客体验证R1**。
 
 ## 7. HOST_BOOTSTRAP 打包器
 
@@ -241,3 +253,7 @@ python3 tests/m10a2/test_scl_format.py
 |---|---|---|
 | v1.0 | 2026-10-14 | 固定 SCL v1 字节布局与规范化规则；新增 ELF HOST_BOOTSTRAP、表/依赖检查工具、两库真实输入及一轮宿主格式一致证据，另记主开发客体首切片与冻结输入一致，完整 Phase 1 尚未结束 |
 | v1.0 | 2026-10-14 | 磁盘ABI不变；增加完整表边界的metadata-prefix校验用于借用启动根，完整文件payload/零填充校验保留，自动SCX及原生SCL/G1客体接线见SCX-DYNAMIC与M10A2-IMPLEMENTATION |
+| v1.1 ROOT | 2026-10-15 | 原九exports只增三个正常终止/pin接口；落ROOT双栈控制、init逃逸、候选hook与callback寿命，SCL磁盘/CRT/SCAPI不变，源码尚未构建或客体验证 |
+
+
+修订：2026-10-15，统一stdlib-build-06及guest02/04/05实际SCCLIB/SCLIB/R1/C1..C5、九模式/当前G1/253项通用工作流与精确回收通过；保留三项验证失败、未变输入复用与证据边界，见evidence/m10a2-stdlib，完整目标继续。

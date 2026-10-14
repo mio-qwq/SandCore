@@ -118,8 +118,9 @@ def build_sccc(label: str, cli: bool = True, baseline: bool = False) -> Path:
     source = read("s3c.c").replace('#include "SCAPI.H"', ADAPTER)
     for name in ("COMPILECLI.inc", "COMPILEUI.inc"):
         source = source.replace(f'#include "{name}"', "")
-    for name in ("s3c_lex.inc", "s3c_pp.inc", "s3c_parse.inc", "s3c_emit.inc", "s3c_scl.inc"):
-        source = source.replace(f'#include "{name}"', read(name))
+    for name in ("s3c_lex.inc", "s3c_pp.inc", "s3c_parse.inc", "s3c_std_parse.inc",
+                 "s3c_emit.inc", "s3c_std_emit.inc", "s3c_scl.inc"):
+        if f'#include "{name}"' in source:source = source.replace(f'#include "{name}"', read(name))
     source = source.replace("int main(void)", "static int sccc_actual_main(void)")
     path = OUT / (label + ".c")
     path.write_text(("#define SCCC_CLI 1\n" if cli else "") + source + WRAPPER, encoding="utf-8")
@@ -307,7 +308,8 @@ class ScdFormatTests(unittest.TestCase):
         self.records.append(dict(case="legacy-SCX-SKM-representative-byte-identity-and-nine-field-SCL", status="PASS", baseline=BASELINE))
 
     def test_06_current_self_source_capacity(self):
-        names = ["sccc.c", "s3c.c", "s3c_lex.inc", "s3c_pp.inc", "s3c_parse.inc", "s3c_emit.inc", "s3c_scl.inc",
+        names = ["sccc.c", "s3c.c", "s3c_lex.inc", "s3c_pp.inc", "s3c_parse.inc", "s3c_std_parse.inc",
+                 "s3c_emit.inc", "s3c_std_emit.inc", "s3c_scl.inc",
                  "SCAPI.H", "SCIO.H", "COMPILECLI.inc", "runtime/SCLFMT.H", "runtime/scl_format.c",
                  "runtime/SCDYN.H", "runtime/scd_format.c"]
         for name in names:
@@ -319,7 +321,8 @@ class ScdFormatTests(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        paths = ("user/s3c.c", "user/s3c_parse.inc", "user/s3c_emit.inc", "user/s3c_scl.inc",
+        paths = ("user/s3c.c", "user/s3c_parse.inc", "user/s3c_std_parse.inc", "user/s3c_emit.inc",
+                 "user/s3c_std_emit.inc", "user/s3c_pp.inc", "user/s3c_lex.inc", "user/s3c_scl.inc",
                  "user/runtime/SCDYN.H", "user/runtime/scd_format.c", "tools/scd_format.py", "tools/mkdscx.py",
                  "tests/m10a2/DYNAPP.C", "tests/m10a2/DYNAPP.json", "tests/m10a2/test_scd_format.py")
         report = dict(scope="DYNAMIC_SCX_HOST_REAL_LINK_AND_NATIVE_EMITTER", executes_i386=False, guest_sccc=False,

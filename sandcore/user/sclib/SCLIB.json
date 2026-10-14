@@ -1,0 +1,858 @@
+{
+  "name": "SCLIB.SCL",
+  "abi_major": 1,
+  "abi_minor": 0,
+  "library_version": 1,
+  "init": null,
+  "fini": "ScLibFinalize",
+  "exports": [
+    {
+      "name": "ScArrayClear",
+      "kind": "function"
+    },
+    {
+      "name": "ScArrayCreate",
+      "kind": "function"
+    },
+    {
+      "name": "ScArrayErase",
+      "kind": "function"
+    },
+    {
+      "name": "ScArrayGet",
+      "kind": "function"
+    },
+    {
+      "name": "ScArrayInsert",
+      "kind": "function"
+    },
+    {
+      "name": "ScArrayQuery",
+      "kind": "function"
+    },
+    {
+      "name": "ScArrayRelease",
+      "kind": "function"
+    },
+    {
+      "name": "ScArrayReserve",
+      "kind": "function"
+    },
+    {
+      "name": "ScArrayResize",
+      "kind": "function"
+    },
+    {
+      "name": "ScArrayRetain",
+      "kind": "function"
+    },
+    {
+      "name": "ScArraySet",
+      "kind": "function"
+    },
+    {
+      "name": "ScArrayView",
+      "kind": "function"
+    },
+    {
+      "name": "ScBinaryRead",
+      "kind": "function"
+    },
+    {
+      "name": "ScBinaryReadCounterLE",
+      "kind": "function"
+    },
+    {
+      "name": "ScBinaryReaderInit",
+      "kind": "function"
+    },
+    {
+      "name": "ScBinaryReadU16LE",
+      "kind": "function"
+    },
+    {
+      "name": "ScBinaryReadU32LE",
+      "kind": "function"
+    },
+    {
+      "name": "ScBinaryReadU8",
+      "kind": "function"
+    },
+    {
+      "name": "ScBinaryReadUtf8",
+      "kind": "function"
+    },
+    {
+      "name": "ScBinaryReadVarU32",
+      "kind": "function"
+    },
+    {
+      "name": "ScBinarySkip",
+      "kind": "function"
+    },
+    {
+      "name": "ScBinaryWriteCounterLE",
+      "kind": "function"
+    },
+    {
+      "name": "ScBinaryWriteU16LE",
+      "kind": "function"
+    },
+    {
+      "name": "ScBinaryWriteU32LE",
+      "kind": "function"
+    },
+    {
+      "name": "ScBinaryWriteU8",
+      "kind": "function"
+    },
+    {
+      "name": "ScBinaryWriteUtf8",
+      "kind": "function"
+    },
+    {
+      "name": "ScBinaryWriteVarU32",
+      "kind": "function"
+    },
+    {
+      "name": "ScBufferAppend",
+      "kind": "function"
+    },
+    {
+      "name": "ScBufferBorrow",
+      "kind": "function"
+    },
+    {
+      "name": "ScBufferClear",
+      "kind": "function"
+    },
+    {
+      "name": "ScBufferConsume",
+      "kind": "function"
+    },
+    {
+      "name": "ScBufferCreate",
+      "kind": "function"
+    },
+    {
+      "name": "ScBufferQuery",
+      "kind": "function"
+    },
+    {
+      "name": "ScBufferRelease",
+      "kind": "function"
+    },
+    {
+      "name": "ScBufferReserve",
+      "kind": "function"
+    },
+    {
+      "name": "ScBufferResize",
+      "kind": "function"
+    },
+    {
+      "name": "ScBufferRetain",
+      "kind": "function"
+    },
+    {
+      "name": "ScBufferView",
+      "kind": "function"
+    },
+    {
+      "name": "ScBufferWrite",
+      "kind": "function"
+    },
+    {
+      "name": "ScCacheAcquire",
+      "kind": "function"
+    },
+    {
+      "name": "ScCacheClear",
+      "kind": "function"
+    },
+    {
+      "name": "ScCacheCreate",
+      "kind": "function"
+    },
+    {
+      "name": "ScCacheInvalidate",
+      "kind": "function"
+    },
+    {
+      "name": "ScCacheQuery",
+      "kind": "function"
+    },
+    {
+      "name": "ScCacheRelease",
+      "kind": "function"
+    },
+    {
+      "name": "ScCacheReleaseLease",
+      "kind": "function"
+    },
+    {
+      "name": "ScCacheRetain",
+      "kind": "function"
+    },
+    {
+      "name": "ScCacheSetBudget",
+      "kind": "function"
+    },
+    {
+      "name": "ScConfigCreate",
+      "kind": "function"
+    },
+    {
+      "name": "ScConfigGet",
+      "kind": "function"
+    },
+    {
+      "name": "ScConfigParse",
+      "kind": "function"
+    },
+    {
+      "name": "ScConfigQuery",
+      "kind": "function"
+    },
+    {
+      "name": "ScConfigRelease",
+      "kind": "function"
+    },
+    {
+      "name": "ScConfigRemove",
+      "kind": "function"
+    },
+    {
+      "name": "ScConfigRetain",
+      "kind": "function"
+    },
+    {
+      "name": "ScConfigSerialize",
+      "kind": "function"
+    },
+    {
+      "name": "ScConfigSet",
+      "kind": "function"
+    },
+    {
+      "name": "ScErrorObjectCreate",
+      "kind": "function"
+    },
+    {
+      "name": "ScErrorObjectFormat",
+      "kind": "function"
+    },
+    {
+      "name": "ScErrorObjectMessage",
+      "kind": "function"
+    },
+    {
+      "name": "ScErrorObjectQuery",
+      "kind": "function"
+    },
+    {
+      "name": "ScErrorObjectRelease",
+      "kind": "function"
+    },
+    {
+      "name": "ScErrorObjectRetain",
+      "kind": "function"
+    },
+    {
+      "name": "ScEventConnect",
+      "kind": "function"
+    },
+    {
+      "name": "ScEventDisconnect",
+      "kind": "function"
+    },
+    {
+      "name": "ScEventEmit",
+      "kind": "function"
+    },
+    {
+      "name": "ScEventHubClear",
+      "kind": "function"
+    },
+    {
+      "name": "ScEventHubCreate",
+      "kind": "function"
+    },
+    {
+      "name": "ScEventHubQuery",
+      "kind": "function"
+    },
+    {
+      "name": "ScEventHubRelease",
+      "kind": "function"
+    },
+    {
+      "name": "ScEventHubRetain",
+      "kind": "function"
+    },
+    {
+      "name": "ScFormatBytes",
+      "kind": "function"
+    },
+    {
+      "name": "ScFormatEscape",
+      "kind": "function"
+    },
+    {
+      "name": "ScFormatHex",
+      "kind": "function"
+    },
+    {
+      "name": "ScHashBytes",
+      "kind": "function"
+    },
+    {
+      "name": "ScHashClear",
+      "kind": "function"
+    },
+    {
+      "name": "ScHashCreate",
+      "kind": "function"
+    },
+    {
+      "name": "ScHashGet",
+      "kind": "function"
+    },
+    {
+      "name": "ScHashIterate",
+      "kind": "function"
+    },
+    {
+      "name": "ScHashNext",
+      "kind": "function"
+    },
+    {
+      "name": "ScHashQuery",
+      "kind": "function"
+    },
+    {
+      "name": "ScHashRelease",
+      "kind": "function"
+    },
+    {
+      "name": "ScHashRemove",
+      "kind": "function"
+    },
+    {
+      "name": "ScHashReserve",
+      "kind": "function"
+    },
+    {
+      "name": "ScHashRetain",
+      "kind": "function"
+    },
+    {
+      "name": "ScHashSet",
+      "kind": "function"
+    },
+    {
+      "name": "ScHashVisit",
+      "kind": "function"
+    },
+    {
+      "name": "ScListClear",
+      "kind": "function"
+    },
+    {
+      "name": "ScListCreate",
+      "kind": "function"
+    },
+    {
+      "name": "ScListGet",
+      "kind": "function"
+    },
+    {
+      "name": "ScListInsert",
+      "kind": "function"
+    },
+    {
+      "name": "ScListIterate",
+      "kind": "function"
+    },
+    {
+      "name": "ScListNext",
+      "kind": "function"
+    },
+    {
+      "name": "ScListQuery",
+      "kind": "function"
+    },
+    {
+      "name": "ScListRelease",
+      "kind": "function"
+    },
+    {
+      "name": "ScListRemove",
+      "kind": "function"
+    },
+    {
+      "name": "ScListRetain",
+      "kind": "function"
+    },
+    {
+      "name": "ScListVisit",
+      "kind": "function"
+    },
+    {
+      "name": "ScLogClear",
+      "kind": "function"
+    },
+    {
+      "name": "ScLogCreate",
+      "kind": "function"
+    },
+    {
+      "name": "ScLogFlush",
+      "kind": "function"
+    },
+    {
+      "name": "ScLogFormat",
+      "kind": "function"
+    },
+    {
+      "name": "ScLogGet",
+      "kind": "function"
+    },
+    {
+      "name": "ScLogQuery",
+      "kind": "function"
+    },
+    {
+      "name": "ScLogRelease",
+      "kind": "function"
+    },
+    {
+      "name": "ScLogRetain",
+      "kind": "function"
+    },
+    {
+      "name": "ScLogVFormat",
+      "kind": "function"
+    },
+    {
+      "name": "ScLogWrite",
+      "kind": "function"
+    },
+    {
+      "name": "ScModelConnect",
+      "kind": "function"
+    },
+    {
+      "name": "ScModelCreate",
+      "kind": "function"
+    },
+    {
+      "name": "ScModelDisconnect",
+      "kind": "function"
+    },
+    {
+      "name": "ScModelGet",
+      "kind": "function"
+    },
+    {
+      "name": "ScModelInsert",
+      "kind": "function"
+    },
+    {
+      "name": "ScModelMove",
+      "kind": "function"
+    },
+    {
+      "name": "ScModelNodeQuery",
+      "kind": "function"
+    },
+    {
+      "name": "ScModelNotificationStatus",
+      "kind": "function"
+    },
+    {
+      "name": "ScModelQuery",
+      "kind": "function"
+    },
+    {
+      "name": "ScModelRelease",
+      "kind": "function"
+    },
+    {
+      "name": "ScModelRemove",
+      "kind": "function"
+    },
+    {
+      "name": "ScModelRetain",
+      "kind": "function"
+    },
+    {
+      "name": "ScModelSet",
+      "kind": "function"
+    },
+    {
+      "name": "ScModelUnset",
+      "kind": "function"
+    },
+    {
+      "name": "ScModelVisit",
+      "kind": "function"
+    },
+    {
+      "name": "ScPathJoin",
+      "kind": "function"
+    },
+    {
+      "name": "ScPathNormalize",
+      "kind": "function"
+    },
+    {
+      "name": "ScPathRelative",
+      "kind": "function"
+    },
+    {
+      "name": "ScPathSplit",
+      "kind": "function"
+    },
+    {
+      "name": "ScStreamCreate",
+      "kind": "function"
+    },
+    {
+      "name": "ScStreamFlush",
+      "kind": "function"
+    },
+    {
+      "name": "ScStreamFromBuffer",
+      "kind": "function"
+    },
+    {
+      "name": "ScStreamFromFile",
+      "kind": "function"
+    },
+    {
+      "name": "ScStreamQuery",
+      "kind": "function"
+    },
+    {
+      "name": "ScStreamRead",
+      "kind": "function"
+    },
+    {
+      "name": "ScStreamRelease",
+      "kind": "function"
+    },
+    {
+      "name": "ScStreamRetain",
+      "kind": "function"
+    },
+    {
+      "name": "ScStreamSeek",
+      "kind": "function"
+    },
+    {
+      "name": "ScStreamWrite",
+      "kind": "function"
+    },
+    {
+      "name": "ScStringAppend",
+      "kind": "function"
+    },
+    {
+      "name": "ScStringAppendFormat",
+      "kind": "function"
+    },
+    {
+      "name": "ScStringAppendVFormat",
+      "kind": "function"
+    },
+    {
+      "name": "ScStringAssign",
+      "kind": "function"
+    },
+    {
+      "name": "ScStringBorrow",
+      "kind": "function"
+    },
+    {
+      "name": "ScStringCreate",
+      "kind": "function"
+    },
+    {
+      "name": "ScStringCStr",
+      "kind": "function"
+    },
+    {
+      "name": "ScStringErase",
+      "kind": "function"
+    },
+    {
+      "name": "ScStringFormat",
+      "kind": "function"
+    },
+    {
+      "name": "ScStringInsert",
+      "kind": "function"
+    },
+    {
+      "name": "ScStringQuery",
+      "kind": "function"
+    },
+    {
+      "name": "ScStringRelease",
+      "kind": "function"
+    },
+    {
+      "name": "ScStringRetain",
+      "kind": "function"
+    },
+    {
+      "name": "ScStringVFormat",
+      "kind": "function"
+    },
+    {
+      "name": "ScStringView",
+      "kind": "function"
+    },
+    {
+      "name": "ScUnicodeIsControl",
+      "kind": "function"
+    },
+    {
+      "name": "ScUnicodeIsNoncharacter",
+      "kind": "function"
+    },
+    {
+      "name": "ScUnicodeIsScalar",
+      "kind": "function"
+    },
+    {
+      "name": "ScUnicodeIsWhitespace",
+      "kind": "function"
+    },
+    {
+      "name": "ScUtf8Count",
+      "kind": "function"
+    },
+    {
+      "name": "ScUtf8Decode",
+      "kind": "function"
+    },
+    {
+      "name": "ScUtf8Encode",
+      "kind": "function"
+    },
+    {
+      "name": "ScUtf8Offset",
+      "kind": "function"
+    },
+    {
+      "name": "ScUtf8Previous",
+      "kind": "function"
+    },
+    {
+      "name": "ScUtf8Trim",
+      "kind": "function"
+    },
+    {
+      "name": "ScUtf8Validate",
+      "kind": "function"
+    }
+  ],
+  "imports": [
+    {
+      "name": "__scc_errno_location",
+      "kind": "function",
+      "dependency": "SCCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "calloc",
+      "kind": "function",
+      "dependency": "SCCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "fclose",
+      "kind": "function",
+      "dependency": "SCCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "feof",
+      "kind": "function",
+      "dependency": "SCCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "ferror",
+      "kind": "function",
+      "dependency": "SCCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "fflush",
+      "kind": "function",
+      "dependency": "SCCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "fread",
+      "kind": "function",
+      "dependency": "SCCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "free",
+      "kind": "function",
+      "dependency": "SCCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "fseek",
+      "kind": "function",
+      "dependency": "SCCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "ftell",
+      "kind": "function",
+      "dependency": "SCCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "fwrite",
+      "kind": "function",
+      "dependency": "SCCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "isdigit",
+      "kind": "function",
+      "dependency": "SCCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "isxdigit",
+      "kind": "function",
+      "dependency": "SCCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "malloc",
+      "kind": "function",
+      "dependency": "SCCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "memchr",
+      "kind": "function",
+      "dependency": "SCCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "memcmp",
+      "kind": "function",
+      "dependency": "SCCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "memcpy",
+      "kind": "function",
+      "dependency": "SCCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "memmove",
+      "kind": "function",
+      "dependency": "SCCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "memset",
+      "kind": "function",
+      "dependency": "SCCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "qsort",
+      "kind": "function",
+      "dependency": "SCCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "realloc",
+      "kind": "function",
+      "dependency": "SCCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "snprintf",
+      "kind": "function",
+      "dependency": "SCCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "strcmp",
+      "kind": "function",
+      "dependency": "SCCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "strlen",
+      "kind": "function",
+      "dependency": "SCCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "strtol",
+      "kind": "function",
+      "dependency": "SCCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "strtoul",
+      "kind": "function",
+      "dependency": "SCCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "toupper",
+      "kind": "function",
+      "dependency": "SCCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "vsnprintf",
+      "kind": "function",
+      "dependency": "SCCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScCallbackPin",
+      "kind": "function",
+      "dependency": "SC32API.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScSystemMonotonic",
+      "kind": "function",
+      "dependency": "SC32API.SCL",
+      "size": 1
+    }
+  ],
+  "dependencies": [
+    {
+      "name": "SCCLIB.SCL",
+      "abi_major": 1,
+      "min_minor": 0,
+      "min_version": 1
+    },
+    {
+      "name": "SC32API.SCL",
+      "abi_major": 1,
+      "min_minor": 1,
+      "min_version": 2
+    }
+  ]
+}

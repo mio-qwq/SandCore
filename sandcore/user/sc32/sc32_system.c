@@ -1,7 +1,12 @@
 #include "SC32PRIVATE.H"
 
 ScStatus ScSystemCapabilities(ScCapabilities *out)
-{return sc32_native(sc32_call(SC32_WIRE_GATE,SC32_WIRE_CAPABILITIES,0,(ScI32)out,0,0,0),SC32_OP_CAPS);}
+{
+    ScStatus status=sc32_native(sc32_call(SC32_WIRE_GATE,SC32_WIRE_CAPABILITIES,0,(ScI32)out,0,0,0),SC32_OP_CAPS);
+    /* 这个能力在本R3库/ROOT，而非新增内核gate；导入版本已保证实现存在。 */
+    if(!status)out->capabilities_lo|=SC32_CAP_CALLBACK_LIFETIME;
+    return status;
+}
 ScStatus ScSystemMemory(ScMemoryInfo *out)
 {return sc32_native(sc32_call(SC32_WIRE_GATE,SC32_WIRE_MEMORY,0,(ScI32)out,0,0,0),SC32_OP_MEMORY);}
 ScStatus ScSystemMonotonic(ScMonotonicClock *out)

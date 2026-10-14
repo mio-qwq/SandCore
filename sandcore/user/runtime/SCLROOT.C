@@ -4,4 +4,5 @@
 #include "scd_format.c"
 #include "scldr.c"
 #include "scl_platform.c"
+#include "scl_termination.c"
 #include "scl_application.c"

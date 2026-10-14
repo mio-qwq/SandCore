@@ -132,18 +132,27 @@ static void lexnext(Lexer *l,Tok *t)
         return;
     }
     if(c>='0' && c<='9') {
-        int start=l->offset,base=10,digits=0,unsigned_flag=0;
+        int start=l->offset,base=10,digits=0,unsigned_flag=0,long_flag=0;
         u32 value=0;
         if(lexmatch(l,"0x") || lexmatch(l,"0X")) base=16;
         else if(c=='0') base=8;
         while(hexvalue(lexpeek(l))>=0 && hexvalue(lexpeek(l))<base) {
-            value=value*(u32)base+(u32)hexvalue(lexpeek(l));
+            u32 digit=(u32)hexvalue(lexpeek(l));
+            /* 溢出必须在乘加前诊断，否则过大字面量已经回绕成合法小数。 */
+            if(value>(0xffffffffu-digit)/(u32)base)fatal("integer literal exceeds the 32-bit profile");
+            value=value*(u32)base+digit;
             l->offset++;
             digits++;
         }
         if(!digits) fatal("integer literal needs digits");
         while(lexpeek(l)=='u' || lexpeek(l)=='U' || lexpeek(l)=='l' || lexpeek(l)=='L') {
-            if(lexpeek(l)=='u' || lexpeek(l)=='U') unsigned_flag=1;
+            if(lexpeek(l)=='u' || lexpeek(l)=='U'){
+                if(unsigned_flag)fatal("integer literal repeats its unsigned suffix");
+                unsigned_flag=1;
+            }else{
+                if(long_flag)fatal("64-bit integer suffixes are unsupported");
+                long_flag=1;
+            }
             l->offset++;
         }
         if(identifier_char(lexpeek(l)) || lexpeek(l)=='.') fatal("invalid or unsupported numeric literal");

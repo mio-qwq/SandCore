@@ -66,7 +66,8 @@ def main():
         if sha(ROOT/item['path'])!=item['sha256']:raise ValueError('当前产物与构建记录不同')
     library=args.native_library.read_bytes();tables=validate(library)
     generated=next(x for x in foundation['cases'] if x['name']=='native-library-all-declared-exports')
-    if sha(args.native_library)!=generated['sha256'] or len(tables['exports'])!=85:
+    library_manifest=json.loads((ROOT/'user/sc32/SC32API.json').read_text(encoding='utf-8'))
+    if sha(args.native_library)!=generated['sha256'] or {x['name'] for x in tables['exports']}!={x['name'] for x in library_manifest['exports']}:
         raise ValueError('库不是首轮客体实际生成的文件')
     # R3基础库源码未变，键盘锁定重复修复由新core构建单列。
     for name,digest in foundation['input_sha256'].items():
@@ -74,7 +75,8 @@ def main():
             'user/SC32API.H','user/SC32GUI.H','user/SCTYPES.H'):
             if sha(ROOT/name)!=digest:raise ValueError('原生库对应源码已经改变：'+name)
     root_tables=validate(args.native_root.read_bytes())
-    if root_tables['imports'] or root_tables['dependencies'] or len(root_tables['exports'])!=9:
+    root_manifest=json.loads((ROOT/'user/runtime/SCLROOT.json').read_text(encoding='utf-8'))
+    if root_tables['imports'] or root_tables['dependencies'] or {x['name'] for x in root_tables['exports']}!={x['name'] for x in root_manifest['exports']}:
         raise ValueError('原生根不符合固定引导合同')
     validate_scx(args.native_probe.read_bytes())
     prefix='/TMP/TWIN-'+secrets.token_hex(3);package='/HOME/M10P';compiler=prefix+'/SCCC0.SCX'

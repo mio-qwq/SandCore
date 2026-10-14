@@ -2,7 +2,7 @@
 
 正式名称：**SandCore M10a2 — The Application Platform Era**。
 
-2026-10-14 已按用户要求开工；用户随后明确设立持续完整目标，直到完全完成M10a2，目标状态active。开工基线 `main@8e1c27abfe1b0c14ddff6d23464a961eabfd8cc0`；完整范围见根 `M10a2RULE.MD` 和 `M10A2-DESIGN.md`。最新已推送验证检查点为`72783199e3d2e987d4124a89b45913a4290937a2`，整个M10a2尚未完成，不能以阶段提交关闭目标。
+2026-10-14 已按用户要求开工；完整持续目标保持active。开工基线 `main@8e1c27abfe1b0c14ddff6d23464a961eabfd8cc0`；完整范围见根 `M10a2RULE.MD` 和 `M10A2-DESIGN.md`。此前SC32检查点为`9bf6d8e4fffffab8e159ee1dc1aa8277b6801463`；本批SCCLIB/SCLIB/R1与当前G1实际结果见[evidence/m10a2-stdlib](../evidence/m10a2-stdlib/README.md)，对应阶段提交从main日志定位。整个M10a2尚未完成，不能以阶段提交关闭目标。
 
 ## 当前状态
 
@@ -13,7 +13,9 @@
 | SCLDR | 真正文件装载、迭代依赖/环检测、函数/数据导入、ABS/PC 回填、初始化/回滚、引用/地址固定寿命与独立三环启动根已写 | 宿主算法及真实两库/自动导入/并发进程隔离/显式卸载/正常及异常退出回收通过；进入SC32API基础 |
 | 模块分页 | 独立 VA 区、0x280..282 分配/保护/释放、syscall 输出 RW、授权调试特例、退出回收接线已写 | 定向 WSL 构建与单次双盘 QEMU 保护原子性/只读写回拒绝/显式和退出回收通过 |
 | SCCC 动态编译/动态 SCX 启动 | SCL与SCD1动态应用模式、自动64B CRT、SYS0x283固定根、包内导入和同一进程运行时已接通 | SCCC0及实际执行G1都生成并运行动态SCX，输出字节一致；原生根库已客体生成，尚未执行该生成文件 |
-| SC32API / SCCLIB / SCLIB / SCUI | SC32首批85真实导出、typed-query、更新文件与消息GUI源已收齐；SCCLIB/SCLIB实际实现与受控终止/标准头前置增量开始 | SC32公开应用、实际客体根/SC32库、三窗口27个约定行为与精确暖态回收通过；剪贴板/IPC/共享映射等后续范围和完整四库未达成 |
+| SC32API | 86真实导出/6 ROOT导入；原85与typed-query/更新文件/GUI保持，新callback pin已接线 | 本批R1/STD/UTIL回调与全native库真实执行；旧三窗口证据复用，字体/popup/剪贴板/IPC/shared新源待接线 |
+| SCCLIB / SCLIB | 标准C32字节profile94导出与通用完整功能163导出、标准头/C1..C5/R1收齐 | 统一构建、实际客体生成/运行、九模式及七组253检查/精确22B文件、当前G1执行与暖态页回收通过；不宣称完整ISO C或整机性能 |
+| SCUI | 完整156入口设计/公共私有头收齐，core与controls/edit/dialog/data正文正在写 | 未构建或运行；后续真实字体/取消paint/popup/cursor/wheel/broker接線由主代理整合 |
 | Desktop/Shell/主要应用重制 | 完整范围保留，平台成熟后按次序推进 | 尚未实施重制/验收 |
 | SDK/性能/统一验收 | 出口标准已明确 | 待平台及应用完成 |
 
@@ -104,6 +106,10 @@ SCCC的通用cdecl调用只保证4B栈，新增官方GCC SCL flags接受4B入口
 
 ## 修订
 
+2026-10-15真实构建接续：stdlib-build03退出0、source_modified=[]，生成CORE payload451568B/BSS356584B、ROOT19473B(12导出)、SC32 101745B(86)、SCCLIB39256B(94)、SCLIB87101B(163)、Guard2047B及公开Probe17956B。前两批仅探针GCC预处理符号警告，已隔离SCCC专用#if与运行值Bool检查，不降Werror。test_stdlib_compiler三个分组通过，包括9个实际拒绝保旧、真正后端生成自身load234065/BSS3591864/tokens58316/source260508/code217510/data16553/fixes4844/macros268；未执行该生成G1。新批库/终止/stdio/utility仍无客体运行证据，Windows主控与UTILPROBE正在live子代理源码接线，目标active、所有库source已冻结，下一动作运行其定向主控。
+
+2026-10-15新批实施中：已推送9bf6d8e作为P0恢复点。R1真实prepare候选/128K双栈/代码回调pin/初始化exit与旧九入口兼容源已收齐，ROOT1.1/v2增加至12导出；SC32新ScCallbackPin使库1.1/v2增加至86导出，原85不删。SCCLIB94实体导出/19导入与11标准头已收齐，SCLIB完整容器/UTF8/path/config/stream/event/model/cache源正在收尾。SCCC共同增量包括真实Bool/参数转换/stdarg/offsetof/__func__/unsigned整数规则与私有终止机器实体；实际cpp自身输入静态260502B仅余1642B，新的CV小链32KiB计入BSS。全部新批尚未构建/运行，P0旧PASS不代表这些新源；源码收齐再统一针对std/utility和生命周期验证，不扩大旧矩阵。
+
 2026-10-15：GUI03实际执行前轮客体根/SC32库与本轮SCCC三窗口应用，27个约定行为通过。先实测父Shell背景表+1页，再GUI暖PF6878→6878，GUI/窗口池归零；保留首次FAIL与脚本basename拒绝，进入真正SCCLIB/SCLIB实现和R1/C1..C5增量，完整目标继续。
 
 2026-10-15：SC32 build03退出0，真实公开探针/原生动态应用/更新零洞与标准流继承通过；SCCC实际生成85导出SC32库、退出暖页8894→8894。证据见evidence/m10a2-sc32；该生成库与消息GUI下一轮实际运行，完整目标继续active。
@@ -119,3 +125,12 @@ SCCC的通用cdecl调用只保证4B栈，新增官方GCC SCL flags接受4B入口
 2026-10-14：自动SCX/G1/两并发进程/系统根保护/正常与真实异常退出通过，记录30个定向步骤和首次故障流程修正，进入SC32API基础，完整目标继续active。
 
 2026-10-14：保存新SC32/文件/有序GUI接线、声明式公开探针、跨工具链栈与实际宏容量修正；新批仍未验证，中断后按真实状态恢复相同文件所有权。
+
+
+## 2026-10-15 标准库/通用库与受控终止实际出口
+
+统一build06退出0、39.36秒，SC32公共库版本宏修为与清单一致的2。ROOT/SC32/SCCLIB/SCLIB客体字节57040/82014/66892/146165B均生成并安装真实执行；12/86/94/163导出完整清单匹配。当前G1 load234065/BSS3591864、SHA dadf20e7f94370f3621b2f0a2006f49127bab23cade89fc19f7bc35ff4dd57bf，实际编译/运行标准app。九种std模式、共享STD BA/position2、空pipe/管理TTY及通用七组253检查/22B文件通过；所有暖态应用退出PF差0，原盘/源码保持。compact证据evidence/m10a2-stdlib已存原native字节、报告、失败和两张实际查看的旧桌面截图。
+
+guest01功能全过但冷PF+2025；guest02真实HMP确认旧desktop.pages1793→3818、scaled_background0→2025。guest02 shared只在Shell拒绝未支持2>&1时失败；guest03 helper误重复Close已领取票据返回84。只修主控/新helper，库和内核未为三项改行为；guest02六个成功HOST模式在guest04核相同输入后明确复用，native05仍实际全模式执行。Build/host-adapter/native生成/native执行和截图边界分别记录，不以小流程时长称整机性能。
+
+下一批实际SCUI156入口、正式Font/Palette/PaintCancel/Popup/Cursor/Wheel以及会话Broker/Shared/DropTarget。core owner仅user/SCUI.H及user/scui/SCUIPRIVATE.H、SCUI.C/json/core八片段与SCUI.md；controls owner仅ui_controls/edit/dialog/data、SCUIDEMO及说明；broker owner仅新增broker/kernel/分页草稿与规范。root负责字体/GUI/paging/任务接线、Unicode15.1资源归档、构建和Windows定向执行。所有子代理Sol+max；当前新批不在已证SOURCE集合，尚未接线/构建/运行。完整Desktop/Shell/应用重制/SDK/整版目标继续active，不创建Release、不重启M8。

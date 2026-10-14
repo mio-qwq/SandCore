@@ -1,0 +1,88 @@
+{
+  "name": "STDLIBGUARD.SCL",
+  "abi_major": 1,
+  "abi_minor": 0,
+  "library_version": 1,
+  "init": "StdlibGuardInit",
+  "fini": "StdlibGuardFini",
+  "exports": [
+    {
+      "name": "StdlibGuardSetStream",
+      "kind": "function"
+    },
+    {
+      "name": "StdlibGuardRegister",
+      "kind": "function"
+    },
+    {
+      "name": "StdlibGuardNarrow",
+      "kind": "function"
+    },
+    {
+      "name": "StdlibGuardFalse",
+      "kind": "function"
+    },
+    {
+      "name": "StdlibGuardTrue",
+      "kind": "function"
+    }
+  ],
+  "imports": [
+    {
+      "name": "atexit",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "fputs",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "fopen",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "strcmp",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "exit",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScProcessArguments",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    }
+  ],
+  "dependencies": [
+    {
+      "name": "SCCLIB.SCL",
+      "abi_major": 1,
+      "min_minor": 0,
+      "min_version": 1
+    },
+    {
+      "name": "SCLDR.SCL",
+      "abi_major": 1,
+      "min_minor": 1,
+      "min_version": 2
+    },
+    {
+      "name": "SC32API.SCL",
+      "abi_major": 1,
+      "min_minor": 0,
+      "min_version": 1
+    }
+  ]
+}

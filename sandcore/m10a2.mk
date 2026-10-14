@@ -53,7 +53,7 @@ M10A2_DYNAMIC_DIR ?= build/m10a2-dynamic-bootstrap
 .PHONY: m10a2-dynamic-bootstrap m10a2-dynamic-artifacts
 m10a2-dynamic-bootstrap:
 	$(MAKE) BUILD=$(M10A2_DYNAMIC_DIR) M9_BUILD=1 M10_BUILD=1 $(M10A2_DYNAMIC_DIR)/sandcore.img $(M10A2_DYNAMIC_DIR)/fs/SYS/CORE/CORE.SKM $(M10A2_DYNAMIC_DIR)/fs/bin/sccc.scx m10a2-dynamic-artifacts
-$(BUILD)/scl-root.o: user/runtime/SCLROOT.C user/runtime/SCLDR.H user/runtime/SCLFMT.H user/runtime/SCDYN.H user/runtime/SCLPRIVATE.H $(STAMP)
+$(BUILD)/scl-root.o: user/runtime/SCLROOT.C user/runtime/SCLDR.H user/runtime/SCLFMT.H user/runtime/SCDYN.H user/runtime/SCLPRIVATE.H user/runtime/SCLJUMPPRIVATE.H user/runtime/scl_termination.c $(STAMP)
 	$(CC) $(CFLAGS) $(M10A2_SCL_CFLAGS) -Werror -x c -Iuser/runtime -c $< -o $@
 $(BUILD)/SCLDR.SCL: $(BUILD)/scl-root.o user/runtime/SCLROOT.json tools/mkscl.py tools/scl_format.py
 	$(PY) tools/mkscl.py $< $@ --manifest user/runtime/SCLROOT.json
@@ -96,3 +96,32 @@ $(BUILD)/sc32-twin.o: tests/m10a2/SC32TWIN.C user/SC32API.H user/SC32GUI.H $(STA
 $(BUILD)/SC32TWIN.SCX: $(BUILD)/sc32-twin.o tests/m10a2/SC32TWIN.json tools/mkdscx.py tools/scd_format.py
 	$(PY) tools/mkdscx.py $< $@ --manifest tests/m10a2/SC32TWIN.json
 m10a2-sc32-artifacts: $(BUILD)/SC32TWIN.SCX
+
+# Phase3只构建实际新库/工具链；原M8游戏和全应用规则不在目标中。
+M10A2_STDLIB_DIR ?= build/m10a2-stdlib-bootstrap
+.PHONY: m10a2-stdlib-bootstrap m10a2-stdlib-artifacts
+m10a2-stdlib-bootstrap:
+	$(MAKE) BUILD=$(M10A2_STDLIB_DIR) M9_BUILD=1 M10_BUILD=1 $(M10A2_STDLIB_DIR)/sandcore.img $(M10A2_STDLIB_DIR)/fs/SYS/CORE/CORE.SKM $(M10A2_STDLIB_DIR)/fs/bin/sccc.scx m10a2-stdlib-artifacts
+$(BUILD)/stdlib-library.o: user/stdlib/SCCLIB.C $(wildcard user/stdlib/*.c user/stdlib/*.h user/stdlib/*.H) user/SC32API.H user/runtime/SCLDR.H $(STAMP)
+	$(CC) $(CFLAGS) $(M10A2_SCL_CFLAGS) -Werror -x c -Iuser/stdlib -Iuser -c $< -o $@
+$(BUILD)/SCCLIB.SCL: $(BUILD)/stdlib-library.o user/stdlib/SCCLIB.json tools/mkscl.py tools/scl_format.py
+	$(PY) tools/mkscl.py $< $@ --manifest user/stdlib/SCCLIB.json
+$(BUILD)/utility-library.o: user/sclib/SCLIB.C $(wildcard user/sclib/*.c user/sclib/*.H user/stdlib/*.h) user/SC32API.H $(STAMP)
+	$(CC) $(CFLAGS) $(M10A2_SCL_CFLAGS) -Werror -x c -Iuser/stdlib -Iuser -c $< -o $@
+$(BUILD)/SCLIB.SCL: $(BUILD)/utility-library.o user/sclib/SCLIB.json tools/mkscl.py tools/scl_format.py
+	$(PY) tools/mkscl.py $< $@ --manifest user/sclib/SCLIB.json
+m10a2-stdlib-artifacts: $(BUILD)/SCLDR.SCL $(BUILD)/SC32API.SCL $(BUILD)/SCCLIB.SCL $(BUILD)/SCLIB.SCL
+$(BUILD)/stdlib-guard.o: tests/m10a2/STDLIBGUARD.C user/SC32API.H $(wildcard user/stdlib/*.h) $(STAMP)
+	$(CC) $(CFLAGS) $(M10A2_SCL_CFLAGS) -Werror -x c -Iuser/stdlib -Iuser -c $< -o $@
+$(BUILD)/STDLIBGUARD.SCL: $(BUILD)/stdlib-guard.o tests/m10a2/STDLIBGUARD.json tools/mkscl.py tools/scl_format.py
+	$(PY) tools/mkscl.py $< $@ --manifest tests/m10a2/STDLIBGUARD.json
+$(BUILD)/stdlib-probe.o: tests/m10a2/STDLIBPROBE.C user/SC32API.H $(wildcard user/stdlib/*.h) $(STAMP)
+	$(CC) $(CFLAGS) $(M10A2_SCL_CFLAGS) -Werror -x c -Iuser/stdlib -Iuser -c $< -o $@
+$(BUILD)/STDLIBPROBE.SCX: $(BUILD)/stdlib-probe.o tests/m10a2/STDLIBPROBE.json tools/mkdscx.py tools/scd_format.py
+	$(PY) tools/mkdscx.py $< $@ --manifest tests/m10a2/STDLIBPROBE.json
+m10a2-stdlib-artifacts: $(BUILD)/STDLIBGUARD.SCL $(BUILD)/STDLIBPROBE.SCX
+$(BUILD)/utility-probe.o: tests/m10a2/UTILPROBE.C user/sclib/SCLIB.H user/SC32API.H $(wildcard user/stdlib/*.h) $(STAMP)
+	$(CC) $(CFLAGS) $(M10A2_SCL_CFLAGS) -Werror -x c -Iuser/sclib -Iuser/stdlib -Iuser -c $< -o $@
+$(BUILD)/UTILPROBE.SCX: $(BUILD)/utility-probe.o tests/m10a2/UTILPROBE.json tools/mkdscx.py tools/scd_format.py
+	$(PY) tools/mkdscx.py $< $@ --manifest tests/m10a2/UTILPROBE.json
+m10a2-stdlib-artifacts: $(BUILD)/UTILPROBE.SCX

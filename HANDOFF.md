@@ -1,6 +1,6 @@
 # HANDOFF.md —— 沙核 OS (SandCore) 交接文档
 
-> **2026-10-15 M10a2当前：** 完整持续Goal active。SC32基础85真实导出、typed-query/更新文件/目录/STD与R3消息窗口已统一构建并实际运行；客体SC32库81686B、客体SCLDR根45989B和客体三窗口应用25927B都已执行，27个约定窗口/键鼠行为、应用heap10→10和暖PF6878→6878通过。首次父Shell背景表+1页已单独实测与归属，GUI/window对象池0页0对象，失败报告保留。证据入口sandcore/evidence/m10a2-sc32。SCAPI.H仍81a73045…冻结；下一批真实SCCLIB/SCLIB及受控终止、SCCC标准头/varargs/bool增量开始，尚未验证。完整四库/SCUI/Desktop/Shell/主要组件/SDK/最终验收继续，子代理Sol+max，不创建Release、不重启M8。此前“原生根只格式通过”现由本次执行补齐。
+> **2026-10-15 M10a2当前：** 完整持续Goal active。SCCLIB/SCLIB、R1终止和C1..C5已统一构建并实际运行；四份客体库ROOT57040/SC3282014/STD66892/UTIL146165B均执行，当前G1实际编译/运行标准app，native九模式与通用七组253检查/22B文件/精确页回收通过。证据sandcore/evidence/m10a2-stdlib；旧SC32三窗口证据保持。三项验证失败全部保留：旧桌面异步缓存2025页已真实归属、Shell无2>&1改正式Spawn同端点helper、Wait领票后重复Close修helper。原库/内核未为这些失败改行为，输入/原盘保持。SCUI完整156入口设计和公共/私有头已落，core与controls/edit/dialog/data两代理实际实现；broker/font/GUI增量正在写，尚未接线验证。ROOT/STD/UTIL原验证源保持，主代理负责最终接线/WindowsQEMU。SCAPI.H仍81a73045…冻结；Desktop/Shell/主要组件/SDK/完整验收继续，Sol+max，不创建Release、不重启M8。
 
 > **2026-10-07 用户验收通过：** 用户明确“验收通过，提交GitHub，用wsl的gh”。M10a1保持M10a开发版本，19个网络工具（含curl/nc -e）的实际支持与HTTP/TLS边界不变；停止新增验证。验收结果同批持久化后推送代码，不创建Release，不宣称M10已完成或基础内核冻结。
 

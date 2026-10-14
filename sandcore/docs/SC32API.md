@@ -6,7 +6,9 @@
 
 ## 1. 动态链接与依赖
 
-SC32API是Ring3代码，依赖只有 `SCLDR.SCL`，不导入SCCLIB/libc。五个真实导入为 `ScApplicationRuntime`、`ScRuntimeOpen`、`ScRuntimeClose`、`ScRuntimeResolve`、`ScRuntimeQuery`。库清单明确ABI主版本1、次版本0、library version1，init为空，fini为不公开的 `Sc32Finalize`；公共函数一律cdecl。
+2026-10-15增量已随R1/SCCLIB统一构建、客体生成并实际执行，见[m10a2-stdlib](../evidence/m10a2-stdlib/README.md)。新增真实ScCallbackPin，原85入口保留，ABI1/minor1/library_version2、86 exports/6 ROOT imports，要求ROOT1.1/version2。回调只在自动应用运行/prepare期间固定实际主正文或READY/X模块，库和依赖闭包直到进程终止；不是对任意可读指针宣称CFI/NX。R3代码固定能力、Guard私有static回调与事件/model/cache回调已运行；不新增kernel gate。此前三窗口证据仍对应9bf6d8e的1.0/85入口版本。
+
+SC32API是Ring3代码，依赖只有 `SCLDR.SCL`，不导入SCCLIB/libc。六个真实导入为 `ScApplicationRuntime`、`ScRuntimeOpen`、`ScRuntimeClose`、`ScRuntimeResolve`、`ScRuntimeQuery`、`ScApplicationPinCallback`。当前清单ABI主版本1、次版本1、library version2，init为空，fini为不公开的 `Sc32Finalize`；公共函数一律cdecl。1.0历史五项导入保留其原含义。
 
 主编译输入是 `SC32API.C`，其源片段按桥、错误/验证、系统、进程、路径、身份/会话/主题/库、文件职责分开。宿主编译须明确32位C（大写`.C`不能被驱动程序误当C++），客体由SCCC `--scl`加同一清单生成。这里只记录接线输入；具体命令、产物摘要和真实编译/执行另由主代理记录。
 
@@ -150,3 +152,6 @@ GUI100..1ff、FILE200..2ff、clipboard300、IPC400、shared500分别为私有ope
 2026-10-14：保留原基础入口，在同库接入20个真实GUI过程/消息桥、公共SC32GUI.H、manifest与静默GUI fini；详细生命周期和未验证出口见SC32-GUI-USER.md。
 
 2026-10-15：主代理统一构建、实际客体生成的库/公开应用与三窗口P0运行通过；首Shell背景表一页单列，暖PF及GUI池精确恢复，证据见evidence/m10a2-sc32；完整平台继续。
+
+
+修订：2026-10-15，统一stdlib-build-06及guest02/04/05实际SCCLIB/SCLIB/R1/C1..C5、九模式/当前G1/253项通用工作流与精确回收通过；保留三项验证失败、未变输入复用与证据边界，见evidence/m10a2-stdlib，完整目标继续。

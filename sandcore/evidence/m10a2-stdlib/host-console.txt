@@ -1,0 +1,273 @@
+SandShell M9
+SYSTEM /SYS [SYSTEM] # true; _m9_status=$?; printf "\n"; echo __M9_007c2d3240720c7b5a027f4e:$_m9_status
+
+__M9_007c2d3240720c7b5a027f4e:0
+SYSTEM /SYS [SYSTEM] # ls /HOME/M10STD/HOST; _m9_status=$?; printf "\n"; echo __M9_a78a2fa1208602f3460e1072:$_m9_status
+STDLIBGUARD.SCL
+STDLIBPROBE.SCX
+
+__M9_a78a2fa1208602f3460e1072:0
+SYSTEM /SYS [SYSTEM] # echo STDLIB_BG_WARM & wait; _m9_status=$?; printf "\n"; echo __M9_bfc56fca1e781e1906dc0fd3:$_m9_status
+STDLIB_BG_WARM
+
+__M9_bfc56fca1e781e1906dc0fd3:0
+SYSTEM /SYS [SYSTEM] # printf warm > /HOME/M10STD/WARM.DAT; cat /HOME/M10STD/WARM.DAT; _m9_status=$?; printf "\n"; echo __M9_5bbf783a8950d5e632004d6c:$_m9_status
+warm
+__M9_5bbf783a8950d5e632004d6c:0
+SYSTEM /SYS [SYSTEM] # mkdir -p /TMP/STD-2e05f4/SHARED; _m9_status=$?; printf "\n"; echo __M9_a73ed779f9a1b5f3b26f9b07:$_m9_status
+
+__M9_a73ed779f9a1b5f3b26f9b07:0
+SYSTEM /SYS [SYSTEM] # /TMP/STD-2e05f4/SCCC0.SCX /TMP/STD-2e05f4/SHARERUN.C /TMP/STD-2e05f4/SHARED/SHARERUN.SCX --dynamic /TMP/STD-2e05f4/SHARERUN.json; _m9_status=$?; printf "\n"; echo __M9_db6a0f4925c22cdafcdfbe80:$_m9_status
+SCCC / mio
+TMP/STD-2e05f4/SHARERUN.C -> TMP/STD-2e05f4/SHARED/SHARERUN.SCX
+Validating application manifest
+SCCC: preprocess -> C -> x86
+Preprocessing source and includes
+Parsing C and generating x86
+Linking and writing SCX
+SCCC OK SCX DYNAMIC
+Compilation complete
+
+__M9_db6a0f4925c22cdafcdfbe80:0
+SYSTEM /SYS [SYSTEM] # /TMP/STD-2e05f4/SHARED/SHARERUN.SCX /HOME/M10STD/HOST/STDLIBPROBE.SCX > /HOME/M10STD/SHARED.OUT; _m9_status=$?; printf "\n"; echo __M9_46781a86615bb07d4ca2c25c:$_m9_status
+
+__M9_46781a86615bb07d4ca2c25c:0
+SYSTEM /SYS [SYSTEM] # (read line; printf '%s\n' "$line") | /HOME/M10STD/HOST/STDLIBPROBE.SCX pipe; echo __M9_ff422dc7b1a77be243df0c41:$?
+STDLIB_INPUT_READY pipe
+STDLIB PASS input-line-after-wait
+STDLIB PASS input-real-writer-eof
+STDLIB_PIPE_PASS failures=0
+__M9_ff422dc7b1a77be243df0c41:0
+SYSTEM /SYS [SYSTEM] # /HOME/M10STD/HOST/STDLIBPROBE.SCX tty; echo __M9_60f54b1ee151c6b82a1fba95:$?
+STDLIB_INPUT_READY tty
+STDLIB PASS input-line-after-wait
+STDLIB_TTY_PASS failures=0
+__M9_60f54b1ee151c6b82a1fba95:0
+SYSTEM /SYS [SYSTEM] # mkdir -p /HOME/M10STD/NATIVE; _m9_status=$?; printf "\n"; echo __M9_09211a49f025b39fe20c7f55:$_m9_status
+
+__M9_09211a49f025b39fe20c7f55:0
+SYSTEM /SYS [SYSTEM] # cp /HOME/M10STD/HOST/STDLIBGUARD.SCL /HOME/M10STD/NATIVE/STDLIBGUARD.SCL; _m9_status=$?; printf "\n"; echo __M9_7e63d7ca5b5911025ff55a76:$_m9_status
+
+__M9_7e63d7ca5b5911025ff55a76:0
+SYSTEM /SYS [SYSTEM] # /TMP/STD-2e05f4/SCCC0.SCX /TMP/STD-2e05f4/STDLIBPROBE.C /HOME/M10STD/NATIVE/STDLIBPROBE.SCX --dynamic /TMP/STD-2e05f4/STDLIBPROBE.json; _m9_status=$?; printf "\n"; echo __M9_07dbc40802b8ae81dc8a3956:$_m9_status
+SCCC / mio
+TMP/STD-2e05f4/STDLIBPROBE.C -> HOME/M10STD/NATIVE/STDLIBPROBE.SCX
+Validating application manifest
+SCCC: preprocess -> C -> x86
+Preprocessing source and includes
+Parsing C and generating x86
+Linking and writing SCX
+SCCC OK SCX DYNAMIC
+Compilation complete
+
+__M9_07dbc40802b8ae81dc8a3956:0
+SYSTEM /SYS [SYSTEM] # /HOME/M10STD/NATIVE/STDLIBPROBE.SCX core; _m9_status=$?; printf "\n"; echo __M9_e12576966547e288b97b48fe:$_m9_status
+STDLIB PASS bool-full-scalar
+STDLIB PASS bool-storage
+STDLIB PASS offsetof-ice
+STDLIB PASS pointer-cv-null
+STDLIB PASS narrow-prototype
+STDLIB PASS external-bool-al
+STDLIB PASS varargs-copy-promotions-once
+STDLIB PASS assert-once
+STDLIB PASS allocator-align-isolation
+STDLIB PASS allocator-reuse
+STDLIB PASS allocator-adjacent-coalesce
+STDLIB PASS calloc-overflow
+STDLIB PASS calloc-reused-zero
+STDLIB PASS realloc-source
+STDLIB PASS realloc-failure-keeps-old
+STDLIB PASS realloc-shrink
+STDLIB PASS realloc-grow-prefix
+STDLIB PASS memmove-backward
+STDLIB PASS memmove-forward
+STDLIB PASS byte-memory
+STDLIB PASS strncpy-boundary
+STDLIB PASS strstr-periodic
+STDLIB PASS strstr-nonperiodic
+STDLIB PASS strstr-long-tail
+STDLIB PASS strtol-min-end-errno
+STDLIB PASS strto-bases
+STDLIB PASS strto-no-digit-prefix
+STDLIB PASS strtoul-overflow-scan
+STDLIB PASS strtoul-negative-modulo
+STDLIB PASS strto-invalid-base
+STDLIB PASS qsort-bsearch
+STDLIB PASS ctype-byte-eof
+STDLIB PASS format-integer-string-pointer
+STDLIB PASS snprintf-truncation-n
+STDLIB PASS snprintf-zero-capacity
+STDLIB PASS format-width-precision
+STDLIB PASS format-promoted-narrow
+STDLIB CORE VALUE -2147483648 text 0x00001234
+STDLIB_CORE_PASS failures=0
+
+__M9_e12576966547e288b97b48fe:0
+SYSTEM /SYS [SYSTEM] # mkdir -p /HOME/M10STD/GUARDN; _m9_status=$?; printf "\n"; echo __M9_e78a3c32c9edcf4360bf6ba2:$_m9_status
+
+__M9_e78a3c32c9edcf4360bf6ba2:0
+SYSTEM /SYS [SYSTEM] # /TMP/STD-2e05f4/SCCC0.SCX /TMP/STD-2e05f4/STDLIBGUARD.C /HOME/M10STD/GUARDN/STDLIBGUARD.SCL --scl /TMP/STD-2e05f4/STDLIBGUARD.json; _m9_status=$?; printf "\n"; echo __M9_84f8cbe5de43938bd1c3e026:$_m9_status
+SCCC / mio
+TMP/STD-2e05f4/STDLIBGUARD.C -> HOME/M10STD/GUARDN/STDLIBGUARD.SCL
+Validating SCL manifest
+SCCC: preprocess -> C -> x86
+Preprocessing source and includes
+Parsing C and generating x86
+Linking and writing SCL
+SCCC OK SCL NATIVE
+Compilation complete
+
+__M9_84f8cbe5de43938bd1c3e026:0
+SYSTEM /SYS [SYSTEM] # mkdir -p /TMP/STD-2e05f4/BUILT; _m9_status=$?; printf "\n"; echo __M9_9f708b9a5a03e075319a39c6:$_m9_status
+
+__M9_9f708b9a5a03e075319a39c6:0
+SYSTEM /SYS [SYSTEM] # /TMP/STD-2e05f4/SCCC0.SCX /TMP/STD-2e05f4/SRC/sccc.c /TMP/STD-2e05f4/BUILT/SCCC1.SCX; _m9_status=$?; printf "\n"; echo __M9_f5b6ff20a835a6b86279da0d:$_m9_status
+SCCC / mio
+TMP/STD-2e05f4/SRC/sccc.c -> TMP/STD-2e05f4/BUILT/SCCC1.SCX
+SCCC: preprocess -> C -> x86
+Preprocessing source and includes
+Parsing C and generating x86
+Linking and writing SCX
+SCCC OK load=234065 bss=3591864 / mio
+Compilation complete
+
+__M9_f5b6ff20a835a6b86279da0d:0
+SYSTEM /SYS [SYSTEM] # mkdir -p /HOME/M10STD/G1; _m9_status=$?; printf "\n"; echo __M9_c2a352fa7cd27cd26c8d7871:$_m9_status
+
+__M9_c2a352fa7cd27cd26c8d7871:0
+SYSTEM /SYS [SYSTEM] # cp /HOME/M10STD/HOST/STDLIBGUARD.SCL /HOME/M10STD/G1/STDLIBGUARD.SCL; _m9_status=$?; printf "\n"; echo __M9_52d9823899877540e812c46a:$_m9_status
+
+__M9_52d9823899877540e812c46a:0
+SYSTEM /SYS [SYSTEM] # /TMP/STD-2e05f4/BUILT/SCCC1.SCX /TMP/STD-2e05f4/STDLIBPROBE.C /HOME/M10STD/G1/STDLIBPROBE.SCX --dynamic /TMP/STD-2e05f4/STDLIBPROBE.json; _m9_status=$?; printf "\n"; echo __M9_70dd7c2e7784fdf946bc0987:$_m9_status
+SCCC / mio
+TMP/STD-2e05f4/STDLIBPROBE.C -> HOME/M10STD/G1/STDLIBPROBE.SCX
+Validating application manifest
+SCCC: preprocess -> C -> x86
+Preprocessing source and includes
+Parsing C and generating x86
+Linking and writing SCX
+SCCC OK SCX DYNAMIC
+Compilation complete
+
+__M9_70dd7c2e7784fdf946bc0987:0
+SYSTEM /SYS [SYSTEM] # /HOME/M10STD/G1/STDLIBPROBE.SCX core; _m9_status=$?; printf "\n"; echo __M9_12d8c29089dffe4a8dfa2d6a:$_m9_status
+STDLIB PASS bool-full-scalar
+STDLIB PASS bool-storage
+STDLIB PASS offsetof-ice
+STDLIB PASS pointer-cv-null
+STDLIB PASS narrow-prototype
+STDLIB PASS external-bool-al
+STDLIB PASS varargs-copy-promotions-once
+STDLIB PASS assert-once
+STDLIB PASS allocator-align-isolation
+STDLIB PASS allocator-reuse
+STDLIB PASS allocator-adjacent-coalesce
+STDLIB PASS calloc-overflow
+STDLIB PASS calloc-reused-zero
+STDLIB PASS realloc-source
+STDLIB PASS realloc-failure-keeps-old
+STDLIB PASS realloc-shrink
+STDLIB PASS realloc-grow-prefix
+STDLIB PASS memmove-backward
+STDLIB PASS memmove-forward
+STDLIB PASS byte-memory
+STDLIB PASS strncpy-boundary
+STDLIB PASS strstr-periodic
+STDLIB PASS strstr-nonperiodic
+STDLIB PASS strstr-long-tail
+STDLIB PASS strtol-min-end-errno
+STDLIB PASS strto-bases
+STDLIB PASS strto-no-digit-prefix
+STDLIB PASS strtoul-overflow-scan
+STDLIB PASS strtoul-negative-modulo
+STDLIB PASS strto-invalid-base
+STDLIB PASS qsort-bsearch
+STDLIB PASS ctype-byte-eof
+STDLIB PASS format-integer-string-pointer
+STDLIB PASS snprintf-truncation-n
+STDLIB PASS snprintf-zero-capacity
+STDLIB PASS format-width-precision
+STDLIB PASS format-promoted-narrow
+STDLIB CORE VALUE -2147483648 text 0x00001234
+STDLIB_CORE_PASS failures=0
+
+__M9_12d8c29089dffe4a8dfa2d6a:0
+SYSTEM /SYS [SYSTEM] # mkdir -p /HOME/M10A2UTIL; _m9_status=$?; printf "\n"; echo __M9_927c958266dd2304271163f7:$_m9_status
+
+__M9_927c958266dd2304271163f7:0
+SYSTEM /SYS [SYSTEM] # /TMP/STD-2e05f4/SCCC0.SCX /TMP/STD-2e05f4/UTILPROBE.C /HOME/M10A2UTIL/UTILPROBE.SCX --dynamic /TMP/STD-2e05f4/UTILPROBE.json; _m9_status=$?; printf "\n"; echo __M9_9b1d0f924bb0555fd613f045:$_m9_status
+SCCC / mio
+TMP/STD-2e05f4/UTILPROBE.C -> HOME/M10A2UTIL/UTILPROBE.SCX
+Validating application manifest
+SCCC: preprocess -> C -> x86
+Preprocessing source and includes
+Parsing C and generating x86
+Linking and writing SCX
+SCCC OK SCX DYNAMIC
+Compilation complete
+
+__M9_9b1d0f924bb0555fd613f045:0
+SYSTEM /SYS [SYSTEM] # cd /HOME/M10A2UTIL && /HOME/M10A2UTIL/UTILPROBE.SCX; _m9_status=$?; printf "\n"; echo __M9_71456469f18d5dda26ae4296:$_m9_status
+UTIL BEGIN v1
+UTIL containers drops=4/4/3
+UTIL text-path-config finished
+UTIL buffer-binary-file finished
+UTIL error-log finished
+UTIL events first=1 late=2 drop=3
+UTIL model notices=7 visited=4
+UTIL cache load=5 drop=5 oom=1
+UTIL PASS checks=253 heap=77 modules=50
+
+__M9_71456469f18d5dda26ae4296:0
+SYSTEM /HOME/M10A2UTIL [SYSTEM] # mkdir -p /TMP/STD-2e05f4/BUILT; _m9_status=$?; printf "\n"; echo __M9_873166030052852fa0405416:$_m9_status
+
+__M9_873166030052852fa0405416:0
+SYSTEM /HOME/M10A2UTIL [SYSTEM] # /TMP/STD-2e05f4/SCCC0.SCX /TMP/STD-2e05f4/SRC/runtime/SCLROOT.C /TMP/STD-2e05f4/BUILT/SCLDR.SCL --scl /TMP/STD-2e05f4/SRC/runtime/SCLROOT.json; _m9_status=$?; printf "\n"; echo __M9_536616d1b2796cdb19692b6c:$_m9_status
+SCCC / mio
+TMP/STD-2e05f4/SRC/runtime/SCLROOT.C -> TMP/STD-2e05f4/BUILT/SCLDR.SCL
+Validating SCL manifest
+SCCC: preprocess -> C -> x86
+Preprocessing source and includes
+Parsing C and generating x86
+Linking and writing SCL
+SCCC OK SCL NATIVE
+Compilation complete
+
+__M9_536616d1b2796cdb19692b6c:0
+SYSTEM /HOME/M10A2UTIL [SYSTEM] # /TMP/STD-2e05f4/SCCC0.SCX /TMP/STD-2e05f4/SRC/sc32/SC32API.C /TMP/STD-2e05f4/BUILT/SC32API.SCL --scl /TMP/STD-2e05f4/SRC/sc32/SC32API.json; _m9_status=$?; printf "\n"; echo __M9_584d91c1dfed501766b08379:$_m9_status
+SCCC / mio
+TMP/STD-2e05f4/SRC/sc32/SC32API.C -> TMP/STD-2e05f4/BUILT/SC32API.SCL
+Validating SCL manifest
+SCCC: preprocess -> C -> x86
+Preprocessing source and includes
+Parsing C and generating x86
+Linking and writing SCL
+SCCC OK SCL NATIVE
+Compilation complete
+
+__M9_584d91c1dfed501766b08379:0
+SYSTEM /HOME/M10A2UTIL [SYSTEM] # /TMP/STD-2e05f4/SCCC0.SCX /TMP/STD-2e05f4/SRC/stdlib/SCCLIB.C /TMP/STD-2e05f4/BUILT/SCCLIB.SCL --scl /TMP/STD-2e05f4/SRC/stdlib/SCCLIB.json; _m9_status=$?; printf "\n"; echo __M9_37c15d94a08e99f7aa74a46e:$_m9_status
+SCCC / mio
+TMP/STD-2e05f4/SRC/stdlib/SCCLIB.C -> TMP/STD-2e05f4/BUILT/SCCLIB.SCL
+Validating SCL manifest
+SCCC: preprocess -> C -> x86
+Preprocessing source and includes
+Parsing C and generating x86
+Linking and writing SCL
+SCCC OK SCL NATIVE
+Compilation complete
+
+__M9_37c15d94a08e99f7aa74a46e:0
+SYSTEM /HOME/M10A2UTIL [SYSTEM] # /TMP/STD-2e05f4/SCCC0.SCX /TMP/STD-2e05f4/SRC/sclib/SCLIB.C /TMP/STD-2e05f4/BUILT/SCLIB.SCL --scl /TMP/STD-2e05f4/SRC/sclib/SCLIB.json; _m9_status=$?; printf "\n"; echo __M9_6b9c4b1aa045089099358110:$_m9_status
+SCCC / mio
+TMP/STD-2e05f4/SRC/sclib/SCLIB.C -> TMP/STD-2e05f4/BUILT/SCLIB.SCL
+Validating SCL manifest
+SCCC: preprocess -> C -> x86
+Preprocessing source and includes
+Parsing C and generating x86
+Linking and writing SCL
+SCCC OK SCL NATIVE
+Compilation complete
+
+__M9_6b9c4b1aa045089099358110:0
+SYSTEM /HOME/M10A2UTIL [SYSTEM] # 

@@ -15,6 +15,7 @@
 #define C_USHORT 4
 #define C_INT 5
 #define C_UINT 6
+#define C_BOOL 7
 #define Q_UNSIGNED 1
 #define Q_CONST 2
 #define Q_VOLATILE 4
@@ -46,13 +47,18 @@ static int new_type(int kind,int size,int base,int count,int fields,int flags)
     t->fields=fields;
     t->flags=flags;
     aggregate_identity[i]=(kind==TY_STRUCT || kind==TY_UNION)?i:0;
+    qualifier_origin[i]=i;qualifier_next[i]=0;
     return i;
 }
 static int qualified(int type,int flags)
 {
     if((types[type].flags|flags)==types[type].flags) return type;
     Type *t=types+type;
+    int origin=qualifier_origin[type],wanted=t->flags|flags;
+    for(int variant=qualifier_next[origin];variant;variant=qualifier_next[variant])
+        if(types[variant].flags==wanted)return variant;
     int result=new_type(t->kind,t->size,t->base,t->count,t->fields,t->flags|flags);
+    qualifier_origin[result]=origin;qualifier_next[result]=qualifier_next[origin];qualifier_next[origin]=result;
     if(t->kind==TY_STRUCT || t->kind==TY_UNION)aggregate_identity[result]=aggregate_identity[type];
     return result;
 }
@@ -76,9 +82,9 @@ static int alignment(int type)
 static int promoted(int type)
 {
     Type *t=types+type;
-    if(t->kind==TY_ARRAY) return pointer_to(t->base);
+    if(t->kind==TY_ARRAY)return pointer_to(qualified(t->base,t->flags&(Q_CONST|Q_VOLATILE)));
     if(t->kind==TY_FUNC) return pointer_to(type);
-    if(t->kind==TY_CHAR || t->kind==TY_SHORT) return C_INT;
+    if(t->kind==TY_CHAR || t->kind==TY_SHORT || t->kind==TY_BOOL) return C_INT;
     return type;
 }
 static int find_symbol(int name,int tags)
@@ -195,7 +201,7 @@ static int enumeration(void)
 }
 static int declaration_spec(int *storage)
 {
-    int type=-1,flags=0,sign=0,short_flag=0,long_count=0,builtin=0;
+    int type=-1,flags=0,sign=0,short_flag=0,long_count=0,builtin=0,bool_spec=0;
     for(;;) {
         Tok *t=current_token();
         if(take_word("const")) flags|=Q_CONST;
@@ -218,6 +224,10 @@ static int declaration_spec(int *storage)
             builtin=1; }
         else if(take_word("char")) { type=C_CHAR;
             builtin=1; }
+        else if(take_word("_Bool")) {
+            if(type>=0 || builtin || bool_spec)fatal("_Bool cannot be combined with another base type");
+            type=C_BOOL;bool_spec=1;
+        }
         else if(take_word("void")) type=C_VOID;
         else if(take_word("struct")) type=aggregate(TY_STRUCT);
         else if(take_word("union")) type=aggregate(TY_UNION);
@@ -232,6 +242,8 @@ static int declaration_spec(int *storage)
     }
     if(type<0 && builtin) type=C_INT;
     if(type<0) return -1;
+    if(bool_spec && (type!=C_BOOL || sign || short_flag || long_count))
+        fatal("_Bool cannot have integer length or signedness qualifiers");
     if(short_flag) { if(type!=C_INT) fatal("short qualifier needs int");
         type=C_SHORT; }
     if(sign==1) {
@@ -320,8 +332,8 @@ static int declarator(int base,int *name,int abstract)
 static int type_ahead(void)
 {
     Tok *t=current_token();
-    const char *words[]={"void","char","short","int","long","unsigned","signed","struct","union","enum","const","volatile"};
-    for(int i=0;i<12;i++) if(word(t,words[i])) return 1;
+    const char *words[]={"void","char","short","int","long","unsigned","signed","struct","union","enum","const","volatile","_Bool"};
+    for(int i=0;i<13;i++) if(word(t,words[i])) return 1;
     int s=t->k==T_ID?find_symbol(t->v,0):0;
     return s && symbols[s].kind==S_TYPEDEF;
 }
@@ -336,7 +348,8 @@ static int binary(int op,int left,int right)
         if(op=='-' && types[a].kind==TY_PTR && types[b].kind==TY_PTR) type=C_INT;
     }
     if(type==C_INT && op!=T_EQ && op!=T_NE && op!=T_LE && op!=T_GE && op!='<' && op!='>' && op!=T_AND && op!=T_OR)
-        type=(types[a].flags|types[b].flags)&Q_UNSIGNED?C_UINT:C_INT;
+        type=(types[a].flags|((op==T_SHL || op==T_SHR)?0:types[b].flags))&Q_UNSIGNED?C_UINT:C_INT;
+    standard_bool_source(left);standard_bool_source(right);
     return node_new(N_BINARY,type,left,right,0,op);
 }
 static int primary(void)
@@ -361,18 +374,24 @@ static int primary(void)
         if(shared_output)scl_literal_new(at,bytes+1);
         n=node_new(N_STRING,array_of(C_CHAR,bytes+1),0,0,0,at);
     } else if(t->k==T_ID) {
+        n=standard_builtin();
+        if(n)goto postfix_value;
         int name=t->v,s=find_symbol(name,0);
         position++;
         if(!s && current_token()->k=='(') {
+            if(standard_undeclared(name))fatal("standard function needs its declared SDK header");
             int type=new_type(TY_FUNC,0,C_INT,-1,0,0);
             s=symbol_new(name,type,S_FUNCTION,0,0);
         }
         if(!s || symbols[s].kind==S_TYPEDEF) fatal("unknown identifier");
+        if(symbols[s].kind==S_FUNCTION){int root=standard_root_name(name);
+            if(root){root_adapter_used[root-1]=1;root_adapter_symbols[root-1]=s;}}
         if(symbols[s].kind==S_ENUM) n=constant((u32)symbols[s].value,C_INT);
         else n=node_new(N_SYMBOL,symbols[s].type,0,0,0,s);
     } else if(take('(')) { n=expression(1);
     need(')'); }
     else fatal("expression needs a value");
+postfix_value:
     for(;;) {
         if(take('[')) {
             int subscript=expression(1);
@@ -406,15 +425,20 @@ static int primary(void)
             int type=promoted(nodes[n].type);
             if(types[type].kind!=TY_PTR || types[types[type].base].kind!=TY_FUNC) fatal("call needs a function");
             type=types[type].base;
-            int args=0,argc=0;
+            int args=0,argc=0,parameter=types[type].fields;
             if(!take(')')) do {
                 int value=expression(2);
+                if(parameter){value=standard_value_conversion(parameters[parameter].type,value);
+                    parameter=parameters[parameter].next;}
+                else value=standard_default_conversion(value);
                 args=node_new(N_ARG,nodes[value].type,value,args,0,0);
                 argc++;
                 if(take(')')) break;
                 need(',');
             } while(1);
             if(types[type].count>=0 && ((!types[type].flags && argc!=types[type].count) || (types[type].flags && argc<types[type].count))) fatal("function argument count mismatch");
+            if(nodes[n].kind==N_SYMBOL){int root=standard_root_name(symbols[nodes[n].value].name);
+                if(root){root_adapter_used[root-1]=1;root_adapter_symbols[root-1]=nodes[n].value;}}
             n=node_new(N_CALL,types[type].base,n,args,0,argc);
         } else if(current_token()->k==T_INC || current_token()->k==T_DEC) {
             int delta=current_token()->k==T_INC?1:-1;
@@ -449,7 +473,9 @@ static int unary(void)
             int storage=0,name=0,type=declaration_spec(&storage);
             type=declarator(type,&name,1);
             need(')');
-            return node_new(N_CAST,type,unary(),0,0,0);
+            int value=unary();
+            if(types[type].kind==TY_BOOL)return standard_value_conversion(type,value);
+            return node_new(N_CAST,type,value,0,0,0);
         }
         position=saved;
     }
@@ -465,6 +491,8 @@ static int unary(void)
             if(!lvalue(a) || (types[nodes[a].type].flags&Q_CONST)) fatal("increment needs writable lvalue");
             return node_new(N_INC,nodes[a].type,a,0,0,op==T_INC?1:-1);
         }
+        standard_bool_source(a);
+        if(op!='!' && types[type].kind!=TY_INT)fatal("unary integer operator requires an integer");
         return node_new(N_UNARY,op=='!'?C_INT:type,a,0,0,op);
     }
     return primary();
@@ -488,13 +516,18 @@ static int expression(int minimum)
             int yes=expression(1);
             need(':');
             int no=expression(3);
-            int type=promoted(nodes[yes].type);
-            if(types[type].kind!=TY_PTR && (types[promoted(nodes[no].type)].flags&Q_UNSIGNED)) type=C_UINT;
+            standard_bool_source(left);
+            int type=standard_conditional_type(yes,no);
             left=node_new(N_COND,type,left,yes,no,0);
         } else {
             int assignment=p==2,right=expression(assignment?p:p+1);
             if(assignment) {
                 if(!lvalue(left) || (types[nodes[left].type].flags&Q_CONST) || types[nodes[left].type].kind==TY_ARRAY) fatal("assignment needs writable lvalue");
+                if(types[nodes[left].type].kind==TY_BOOL){
+                    if(op=='=')standard_bool_source(right);
+                    else if(types[promoted(nodes[right].type)].kind!=TY_INT)
+                        fatal("compound bool assignment requires an integer operand");
+                }
                 left=node_new(N_ASSIGN,nodes[left].type,left,right,0,op);
             } else if(op==',') left=node_new(N_COMMA,nodes[right].type,left,right,0,0);
             else left=binary(op,left,right);
@@ -566,6 +599,7 @@ static int initialize(int type,int symbol,int offset,int global)
     } else {
         if(t->kind==TY_ARRAY) fatal("array initializer needs braces or string");
         int value=expression(2);
+        if(t->kind==TY_BOOL)standard_bool_source(value);
         if(t->kind==TY_STRUCT || t->kind==TY_UNION){
             int source=nodes[value].type;
             if(types[source].kind!=t->kind || aggregate_identity[source]!=aggregate_identity[type])
@@ -679,6 +713,7 @@ static int statement(void)
     if(take_word("if")) {
         need('(');
         int test=expression(1);
+        standard_bool_source(test);
         need(')');
         int yes=statement(),no=0;
         if(take_word("else")) no=statement();
@@ -687,6 +722,7 @@ static int statement(void)
     if(take_word("while")) {
         need('(');
         int test=expression(1);
+        standard_bool_source(test);
         need(')');
         return node_new(N_WHILE,C_VOID,test,statement(),0,0);
     }
@@ -695,6 +731,7 @@ static int statement(void)
         if(!take_word("while")) fatal("do needs while");
         need('(');
         int test=expression(1);
+        standard_bool_source(test);
         need(')');
         need(';');
         return node_new(N_DO,C_VOID,test,body,0,0);
@@ -707,6 +744,7 @@ static int statement(void)
         else if(!take(';')) { init=node_new(N_EXPR,C_VOID,expression(1),0,0,0);
             need(';'); }
         if(!take(';')) { test=expression(1);
+            standard_bool_source(test);
             need(';'); }
         if(!take(')')) { step=expression(1);
             need(')'); }
@@ -719,6 +757,7 @@ static int statement(void)
     if(take_word("switch")) {
         need('(');
         int test=expression(1);
+        if(types[promoted(nodes[test].type)].kind!=TY_INT)fatal("switch requires an integer expression");
         need(')');
         int previous=switch_node;
         int n=node_new(N_SWITCH,C_VOID,test,0,0,0);
@@ -746,6 +785,7 @@ static int statement(void)
             need(';'); }
         int result=types[symbols[function_symbol].type].base;
         if((types[result].kind==TY_VOID && value) || (types[result].kind!=TY_VOID && !value)) fatal("return value disagrees with function type");
+        if(value && types[result].kind==TY_BOOL)standard_bool_source(value);
         return node_new(N_RETURN,result,value,0,0,0);
     }
     if(take_word("break")) { need(';');
@@ -770,6 +810,8 @@ static void compile_unit(void)
     type_count=0;
     symbol_count=param_count=node_count=1;
     position=0;
+    root_adapter_symbols[0]=root_adapter_symbols[1]=0;
+    root_adapter_used[0]=root_adapter_used[1]=0;
     new_type(TY_VOID,0,0,0,0,0);
     new_type(TY_CHAR,1,0,0,0,0);
     new_type(TY_CHAR,1,0,0,0,Q_UNSIGNED);
@@ -777,6 +819,8 @@ static void compile_unit(void)
     new_type(TY_SHORT,2,0,0,0,Q_UNSIGNED);
     new_type(TY_INT,4,0,0,0,0);
     new_type(TY_INT,4,0,0,0,Q_UNSIGNED);
+    /* bool占一个存储字节，但提升成int，cdecl仍占四字节参数槽。 */
+    new_type(TY_BOOL,1,0,0,0,0);
     /* 入口与最终 main 调用由后端 finish_image 统一生成，函数偏移从
      * 预留的 24 字节之后算起。绝对地址仍须等代码/数据布局确定后回填。 */
     code_used=shared_output?0:dynamic_output?64:24;
@@ -800,12 +844,16 @@ static void compile_unit(void)
                 int kind=types[type].kind==TY_FUNC?S_FUNCTION:S_GLOBAL;
                 if(s && symbols[s].kind!=kind) fatal("declaration kind conflicts with previous name");
                 if(!s) s=symbol_new(name,type,kind,0,0);
-                if(shared_output || dynamic_output)scl_declare(s,storage);
+                int root=kind==S_FUNCTION?standard_root_name(name):0;
+                if(root){standard_root_declaration(s,type,root);
+                    if(current_token()->k=='{')fatal("reserved root adapter cannot have a C body");}
+                if(shared_output || dynamic_output)scl_declare(s,root?D_STATIC:storage);
                 if(shared_output || dynamic_output)type=scl_declaration_type(symbols[s].type,type);
                 symbols[s].type=type;
                 if(kind==S_FUNCTION && current_token()->k=='{') {
                     if(symbols[s].defined) fatal("function is already defined");
                     function_symbol=s;
+                    function_name_literal=-1;function_name_bytes=0;
                     scope_depth=1;
                     local_bytes=0;
                     node_count=1;
@@ -835,4 +883,5 @@ static void compile_unit(void)
         if(!function_body) need(';');
         node_count=1;
     }
+    emit_standard_adapters();
 }

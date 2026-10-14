@@ -1,5 +1,7 @@
 # SCCC：原生 C 编译与系统内自编译 v0.2
 
+> **2026-10-15当前实际结果：** C1..C5标准头前置增量与R1私有控制点已统一构建；SCCC0生成当前G1（load234065B/BSS3591864B），该G1实际编译并运行标准库动态app。四份ROOT/SC32/SCCLIB/SCLIB客体库均已生成并实际执行；Bool仅AL、真实va游标、offsetof/unsigned和253项通用工作流通过。详见[m10a2-stdlib](../evidence/m10a2-stdlib/README.md)，不声明完整ISO C、FP/64或全版完成。
+
 > **2026-10-14实际客体更新：** M10a2 `--scl` 已在Windows双盘由SCCC0生成两库，再由其真实生成的G1重编同库；两代库字节相同且实际动态调用通过。旧SCX/SKM代表输出、失败保留及ROOTLESS路径修复定向通过。完整自举固定点、动态SCX自动启动和其它阶段尚待，详见SCCC-SCL.md§7和M10A2-IMPLEMENTATION；下方首次冻结数字保留为历史。
 
 > **2026-10-14 M10a2 新切片：** 已实现 `source output.SCL --scl manifest.json`，
@@ -249,3 +251,22 @@ IODENY使用32位MOV预置寄存器后执行outb %%al,%%dx，避免混淆MOV宽�
 修订：2026-10-14，新增严格四字段动态应用、SCD1/64B自动CRT和最终BSS回填，宏表容量基于真实自编译失败调整；完整启动运行证据由主开发接续。
 
 修订：2026-10-14，自动CRT等长加入8B参数垫片，使实际USER_TOP-16初始栈在CALL前保持16B对齐；成功返回恢复48B、参数立即数移至RVA32，失败分支和旧SCX不变。只刷新动态HOST/原生CLI/GUI生成与共同CRT检查，新1416B摘要2e70b1d0开头；旧自身产物仍仅对应修复前容量输入，详见SCX-DYNAMIC.md§7。
+
+## M10a2 标准库前置增量（2026-10-15，已实际执行）
+
+共同CLI/GUI后端新增 `s3c_std_parse.inc` / `s3c_std_emit.inc`，不建立另一套标准库编译器。固定实参按真实prototype转换，变参做整数提升和数组/函数衰减；兼容对象/void指针、增加直接所指CV和NULL常量，拒绝丢CV、多级指针不兼容、错函数签名及aggregate/void实参。条件表达式由两个分支建立共同类型，const聚合数组成员衰减仍保留元素CV。每个原类型最多三个CV变体的小链复用，32KiB索引计入真实BSS，不反复消耗4096类型槽。
+
+真正 `_Bool` 是1B对象，转换比较完整整数/指针非零，赋值/初始化/全局与数组字段/增减/返回一致；它提升为int并使用4B参数槽。i386外部bool返回只AL有效，调用后零扩展AL，不能把未定义的EAX高位当作真。旧TY编号与基础0..6保留，新kind/基本BOOL追加。
+
+`__builtin_va_start/arg/copy/end`操作真实ABI4游标：start验证本variadic定义最右S_PARAM并从EBP得到首unnamed槽；arg类型名只允许已支持的4B提升整数/指针并推进4；copy源与所有ap表达式一次求值；end使本游标失效。sizeof不执行ARG；char/short/bool/FP/64/aggregate请求明确拒绝。标准头中的宏没有自行猜栈。
+
+整数扫描在乘加前检查32位溢出、合法U/L/UL/LU后缀，LL/重复U等明确拒绝；#if保留unsigned类别，包括短路和两支条件的共同类型。普通/常量/预处理右移只由提升后的左类型决定符号，不受右操作数的unsigned影响。offsetof由真实完整聚合字段/常量数组成员布局返回ICE；__func__为本函数共享的静态const字串。
+
+Root私有 `__scl_root_run` / `__scl_root_unwind`有真实单独机器实体及F_REL，核对48B十二unsigned字段与精确cdecl原型，没有私有SCL imports。双栈/ESI/savedSP/16B调用与GCC naked合同一致，非法Unwind的UD2后自跳不返回；它们没有进入公开标准头，不是任意setjmp服务。规范见[SCL终止](SCL-TERMINATION-DESIGN.md)。
+
+实际能力宏为 `__SCCC_BOOL__`、`__SCCC_VA32__`、`__SCCC_OFFSETOF__`、`__SCCC_ROOTTERM__`、`__SCCC_FUNC__`。没有以局部能力宣称完整C99/C11，FP/64/聚合ABI边界保持。已知标准函数缺头明确拒绝。当前宿主真实前后端自编译输入260508B、tokens58316、code217510/data16553/fixes4844；客体生成G1 load234065/BSS3591864，仍在0x3d0000私有映像预算内并实际编译/运行标准app。SOURCE262144只余1636B，后续新源须测真实容量，不据这些数字宣称所有目标自举收敛。
+
+修订：2026-10-15，收齐真实prototype/Bool/stdarg/offsetof/unsigned常量及Root机器控制点增量；静态来源与SDK头接线，尚未构建或取得本批实际运行证据。
+
+
+修订：2026-10-15，统一stdlib-build-06及guest02/04/05实际SCCLIB/SCLIB/R1/C1..C5、九模式/当前G1/253项通用工作流与精确回收通过；保留三项验证失败、未变输入复用与证据边界，见evidence/m10a2-stdlib，完整目标继续。

@@ -1,10 +1,10 @@
 # SCL 应用根正常终止方案
 
-2026-10-15，**SandCore M10a2 — The Application Platform Era**。本文件只完成 R1 的源审阅、接口设计和交接，**尚未实现、构建或运行验证**。不修改当前统一构建 / GUI 验证所使用的 ROOT、编译器、内核、SCAPI.H 或其它规范；后续实施由 root 协调冻结点后开始。
+2026-10-15，**SandCore M10a2 — The Application Platform Era**。R1已统一构建、由客体SCCC生成57040B/12导出根库，并实际执行借用main缓冲的return37/exit38、init退出42、递归异常1及精确回收，见[实际证据](../evidence/m10a2-stdlib/README.md)。64B CRT、内核、冻结SCAPI.H与此前P0证据保留；本批不代表完整M10a2结束。
 
 合同来源为 [SCCLIB-DESIGN.md §10](SCCLIB-DESIGN.md#10-正常终止main-返回与异常)。本方案补足受控 continuation、借用栈缓冲、init 事务中 exit、callback 寿命和独立 runtime 的实际边界；不宣称公开 setjmp/signal 或完整 hosted C 已实现。
 
-## 1. 已核对的控制流
+## 1. 改动前控制流（历史分析）
 
 - `SCLROOT.C` 聚合格式校验、scldr、platform 和 application 源；根没有自己的 main、init/fini、外部 imports 或 dependencies。
 - `scl_application.c::ScApplicationStart` 当前建立 runtime、借入根、Open 依赖、Resolve 全部导入、回填应用，再直接调用 main；main 返回后直接 Destroy。尚无 prepare / atexit。
@@ -98,7 +98,7 @@ void __scl_root_unwind(ScRootJumpI386 *jump);
 2. landing PC 用 adapter 内 call/pop 加标签差计算，避免将固定宿主 VA 写入 SCL。jump 不提供给应用；内部地址按实际 ROOT 映像生成。
 3. ESI 暂存 jump（入口值已经保存），对齐 ESP 到16B后 call entry；entry 是 ROOT thunk，不是直接裸 main。当前 ROOT / 应用栈保持与既有 ABI 相同区域。
 4. entry 正常返回后，将 EAX 写入 status，reason=0、armed=0；不调用 C、不在应用栈新建清理帧，直接进入 landing。
-5. landing 用 jump.termination_top 切 ESP；有效顶端向下16B对齐，留12B垫片、push context、call finish，保证调用前16B对齐。ESI 持有 jump，finisher 按 cdecl 保留它。
+5. landing 始终以ESI=jump读取 termination_top / finish / context；有效顶端向下16B对齐，留12B垫片、push context、call finish，保证调用前16B对齐。finisher 按 cdecl 保留ESI，不能恢复入口SI后丢掉控制块。
 6. finisher 返回后保存其 EAX，不再引用库帧；ESP=caller_sp，pop EDI/ESI/EBX/EBP，ret 返回原 ROOT C caller。原 ROOT caller 此时才释放终止栈。
 
 未启用终止栈仅适用于普通 entry 已返回、没有 committed SCCLIB provider 的原清理路径；可用已保存 caller_sp 对齐建立 finisher 帧。显式 unwind 不允许用这个回退分支。
@@ -107,7 +107,7 @@ void __scl_root_unwind(ScRootJumpI386 *jump);
 
 ROOT ApplicationExit 先校验状态和真实 init invoke 边界，设置 jump.status 和退出来源，保持 armed=1；随后普通 cdecl 调用 unwind，jump 在 `[ESP+4]`。
 
-unwind 取得 jump 到 EDX，核对 armed=1 / termination_top 非0，设置 armed=0、reason=1，恢复 ROOT caller 的 BP/BX/SI/DI，并跳真实 landing_pc。**不沿 SCCLIB / init / main 帧 return，不先在旧应用栈运行 C finisher**。landing 按上述独立栈步骤继续。私有适配被错误调用时 UD2 / 明确异常终止，不能继续使用无效 continuation。
+unwind 取得 jump 到 EDX，核对 armed=1 / termination_top 非0，设置 armed=0、reason=1，先恢复 ROOT caller 的 BP/BX/DI，ESI=jump，并跳真实 landing_pc。ESI 在 landing / finisher 期间持续保存 jump，入口 SI 最后从 savedSP 的保存字恢复。**不沿 SCCLIB / init / main 帧 return，不先在旧应用栈运行 C finisher**。landing 按上述独立栈步骤继续。私有适配被错误调用时 UD2 / 明确异常终止，不能继续使用无效 continuation。
 
 SCCC 必须记录 builtin 的完整内存副作用、精确参数原型和无返回语义；不得按普通未定义 extern 生成 SCL imports。两个 helper 在 ROOT text 内有真实机器正文，internal call / landing 相对地址处理必须与 GCC 版本一致。GCC naked 函数只含 basic asm；不能使用输入约束要求编译器插入的隐藏 C 帧。
 
@@ -147,18 +147,23 @@ Init 返回错误是另一条路径：按原事务 checkpoint rollback，不执�
 
 ### 6.2 独立 runtime 边界
 
-ScRuntimeCreate 仍创建独立空图，不自动成为 process main、不拥有 exit continuation。自动应用 root 中再建独立图不能注册或借用当前进程终止 hook；它的宿主在没有库调用帧时正常 Close / Destroy。独立 ROOT 映像里的 application_runtime 也不会冒充 kernel 借入的唯一 root。
+ScRuntimeCreate 仍创建独立空图，不自动成为 process main、不拥有 exit continuation。自动应用 root 中再建独立图不能注册或借用当前进程终止 hook；它的宿主在没有库调用帧时正常 Close / Destroy。Start 用已有 SYS0x283、ECX=0 取得本人 cached bootinfo，精确核对本函数 entry 与全部8字段；不重新扫描应用或依赖。独立 ROOT 副本不能凭伪造自洽info冒充 kernel 固定自动根。
 
 新 SCCLIB 的正常进程终止 profile 要求自动 ROOT；无该上下文的 SCCLIB init 应明确失败并撤候选，不能让 exit 成功链接但跳过全部标准收尾。现有独立 loader / 无SCCLIB库的有效调用保持。未来若提供显式受控应用宿主，应增加正式 opt-in 运行入口；不由 Create 或旧忽略字段暗中安装进程终止能力。
 
 ## 7. 最小实施文件与必要证据
 
-ROOT owner 拟改 `user/runtime/SCLROOT.C`、`scl_application.c`、`scldr.c`、`SCLDR.H`、`SCLROOT.json`，新增私有 `scl_termination.c` 与 `SCLJUMPPRIVATE.H`（GCC naked 分支可在同一私有源）；同步 SCLDR / SCL / 当前实施规范由 root 协调。ScRuntime 私有 current_invoking / hook字段不扩公开结构。
+ROOT owner 修改 `user/runtime/SCLROOT.C`、`scl_application.c`、`scldr.c`、`SCLDR.H`、`SCLROOT.json`，新增私有 `scl_termination.c` 与 `SCLJUMPPRIVATE.H`，GCC naked 分支在同一私有源；同步 SCL / 本规范，当前实施与构建接线由root协调。ScRuntime 私有 invoking / hook字段不扩公开结构。
 
-compiler owner 实现上述两个明确名称的 builtin 和真实能力宏 / emitter，在普通 SCLROOT 聚合源使用声明而不是公开 asm桥；root统一接构建依赖和 SDK。SCCLIB owner 只实现自身 prepare / fini / atexit / exit，依赖版本和三函数 imports，与根候选提交顺序一致。此文不是修改这些文件的当前授权冻结点；GUI VM仍使用已保存产物，开始实现前由root确认切换。
+compiler owner 实现上述两个明确名称的 intrinsic 和真实能力宏 `__SCCC_ROOTTERM__` / emitter，私有声明在 SCLJUMPPRIVATE.H，缺能力的SCCC编ROOT明确#error；root统一接构建依赖和 SDK。SCCLIB owner 只实现自身 prepare / fini / atexit / exit，依赖版本和三函数 imports，与根候选提交顺序一致。实现收齐后统一构建和定向验证，不能把源码状态当作P0历史产物的新证据。
 
 后续一组定向程序即可核对 main return / explicit exit / 后续 init exit / 递归exit安全失败、atexit一次/LIFO/动态callback pin、fini继续写stdio和借用 main 自动 setvbuf 缓冲，读取真实文件与128KiB页归还。GCC / 客体 SCCC 用同私有adapter合同生成执行，旧九导出和旧 SCAPI摘要保持；不扩大全矩阵、重复整盘或以设计当PASS。
 
 ## 修订
 
 2026-10-15：只读核对 ROOT / loader / platform / CRT / SYS_EXIT，提出原九exports兼容、三个新增接口、48B私有双栈runner、init逃逸与callback pin、stdio/allocator收尾和独立runtime边界；设计未实现，等待GUI验证冻结点后再实施。
+
+2026-10-15：P0检查点保存后收齐实际ROOT双栈adapter与C生命周期、init/回滚hook、静态callback pin及cached根身份核对；原9exports只增3，CRT/SCAPI保持，ROOT源码静态收齐，未构建或客体验证R1。
+
+
+修订：2026-10-15，统一stdlib-build-06及guest02/04/05实际SCCLIB/SCLIB/R1/C1..C5、九模式/当前G1/253项通用工作流与精确回收通过；保留三项验证失败、未变输入复用与证据边界，见evidence/m10a2-stdlib，完整目标继续。

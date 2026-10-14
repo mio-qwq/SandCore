@@ -1,0 +1,1934 @@
+{
+  "status": "FAIL_OR_INTERRUPTED",
+  "scope": "SCCLIB_C1_C5_R1_DIRECTED_WINDOWS_GUEST",
+  "cases": [
+    {
+      "name": "warm-parent-Shell-command-cache",
+      "command": "true",
+      "expected_exit": 0,
+      "exit_code": 0,
+      "output": "true; _m9_status=$?; printf \"\\n\"; echo __M9_3c93f1a1242ba4be8d7d7100:$_m9_status\n",
+      "stdout_path": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-stdlib-guest-03\\case-000.stdout.bin",
+      "stdout_sha256": "73202ed5ffe07f5445b2fb5c35e845bffe050df0e53585212f92c65aaaef31d2",
+      "stdout_bytes": 81,
+      "wall_seconds": 0.6410000000032596,
+      "qemu_cpu_seconds": 0.625,
+      "status": "PASS"
+    },
+    {
+      "name": "warm-existing-task-history",
+      "command": "ls /HOME/M10STD/HOST",
+      "expected_exit": 0,
+      "exit_code": 0,
+      "output": "ls /HOME/M10STD/HOST; _m9_status=$?; printf \"\\n\"; echo __M9_b847838e148e35d2e3bcc376:$_m9_status\nSTDLIBGUARD.SCL\nSTDLIBPROBE.SCX\n",
+      "stdout_path": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-stdlib-guest-03\\case-001.stdout.bin",
+      "stdout_sha256": "036275509a57897a24e9a41ef21f778d6ff68c3195ec7e9ae3b54fc539ea11fe",
+      "stdout_bytes": 129,
+      "wall_seconds": 0.17199999999866122,
+      "qemu_cpu_seconds": 0.203125,
+      "status": "PASS"
+    },
+    {
+      "name": "warm-parent-Shell-background-table",
+      "command": "echo STDLIB_BG_WARM & wait",
+      "expected_exit": 0,
+      "exit_code": 0,
+      "output": "echo STDLIB_BG_WARM & wait; _m9_status=$?; printf \"\\n\"; echo __M9_43a8679828adf05061866183:$_m9_status\nSTDLIB_BG_WARM\n",
+      "stdout_path": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-stdlib-guest-03\\case-002.stdout.bin",
+      "stdout_sha256": "1a55c9aae8208ef6af108e6bbe323d5458c9872e265df241d850901285af9cf3",
+      "stdout_bytes": 118,
+      "wall_seconds": 0.18800000000192085,
+      "qemu_cpu_seconds": 0.21875,
+      "status": "PASS"
+    },
+    {
+      "name": "warm-existing-path-I/O",
+      "command": "printf warm > /HOME/M10STD/WARM.DAT; cat /HOME/M10STD/WARM.DAT",
+      "expected_exit": 0,
+      "exit_code": 0,
+      "output": "printf warm > /HOME/M10STD/WARM.DAT; cat /HOME/M10STD/WARM.DAT; _m9_status=$?; printf \"\\n\"; echo __M9_f223a58076fb613b765c3ace:$_m9_status\nwarm",
+      "stdout_path": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-stdlib-guest-03\\case-003.stdout.bin",
+      "stdout_sha256": "0e0f33919c0f2094f2809d2f367b81b6ab23714d3dd7c3d9f312c5fc30bd976e",
+      "stdout_bytes": 143,
+      "wall_seconds": 0.3289999999979045,
+      "qemu_cpu_seconds": 0.390625,
+      "status": "PASS"
+    },
+    {
+      "name": "warm-existing-async-desktop-resources",
+      "source": "kernel/desktop.c::desktop_poll/desktop_wallpaper; current desktop owns scaled_background",
+      "before_physical_pages": 6965,
+      "after_physical_pages": 8990,
+      "physical_delta": 2025,
+      "before_desktop": {
+        "state_pointer": 10383360,
+        "native_backbuffer": 14106624,
+        "width": 1920,
+        "height": 1080,
+        "pending_images": 0,
+        "pages": 3818,
+        "map_width": 1920,
+        "map_height": 1080,
+        "needs_flush": 0,
+        "attempted": 1,
+        "error": 0,
+        "background_reader_phase": 0,
+        "background": {
+          "pixels": 22806528,
+          "width": 1672,
+          "height": 941,
+          "pages": 1537
+        },
+        "scaled_background": {
+          "pixels": 30625792,
+          "width": 1920,
+          "height": 1080,
+          "pages": 2025
+        }
+      },
+      "after_desktop": {
+        "state_pointer": 10383360,
+        "native_backbuffer": 14106624,
+        "width": 1920,
+        "height": 1080,
+        "pending_images": 0,
+        "pages": 3818,
+        "map_width": 1920,
+        "map_height": 1080,
+        "needs_flush": 0,
+        "attempted": 1,
+        "error": 0,
+        "background_reader_phase": 0,
+        "background": {
+          "pixels": 22806528,
+          "width": 1672,
+          "height": 941,
+          "pages": 1537
+        },
+        "scaled_background": {
+          "pixels": 30625792,
+          "width": 1920,
+          "height": 1080,
+          "pages": 2025
+        }
+      },
+      "observations": [
+        {
+          "seconds": 0.1559999999954016,
+          "state_pointer": 10383360,
+          "native_backbuffer": 14106624,
+          "width": 1920,
+          "height": 1080,
+          "pending_images": 0,
+          "pages": 3818,
+          "map_width": 1920,
+          "map_height": 1080,
+          "needs_flush": 0,
+          "attempted": 1,
+          "error": 0,
+          "background_reader_phase": 0,
+          "background": {
+            "pixels": 22806528,
+            "width": 1672,
+            "height": 941,
+            "pages": 1537
+          },
+          "scaled_background": {
+            "pixels": 30625792,
+            "width": 1920,
+            "height": 1080,
+            "pages": 2025
+          }
+        }
+      ],
+      "before_observations": [
+        6965,
+        6965,
+        6965,
+        6965,
+        6965
+      ],
+      "after_observations": [
+        8990,
+        8990,
+        8990,
+        8990,
+        8990
+      ],
+      "wall_seconds": 0.48399999999674037,
+      "complete_existing_desktop_resources": true,
+      "layout": {
+        "state_bytes": 32660,
+        "background_offset": 24680,
+        "scaled_background_offset": 24696,
+        "background_reader_phase_offset": 24800,
+        "pages_offset": 32560,
+        "map_offset": 32572
+      },
+      "desktop_owned_page_delta": 0,
+      "attributed_all_delta": false,
+      "status": "PASS"
+    },
+    {
+      "name": "shared-runner-output-directory",
+      "command": "mkdir -p /TMP/STD-f3f365/SHARED",
+      "expected_exit": 0,
+      "exit_code": 0,
+      "output": "mkdir -p /TMP/STD-f3f365/SHARED; _m9_status=$?; printf \"\\n\"; echo __M9_deee0066dd6b02daf53b6d7e:$_m9_status\n",
+      "stdout_path": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-stdlib-guest-03\\case-005.stdout.bin",
+      "stdout_sha256": "5c32d0ed51a495d360e10ebf0d311b41bebef4a69973f0bc227a0968a470fae3",
+      "stdout_bytes": 108,
+      "wall_seconds": 0.20299999999406282,
+      "qemu_cpu_seconds": 0.15625,
+      "status": "PASS"
+    },
+    {
+      "name": "guest-SCCC-shared-STD-runner",
+      "command": "/TMP/STD-f3f365/SCCC0.SCX /TMP/STD-f3f365/SHARERUN.C /TMP/STD-f3f365/SHARED/SHARERUN.SCX --dynamic /TMP/STD-f3f365/SHARERUN.json",
+      "expected_exit": 0,
+      "exit_code": 0,
+      "output": "/TMP/STD-f3f365/SCCC0.SCX /TMP/STD-f3f365/SHARERUN.C /TMP/STD-f3f365/SHARED/SHARERUN.SCX --dynamic /TMP/STD-f3f365/SHARERUN.json; _m9_status=$?; printf \"\\n\"; echo __M9_af37a5b5baf2f5d70cc0cf19:$_m9_status\nSCCC / mio\nTMP/STD-f3f365/SHARERUN.C -> TMP/STD-f3f365/SHARED/SHARERUN.SCX\nValidating application manifest\nSCCC: preprocess -> C -> x86\nPreprocessing source and includes\nParsing C and generating x86\nLinking and writing SCX\nSCCC OK SCX DYNAMIC\nCompilation complete\n",
+      "stdout_path": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-stdlib-guest-03\\case-006.stdout.bin",
+      "stdout_sha256": "2a6b74cb64a7baf348305ffaab46e6b876c0a5671ae43e090c17865b15d95ae7",
+      "stdout_bytes": 469,
+      "wall_seconds": 0.6869999999980791,
+      "qemu_cpu_seconds": 0.71875,
+      "status": "PASS",
+      "generated_sha256": "0bb85fe65f482c35c3018030ab6bfd4d26c4d4efe69aafb3e3eff258076e1826",
+      "generated_bytes": 1604,
+      "generated_path": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-stdlib-guest-03\\SHARERUN.SCX",
+      "guest_target": "/TMP/STD-f3f365/SHARED/SHARERUN.SCX",
+      "guest_sccc_compiled": true,
+      "executed_this_generated_file": false,
+      "format_contract": {
+        "format": "SCD1MIO",
+        "imports": 5,
+        "dependencies": 1,
+        "exports": 0,
+        "contract_exact": true
+      },
+      "compiler_sha256": "d574f1faf6ece7ac85f7f9ce3dae8af04d90dd1666109c7dad83b7e72065b422"
+    },
+    {
+      "name": "guest-SCCC-shared-STD-runner-output",
+      "guest": "/TMP/STD-f3f365/SHARED/SHARERUN.SCX",
+      "path": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-stdlib-guest-03\\SHARERUN.SCX",
+      "bytes": 1604,
+      "sha256": "0bb85fe65f482c35c3018030ab6bfd4d26c4d4efe69aafb3e3eff258076e1826",
+      "generation": 665,
+      "wall_seconds": 0.10899999999674037,
+      "qemu_cpu_seconds": 0.03125,
+      "status": "PASS"
+    },
+    {
+      "name": "guest-SCCC-shared-STD-runner-format-contract",
+      "format": "SCD1MIO",
+      "imports": 5,
+      "dependencies": 1,
+      "exports": 0,
+      "contract_exact": true,
+      "generated_sha256": "0bb85fe65f482c35c3018030ab6bfd4d26c4d4efe69aafb3e3eff258076e1826",
+      "status": "PASS"
+    },
+    {
+      "name": "guest-SCCC-shared-STD-runner-log",
+      "guest": "/TMP/STD-f3f365/SHARED/SHARERUN.SCX.log",
+      "path": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-stdlib-guest-03\\file-guest-SCCC-shared-STD-runner-log",
+      "bytes": 20,
+      "sha256": "76f8bfd932a0325450d43f49241a7f0bd43a17c44b9635a626a5af81148f88a4",
+      "generation": 666,
+      "wall_seconds": 0.06199999999807915,
+      "qemu_cpu_seconds": 0.015625,
+      "expected_bytes": 20,
+      "expected_sha256": "76f8bfd932a0325450d43f49241a7f0bd43a17c44b9635a626a5af81148f88a4",
+      "expected_hex": "53434343204f4b205343582044594e414d49430a",
+      "status": "PASS"
+    },
+    {
+      "name": "guest-SCCC-shared-STD-runner-map",
+      "guest": "/TMP/STD-f3f365/SHARED/SHARERUN.SCX.map",
+      "path": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-stdlib-guest-03\\file-guest-SCCC-shared-STD-runner-map",
+      "bytes": 242,
+      "sha256": "64a9cc218eb3ab149cbed24dc171e48f17ec87175f864c789ac94b2628a8f56a",
+      "generation": 664,
+      "wall_seconds": 0.06300000000192085,
+      "qemu_cpu_seconds": 0.0,
+      "status": "PASS"
+    },
+    {
+      "name": "host-libraries-host-caller-core",
+      "status": "REUSED_PASS",
+      "command": "/HOME/M10STD/HOST/STDLIBPROBE.SCX core",
+      "source_report": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-stdlib-guest-02\\stdlib.json",
+      "source_case": "host-libraries-host-caller-core",
+      "source_report_sha256": "7eaba43bd48d7b72bcb9ba0ace4fd9c631af44c681d674951802898bbd31cbd9",
+      "exit_code": 0,
+      "executed_in_this_vm": false,
+      "source_physical_delta": 0,
+      "unchanged_executable_library_core_and_source_inputs": true
+    },
+    {
+      "name": "host-libraries-host-caller-stdio-six-modes",
+      "status": "REUSED_PASS",
+      "command": "/HOME/M10STD/HOST/STDLIBPROBE.SCX stdio",
+      "source_report": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-stdlib-guest-02\\stdlib.json",
+      "source_case": "host-libraries-host-caller-stdio-six-modes",
+      "source_report_sha256": "7eaba43bd48d7b72bcb9ba0ace4fd9c631af44c681d674951802898bbd31cbd9",
+      "exit_code": 0,
+      "executed_in_this_vm": false,
+      "source_physical_delta": 0,
+      "unchanged_executable_library_core_and_source_inputs": true
+    },
+    {
+      "name": "host-libraries-host-caller-lifecycle-return",
+      "status": "REUSED_PASS",
+      "command": "/HOME/M10STD/HOST/STDLIBPROBE.SCX return",
+      "source_report": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-stdlib-guest-02\\stdlib.json",
+      "source_case": "host-libraries-host-caller-lifecycle-return",
+      "source_report_sha256": "7eaba43bd48d7b72bcb9ba0ace4fd9c631af44c681d674951802898bbd31cbd9",
+      "exit_code": 37,
+      "executed_in_this_vm": false,
+      "source_physical_delta": 0,
+      "unchanged_executable_library_core_and_source_inputs": true
+    },
+    {
+      "name": "host-libraries-host-caller-lifecycle-exit",
+      "status": "REUSED_PASS",
+      "command": "/HOME/M10STD/HOST/STDLIBPROBE.SCX exit",
+      "source_report": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-stdlib-guest-02\\stdlib.json",
+      "source_case": "host-libraries-host-caller-lifecycle-exit",
+      "source_report_sha256": "7eaba43bd48d7b72bcb9ba0ace4fd9c631af44c681d674951802898bbd31cbd9",
+      "exit_code": 38,
+      "executed_in_this_vm": false,
+      "source_physical_delta": 0,
+      "unchanged_executable_library_core_and_source_inputs": true
+    },
+    {
+      "name": "host-libraries-host-caller-exit-during-guard-init",
+      "status": "REUSED_PASS",
+      "command": "/HOME/M10STD/HOST/STDLIBPROBE.SCX init-exit",
+      "source_report": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-stdlib-guest-02\\stdlib.json",
+      "source_case": "host-libraries-host-caller-exit-during-guard-init",
+      "source_report_sha256": "7eaba43bd48d7b72bcb9ba0ace4fd9c631af44c681d674951802898bbd31cbd9",
+      "exit_code": 42,
+      "executed_in_this_vm": false,
+      "source_physical_delta": 0,
+      "unchanged_executable_library_core_and_source_inputs": true
+    },
+    {
+      "name": "host-libraries-host-caller-recursive-exit-is-abnormal",
+      "status": "REUSED_PASS",
+      "command": "/HOME/M10STD/HOST/STDLIBPROBE.SCX recursive",
+      "source_report": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-stdlib-guest-02\\stdlib.json",
+      "source_case": "host-libraries-host-caller-recursive-exit-is-abnormal",
+      "source_report_sha256": "7eaba43bd48d7b72bcb9ba0ace4fd9c631af44c681d674951802898bbd31cbd9",
+      "exit_code": 1,
+      "executed_in_this_vm": false,
+      "source_physical_delta": 0,
+      "unchanged_executable_library_core_and_source_inputs": true
+    },
+    {
+      "name": "host-libraries-host-caller-shared-standard-position",
+      "command": "/TMP/STD-f3f365/SHARED/SHARERUN.SCX /HOME/M10STD/HOST/STDLIBPROBE.SCX > /HOME/M10STD/SHARED.OUT",
+      "expected_exit": 0,
+      "before_physical_pages": 8990,
+      "before_observations": [
+        8990,
+        8990,
+        8990,
+        8990,
+        8990
+      ],
+      "resources_before": {
+        "records@00883fc0": {
+          "objects": 2,
+          "pages": 5,
+          "peak_pages": 5,
+          "high_water": 4
+        },
+        "view_pool@008a9520": {
+          "objects": 1,
+          "pages": 4,
+          "peak_pages": 4,
+          "high_water": 2
+        },
+        "window_pool@008a9980": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "capture_pool@008a9de0": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "native_pool@008aa760": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "transaction_pool@008aabc0": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 3,
+          "high_water": 2
+        },
+        "native_pool@008b3240": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "job_pool@008b36a0": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 3,
+          "high_water": 21
+        },
+        "pipe_pool@008b3b00": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "endpoint_pool@008b3f60": {
+          "objects": 1,
+          "pages": 6,
+          "peak_pages": 6,
+          "high_water": 3
+        },
+        "owners@008b9780": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "descriptions@008b9be0": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "handles@008ba040": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "owners@008ba4c0": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "owners@008c23e0": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "wait_pages": 0,
+        "dir_pages": 96,
+        "meta_pages": 96,
+        "allocation_pages": 16,
+        "space_pages": 8,
+        "cache_pages": 99,
+        "capture_pages": 0,
+        "desktop": {
+          "state_pointer": 10383360,
+          "native_backbuffer": 14106624,
+          "width": 1920,
+          "height": 1080,
+          "pending_images": 0,
+          "pages": 3818,
+          "map_width": 1920,
+          "map_height": 1080,
+          "needs_flush": 0,
+          "attempted": 1,
+          "error": 0,
+          "background_reader_phase": 0,
+          "background": {
+            "pixels": 22806528,
+            "width": 1672,
+            "height": 941,
+            "pages": 1537
+          },
+          "scaled_background": {
+            "pixels": 30625792,
+            "width": 1920,
+            "height": 1080,
+            "pages": 2025
+          }
+        }
+      },
+      "exit_code": 84,
+      "output": "/TMP/STD-f3f365/SHARED/SHARERUN.SCX /HOME/M10STD/HOST/STDLIBPROBE.SCX > /HOME/M10STD/SHARED.OUT; _m9_status=$?; printf \"\\n\"; echo __M9_9f160764918939eaefab34c8:$_m9_status\n",
+      "stdout_path": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-stdlib-guest-03\\case-017.stdout.bin",
+      "stdout_sha256": "4b2e7dae3f440d4d744803a9b28cd8a8e3bf78b5e6fc2e0048d0d345ed7d08f0",
+      "stdout_bytes": 172,
+      "wall_seconds": 0.7649999999994179,
+      "qemu_cpu_seconds": 0.796875,
+      "status": "FAIL"
+    }
+  ],
+  "installed_libraries": {
+    "SCLDR.SCL": {
+      "bytes": 19473,
+      "sha256": "9bfde2905763d4d30db173c67767504aefa3c9cbf223296894a3518a7f3d97e9",
+      "format_contract": {
+        "format": "SCL1MIO",
+        "imports": 0,
+        "dependencies": 0,
+        "exports": 12,
+        "contract_exact": true
+      },
+      "source": "HOST_GCC_BOOTSTRAP"
+    },
+    "SC32API.SCL": {
+      "bytes": 101745,
+      "sha256": "8304cfcf9abc1307a0018a942f6b47fcf15d31ad437ef9acf847678fdc053c4a",
+      "format_contract": {
+        "format": "SCL1MIO",
+        "imports": 6,
+        "dependencies": 1,
+        "exports": 86,
+        "contract_exact": true
+      },
+      "source": "HOST_GCC_BOOTSTRAP"
+    },
+    "SCCLIB.SCL": {
+      "bytes": 39256,
+      "sha256": "181d4b647e466d58bc0d0966a1b1253d36612d989ced5bf5c406204fe7c5619b",
+      "format_contract": {
+        "format": "SCL1MIO",
+        "imports": 19,
+        "dependencies": 2,
+        "exports": 94,
+        "contract_exact": true
+      },
+      "source": "HOST_GCC_BOOTSTRAP"
+    },
+    "SCLIB.SCL": {
+      "bytes": 87101,
+      "sha256": "691d506af1c1e01aeac5a93f622f91b1ac1da1ec4a153fb9859183452533988b",
+      "format_contract": {
+        "format": "SCL1MIO",
+        "imports": 30,
+        "dependencies": 2,
+        "exports": 163,
+        "contract_exact": true
+      },
+      "source": "HOST_GCC_BOOTSTRAP"
+    }
+  },
+  "native_install_provenance": null,
+  "input_sha256": {
+    "user/COMPILECLI.inc": "f2d0cf982365b0eab60ff60c48d5531fece70c2a70cf2bf235055bead3f9cb1e",
+    "user/SC32API.H": "71230e211b927c5f8a9ddde395b408528359dccdd9b89c30dd5b05b00b8a74fd",
+    "user/SC32GUI.H": "470cb56da856c79630c3621e5f765641db798456fcb0bd643e9fa615cbc051a6",
+    "user/SCAPI.H": "81a730450fcb3d310ed841ad3e5c70a3fed32aa7fbd10acac8b888ac7da9ffc1",
+    "user/SCIO.H": "f0843c3702fb2ab28276c2da0ac9f7f8139d705c8a043d67b7f5b343ed11a7dd",
+    "user/SCTYPES.H": "f705794dfb569a00241613b1e19b5bd0c8875fdd68e074c72c5fb9bbf6a690d2",
+    "user/guiapi/sc32_gui.c": "0e3f03da1b03dfaba328d71210285aa71f8b833c2bf78bfac182b0dd6b45c3ac",
+    "user/runtime/SCDYN.H": "9fe728833ddddf4e8b7a4a6a21e8b5abc787926e32e6b68127860a05e8e613b1",
+    "user/runtime/SCLDR.H": "0f9dd692e7a5b47a4299e17d4fe13295de2911cb0ceeb8b35e7187659805b9cb",
+    "user/runtime/SCLFMT.H": "f040266a9d13f513d4cc6ec7fe8ac43175287e2c484abd150607387043053611",
+    "user/runtime/SCLJUMPPRIVATE.H": "9bb40c3eecae85d6572050befaab48489f0d4cb5507b3bc04511ddf6018acbda",
+    "user/runtime/SCLPRIVATE.H": "ad1c41821883f884f569200030aafc68c7aa13f9f36a26e568a5a4295647a854",
+    "user/runtime/SCLROOT.C": "559e5ce155d4bb0477a3a3882ae6a91d9501441a4ac5398a23cf00f8cad96e50",
+    "user/runtime/SCLROOT.json": "2962252a9f62ed2e87abe9c15662fd5ce9b0b88e8ac955c11d26035553bda8be",
+    "user/runtime/scd_format.c": "952db60181b9eddb4b32da97509c2767e7fabfaba40f5423084690c47f01421d",
+    "user/runtime/scl_application.c": "412a933b833f87a48b2b48a45bf352a51edfa50047b608e45c8474c4306d0dd7",
+    "user/runtime/scl_format.c": "72910926be9da4ee90466945e4ac42a9ac2bacb2d83ff3e7cf51a6611894187f",
+    "user/runtime/scl_platform.c": "03120e218bc18ad94578bb1bfe61813627c44ee45a5462600e96fb2d00ece027",
+    "user/runtime/scl_termination.c": "374643a477728fd22d48d64dff23cc08864260fdb85c4b4b873cdc65b0f1b9f9",
+    "user/runtime/scldr.c": "8f79ec7c5d4ca436327a22b555aa77c8c3c85e047b5ffb0aaa9f22498a25c194",
+    "user/s3c.c": "3364c295698b1258112d9e5d6f51e28f30df24dfe1335019afd534a20199817e",
+    "user/s3c_emit.inc": "2b36fbd0a4dac11f71a71a04a4a71a72541c1a9b9e7de9ddd22d026559a0309b",
+    "user/s3c_lex.inc": "1819ce5af916c3dbf8e13e08b1824fe388b5ecf955d484b1d18b0ba239a7859b",
+    "user/s3c_parse.inc": "137075d91b5026f079ea7d41346539e5e699349560c66dd86a7413dfc7c439f7",
+    "user/s3c_pp.inc": "a23d5271b46dbbcbf68d83136915ad30e36eb7d2d782eadb11bcd569f467a892",
+    "user/s3c_scl.inc": "14b6066e184fc3c845f9402181cb1df309b62ffde091f98af298ac5145408a27",
+    "user/s3c_std_emit.inc": "df80ae20d631e76a7002a22cd265728f07ab656423824c19ff525e90067fda76",
+    "user/s3c_std_parse.inc": "af38d856fbe8ba13a8474835e9fcc9ccbfeda429c419a58bdbfbdd4923974c8d",
+    "user/sc32/SC32API.C": "6525470914798f58406c5a9904a530bb2871c5bf5e244c4254d9e17ac587d9c6",
+    "user/sc32/SC32API.json": "9b818ba94275076b5206cc234797927f407159cba95f3dcf407c88bcf8806e60",
+    "user/sc32/SC32FILEWIRE.H": "ee14d085aa5c3adb0c3283eceff11fa33e94effb14f24b803184670cd8df5655",
+    "user/sc32/SC32GUIWIRE.H": "9b6b2a979778d323ec5a81546aa1ba98ee3e6fb0ac9e4a5e1875d049aea8f046",
+    "user/sc32/SC32PRIVATE.H": "1f8cd9c6da8e0f7fa0561df1196bd444c0c531457778662c526e87d37a8288a9",
+    "user/sc32/SC32WIRE.H": "8b327411c06e252c0fb814d9428b74a955ac549cedc4dc21355f96f4e56a602b",
+    "user/sc32/sc32_bridge.c": "e648e160907499e1a805ea75da5044fd9f2f32006e5b2aecf2e4bf92c1b6fa49",
+    "user/sc32/sc32_file.c": "01426109d22d722b699924eff57f01f30fe07ad1b31854db351c278fa21c2072",
+    "user/sc32/sc32_objects.c": "f4c191c9b46231c13e193bff4f34e7653810239995f2321ac6977ebcb008a7f2",
+    "user/sc32/sc32_path.c": "8741700f63b22121181e8c26791df46b0d2b3636d35f5f4ae70616120656d2bf",
+    "user/sc32/sc32_process.c": "53aee91d0dce998bcc3dbeb76fbb294b04b136971923405ae37db9e4de89ee34",
+    "user/sc32/sc32_support.c": "faa7b3df51e0b0dd4ae7334a416dc30769aa09a5f9e2c0ac2b175dab533bdd18",
+    "user/sc32/sc32_system.c": "6974edfc77f1b07a6bc7f318940e879005d3720945d93333f3bc498895eb3ab2",
+    "user/sccc.c": "57b0b9bd0a607fc4b4c5d87b6c2af0c952b8675d6f282c02c1e3545aca013ae1",
+    "user/sclib/SCLIB.C": "fad6170d093519c5d89dace7064223895419a6d7c9bf5bf83ebe269ee781f31f",
+    "user/sclib/SCLIB.H": "a6c3cc3946fb690e1384b4462aa710d3e872697fa390e6c3be2123423434243d",
+    "user/sclib/SCLIB.json": "5d52279d4324a2f6a139300c3ad9b3a828a0a5fbce52e90ffbab033c566275c1",
+    "user/sclib/SCLIBPRIVATE.H": "bff13c82d844bb8a33a2041d929d18ba305d744fa2bda9a8b55c2a503061f068",
+    "user/sclib/sclib_array.c": "db39aec9ae0dc380e894c1b3e6cfa7d2fb921d662f6536d01e91ecc816be416a",
+    "user/sclib/sclib_base.c": "6a6c1c1c4cab263db2dbc5ffaa6be0044db7c911d194d63072900e25c30cc484",
+    "user/sclib/sclib_binary.c": "b2cbffd519001b8eeffa4fccf94053e7c2838bd545e789307469b8155ff3dff3",
+    "user/sclib/sclib_buffer.c": "7445222036df43440ddeebfb310d6f859a1892f59c1caa1b8421bbfb5b67b0c7",
+    "user/sclib/sclib_cache.c": "8411773cf6eedfbdac162dafb7cc6fc7c1767004ba2ace03d2584c469214a5c5",
+    "user/sclib/sclib_config.c": "9f04507c76ae875540048dc0345589d6b64bd02bf809838643e7397dfdbaa1f2",
+    "user/sclib/sclib_error.c": "dcd4253886d218def992171bf71bfdc58e9ea7b6174f972bca0f6f1879fa3878",
+    "user/sclib/sclib_events.c": "ca941b4d60f54d5739abecbf5886a3b645fdfcaac6ea2322e00a6e67df01a3db",
+    "user/sclib/sclib_hash.c": "3fb96e683129e6bb83bcbf13d22e130de11eeb1fbe652d96459d74e296316157",
+    "user/sclib/sclib_list.c": "da1763f25aee46f6546dd8e25021fd1ee50f64e2276a2afa1077c869e2c733de",
+    "user/sclib/sclib_log.c": "2ec5241f9817c44e3413bcc66f6d2d048a52baaa7a79227c1dfd1a886499dc98",
+    "user/sclib/sclib_model.c": "5107690cad922a1c4e01d6ad180b5f7fa1544108cba6e2d192052227561f3953",
+    "user/sclib/sclib_path.c": "4c3fa94afb221b58f14c180fb887b8403a0807d182c3b89996b323c596475e42",
+    "user/sclib/sclib_stream.c": "6546cbfff38c0899c2f32cb2165f15a455d40f30f6ef571e7eec312cb98b4d88",
+    "user/sclib/sclib_string.c": "5d6cd27fb3116310246df21884b2f612eba40cbf077211593603525868185bbe",
+    "user/sclib/sclib_utf8.c": "8bb5c152b9bba9cf07c30a24e037f18e289d4b8253ea8cfbb8da5d4439792971",
+    "user/stdlib/SCCLIB.C": "2655f69e1b5fbe38be6fdf79a407e650356455dd4d7fa75fea2b68b9c6e50994",
+    "user/stdlib/SCCLIB.json": "47c30942713fc2c87dc69d46191100853017c27ae85a0a762b699277800663cb",
+    "user/stdlib/SCCLIBPRIVATE.H": "90c27d51d1df370c7037797025144dc18a494f56de6cbd5f9b6701117f0f3c95",
+    "user/stdlib/algorithm.c": "9afde154014c23e512a4b2f6bd3e16eab8429a3399d2de1a3b6c9e25901f015c",
+    "user/stdlib/assert.h": "b797185521d21ff70688df708128f848ee5a9bbf0b1eb15e7f3f70a07420d0da",
+    "user/stdlib/convert.c": "109fefdf112de2539c53b61ccdd43d0de6288bf92aebbbadc3a38ebfa23e466f",
+    "user/stdlib/ctype.c": "1dc79716b7a34655faf835d3c9af9d184ddda949cd1e3106ff7f7fd48a95df2c",
+    "user/stdlib/ctype.h": "8150eaedde6f16b0664baa9ee5e408cb5c9fdf52cd0dd6268138873fbd9e2920",
+    "user/stdlib/errno.c": "fd7fcd0b49febd82dd7f10089ea938025fc76e326758495e93b3c81679b706aa",
+    "user/stdlib/errno.h": "d8ada0445358aaa7462eae03a900519673b7477a8fa4d98cbfdd2fc34e525e8a",
+    "user/stdlib/format.c": "be9df6ad301c9379c4f595260fe7beefdd51daf7a6968174acff3844cf948613",
+    "user/stdlib/limits.h": "c92c213efbc5191ceb0bacfcafbae3a741e558ec383186bf1b4405814f789e4d",
+    "user/stdlib/memory.c": "339c2204d0bbb9e43747d983f1a399a5f9ab25f3da45dab0386eed95f44b526f",
+    "user/stdlib/stdarg.h": "51a09fb007529c51d7f758f849d917726c82859e78f9cb79f16f21555a4855ef",
+    "user/stdlib/stdbool.h": "33b2448da1e0e5ee5ee0bb5bfc3678e6036dfaa1f6c9fbf1fbd29995a11218d5",
+    "user/stdlib/stddef.h": "a58026688294d4ca51c5929355f79f9a9d219b1e4e1f5e08a89ecf67d863c33c",
+    "user/stdlib/stdint.h": "964461377d5e3e44fefcccdaf20cb553b33e4cbfd1019c7317ca6ba3ad822af7",
+    "user/stdlib/stdio.c": "f34d95893de28cb9e5a34d16bb14886e974924ca7408b3f51dbaa3d3edf4afd9",
+    "user/stdlib/stdio.h": "68a12b4347f9cd9d2d8c12fe470c940462cf5c759ece23855108c4fed7278c0e",
+    "user/stdlib/stdlib.h": "38c7d2aeff9a9c75e92651551dde646a42de5d1b46e1c027751a97f092023ebd",
+    "user/stdlib/string.c": "a9c50c126eb21f1f4acd03fe62960bf44e673d872828ade731a5b19d7cd5a05d",
+    "user/stdlib/string.h": "fd638710dde87186847aff374cdf0884e6cca3a57b8443851012b7729eacdee3",
+    "user/stdlib/terminate.c": "b98da8f56dbea568bdc339f78063ca635af53ae151cc3937ac43b83a5ea2df20",
+    "tests/m10a2/STDLIBPROBE.C": "e51ba5ae8822c9f53764c7d055fc7f0aa92408d17d6561211744f3cecb6a08e7",
+    "tests/m10a2/STDLIBPROBE.json": "635f7be4c7beb2f9e6ed3a861f357fb96a3d33495766880dcddb029075cfba27",
+    "tests/m10a2/STDLIBGUARD.C": "6732bdd90e2240a1a292ef902b386f23bd07edc46d31b16a60598b644bfe8cd0",
+    "tests/m10a2/STDLIBGUARD.json": "f0de66a99d18891586f37f1f217f859138aac11440263877a79f95cc92c19e70",
+    "tests/m10a2/SHARERUN.C": "b5c0a15a1baa86236e832a20af0080c7635c5185fe6e439cb800b7bbcdaccdcb",
+    "tests/m10a2/SHARERUN.json": "99f581e3e2b591a15ebb778b20a6d30281f54c8e44bfee2e43ad96ba41f8deb1",
+    "tools/verify_m10a2_stdlib.py": "01f34b6381ed8a9db34d152baa3ece18a5b7ceeeb3da67006dd3781820f7f279",
+    "tests/m10a2/UTILPROBE.C": "b4bd31014accf5c063ed0ca939b8ecbcf3734942b497ad03fe1079620631a205",
+    "tests/m10a2/UTILPROBE.json": "96c8608ae68cae291f3da1e46c8834657e1f1d6a076f1ff2f616e44fdc330802"
+  },
+  "source_data_sha256": "3db2e3cd9262343204e8c19af02847e98244732c5b5ad4397dd334be84fe7e64",
+  "build_report_sha256": "5ecfa08377747bcc785b9544566dfc94782b4ed09050a468868ba738e58bb87b",
+  "host_build_wall_seconds": 39.359939298,
+  "core_sha256": "cce384a89e151008f856677b50f6418225977e546d291bafe839bc6c8eabda4f",
+  "compiler": {
+    "path": "/TMP/STD-f3f365/SCCC0.SCX",
+    "sha256": "d574f1faf6ece7ac85f7f9ce3dae8af04d90dd1666109c7dad83b7e72065b422",
+    "source": "HOST_GCC_SCCC0"
+  },
+  "host_application": {
+    "sha256": "782ed95a6d87311c0aa38492e365f79eb07db541d2303137b733c25d979ed9c1",
+    "bytes": 17956,
+    "source": "HOST_GCC_BOOTSTRAP"
+  },
+  "GCC_guard": {
+    "sha256": "3f5d328042e268fdc6eb4ff56d531ffe013ac17e5b7eb50e068d66b66e551b8f",
+    "bytes": 2047,
+    "poisoned_EAX_for_Bool": true,
+    "valid_return_register": "AL"
+  },
+  "native_guard_executed": false,
+  "library_generation_skipped": false,
+  "screenshots": [
+    {
+      "path": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-stdlib-guest-03\\stdlib-failure.png",
+      "width": 1920,
+      "height": 1080,
+      "sha256": "de8097cabd62b263efbb643bc4a7867032346a5ff958bce430da1741a0e6dc16"
+    }
+  ],
+  "execution_scope": "EXTERNAL_SYSTEM_RING3_MANAGEMENT_SESSION",
+  "physical_keyboard_verified": false,
+  "GUI_behavior_verified": false,
+  "full_Phase3": false,
+  "full_M10a2": false,
+  "unrelated_prior_evidence": "REUSED_NOT_RERUN",
+  "reused_evidence": {
+    "report": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-stdlib-guest-02\\stdlib.json",
+    "sha256": "7eaba43bd48d7b72bcb9ba0ace4fd9c631af44c681d674951802898bbd31cbd9",
+    "cases": [
+      "host-libraries-host-caller-core",
+      "host-libraries-host-caller-stdio-six-modes",
+      "host-libraries-host-caller-lifecycle-return",
+      "host-libraries-host-caller-lifecycle-exit",
+      "host-libraries-host-caller-exit-during-guard-init",
+      "host-libraries-host-caller-recursive-exit-is-abnormal"
+    ],
+    "reason": "only harness corrected; same source/application/guard/libraries/core",
+    "verified_current_inputs": true,
+    "failed_cases_reused": false
+  },
+  "qemu_pid": 8720,
+  "startup_readiness": {
+    "status": "ACTUAL_FIRST_DESKTOP_COMPLETED",
+    "method": "READ_ONLY_HMP_COUNTERS_AND_PHYSICAL_ESC",
+    "symbols": {
+      "boot_stage": 8843268,
+      "sc_ticks": 8909864,
+      "wm_frames": 9080372
+    },
+    "observations": [
+      {
+        "seconds": 0.01600000000325963,
+        "boot_stage": 0,
+        "completed_frames": 0,
+        "ticks": 0
+      },
+      {
+        "seconds": 0.48400000000401633,
+        "boot_stage": 1,
+        "completed_frames": 0,
+        "ticks": 14
+      },
+      {
+        "seconds": 1.6719999999986612,
+        "boot_stage": 2,
+        "completed_frames": 0,
+        "ticks": 131
+      },
+      {
+        "seconds": 1.9219999999986612,
+        "boot_stage": 3,
+        "completed_frames": 1,
+        "ticks": 156
+      }
+    ],
+    "input_sent": true,
+    "input": "esc",
+    "input_seconds": 1.6880000000019209,
+    "seconds": 1.9219999999986612
+  },
+  "warm_observations": [
+    {
+      "name": "parent-Shell-command-cache",
+      "source": "user/m9/sh.c::command_frames：按命令层首次分配，归父Shell至其退出",
+      "before": 6958,
+      "after": 6964,
+      "delta": 6,
+      "observations_before": [
+        6958,
+        6958,
+        6958,
+        6958,
+        6958
+      ],
+      "observations_after": [
+        6964,
+        6964,
+        6964,
+        6964,
+        6964
+      ],
+      "resources_before": {
+        "records@00883fc0": {
+          "objects": 2,
+          "pages": 5,
+          "peak_pages": 5,
+          "high_water": 2
+        },
+        "view_pool@008a9520": {
+          "objects": 1,
+          "pages": 4,
+          "peak_pages": 4,
+          "high_water": 2
+        },
+        "window_pool@008a9980": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "capture_pool@008a9de0": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "native_pool@008aa760": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "transaction_pool@008aabc0": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "native_pool@008b3240": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "job_pool@008b36a0": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "pipe_pool@008b3b00": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "endpoint_pool@008b3f60": {
+          "objects": 1,
+          "pages": 6,
+          "peak_pages": 6,
+          "high_water": 1
+        },
+        "owners@008b9780": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "descriptions@008b9be0": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "handles@008ba040": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "owners@008ba4c0": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "owners@008c23e0": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "wait_pages": 0,
+        "dir_pages": 96,
+        "meta_pages": 96,
+        "allocation_pages": 16,
+        "space_pages": 8,
+        "cache_pages": 99,
+        "capture_pages": 0,
+        "desktop": {
+          "state_pointer": 10383360,
+          "native_backbuffer": 14106624,
+          "width": 1920,
+          "height": 1080,
+          "pending_images": 15,
+          "pages": 1793,
+          "map_width": 0,
+          "map_height": 0,
+          "needs_flush": 0,
+          "attempted": 1,
+          "error": 0,
+          "background_reader_phase": 2,
+          "background": {
+            "pixels": 0,
+            "width": 0,
+            "height": 0,
+            "pages": 0
+          },
+          "scaled_background": {
+            "pixels": 0,
+            "width": 0,
+            "height": 0,
+            "pages": 0
+          }
+        }
+      },
+      "resources_after": {
+        "records@00883fc0": {
+          "objects": 2,
+          "pages": 5,
+          "peak_pages": 5,
+          "high_water": 3
+        },
+        "view_pool@008a9520": {
+          "objects": 1,
+          "pages": 4,
+          "peak_pages": 4,
+          "high_water": 2
+        },
+        "window_pool@008a9980": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "capture_pool@008a9de0": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "native_pool@008aa760": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "transaction_pool@008aabc0": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "native_pool@008b3240": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "job_pool@008b36a0": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 3,
+          "high_water": 4
+        },
+        "pipe_pool@008b3b00": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "endpoint_pool@008b3f60": {
+          "objects": 1,
+          "pages": 6,
+          "peak_pages": 6,
+          "high_water": 1
+        },
+        "owners@008b9780": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "descriptions@008b9be0": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "handles@008ba040": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "owners@008ba4c0": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "owners@008c23e0": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "wait_pages": 0,
+        "dir_pages": 96,
+        "meta_pages": 96,
+        "allocation_pages": 16,
+        "space_pages": 8,
+        "cache_pages": 99,
+        "capture_pages": 0,
+        "desktop": {
+          "state_pointer": 10383360,
+          "native_backbuffer": 14106624,
+          "width": 1920,
+          "height": 1080,
+          "pending_images": 1,
+          "pages": 1793,
+          "map_width": 0,
+          "map_height": 0,
+          "needs_flush": 0,
+          "attempted": 1,
+          "error": 0,
+          "background_reader_phase": 2,
+          "background": {
+            "pixels": 0,
+            "width": 0,
+            "height": 0,
+            "pages": 0
+          },
+          "scaled_background": {
+            "pixels": 0,
+            "width": 0,
+            "height": 0,
+            "pages": 0
+          }
+        }
+      },
+      "command_case": "warm-parent-Shell-command-cache",
+      "attributed_all_delta": false
+    },
+    {
+      "name": "existing-task-history",
+      "source": "kernel/task_store.c records OBJPOOL_KEEP_IDLE：既有PID历史；当前页逐项留账",
+      "before": 6964,
+      "after": 6964,
+      "delta": 0,
+      "observations_before": [
+        6964,
+        6964,
+        6964,
+        6964,
+        6964
+      ],
+      "observations_after": [
+        6964,
+        6964,
+        6964,
+        6964,
+        6964
+      ],
+      "resources_before": {
+        "records@00883fc0": {
+          "objects": 2,
+          "pages": 5,
+          "peak_pages": 5,
+          "high_water": 3
+        },
+        "view_pool@008a9520": {
+          "objects": 1,
+          "pages": 4,
+          "peak_pages": 4,
+          "high_water": 2
+        },
+        "window_pool@008a9980": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "capture_pool@008a9de0": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "native_pool@008aa760": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "transaction_pool@008aabc0": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "native_pool@008b3240": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "job_pool@008b36a0": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 3,
+          "high_water": 4
+        },
+        "pipe_pool@008b3b00": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "endpoint_pool@008b3f60": {
+          "objects": 1,
+          "pages": 6,
+          "peak_pages": 6,
+          "high_water": 1
+        },
+        "owners@008b9780": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "descriptions@008b9be0": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "handles@008ba040": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "owners@008ba4c0": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "owners@008c23e0": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "wait_pages": 0,
+        "dir_pages": 96,
+        "meta_pages": 96,
+        "allocation_pages": 16,
+        "space_pages": 8,
+        "cache_pages": 99,
+        "capture_pages": 0,
+        "desktop": {
+          "state_pointer": 10383360,
+          "native_backbuffer": 14106624,
+          "width": 1920,
+          "height": 1080,
+          "pending_images": 1,
+          "pages": 1793,
+          "map_width": 0,
+          "map_height": 0,
+          "needs_flush": 0,
+          "attempted": 1,
+          "error": 0,
+          "background_reader_phase": 2,
+          "background": {
+            "pixels": 0,
+            "width": 0,
+            "height": 0,
+            "pages": 0
+          },
+          "scaled_background": {
+            "pixels": 0,
+            "width": 0,
+            "height": 0,
+            "pages": 0
+          }
+        }
+      },
+      "resources_after": {
+        "records@00883fc0": {
+          "objects": 2,
+          "pages": 5,
+          "peak_pages": 5,
+          "high_water": 3
+        },
+        "view_pool@008a9520": {
+          "objects": 1,
+          "pages": 4,
+          "peak_pages": 4,
+          "high_water": 2
+        },
+        "window_pool@008a9980": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "capture_pool@008a9de0": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "native_pool@008aa760": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "transaction_pool@008aabc0": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "native_pool@008b3240": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "job_pool@008b36a0": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 3,
+          "high_water": 7
+        },
+        "pipe_pool@008b3b00": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "endpoint_pool@008b3f60": {
+          "objects": 1,
+          "pages": 6,
+          "peak_pages": 6,
+          "high_water": 1
+        },
+        "owners@008b9780": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "descriptions@008b9be0": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "handles@008ba040": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "owners@008ba4c0": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "owners@008c23e0": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "wait_pages": 0,
+        "dir_pages": 96,
+        "meta_pages": 96,
+        "allocation_pages": 16,
+        "space_pages": 8,
+        "cache_pages": 99,
+        "capture_pages": 0,
+        "desktop": {
+          "state_pointer": 10383360,
+          "native_backbuffer": 14106624,
+          "width": 1920,
+          "height": 1080,
+          "pending_images": 1,
+          "pages": 1793,
+          "map_width": 0,
+          "map_height": 0,
+          "needs_flush": 0,
+          "attempted": 1,
+          "error": 0,
+          "background_reader_phase": 2,
+          "background": {
+            "pixels": 0,
+            "width": 0,
+            "height": 0,
+            "pages": 0
+          },
+          "scaled_background": {
+            "pixels": 0,
+            "width": 0,
+            "height": 0,
+            "pages": 0
+          }
+        }
+      },
+      "command_case": "warm-existing-task-history",
+      "attributed_all_delta": false
+    },
+    {
+      "name": "parent-Shell-background-table",
+      "source": "user/m9/sh.c::background_reserve：16*8B首次后台表由父Shell保留",
+      "before": 6964,
+      "after": 6965,
+      "delta": 1,
+      "observations_before": [
+        6964,
+        6964,
+        6964,
+        6964,
+        6964
+      ],
+      "observations_after": [
+        6965,
+        6965,
+        6965,
+        6965,
+        6965
+      ],
+      "resources_before": {
+        "records@00883fc0": {
+          "objects": 2,
+          "pages": 5,
+          "peak_pages": 5,
+          "high_water": 3
+        },
+        "view_pool@008a9520": {
+          "objects": 1,
+          "pages": 4,
+          "peak_pages": 4,
+          "high_water": 2
+        },
+        "window_pool@008a9980": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "capture_pool@008a9de0": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "native_pool@008aa760": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "transaction_pool@008aabc0": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "native_pool@008b3240": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "job_pool@008b36a0": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 3,
+          "high_water": 7
+        },
+        "pipe_pool@008b3b00": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "endpoint_pool@008b3f60": {
+          "objects": 1,
+          "pages": 6,
+          "peak_pages": 6,
+          "high_water": 1
+        },
+        "owners@008b9780": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "descriptions@008b9be0": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "handles@008ba040": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "owners@008ba4c0": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "owners@008c23e0": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "wait_pages": 0,
+        "dir_pages": 96,
+        "meta_pages": 96,
+        "allocation_pages": 16,
+        "space_pages": 8,
+        "cache_pages": 99,
+        "capture_pages": 0,
+        "desktop": {
+          "state_pointer": 10383360,
+          "native_backbuffer": 14106624,
+          "width": 1920,
+          "height": 1080,
+          "pending_images": 1,
+          "pages": 1793,
+          "map_width": 0,
+          "map_height": 0,
+          "needs_flush": 0,
+          "attempted": 1,
+          "error": 0,
+          "background_reader_phase": 2,
+          "background": {
+            "pixels": 0,
+            "width": 0,
+            "height": 0,
+            "pages": 0
+          },
+          "scaled_background": {
+            "pixels": 0,
+            "width": 0,
+            "height": 0,
+            "pages": 0
+          }
+        }
+      },
+      "resources_after": {
+        "records@00883fc0": {
+          "objects": 2,
+          "pages": 5,
+          "peak_pages": 5,
+          "high_water": 4
+        },
+        "view_pool@008a9520": {
+          "objects": 1,
+          "pages": 4,
+          "peak_pages": 4,
+          "high_water": 2
+        },
+        "window_pool@008a9980": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "capture_pool@008a9de0": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "native_pool@008aa760": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "transaction_pool@008aabc0": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "native_pool@008b3240": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "job_pool@008b36a0": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 3,
+          "high_water": 11
+        },
+        "pipe_pool@008b3b00": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "endpoint_pool@008b3f60": {
+          "objects": 1,
+          "pages": 6,
+          "peak_pages": 6,
+          "high_water": 3
+        },
+        "owners@008b9780": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "descriptions@008b9be0": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "handles@008ba040": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "owners@008ba4c0": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "owners@008c23e0": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "wait_pages": 0,
+        "dir_pages": 96,
+        "meta_pages": 96,
+        "allocation_pages": 16,
+        "space_pages": 8,
+        "cache_pages": 99,
+        "capture_pages": 0,
+        "desktop": {
+          "state_pointer": 10383360,
+          "native_backbuffer": 14106624,
+          "width": 1920,
+          "height": 1080,
+          "pending_images": 1,
+          "pages": 1793,
+          "map_width": 0,
+          "map_height": 0,
+          "needs_flush": 0,
+          "attempted": 1,
+          "error": 0,
+          "background_reader_phase": 2,
+          "background": {
+            "pixels": 0,
+            "width": 0,
+            "height": 0,
+            "pages": 0
+          },
+          "scaled_background": {
+            "pixels": 0,
+            "width": 0,
+            "height": 0,
+            "pages": 0
+          }
+        }
+      },
+      "command_case": "warm-parent-Shell-background-table",
+      "attributed_all_delta": false
+    },
+    {
+      "name": "existing-path-I/O",
+      "source": "只预热既有路径/旧SCX与Shell重定向；不执行新库测试也不抹页差额",
+      "before": 6965,
+      "after": 6965,
+      "delta": 0,
+      "observations_before": [
+        6965,
+        6965,
+        6965,
+        6965,
+        6965
+      ],
+      "observations_after": [
+        6965,
+        6965,
+        6965,
+        6965,
+        6965
+      ],
+      "resources_before": {
+        "records@00883fc0": {
+          "objects": 2,
+          "pages": 5,
+          "peak_pages": 5,
+          "high_water": 4
+        },
+        "view_pool@008a9520": {
+          "objects": 1,
+          "pages": 4,
+          "peak_pages": 4,
+          "high_water": 2
+        },
+        "window_pool@008a9980": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "capture_pool@008a9de0": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "native_pool@008aa760": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "transaction_pool@008aabc0": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "native_pool@008b3240": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "job_pool@008b36a0": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 3,
+          "high_water": 11
+        },
+        "pipe_pool@008b3b00": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "endpoint_pool@008b3f60": {
+          "objects": 1,
+          "pages": 6,
+          "peak_pages": 6,
+          "high_water": 3
+        },
+        "owners@008b9780": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "descriptions@008b9be0": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "handles@008ba040": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "owners@008ba4c0": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "owners@008c23e0": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "wait_pages": 0,
+        "dir_pages": 96,
+        "meta_pages": 96,
+        "allocation_pages": 16,
+        "space_pages": 8,
+        "cache_pages": 99,
+        "capture_pages": 0,
+        "desktop": {
+          "state_pointer": 10383360,
+          "native_backbuffer": 14106624,
+          "width": 1920,
+          "height": 1080,
+          "pending_images": 1,
+          "pages": 1793,
+          "map_width": 0,
+          "map_height": 0,
+          "needs_flush": 0,
+          "attempted": 1,
+          "error": 0,
+          "background_reader_phase": 2,
+          "background": {
+            "pixels": 0,
+            "width": 0,
+            "height": 0,
+            "pages": 0
+          },
+          "scaled_background": {
+            "pixels": 0,
+            "width": 0,
+            "height": 0,
+            "pages": 0
+          }
+        }
+      },
+      "resources_after": {
+        "records@00883fc0": {
+          "objects": 2,
+          "pages": 5,
+          "peak_pages": 5,
+          "high_water": 4
+        },
+        "view_pool@008a9520": {
+          "objects": 1,
+          "pages": 4,
+          "peak_pages": 4,
+          "high_water": 2
+        },
+        "window_pool@008a9980": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "capture_pool@008a9de0": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "native_pool@008aa760": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "transaction_pool@008aabc0": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 3,
+          "high_water": 2
+        },
+        "native_pool@008b3240": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "job_pool@008b36a0": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 3,
+          "high_water": 15
+        },
+        "pipe_pool@008b3b00": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "endpoint_pool@008b3f60": {
+          "objects": 1,
+          "pages": 6,
+          "peak_pages": 6,
+          "high_water": 3
+        },
+        "owners@008b9780": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "descriptions@008b9be0": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "handles@008ba040": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "owners@008ba4c0": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "owners@008c23e0": {
+          "objects": 0,
+          "pages": 0,
+          "peak_pages": 0,
+          "high_water": 0
+        },
+        "wait_pages": 0,
+        "dir_pages": 96,
+        "meta_pages": 96,
+        "allocation_pages": 16,
+        "space_pages": 8,
+        "cache_pages": 99,
+        "capture_pages": 0,
+        "desktop": {
+          "state_pointer": 10383360,
+          "native_backbuffer": 14106624,
+          "width": 1920,
+          "height": 1080,
+          "pending_images": 1,
+          "pages": 1793,
+          "map_width": 0,
+          "map_height": 0,
+          "needs_flush": 0,
+          "attempted": 1,
+          "error": 0,
+          "background_reader_phase": 2,
+          "background": {
+            "pixels": 0,
+            "width": 0,
+            "height": 0,
+            "pages": 0
+          },
+          "scaled_background": {
+            "pixels": 0,
+            "width": 0,
+            "height": 0,
+            "pages": 0
+          }
+        }
+      },
+      "command_case": "warm-existing-path-I/O",
+      "attributed_all_delta": false
+    },
+    {
+      "name": "warm-existing-async-desktop-resources",
+      "source": "kernel/desktop.c::desktop_poll/desktop_wallpaper; current desktop owns scaled_background",
+      "before_physical_pages": 6965,
+      "after_physical_pages": 8990,
+      "physical_delta": 2025,
+      "before_desktop": {
+        "state_pointer": 10383360,
+        "native_backbuffer": 14106624,
+        "width": 1920,
+        "height": 1080,
+        "pending_images": 0,
+        "pages": 3818,
+        "map_width": 1920,
+        "map_height": 1080,
+        "needs_flush": 0,
+        "attempted": 1,
+        "error": 0,
+        "background_reader_phase": 0,
+        "background": {
+          "pixels": 22806528,
+          "width": 1672,
+          "height": 941,
+          "pages": 1537
+        },
+        "scaled_background": {
+          "pixels": 30625792,
+          "width": 1920,
+          "height": 1080,
+          "pages": 2025
+        }
+      },
+      "after_desktop": {
+        "state_pointer": 10383360,
+        "native_backbuffer": 14106624,
+        "width": 1920,
+        "height": 1080,
+        "pending_images": 0,
+        "pages": 3818,
+        "map_width": 1920,
+        "map_height": 1080,
+        "needs_flush": 0,
+        "attempted": 1,
+        "error": 0,
+        "background_reader_phase": 0,
+        "background": {
+          "pixels": 22806528,
+          "width": 1672,
+          "height": 941,
+          "pages": 1537
+        },
+        "scaled_background": {
+          "pixels": 30625792,
+          "width": 1920,
+          "height": 1080,
+          "pages": 2025
+        }
+      },
+      "observations": [
+        {
+          "seconds": 0.1559999999954016,
+          "state_pointer": 10383360,
+          "native_backbuffer": 14106624,
+          "width": 1920,
+          "height": 1080,
+          "pending_images": 0,
+          "pages": 3818,
+          "map_width": 1920,
+          "map_height": 1080,
+          "needs_flush": 0,
+          "attempted": 1,
+          "error": 0,
+          "background_reader_phase": 0,
+          "background": {
+            "pixels": 22806528,
+            "width": 1672,
+            "height": 941,
+            "pages": 1537
+          },
+          "scaled_background": {
+            "pixels": 30625792,
+            "width": 1920,
+            "height": 1080,
+            "pages": 2025
+          }
+        }
+      ],
+      "before_observations": [
+        6965,
+        6965,
+        6965,
+        6965,
+        6965
+      ],
+      "after_observations": [
+        8990,
+        8990,
+        8990,
+        8990,
+        8990
+      ],
+      "wall_seconds": 0.48399999999674037,
+      "complete_existing_desktop_resources": true,
+      "layout": {
+        "state_bytes": 32660,
+        "background_offset": 24680,
+        "scaled_background_offset": 24696,
+        "background_reader_phase_offset": 24800,
+        "pages_offset": 32560,
+        "map_offset": 32572
+      },
+      "desktop_owned_page_delta": 0,
+      "attributed_all_delta": false,
+      "status": "PASS"
+    }
+  ],
+  "error": {
+    "type": "AssertionError",
+    "message": "host-libraries-host-caller-shared-standard-position",
+    "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\tools\\verify_m10a2_stdlib.py\", line 661, in main\n    harness.suite(app, label)\n  File \"C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\tools\\verify_m10a2_stdlib.py\", line 444, in suite\n    self.run(label + '-shared-standard-position', self.shared_runner + ' ' + app + ' > ' + PACKAGE + '/SHARED.OUT',\n  File \"C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\tools\\verify_m10a2_stdlib.py\", line 336, in run\n    self.append(item, False)\n  File \"C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\tools\\verify_m10a2_stdlib.py\", line 275, in append\n    raise AssertionError(item['name'])\nAssertionError: host-libraries-host-caller-shared-standard-position\n"
+  },
+  "failure_console_tail": "SandShell M9\nSYSTEM /SYS [SYSTEM] # true; _m9_status=$?; printf \"\\n\"; echo __M9_3c93f1a1242ba4be8d7d7100:$_m9_status\n\n__M9_3c93f1a1242ba4be8d7d7100:0\nSYSTEM /SYS [SYSTEM] # ls /HOME/M10STD/HOST; _m9_status=$?; printf \"\\n\"; echo __M9_b847838e148e35d2e3bcc376:$_m9_status\nSTDLIBGUARD.SCL\nSTDLIBPROBE.SCX\n\n__M9_b847838e148e35d2e3bcc376:0\nSYSTEM /SYS [SYSTEM] # echo STDLIB_BG_WARM & wait; _m9_status=$?; printf \"\\n\"; echo __M9_43a8679828adf05061866183:$_m9_status\nSTDLIB_BG_WARM\n\n__M9_43a8679828adf05061866183:0\nSYSTEM /SYS [SYSTEM] # printf warm > /HOME/M10STD/WARM.DAT; cat /HOME/M10STD/WARM.DAT; _m9_status=$?; printf \"\\n\"; echo __M9_f223a58076fb613b765c3ace:$_m9_status\nwarm\n__M9_f223a58076fb613b765c3ace:0\nSYSTEM /SYS [SYSTEM] # mkdir -p /TMP/STD-f3f365/SHARED; _m9_status=$?; printf \"\\n\"; echo __M9_deee0066dd6b02daf53b6d7e:$_m9_status\n\n__M9_deee0066dd6b02daf53b6d7e:0\nSYSTEM /SYS [SYSTEM] # /TMP/STD-f3f365/SCCC0.SCX /TMP/STD-f3f365/SHARERUN.C /TMP/STD-f3f365/SHARED/SHARERUN.SCX --dynamic /TMP/STD-f3f365/SHARERUN.json; _m9_status=$?; printf \"\\n\"; echo __M9_af37a5b5baf2f5d70cc0cf19:$_m9_status\nSCCC / mio\nTMP/STD-f3f365/SHARERUN.C -> TMP/STD-f3f365/SHARED/SHARERUN.SCX\nValidating application manifest\nSCCC: preprocess -> C -> x86\nPreprocessing source and includes\nParsing C and generating x86\nLinking and writing SCX\nSCCC OK SCX DYNAMIC\nCompilation complete\n\n__M9_af37a5b5baf2f5d70cc0cf19:0\nSYSTEM /SYS [SYSTEM] # /TMP/STD-f3f365/SHARED/SHARERUN.SCX /HOME/M10STD/HOST/STDLIBPROBE.SCX > /HOME/M10STD/SHARED.OUT; _m9_status=$?; printf \"\\n\"; echo __M9_9f160764918939eaefab34c8:$_m9_status\n\n__M9_9f160764918939eaefab34c8:84\nSYSTEM /SYS [SYSTEM] # ",
+  "failure_debug_tail": "SandCore loader v1\r\nCORE START SYS/CORE/CORE.SKM\r\nSandCore M9 | debug transport ready\r\nCORE EXT SYS/CORE/WALL100.SKM STARTED\r\n",
+  "failure_registers": "\r\nCPU#0\r\nEAX=00000001 EBX=0000000a ECX=00000000 EDX=00000001\r\nESI=51eb851f EDI=0000000a EBP=000000ff ESP=0008ffc0\r\nEIP=00800845 EFL=00000202 [-------] CPL=0 II=0 A20=1 SMM=0 HLT=1\r\nES =0010 00000000 ffffffff 00cf9300 DPL=0 DS   [-WA]\r\nCS =0008 00000000 ffffffff 00cf9a00 DPL=0 CS32 [-R-]\r\nSS =0010 00000000 ffffffff 00cf9300 DPL=0 DS   [-WA]\r\nDS =0010 00000000 ffffffff 00cf9300 DPL=0 DS   [-WA]\r\nFS =0010 00000000 ffffffff 00cf9300 DPL=0 DS   [-WA]\r\nGS =0010 00000000 ffffffff 00cf9300 DPL=0 DS   [-WA]\r\nLDT=0000 00000000 0000ffff 00008200 DPL=0 LDT\r\nTR =0028 008aa2c0 00000067 00008900 DPL=0 TSS32-avl\r\nGDT=     008aa340 0000002f\r\nIDT=     0087f040 000003e7\r\nCR0=80000033 CR2=00000000 CR3=00886000 CR4=00000600\r\nDR0=00000000 DR1=00000000 DR2=00000000 DR3=00000000 \r\nDR6=ffff0ff0 DR7=00000400\r\nEFER=0000000000000000\r\nFCW=037f FSW=0000 [ST=0] FTW=00 MXCSR=00001f80\r\nFPR0=0000000000000000 0000 FPR1=0000000000000000 0000\r\nFPR2=0000000000000000 0000 FPR3=0000000000000000 0000\r\nFPR4=0000000000000000 0000 FPR5=0000000000000000 0000\r\nFPR6=0000000000000000 0000 FPR7=0000000000000000 0000\r\nXMM00=0000000000000000 0000000000000000 XMM01=0000000000000000 0000000000000000\r\nXMM02=0000000000000000 0000000000000000 XMM03=0000000000000000 0000000000000000\r\nXMM04=0000000000000000 0000000000000000 XMM05=0000000000000000 0000000000000000\r\nXMM06=0000000000000000 0000000000000000 XMM07=0000000000000000 0000000000000000\r\n",
+  "source_disk_unchanged": true,
+  "current_inputs_unchanged": true
+}

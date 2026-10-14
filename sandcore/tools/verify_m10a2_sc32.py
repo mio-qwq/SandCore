@@ -89,7 +89,10 @@ def main():
             run('guest-SCCC-builds-SC32-library',compiler+' '+prefix+'/SRC/sc32/SC32API.C '+target+
                 ' --scl '+prefix+'/SRC/sc32/SC32API.json',timeout=240)
             library=guest.get_bytes(target,'SC32API-native.scl');tables=validate(library)
-            check('native-library-all-declared-exports',len(tables['exports'])==85 and len(tables['imports'])==5,
+            declared=json.loads((ROOT/'user/sc32/SC32API.json').read_text(encoding='utf-8'))
+            check('native-library-all-declared-exports',
+                {x['name'] for x in tables['exports']}=={x['name'] for x in declared['exports']}
+                and {x['name'] for x in tables['imports']}=={x['name'] for x in declared['imports']},
                 bytes=len(library),sha256=hashlib.sha256(library).hexdigest(),executed_this_generated_file=False)
             before,_=stable_pages(vm,symbols)
             run('warm-public-API-exit',app,contains=b'SC32_FOUNDATION_PASS')

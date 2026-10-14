@@ -1,11 +1,15 @@
 {
   "name": "SC32API.SCL",
   "abi_major": 1,
-  "abi_minor": 0,
-  "library_version": 1,
+  "abi_minor": 1,
+  "library_version": 2,
   "init": null,
   "fini": "Sc32Finalize",
   "exports": [
+    {
+      "name": "ScCallbackPin",
+      "kind": "function"
+    },
     {
       "name": "ScDefaultWindowProc",
       "kind": "function"
@@ -349,6 +353,12 @@
   ],
   "imports": [
     {
+      "name": "ScApplicationPinCallback",
+      "kind": "function",
+      "dependency": "SCLDR.SCL",
+      "size": 1
+    },
+    {
       "name": "ScApplicationRuntime",
       "kind": "function",
       "dependency": "SCLDR.SCL",
@@ -383,8 +393,8 @@
     {
       "name": "SCLDR.SCL",
       "abi_major": 1,
-      "min_minor": 0,
-      "min_version": 1
+      "min_minor": 1,
+      "min_version": 2
     }
   ]
 }

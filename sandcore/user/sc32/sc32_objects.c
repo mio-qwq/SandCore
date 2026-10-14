@@ -133,3 +133,11 @@ ScStatus ScLibraryQuery(ScLibraryInfo *out)
     value.modules=stats.modules;value.image_bytes=stats.image_bytes;value.metadata_bytes=stats.metadata_bytes;value.pinned_modules=stats.pinned_modules;
     value.loads=stats.loads;value.reuses=stats.reuses;value.relocations=stats.relocations;sc32_copy(out,&value,sizeof(value));return 0;
 }
+ScStatus ScCallbackPin(const void *function_address)
+{
+    if(!function_address)return sc32_invalid(SC32_E_INVALID,SC32_OP_CALLBACK_PIN);
+    /* ROOT知道真实应用正文和本人READY/X段，不用“可读”冒充函数资格；
+     * 固定provider和依赖闭包后，长期容器才可提交保存这个地址。 */
+    ScI32 raw=ScApplicationPinCallback((void (*)(void))function_address);
+    return sc32_runtime_error(raw,SC32_OP_CALLBACK_PIN);
+}

@@ -6,8 +6,8 @@
 /* 正式cdecl API。只声明本基础切片的真实入口，寄存器桥留在库内部。
  * 记录调用前填size/version；成功返回规范size，未定义尾部保持不变。 */
 #define SC32_ABI_MAJOR 1u
-#define SC32_ABI_MINOR 0u
-#define SC32_LIBRARY_VERSION 1u
+#define SC32_ABI_MINOR 1u
+#define SC32_LIBRARY_VERSION 2u
 #define SC32_RECORD_VERSION 1u
 #define SC32_PATH_CAPACITY 65u
 #define SC32_INFINITE 0xFFFFFFFFu
@@ -65,6 +65,7 @@
 #define SC32_CAP_CLIPBOARD 16384u
 #define SC32_CAP_IPC 32768u
 #define SC32_CAP_SHARED_MEMORY 65536u
+#define SC32_CAP_CALLBACK_LIFETIME 131072u
 
 typedef struct {
     ScU32 size,version;
@@ -322,6 +323,8 @@ ScStatus ScLoadLibrary(const ScLibraryDesc *desc,ScLibrary *out);
 ScStatus ScGetSymbol(ScLibrary library,const char *name,ScU32 kind,ScU32 minimum_size,void **out);
 ScStatus ScFreeLibrary(ScLibrary library);
 ScStatus ScLibraryQuery(ScLibraryInfo *out);
+/* 持久回调先固定所属代码映像到进程终止；只接受本人实际函数域。 */
+ScStatus ScCallbackPin(const void *function_address);
 
 /* 普通文件对象由独立FILE切片提供，声明与实际桥/内核同批收齐。
  * 这不是旧顺序替换流的别名；更新模式与保持打开的flush见规范。 */

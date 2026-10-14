@@ -14,12 +14,25 @@ struct ScLoaded {
     ScLoaded **dependencies;
     ScU32 *imports;
     ScU32 id, external, edges, pinned, ready, initialized, retiring, borrowed, cursor, metadata_size;
+    void (*application_prepare)(void);
+    void *application_stack_candidate;
 };
 struct ScRuntime {
     ScRuntimePlatform platform;
     ScLoaded *modules, *initialized;
     ScU32 next_id, busy, loads, reuses, relocations;
+    ScLoaded *invoking;
+    ScU32 invoking_kind;
 };
+
+#ifdef SCL_BOOT_LIBRARY
+/* 聚合ROOT的终止控制不成为普通独立loader的外部依赖。实现放在
+ * 私有termination源；同一状态保护也覆盖旧九个公开入口的误重入。 */
+static int app_runtime_change_allowed(ScRuntime *runtime);
+static int app_runtime_destroy_allowed(ScRuntime *runtime);
+static void app_module_initialized(ScRuntime *runtime,ScLoaded *module);
+static void app_module_releasing(ScRuntime *runtime,ScLoaded *module);
+#endif
 
 /* 所有偏移只在完整格式验证后读取。元数据独立保留，段正文搬入
  * 映像后释放文件副本，避免每个库永久占两份完整机器码。 */
@@ -101,13 +114,22 @@ static void unlink_initialized(ScRuntime *r, ScLoaded *m)
 }
 static void finalize(ScRuntime *r, ScLoaded *m)
 {
+#ifdef SCL_BOOT_LIBRARY
+    app_module_releasing(r,m);
+#endif
     ScU32 entry = word(m->metadata, 100);
-    if (m->initialized && entry != 0xffffffffu)
+    if (m->initialized && entry != 0xffffffffu){
+        r->invoking=m;r->invoking_kind=2;
         r->platform.invoke(r->platform.context, m->image + entry, 1);
+        r->invoking=0;r->invoking_kind=0;
+    }
     unlink_initialized(r, m);
 }
 static void release_storage(ScRuntime *r, ScLoaded *m)
 {
+#ifdef SCL_BOOT_LIBRARY
+    app_module_releasing(r,m);
+#endif
     void *context = r->platform.context;
     /* 根代码和元数据位于同一个已验证MODULE块，且当前清理函数本身
      * 就在根中执行。借用实例的页由进程EXIT回收，不能在RET前拆栈下代码。 */
@@ -203,13 +225,20 @@ static int link_module(ScRuntime *r, ScLoaded *m)
             m->image + word(s, 0), word(s, 4), 3)) return SC_SCL_IO;
     }
     ScU32 entry = word(m->metadata, 96);
-    if (entry != 0xffffffffu && r->platform.invoke(r->platform.context, m->image + entry, 0))
-        return SC_SCL_INIT;
+    if (entry != 0xffffffffu){
+        r->invoking=m;r->invoking_kind=1;
+        int result=r->platform.invoke(r->platform.context,m->image+entry,0);
+        r->invoking=0;r->invoking_kind=0;
+        if(result)return SC_SCL_INIT;
+    }
     m->initialized = 1;
     m->init_next = r->initialized;
     if (m->init_next) m->init_next->init_previous = m;
     r->initialized = m;
     m->ready = 1;
+#ifdef SCL_BOOT_LIBRARY
+    app_module_initialized(r,m);
+#endif
     return 0;
 }
 static void rollback(ScRuntime *r, ScLoaded *checkpoint, ScLoaded *init_checkpoint)
@@ -241,6 +270,9 @@ int ScRuntimeOpen(ScRuntime *r, const char *name, ScU32 major,
                   ScU32 minor, ScU32 release, ScModule *result)
 {
     if (!r || !result || !name_valid(name) || !major) return SC_SCL_FORMAT;
+#ifdef SCL_BOOT_LIBRARY
+    if(!app_runtime_change_allowed(r))return SC_SCL_BUSY;
+#endif
     if (r->busy) return SC_SCL_BUSY;
     r->busy = 1;
     ScLoaded *root = find_name(r, name);
@@ -291,6 +323,9 @@ int ScRuntimeOpen(ScRuntime *r, const char *name, ScU32 major,
 int ScRuntimeClose(ScRuntime *r, ScModule module)
 {
     if (!r) return SC_SCL_HANDLE;
+#ifdef SCL_BOOT_LIBRARY
+    if(!app_runtime_change_allowed(r))return SC_SCL_BUSY;
+#endif
     if (r->busy) return SC_SCL_BUSY;
     ScLoaded *m = find_id(r, module);
     if (!m || !m->external) return SC_SCL_HANDLE;
@@ -382,6 +417,9 @@ int ScRuntimeQuery(ScRuntime *r, ScRuntimeStats *stats)
 int ScRuntimeDestroy(ScRuntime *r)
 {
     if (!r) return SC_SCL_HANDLE;
+#ifdef SCL_BOOT_LIBRARY
+    if(!app_runtime_destroy_allowed(r))return SC_SCL_BUSY;
+#endif
     if (r->busy) return SC_SCL_BUSY;
     r->busy = 1;
     while (r->initialized) finalize(r, r->initialized);

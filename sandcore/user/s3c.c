@@ -70,7 +70,7 @@ typedef struct { int parent,active,taken,otherwise; } Conditional;
 /* 类型引用以整数索引表示，自编译时不依赖宿主指针宽度/结构体标签
  * 的隐藏表示。聚合字段/函数参数的列表存独立表，作用域只是名字解析
  * 的可见性标记，不会让已建语法树的符号编号失效。 */
-enum { TY_VOID,TY_CHAR,TY_SHORT,TY_INT,TY_PTR,TY_ARRAY,TY_FUNC,TY_STRUCT,TY_UNION };
+enum { TY_VOID,TY_CHAR,TY_SHORT,TY_INT,TY_PTR,TY_ARRAY,TY_FUNC,TY_STRUCT,TY_UNION,TY_BOOL };
 typedef struct { int kind,size,base,count,fields,flags; } Type;
 enum { S_GLOBAL,S_LOCAL,S_PARAM,S_FUNCTION,S_TYPEDEF,S_ENUM,S_FIELD,S_TAG };
 typedef struct { int name,type,kind,value,scope,defined,next,aux; } Symbol;
@@ -78,7 +78,8 @@ typedef struct { int name,type,next; } Parameter;
 enum {
     N_CONST,N_SYMBOL,N_STRING,N_DEREF,N_ADDR,N_CAST,N_BINARY,N_UNARY,N_ASSIGN,
     N_INC,N_CALL,N_COND,N_COMMA,N_BLOCK,N_EXPR,N_IF,N_WHILE,N_DO,N_FOR,
-    N_RETURN,N_BREAK,N_CONTINUE,N_SWITCH,N_CASE,N_ASM,N_ARG,N_INIT,N_LABEL,N_GOTO
+    N_RETURN,N_BREAK,N_CONTINUE,N_SWITCH,N_CASE,N_ASM,N_ARG,N_INIT,N_LABEL,N_GOTO,
+    N_VA_START,N_VA_ARG,N_VA_COPY,N_VA_END
 };
 typedef struct { int kind,type,a,b,c,value,where,next; } Node;
 typedef struct { int offset,kind,symbol,addend; } Fix;
@@ -104,12 +105,16 @@ static int raw_used;
 static Type types[TYPE_MAX];
 /* const/volatile副本仍属于同一聚合身份；前向声明完成后同步副本。 */
 static int aggregate_identity[TYPE_MAX];
+/* 每个原类型最多三个CV副本；小链复用避免头/成员访问反复消耗类型槽。 */
+static int qualifier_origin[TYPE_MAX],qualifier_next[TYPE_MAX];
 static Symbol symbols[SYMBOL_MAX];
 static Parameter parameters[PARAM_MAX];
 static Node nodes[NODE_MAX];
 static Fix fixes[FIX_MAX];
 static int type_count,symbol_count,param_count,node_count,fix_count;
 static int function_symbol,scope_depth,local_bytes;
+static int function_name_literal,function_name_bytes;
+static int root_adapter_symbols[2],root_adapter_used[2];
 static u8 code[CODE_MAX+36],data[DATA_MAX];
 static int code_used,data_used,bss_used;
 static int scl_symbol_storage[SYMBOL_MAX],scl_symbol_sizes[SYMBOL_MAX];
@@ -124,6 +129,18 @@ static void emit_function(int symbol,int body);
 static void global_init(int type,int offset,int expression);
 static void define_global(int symbol,int initializer);
 static u32 constant_value(int expression);
+static int constant_address_mode(int node,int *symbol,int *kind,int *addend,int lvalue_mode);
+static int sclc_type_same(int a,int b,int depth,int parameter);
+static int standard_builtin(void);
+static int standard_value_conversion(int target,int value);
+static void standard_bool_source(int value);
+static int standard_conditional_type(int yes,int no);
+static int standard_default_conversion(int value);
+static int standard_undeclared(int name);
+static int standard_root_name(int name);
+static void standard_root_declaration(int symbol,int type,int kind);
+static void emit_standard_adapters(void);
+static void map_function(int symbol,int address_value,int where);
 static void compile_unit(void);
 static void finish_image(const char *output);
 static void scl_literal_new(int offset,int size);
@@ -211,6 +228,7 @@ static void tokcopy(Tok *d,Tok *s) { d->k=s->k;
 #include "s3c_lex.inc"
 #include "s3c_pp.inc"
 #include "s3c_parse.inc"
+#include "s3c_std_parse.inc"
 #include "s3c_emit.inc"
 #include "s3c_scl.inc"
 

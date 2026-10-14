@@ -234,21 +234,21 @@ static int pp_precedence(int op)
     if(op=='*' || op=='/' || op=='%') return 10;
     return 0;
 }
-static u32 pp_expression(Tok *ts,int count,int *at,int minimum,int evaluate)
+static u32 pp_expression(Tok *ts,int count,int *at,int minimum,int evaluate,int *unsigned_out)
 {
     if(*at>=count) fatal("incomplete #if expression");
     Tok *t=ts+*at;
     (*at)++;
-    u32 value=0;
-    if(t->k==T_NUM || t->k==T_UNUM) value=number(t);
+    u32 value=0;int unsigned_value=0;
+    if(t->k==T_NUM || t->k==T_UNUM){value=number(t);unsigned_value=t->k==T_UNUM;}
     else if(t->k==T_ID) value=0;
     else if(t->k=='(') {
-        value=pp_expression(ts,count,at,1,evaluate);
+        value=pp_expression(ts,count,at,1,evaluate,&unsigned_value);
         if(*at>=count || ts[*at].k!=')') fatal("#if needs closing parenthesis");
         (*at)++;
     } else if(t->k=='!' || t->k=='~' || t->k=='-' || t->k=='+') {
-        value=pp_expression(ts,count,at,11,evaluate);
-        if(t->k=='!') value=!value;
+        value=pp_expression(ts,count,at,11,evaluate,&unsigned_value);
+        if(t->k=='!'){value=!value;unsigned_value=0;}
         if(t->k=='~') value=~value;
         if(t->k=='-') value=0u-value;
     } else fatal("invalid #if expression");
@@ -258,39 +258,48 @@ static u32 pp_expression(Tok *ts,int count,int *at,int minimum,int evaluate)
         (*at)++;
         int right_evaluate=evaluate;
         if((op==T_AND && !value) || (op==T_OR && value)) right_evaluate=0;
-        u32 right=pp_expression(ts,count,at,precedence+1,right_evaluate);
-        if(!evaluate) { value=0;
+        int unsigned_right=0;
+        u32 right=pp_expression(ts,count,at,precedence+1,right_evaluate,&unsigned_right);
+        int uns=unsigned_value|unsigned_right;
+        int comparison=op==T_EQ || op==T_NE || op=='<' || op=='>' || op==T_LE || op==T_GE || op==T_AND || op==T_OR;
+        int result_unsigned=comparison?0:(op==T_SHL || op==T_SHR)?unsigned_value:uns;
+        if(!evaluate) { value=0;unsigned_value=result_unsigned;
             continue; }
         if(op=='+') value+=right;
         else if(op=='-') value-=right;
         else if(op=='*') value*=right;
         else if(op=='/' || op=='%') {
             if(!right) fatal("division by zero in #if");
-            if(value==0x80000000u && right==0xFFFFFFFFu) fatal("signed division overflow in #if");
-            if(op=='/') value=(u32)((int)value/(int)right);
+            if(!uns && value==0x80000000u && right==0xFFFFFFFFu) fatal("signed division overflow in #if");
+            if(uns)value=op=='/'?value/right:value%right;
+            else if(op=='/') value=(u32)((int)value/(int)right);
             else value=(u32)((int)value%(int)right);
         } else if(op=='&') value&=right;
         else if(op=='^') value^=right;
         else if(op=='|') value|=right;
         else if(op==T_SHL) value<<=(right&31);
-        else if(op==T_SHR) value=(u32)((int)value>>(right&31));
+        else if(op==T_SHR) value=unsigned_value?value>>(right&31):(u32)((int)value>>(right&31));
         else if(op==T_EQ) value=value==right;
         else if(op==T_NE) value=value!=right;
-        else if(op=='<') value=(int)value<(int)right;
-        else if(op=='>') value=(int)value>(int)right;
-        else if(op==T_LE) value=(int)value<=(int)right;
-        else if(op==T_GE) value=(int)value>=(int)right;
+        else if(op=='<') value=uns?value<right:(int)value<(int)right;
+        else if(op=='>') value=uns?value>right:(int)value>(int)right;
+        else if(op==T_LE) value=uns?value<=right:(int)value<=(int)right;
+        else if(op==T_GE) value=uns?value>=right:(int)value>=(int)right;
         else if(op==T_AND) value=value && right;
         else if(op==T_OR) value=value || right;
+        unsigned_value=result_unsigned;
     }
     if(minimum==1 && *at<count && ts[*at].k=='?') {
         (*at)++;
-        u32 yes=pp_expression(ts,count,at,1,evaluate && value!=0);
+        int unsigned_yes=0,unsigned_no=0;
+        u32 yes=pp_expression(ts,count,at,1,evaluate && value!=0,&unsigned_yes);
         if(*at>=count || ts[*at].k!=':') fatal("#if conditional needs colon");
         (*at)++;
-        u32 no=pp_expression(ts,count,at,1,evaluate && value==0);
+        u32 no=pp_expression(ts,count,at,1,evaluate && value==0,&unsigned_no);
         value=value?yes:no;
+        unsigned_value=unsigned_yes|unsigned_no;
     }
+    *unsigned_out=unsigned_value;
     return value;
 }
 static int pp_condition(Tok *line,int count)
@@ -310,8 +319,8 @@ static int pp_condition(Tok *line,int count)
     }
     int expanded=0;
     pp_expand(condition_tokens,used,0,replacements[DEPTH_MAX-1],&expanded,LINE_MAX);
-    int at=0;
-    u32 value=pp_expression(replacements[DEPTH_MAX-1],expanded,&at,1,1);
+    int at=0,unsigned_value=0;
+    u32 value=pp_expression(replacements[DEPTH_MAX-1],expanded,&at,1,1,&unsigned_value);
     if(at!=expanded) fatal("extra token in #if");
     return value!=0;
 }
@@ -514,8 +523,9 @@ static void preprocess(const char *path)
      * 这保留M7→G1引导链，不要求老编译器先识别新汇编模板。 */
     /* 完整EDX:EAX乘积及ADC能力独立于REP。旧编译器没有WIDE宏，
      * 同一SCWIDE源码可走16位肢体纯C回退，保留M7→G1自编译链。 */
-    const char *predefined[]={"__SCCC__","__i386__","__STDC_HOSTED__","__SCCC_REP__","__SCCC_WIDE__","__SCCC_SSE2__"};
-    for(int i=0;i<6;i++) {
+    const char *predefined[]={"__SCCC__","__i386__","__STDC_HOSTED__","__SCCC_REP__","__SCCC_WIDE__","__SCCC_SSE2__",
+        "__SCCC_BOOL__","__SCCC_VA32__","__SCCC_OFFSETOF__","__SCCC_ROOTTERM__","__SCCC_FUNC__"};
+    for(int i=0;i<11;i++) {
         Macro *m=macros+macro_count++;
         m->name=intern(predefined[i],length(predefined[i]));
         m->active=1;

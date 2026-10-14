@@ -94,7 +94,10 @@ static void bool_result(int condition) { byte(0x0F);
 static void cast_value(int type)
 {
     Type *t=types+type;
-    if(t->kind==TY_CHAR || t->kind==TY_SHORT) {
+    if(t->kind==TY_BOOL) {
+        /* 先比较完整标量；256和低字节为0的非空指针仍必须是真。 */
+        test_eax();bool_result(5);
+    }else if(t->kind==TY_CHAR || t->kind==TY_SHORT) {
         byte(0x0F);
         byte((t->flags&Q_UNSIGNED)?(t->size==1?0xB6:0xB7):(t->size==1?0xBE:0xBF));
         byte(0xC0);
@@ -105,7 +108,7 @@ static void load_value(int type)
     Type *t=types+type;
     if(t->kind==TY_ARRAY || t->kind==TY_FUNC || t->kind==TY_STRUCT || t->kind==TY_UNION) return;
     if(t->size==1 || t->size==2) { byte(0x0F);
-        byte((t->flags&Q_UNSIGNED)?(t->size==1?0xB6:0xB7):(t->size==1?0xBE:0xBF));
+        byte(((t->flags&Q_UNSIGNED)||t->kind==TY_BOOL)?(t->size==1?0xB6:0xB7):(t->size==1?0xBE:0xBF));
         byte(0x00); }
     else if(t->size==4) { byte(0x8B);
         byte(0x00); }
@@ -149,7 +152,7 @@ static int frame_scalar(int node)
     if(!node||nodes[node].kind!=N_SYMBOL)return 0;
     Symbol *s=symbols+nodes[node].value;Type *t=types+nodes[node].type;
     if(s->kind!=S_LOCAL&&s->kind!=S_PARAM)return 0;
-    return (t->kind==TY_CHAR||t->kind==TY_SHORT||t->kind==TY_INT||t->kind==TY_PTR)
+    return (t->kind==TY_CHAR||t->kind==TY_SHORT||t->kind==TY_INT||t->kind==TY_PTR||t->kind==TY_BOOL)
         &&(t->size==1||t->size==2||t->size==4);
 }
 static void frame_load_register(int node,int reg)
@@ -157,7 +160,7 @@ static void frame_load_register(int node,int reg)
     Type *t=types+nodes[node].type;
     if(t->size==1||t->size==2){
         byte(0x0F);
-        byte((t->flags&Q_UNSIGNED)?(t->size==1?0xB6:0xB7):(t->size==1?0xBE:0xBF));
+        byte(((t->flags&Q_UNSIGNED)||t->kind==TY_BOOL)?(t->size==1?0xB6:0xB7):(t->size==1?0xBE:0xBF));
     }else byte(0x8B);
     memory(reg,5,symbols[nodes[node].value].value);
 }
@@ -167,7 +170,7 @@ static int global_scalar(int node)
     if(!node||nodes[node].kind!=N_SYMBOL)return 0;
     Symbol *s=symbols+nodes[node].value;Type *t=types+nodes[node].type;
     return s->kind==S_GLOBAL&&(t->kind==TY_CHAR||t->kind==TY_SHORT
-        ||t->kind==TY_INT||t->kind==TY_PTR)&&(t->size==1||t->size==2||t->size==4);
+        ||t->kind==TY_INT||t->kind==TY_PTR||t->kind==TY_BOOL)&&(t->size==1||t->size==2||t->size==4);
 }
 static void global_load_register(int node,int reg)
 {
@@ -176,7 +179,7 @@ static void global_load_register(int node,int reg)
      * 这与原LEA地址后间接读取访问同一对象，只缩短机器指令。 */
     Type *t=types+nodes[node].type;
     if(t->size==1||t->size==2){byte(0x0F);
-        byte((t->flags&Q_UNSIGNED)?(t->size==1?0xB6:0xB7):(t->size==1?0xBE:0xBF));}
+        byte(((t->flags&Q_UNSIGNED)||t->kind==TY_BOOL)?(t->size==1?0xB6:0xB7):(t->size==1?0xBE:0xBF));}
     else byte(0x8B);
     byte(reg*8+5);fixed(F_ABS,nodes[node].value,0,code_used);dword(0);
 }
@@ -265,7 +268,7 @@ static void operation(int op,int left_type,int right_type)
     else if(op=='^') { byte(0x31);
         byte(0xC8); }
     else if(op==T_SHL || op==T_SHR) { byte(0xD3);
-        byte(op==T_SHL?0xE0:unsigned_math?0xE8:0xF8); }
+        byte(op==T_SHL?0xE0:(types[a].flags&Q_UNSIGNED)?0xE8:0xF8); }
     else {
         byte(0x39);
         byte(0xC8);
@@ -302,6 +305,7 @@ static int constant_operation(int op,int left_type,int right_type,u32 value)
         byte(0x69);byte(0xC0);dword(value);return 1;
     }
     if(op==T_SHL||op==T_SHR){
+        unsigned_math=types[a].flags&Q_UNSIGNED;
         byte(0xC1);byte(op==T_SHL?0xE0:unsigned_math?0xE8:0xF8);
         byte((int)(value&31));return 1;
     }
@@ -326,6 +330,7 @@ static int constant_operation(int op,int left_type,int right_type,u32 value)
     }
     return 0;
 }
+#include "s3c_std_emit.inc"
 static void emit_expression(int node)
 {
     if(!node) { immediate(0,0);
@@ -341,6 +346,7 @@ static void emit_expression(int node)
     else if(kind==N_ADDR) address(n->a);
     else if(kind==N_CAST) { emit_expression(n->a);
         cast_value(n->type); }
+    else if(kind>=N_VA_START && kind<=N_VA_END)emit_standard_value(n);
     else if(kind==N_COMMA) { emit_expression(n->a);
         emit_expression(n->b); }
     else if(kind==N_UNARY) {
@@ -464,23 +470,34 @@ static void emit_expression(int node)
             byte(0xFF);
             byte(0xD0); }
         stack_add(n->value*4+(direct?0:4));
-        cast_value(n->type);
+        if(types[n->type].kind==TY_BOOL){
+            /* i386外部bool返回只保证AL；不能拿未定义的EAX高字判断真。 */
+            byte(0x0F);byte(0xB6);byte(0xC0);
+        }else cast_value(n->type);
     } else fatal("unsupported value node");
 }
 /* 编译期计算与运行时生成分别实现并互相测试，不能用宿主 signed
  * 溢出行为定义目标整数语义。加减乘在 u32 环上运算，比较/除法再依据
  * 类型选择有符号；条件与逻辑短路不访问未选中的除零表达式。 */
+static u32 constant_conversion(int type,u32 value)
+{
+    Type *t=types+type;
+    if(t->kind==TY_BOOL)return value!=0;
+    if(t->size==1)return (t->flags&Q_UNSIGNED)?value&255:(u32)(int)(char)value;
+    if(t->size==2)return (t->flags&Q_UNSIGNED)?value&65535:(u32)(int)(short)value;
+    return value;
+}
 static u32 constant_value(int node)
 {
     Node *n=nodes+node;
     error_position=n->where;
     if(n->kind==N_CONST) return (u32)n->value;
     if(n->kind==N_CAST) {
-        u32 v=constant_value(n->a);
-        Type *t=types+n->type;
-        if(t->size==1) return (t->flags&Q_UNSIGNED)?v&255:(u32)(int)(char)v;
-        if(t->size==2) return (t->flags&Q_UNSIGNED)?v&65535:(u32)(int)(short)v;
-        return v;
+        if(types[n->type].kind==TY_BOOL){
+            int symbol=0,kind=0,addend=0;
+            if(constant_address_mode(n->a,&symbol,&kind,&addend,0))return 1;
+        }
+        return constant_conversion(n->type,constant_value(n->a));
     }
     if(n->kind==N_UNARY) { u32 v=constant_value(n->a);
         return n->value=='-'?0u-v:n->value=='~'?~v:n->value=='!'?!v:v; }
@@ -507,7 +524,7 @@ static u32 constant_value(int node)
     if(op=='|') return a|b;
     if(op=='^') return a^b;
     if(op==T_SHL) return a<<(b&31);
-    if(op==T_SHR) return uns?a>>(b&31):(u32)((int)a>>(b&31));
+    if(op==T_SHR) return (types[promoted(nodes[n->a].type)].flags&Q_UNSIGNED)?a>>(b&31):(u32)((int)a>>(b&31));
     if(op==T_EQ) return a==b;
     if(op==T_NE) return a!=b;
     if(op=='<') return uns?a<b:(int)a<(int)b;
@@ -556,7 +573,10 @@ static void global_init(int type,int offset,int expression)
         fixed(kind,symbol,addend,-offset-1);
         return;
     }
-    u32 value=constant_value(expression);
+    /* 地址常量的bool不需要窄绝对重定位，真正对象地址必不为NULL。 */
+    u32 value;
+    if(types[type].kind==TY_BOOL && constant_address_mode(expression,&symbol,&kind,&addend,0))value=1;
+    else value=constant_conversion(type,constant_value(expression));
     for(int i=0;i<types[type].size;i++) { data[offset+i]=(u8)value;
         value>>=8; }
 }

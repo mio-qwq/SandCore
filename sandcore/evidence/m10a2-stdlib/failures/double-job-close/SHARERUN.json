@@ -1,0 +1,14 @@
+{
+  "kind": "application",
+  "name": "SHARERUN.SCX",
+  "dependencies": [
+    {"name": "SC32API.SCL", "abi_major": 1, "min_minor": 0, "min_version": 1}
+  ],
+  "imports": [
+    {"name": "ScJobCancel", "dependency": "SC32API.SCL", "kind": "function", "size": 1},
+    {"name": "ScJobClose", "dependency": "SC32API.SCL", "kind": "function", "size": 1},
+    {"name": "ScJobWait", "dependency": "SC32API.SCL", "kind": "function", "size": 1},
+    {"name": "ScProcessArguments", "dependency": "SC32API.SCL", "kind": "function", "size": 1},
+    {"name": "ScProcessSpawn", "dependency": "SC32API.SCL", "kind": "function", "size": 1}
+  ]
+}
