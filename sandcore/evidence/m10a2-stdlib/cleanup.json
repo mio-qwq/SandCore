@@ -1,0 +1,52 @@
+{
+  "authorization": "AGENTS section12 build-only useless generated artifacts",
+  "files": [
+    {
+      "path": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-stdlib-guest-01\\sandcore.img",
+      "bytes": 1474560,
+      "sha256": "47921cc2f9f0a23ea404cbd041a216931844023eedbcdbb4c824e9a55a8cfb3f",
+      "source": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-stdlib-bootstrap\\sandcore.img",
+      "reason": "failed owned verification clone; code/log/report/current useful artifacts kept"
+    },
+    {
+      "path": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-stdlib-guest-01\\sanddata.img",
+      "bytes": 268435456,
+      "sha256": "e6e1120021e90967e5097bb916ae8b31fe96784cb01251fd073518594faf2683",
+      "source": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a1\\sanddata.img",
+      "reason": "failed owned verification clone; code/log/report/current useful artifacts kept"
+    },
+    {
+      "path": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-stdlib-guest-02\\sandcore.img",
+      "bytes": 1474560,
+      "sha256": "47921cc2f9f0a23ea404cbd041a216931844023eedbcdbb4c824e9a55a8cfb3f",
+      "source": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-stdlib-bootstrap\\sandcore.img",
+      "reason": "failed owned verification clone; code/log/report/current useful artifacts kept"
+    },
+    {
+      "path": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-stdlib-guest-02\\sanddata.img",
+      "bytes": 268435456,
+      "sha256": "0ec52d33f5bb270390fb69e8c94428fc074a934639ebe3fd849ed9309aa2824e",
+      "source": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a1\\sanddata.img",
+      "reason": "failed owned verification clone; code/log/report/current useful artifacts kept"
+    },
+    {
+      "path": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-stdlib-guest-03\\sandcore.img",
+      "bytes": 1474560,
+      "sha256": "47921cc2f9f0a23ea404cbd041a216931844023eedbcdbb4c824e9a55a8cfb3f",
+      "source": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-stdlib-bootstrap\\sandcore.img",
+      "reason": "failed owned verification clone; code/log/report/current useful artifacts kept"
+    },
+    {
+      "path": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-stdlib-guest-03\\sanddata.img",
+      "bytes": 268435456,
+      "sha256": "d9b9daa1455d4ca82c271401e40182d25cf342866ad610de3a1280c4be5931d2",
+      "source": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a1\\sanddata.img",
+      "reason": "failed owned verification clone; code/log/report/current useful artifacts kept"
+    }
+  ],
+  "bytes": 809730048.0,
+  "original_disks_preserved": true,
+  "code_preserved": true,
+  "current_guest04_guest05_preserved": true,
+  "status": "REMOVED"
+}
