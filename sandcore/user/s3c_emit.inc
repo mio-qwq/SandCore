@@ -584,6 +584,7 @@ static void define_global(int symbol,int initializer)
     }
     s->defined=1;
     if(shared_output)scl_global_new(symbol,size);
+    if(dynamic_output)scl_symbol_sizes[symbol]=size;
 }
 /* 内联汇编只接受明确的固定寄存器约束；未知约束必须诊断，不偷偷
  * 当成普通函数。模板采用常用 AT&T 写法，%% 转义寄存器，也支持 %0
@@ -1041,11 +1042,12 @@ static void emit_function(int symbol,int body)
     if(preserve){byte(0x5F);byte(0x5E);byte(0x5B);}
     byte(0xC9);
     byte(0xC3);
-    if(shared_output)scl_symbol_sizes[symbol]=code_used-symbols[symbol].value;
+    if(shared_output || dynamic_output)scl_symbol_sizes[symbol]=code_used-symbols[symbol].value;
 }
 static void finish_image(const char *output)
 {
     if(shared_output){finish_scl(output);return;}
+    if(dynamic_output){finish_dynamic(output);return;}
     int main_symbol=find_symbol(module_output?intern("skm_main",8):intern("main",4),0);
     if(!main_symbol || symbols[main_symbol].kind!=S_FUNCTION || !symbols[main_symbol].defined) fatal("main function is missing");
     if(types[symbols[main_symbol].type].count!=(module_output?1:0)) fatal("SCX main takes no parameters; SKM skm_main takes API pointer");

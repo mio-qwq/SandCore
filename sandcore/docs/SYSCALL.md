@@ -575,3 +575,60 @@ FSREAD/READAT、STREAMREAD、SOCKETRECEIVE、图片结果、调试读回、
 SCAPI.H冻结，未构建/未客体运行，SCL运行期装载仍须单独验收。
 
 修订：2026-10-14，0x280..282实际执行、整范围保护失败/中间与重复释放拒绝、库只读输入与GETARGS/MONITOR/STAT写回拒绝及页回收已通过；释放同时撤销旧断点/异常入口，授权调试全流程另验。旧SCX ls在新核心实际运行，SCAPI.H原字节保持。
+
+## M10a2 固定 Ring3 根引导入口（本批源码，未构建/未运行）
+
+| EAX | 名称 | 入参 | 返回与合同 |
+|---|---|---|---|
+| 0x283 | SCLBOOT | EBX=本人可写32B输出；ECX=本人SCD1描述符虚址或0 | EAX=0成功或明确负错误；映射固定 `/SYS/LIB/SCLDR.SCL`，返回本人用户虚址；不执行任何库函数 |
+
+EDX/ESI/EDI/EBP均忽略。该入口只供编译器CRT和SCLDR私有引导层使用，
+不向冻结的SCAPI.H增加包装。输出完整32B先检查本人P/US/RW映射；任何
+格式、权限、资源或保护失败均不写半份输出，也不留下新模块页。
+
+ECX非零时，先检查本人低端SCX窗口内的完整64B头，再读metadata_size并
+检查整个元数据区；使用共享 `scd_validate(metadata,size,descriptor_va-0x400000)`
+完整校验SCD1。描述符的load/bss必须分别精确等于内核从真实SCX容器保存的
+字节数，整个load+bss区间仍须在本人低端映像映射内。页尾填充、独立栈和
+图形/模块堆不作为SCX正文。此项检查在首次装根和重复引导时都先完成；
+错误不触发装根。32B输出不得与传入的完整描述符元数据区重叠，避免成功
+写回破坏下一步根入口使用的输入。ECX=0只请求固定根映射，不验证应用描述符。
+
+成功恰写8个小端u32：
+
+| 索引 | 字段 | 含义 |
+|---:|---|---|
+| 0 | size | 32 |
+| 1 | version | 1 |
+| 2 | root_base | 本人SCLDR映像基址 |
+| 3 | entry_va | 函数导出 `ScApplicationStart` 的本人虚址 |
+| 4 | metadata_va | `root_base+image_size`，页对齐的只读元数据起点 |
+| 5 | metadata_size | 完整SCL头、五张表和字符串区前缀的实际字节数 |
+| 6 | allocation_bytes | image_size加元数据向4KiB取整后的整块分配长度 |
+| 7 | image_size | SCL头中的页对齐映像尺寸 |
+
+元数据是已经完整校验的文件前缀，不是第二份完整文件；文件头仍保留原
+file_size及段file_offset。段正文在 `root_base+segment_rva`，不能从
+metadata_va加file_offset去读取正文。没有字段含内核指针或物理帧地址。
+
+固定根文件最多256KiB，ABI主版本必须为1、声明名称必须为SCLDR.SCL；
+导入与依赖项数必须为0，init/fini均须为NO_ENTRY，必须有合法函数导出
+ScApplicationStart。内核使用与三环相同的完整SCL v1校验器，复制各段，
+处理内部ABS32/PC32回填，再保护text/rodata/元数据为只读、data/BSS为RW。
+映像及页对齐元数据合计不得超过64MiB模块窗口。256KiB只限这个小型固定
+引导根，普通SCL运行期文件仍按SCL v1的16MiB文件/64MiB映像合同处理。
+
+同进程重复引导复用同一根实例及磁盘快照，不重新复制或重定位；显式
+MODULEFREE成功释放这个精确根块时清除私有根缓存，下次才重新装根。
+正常运行时将自己借用并固定至退出，不在仍执行根代码时释放。槽位复用
+及退出回收清除旧根字段；进程退出沿既有US私有页回收根映像/元数据。
+根入口的真正调用、应用依赖解析、初始化、main及逆序清理由Ring3负责。
+代码只读没有NX，原MODULEPROTECT本人重新申请RW的合同也保留。
+
+负错误沿SCL/SCD基础语义：-1 FORMAT，-2 RANGE（含非法输出/描述符
+映射及容器尺寸不符），-3 SYMBOL，-4 VERSION，-5 NOT_FOUND（缺失或
+无读取资格），-6 MEMORY，-10 BUSY（可信调用错误地处于IF=1），
+-11 IO（读取、复制、保护或缓存映射不一致）。失败不执行用户回调。
+
+修订：2026-10-14，新增0x283固定用户态根引导、精确SCD/SCX启动校验、
+32B本人虚址输出及复用/失败回滚/退出寿命；本批仍未构建或客体运行。

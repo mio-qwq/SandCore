@@ -17,6 +17,11 @@ typedef struct {
     u32 deferred_draw;
     int visibility_aware;
     int cleanup_phase;
+    /* 固定SCLDR根的本人虚址缓存；只加私有尾部，不扩168B公共前缀。 */
+    u32 scl_root_base,scl_root_entry,scl_root_metadata;
+    u32 scl_root_metadata_size,scl_root_bytes,scl_root_image_size;
+    /* 精确容器长度只存可信尾部，动态描述符不能凭映射页数伪造它。 */
+    u32 scx_load_size,scx_bss_size;
 } task_record_t;
 
 int task_store_init(const u32 sizes[TASK_DATA_COUNT]);

@@ -1,0 +1,515 @@
+{
+  "status": "DECLARED_DYNAMIC_STARTUP_CASES_PASS",
+  "scope": "M10A2_AUTOMATIC_DYNAMIC_SCX_AND_NATIVE_TOOLCHAIN",
+  "cases": [
+    {
+      "name": "automatic-host-SCX-and-fixed-system-root",
+      "status": "PASS",
+      "command": "/HOME/M10D/HOST/DYNAPP.SCX",
+      "exit_code": 0,
+      "expected_exit": 0,
+      "output": "/HOME/M10D/HOST/DYNAPP.SCX; _m9_status=$?; printf \"\\n\"; echo __M9_0c428357cf4deff53cb189de:$_m9_status\n",
+      "wall_seconds": 0.13999999999941792,
+      "qemu_cpu_seconds": 0.140625
+    },
+    {
+      "name": "guest-SCCC-dynamic-compile",
+      "status": "PASS",
+      "command": "/TMP/DY-ff49d2/SCCC0.SCX /TMP/DY-ff49d2/DYNAPP.C /HOME/M10D/NATIVE/DYNAPP.SCX --dynamic /TMP/DY-ff49d2/DYNAPP.json",
+      "exit_code": 0,
+      "expected_exit": 0,
+      "output": "/TMP/DY-ff49d2/SCCC0.SCX /TMP/DY-ff49d2/DYNAPP.C /HOME/M10D/NATIVE/DYNAPP.SCX --dynamic /TMP/DY-ff49d2/DYNAPP.json; _m9_status=$?; printf \"\\n\"; echo __M9_708933d56d7679c41bcde8a6:$_m9_status\nSCCC / mio\nTMP/DY-ff49d2/DYNAPP.C -> HOME/M10D/NATIVE/DYNAPP.SCX\nValidating application manifest\nSCCC: preprocess -> C -> x86\nPreprocessing source and includes\nParsing C and generating x86\nLinking and writing SCX\nSCCC OK SCX DYNAMIC\nCompilation complete\n",
+      "wall_seconds": 0.8130000000019209,
+      "qemu_cpu_seconds": 1.0625
+    },
+    {
+      "name": "automatic-native-SCX-real-import-calls",
+      "status": "PASS",
+      "command": "/HOME/M10D/NATIVE/DYNAPP.SCX",
+      "exit_code": 0,
+      "expected_exit": 0,
+      "output": "/HOME/M10D/NATIVE/DYNAPP.SCX; _m9_status=$?; printf \"\\n\"; echo __M9_f53da88676ff2805058d2b87:$_m9_status\n",
+      "wall_seconds": 0.5619999999980791,
+      "qemu_cpu_seconds": 0.453125
+    },
+    {
+      "name": "compile-ROOTCHECK",
+      "status": "PASS",
+      "command": "/TMP/DY-ff49d2/SCCC0.SCX /TMP/DY-ff49d2/ROOTCHECK.C /HOME/M10D/NATIVE/ROOTCHK.SCL --scl /TMP/DY-ff49d2/ROOTCHECK.json",
+      "exit_code": 0,
+      "expected_exit": 0,
+      "output": "/TMP/DY-ff49d2/SCCC0.SCX /TMP/DY-ff49d2/ROOTCHECK.C /HOME/M10D/NATIVE/ROOTCHK.SCL --scl /TMP/DY-ff49d2/ROOTCHECK.json; _m9_status=$?; printf \"\\n\"; echo __M9_636b348d7a76246b0ac13f3c:$_m9_status\nSCCC / mio\nTMP/DY-ff49d2/ROOTCHECK.C -> HOME/M10D/NATIVE/ROOTCHK.SCL\nValidating SCL manifest\nSCCC: preprocess -> C -> x86\nPreprocessing source and includes\nParsing C and generating x86\nLinking and writing SCL\nSCCC OK SCL NATIVE\nCompilation complete\n",
+      "wall_seconds": 1.9689999999973224,
+      "qemu_cpu_seconds": 1.875
+    },
+    {
+      "name": "compile-DYNROOT",
+      "status": "PASS",
+      "command": "/TMP/DY-ff49d2/SCCC0.SCX /TMP/DY-ff49d2/DYNROOT.C /HOME/M10D/NATIVE/DYNROOT.SCX --dynamic /TMP/DY-ff49d2/DYNROOT.json",
+      "exit_code": 0,
+      "expected_exit": 0,
+      "output": "/TMP/DY-ff49d2/SCCC0.SCX /TMP/DY-ff49d2/DYNROOT.C /HOME/M10D/NATIVE/DYNROOT.SCX --dynamic /TMP/DY-ff49d2/DYNROOT.json; _m9_status=$?; printf \"\\n\"; echo __M9_d5e093277d64b18c7c7a8622:$_m9_status\nSCCC / mio\nTMP/DY-ff49d2/DYNROOT.C -> HOME/M10D/NATIVE/DYNROOT.SCX\nValidating application manifest\nSCCC: preprocess -> C -> x86\nPreprocessing source and includes\nParsing C and generating x86\nLinking and writing SCX\nSCCC OK SCX DYNAMIC\nCompilation complete\n",
+      "wall_seconds": 1.1560000000026776,
+      "qemu_cpu_seconds": 1.140625
+    },
+    {
+      "name": "compile-DYNFAULT",
+      "status": "PASS",
+      "command": "/TMP/DY-ff49d2/SCCC0.SCX /TMP/DY-ff49d2/DYNFAULT.C /HOME/M10D/NATIVE/DYNFAULT.SCX --dynamic /TMP/DY-ff49d2/DYNFAULT.json",
+      "exit_code": 0,
+      "expected_exit": 0,
+      "output": "/TMP/DY-ff49d2/SCCC0.SCX /TMP/DY-ff49d2/DYNFAULT.C /HOME/M10D/NATIVE/DYNFAULT.SCX --dynamic /TMP/DY-ff49d2/DYNFAULT.json; _m9_status=$?; printf \"\\n\"; echo __M9_b5e396f4140ee591fa8a7b0a:$_m9_status\nSCCC / mio\nTMP/DY-ff49d2/DYNFAULT.C -> HOME/M10D/NATIVE/DYNFAULT.SCX\nValidating application manifest\nSCCC: preprocess -> C -> x86\nPreprocessing source and includes\nParsing C and generating x86\nLinking and writing SCX\nSCCC OK SCX DYNAMIC\nCompilation complete\n",
+      "wall_seconds": 1.3130000000019209,
+      "qemu_cpu_seconds": 1.265625
+    },
+    {
+      "name": "compile-DYNONE",
+      "status": "PASS",
+      "command": "/TMP/DY-ff49d2/SCCC0.SCX /TMP/DY-ff49d2/DYNONE.C /HOME/M10D/NATIVE/DYNONE.SCX --dynamic /TMP/DY-ff49d2/DYNONE.json",
+      "exit_code": 0,
+      "expected_exit": 0,
+      "output": "/TMP/DY-ff49d2/SCCC0.SCX /TMP/DY-ff49d2/DYNONE.C /HOME/M10D/NATIVE/DYNONE.SCX --dynamic /TMP/DY-ff49d2/DYNONE.json; _m9_status=$?; printf \"\\n\"; echo __M9_17e98cad1af8af3978a36307:$_m9_status\nSCCC / mio\nTMP/DY-ff49d2/DYNONE.C -> HOME/M10D/NATIVE/DYNONE.SCX\nValidating application manifest\nSCCC: preprocess -> C -> x86\nPreprocessing source and includes\nParsing C and generating x86\nLinking and writing SCX\nSCCC OK SCX DYNAMIC\nCompilation complete\n",
+      "wall_seconds": 1.1869999999980791,
+      "qemu_cpu_seconds": 1.203125
+    },
+    {
+      "name": "compile-DYNTWO",
+      "status": "PASS",
+      "command": "/TMP/DY-ff49d2/SCCC0.SCX /TMP/DY-ff49d2/DYNTWO.C /HOME/M10D/NATIVE/DYNTWO.SCX --dynamic /TMP/DY-ff49d2/DYNTWO.json",
+      "exit_code": 0,
+      "expected_exit": 0,
+      "output": "/TMP/DY-ff49d2/SCCC0.SCX /TMP/DY-ff49d2/DYNTWO.C /HOME/M10D/NATIVE/DYNTWO.SCX --dynamic /TMP/DY-ff49d2/DYNTWO.json; _m9_status=$?; printf \"\\n\"; echo __M9_c6dfe0f8bbcf5aaf40821d18:$_m9_status\nSCCC / mio\nTMP/DY-ff49d2/DYNTWO.C -> HOME/M10D/NATIVE/DYNTWO.SCX\nValidating application manifest\nSCCC: preprocess -> C -> x86\nPreprocessing source and includes\nParsing C and generating x86\nLinking and writing SCX\nSCCC OK SCX DYNAMIC\nCompilation complete\n",
+      "wall_seconds": 1.0780000000013388,
+      "qemu_cpu_seconds": 1.0
+    },
+    {
+      "name": "init-sees-shared-root-context",
+      "status": "PASS",
+      "command": "/HOME/M10D/NATIVE/DYNROOT.SCX",
+      "exit_code": 0,
+      "expected_exit": 0,
+      "output": "/HOME/M10D/NATIVE/DYNROOT.SCX; _m9_status=$?; printf \"\\n\"; echo __M9_f2114a325e36afc63d8476e1:$_m9_status\n",
+      "wall_seconds": 0.26599999999598367,
+      "qemu_cpu_seconds": 0.25
+    },
+    {
+      "name": "two-concurrent-processes-private-library-data",
+      "status": "PASS",
+      "command": "/HOME/M10D/NATIVE/DYNONE.SCX & a=$!; /HOME/M10D/NATIVE/DYNTWO.SCX & b=$!; wait $a; first=$?; wait $b; second=$?; echo M10D_ISOLATION:$first:$second; test $first -eq 0 && test $second -eq 0",
+      "exit_code": 0,
+      "expected_exit": 0,
+      "output": "/HOME/M10D/NATIVE/DYNONE.SCX & a=$!; /HOME/M10D/NATIVE/DYNTWO.SCX & b=$!; wait $a; first=$?; wait $b; second=$?; echo M10D_ISOLATION:$first:$second; test $first -eq 0 && test $second -eq 0; _m9_status=$?; printf \"\\n\"; echo __M9_b2588106f0de285f9c45633b:$_m9_status\nM10D_ISOLATION:0:0\n",
+      "wall_seconds": 8.875,
+      "qemu_cpu_seconds": 8.296875
+    },
+    {
+      "name": "native-root-output-directory",
+      "status": "PASS",
+      "command": "mkdir /TMP/DY-ff49d2/BUILT",
+      "exit_code": 0,
+      "expected_exit": 0,
+      "output": "mkdir /TMP/DY-ff49d2/BUILT; _m9_status=$?; printf \"\\n\"; echo __M9_1cdad8f3de12a557fc023b1e:$_m9_status\n",
+      "wall_seconds": 0.23399999999674037,
+      "qemu_cpu_seconds": 0.125
+    },
+    {
+      "name": "guest-SCCC-builds-runtime-root",
+      "status": "PASS",
+      "command": "/TMP/DY-ff49d2/SCCC0.SCX /TMP/DY-ff49d2/SRC/runtime/SCLROOT.C /TMP/DY-ff49d2/BUILT/SCLDR.SCL --scl /TMP/DY-ff49d2/SRC/runtime/SCLROOT.json",
+      "exit_code": 0,
+      "expected_exit": 0,
+      "output": "/TMP/DY-ff49d2/SCCC0.SCX /TMP/DY-ff49d2/SRC/runtime/SCLROOT.C /TMP/DY-ff49d2/BUILT/SCLDR.SCL --scl /TMP/DY-ff49d2/SRC/runtime/SCLROOT.json; _m9_status=$?; printf \"\\n\"; echo __M9_01b37e6d3acac3b9755032f6:$_m9_status\nSCCC / mio\nTMP/DY-ff49d2/SRC/runtime/SCLROOT.C -> TMP/DY-ff49d2/BUILT/SCLDR.SCL\nValidating SCL manifest\nSCCC: preprocess -> C -> x86\nPreprocessing source and includes\nParsing C and generating x86\nLinking and writing SCL\nSCCC OK SCL NATIVE\nCompilation complete\n",
+      "wall_seconds": 1.7970000000059372,
+      "qemu_cpu_seconds": 1.65625
+    },
+    {
+      "name": "native-root-nine-exports-no-imports",
+      "status": "PASS",
+      "bytes": 45989,
+      "sha256": "c0a4b47cab3f83a578b23dbe3baa3fcbf2d1a5592871a218546f02e55fd51aba",
+      "executed_this_generated_file": false
+    },
+    {
+      "name": "guest-SCCC-self-build-G1",
+      "status": "PASS",
+      "command": "/TMP/DY-ff49d2/SCCC0.SCX /TMP/DY-ff49d2/SRC/sccc.c /TMP/DY-ff49d2/BUILT/SCCC1.SCX",
+      "exit_code": 0,
+      "expected_exit": 0,
+      "output": "/TMP/DY-ff49d2/SCCC0.SCX /TMP/DY-ff49d2/SRC/sccc.c /TMP/DY-ff49d2/BUILT/SCCC1.SCX; _m9_status=$?; printf \"\\n\"; echo __M9_416ab47eccedb3ea84b85c4a:$_m9_status\nSCCC / mio\nTMP/DY-ff49d2/SRC/sccc.c -> TMP/DY-ff49d2/BUILT/SCCC1.SCX\nSCCC: preprocess -> C -> x86\nPreprocessing source and includes\nParsing C and generating x86\nLinking and writing SCX\nSCCC OK load=208258 bss=3538848 / mio\nCompilation complete\n",
+      "wall_seconds": 3.4530000000013388,
+      "qemu_cpu_seconds": 3.21875
+    },
+    {
+      "name": "G1-output-directory",
+      "status": "PASS",
+      "command": "mkdir /HOME/M10D/G1",
+      "exit_code": 0,
+      "expected_exit": 0,
+      "output": "mkdir /HOME/M10D/G1; _m9_status=$?; printf \"\\n\"; echo __M9_59072bc63865067d00821d0c:$_m9_status\n",
+      "wall_seconds": 0.125,
+      "qemu_cpu_seconds": 0.109375
+    },
+    {
+      "name": "G1-library-BASE.SCL",
+      "status": "PASS",
+      "command": "cp /HOME/M10D/NATIVE/BASE.SCL /HOME/M10D/G1/BASE.SCL",
+      "exit_code": 0,
+      "expected_exit": 0,
+      "output": "cp /HOME/M10D/NATIVE/BASE.SCL /HOME/M10D/G1/BASE.SCL; _m9_status=$?; printf \"\\n\"; echo __M9_a40a530911f1a3b2d88a7682:$_m9_status\n",
+      "wall_seconds": 0.25,
+      "qemu_cpu_seconds": 0.15625
+    },
+    {
+      "name": "G1-library-UPPER.SCL",
+      "status": "PASS",
+      "command": "cp /HOME/M10D/NATIVE/UPPER.SCL /HOME/M10D/G1/UPPER.SCL",
+      "exit_code": 0,
+      "expected_exit": 0,
+      "output": "cp /HOME/M10D/NATIVE/UPPER.SCL /HOME/M10D/G1/UPPER.SCL; _m9_status=$?; printf \"\\n\"; echo __M9_50185f6b4834ebf536d09f4c:$_m9_status\n",
+      "wall_seconds": 0.3440000000045984,
+      "qemu_cpu_seconds": 0.1875
+    },
+    {
+      "name": "actual-G1-dynamic-compile",
+      "status": "PASS",
+      "command": "/TMP/DY-ff49d2/BUILT/SCCC1.SCX /TMP/DY-ff49d2/DYNAPP.C /HOME/M10D/G1/DYNAPP.SCX --dynamic /TMP/DY-ff49d2/DYNAPP.json",
+      "exit_code": 0,
+      "expected_exit": 0,
+      "output": "/TMP/DY-ff49d2/BUILT/SCCC1.SCX /TMP/DY-ff49d2/DYNAPP.C /HOME/M10D/G1/DYNAPP.SCX --dynamic /TMP/DY-ff49d2/DYNAPP.json; _m9_status=$?; printf \"\\n\"; echo __M9_ac55beea5f3285394cbe8aba:$_m9_status\nSCCC / mio\nTMP/DY-ff49d2/DYNAPP.C -> HOME/M10D/G1/DYNAPP.SCX\nValidating application manifest\nSCCC: preprocess -> C -> x86\nPreprocessing source and includes\nParsing C and generating x86\nLinking and writing SCX\nSCCC OK SCX DYNAMIC\nCompilation complete\n",
+      "wall_seconds": 0.9839999999967404,
+      "qemu_cpu_seconds": 0.921875
+    },
+    {
+      "name": "automatic-G1-application-executes",
+      "status": "PASS",
+      "command": "/HOME/M10D/G1/DYNAPP.SCX",
+      "exit_code": 0,
+      "expected_exit": 0,
+      "output": "/HOME/M10D/G1/DYNAPP.SCX; _m9_status=$?; printf \"\\n\"; echo __M9_0848825092807129742ed17d:$_m9_status\n",
+      "wall_seconds": 0.18800000000192085,
+      "qemu_cpu_seconds": 0.109375
+    },
+    {
+      "name": "G0-G1-dynamic-bytes-identical",
+      "status": "PASS"
+    },
+    {
+      "name": "repeat-normal-exit",
+      "status": "PASS",
+      "command": "/HOME/M10D/NATIVE/DYNAPP.SCX",
+      "exit_code": 0,
+      "expected_exit": 0,
+      "output": "/HOME/M10D/NATIVE/DYNAPP.SCX; _m9_status=$?; printf \"\\n\"; echo __M9_a0213a15a79fe21e50335a39:$_m9_status\n",
+      "wall_seconds": 0.10899999999674037,
+      "qemu_cpu_seconds": 0.0625
+    },
+    {
+      "name": "normal-exit-page-recovery",
+      "status": "PASS",
+      "before": 8872,
+      "after": 8872,
+      "observations": [
+        8872,
+        8872,
+        8872,
+        8872,
+        8872
+      ]
+    },
+    {
+      "name": "root-code-readonly-real-page-fault",
+      "status": "PASS",
+      "command": "/HOME/M10D/NATIVE/DYNFAULT.SCX",
+      "exit_code": 14,
+      "expected_exit": 14,
+      "output": "/HOME/M10D/NATIVE/DYNFAULT.SCX; _m9_status=$?; printf \"\\n\"; echo __M9_62334532dbe2523df0a5065b:$_m9_status\n",
+      "wall_seconds": 0.125,
+      "qemu_cpu_seconds": 0.0625
+    },
+    {
+      "name": "abnormal-exit-page-recovery",
+      "status": "PASS",
+      "before": 8872,
+      "after": 8872,
+      "observations": [
+        8872,
+        8872,
+        8872,
+        8872,
+        8872
+      ]
+    },
+    {
+      "name": "incompatible-ABI-rejected",
+      "status": "PASS",
+      "command": "/HOME/M10D/HOST/BADVER.SCX",
+      "exit_code": 1,
+      "expected_exit": 1,
+      "output": "/HOME/M10D/HOST/BADVER.SCX; _m9_status=$?; printf \"\\n\"; echo __M9_227266010ab18197e571243f:$_m9_status\nSCL: dependency or symbol (-4)\n",
+      "wall_seconds": 0.125,
+      "qemu_cpu_seconds": 0.0625
+    },
+    {
+      "name": "missing-library-rejected",
+      "status": "PASS",
+      "command": "/HOME/M10D/HOST/MISSING.SCX",
+      "exit_code": 1,
+      "expected_exit": 1,
+      "output": "/HOME/M10D/HOST/MISSING.SCX; _m9_status=$?; printf \"\\n\"; echo __M9_88d253cec7cfd1716f999b00:$_m9_status\nSCL: dependency or symbol (-5)\n",
+      "wall_seconds": 0.13999999999941792,
+      "qemu_cpu_seconds": 0.078125
+    },
+    {
+      "name": "patch-into-CRT-rejected",
+      "status": "PASS",
+      "command": "/HOME/M10D/HOST/BADCRT.SCX",
+      "exit_code": 1,
+      "expected_exit": 1,
+      "output": "/HOME/M10D/HOST/BADCRT.SCX; _m9_status=$?; printf \"\\n\"; echo __M9_8a89fe24ffc1d2c8a77c9b3c:$_m9_status\n",
+      "wall_seconds": 0.11000000000058208,
+      "qemu_cpu_seconds": 0.0625
+    },
+    {
+      "name": "SYSTEM-cannot-overwrite-system-root",
+      "status": "PASS",
+      "command": "cp /TMP/DY-ff49d2/SCCC0.SCX /SYS/LIB/SCLDR.SCL",
+      "exit_code": 1,
+      "expected_exit": 1,
+      "output": "cp /TMP/DY-ff49d2/SCCC0.SCX /SYS/LIB/SCLDR.SCL; _m9_status=$?; printf \"\\n\"; echo __M9_ced240d9865933e234a496d4:$_m9_status\ncp: -1\n",
+      "wall_seconds": 0.125,
+      "qemu_cpu_seconds": 0.09375
+    },
+    {
+      "name": "protected-root-bytes-preserved",
+      "status": "PASS"
+    },
+    {
+      "name": "legacy-SCX-ls-still-runs",
+      "status": "PASS",
+      "command": "ls /HOME/M10D/NATIVE",
+      "exit_code": 0,
+      "expected_exit": 0,
+      "output": "ls /HOME/M10D/NATIVE; _m9_status=$?; printf \"\\n\"; echo __M9_8725096f1c608450d87cbecf:$_m9_status\nBASE.SCL\nDYNAPP.SCX\nDYNAPP.SCX.log\nDYNAPP.SCX.map\nDYNFAULT.SCX\nDYNFAULT.SCX.log\nDYNFAULT.SCX.map\nDYNONE.SCX\nDYNONE.SCX.log\nDYNONE.SCX.map\nDYNROOT.SCX\nDYNROOT.SCX.log\nDYNROOT.SCX.map\nDYNTWO.SCX\nDYNTWO.SCX.log\nDYNTWO.SCX.map\nROOTCHK.SCL\nROOTCHK.SCL.log\nROOTCHK.SCL.map\nUPPER.SCL\n",
+      "wall_seconds": 0.125,
+      "qemu_cpu_seconds": 0.046875
+    }
+  ],
+  "installed_root_source": "HOST_GCC_BOOTSTRAP",
+  "source_data_sha256": "3db2e3cd9262343204e8c19af02847e98244732c5b5ad4397dd334be84fe7e64",
+  "build_report_sha256": "14c3a3c4920e235d378894429a464ad162e2cc596ec89a25cbef664b91727cf2",
+  "input_sha256": {
+    "user/sccc.c": "57b0b9bd0a607fc4b4c5d87b6c2af0c952b8675d6f282c02c1e3545aca013ae1",
+    "user/s3c.c": "014d1db1c5127ca7ea03b95cde1bd0fbbdbcd5122822fa6621b295f0ebce1a52",
+    "user/SCAPI.H": "81a730450fcb3d310ed841ad3e5c70a3fed32aa7fbd10acac8b888ac7da9ffc1",
+    "user/SCIO.H": "f0843c3702fb2ab28276c2da0ac9f7f8139d705c8a043d67b7f5b343ed11a7dd",
+    "user/COMPILECLI.inc": "f2d0cf982365b0eab60ff60c48d5531fece70c2a70cf2bf235055bead3f9cb1e",
+    "user/s3c_lex.inc": "daac00f4c34383cbb47ec2dfce8fa3e959ef2813c66f647284ab2ab4b75becfc",
+    "user/s3c_pp.inc": "9ebde1119c4cf4d67d681b79bb51cae79c1a7d79b3682c4a09d977ec83acb871",
+    "user/s3c_parse.inc": "b4a109769db27d3421690fd2eec04483f79afb5b3ac6f5b24f2870d4f7c8f933",
+    "user/s3c_emit.inc": "6b125aa0d42f32cce848193057f51d3663a5f69df3c3d84a43a348ff78470a2c",
+    "user/s3c_scl.inc": "fcc63260bd999c516be224997ada22554c38c6aadad393b56014056a70743fd2",
+    "user/runtime/SCLFMT.H": "f040266a9d13f513d4cc6ec7fe8ac43175287e2c484abd150607387043053611",
+    "user/runtime/scl_format.c": "72910926be9da4ee90466945e4ac42a9ac2bacb2d83ff3e7cf51a6611894187f",
+    "user/runtime/SCDYN.H": "9fe728833ddddf4e8b7a4a6a21e8b5abc787926e32e6b68127860a05e8e613b1",
+    "user/runtime/scd_format.c": "952db60181b9eddb4b32da97509c2767e7fabfaba40f5423084690c47f01421d",
+    "user/runtime/SCLDR.H": "8457c40765f034acc304575eb438bce17220834ea3a236fea2d662a1a8cd4bdd",
+    "user/runtime/SCLPRIVATE.H": "ad1c41821883f884f569200030aafc68c7aa13f9f36a26e568a5a4295647a854",
+    "user/runtime/SCLROOT.C": "b1c5a691f9d2b27486b635e7a5c13297d5942fb8a6886fc252ed7d5cc2484f8c",
+    "user/runtime/SCLROOT.json": "77c64721670c2d8f78023afb3ef0a2be32bf2b45e6b564ac7afdf6b82d525f42",
+    "user/runtime/scldr.c": "0bb8ad1d58e5948a721a14b61ef44bb83bfa99d35571cceddbe660463c0178a5",
+    "user/runtime/scl_platform.c": "03120e218bc18ad94578bb1bfe61813627c44ee45a5462600e96fb2d00ece027",
+    "user/runtime/scl_application.c": "714361b36497bf64e6bc8e2a471daf6b2961f6dd8936acd62459838a752b12df",
+    "tests/m10a2/DYNAPP.C": "53b8249582aee2835549d8c5d0e6a422c30df84a7b9a0f0fc1b5618b454fcef9",
+    "tests/m10a2/DYNAPP.json": "9ca185c56e314e70da3290263a9a2ebd332e1ced3ced803d6f7180af7247eb83"
+  },
+  "core_sha256": "7d45089e45303b0fa21cb9e2934c0add365d83b5ebf914d0bba655654e503dcb",
+  "root_sha256": "02be94772a654f32a8aff1c977840d95b5c51f3859d803d38a3c7fa368e96d1a",
+  "prefix": "/TMP/DY-ff49d2",
+  "package": "/HOME/M10D",
+  "screenshots": [
+    {
+      "path": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-dynamic-guest-02\\desktop.png",
+      "width": 1920,
+      "height": 1080,
+      "sha256": "3cbf674ca14a210b1990e545663f35961ca50167ca0dad8ff298aa2716cb00da"
+    }
+  ],
+  "full_M10a2": false,
+  "startup_readiness": {
+    "status": "ACTUAL_FIRST_DESKTOP_COMPLETED",
+    "method": "READ_ONLY_HMP_COUNTERS_AND_PHYSICAL_ESC",
+    "symbols": {
+      "boot_stage": 8781828,
+      "sc_ticks": 8848424,
+      "wm_frames": 9018932
+    },
+    "observations": [
+      {
+        "seconds": 0.01599999999598367,
+        "boot_stage": 0,
+        "completed_frames": 0,
+        "ticks": 0
+      },
+      {
+        "seconds": 0.5,
+        "boot_stage": 1,
+        "completed_frames": 0,
+        "ticks": 20
+      },
+      {
+        "seconds": 1.6569999999992433,
+        "boot_stage": 2,
+        "completed_frames": 0,
+        "ticks": 135
+      },
+      {
+        "seconds": 1.9069999999992433,
+        "boot_stage": 3,
+        "completed_frames": 1,
+        "ticks": 160
+      }
+    ],
+    "input_sent": true,
+    "input": "esc",
+    "input_seconds": 1.6719999999986612,
+    "seconds": 1.9219999999986612
+  },
+  "native_application": {
+    "sha256": "2e70b1d0944949b6cb3a5c501c37135e98570aa3140fe4a2151d447aad2cf580",
+    "bytes": 1416,
+    "guest_compiled": true,
+    "metadata": {
+      "format": "SCD1MIO",
+      "version": 1,
+      "metadata_rva": 916,
+      "metadata_size": 464,
+      "program_load_bytes": 1380,
+      "program_bss_bytes": 16,
+      "main_rva": 105,
+      "dependencies": [
+        {
+          "name": "BASE.SCL",
+          "abi_major": 1,
+          "min_minor": 0,
+          "min_version": 1,
+          "flags": 0
+        },
+        {
+          "name": "UPPER.SCL",
+          "abi_major": 1,
+          "min_minor": 0,
+          "min_version": 1,
+          "flags": 0
+        }
+      ],
+      "imports": [
+        {
+          "name": "base_add",
+          "dep_index": 0,
+          "dependency": "BASE.SCL",
+          "kind": 1,
+          "size": 1
+        },
+        {
+          "name": "base_init_count",
+          "dep_index": 0,
+          "dependency": "BASE.SCL",
+          "kind": 2,
+          "size": 4
+        },
+        {
+          "name": "base_value",
+          "dep_index": 0,
+          "dependency": "BASE.SCL",
+          "kind": 2,
+          "size": 4
+        },
+        {
+          "name": "upper_call_pointer",
+          "dep_index": 1,
+          "dependency": "UPPER.SCL",
+          "kind": 1,
+          "size": 1
+        },
+        {
+          "name": "upper_compute",
+          "dep_index": 1,
+          "dependency": "UPPER.SCL",
+          "kind": 1,
+          "size": 1
+        },
+        {
+          "name": "upper_init_count",
+          "dep_index": 1,
+          "dependency": "UPPER.SCL",
+          "kind": 2,
+          "size": 4
+        },
+        {
+          "name": "upper_message",
+          "dep_index": 1,
+          "dependency": "UPPER.SCL",
+          "kind": 2,
+          "size": 10
+        }
+      ],
+      "relocations": [
+        {
+          "patch_rva": 116,
+          "type": 1,
+          "import_index": 1,
+          "addend": 0
+        },
+        {
+          "patch_rva": 143,
+          "type": 1,
+          "import_index": 5,
+          "addend": 0
+        },
+        {
+          "patch_rva": 198,
+          "type": 1,
+          "import_index": 2,
+          "addend": 0
+        },
+        {
+          "patch_rva": 332,
+          "type": 2,
+          "import_index": 4,
+          "addend": -4
+        },
+        {
+          "patch_rva": 370,
+          "type": 2,
+          "import_index": 3,
+          "addend": -4
+        },
+        {
+          "patch_rva": 876,
+          "type": 1,
+          "import_index": 2,
+          "addend": 0
+        },
+        {
+          "patch_rva": 880,
+          "type": 1,
+          "import_index": 0,
+          "addend": 0
+        },
+        {
+          "patch_rva": 884,
+          "type": 1,
+          "import_index": 6,
+          "addend": 0
+        }
+      ],
+      "strings_offset": 344,
+      "strings_size": 120
+    }
+  },
+  "guest_compiler_G1": {
+    "sha256": "b358fe578163e742b94502c524ebe5d44395892ae7707a56bde808d7f1931908"
+  },
+  "source_disk_unchanged": true,
+  "current_inputs_unchanged": true
+}

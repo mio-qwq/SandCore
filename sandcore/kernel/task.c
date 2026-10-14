@@ -15,6 +15,7 @@
 #include "io.h"
 #include "task.h"
 #include "task_store.h"
+#include "scl_boot.h"
 #ifdef M10_DISK_CORE
 #include "network.h"
 #endif
@@ -395,6 +396,8 @@ int task_spawn(const char *name, u32 pd, u32 entry, u32 user_esp)
         record->transactions=record->windows=record->captures=0;
         record->events=record->wait_mask=record->wait_frame=0;record->waiting=0;record->wait_heap=-1;
         record->deferred_draw=0;record->visibility_aware=0;record->cleanup_phase=0;
+        scl_boot_reset(i);
+        record->scx_load_size=record->scx_bss_size=0;
         process_reset(i);
         task_record(i)->generation++;if(!task_record(i)->generation)task_record(i)->generation=1;
         task_record(i)->running=task_record(i)->dispatch=0;
@@ -443,6 +446,8 @@ u32 sched_pick(u32 cur_esp)
         if(i==current){previous=i;i=following;continue;}
         if(previous<0)zombie_head=following;else task_record(previous)->zombie_next=following;
             paging_free_task_dir(TASK(i).pd);
+            scl_boot_reset(i);
+            dead->scx_load_size=dead->scx_bss_size=0;
             pframe_free(TASK(i).kstack_top - PAGE_SIZE);
             simd_stop(i);
             TASK(i).state=0;TASK(i).pd=TASK(i).kstack_top=TASK(i).saved_esp=0;
@@ -625,10 +630,14 @@ void syscall_c_common(u32 vec, u32 *frame)
         if(!bytes)frame[11]=(u32)-1;
         else {
             process_unmap(current,frame[8],bytes);
-            frame[11]=(u32)paging_module_free(TASK(current).pd,frame[8]);
+            int result=paging_module_free(TASK(current).pd,frame[8]);
+            if(!result && task_record(current)->scl_root_base==frame[8])scl_boot_reset(current);
+            frame[11]=(u32)result;
         }
         break;
     }
+    case SYS_SCLBOOT:
+        frame[11]=(u32)scl_boot_map(frame[8],frame[10]);break;
     case SYS_STATUS:
         frame[11]=(u32)process_status((int)frame[8]); break;
     case SYS_YIELD:
@@ -1205,6 +1214,16 @@ void syscall_c_common(u32 vec, u32 *frame)
 /* ---------------- SCX 加载器 (分页版) ---------------- */
 static u8 *scx_stage;
 
+u8 *task_loader_stage(u32 bytes)
+{
+    u32 flags;__asm__ __volatile__("pushfl;popl %0":"=r"(flags));
+    if((flags&0x200u) || !bytes || bytes>TASK_LOADER_STAGE_BYTES)return 0;
+    /* 单CPU、IF=0的装载事务串行共用原64页。没有根库回调可重入
+     * 本区；元数据/映像复制完成后才把用户入口交回三环。 */
+    if(!scx_stage)scx_stage=(u8 *)pframe_alloc_run(TASK_LOADER_STAGE_BYTES/PAGE_SIZE);
+    return scx_stage;
+}
+
 int task_exec_scx(const char *path)
 {
     /* EXEC 接受“路径 空格 参数串”。内核只切出首个路径，参数原样传给
@@ -1226,7 +1245,7 @@ int task_exec_scx(const char *path)
      * 固定64页，只在首次合法装载时向PF申请，之后复用到重启；
      * 仍是IF=0加载路径的单一内核工作区，不随任务反复分配。
      * 旧262144B容量及容器/载荷边界保持，不抬高低端保留上限。 */
-    if(!scx_stage){scx_stage=(u8 *)pframe_alloc_run(64);if(!scx_stage)return -4;}
+    if(!task_loader_stage(TASK_LOADER_STAGE_BYTES))return -4;
     u32 icon_offset,icon_length;
     int checked=image_scx_info(filename,scx_stage,&icon_offset,&icon_length);
     if(checked)return checked;
@@ -1280,6 +1299,9 @@ int task_exec_scx(const char *path)
     int pid = task_spawn(nm, pd, USER_BASE + entry_rva, USER_TOP - 16);
     if (pid < 0) paging_free_task_dir(pd);
     else {
+        /* 页尾补零和独立栈都不是SCX正文。启动描述符须与已校验
+         * 容器精确相等，不能靠“这一段恰好已映射”猜载荷/BSS身份。 */
+        task_record(pid)->scx_load_size=load_size;task_record(pid)->scx_bss_size=bss_size;
         for (int i = 0; i <= arglen; i++) TASK(pid).args[i] = arguments[i];
         streams_set_arguments(pid,arguments);
         userspace_executable(pid,filename);

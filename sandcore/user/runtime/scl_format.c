@@ -71,12 +71,12 @@ static const unsigned char *scl_segment(const unsigned char *h, unsigned int rva
     return 0;
 }
 
-int scl_validate(const void *bytes, unsigned int size)
+static int scl_validate_view(const void *bytes, unsigned int size, int metadata_only)
 {
     const unsigned char *h = (const unsigned char *)bytes;
     const unsigned char *strings;
     unsigned int cursor = SCL_HEADER_SIZE, image_size, string_size;
-    unsigned int previous_end = 0, payload_end;
+    unsigned int previous_end = 0, payload_end, file_size;
     if (!h || size < SCL_HEADER_SIZE || size > SCL_MAX_FILE_SIZE) return SCL_E_RANGE;
     for (unsigned int i = 0; i < 8; i++) if (h[i] != (unsigned char)SCL_MAGIC[i]) return SCL_E_FORMAT;
     if (scl_read32(h + SCL_H_HEADER_SIZE) != SCL_HEADER_SIZE
@@ -84,7 +84,9 @@ int scl_validate(const void *bytes, unsigned int size)
     if (scl_read32(h + SCL_H_VERSION) != SCL_FORMAT_VERSION
         || scl_read32(h + SCL_H_MACHINE) != SCL_MACHINE_I386
         || !scl_read32(h + SCL_H_ABI_MAJOR)) return SCL_E_VERSION;
-    if (scl_read32(h + SCL_H_FILE_SIZE) != size) return SCL_E_RANGE;
+    file_size = scl_read32(h + SCL_H_FILE_SIZE);
+    if (file_size > SCL_MAX_FILE_SIZE || file_size < size ||
+        (!metadata_only && file_size != size)) return SCL_E_RANGE;
     image_size = scl_read32(h + SCL_H_IMAGE_SIZE);
     if (!image_size || image_size > SCL_MAX_IMAGE_SIZE || image_size % SCL_PAGE_SIZE) return SCL_E_RANGE;
     if (!scl_table(h,SCL_H_SEGMENTS,SCL_SEGMENT_SIZE,size,&cursor)
@@ -97,6 +99,7 @@ int scl_validate(const void *bytes, unsigned int size)
         || string_size > size - cursor) return SCL_E_RANGE;
     strings = h + cursor;
     cursor += string_size;
+    if (metadata_only && cursor != size) return SCL_E_RANGE;
     if (strings[string_size-1] || !scl_name(strings,string_size,scl_read32(h+SCL_H_NAME),1)) return SCL_E_SYMBOL;
     if (!scl_read32(h + SCL_H_SEGMENT_COUNT)) return SCL_E_FORMAT;
     payload_end = cursor;
@@ -111,12 +114,12 @@ int scl_validate(const void *bytes, unsigned int size)
         previous_end=rva+mem;
         if (!file) { if (off) return SCL_E_RANGE; }
         else {
-            if (off<payload_end || off>size || file>size-off) return SCL_E_RANGE;
-            if (!scl_zero(h+payload_end,off-payload_end)) return SCL_E_FORMAT;
+            if (off<payload_end || off>file_size || file>file_size-off) return SCL_E_RANGE;
+            if (!metadata_only && !scl_zero(h+payload_end,off-payload_end)) return SCL_E_FORMAT;
             payload_end=off+file;
         }
     }
-    if (!scl_zero(h+payload_end,size-payload_end)) return SCL_E_FORMAT;
+    if (!metadata_only && !scl_zero(h+payload_end,size-payload_end)) return SCL_E_FORMAT;
     for (unsigned int i = 0; i < scl_read32(h + SCL_H_DEP_COUNT); i++) {
         const unsigned char *d=h+scl_read32(h+SCL_H_DEPS)+i*SCL_DEPENDENCY_SIZE;
         unsigned int name=scl_read32(d);
@@ -170,3 +173,7 @@ int scl_validate(const void *bytes, unsigned int size)
     }
     return 0;
 }
+int scl_validate(const void *bytes, unsigned int size)
+{ return scl_validate_view(bytes, size, 0); }
+int scl_validate_metadata(const void *bytes, unsigned int size)
+{ return scl_validate_view(bytes, size, 1); }

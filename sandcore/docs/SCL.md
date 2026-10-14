@@ -238,3 +238,4 @@ python3 tests/m10a2/test_scl_format.py
 | 版本 | 日期 | 变更 |
 |---|---|---|
 | v1.0 | 2026-10-14 | 固定 SCL v1 字节布局与规范化规则；新增 ELF HOST_BOOTSTRAP、表/依赖检查工具、两库真实输入及一轮宿主格式一致证据，另记主开发客体首切片与冻结输入一致，完整 Phase 1 尚未结束 |
+| v1.0 | 2026-10-14 | 磁盘ABI不变；增加完整表边界的metadata-prefix校验用于借用启动根，完整文件payload/零填充校验保留，自动SCX及原生SCL/G1客体接线见SCX-DYNAMIC与M10A2-IMPLEMENTATION |

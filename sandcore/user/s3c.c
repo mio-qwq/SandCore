@@ -32,7 +32,9 @@
 #define FILE_MAX 32
 #define LINE_MAX 1024
 #define DEPTH_MAX 16
-#define MACRO_MAX 256
+/* SCD1与SCL的正式偏移/启动宏同属真实自编译输入：256项在
+ * runtime/SCDYN.H中耗尽。保留有界诊断，扩到320项供当前261余项。 */
+#define MACRO_MAX 320
 #define MACRO_BODY_MAX 8192
 #define MACRO_ARGS 8
 #define MACRO_ARG_TOKENS 128
@@ -45,6 +47,7 @@
 #define DATA_MAX 131072
 static int module_output;
 static int shared_output;
+static int dynamic_output;
 #define BASE ((module_output||shared_output)?0u:0x400000u)
 
 /* 单字节运算符直接保存 ASCII，多字节运算符才分配扩展编号。
@@ -127,8 +130,10 @@ static void scl_declare(int symbol,int storage);
 static int scl_object_const(int type);
 static int scl_declaration_type(int previous,int type);
 static void scl_manifest_load(const char *path,const char *output);
+static void dynamic_manifest_load(const char *path,const char *output);
 static int scl_path_same(const char *a,const char *b);
 static void finish_scl(const char *output);
+static void finish_dynamic(const char *output);
 
 static void fatal(const char *reason)
 {
@@ -211,7 +216,7 @@ int main(void)
 {
 #ifdef SCCC_CLI
     if(cli_parse()<0 || cli_argc<2 || cli_argc>4){
-        cli_text(2,"s3c source.c output.scx [icon.scb | --skm]\ns3c source.c output.SCL --scl manifest.json\n");return 2;
+        cli_text(2,"s3c source.c output.scx [icon.scb | --skm]\ns3c source.c output.SCL --scl manifest.json\ns3c source.c output.SCX --dynamic app.json\n");return 2;
     }
     char *input=cli_argv[0],*output=cli_argv[1],*icon=cli_argc>=3?cli_argv[2]:"";
     char *manifest=cli_argc==4?cli_argv[3]:"";
@@ -229,21 +234,27 @@ int main(void)
         manifest=token(&p);
 #endif
     }
+    if(equal(icon,"--dynamic")){
+        dynamic_output=1;icon="";
+#ifndef SCCC_CLI
+        manifest=token(&p);
+#endif
+    }
 #ifdef SCCC_CLI
-    if((shared_output && cli_argc!=4) || (!shared_output && cli_argc>3)){
-        cli_text(2,"--scl requires exactly one manifest.json argument\n");return 2;
+    if(((shared_output || dynamic_output) && cli_argc!=4) || (!(shared_output || dynamic_output) && cli_argc>3)){
+        cli_text(2,"--scl and --dynamic require exactly one manifest.json argument\n");return 2;
     }
     char input_path[64],output_path[64],resolved_icon[64];
-    if(!shared_output){
+    if(!(shared_output || dynamic_output)){
         if(sc_resolve(input,input_path,64)<0 || sc_resolve(output,output_path,64)<0)return 2;
         input=input_path;output=output_path;
         if(*icon){if(sc_resolve(icon,resolved_icon,64)<0)return 2;icon=resolved_icon;}
     }
 #endif
     char shared_input_path[64],shared_output_path[64],shared_manifest_path[64];
-    if(shared_output){
+    if(shared_output || dynamic_output){
         /* RESOLVE返回根内无前导斜杠的规范名，不能再次按cwd解析。
-         * shared的CLI/GUI共用这唯一解析点，保留原63B名字容量。 */
+         * 两个清单模式的CLI/GUI共用唯一解析点，保留原63B名字容量。 */
         if(sc_resolve(input,shared_input_path,64)<0 || sc_resolve(output,shared_output_path,64)<0
            || sc_resolve(manifest,shared_manifest_path,64)<0)return 2;
         input=shared_input_path;output=shared_output_path;manifest=shared_manifest_path;
@@ -256,15 +267,15 @@ int main(void)
         return 1;
     }
     copy(log_path,output,sizeof(log_path));
-    if(length(log_path)>59) copy(log_path,shared_output?"/HOME/S3C":"HOME/S3C",sizeof(log_path));
+    if(length(log_path)>59) copy(log_path,(shared_output || dynamic_output)?"/HOME/S3C":"HOME/S3C",sizeof(log_path));
     copy(map_path,log_path,sizeof(map_path));
     append(log_path,".log",sizeof(log_path));
     append(map_path,".map",sizeof(map_path));
-    if(shared_output && (scl_path_same(output,input) || scl_path_same(output,manifest)
+    if((shared_output || dynamic_output) && (scl_path_same(output,input) || scl_path_same(output,manifest)
        || scl_path_same(log_path,input) || scl_path_same(log_path,manifest)
        || scl_path_same(map_path,input) || scl_path_same(map_path,manifest))){
         /* 日志本身也可能是输入的别名，此处不能调用会写日志的fatal。 */
-        build_view_result("SCL output, log or map overlaps an input",1);return 2;
+        build_view_result("Dynamic output, log or map overlaps an input",1);return 2;
     }
 #ifdef SCCC_CLI
     if(length(icon)>63)fatal("icon path capacity exceeded");
@@ -276,6 +287,11 @@ int main(void)
         if(!*manifest)fatal("SCL manifest is missing");
         if(build_view_poll("Validating SCL manifest",0,0,1))fatal("compilation cancelled");
         scl_manifest_load(manifest,output);
+    }
+    if(dynamic_output){
+        if(!*manifest)fatal("dynamic application manifest is missing");
+        if(build_view_poll("Validating application manifest",0,0,1))fatal("compilation cancelled");
+        dynamic_manifest_load(manifest,output);
     }
     sc_puts("SCCC: preprocess -> C -> x86\n");
     if(build_view_poll("Preprocessing source and includes",0,0,1))fatal("compilation cancelled");

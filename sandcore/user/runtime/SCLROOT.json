@@ -1,0 +1,21 @@
+{
+  "name": "SCLDR.SCL",
+  "abi_major": 1,
+  "abi_minor": 0,
+  "library_version": 1,
+  "init": null,
+  "fini": null,
+  "exports": [
+    {"name": "ScApplicationStart", "kind": "function"},
+    {"name": "ScApplicationRuntime", "kind": "function"},
+    {"name": "ScRuntimeCreate", "kind": "function"},
+    {"name": "ScRuntimeOpen", "kind": "function"},
+    {"name": "ScRuntimeClose", "kind": "function"},
+    {"name": "ScRuntimeSymbol", "kind": "function"},
+    {"name": "ScRuntimeResolve", "kind": "function"},
+    {"name": "ScRuntimeQuery", "kind": "function"},
+    {"name": "ScRuntimeDestroy", "kind": "function"}
+  ],
+  "imports": [],
+  "dependencies": []
+}

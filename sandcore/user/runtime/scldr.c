@@ -13,7 +13,7 @@ struct ScLoaded {
     unsigned char *metadata, *image;
     ScLoaded **dependencies;
     ScU32 *imports;
-    ScU32 id, external, edges, pinned, ready, initialized, retiring, cursor, metadata_size;
+    ScU32 id, external, edges, pinned, ready, initialized, retiring, borrowed, cursor, metadata_size;
 };
 struct ScRuntime {
     ScRuntimePlatform platform;
@@ -109,8 +109,10 @@ static void finalize(ScRuntime *r, ScLoaded *m)
 static void release_storage(ScRuntime *r, ScLoaded *m)
 {
     void *context = r->platform.context;
-    if (m->image) r->platform.unmap_image(context, m->image);
-    if (m->metadata) r->platform.release(context, m->metadata);
+    /* 根代码和元数据位于同一个已验证MODULE块，且当前清理函数本身
+     * 就在根中执行。借用实例的页由进程EXIT回收，不能在RET前拆栈下代码。 */
+    if (!m->borrowed && m->image) r->platform.unmap_image(context, m->image);
+    if (!m->borrowed && m->metadata) r->platform.release(context, m->metadata);
     r->platform.release(context, m);
 }
 static int prepare(ScRuntime *r, const char *name, ScU32 major, ScU32 minor,
@@ -325,15 +327,44 @@ int ScRuntimeClose(ScRuntime *r, ScModule module)
 }
 int ScRuntimeSymbol(ScRuntime *r, ScModule module, const char *name,
                     ScU32 kind, void **address)
+{ return ScRuntimeResolve(r, module, name, kind, 1, address); }
+int ScRuntimeResolve(ScRuntime *r, ScModule module, const char *name,
+                     ScU32 kind, ScU32 minimum, void **address)
 {
-    if (!r || !name || !address || (kind != 1 && kind != 2)) return SC_SCL_FORMAT;
+    if (!r || !name || !address || !minimum || (kind != 1 && kind != 2)) return SC_SCL_FORMAT;
     if (r->busy) return SC_SCL_BUSY;
     ScLoaded *m = find_id(r, module);
     if (!m || !m->external) return SC_SCL_HANDLE;
     const unsigned char *entry = find_export(m, name);
-    if (!entry || word(entry, 12) != kind) return SC_SCL_SYMBOL;
+    if (!entry || word(entry, 12) != kind || word(entry, 8) < minimum) return SC_SCL_SYMBOL;
     m->pinned = 1;
     *address = m->image + word(entry, 4);
+    return 0;
+}
+int ScRuntimeAdoptBootstrap(ScRuntime *r, void *image, const void *metadata, ScU32 size)
+{
+    if (!r || !image || !metadata || size < SCL_HEADER_SIZE) return SC_SCL_FORMAT;
+    if (r->busy) return SC_SCL_BUSY;
+    const unsigned char *h = metadata;
+    /* 0x283先验完整磁盘文件。借用入口仍核验全部元数据边界，不能
+     * 只因名字叫SCLDR就信任导出偏移；这里不读取不存在的payload。 */
+    int error = scl_validate_metadata(metadata, size);
+    if (error) return error;
+    if (word(h, 32) != 1 || word(h, 68) || word(h, 84) ||
+        word(h, 96) != 0xffffffffu || word(h, 100) != 0xffffffffu)
+        return SC_SCL_FORMAT;
+    const char *name = (const char *)h + word(h, 88) + word(h, 44);
+    if (!name_valid(name) || compare(name, "SCLDR.SCL") || find_name(r, name) || !r->next_id)
+        return SC_SCL_FORMAT;
+    ScLoaded *m = r->platform.allocate(r->platform.context, sizeof(*m));
+    if (!m) return SC_SCL_MEMORY;
+    zero(m, sizeof(*m));
+    m->metadata = (unsigned char *)metadata; m->metadata_size = size; m->image = image;
+    m->id = r->next_id++; m->borrowed = m->pinned = m->ready = m->initialized = 1;
+    m->next = r->modules; if (m->next) m->next->previous = m; r->modules = m;
+    m->init_next = r->initialized;
+    if (m->init_next) m->init_next->init_previous = m;
+    r->initialized = m; ++r->loads;
     return 0;
 }
 int ScRuntimeQuery(ScRuntime *r, ScRuntimeStats *stats)

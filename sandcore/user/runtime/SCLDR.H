@@ -49,6 +49,13 @@ int ScRuntimeClose(ScRuntime *runtime, ScModule module);
  * 是否仍持有地址后强制卸载。依赖边同时保护被导入模块。 */
 int ScRuntimeSymbol(ScRuntime *runtime, ScModule module, const char *name,
                     ScU32 kind, void **address);
+int ScRuntimeResolve(ScRuntime *runtime, ScModule module, const char *name,
+                     ScU32 kind, ScU32 minimum_size, void **address);
+/* 引导根由内核只做页装载，真正依赖解析仍在三环。本接口将已经验证
+ * 的根元数据借入同一模块图；根代码正在执行，Destroy不自行卸载它。 */
+int ScRuntimeAdoptBootstrap(ScRuntime *runtime, void *image,
+                           const void *metadata, ScU32 metadata_size);
+ScRuntime *ScApplicationRuntime(void);
 int ScRuntimeQuery(ScRuntime *runtime, ScRuntimeStats *stats);
 /* 仅在 main 已返回、没有任何库调用栈/回调时关闭运行时。异常退出
  * 由内核直接回收私有页，不承诺执行可能已经损坏的用户态析构。 */

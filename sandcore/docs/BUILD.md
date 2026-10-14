@@ -393,3 +393,13 @@ M10测试源码通配规则同样安装新增M10LIFE.C。统一阶段由客体s3
 从根目录运行`python sandcore/tools/verify_m10a2_native.py --out sandcore/build/m10a2-native-guest-02 --compiler-build-report sandcore/build/m10a2-native-bootstrap/native-build-02.json --accel tcg`，指定报告须匹配当前启动编译器SHA，新输出目录拒绝覆盖。该轮复用已有core/runtime与只读基盘，在一个准备后的会话盘执行完整SCCC0/G1→两库→调用及相关错误保留。首次native-guest-01路径失败已保留并修复；没有据此重跑无关组件或M8。
 
 修订：2026-10-14，新增编译器独立小目标和真实系统内SCL/G1链；CLI load/BSS界限、旧模式代表字节和失败保留已通过，完整自举固定点/SDK/动态SCX启动仍待。
+
+### 动态SCX自动启动切片
+
+WSL运行`make m10a2-dynamic-bootstrap`或`python3 tools/build_m10a2_dynamic.py --tag dynamic-build-04`，定向生成独立`build/m10a2-dynamic-bootstrap`的loader/core、SCCC0、SCLDR.SCL和DYNAPP.SCX。tag必须新名字，不覆盖构建记录；不执行默认all/全部GUI/游戏目标。内核链接同源SCL/SCD校验器和scl_boot，运行时根使用无依赖SCLROOT清单；宿主工具对大写.C显式`-x c`。
+
+从仓库根运行`python sandcore/tools/verify_m10a2_dynamic.py --out sandcore/build/m10a2-dynamic-guest-02 --build-report sandcore/build/m10a2-dynamic-bootstrap/dynamic-build-04.json`，指定报告必须逐项匹配当前产物；输出目录拒绝覆盖。Windows双盘启动只准备本轮独立盘，安装CORE/受保护SYS/LIB根及明确的源码和样例。SOURCE_NAMES包含编译器及完整runtime目录层次，客体分别生成动态应用、根库和G1；来源在报告中分列。
+
+dynamic-guest-02已经实际通过；正常/回调异常退出PF8872→8872。首次未注册异常回调的故障会沿历史调试暂停语义留卡，不能等待它自动EXIT14；已保留失败与修正。无关既有矩阵复用，源码/原盘/当前盘与紧凑证据的范围见M10A2-IMPLEMENTATION。
+
+修订：2026-10-14，新增真正自动动态SCX/root/SCCC接线和真实G1执行、并发隔离及系统库保护证据，完整平台继续SC32API。

@@ -18,13 +18,14 @@ from mkfs_m10 import mapped, release_views, parents, write_image, check_main, di
 
 ROOT = Path(__file__).resolve().parents[1]
 
-def prepare(image, build, extra=None):
+def prepare(image, build, extra=None, runtime_fixtures=True):
     core = (build/'fs/SYS/CORE/CORE.SKM').read_bytes()
     check_main(core)
-    additions = {'SYS/CORE/CORE.SKM':core,
-                 'HOME/M10A2/BASE.SCL':(build/'BASE.SCL').read_bytes(),
+    additions = {'SYS/CORE/CORE.SKM':core}
+    if runtime_fixtures:
+        additions.update({'HOME/M10A2/BASE.SCL':(build/'BASE.SCL').read_bytes(),
                  'HOME/M10A2/UPPER.SCL':(build/'UPPER.SCL').read_bytes(),
-                 'HOME/M10A2/SCLPROBE.SCX':(build/'SCLPROBE.SCX').read_bytes()}
+                 'HOME/M10A2/SCLPROBE.SCX':(build/'SCLPROBE.SCX').read_bytes()})
     if extra:
         additions.update(extra)
     temporary = image.with_suffix('.prepared.tmp')

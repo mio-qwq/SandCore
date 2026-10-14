@@ -2,6 +2,7 @@
  * 这里的清单、源数据区间与排序工作区按实际需要从原有用户堆申请；
  * 只读重排保留来源范围，不能用一个“最后数据偏移”猜混合段的地址。 */
 #include "runtime/SCLFMT.H"
+#include "runtime/SCDYN.H"
 
 typedef struct { int name; u32 major,minor,version; int string_offset; } SclCDependency;
 typedef struct { int name,kind,symbol,string_offset; } SclCExport;
@@ -241,6 +242,38 @@ static void scl_manifest_load(const char *path,const char *output)
     const char *base=output;
     for(const char *p=output;*p;p++)if(*p=='/')base=p+1;
     if(!equal(base,spelling(sclc_library)))fatal("SCL output basename differs from manifest name");
+    sc_free(sclc_json);sclc_json=0;
+}
+
+static void dynamic_manifest_load(const char *path,const char *output)
+{
+    /* 应用与库使用独立顶层合同，不能把 --scl 的九字段清单悄悄
+     * 改成带默认值的应用清单；依赖和导入的子项仍完全同源。 */
+    u32 info[2];
+    if(sc_stat(path,info) || info[0]!=1 || !info[1] || info[1]>1048576u)fatal("application manifest missing or exceeds 1 MiB");
+    sclc_json=sc_alloc(info[1]+1u);if(!sclc_json)fatal("application manifest allocation failed");
+    if(sc_read(path,sclc_json,(int)info[1])!=(int)info[1])fatal("application manifest read failed");
+    sclc_json_size=(int)info[1];sclc_at=0;sclc_json[sclc_json_size]=0;
+    for(int i=0;i<sclc_json_size;i++)if(!sclc_json[i])fatal("application manifest contains NUL");
+    int seen=0,kind=0;sclc_need('{');
+    if(!sclc_take('}'))do{
+        int field=sclc_string();sclc_need(':');
+        if(equal(spelling(field),"name")){sclc_member_seen(&seen,1);sclc_library=sclc_string();}
+        else if(equal(spelling(field),"kind")){sclc_member_seen(&seen,2);kind=sclc_string();}
+        else if(equal(spelling(field),"imports")){sclc_member_seen(&seen,4);sclc_read_imports();}
+        else if(equal(spelling(field),"dependencies")){sclc_member_seen(&seen,8);sclc_read_dependencies();}
+        else fatal("application manifest has an unknown top-level field");
+        if(sclc_take('}'))break;
+        sclc_need(',');
+    }while(1);
+    sclc_space();
+    char *name=spelling(sclc_library);int n=length(name);
+    if(seen!=15 || sclc_at!=sclc_json_size || !equal(spelling(kind),"application")
+       || n<5 || n>35 || !equal(name+n-4,".SCX"))fatal("application manifest requires exactly kind, name, dependencies and imports");
+    for(int i=0;i<n-4;i++)if(!((name[i]>='A' && name[i]<='Z') || (name[i]>='0' && name[i]<='9') || name[i]=='_'))fatal("application name is not an uppercase SCX basename");
+    const char *base=output;
+    for(const char *p=output;*p;p++)if(*p=='/')base=p+1;
+    if(!equal(base,name))fatal("application output basename differs from manifest name");
     sc_free(sclc_json);sclc_json=0;
 }
 
@@ -563,6 +596,121 @@ static void finish_scl(const char *output)
     if(sclc_fixes)sc_free(sclc_fixes);
 }
 
+static void dynamic_crt(u8 *p,u32 metadata_va)
+{
+    /* 私有桥只有64B：先取得正式ROOT运行时，随后用cdecl传元数据
+     * 与栈内bootinfo。库加载、导入及main由ROOT执行；应用不会
+     * 静态包含SCLDR，也不需要手写int或显式ScRuntimeOpen。
+     * 初始ESP为16B对齐；32B信息外再留8B垫片，压两个参数后
+     * CALL前仍16B对齐，使GCC与SCCC的cdecl库都能安全调用。 */
+    const u8 crt[64]={
+        0x83,0xec,0x20,0x89,0xe3,0xb9,0,0,0,0,0xb8,0x83,0x02,0x00,
+        0x00,0xcd,0x7c,0x85,0xc0,0x78,0x1c,0x8b,0x44,0x24,0x0c,
+        0x89,0xe2,0x83,0xec,0x08,0x52,0x68,0,0,0,0,0xff,0xd0,
+        0x83,0xc4,0x30,0x89,0xc3,0x31,0xc0,0xcd,0x7c,0xeb,0xfe,
+        0x83,0xc4,0x20,0xbb,1,0,0,0,0x31,0xc0,0xcd,0x7c,0xeb,0xfe,0x90
+    };
+    for(int i=0;i<64;i++)p[i]=crt[i];
+    put32(p+SCD_CRT_DESCRIPTOR_OFFSET,metadata_va);
+    put32(p+SCD_CRT_ARGUMENT_OFFSET,metadata_va);
+}
+static void dynamic_relocations(int *lookup,int text_end,int payload_size)
+{
+    /* 只把真正的外部引用记入SCD。内部固定基址引用稍后用包含
+     * 元数据的最终load回填，尤其BSS指针不能沿用旧载荷末地址。 */
+    for(int i=0;i<fix_count;i++){
+        Fix *f=fixes+i;int patch=f->offset<0?text_end-f->offset-1:f->offset;
+        if(patch<0 || patch>payload_size-4)fatal("application relocation outside initialized payload");
+        if(f->kind==F_DATA)continue;
+        if(f->symbol<=0 || f->symbol>=symbol_count)fatal("application relocation has an invalid symbol");
+        if(symbols[f->symbol].defined)continue;
+        int index=lookup[f->symbol];
+        if(index<0)fatal("application unresolved reference is absent from manifest imports");
+        sclc_fixes=sclc_grow(sclc_fixes,sclc_fix_count,&sclc_fix_capacity,sizeof(SclCFix));
+        SclCFix *r=sclc_fixes+sclc_fix_count++;
+        r->patch=(u32)patch;r->type=f->kind==F_REL?SCD_RELOC_PC32:SCD_RELOC_ABS32;
+        r->target_kind=0;r->target=(u32)index;
+        r->addend=(u32)f->addend-(f->kind==F_REL?4u:0u);sclc_imports[index].used=1;
+    }
+    for(int i=0;i<sclc_import_count;i++)if(!sclc_imports[i].used)fatal("application manifest import is not referenced by machine code or initializer");
+    sclc_sort((u8 *)sclc_fixes,sclc_fix_count,sizeof(SclCFix),sclc_fix_compare);
+    for(int i=1;i<sclc_fix_count;i++)if(sclc_fixes[i].patch<sclc_fixes[i-1].patch+4u)fatal("application import relocations overlap");
+}
+static void finish_dynamic(const char *output)
+{
+    u32 main_rva=sclc_callback(intern("main",4),0);
+    int *lookup=sclc_resolve(),text_end=(code_used+3)&~3;
+    if(data_used>CODE_MAX-text_end)fatal("application initialized image capacity exceeded");
+    int payload_size=text_end+data_used;
+    dynamic_relocations(lookup,text_end,payload_size);
+    u32 dep_off=SCD_HEADER_SIZE,import_off=sclc_table_size(dep_off,sclc_dep_count,SCD_DEPENDENCY_SIZE);
+    u32 reloc_off=sclc_table_size(import_off,sclc_import_count,SCD_IMPORT_SIZE);
+    u32 string_off=sclc_table_size(reloc_off,sclc_fix_count,SCD_RELOC_SIZE),string_size=1u;
+    for(int i=0;i<sclc_dep_count;i++){sclc_dependencies[i].string_offset=(int)string_size;string_size+=(u32)length(spelling(sclc_dependencies[i].name))+1u;}
+    for(int i=0;i<sclc_import_count;i++){sclc_imports[i].string_offset=(int)string_size;string_size+=(u32)length(spelling(sclc_imports[i].name))+1u;}
+    if(string_off>(u32)(CODE_MAX-payload_size) || string_size>(u32)(CODE_MAX-payload_size)-string_off)fatal("application metadata exceeds initialized image capacity");
+    u32 metadata_size=string_off+string_size,load=(u32)payload_size+metadata_size;
+    if(load>SCD_MAX_PROGRAM_IMAGE || (u32)bss_used>SCD_MAX_PROGRAM_IMAGE-load)fatal("application code/data/metadata/BSS exceed private address region");
+    u8 *image=sc_alloc(36u+load);if(!image)fatal("application output allocation failed");
+    for(u32 i=0;i<36u+load;i++)image[i]=0;
+    for(int i=0;i<code_used;i++)image[36+i]=code[36+i];
+    for(int i=0;i<data_used;i++)image[36+text_end+i]=data[i];
+    for(int i=0;i<fix_count;i++){
+        Fix *f=fixes+i;int offset=f->offset<0?text_end-f->offset-1:f->offset;u32 value=0;
+        if(f->kind==F_DATA)value=SCD_PROGRAM_BASE+(u32)text_end+(u32)f->addend;
+        else{
+            Symbol *s=symbols+f->symbol;
+            if(!s->defined){put32(image+36+offset,0);continue;}
+            if(s->kind==S_FUNCTION)value=SCD_PROGRAM_BASE+(u32)s->value;
+            else value=SCD_PROGRAM_BASE+(s->aux?(u32)text_end:load)+(u32)s->value;
+            value+=(u32)f->addend;
+            if(f->kind==F_REL)value-=SCD_PROGRAM_BASE+(u32)f->offset+4u;
+        }
+        put32(image+36+offset,value);
+    }
+    sc_free(lookup);
+    u8 *h=image+36+payload_size;const char *magic=SCD_MAGIC;
+    for(int i=0;i<8;i++)h[i]=(u8)magic[i];
+    put32(h+8,SCD_FORMAT_VERSION);put32(h+12,SCD_HEADER_SIZE);put32(h+16,metadata_size);
+    put32(h+20,load);put32(h+24,(u32)bss_used);put32(h+28,main_rva);
+    put32(h+32,dep_off);put32(h+36,(u32)sclc_dep_count);put32(h+40,import_off);put32(h+44,(u32)sclc_import_count);
+    put32(h+48,reloc_off);put32(h+52,(u32)sclc_fix_count);put32(h+56,string_off);put32(h+60,string_size);
+    for(int i=0;i<sclc_dep_count;i++){
+        SclCDependency *d=sclc_dependencies+i;u8 *r=h+dep_off+(u32)i*SCD_DEPENDENCY_SIZE;
+        put32(r,(u32)d->string_offset);put32(r+4,d->major);put32(r+8,d->minor);put32(r+12,d->version);
+        copy((char *)(h+string_off+(u32)d->string_offset),spelling(d->name),length(spelling(d->name))+1);
+        sclc_map_row("REQUIRE",d->name,(u32)i,d->major);
+    }
+    for(int i=0;i<sclc_import_count;i++){
+        SclCImport *d=sclc_imports+i;u8 *r=h+import_off+(u32)i*SCD_IMPORT_SIZE;
+        put32(r,(u32)d->string_offset);put32(r+4,(u32)d->index);put32(r+8,(u32)d->kind);put32(r+12,d->size);
+        copy((char *)(h+string_off+(u32)d->string_offset),spelling(d->name),length(spelling(d->name))+1);
+        sclc_map_row("IMPORT",d->name,(u32)i,d->size);
+    }
+    for(int i=0;i<sclc_fix_count;i++){
+        SclCFix *d=sclc_fixes+i;u8 *r=h+reloc_off+(u32)i*SCD_RELOC_SIZE;
+        put32(r,d->patch);put32(r+4,d->type);put32(r+8,d->target);put32(r+12,d->addend);
+    }
+    if(scd_validate(h,metadata_size,(u32)payload_size))fatal("application output failed common SCD format validation");
+    for(int i=1;i<symbol_count;i++)if(symbols[i].kind==S_GLOBAL && symbols[i].defined){
+        u32 address=SCD_PROGRAM_BASE+(symbols[i].aux?(u32)text_end:load)+(u32)symbols[i].value;
+        sclc_map_row("OBJECT",symbols[i].name,address,(u32)scl_symbol_sizes[i]);
+    }
+    dynamic_crt(image+36,SCD_PROGRAM_BASE+(u32)payload_size);
+    magic="SCX1MIO";for(int i=0;i<8;i++)image[i]=(u8)magic[i];
+    put32(image+8,0);put32(image+12,load);put32(image+16,(u32)bss_used);put32(image+20,131072);
+    put32(image+28,SCD_PROGRAM_BASE);put32(image+32,0x004f494du);
+    /* 所有语义/格式/map失败都在正文提交前停止，副产物绝不覆盖输入。
+     * map与正文仍遵守既有整文件I/O，不伪称跨文件原子提交。 */
+    if(sc_write(map_path,map_text,map_used)!=map_used)fatal("cannot write application dynamic map");
+    if(sc_write(output,image,(int)(36u+load))!=(int)(36u+load))fatal("cannot write dynamic SCX output");
+    sc_free(image);sc_write(log_path,"SCCC OK SCX DYNAMIC\n",20);sc_puts("SCCC OK SCX DYNAMIC\n");
+    if(sclc_dependencies)sc_free(sclc_dependencies);
+    if(sclc_imports)sc_free(sclc_imports);
+    if(sclc_fixes)sc_free(sclc_fixes);
+}
+
 /* 共同验证源码在编译器内部使用，并不进入所生成库的正文。
  * 本文件没有依赖宿主库；原生SCCC也能预处理并编译这些普通C函数。 */
 #include "runtime/scl_format.c"
+#include "runtime/scd_format.c"

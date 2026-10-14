@@ -239,3 +239,13 @@ IODENY使用32位MOV预置寄存器后执行outb %%al,%%dx，避免混淆MOV宽�
 另行留证，宿主适配器与生成自身SCX不称客体自编译PASS。
 
 修订：2026-10-14，记录真实SCCC0/G1原生SCL输出与调用、ROOTLESS路径修复和定向旧格式/失败保留，完整自举固定点与平台验收继续。
+
+## M10a2 动态 SCX 输出（2026-10-14）
+
+新增 `sccc source.c output.SCX --dynamic app.json`。应用JSON严格仅kind/application、name、dependencies、imports四字段；与库九字段模式独立。真实SCCC后端保留未定义函数/数据/初始化指针的动态导入，以SCD1放在初始化载荷末；内部BSS地址按包含metadata的最终load回填。64B自动CRT取得正式根运行时再调用ScApplicationStart，应用只写有符号int main(void)并普通调用公开库函数。无静态依赖正文、无SCAPI桥复制，旧SCX/SKM和图标行为保持。完整规范见 [SCX-DYNAMIC.md](SCX-DYNAMIC.md)。
+
+本轮新增共同格式头使实际自身源码宏表256项耗尽，定向宿主检查保留失败；MACRO_MAX调整320，其它容量继续按真实生成输入核对。动态输出继承一次RESOLVE/ROOTLESS、输入与副产物身份检查及map失败不提交正文。宿主实际后端生成、宿主ELF链接、系统内编译和自动启动执行分别记录，不把格式通过称客体或完整M10a2验收。
+
+修订：2026-10-14，新增严格四字段动态应用、SCD1/64B自动CRT和最终BSS回填，宏表容量基于真实自编译失败调整；完整启动运行证据由主开发接续。
+
+修订：2026-10-14，自动CRT等长加入8B参数垫片，使实际USER_TOP-16初始栈在CALL前保持16B对齐；成功返回恢复48B、参数立即数移至RVA32，失败分支和旧SCX不变。只刷新动态HOST/原生CLI/GUI生成与共同CRT检查，新1416B摘要2e70b1d0开头；旧自身产物仍仅对应修复前容量输入，详见SCX-DYNAMIC.md§7。

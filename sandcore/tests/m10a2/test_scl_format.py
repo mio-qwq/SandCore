@@ -46,9 +46,13 @@ class SclFormatTests(unittest.TestCase):
                         "-fno-builtin", "-fno-stack-protector", "-fno-tree-loop-distribute-patterns",
                         str(ROOT / "user" / "runtime" / "scl_format.c"), "-o", str(shared)],
                        check=True, capture_output=True)
-        cls.validator = ctypes.CDLL(str(shared)).scl_validate
+        cls.library = ctypes.CDLL(str(shared))
+        cls.validator = cls.library.scl_validate
         cls.validator.argtypes = [ctypes.c_void_p, ctypes.c_uint]
         cls.validator.restype = ctypes.c_int
+        cls.metadata_validator = cls.library.scl_validate_metadata
+        cls.metadata_validator.argtypes = [ctypes.c_void_p, ctypes.c_uint]
+        cls.metadata_validator.restype = ctypes.c_int
 
     def verdicts(self, blob: bytes) -> tuple[int, int]:
         try:
@@ -89,6 +93,19 @@ class SclFormatTests(unittest.TestCase):
                 if r["type"] == scl.PC32 and r["target_kind"] == scl.IMPORT:
                     expected = (imports[r["target"]] + r["addend"] - ubase - r["patch_rva"]) & 0xFFFFFFFF
                     self.assertEqual(struct.unpack_from("<I", image, r["patch_rva"])[0], expected)
+
+    def test_borrowed_metadata_rejects_outside_exports(self) -> None:
+        source = self.blobs["upper"]
+        strings, length = struct.unpack_from("<2I", source, 88)
+        prefix = source[:strings + length]
+        self.assertEqual(self.metadata_validator(ctypes.create_string_buffer(prefix), len(prefix)), 0)
+        self.assertEqual(self.validator(ctypes.create_string_buffer(prefix), len(prefix)), scl.E_RANGE)
+        bad = bytearray(prefix)
+        struct.pack_into("<I", bad, 56, 0xFFFFFFF0)
+        self.assertEqual(self.metadata_validator(ctypes.create_string_buffer(bytes(bad)), len(bad)), scl.E_RANGE)
+        bad = bytearray(prefix)
+        bad[-1] = ord('X')
+        self.assertEqual(self.metadata_validator(ctypes.create_string_buffer(bytes(bad)), len(bad)), scl.E_SYMBOL)
 
     def test_format_rejection_agrees_in_both_languages(self) -> None:
         source = self.blobs["upper"]

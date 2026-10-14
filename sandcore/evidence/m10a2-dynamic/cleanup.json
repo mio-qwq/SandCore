@@ -1,0 +1,20 @@
+{
+  "deleted": [
+    {
+      "path": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-dynamic-guest-01\\sandcore.img",
+      "bytes": 1474560,
+      "sha256": "47921cc2f9f0a23ea404cbd041a216931844023eedbcdbb4c824e9a55a8cfb3f",
+      "reason": "failed duplicate test disk; source, code, log and screenshots retained"
+    },
+    {
+      "path": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-dynamic-guest-01\\sanddata.img",
+      "bytes": 268435456,
+      "sha256": "9bc9dfb99044aa3e1ecdd2ae3488d6d04a465d00860a7befc8c47446f8506f43",
+      "reason": "failed duplicate test disk; source, code, log and screenshots retained"
+    }
+  ],
+  "freed_bytes": 269910016,
+  "retained_code": "build/m10a2-dynamic-guest-01/failed-code",
+  "original_data_unchanged": true,
+  "successful_current_disks_retained": true
+}

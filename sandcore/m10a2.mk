@@ -35,3 +35,26 @@ M10A2_NATIVE_DIR ?= build/m10a2-native-bootstrap
 .PHONY: m10a2-native-compiler
 m10a2-native-compiler:
 	$(MAKE) BUILD=$(M10A2_NATIVE_DIR) M9_BUILD=1 M10_BUILD=1 $(M10A2_NATIVE_DIR)/fs/bin/sccc.scx
+
+# 内核只解析并映射无依赖引导根，不执行库代码。两个校验器与三环
+# 运行时共用源文件，确保系统根和第三方库不存在宽松解析分支。
+$(BUILD)/scl_boot.o: kernel/scl_boot.c kernel/scl_boot.h user/runtime/SCLFMT.H user/runtime/SCDYN.H $(STAMP)
+	$(CC) $(CFLAGS) -Werror -c $< -o $@
+$(BUILD)/scl_validate.o: user/runtime/scl_format.c user/runtime/SCLFMT.H $(STAMP)
+	$(CC) $(CFLAGS) -Werror -Iuser/runtime -c $< -o $@
+$(BUILD)/scd_validate.o: user/runtime/scd_format.c user/runtime/SCDYN.H $(STAMP)
+	$(CC) $(CFLAGS) -Werror -Iuser/runtime -c $< -o $@
+
+M10A2_DYNAMIC_DIR ?= build/m10a2-dynamic-bootstrap
+.PHONY: m10a2-dynamic-bootstrap m10a2-dynamic-artifacts
+m10a2-dynamic-bootstrap:
+	$(MAKE) BUILD=$(M10A2_DYNAMIC_DIR) M9_BUILD=1 M10_BUILD=1 $(M10A2_DYNAMIC_DIR)/sandcore.img $(M10A2_DYNAMIC_DIR)/fs/SYS/CORE/CORE.SKM $(M10A2_DYNAMIC_DIR)/fs/bin/sccc.scx m10a2-dynamic-artifacts
+$(BUILD)/scl-root.o: user/runtime/SCLROOT.C user/runtime/SCLDR.H user/runtime/SCLFMT.H user/runtime/SCDYN.H user/runtime/SCLPRIVATE.H $(STAMP)
+	$(CC) $(CFLAGS) -Werror -x c -Iuser/runtime -c $< -o $@
+$(BUILD)/SCLDR.SCL: $(BUILD)/scl-root.o user/runtime/SCLROOT.json tools/mkscl.py tools/scl_format.py
+	$(PY) tools/mkscl.py $< $@ --manifest user/runtime/SCLROOT.json
+$(BUILD)/dynapp.o: tests/m10a2/DYNAPP.C $(STAMP)
+	$(CC) $(CFLAGS) -Werror -x c -c $< -o $@
+$(BUILD)/DYNAPP.SCX: $(BUILD)/dynapp.o tests/m10a2/DYNAPP.json tools/mkdscx.py tools/scd_format.py tools/mkscl.py
+	$(PY) tools/mkdscx.py $< $@ --manifest tests/m10a2/DYNAPP.json
+m10a2-dynamic-artifacts: $(BUILD)/SCLDR.SCL $(BUILD)/DYNAPP.SCX

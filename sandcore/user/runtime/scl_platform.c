@@ -1,8 +1,29 @@
 #include "SCLDR.H"
+#include "SCLPRIVATE.H"
 
 /* 唯一的引导桥依赖 start.asm；这里属于 SCLDR 私有后端。应用只
  * 包含 SCLDR.H，后续 SC32API 使用同一后端而不复制寄存器约定。 */
+#ifndef SCL_BOOT_LIBRARY
 extern int sc_call(int number, int a, int b, int c, int d, int e, int f);
+int ScRuntimePlatformCall(int number,int a,int b,int c,int d,int e,int f)
+{ return sc_call(number,a,b,c,d,e,f); }
+#else
+int ScRuntimePlatformCall(int number,int a,int b,int c,int d,int e,int f)
+{
+    /* cdecl的保留寄存器与内核陷入约定只在这个独立引导后端处理。
+     * args先完整排好，再覆盖作为临时参数指针的ECX。 */
+    int args[7]={number,a,b,c,d,e,f};int result;int *p=args;
+    __asm__ __volatile__(
+        "push %%ebp; push %%ebx; push %%esi; push %%edi; "
+        "mov 16(%%ecx),%%esi; mov 20(%%ecx),%%edi; mov 24(%%ecx),%%ebp; "
+        "mov 4(%%ecx),%%ebx; mov 12(%%ecx),%%edx; mov (%%ecx),%%eax; "
+        "mov 8(%%ecx),%%ecx; int $0x7c; "
+        "pop %%edi; pop %%esi; pop %%ebx; pop %%ebp"
+        :"=a"(result),"+c"(p)::"edx","cc","memory");
+    return result;
+}
+#endif
+#define sc_call ScRuntimePlatformCall
 
 static int same(const char *a, const char *b)
 { while (*a && *a == *b) { ++a; ++b; } return *a == *b; }
@@ -59,11 +80,20 @@ int ScRuntimeDefaultPlatform(ScRuntimePlatform *platform, const char *root)
     if (!platform) return SC_SCL_FORMAT;
     if (root) {
         if (*root != '/') return SC_SCL_FORMAT;
-        ScU32 i = 1;
-        for (; root[i]; ++i) {
-            if (i > 26 || root[i] == '\\' || root[i] == ':' || root[i] < 32)
-                return SC_SCL_FORMAT;
-            if (root[i] == '.' && (root[i - 1] == '/' || root[i - 1] == '.'))
+        ScU32 i = 1, start = 1;
+        for (;; ++i) {
+            ScU32 byte = (unsigned char)root[i];
+            if (!byte || byte == '/') {
+                /* 只拒绝路径导航组件；点文件、连续点和UTF-8目录是
+                 * SandFS合法名字，不能让引导库另行缩窄其字符集。 */
+                ScU32 length = i - start;
+                if ((length == 1 && root[start] == '.') ||
+                    (length == 2 && root[start] == '.' && root[start + 1] == '.'))
+                    return SC_SCL_FORMAT;
+                if (!byte) break;
+                start = i + 1;
+            }
+            if (i > 62 || byte == '\\' || byte == ':' || byte < 33)
                 return SC_SCL_FORMAT;
         }
     }

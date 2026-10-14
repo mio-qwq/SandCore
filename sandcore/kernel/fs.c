@@ -128,7 +128,10 @@ static int busy(const char *name)
 }
 static int protected(const char *name)
 { return same(name,"SYS/CORE") || child(name,"SYS/CORE") || same(name,"SYS/AUTH") || child(name,"SYS/AUTH")
-    || same(name,"SYS/RECOVERY") || child(name,"SYS/RECOVERY"); }
+    || same(name,"SYS/RECOVERY") || child(name,"SYS/RECOVERY")
+    /* 系统SCL是用户态代码，但启动来源必须稳定。root绕过普通rw
+     * 不等于可替换系统库；宿主发行包与可信零环更新沿原内部接口。 */
+    || same(name,"SYS/LIB") || child(name,"SYS/LIB"); }
 static int module_path(const char *name)
 {return same(name,"SYS/MOD") || child(name,"SYS/MOD");}
 int fs_user_mutable(const char *path,int descendants)

@@ -1,0 +1,17 @@
+{
+  "kind": "application",
+  "name": "DYNAPP.SCX",
+  "dependencies": [
+    {"name": "UPPER.SCL", "abi_major": 1, "min_minor": 0, "min_version": 1},
+    {"name": "BASE.SCL", "abi_major": 1, "min_minor": 0, "min_version": 1}
+  ],
+  "imports": [
+    {"name": "upper_message", "dependency": "UPPER.SCL", "kind": "data", "size": 10},
+    {"name": "upper_compute", "dependency": "UPPER.SCL", "kind": "function", "size": 1},
+    {"name": "base_value", "dependency": "BASE.SCL", "kind": "data", "size": 4},
+    {"name": "base_add", "dependency": "BASE.SCL", "kind": "function", "size": 1},
+    {"name": "base_init_count", "dependency": "BASE.SCL", "kind": "data", "size": 4},
+    {"name": "upper_init_count", "dependency": "UPPER.SCL", "kind": "data", "size": 4},
+    {"name": "upper_call_pointer", "dependency": "UPPER.SCL", "kind": "function", "size": 1}
+  ]
+}

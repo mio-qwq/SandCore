@@ -89,5 +89,8 @@
 
 unsigned int scl_read32(const unsigned char *bytes);
 int scl_validate(const void *bytes, unsigned int size);
+/* 完整文件先验过并已映射后，可单独核验恰好到字符串末尾的元数据。
+ * 此入口验证全部表/名字/段/导出/重定位边界，不读取缺失的磁盘payload。 */
+int scl_validate_metadata(const void *bytes, unsigned int size);
 
 #endif
