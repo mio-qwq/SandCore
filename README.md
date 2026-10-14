@@ -1,10 +1,14 @@
 # SandCore / 沙核
 
+> 🌐 **Language / 语言：** 简体中文（当前） | [English README →](README_EN.md)
+
 **从引导器、内核到桌面和原生开发工具的 32 位 x86 操作系统。**
 
 SandCore 由 [mio](https://github.com/mio-qwq/) 开发。工程包含 BIOS 引导、分页与抢占式多任务、SandFS 文件系统、多用户桌面、图形应用、音频、IPv4 网络、自有可执行格式，以及可以在系统内编译和运行程序的 C 编译器、汇编器和调试器。
 
-当前开发工作为 **SandCore M10a2 — The Application Platform Era**，2026-10-14 已按用户规则开工，平台切片尚在实现与验证中；[总体设计](sandcore/docs/M10A2-DESIGN.md)、[实际状态与恢复入口](sandcore/docs/M10A2-IMPLEMENTATION.md)。可用验收基线仍为 **M10a1**，已于 **2026-10-07 用户验收通过**，作为 M10a 的 **GitHub Preview 预发布版**交付；统一在 `main` 开发。M9 是已验收的正式发布版本，M8a 与更早版本保留源码和运行镜像。完整 M10 尚未宣布完成，基础内核尚未冻结。
+当前开发工作为 **SandCore M10a2 — The Application Platform Era**，2026-10-14 已开工，平台切片正在实现与验证中；[总体设计](sandcore/docs/M10A2-DESIGN.md)、[实际状态与恢复入口](sandcore/docs/M10A2-IMPLEMENTATION.md)。可用验收基线仍为 **M10a1**，已于 **2026-10-07 验收通过**，作为 M10a 的 **GitHub Preview 预发布版**交付；统一在 `main` 开发。M9 是已验收的正式发布版本，M8a 与更早版本保留源码和运行镜像。完整 M10 尚未宣布完成，基础内核尚未冻结。
+
+> **关于 AI 参与与文档质量：** 本项目包含由 AI 生成或辅助编写的代码，部分文档也由 Agent 撰写或整理，因此可能存在表述不清、人称或代词指代错误，以及遗留的 Agent 自述等问题。欢迎通过 [Issues](https://github.com/mio-qwq/SandCore/issues) 指出问题；我也会在后续持续校对与完善。
 
 | 入口 | 内容 |
 |---|---|
@@ -38,7 +42,7 @@ SandCore 由 [mio](https://github.com/mio-qwq/) 开发。工程包含 BIOS 引�
 
 取消固定多任务上限是 M10a1 的重点：任务、凭据、环境、调试/SIMD 状态及关联会话、窗口、管道等按实际资源动态分配。数量最终受可用内存和各项资源合同约束，分配失败明确返回并回滚；具体生命周期见 [M10-LIFECYCLE.md](sandcore/docs/M10-LIFECYCLE.md)。
 
-内置图形应用包括 Files、Notes、Canvas、Lens、Settings、Monitor、IDE、Debug 等。内置游戏、通用图形库与影片工程也保留在仓库中；其中原完整 M8 未达成的性能、画质和成片目标已按用户决定封存，具体范围见 [M8-FROZEN.md](sandcore/docs/M8-FROZEN.md)。
+内置图形应用包括 Files、Notes、Canvas、Lens、Settings、Monitor、IDE、Debug 等。内置游戏、通用图形库与影片工程也保留在仓库中；其中原完整 M8 未达成的性能、画质和成片目标已封存，具体范围见 [M8-FROZEN.md](sandcore/docs/M8-FROZEN.md)。
 
 ### 网络工具与范围
 
@@ -80,7 +84,7 @@ flowchart TD
 
 主核无法装载时尝试 `/SYS/RECOVERY/CORE.SKM`。恢复目录与启动扩展目录分开；主内核的 CRC/SHA256 完整性检查和扩展的 Ed25519 签名验证是不同合同。
 
-`/SYS/CORE/` 下除 `CORE.SKM` 外的 SKM2 扩展须通过正式用户公钥验签，再按受签名保护的内部唯一编号升序初始化一次。重复编号拒绝全部冲突项；成功注册的服务可常驻到重启。本轮不支持热卸载或热重载。旧 `/SYS/MOD` 的 SKM1 管理链路保留，格式说明见 [CORE.md](sandcore/docs/CORE.md) 和 [MODULE.md](sandcore/docs/MODULE.md)。
+`/SYS/CORE/` 下除 `CORE.SKM` 外的 SKM2 扩展须通过正式公钥验签，再按受签名保护的内部唯一编号升序初始化一次。重复编号拒绝全部冲突项；成功注册的服务可常驻到重启。本轮不支持热卸载或热重载。旧 `/SYS/MOD` 的 SKM1 管理链路保留，格式说明见 [CORE.md](sandcore/docs/CORE.md) 和 [MODULE.md](sandcore/docs/MODULE.md)。
 
 ### 内核模块与用户态边界
 
@@ -110,7 +114,7 @@ NUI 和各类 `SC*.H` / `*.inc` 提供原生界面、内存、标准流、网络
 | 客体路径 | 用途 |
 |---|---|
 | `/SYS/CORE/CORE.SKM` | 主内核 |
-| `/SYS/CORE/*.SKM` | 经过用户签名授权的开机扩展 |
+| `/SYS/CORE/*.SKM` | 经过签名授权的开机扩展 |
 | `/SYS/RECOVERY/CORE.SKM` | 独立恢复主核 |
 | `/SYS/MOD/` | 旧 SKM1 管理扩展，按外部 SYSTEM 权限链操作 |
 | `/SYS/FONT/` | 原始凤凰 TTF 与相关字体资源 |
@@ -135,8 +139,7 @@ projectos/
 ├── build.bat                    当前系统构建入口，默认 M10a1
 ├── build-version.bat            历史源码快照重建入口
 ├── run-m10a1.bat                 当前开发验收版本运行入口
-├── sign-m10a1-yourself.bat        用户亲自操作的离线签署入口
-├── vonwaon-bitmap.ttf.zip        用户提供的原始凤凰字体归档
+├── vonwaon-bitmap.ttf.zip        原始凤凰字体归档
 │
 ├── sandcore/                    操作系统主工程
 │   ├── boot/                    BIOS 引导与最小 loader
@@ -150,7 +153,7 @@ projectos/
 │   │   ├── compress/           DEFLATE 等压缩适配
 │   │   └── pack/               bzip2 / LZMA 等归档组件
 │   ├── modules/                 壁纸模块源码与已签扩展
-│   │   └── signed/             已接收的用户签名公开产物
+│   │   └── signed/             已接收的签名公开产物
 │   ├── assets/                  字体、图标、壁纸、声音/配置等资源
 │   │   ├── design/             设计资料
 │   │   ├── font/               字体构建输入与缓存资源
@@ -303,7 +306,7 @@ run HOME/SandCore_ExtraSoftware_Pack_1.scx
 env -u OS make -j4
 ```
 
-该包面向 M9，原记录为用户于 2026-10-06 完全验收主体功能；署名/About 补充另有 freestanding 构建、442 项宿主回归和封装检查记录，明确没有新增客体启动。本次仅迁入既有工程与成品，不追加 M10a1 兼容运行声明。来源与边界见 [RELEASE.md](ext/SoftwarePack1/RELEASE.md)、[TESTING.md](ext/SoftwarePack1/TESTING.md)。
+该包面向 M9，原记录为于 2026-10-06 完全验收主体功能；署名/About 补充另有 freestanding 构建、442 项宿主回归和封装检查记录，明确没有新增客体启动。本次仅迁入既有工程与成品，不追加 M10a1 兼容运行声明。来源与边界见 [RELEASE.md](ext/SoftwarePack1/RELEASE.md)、[TESTING.md](ext/SoftwarePack1/TESTING.md)。
 
 共享库包括表达式求值、CSV、配置、UTF-8、整数工具、音频包装与 NUI 附加控件，合同见 [LIBEX.md](ext/libex/LIBEX.md)。原基线和署名前验收包保存在 `ext/SoftwarePack1-baseline-20261006/`；本机中间物完整复制保留，Git 排除可重新生成的目标文件、宿主测试程序和原始 PPM，保留既有日志与 PNG 预览。
 
@@ -334,7 +337,7 @@ env -u OS make -j4
 | `tools/mkimg.py`、`mkfs.py`、`mkfs_m9.py`、`mkfs_m10.py` | 启动盘打包、SandFS 创建、权限卷与 M10 迁移 |
 | `tools/mkscx.py`、`mkskm.py`、`mkcore.py`、`mkext.py` | SCX、旧 SKM、主核和签名扩展正文封装 |
 | `tools/mkcore_public_key.py`、`core_signature.py`、`receive_m10_signatures.py` | 公钥接线、公开结果验签与签名接收 |
-| `tools/user_sign_m10.py`、根签署 BAT | 仅由用户亲自操作的离线签署界面；签署 BAT 使用本机配置的 Python 路径 |
+| `tools/user_sign_m10.py`、根签署 BAT | 仅亲自操作的离线签署界面；签署 BAT 使用本机配置的 Python 路径 |
 | `tools/scserial.py`、`serial_protocol.py` | 外部 SYSTEM 管理、双串口连接与调试协议 |
 | `tools/run_m10a1.py`、`qemu_config.py` | 有窗运行、独立会话、QEMU 配置与加速选择 |
 | `tools/publish_native.py`、`publish_m8_native.py` | 历史系统内编译来源核对与原生产物装盘 |
@@ -429,7 +432,7 @@ env -u OS make -j4
 
 | 文档 | 内容 |
 |---|---|
-| [M9-RELEASE](sandcore/docs/M9-RELEASE.md)、[M9-ACCEPTANCE](sandcore/docs/M9-ACCEPTANCE.md) | M9 正式发布与用户验收 |
+| [M9-RELEASE](sandcore/docs/M9-RELEASE.md)、[M9-ACCEPTANCE](sandcore/docs/M9-ACCEPTANCE.md) | M9 正式发布与验收 |
 | [M9-DESIGN](sandcore/docs/M9-DESIGN.md)、[M9-IMPLEMENTATION](sandcore/docs/M9-IMPLEMENTATION.md)、[M9-VERIFICATION](sandcore/docs/M9-VERIFICATION.md) | M9 合同、实现和运行沿革 |
 | [M8A-RELEASE](sandcore/docs/M8A-RELEASE.md)、[M8-FROZEN](sandcore/docs/M8-FROZEN.md)、[M8-RETROSPECTIVE](sandcore/docs/M8-RETROSPECTIVE.md) | M8a 发布、原 M8 封存与经验 |
 | [M8](sandcore/docs/M8.md)、[M8-DESIGN](sandcore/docs/M8-DESIGN.md)、[M8-COMPONENTS](sandcore/docs/M8-COMPONENTS.md) | M8 原规划、设计和组件清单 |
@@ -443,16 +446,16 @@ env -u OS make -j4
 
 引导器、内核、文件系统、桌面、编译器和工具主要由本项目编写；协议栈、部分图片/音频解码和压缩使用固定的第三方实现。第三方源码、原版权/许可文本、来源与适配记录一起保存，客体统一归档到 `/SYS/LICENSE/`。
 
-主要外部组件包括 lwIP、Monocypher、stb_image、libwebp、dr_mp3、dr_flac、miniz、libbzip2 和 LZMA SDK 解码器；字体为凤凰点阵体 / Vonwaon Bitmap。实际选用许可、嵌套实现和逐文件来源以 [THIRD-PARTY.md](sandcore/docs/THIRD-PARTY.md) 及各组件原文为准。仓库当前未设置统一的根 `LICENSE`，第三方的独立授权范围和资源来源声明仍须分别阅读；本说明不为用户素材补造许可。
+主要外部组件包括 lwIP、Monocypher、stb_image、libwebp、dr_mp3、dr_flac、miniz、libbzip2 和 LZMA SDK 解码器；字体为凤凰点阵体 / Vonwaon Bitmap。项目自有材料的许可见根 [LICENSE](LICENSE)；第三方的独立授权范围、嵌套实现与逐文件来源见 [THIRD-PARTY.md](sandcore/docs/THIRD-PARTY.md) 及各组件原文，资源来源声明不补造素材授权。
 
-正式 Ed25519 私钥由用户独占保管。仓库接收公开公钥与签名结果，代理不生成、读取、保存或代用用户私钥；签署流程见 [CORE.md](sandcore/docs/CORE.md)。
+正式 Ed25519 私钥独占保管。仓库接收公开公钥与签名结果，代理不生成、读取、保存或代用私钥；签署流程见 [CORE.md](sandcore/docs/CORE.md)。
 
 | 版本 | 状态 |
 |---|---|
 | M10a2 — The Application Platform Era | 2026-10-14 授权开工，SCL/用户态应用平台建设中，尚未验收 |
-| M10a1 | 2026-10-07 用户验收通过，GitHub Preview 预发布，含追加 curl；统一使用 main |
-| M9 | 2026-10-05 用户验收通过，正式发布 |
-| M8a | 用户批准的部分正式发布；原 M8 未完成部分继续封存 |
+| M10a1 | 2026-10-07 验收通过，GitHub Preview 预发布，含追加 curl；统一使用 main |
+| M9 | 2026-10-05 验收通过，正式发布 |
+| M8a | 批准的部分正式发布；原 M8 未完成部分继续封存 |
 | M7 / M6 | 保留已交付运行包及历史源码 |
 | M6a | 保留早期源码基线与重建入口 |
 
@@ -462,6 +465,8 @@ env -u OS make -j4
 
 修订：2026-10-07，建立项目总 README，原根 README 改名为开发阶段记录；纳入 ext 原工程/成品/基线，补齐架构、目录、镜像编辑器、工具与文档索引。
 
-修订：2026-10-07，按用户最新授权发布 M10a1 Preview，登记原验收 ZIP 与下载入口；整合已有分支后统一 main。
+修订：2026-10-07，按最新授权发布 M10a1 Preview，登记原验收 ZIP 与下载入口；整合已有分支后统一 main。
 
 修订：2026-10-14，M10a2 The Application Platform Era 开工，增加设计/状态入口；M10a1 继续作为已验收运行基线。
+
+修订：2026-10-14，合并远端许可证、英文README和原文调整，保留全部已有提交并同步双语开发状态。
