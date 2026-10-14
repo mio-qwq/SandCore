@@ -1,0 +1,18 @@
+{
+  "name": "BASE.SCL",
+  "abi_major": 1,
+  "abi_minor": 0,
+  "library_version": 1,
+  "init": "base_init",
+  "fini": "base_fini",
+  "exports": [
+    {"name": "base_add", "kind": "function"},
+    {"name": "base_value", "kind": "data"},
+    {"name": "base_message", "kind": "data"},
+    {"name": "base_state", "kind": "data"},
+    {"name": "base_init_count", "kind": "data"},
+    {"name": "base_fini_count", "kind": "data"}
+  ],
+  "imports": [],
+  "dependencies": []
+}

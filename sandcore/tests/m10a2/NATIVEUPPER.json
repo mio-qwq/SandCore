@@ -1,0 +1,29 @@
+{
+  "name": "UPPER.SCL",
+  "abi_major": 1,
+  "abi_minor": 0,
+  "library_version": 1,
+  "init": "upper_init",
+  "fini": "upper_fini",
+  "exports": [
+    {"name": "upper_compute", "kind": "function"},
+    {"name": "upper_call_pointer", "kind": "function"},
+    {"name": "upper_value", "kind": "data"},
+    {"name": "upper_state", "kind": "data"},
+    {"name": "upper_init_count", "kind": "data"},
+    {"name": "upper_fini_count", "kind": "data"},
+    {"name": "upper_bss", "kind": "data"},
+    {"name": "upper_message", "kind": "data"},
+    {"name": "upper_base_pointer", "kind": "data"},
+    {"name": "upper_value_pointer", "kind": "data"},
+    {"name": "upper_message_pointer", "kind": "data"},
+    {"name": "upper_add_pointer", "kind": "data"}
+  ],
+  "imports": [
+    {"name": "base_add", "dependency": "BASE.SCL", "kind": "function", "size": 1},
+    {"name": "base_value", "dependency": "BASE.SCL", "kind": "data", "size": 4}
+  ],
+  "dependencies": [
+    {"name": "BASE.SCL", "abi_major": 1, "min_minor": 0, "min_version": 1}
+  ]
+}

@@ -348,6 +348,7 @@ static int primary(void)
         int at=data_used;
         for(int i=0;i<bytes;i++) data[data_used++]=(u8)literal[i];
         data[data_used++]=0;
+        if(shared_output)scl_literal_new(at,bytes+1);
         n=node_new(N_STRING,array_of(C_CHAR,bytes+1),0,0,0,at);
     } else if(t->k==T_ID) {
         int name=t->v,s=find_symbol(name,0);
@@ -584,6 +585,7 @@ static int local_declaration(void)
             if(old && symbols[old].scope==0) s=old;
             else s=symbol_new(name,type,types[type].kind==TY_FUNC?S_FUNCTION:S_GLOBAL,0,0);
         } else s=symbol_new(name,type,(storage&D_STATIC)?S_GLOBAL:S_LOCAL,0,scope_depth);
+        if(shared_output && (symbols[s].kind==S_GLOBAL || symbols[s].kind==S_FUNCTION))scl_declare(s,storage);
         int init=0;
         if(take('=')) {
             if((storage&D_TYPEDEF) || (storage&D_EXTERN) || types[type].kind==TY_FUNC) fatal("invalid initializer on declaration");
@@ -763,8 +765,8 @@ static void compile_unit(void)
     new_type(TY_INT,4,0,0,0,Q_UNSIGNED);
     /* 入口与最终 main 调用由后端 finish_image 统一生成，函数偏移从
      * 预留的 24 字节之后算起。绝对地址仍须等代码/数据布局确定后回填。 */
-    code_used=24;
-    copy(map_text,"SCSYM1MIO\n",sizeof(map_text));
+    code_used=shared_output?0:24;
+    copy(map_text,shared_output?"SCLMAP1MIO\n":"SCSYM1MIO\n",sizeof(map_text));
     map_used=length(map_text);
     while(current_token()->k) {
         /* 顶层声明之间没有半写的输出文件，是检查取消/窗口重排的安全点。
@@ -784,6 +786,8 @@ static void compile_unit(void)
                 int kind=types[type].kind==TY_FUNC?S_FUNCTION:S_GLOBAL;
                 if(s && symbols[s].kind!=kind) fatal("declaration kind conflicts with previous name");
                 if(!s) s=symbol_new(name,type,kind,0,0);
+                if(shared_output)scl_declare(s,storage);
+                if(shared_output)type=scl_declaration_type(symbols[s].type,type);
                 symbols[s].type=type;
                 if(kind==S_FUNCTION && current_token()->k=='{') {
                     if(symbols[s].defined) fatal("function is already defined");

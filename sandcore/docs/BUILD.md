@@ -385,3 +385,11 @@ M10测试源码通配规则同样安装新增M10LIFE.C。统一阶段由客体s3
 定向客体命令：`python sandcore/tools/verify_m10a2_scl.py --out sandcore/build/m10a2-scl-guest-01 --accel tcg`（从仓库根目录）。输出目录必须不存在；scserial 的可选 data_prepare 在启动VM前仅准备已校验的本会话盘，原基盘不变；默认其它启动器行为保持。准备后回读全部对象正文/权限/代数，正常运行只保留这一个实际会话盘，截图/JSON/日志留证。
 
 修订：2026-10-14，新增SCL宿主引导定向链、无shell退出码记录和单会话盘准备；首次构建与两库实际调用通过，完整SCCC/SDK/平台构建不以此冒充完成。
+
+### SCCC原生输出切片
+
+`make m10a2-native-compiler`只生成独立`build/m10a2-native-bootstrap/fs/bin/sccc.scx`，不重建核心、全部应用或盘。记录入口为`wsl.exe -e python3 /mnt/c/Users/Administrator/Desktop/projectos/sandcore/tools/build_m10a2_native.py --tag native-build-02`。当前新编译器依赖s3c_scl.inc和runtime/SCLFMT.H/scl_format.c；真正系统内自编译时必须按源码目录层次安装这些输入。
+
+从根目录运行`python sandcore/tools/verify_m10a2_native.py --out sandcore/build/m10a2-native-guest-02 --compiler-build-report sandcore/build/m10a2-native-bootstrap/native-build-02.json --accel tcg`，指定报告须匹配当前启动编译器SHA，新输出目录拒绝覆盖。该轮复用已有core/runtime与只读基盘，在一个准备后的会话盘执行完整SCCC0/G1→两库→调用及相关错误保留。首次native-guest-01路径失败已保留并修复；没有据此重跑无关组件或M8。
+
+修订：2026-10-14，新增编译器独立小目标和真实系统内SCL/G1链；CLI load/BSS界限、旧模式代表字节和失败保留已通过，完整自举固定点/SDK/动态SCX启动仍待。

@@ -1,0 +1,89 @@
+{
+  "scope": "HOST_REAL_SCCC_EMITTER_WITH_IO_ADAPTER",
+  "executes_i386": false,
+  "guest_sccc": false,
+  "status": "PASS",
+  "cases": [
+    {
+      "case": "native-emitter-BASE",
+      "status": "PASS",
+      "bytes": 732,
+      "sha256": "bafa9fd7cce5e7bccc4f5fbbe58f699bf082d639a1f1b07a59a1b5422ea2edfa",
+      "relocations": 6,
+      "stderr": "SCCC OK SCL NATIVE\nHOST_SCCC tokens=77 source=468 code=152 data=32 bss=12 fixes=6\n"
+    },
+    {
+      "case": "native-emitter-UPPER",
+      "status": "PASS",
+      "bytes": 1660,
+      "sha256": "502498d29fdd9ae0271d0c4c95e1293fb9b848ed6481f756821a679c527e6f9d",
+      "relocations": 22,
+      "stderr": "SCCC OK SCL NATIVE\nHOST_SCCC tokens=194 source=1160 code=426 data=44 bss=28 fixes=22\n"
+    },
+    {
+      "case": "old-scx-byte-identical",
+      "status": "PASS",
+      "bytes": 160
+    },
+    {
+      "case": "old-skm-byte-identical",
+      "status": "PASS",
+      "bytes": 124
+    },
+    {
+      "case": "map-failure-preserves-previous-body",
+      "status": "PASS",
+      "stderr": "SCCC ERROR tests/m10a2/NATIVEBASE.C:25: cannot write SCL RVA map\nSCCC ERROR tests/m10a2/NATIVEBASE.C:25: cannot write SCL RVA map\n"
+    },
+    {
+      "case": "static-export-preserves-previous-body",
+      "status": "PASS",
+      "stderr": "SCCC ERROR tests/m10a2/NATIVEBASE.C:25: SCL export is missing or has static linkage\nSCCC ERROR tests/m10a2/NATIVEBASE.C:25: SCL export is missing or has static linkage\n"
+    },
+    {
+      "case": "duplicate-export-preserves-previous-body",
+      "status": "PASS",
+      "stderr": "SCCC ERROR tests/m10a2/NATIVEBASE.C:25: SCL duplicate export\nSCCC ERROR tests/m10a2/NATIVEBASE.C:25: SCL duplicate export\n"
+    },
+    {
+      "case": "bad-callback-preserves-previous-body",
+      "status": "PASS",
+      "stderr": "SCCC ERROR tests/m10a2/NATIVEBASE.C:25: SCL callback must be a defined external function\nSCCC ERROR tests/m10a2/NATIVEBASE.C:25: SCL callback must be a defined external function\n"
+    },
+    {
+      "case": "unknown-key-preserves-previous-body",
+      "status": "PASS",
+      "stderr": "SCCC ERROR :0: SCL manifest has an unknown top-level field\nSCCC ERROR :0: SCL manifest has an unknown top-level field\n"
+    },
+    {
+      "case": "ARRAY.SCL-declaration-boundary",
+      "status": "PASS",
+      "stderr": "SCCC OK SCL NATIVE\nHOST_SCCC tokens=44 source=112 code=49 data=8 bss=0 fixes=1\n"
+    },
+    {
+      "case": "MESSAGE.SCL-declaration-boundary",
+      "status": "PASS",
+      "stderr": "SCCC OK SCL NATIVE\nHOST_SCCC tokens=20 source=82 code=36 data=0 bss=0 fixes=1\n"
+    },
+    {
+      "case": "self-source-generates-SCX",
+      "status": "PASS",
+      "stderr": "SCCC OK load=190421 bss=3535004 / mio\nHOST_SCCC tokens=48855 source=217212 code=178428 data=11993 bss=3535004 fixes=3905\n"
+    }
+  ],
+  "input_sha256": {
+    "user/s3c.c": "1cc50b11ce29081ec6f8259ecf22984bf9aa6252d856e766069f004b26e1958e",
+    "user/s3c_lex.inc": "daac00f4c34383cbb47ec2dfce8fa3e959ef2813c66f647284ab2ab4b75becfc",
+    "user/s3c_pp.inc": "9ebde1119c4cf4d67d681b79bb51cae79c1a7d79b3682c4a09d977ec83acb871",
+    "user/s3c_parse.inc": "304b3c9dd869ae8d1e3541c5096aabd2027531a33c81a1100d2e96faebefe49b",
+    "user/s3c_emit.inc": "37de256e3a55afffaeeabcde9bcc7a8a7a5efe21179b2b1a54f068712f7f1da1",
+    "user/s3c_scl.inc": "544a4f8a7cc876b78d5a19b38e801679bcd8c47129757fead8b328e553c0e686",
+    "user/runtime/SCLFMT.H": "9dbb6b1f3ca8cc9ac347c00f014a99e5e7052f8603838941b12cb47f7b95320c",
+    "user/runtime/scl_format.c": "23d64e0d7f696759098d13998c491bf02d2b368d0a78eb15168fbbfe669d65e5",
+    "tests/m10a2/NATIVEBASE.C": "4748ba40c30cffa2fdb0b27cf5a6423eecbd3dbd78e6ea98e79d1cb65fa3ac23",
+    "tests/m10a2/NATIVEUPPER.C": "1716678c59ff7b78c41a208b9305bff99bfe76881763fc36c0491091315f95ca",
+    "tests/m10a2/NATIVEBASE.json": "2dd137eb18b723ac27aef37a74780f2daae4b9ab2bc197b4ea721513762879e6",
+    "tests/m10a2/NATIVEUPPER.json": "265cc2a7fb5a53d28102714b1a611fc86c21b671729eb2a30580c801a13f9f57"
+  },
+  "reuse_basis": "Only actual main CLI/GUI output-sidecar alias guards changed; host harness prefix and every parser/emitter/common-validator/fixture input are byte-identical. Refreshed self-source emission; preserved prior unaffected cases."
+}

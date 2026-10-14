@@ -1,0 +1,107 @@
+{
+  "status": "FAIL_OR_INTERRUPTED",
+  "scope": "M10A2_SCCC_NATIVE_SCL_AND_SELF_BOOTSTRAP_ONLY",
+  "cases": [
+    {
+      "name": "G0-directory",
+      "status": "PASS",
+      "command": "mkdir /TMP/SCLN-7b5537/G0",
+      "exit_code": 0,
+      "expected_exit": 0,
+      "output": "mkdir /TMP/SCLN-7b5537/G0; _m9_status=$?; printf \"\\n\"; echo __M9_1f6d48cd53fcd7ee41f251c8:$_m9_status\n",
+      "wall_seconds": 0.15600000000267755,
+      "qemu_cpu_seconds": 0.1875
+    },
+    {
+      "name": "G0-compile-BASE",
+      "status": "FAIL",
+      "command": "/TMP/SCLN-7b5537/SCCC0.SCX /TMP/SCLN-7b5537/NATIVEBASE.C /TMP/SCLN-7b5537/G0/BASE.SCL --scl /TMP/SCLN-7b5537/NATIVEBASE.json",
+      "exit_code": 1,
+      "expected_exit": 0,
+      "output": "/TMP/SCLN-7b5537/SCCC0.SCX /TMP/SCLN-7b5537/NATIVEBASE.C /TMP/SCLN-7b5537/G0/BASE.SCL --scl /TMP/SCLN-7b5537/NATIVEBASE.json; _m9_status=$?; printf \"\\n\"; echo __M9_faa6730f6cbedb8bcfca1a06:$_m9_status\nSCCC / mio\nSYS/TMP/SCLN-7b5537/NATIVEBASE.C -> SYS/TMP/SCLN-7b5537/G0/BASE.SCL\nValidating SCL manifest\nSCCC ERROR :0: SCL manifest missing or exceeds 1 MiB\n\n",
+      "wall_seconds": 0.13999999999941792,
+      "qemu_cpu_seconds": 0.3125
+    }
+  ],
+  "prefix": "/TMP/SCLN-7b5537",
+  "source_data_sha256": "3db2e3cd9262343204e8c19af02847e98244732c5b5ad4397dd334be84fe7e64",
+  "core_sha256": "30928d3dd5778bd9a66f7f2e2badc12c916179a1978f8e7e4a957e44e1e12f43",
+  "host_compiler_sha256": "dc5eaaa1ca570709997f6868fb8fc733077ce1a0393f3bb5f1d2aa7e2358c697",
+  "compiler_build_sha256": "7717331c5c3c639edd31a7e4e5fc63c8716480385eee128fa7dc20f425e82038",
+  "input_sha256": {
+    "user/sccc.c": "57b0b9bd0a607fc4b4c5d87b6c2af0c952b8675d6f282c02c1e3545aca013ae1",
+    "user/s3c.c": "1cc50b11ce29081ec6f8259ecf22984bf9aa6252d856e766069f004b26e1958e",
+    "user/SCAPI.H": "81a730450fcb3d310ed841ad3e5c70a3fed32aa7fbd10acac8b888ac7da9ffc1",
+    "user/SCIO.H": "f0843c3702fb2ab28276c2da0ac9f7f8139d705c8a043d67b7f5b343ed11a7dd",
+    "user/COMPILECLI.inc": "f2d0cf982365b0eab60ff60c48d5531fece70c2a70cf2bf235055bead3f9cb1e",
+    "user/s3c_lex.inc": "daac00f4c34383cbb47ec2dfce8fa3e959ef2813c66f647284ab2ab4b75becfc",
+    "user/s3c_pp.inc": "9ebde1119c4cf4d67d681b79bb51cae79c1a7d79b3682c4a09d977ec83acb871",
+    "user/s3c_parse.inc": "304b3c9dd869ae8d1e3541c5096aabd2027531a33c81a1100d2e96faebefe49b",
+    "user/s3c_emit.inc": "37de256e3a55afffaeeabcde9bcc7a8a7a5efe21179b2b1a54f068712f7f1da1",
+    "user/s3c_scl.inc": "544a4f8a7cc876b78d5a19b38e801679bcd8c47129757fead8b328e553c0e686",
+    "user/runtime/SCLFMT.H": "9dbb6b1f3ca8cc9ac347c00f014a99e5e7052f8603838941b12cb47f7b95320c",
+    "user/runtime/scl_format.c": "23d64e0d7f696759098d13998c491bf02d2b368d0a78eb15168fbbfe669d65e5",
+    "tests/m10a2/NATIVEBASE.C": "4748ba40c30cffa2fdb0b27cf5a6423eecbd3dbd78e6ea98e79d1cb65fa3ac23",
+    "tests/m10a2/NATIVEUPPER.C": "1716678c59ff7b78c41a208b9305bff99bfe76881763fc36c0491091315f95ca",
+    "tests/m10a2/NATIVEBASE.json": "2dd137eb18b723ac27aef37a74780f2daae4b9ab2bc197b4ea721513762879e6",
+    "tests/m10a2/NATIVEUPPER.json": "265cc2a7fb5a53d28102714b1a611fc86c21b671729eb2a30580c801a13f9f57"
+  },
+  "guest_libraries": [],
+  "screenshots": [
+    {
+      "path": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-native-guest-01\\failure.png",
+      "width": 1920,
+      "height": 1080,
+      "sha256": "7be7240427e05fa79f07498bd8c1419b1c66040d9d2d4d160c6bec811112aec2"
+    }
+  ],
+  "execution_context": "RING3_FROM_EXTERNAL_SYSTEM_SHELL",
+  "dynamic_SCX_startup": false,
+  "full_M10a2": false,
+  "startup_readiness": {
+    "status": "ACTUAL_FIRST_DESKTOP_COMPLETED",
+    "method": "READ_ONLY_HMP_COUNTERS_AND_PHYSICAL_ESC",
+    "symbols": {
+      "boot_stage": 8773636,
+      "sc_ticks": 8840232,
+      "wm_frames": 9010740
+    },
+    "observations": [
+      {
+        "seconds": 0.014999999999417923,
+        "boot_stage": 0,
+        "completed_frames": 0,
+        "ticks": 0
+      },
+      {
+        "seconds": 0.5,
+        "boot_stage": 1,
+        "completed_frames": 0,
+        "ticks": 18
+      },
+      {
+        "seconds": 1.6710000000020955,
+        "boot_stage": 2,
+        "completed_frames": 0,
+        "ticks": 135
+      },
+      {
+        "seconds": 1.9210000000020955,
+        "boot_stage": 3,
+        "completed_frames": 1,
+        "ticks": 160
+      }
+    ],
+    "input_sent": true,
+    "input": "esc",
+    "input_seconds": 1.6869999999980791,
+    "seconds": 1.9210000000020955
+  },
+  "error": {
+    "type": "AssertionError",
+    "message": "G0-compile-BASE",
+    "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\tools\\verify_m10a2_native.py\", line 99, in main\n    first=libraries(compiler0,'G0')\n          ^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\tools\\verify_m10a2_native.py\", line 82, in libraries\n    run(generation+'-compile-'+lib,compiler+' '+prefix+'/'+source+'.C '+target+\n  File \"C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\tools\\verify_m10a2_native.py\", line 69, in run\n    raise AssertionError(name)\nAssertionError: G0-compile-BASE\n"
+  },
+  "source_disk_unchanged": true,
+  "current_inputs_unchanged": true
+}

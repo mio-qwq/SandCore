@@ -25,7 +25,9 @@
 
 #define TOKEN_MAX 65536
 #define POOL_MAX 196608
-#define SOURCE_MAX 196608
+/* 原生 SCL 清单/封装与共同格式验证器成为自编译输入，真实源码总量
+ * 超过旧 192KiB。只增加有依据的源码区；输出映像/栈/代码上限仍检查。 */
+#define SOURCE_MAX 262144
 #define IDENT_MAX 4096
 #define FILE_MAX 32
 #define LINE_MAX 1024
@@ -42,7 +44,8 @@
 #define CODE_MAX 262000
 #define DATA_MAX 131072
 static int module_output;
-#define BASE (module_output?0u:0x400000u)
+static int shared_output;
+#define BASE ((module_output||shared_output)?0u:0x400000u)
 
 /* 单字节运算符直接保存 ASCII，多字节运算符才分配扩展编号。
  * 标记 v 是整数值或字符串池偏移；字符串池前四字节保存字节数，
@@ -104,7 +107,10 @@ static int type_count,symbol_count,param_count,node_count,fix_count;
 static int function_symbol,scope_depth,local_bytes;
 static u8 code[CODE_MAX+36],data[DATA_MAX];
 static int code_used,data_used,bss_used;
-static char log_path[64],map_path[64],diagnostic[512],map_text[16384];
+static int scl_symbol_storage[SYMBOL_MAX],scl_symbol_sizes[SYMBOL_MAX];
+/* 清单/封装新增函数使真实自身符号图超过16KiB；继续保留有界检查，
+ * 调整至32KiB。普通SCX/SKM的符号行及映像字节顺序均不改变。 */
+static char log_path[64],map_path[64],diagnostic[512],map_text[32768];
 static char icon_path[64];
 static int map_used;
 /* 后端会在函数语法树完成后立即消费它；前置原型保证宿主与 SCCC
@@ -115,6 +121,14 @@ static void define_global(int symbol,int initializer);
 static u32 constant_value(int expression);
 static void compile_unit(void);
 static void finish_image(const char *output);
+static void scl_literal_new(int offset,int size);
+static void scl_global_new(int symbol,int size);
+static void scl_declare(int symbol,int storage);
+static int scl_object_const(int type);
+static int scl_declaration_type(int previous,int type);
+static void scl_manifest_load(const char *path,const char *output);
+static int scl_path_same(const char *a,const char *b);
+static void finish_scl(const char *output);
 
 static void fatal(const char *reason)
 {
@@ -191,27 +205,49 @@ static void tokcopy(Tok *d,Tok *s) { d->k=s->k;
 #include "s3c_pp.inc"
 #include "s3c_parse.inc"
 #include "s3c_emit.inc"
+#include "s3c_scl.inc"
 
 int main(void)
 {
 #ifdef SCCC_CLI
-    if(cli_parse()<0 || cli_argc<2 || cli_argc>3){
-        cli_text(2,"s3c source.c output.scx [icon.scb | --skm]\n");return 2;
+    if(cli_parse()<0 || cli_argc<2 || cli_argc>4){
+        cli_text(2,"s3c source.c output.scx [icon.scb | --skm]\ns3c source.c output.SCL --scl manifest.json\n");return 2;
     }
-    char *input=cli_argv[0],*output=cli_argv[1],*icon=cli_argc==3?cli_argv[2]:"";
+    char *input=cli_argv[0],*output=cli_argv[1],*icon=cli_argc>=3?cli_argv[2]:"";
+    char *manifest=cli_argc==4?cli_argv[3]:"";
 #else
     char args[1024];
     if(sc_arguments2(args,sizeof(args))<0)sc_args(args,sizeof(args));
     char *p=args;
     char *input=token(&p),*output=token(&p),*icon=token(&p);
+    char *manifest="";
 #endif
     if(equal(icon,"--skm")){module_output=1;icon="";}
-#ifdef SCCC_CLI
-    char input_path[64],output_path[64],resolved_icon[64];
-    if(sc_resolve(input,input_path,64)<0 || sc_resolve(output,output_path,64)<0)return 2;
-    input=input_path;output=output_path;
-    if(*icon){if(sc_resolve(icon,resolved_icon,64)<0)return 2;icon=resolved_icon;}
+    if(equal(icon,"--scl")){
+        shared_output=1;icon="";
+#ifndef SCCC_CLI
+        manifest=token(&p);
 #endif
+    }
+#ifdef SCCC_CLI
+    if((shared_output && cli_argc!=4) || (!shared_output && cli_argc>3)){
+        cli_text(2,"--scl requires exactly one manifest.json argument\n");return 2;
+    }
+    char input_path[64],output_path[64],resolved_icon[64];
+    if(!shared_output){
+        if(sc_resolve(input,input_path,64)<0 || sc_resolve(output,output_path,64)<0)return 2;
+        input=input_path;output=output_path;
+        if(*icon){if(sc_resolve(icon,resolved_icon,64)<0)return 2;icon=resolved_icon;}
+    }
+#endif
+    char shared_input_path[64],shared_output_path[64],shared_manifest_path[64];
+    if(shared_output){
+        /* RESOLVE返回根内无前导斜杠的规范名，不能再次按cwd解析。
+         * shared的CLI/GUI共用这唯一解析点，保留原63B名字容量。 */
+        if(sc_resolve(input,shared_input_path,64)<0 || sc_resolve(output,shared_output_path,64)<0
+           || sc_resolve(manifest,shared_manifest_path,64)<0)return 2;
+        input=shared_input_path;output=shared_output_path;manifest=shared_manifest_path;
+    }
     build_view_begin("SCCC / mio",input,output);
     if(!*input || !*output) {
         sc_puts("s3c source.c output.scx [icon.scb]\n");
@@ -220,22 +256,33 @@ int main(void)
         return 1;
     }
     copy(log_path,output,sizeof(log_path));
-    if(length(log_path)>59) copy(log_path,"HOME/S3C",sizeof(log_path));
+    if(length(log_path)>59) copy(log_path,shared_output?"/HOME/S3C":"HOME/S3C",sizeof(log_path));
     copy(map_path,log_path,sizeof(map_path));
     append(log_path,".log",sizeof(log_path));
     append(map_path,".map",sizeof(map_path));
+    if(shared_output && (scl_path_same(output,input) || scl_path_same(output,manifest)
+       || scl_path_same(log_path,input) || scl_path_same(log_path,manifest)
+       || scl_path_same(map_path,input) || scl_path_same(map_path,manifest))){
+        /* 日志本身也可能是输入的别名，此处不能调用会写日志的fatal。 */
+        build_view_result("SCL output, log or map overlaps an input",1);return 2;
+    }
 #ifdef SCCC_CLI
     if(length(icon)>63)fatal("icon path capacity exceeded");
 #else
     if(length(icon)>63 || *token(&p))fatal("expected source, output and optional SCB2 icon");
 #endif
     copy(icon_path,icon,sizeof(icon_path));
+    if(shared_output){
+        if(!*manifest)fatal("SCL manifest is missing");
+        if(build_view_poll("Validating SCL manifest",0,0,1))fatal("compilation cancelled");
+        scl_manifest_load(manifest,output);
+    }
     sc_puts("SCCC: preprocess -> C -> x86\n");
     if(build_view_poll("Preprocessing source and includes",0,0,1))fatal("compilation cancelled");
     preprocess(input);
     if(build_view_poll("Parsing C and generating x86",0,token_count,1))fatal("compilation cancelled");
     compile_unit();
-    if(build_view_poll("Linking and writing SCX",1,1,1))fatal("compilation cancelled");
+    if(build_view_poll(shared_output?"Linking and writing SCL":"Linking and writing SCX",1,1,1))fatal("compilation cancelled");
     finish_image(output);
     build_view_result("Compilation complete",0);
 #ifdef SCCC_CLI

@@ -209,7 +209,7 @@ static void address(int node)
     if(n->kind==N_SYMBOL) symbol_address(n->value,0);
     else if(n->kind==N_DEREF) emit_expression(n->a);
     else if(n->kind==N_STRING) { byte(0xB8);
-        fixed(F_DATA,0,n->value,code_used);
+        fixed(F_DATA,shared_output?n->value:0,shared_output?0:n->value,code_used);
         dword(0); }
     else fatal("code generation needs an addressable object");
 }
@@ -526,8 +526,8 @@ static int constant_address_mode(int node,int *symbol,int *kind,int *addend,int 
     if(n->kind==N_ADDR) return constant_address_mode(n->a,symbol,kind,addend,1);
     if(n->kind==N_DEREF && lvalue_mode) return constant_address_mode(n->a,symbol,kind,addend,0);
     if(n->kind==N_STRING) { *kind=F_DATA;
-        *symbol=0;
-        *addend+=n->value;
+        *symbol=shared_output?n->value:0;
+        if(!shared_output)*addend+=n->value;
         return 1; }
     if(n->kind==N_SYMBOL && (symbols[n->value].kind==S_FUNCTION || (symbols[n->value].kind==S_GLOBAL && (lvalue_mode || types[n->type].kind==TY_ARRAY)))) {
         *kind=F_ABS;
@@ -567,7 +567,7 @@ static void define_global(int symbol,int initializer)
     if(!size || types[s->type].kind==TY_FUNC) fatal("global object needs a complete type");
     if(s->defined) { if(initializer) fatal("global is already defined");
         return; }
-    if(initializer) {
+    if(initializer || (shared_output && scl_object_const(s->type))) {
         data_used=(data_used+3)&~3;
         if(size>DATA_MAX-data_used) fatal("initialized global data capacity exceeded");
         s->aux=1;
@@ -583,6 +583,7 @@ static void define_global(int symbol,int initializer)
         bss_used+=size;
     }
     s->defined=1;
+    if(shared_output)scl_global_new(symbol,size);
 }
 /* 内联汇编只接受明确的固定寄存器约束；未知约束必须诊断，不偷偷
  * 当成普通函数。模板采用常用 AT&T 写法，%% 转义寄存器，也支持 %0
@@ -1040,9 +1041,11 @@ static void emit_function(int symbol,int body)
     if(preserve){byte(0x5F);byte(0x5E);byte(0x5B);}
     byte(0xC9);
     byte(0xC3);
+    if(shared_output)scl_symbol_sizes[symbol]=code_used-symbols[symbol].value;
 }
 static void finish_image(const char *output)
 {
+    if(shared_output){finish_scl(output);return;}
     int main_symbol=find_symbol(module_output?intern("skm_main",8):intern("main",4),0);
     if(!main_symbol || symbols[main_symbol].kind!=S_FUNCTION || !symbols[main_symbol].defined) fatal("main function is missing");
     if(types[symbols[main_symbol].type].count!=(module_output?1:0)) fatal("SCX main takes no parameters; SKM skm_main takes API pointer");

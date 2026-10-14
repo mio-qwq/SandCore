@@ -1,0 +1,32 @@
+{
+  "scope": "HOST_ACTUAL_SCCC_MAIN_ROOTLESS_RESOLVE_REGRESSION",
+  "status": "PASS",
+  "executes_i386": false,
+  "cases": [
+    {
+      "case": "CLI-actual-main-cwd-SYS-absolute-input",
+      "status": "PASS",
+      "stderr": "ACTUAL_MAIN_SOURCE=TMP/SCLN-7b5537/NATIVEBASE.C OUTPUT=TMP/SCLN-7b5537/BASE.SCL\nSCCC: preprocess -> C -> x86\nSCCC OK SCL NATIVE\nCompilation complete\nROOTLESS_RESOLVE_CALLS=3 RESULT=0\n"
+    },
+    {
+      "case": "GUI-actual-main-cwd-SYS-absolute-input",
+      "status": "PASS",
+      "stderr": "ACTUAL_MAIN_SOURCE=TMP/SCLN-7b5537/NATIVEBASE.C OUTPUT=TMP/SCLN-7b5537/BASE.SCL\nSCCC: preprocess -> C -> x86\nSCCC OK SCL NATIVE\nCompilation complete\nROOTLESS_RESOLVE_CALLS=3 RESULT=0\n"
+    },
+    {
+      "case": "ROOTLESS-63-byte-output-preserved",
+      "status": "PASS",
+      "stderr": "ACTUAL_MAIN_SOURCE=TMP/SCLN-7b5537/NATIVEBASE.C OUTPUT=TMP/DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD/BASE.SCL\nSCCC: preprocess -> C -> x86\nSCCC OK SCL NATIVE\nCompilation complete\nROOTLESS_RESOLVE_CALLS=3 RESULT=0\n"
+    },
+    {
+      "case": "rooted-log-fallback-alias-protects-rootless-source",
+      "status": "PASS",
+      "stderr": "ACTUAL_MAIN_SOURCE=HOME/S3C.log OUTPUT=TMP/DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD/BASE.SCL\nSCL output, log or map overlaps an input\nROOTLESS_RESOLVE_CALLS=3 RESULT=2\n"
+    }
+  ],
+  "input_sha256": {
+    "user/s3c.c": "ac7454a2fdb773be06127030aaf1dfd0af1f1621de1c2186c8eaa9cfb15f9ffc",
+    "user/s3c_scl.inc": "364d69fb04da98ddba6a6316aecac6348d49843fa23c01b6c9e2462b6c51a035",
+    "user/SCAPI.H": "81a730450fcb3d310ed841ad3e5c70a3fed32aa7fbd10acac8b888ac7da9ffc1"
+  }
+}

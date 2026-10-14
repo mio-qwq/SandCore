@@ -29,3 +29,9 @@ $(BUILD)/BASE.SCL: $(BUILD)/scl-fixture-base.o tests/m10a2/libbase.json tools/mk
 $(BUILD)/UPPER.SCL: $(BUILD)/scl-fixture-upper.o tests/m10a2/libupper.json tools/mkscl.py tools/scl_format.py
 	$(PY) tools/mkscl.py $< $@ --manifest tests/m10a2/libupper.json
 m10a2-scl-artifacts: $(BUILD)/SCLPROBE.SCX $(BUILD)/BASE.SCL $(BUILD)/UPPER.SCL
+
+# 编译器第二个切片另用小输出目录；已验证core/运行时与基盘直接复用。
+M10A2_NATIVE_DIR ?= build/m10a2-native-bootstrap
+.PHONY: m10a2-native-compiler
+m10a2-native-compiler:
+	$(MAKE) BUILD=$(M10A2_NATIVE_DIR) M9_BUILD=1 M10_BUILD=1 $(M10A2_NATIVE_DIR)/fs/bin/sccc.scx

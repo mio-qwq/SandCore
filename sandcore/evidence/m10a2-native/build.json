@@ -1,0 +1,99 @@
+{
+  "scope": "M10A2_SCCC_HOST_BOOTSTRAP_BUILD",
+  "exit_code": 0,
+  "command": [
+    "make",
+    "-j4",
+    "m10a2-native-compiler"
+  ],
+  "wall_seconds": 7.277563567,
+  "inputs": [
+    {
+      "path": "Makefile",
+      "sha256": "b90d1c3fe2c91ab49fb8c8fa8434705c4283a4748398adceb1fa384abc4c5419"
+    },
+    {
+      "path": "m10.mk",
+      "sha256": "10d6567ab5c9b0e70600f0f4b8222c720b232cfe04f9b28fb917eea4a3aa8a77"
+    },
+    {
+      "path": "m10a2.mk",
+      "sha256": "e35d580db5da0e24cc3b535561ba0a499686c43e852c276a47c7ec8acaae14b1"
+    },
+    {
+      "path": "m9.mk",
+      "sha256": "64717129ffdfc0481507610366e57255996c1fb4d9f070add926222562bff8ed"
+    },
+    {
+      "path": "tools/mkscx.py",
+      "sha256": "0861fe0aebc07d3b7699195ee5e9436a7241ab7eab4251d5c26d4c0b7ae47899"
+    },
+    {
+      "path": "user/COMPILECLI.inc",
+      "sha256": "f2d0cf982365b0eab60ff60c48d5531fece70c2a70cf2bf235055bead3f9cb1e"
+    },
+    {
+      "path": "user/SCAPI.H",
+      "sha256": "81a730450fcb3d310ed841ad3e5c70a3fed32aa7fbd10acac8b888ac7da9ffc1"
+    },
+    {
+      "path": "user/SCIO.H",
+      "sha256": "f0843c3702fb2ab28276c2da0ac9f7f8139d705c8a043d67b7f5b343ed11a7dd"
+    },
+    {
+      "path": "user/linker.ld",
+      "sha256": "f559a3fc2ee06410e0ba3d8aae340e2bcaff3f1116acf371f7961d9940cbabef"
+    },
+    {
+      "path": "user/runtime/SCLFMT.H",
+      "sha256": "9dbb6b1f3ca8cc9ac347c00f014a99e5e7052f8603838941b12cb47f7b95320c"
+    },
+    {
+      "path": "user/runtime/scl_format.c",
+      "sha256": "23d64e0d7f696759098d13998c491bf02d2b368d0a78eb15168fbbfe669d65e5"
+    },
+    {
+      "path": "user/s3c.c",
+      "sha256": "ac7454a2fdb773be06127030aaf1dfd0af1f1621de1c2186c8eaa9cfb15f9ffc"
+    },
+    {
+      "path": "user/s3c_emit.inc",
+      "sha256": "37de256e3a55afffaeeabcde9bcc7a8a7a5efe21179b2b1a54f068712f7f1da1"
+    },
+    {
+      "path": "user/s3c_lex.inc",
+      "sha256": "daac00f4c34383cbb47ec2dfce8fa3e959ef2813c66f647284ab2ab4b75becfc"
+    },
+    {
+      "path": "user/s3c_parse.inc",
+      "sha256": "304b3c9dd869ae8d1e3541c5096aabd2027531a33c81a1100d2e96faebefe49b"
+    },
+    {
+      "path": "user/s3c_pp.inc",
+      "sha256": "9ebde1119c4cf4d67d681b79bb51cae79c1a7d79b3682c4a09d977ec83acb871"
+    },
+    {
+      "path": "user/s3c_scl.inc",
+      "sha256": "364d69fb04da98ddba6a6316aecac6348d49843fa23c01b6c9e2462b6c51a035"
+    },
+    {
+      "path": "user/sccc.c",
+      "sha256": "57b0b9bd0a607fc4b4c5d87b6c2af0c952b8675d6f282c02c1e3545aca013ae1"
+    },
+    {
+      "path": "user/start.asm",
+      "sha256": "9d496e17db4902ad1e73b8b370b89b6b32a62731e350c3e4d59c5074acb30ef1"
+    }
+  ],
+  "compiler": {
+    "bytes": 108373,
+    "sha256": "b4fcf9a4d96169411946f60f8189e15ae383e30a2d30cd5dc52e9a32c5da5b18",
+    "entry": 0,
+    "load_size": 108337,
+    "bss_size": 3535343,
+    "stack_size": 131072,
+    "base": 4194304,
+    "image_and_bss": 3643680,
+    "guest_compiled": false
+  }
+}
