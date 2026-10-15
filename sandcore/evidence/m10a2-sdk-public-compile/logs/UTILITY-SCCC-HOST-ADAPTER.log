@@ -1,0 +1,5 @@
+ACTUAL_MAIN_SOURCE=SDK/UTILITY.C OUTPUT=HOME/UTILITY.SCX
+SCCC: preprocess -> C -> x86
+SCCC OK SCX DYNAMIC
+Compilation complete
+ROOTLESS_RESOLVE_CALLS=3 RESULT=0 tokens=8580 source=50286 code=5401 data=320 bss=0 fixes=86 macros=279

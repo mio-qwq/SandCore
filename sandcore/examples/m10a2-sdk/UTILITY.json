@@ -1,0 +1,242 @@
+{
+  "name": "UTILITY.SCX",
+  "kind": "application",
+  "dependencies": [
+    {
+      "name": "SC32API.SCL",
+      "abi_major": 1,
+      "min_minor": 2,
+      "min_version": 3
+    },
+    {
+      "name": "SCCLIB.SCL",
+      "abi_major": 1,
+      "min_minor": 0,
+      "min_version": 1
+    },
+    {
+      "name": "SCLIB.SCL",
+      "abi_major": 1,
+      "min_minor": 0,
+      "min_version": 1
+    }
+  ],
+  "imports": [
+    {
+      "name": "ScProcessSelf",
+      "kind": "function",
+      "dependency": "SC32API.SCL",
+      "size": 1
+    },
+    {
+      "name": "__scc_errno_location",
+      "kind": "function",
+      "dependency": "SCCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "__scc_standard",
+      "kind": "function",
+      "dependency": "SCCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "fclose",
+      "kind": "function",
+      "dependency": "SCCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "ferror",
+      "kind": "function",
+      "dependency": "SCCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "fflush",
+      "kind": "function",
+      "dependency": "SCCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "fopen",
+      "kind": "function",
+      "dependency": "SCCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "fprintf",
+      "kind": "function",
+      "dependency": "SCCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "fputc",
+      "kind": "function",
+      "dependency": "SCCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "fputs",
+      "kind": "function",
+      "dependency": "SCCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "fread",
+      "kind": "function",
+      "dependency": "SCCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "fwrite",
+      "kind": "function",
+      "dependency": "SCCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "getenv",
+      "kind": "function",
+      "dependency": "SCCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "memset",
+      "kind": "function",
+      "dependency": "SCCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "printf",
+      "kind": "function",
+      "dependency": "SCCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "snprintf",
+      "kind": "function",
+      "dependency": "SCCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "strlen",
+      "kind": "function",
+      "dependency": "SCCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScBufferAppend",
+      "kind": "function",
+      "dependency": "SCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScBufferClear",
+      "kind": "function",
+      "dependency": "SCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScBufferCreate",
+      "kind": "function",
+      "dependency": "SCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScBufferRelease",
+      "kind": "function",
+      "dependency": "SCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScBufferView",
+      "kind": "function",
+      "dependency": "SCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScConfigCreate",
+      "kind": "function",
+      "dependency": "SCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScConfigRelease",
+      "kind": "function",
+      "dependency": "SCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScConfigSerialize",
+      "kind": "function",
+      "dependency": "SCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScConfigSet",
+      "kind": "function",
+      "dependency": "SCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScModelCreate",
+      "kind": "function",
+      "dependency": "SCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScModelGet",
+      "kind": "function",
+      "dependency": "SCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScModelInsert",
+      "kind": "function",
+      "dependency": "SCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScModelRelease",
+      "kind": "function",
+      "dependency": "SCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScModelRemove",
+      "kind": "function",
+      "dependency": "SCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScModelSet",
+      "kind": "function",
+      "dependency": "SCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScModelVisit",
+      "kind": "function",
+      "dependency": "SCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScStringRelease",
+      "kind": "function",
+      "dependency": "SCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScStringView",
+      "kind": "function",
+      "dependency": "SCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScUtf8Validate",
+      "kind": "function",
+      "dependency": "SCLIB.SCL",
+      "size": 1
+    }
+  ]
+}

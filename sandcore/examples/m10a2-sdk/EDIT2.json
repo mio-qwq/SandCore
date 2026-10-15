@@ -1,0 +1,416 @@
+{
+  "name": "EDIT2.SCX",
+  "kind": "application",
+  "dependencies": [
+    {
+      "name": "SCCLIB.SCL",
+      "abi_major": 1,
+      "min_minor": 0,
+      "min_version": 1
+    },
+    {
+      "name": "SCLIB.SCL",
+      "abi_major": 1,
+      "min_minor": 0,
+      "min_version": 1
+    },
+    {
+      "name": "SCUI.SCL",
+      "abi_major": 1,
+      "min_minor": 0,
+      "min_version": 1
+    }
+  ],
+  "imports": [
+    {
+      "name": "__scc_errno_location",
+      "kind": "function",
+      "dependency": "SCCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "__scc_standard",
+      "kind": "function",
+      "dependency": "SCCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "fclose",
+      "kind": "function",
+      "dependency": "SCCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "ferror",
+      "kind": "function",
+      "dependency": "SCCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "fopen",
+      "kind": "function",
+      "dependency": "SCCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "fprintf",
+      "kind": "function",
+      "dependency": "SCCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "fread",
+      "kind": "function",
+      "dependency": "SCCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "fwrite",
+      "kind": "function",
+      "dependency": "SCCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "memset",
+      "kind": "function",
+      "dependency": "SCCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "snprintf",
+      "kind": "function",
+      "dependency": "SCCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "strlen",
+      "kind": "function",
+      "dependency": "SCCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScBufferAppend",
+      "kind": "function",
+      "dependency": "SCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScBufferCreate",
+      "kind": "function",
+      "dependency": "SCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScBufferRelease",
+      "kind": "function",
+      "dependency": "SCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScBufferView",
+      "kind": "function",
+      "dependency": "SCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScStringCStr",
+      "kind": "function",
+      "dependency": "SCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScStringRelease",
+      "kind": "function",
+      "dependency": "SCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScStringRetain",
+      "kind": "function",
+      "dependency": "SCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScStringView",
+      "kind": "function",
+      "dependency": "SCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScUtf8Validate",
+      "kind": "function",
+      "dependency": "SCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScUiCommandSet",
+      "kind": "function",
+      "dependency": "SCUI.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScUiContextCreate",
+      "kind": "function",
+      "dependency": "SCUI.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScUiContextRelease",
+      "kind": "function",
+      "dependency": "SCUI.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScUiContextRun",
+      "kind": "function",
+      "dependency": "SCUI.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScUiDialogQuery",
+      "kind": "function",
+      "dependency": "SCUI.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScUiDialogRelease",
+      "kind": "function",
+      "dependency": "SCUI.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScUiDialogSelectedPath",
+      "kind": "function",
+      "dependency": "SCUI.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScUiDocumentCopy",
+      "kind": "function",
+      "dependency": "SCUI.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScUiDocumentCreate",
+      "kind": "function",
+      "dependency": "SCUI.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScUiDocumentFind",
+      "kind": "function",
+      "dependency": "SCUI.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScUiDocumentMarkSaved",
+      "kind": "function",
+      "dependency": "SCUI.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScUiDocumentQuery",
+      "kind": "function",
+      "dependency": "SCUI.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScUiDocumentRedo",
+      "kind": "function",
+      "dependency": "SCUI.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScUiDocumentRelease",
+      "kind": "function",
+      "dependency": "SCUI.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScUiDocumentReplace",
+      "kind": "function",
+      "dependency": "SCUI.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScUiDocumentUndo",
+      "kind": "function",
+      "dependency": "SCUI.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScUiEditBind",
+      "kind": "function",
+      "dependency": "SCUI.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScUiEditCopy",
+      "kind": "function",
+      "dependency": "SCUI.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScUiEditCut",
+      "kind": "function",
+      "dependency": "SCUI.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScUiEditGetSelection",
+      "kind": "function",
+      "dependency": "SCUI.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScUiEditPaste",
+      "kind": "function",
+      "dependency": "SCUI.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScUiEditSelectAll",
+      "kind": "function",
+      "dependency": "SCUI.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScUiEditSetSelection",
+      "kind": "function",
+      "dependency": "SCUI.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScUiErrorQuery",
+      "kind": "function",
+      "dependency": "SCUI.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScUiFileDialog",
+      "kind": "function",
+      "dependency": "SCUI.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScUiFocus",
+      "kind": "function",
+      "dependency": "SCUI.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScUiLabelAssociate",
+      "kind": "function",
+      "dependency": "SCUI.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScUiLayout",
+      "kind": "function",
+      "dependency": "SCUI.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScUiListen",
+      "kind": "function",
+      "dependency": "SCUI.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScUiMenuBind",
+      "kind": "function",
+      "dependency": "SCUI.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScUiMenuCreate",
+      "kind": "function",
+      "dependency": "SCUI.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScUiMenuInsert",
+      "kind": "function",
+      "dependency": "SCUI.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScUiMenuRelease",
+      "kind": "function",
+      "dependency": "SCUI.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScUiMessageBox",
+      "kind": "function",
+      "dependency": "SCUI.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScUiNodeCopyText",
+      "kind": "function",
+      "dependency": "SCUI.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScUiNodeDestroy",
+      "kind": "function",
+      "dependency": "SCUI.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScUiNodeQuery",
+      "kind": "function",
+      "dependency": "SCUI.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScUiNodeSetFont",
+      "kind": "function",
+      "dependency": "SCUI.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScUiNodeSetLayout",
+      "kind": "function",
+      "dependency": "SCUI.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScUiNodeSetText",
+      "kind": "function",
+      "dependency": "SCUI.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScUiToolbarBind",
+      "kind": "function",
+      "dependency": "SCUI.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScUiTooltipSet",
+      "kind": "function",
+      "dependency": "SCUI.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScUiWidgetCreate",
+      "kind": "function",
+      "dependency": "SCUI.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScUiWindowCreate",
+      "kind": "function",
+      "dependency": "SCUI.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScUiWindowSetTitle",
+      "kind": "function",
+      "dependency": "SCUI.SCL",
+      "size": 1
+    }
+  ]
+}

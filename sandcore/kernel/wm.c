@@ -1932,7 +1932,9 @@ int wm_sc32_route(const Sc32RawEvent *event)
         gui_focus_update();window_record_t *p=window_record(gui_focus_any);
         int top=top_visible();window_record_t *top_record=top>=0?window_record(WINDOW(top).handle):0;
         if(!p && top_record && top_record->gui.mode && !menu_open && !context_open && !fault_focus && event->legacy!=0x8c)return 1;
-        if(!p || !p->gui.mode || menu_open || context_open || fault_focus || event->legacy==0x8c){
+        /* 现代聚焦窗口使用真实完整键事件，包括F12；旧登录快捷键只在
+         * 原回退分支处理，不能抢走SCUI/第三方程序的功能键与KEYUP。 */
+        if(!p || !p->gui.mode || menu_open || context_open || fault_focus){
             if(event->down && event->legacy){int accepted=wm_key_input((char)event->legacy);gui_focus_update();return accepted;}return 1;
         }
         u32 physical=event->physical;if(physical<256){u32 bit=1u<<(physical&31);

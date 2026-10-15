@@ -168,3 +168,5 @@ build06实际退出0/39.2765秒/source_modified=[]；24处兼容转换、正式V
 GUI01五个真实native库安装与get回、普通平台及3013文本/页账通过；整轮仍FAIL：示例Startup创建Drop端点显式ACL_SESSION但未填allowed_session，内核真实INVALID拒绝。SCUI界面尚未呈现，失败日志/报告/PNG保留，VM结束。仅定向修ui_data默认严格同会话同主体ACL及清理原cause；准备严格依赖闭包复用guest04的单库G1刷新工具，重新生成修复SCUI后继续真实GUI。后续桌面/Shell、Files2/Studio2/Debug2和其它组件/SDK/整版目标仍active，不能以平台子结果关闭M10a2。
 
 2026-10-15开发恢复检查点：build12与refresh01实际单库G1刷新已通过，当前native SCUI656796B（5de54249…5950），五native平台/官方文本在GUI02真实通过。GUI02至04只遇宿主换行/节点kind/身份行截断解析缺陷，原FAIL与source/original守恒保留。GUI05真实普通身份、SESSIONPAGE/PROCESSPAGE及showSID通过，第一次可见图显示旧Login/ses面板：真实WM无条件截现代F12，尚未执行完整SCUI流程。下一项最小修focused-modern F12路由，旧窗口快捷键保留；此次检查点不称GUI/Phase4/整版完成。GUI驱动三个正在修改的新工具及其SCUI-DEMO文档暂不纳本次提交。
+
+2026-10-15：恢复检查点0d78cd4已推送；F12仅现代真实聚焦窗口保完整键事件的新CORE由ui-build13成功构建，五库/App/G1原byte。GUI06首snapshot、真实checkbox与combo通过，随后F7未切页及150%布局裁剪FAIL保留；只修对应源码再统一构建刷新，不称GUI完成。SDK actual staging 79文件/10865491B与仅公开INC的GCC/SCCC宿主后端双示例编译通过，小证据m10a2-sdk-public-compile；两个新App仍未客体编译或运行，Phase7/整版目标继续。

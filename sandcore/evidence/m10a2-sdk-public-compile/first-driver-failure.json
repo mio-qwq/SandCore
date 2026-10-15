@@ -1,0 +1,62 @@
+{
+  "scope": "SDK_PUBLIC_HEADERS_AND_TWO_EXAMPLES_COMPILE_ONLY",
+  "executes_i386": false,
+  "guest_compile": false,
+  "guest_runtime": false,
+  "sdk": "/mnt/c/Users/Administrator/Desktop/projectos/sandcore/build/sdk-native-preview-01",
+  "manifest_sha256": "63d33438077939102d50951d2fce7291ac8bd8b0f1d83180687adaaeacba439b",
+  "cases": [
+    {
+      "name": "EDIT2-GCC",
+      "command": [
+        "gcc",
+        "-m32",
+        "-std=c99",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-ffreestanding",
+        "-fno-builtin",
+        "-nostdinc",
+        "-fno-pic",
+        "-fno-pie",
+        "-fno-stack-protector",
+        "-fno-asynchronous-unwind-tables",
+        "-mno-sse",
+        "-mno-mmx",
+        "-msoft-float",
+        "-I/mnt/c/Users/Administrator/Desktop/projectos/sandcore/build/sdk-native-preview-01/SYS/INC",
+        "-x",
+        "c",
+        "-c",
+        "/mnt/c/Users/Administrator/Desktop/projectos/sandcore/build/sdk-native-preview-01/SYS/SDK/EXAMPLES/EDIT2.C",
+        "-o",
+        "/mnt/c/Users/Administrator/Desktop/projectos/sandcore/build/sdk-public-compile/sdk-public-01/EDIT2.o"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 0.629130258,
+      "log": "/mnt/c/Users/Administrator/Desktop/projectos/sandcore/build/sdk-public-compile/sdk-public-01/EDIT2-GCC.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "EDIT2-HOST-DYNAMIC",
+      "command": [
+        "/usr/bin/python3",
+        "/mnt/c/Users/Administrator/Desktop/projectos/sandcore/tools/mkdscx.py",
+        "/mnt/c/Users/Administrator/Desktop/projectos/sandcore/build/sdk-public-compile/sdk-public-01/EDIT2.o",
+        "/mnt/c/Users/Administrator/Desktop/projectos/sandcore/build/sdk-public-compile/sdk-public-01/EDIT2-HOST.SCX",
+        "--manifest",
+        "/mnt/c/Users/Administrator/Desktop/projectos/sandcore/build/sdk-native-preview-01/SYS/SDK/EXAMPLES/EDIT2.JSON"
+      ],
+      "exit_code": 1,
+      "wall_seconds": 0.2357740390000007,
+      "log": "/mnt/c/Users/Administrator/Desktop/projectos/sandcore/build/sdk-public-compile/sdk-public-01/EDIT2-HOST-DYNAMIC.log",
+      "log_sha256": "1cc6c4cb5797efda833443b94dd82b58c552011ebf013d06cb6124c4620c7aeb"
+    }
+  ],
+  "error": "RuntimeError('EDIT2-HOST-DYNAMIC failed')",
+  "exit_code": 1,
+  "wall_seconds": 1.4566539990000003,
+  "changed_inputs": []
+}
