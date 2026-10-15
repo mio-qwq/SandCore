@@ -1,0 +1,5 @@
+sessionctl list; _m9_status=$?; printf "\n"; echo __M9_6bd1cd74fde1ee1cc767ecc8:$_m9_status
+ID  UID  GID  TYPE  ACTIVE  TASKS  NAME
+1  1000  1000  user  yes  0  mio
+2  -1  -1  SYSTEM  no  3  SYSTEM
+3  -2  -2  LOCKED  no  0  Locked

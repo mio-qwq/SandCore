@@ -1,0 +1,4 @@
+printf '%s\n' '' 'id; /HOME/M10UI/NATIVE_APPS/SWDEFAULT.SCX; _ui=$?; echo __UI_LOGIN_965ce5020df6bb67:$_ui; exit 0' | su mio; _m9_status=$?; printf "\n"; echo __M9_d19e588f2549c49c24469264:$_m9_status
+Password: 
+uid=1000 gid=1000 realm=0
+__UI_LOGIN_965ce5020df6bb67:0

@@ -762,7 +762,10 @@ static int asm_statement(void)
 }
 static int statement(void)
 {
-    if(current_token()->k==T_ID && tokens[position+1].k==':') {
+    /* 词法器把关键字也保存为T_ID；default必须交给下面的switch标签
+     * 处理。若先当普通goto标签吃掉，分派链会缺默认分支，嵌套switch
+     * 还会把两个合法default误报成重复函数标签。 */
+    if(current_token()->k==T_ID && tokens[position+1].k==':' && !word(current_token(),"default")) {
         int name=current_token()->v;
         position+=2;
         return node_new(N_LABEL,C_VOID,statement(),0,0,name);

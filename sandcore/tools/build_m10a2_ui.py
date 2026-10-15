@@ -43,6 +43,8 @@ def input_paths():
         paths.add(ROOT / name)
     for name in ('AGGABI.H', 'AGGCALLEE.C', 'AGGCALLEE.json', 'AGGPROBE.C', 'AGGPROBE.json'):
         paths.add(ROOT / 'tests/m10a2' / name)
+    for name in ('SWDEFAULT.C','DEFAULTAPI.C','DEFAULTAPI.json'):
+        paths.add(ROOT / 'tests/m10a2' / name)
     return {p.resolve() for p in paths if p.is_file()}
 
 

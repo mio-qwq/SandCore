@@ -109,7 +109,7 @@ def verified_build(path):
     return proof, paths, outputs
 
 
-def payload(prefix, proof_hashes):
+def payload(prefix, proof_hashes, compiler_repair=False):
     """SRC保留完整实现，INC只放公开头；分页草稿不能混作编译输入。"""
     source_names = set(SOURCE_NAMES) | set(PUBLIC_HEADERS)
     # 本批编译器私有增量也进入自举SRC，不能只复制历史固定include清单。
@@ -158,6 +158,9 @@ def payload(prefix, proof_hashes):
         for suffix in ('.C', '.json'):
             add(ROOT / 'tests/m10a2' / (name + suffix), prefix[1:] + '/' + name + suffix)
         add(BUILD / (name + '.SCX'), PACKAGE[1:] + '/HOST/' + name + '.SCX')
+    if compiler_repair:
+        for name in ('SWDEFAULT.C','DEFAULTAPI.C','DEFAULTAPI.json'):
+            add(ROOT/'tests/m10a2'/name,prefix[1:]+'/'+name)
     # 两个方向分别检验真实GCC/SCCC aggregate ABI；同名库只在各caller目录。
     for name in ('AGGABI.H', 'AGGCALLEE.C', 'AGGCALLEE.json', 'AGGPROBE.C', 'AGGPROBE.json'):
         add(ROOT / 'tests/m10a2' / name, prefix[1:] + '/' + name)
@@ -504,6 +507,8 @@ def main():
     parser.add_argument('--build-report', type=Path, required=True)
     parser.add_argument('--data', type=Path, default=ROOT / 'build/m10a1/sanddata.img')
     parser.add_argument('--accel', choices=('tcg', 'whpx'), default='tcg')
+    parser.add_argument('--compiler-default-repair', action='store_true',
+        help='真实GUI06 default分类修复：新G1生成SCCLIB与对应机器/API探针')
     args = parser.parse_args()
     if os.name != 'nt':
         parser.error('本主控只启动Windows QEMU，不在WSL运行')
@@ -515,7 +520,7 @@ def main():
     proof, proof_hashes, outputs = verified_build(args.build_report)
     prefix = '/TMP/UI-' + secrets.token_hex(3)
     compiler = prefix + '/SCCC0.SCX'
-    extra, hashes, excluded = payload(prefix, proof_hashes)
+    extra, hashes, excluded = payload(prefix, proof_hashes,args.compiler_default_repair)
     hashes['tools/verify_m10a2_ui_platform.py'] = sha(Path(__file__))
     for name in ('tools/verify_m10a2_stdlib.py', 'tools/verify_m10a2_scl.py',
                  'tools/verify_m9.py', 'tools/scserial.py', 'tools/m10_guest_boot.py'):
@@ -569,6 +574,7 @@ def main():
         execution_scope='EXTERNAL_SYSTEM_COMPILE_AND_AUTHENTIC_NORMAL_LOGIN_APPLICATIONS',
         generated_library_execution=False, generated_system_libraries_execution=False,
         GUI_behavior_verified=False, full_M10a2=False,
+        compiler_default_repair=args.compiler_default_repair,
         unrelated_prior_evidence='REUSED_NOT_RERUN')
     guest = harness = None
 
@@ -616,6 +622,22 @@ def main():
                     native_provenance(report, artifacts)
                     native_provenance(report, libraries)
                     persist()
+                    if args.compiler_default_repair:
+                        label='actual-G1-default-switch-machine-flow'
+                        target=PACKAGE+'/NATIVE_APPS/SWDEFAULT.SCX'
+                        item=harness.run(label,g1+' '+prefix+'/SWDEFAULT.C '+target,
+                            contains=(b'SCCC OK load=',),forbidden=BAD_OUTPUT,timeout=120)
+                        local=artifacts/'SWDEFAULT.SCX'
+                        blob=harness.file(target,label+'-output',local=local)
+                        item.update(generated_sha256=digest(blob),generated_bytes=len(blob),
+                            guest_sccc_compiled=True,compiler_sha256=digest(g1_blob),generated_path=str(local))
+                        harness.ordinary(label+'-actual-mio',target,'',(),timeout=60)
+                        report['native_artifacts']['SWDEFAULT.SCX']=dict(path=str(local.resolve()),
+                            sha256=digest(blob),bytes=len(blob),compile_case=label,guest_sccc_compiled=True,
+                            compiler_sha256=digest(g1_blob),executed_this_generated_file=True,
+                            purpose='SIX_DEFAULT_EXPLICIT_NESTED_SWITCH_MACHINE_MAIN_CHECKS')
+                        report['native_artifacts']['SCCC1.SCX']['executed_this_generated_file']=True
+                        native_provenance(report,artifacts);native_provenance(report,libraries);persist()
                     aggregate_directory = vm.out / 'aggregate-abi'
                     aggregate_directory.mkdir()
                     aggregate = report['aggregate_abi'] = dict(
@@ -650,7 +672,8 @@ def main():
                         if callee == 'ACTUAL_G1':
                             report['generated_library_execution'] = True
                         persist()
-                    for name in ('SC32API.SCL', 'SCUI.SCL'):
+                    fresh_libraries=('SC32API.SCL','SCCLIB.SCL','SCUI.SCL') if args.compiler_default_repair else ('SC32API.SCL','SCUI.SCL')
+                    for name in fresh_libraries:
                         source, manifest = LIBRARIES[name]
                         label = 'actual-G1-library-' + name
                         local = libraries / name
@@ -665,6 +688,19 @@ def main():
                         native_provenance(report, artifacts)
                         native_provenance(report, libraries)
                         persist()
+                    if args.compiler_default_repair:
+                        name='DEFAULTAPI'
+                        label='actual-G1-app-'+name
+                        local=artifacts/(name+'.SCX')
+                        manifest=read_json(ROOT/'tests/m10a2'/(name+'.json'))
+                        blob,meta=harness.compile(label,g1,prefix+'/'+name+'.C',
+                            PACKAGE+'/NATIVE_APPS/'+name+'.SCX',prefix+'/'+name+'.json',manifest,False,local,
+                            compiler_sha256=digest(g1_blob))
+                        report['native_artifacts'][name+'.SCX']=dict(meta,path=str(local.resolve()),
+                            compiler_sha256=digest(g1_blob),executed_this_generated_file=False,
+                            format_contract=stdlib.source_contract(validate_scx(blob),manifest,True),
+                            intended_next_round_execution='ACTUAL_NEW_SC32_SCCLIB_UNKNOWN_ERROR_DEFAULT_BRANCHES')
+                        native_provenance(report,artifacts);native_provenance(report,libraries);persist()
                     for name in APPLICATIONS:
                         label = 'actual-G1-app-' + name
                         local = artifacts / (name + '.SCX')

@@ -1,0 +1,30 @@
+SandShell M9
+SYSTEM /SYS [SYSTEM] # true; _m9_status=$?; printf "\n"; echo __M9_3a9738567f9ef0efb2aba3d3:$_m9_status
+
+__M9_3a9738567f9ef0efb2aba3d3:0
+SYSTEM /SYS [SYSTEM] # ls /HOME/M10UI/HOST; _m9_status=$?; printf "\n"; echo __M9_a3410e9e6e45e9775d1c6fb9:$_m9_status
+PLATFORMPROBE.SCX
+SCUIDEMO.SCX
+SCUITEXT.SCX
+
+__M9_a3410e9e6e45e9775d1c6fb9:0
+SYSTEM /SYS [SYSTEM] # echo STDLIB_BG_WARM & wait; _m9_status=$?; printf "\n"; echo __M9_ba1259782a7af2698e03350e:$_m9_status
+STDLIB_BG_WARM
+
+__M9_ba1259782a7af2698e03350e:0
+SYSTEM /SYS [SYSTEM] # printf warm > /HOME/M10UI/WARM.DAT; cat /HOME/M10UI/WARM.DAT; _m9_status=$?; printf "\n"; echo __M9_54a848d02e18b9ff179500a7:$_m9_status
+warm
+__M9_54a848d02e18b9ff179500a7:0
+SYSTEM /SYS [SYSTEM] # /TMP/UI-RF-1e892c/ACTUALG1.SCX /TMP/UI-RF-1e892c/SRC/scui/SCUI.C /HOME/M10UI/GENERATED/SCUI.SCL --scl /TMP/UI-RF-1e892c/SRC/scui/SCUI.json; _m9_status=$?; printf "\n"; echo __M9_7e15b868adcde9786436a9c7:$_m9_status
+SCCC / mio
+TMP/UI-RF-1e892c/SRC/scui/SCUI.C -> HOME/M10UI/GENERATED/SCUI.SCL
+Validating SCL manifest
+SCCC: preprocess -> C -> x86
+Preprocessing source and includes
+Parsing C and generating x86
+Linking and writing SCL
+SCCC OK SCL NATIVE
+Compilation complete
+
+__M9_7e15b868adcde9786436a9c7:0
+SYSTEM /SYS [SYSTEM] # 

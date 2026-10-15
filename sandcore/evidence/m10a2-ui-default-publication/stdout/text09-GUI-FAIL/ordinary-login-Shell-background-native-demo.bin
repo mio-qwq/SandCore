@@ -1,0 +1,2 @@
+printf '%s\n' '' 'id; /HOME/M10UI/NATIVE_APPS/SCUIDEMO.SCX; _gui=$?; echo __SCUI_RESULT_9c23c7a3378f1253:$_gui; exit $_gui' | su mio & echo __SCUI_JOB_0acf175d7a12d470:$!; _m9_status=$?; printf "\n"; echo __M9_52e8132cc9ca870c33ac4fc9:$_m9_status
+__SCUI_JOB_0acf175d7a12d470:2

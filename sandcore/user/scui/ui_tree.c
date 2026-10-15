@@ -440,6 +440,10 @@ ScStatus ScUiWindowCreate(ScUiContext *c,const ScUiWindowDesc *description,ScUiN
         }
     n->window->window=window;
     n->private_flags&=~UI_ROOT_CREATING;
+    /* CREATE过程看到的是尚未ACTIVATE的隐藏候选。成功返回前再查一次
+     * 已提交的真实窗口，避免已排队键盘先于VIS通知时仍按旧可见性路由。 */
+    s=ui_root_surface(n);
+    if(s<0)goto rollback;
     n->private_flags|=UI_NODE_CONTEXT_COMMITTED;
     *out=n->id;
     s=SC_UI_OK;

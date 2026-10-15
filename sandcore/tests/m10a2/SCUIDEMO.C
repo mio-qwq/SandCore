@@ -1079,8 +1079,10 @@ static ScStatus demo_ready(void)
     window.title=demo_text("SCUI / Controls & Workflows");
     window.x=60;
     window.y=50;
-    window.client_width=900;
-    window.client_height=600;
+    /* WindowDesc是物理客户尺寸；为真实200%字形、全部toolbar和六页
+     * 标题留出空间，不能用被clip的按钮冒充同尺寸的高DPI适配。 */
+    window.client_width=1280;
+    window.client_height=840;
     window.style=SC32_STYLE_STANDARD;
     s=ScUiWindowCreate(demo.ui,&window,&demo.root);
     if(s<0)return s;
@@ -1113,15 +1115,24 @@ static ScStatus demo_ready(void)
     if(s==0)s=demo_menu();
     if(s==0)s=demo_listen(demo.root,demo_command,SC_UI_TARGET_PHASE|SC_UI_BUBBLE_PHASE);
     window.title=demo_text("SCUI / Shared document & drag");
-    window.x=1020;
+    window.x=1380;
     window.y=100;
-    window.client_width=360;
-    window.client_height=280;
+    window.client_width=500;
+    window.client_height=600;
     window.owner=0;
     if(s==0)s=ScUiWindowCreate(demo.ui,&window,&demo.second);
     if(s==0)s=demo_layout(demo.second,SC_UI_VBOX,SC_UI_AUTO,SC_UI_AUTO,0,0);
     ScUiNode label=0,source=0;
-    if(s==0)s=demo_widget(demo.second,SC_UI_LABEL,"拖动下面图标到主窗 Editor。\n同窗口与跨窗口都走真实 OS ticket / IPC。",0,&label);
+    if(s==0){ScUiWidgetDesc guide;
+        memset(&guide,0,sizeof(guide));
+        guide.size=sizeof(guide);
+        guide.version=1;
+        guide.kind=SC_UI_LABEL;
+        guide.parent=demo.second;
+        guide.flags=SC_UI_WRAP;
+        guide.text=demo_text("拖动下面图标到主窗 Editor。\n同窗口与跨窗口都走真实 OS ticket / IPC。");
+        s=demo_check(ScUiWidgetCreate(demo.ui,&guide,&label),"WidgetCreate");
+    }
     if(s==0)s=demo_widget(demo.second,SC_UI_BUTTON,"拖放文本 / Drag",0,&source);
     demo.drag_source=source;
     if(s==0)s=ScUiNodeSetIcon(demo.ui,source,demo.icon);

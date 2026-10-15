@@ -1,0 +1,14 @@
+{
+  "kind": "application",
+  "name": "DEFAULTAPI.SCX",
+  "dependencies": [
+    {"name": "SC32API.SCL", "abi_major": 1, "min_minor": 2, "min_version": 3},
+    {"name": "SCCLIB.SCL", "abi_major": 1, "min_minor": 0, "min_version": 1}
+  ],
+  "imports": [
+    {"dependency": "SC32API.SCL", "name": "ScErrorName", "kind": "function", "size": 1},
+    {"dependency": "SCCLIB.SCL", "name": "printf", "kind": "function", "size": 1},
+    {"dependency": "SCCLIB.SCL", "name": "strcmp", "kind": "function", "size": 1},
+    {"dependency": "SCCLIB.SCL", "name": "strerror", "kind": "function", "size": 1}
+  ]
+}

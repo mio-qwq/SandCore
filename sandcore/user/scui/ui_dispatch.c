@@ -476,8 +476,11 @@ static ScStatus ui_native_proc(ScWindow window,const ScMessage *m,void *context)
         w->information.y=(ScI32)m->data[1];
         goto done;
         }
-    if(m->id==SC32_MSG_VISIBILITY){ScU32 previous_visible=w->visible;
+    if(m->id==SC32_MSG_VISIBILITY){ScU32 previous_visible=w->notified_visible;
         w->visible=m->data[0]!=0;
+        /* Query可以先同步当前事实；业务通知仍以最后实际通知状态为准，
+         * 不能因post-ACTIVATE查询提前置位就吞掉第一次真实VIS事件。 */
+        w->notified_visible=w->visible;
         w->information.visibility_epoch=m->epoch;
         if(w->visible)w->information.state|=SC32_WINDOW_VISIBLE;
         else w->information.state&=~SC32_WINDOW_VISIBLE;

@@ -476,6 +476,10 @@ static ScStatus ui_popup_root(UiNode *owner,ScU32 kind,const ScUiRect *anchor,Sc
         }
     n->private_flags&=~UI_ROOT_CREATING;
     n->window->window=window;
+    /* popup成功ACTIVATE后立即同步真实可见性/几何；输入可能早于
+     * 后续VIS消息到队尾，不能把DOWN/ENTER误送回owner的默认按钮。 */
+    s=ui_root_surface(n);
+    if(s<0)goto failed;
     *out=n;
     ui_node_leave(n);
     return SC_UI_OK;

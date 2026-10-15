@@ -22,6 +22,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--build-report', required=True)
     parser.add_argument('--tag', required=True)
+    parser.add_argument('--scui-only', action='store_true', help='只预检本次受影响SCUI，不重复既有Apps/ABI输入')
     args = parser.parse_args()
     if not args.tag or any(c not in 'abcdefghijklmnopqrstuvwxyz0123456789-' for c in args.tag):
         parser.error('invalid tag')
@@ -39,7 +40,7 @@ def main():
         executes_generated_compiler=False, guest_compilation_or_execution=False,
         build_report=str(proof_path), build_report_sha256=sha(proof_path),
         adapter_source_sha256=sha(ROOT / 'tests/m10a2/test_scd_format.py'),
-        driver_sha256=sha(Path(__file__)), cases=[])
+        driver_sha256=sha(Path(__file__)), requested_scope='SCUI_ONLY' if args.scui_only else 'FULL_UI_BATCH', cases=[])
     started = time.monotonic()
     status = 1
     try:
@@ -77,6 +78,8 @@ def main():
             for suffix in ('.C', '.json'):
                 copy(ROOT / 'tests/m10a2' / (name + suffix), 'TMP/UICHECK/' + name + suffix)
         copy(ROOT / 'tests/m10a2/AGGABI.H', 'TMP/UICHECK/AGGABI.H')
+        for suffix in ('.C','.json'):
+            copy(ROOT/'tests/m10a2'/('DEFAULTAPI'+suffix),'TMP/UICHECK/DEFAULTAPI'+suffix)
         (vfs / 'HOME').mkdir(parents=True)
         cases = [('AGGCALLEE', '/TMP/UICHECK/AGGCALLEE.C', '--scl',
                   '/TMP/UICHECK/AGGCALLEE.json', 'SCL'),
@@ -87,6 +90,10 @@ def main():
         cases.extend((name, '/TMP/UICHECK/' + name + '.C', '--dynamic',
                       '/TMP/UICHECK/' + name + '.json', 'SCX')
                      for name in ('SCUIDEMO', 'PLATFORMPROBE', 'SCUITEXT'))
+        cases.append(('DEFAULTAPI','/TMP/UICHECK/DEFAULTAPI.C','--dynamic',
+            '/TMP/UICHECK/DEFAULTAPI.json','SCX'))
+        if args.scui_only:
+            cases=[case for case in cases if case[0]=='SCUI']
         for name, source, mode, manifest, extension in cases:
             target = '/HOME/' + name + '.' + extension
             command = [str(compiler), '/', str(vfs), source, target, mode, manifest, '0']

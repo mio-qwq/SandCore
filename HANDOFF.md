@@ -1,5 +1,13 @@
 # HANDOFF.md —— 沙核 OS (SandCore) 交接文档
 
+> **2026-10-15最新接续（覆盖下面旧“当前/下一步”）：** main先前检查点71a98eb已推送；完整M10a2 Goal保持active，所有subagent GPT-6.1 Sol/max，.zcodeignore保原。实际guest05已PASS：新G1 dd7ba9d4…2138，SWDEFAULT六机器分支、双向55ABI、平台87与官方3013文本；生成SC32/STD/UI及四Apps来源已固定。GUI07实际新SC32/STD的UNKNOWN两分支与平台及owner通过；publication refresh02只由同G1生成SCUI c8141f5d…cdea；GUI09用它真实3013/12948边界及owner通过，整轮因诊断键迟登记FAIL。GUI10经有限真实F12诊断后真实Combo展开/选Aurora/收起通过，随后Ctrl+A传非法ID0，整轮FAIL。118份/23,524,578B无磁盘的精确证据已收至sandcore/evidence/m10a2-ui-default-publication；不称GUI或P4完成。
+
+> 当前全选修复仅ui_data.c fdb60e57…acc6与ui_provider.c acdae2b9…2c79：flat真实首尾Range，Tree真实展开ID一次提交，provider回调改Selection时拒绝陈旧候选。ui-build17实际exit0/106.0278秒/source_modified[]，vs16只这两输入与HOST SCUI变化（333068B/3af7147a…8910），CORE/G1引导器/Apps不变。host-select-all-01只SCUI实际SCCC宿主后端编译exit0（662584B/1f38ab0b…5153，非客体执行）。dynamic_boot_kernel独占活动refresh/GUI工具与doc，准备独立VISIBLE_SELECTION_RANGE_REPAIR模式，从真实first05精确允许publication4源+selection2源；随后唯一Windows refresh03→GUI11，复用07未加载SCUI两组，新SCUI仅一次文本+owner及完整GUI。中断恢复先核句柄，不重复启动VM。
+
+> Phase5隔离源码入口：FS freeze2 e43a2999…836（12租约入口/META_ONLY/条件SetMode，当前kernel/user未接线）、Root host/WM/可信发行SHA及161出口SCUI候选、SCSHELL library由sc32_contract_audit收尾、caller-owned worker由dynamic_scx_toolchain继续、Root新drafts/m10a2-shell-desktop已72KB实际正文/130导入候选。桌面含真实service、动态选择/空间索引/8项候选刷新/布局CAS/任务栏/菜单作业寿命/Drop三选/快捷方式属性等，仍未编译运行、跨窗拖起/缓存等收尾未全。Phase6 Files2/Studio2/Debug2/其它应用仍待完整实现；SDK仅既有公开头双示例HOST编译，未实际SDK客体执行。不能在局部通过处关闭完整目标。
+
+> 失败派生盘清理的自动审批曾以“blocked by policy”拒绝删除已核GUI01..05十份build镜像；未执行删除，不绕过；原盘、当前产物与所有小证据继续保留。该拒绝不阻挡实现/归档/提交。
+
 > **2026-10-15 M10a2当前：** 完整持续Goal active。SCCLIB/SCLIB、R1终止和C1..C5已统一构建并实际运行；四份客体库ROOT57040/SC3282014/STD66892/UTIL146165B均执行，当前G1实际编译/运行标准app，native九模式与通用七组253检查/22B文件/精确页回收通过。证据sandcore/evidence/m10a2-stdlib；旧SC32三窗口证据保持。三项验证失败全部保留：旧桌面异步缓存2025页已真实归属、Shell无2>&1改正式Spawn同端点helper、Wait领票后重复Close修helper。原库/内核未为这些失败改行为，输入/原盘保持。SCUI完整156入口设计和公共/私有头已落，core与controls/edit/dialog/data两代理实际实现；broker/font/GUI增量正在写，尚未接线验证。ROOT/STD/UTIL原验证源保持，主代理负责最终接线/WindowsQEMU。SCAPI.H仍81a73045…冻结；Desktop/Shell/主要组件/SDK/完整验收继续，Sol+max，不创建Release、不重启M8。
 
 > **2026-10-07 用户验收通过：** 用户明确“验收通过，提交GitHub，用wsl的gh”。M10a1保持M10a开发版本，19个网络工具（含curl/nc -e）的实际支持与HTTP/TLS边界不变；停止新增验证。验收结果同批持久化后推送代码，不创建Release，不宣称M10已完成或基础内核冻结。
@@ -845,3 +853,9 @@ Phase5现在已有隔离实际源码，未集成/构建/运行：drafts/m10a2-sh
 2026-10-15新恢复点：main 0d78cd4de7816859bb5f50e80f87b37f13cb47d8已推送，保存P4平台/完整G1/结构体/官方文本及单库refresh真实byte，GUI仍FAIL。Root最窄F12分支已统一ui-build13成功（55.046秒/source_modified[]），432inputs仅wm.c变、17outputs仅CORE/ELF/SYM/BIN变；CORE a6cabc47…8c02，五库/G1/3App/boot仍原byte。旧Core/SYM/ELF已归档evidence/m10a2-ui-refresh，旧wm源在0d78cd4。GUI06实际修复F12并完成首snapshot/混合checkbox/Combo；随后F7 TABLE仍隐藏失败，150%第二窗Exit和主Toolbar/Resources实际裁剪。agent现只解冻owned Demo/controls批量修这两个真实缺陷，未新VM；修收齐再统一build14/仅受影响原生输出刷新，不能宣称GUI画质PASS。
 
 SDK7文件SOURCE收齐后已真实staging native-preview01：79payload/10865491B，五native库/G1/公开include/完整许可/SHA守恒通过。Root check_m10a2_sdk_examples在sdk-public02仅公开INC真实GCC+SCCC宿主后端双示例均编译0（EDIT2 17348/25613B、UTILITY4999/7951B，65/36imports，9.4045秒），未执行i386/未客体编译或运行；小证据evidence/m10a2-sdk-public-compile741264B。first驱动名字与manifest不符FAIL保留，修输出目录。SDK代码暂未提交，Root独占tools/doc/examples后续验证；sc32_contract_audit已转隔离WM角色底座。FS lease与Root host隔离实际正文继续，当前user/kernel不接入，不构建。所有agent Sol+max，完整目标active。
+
+2026-10-15后续恢复：SDK与实际F12修复随main71a98eb已推送。GUI06 F7故障真因为SCCC parser statement先将default:当N_LABEL，分派链缺默认，nested default误报重复函数标签；Root仅parse4+1行排除default，SHA1ca3c6ca…8d09，emitter未改。owned控件/布局同批收齐（controls3ce10291…cc97、Demo b2a2f81b…165c、说明8f8a3256…f92c）：Combo真实count/font行高与半屏预算，Demo物理主1280×840/副500×600及说明WRAP，保原default命令表。ui-build14成功69.518秒/source_modified[]，CORE同13，SCCC0 load132565B、HOST SCUI331304B、Demo44900B。HOST真实SCCC七输入全0；最小SWDEFAULT在旧backend02真实duplicate label FAIL，在新backend03执行SCX main机器6个switch语义exit0（非客体）。
+
+Root first主控新增明确--compiler-default-repair，唯一platform-guest05正在执行（exec59687；不假定中断后仍live）：SCCC0→真正新G1、普通SWDEFAULT机器main、SC32/SCCLIB/SCUI三受影响库与三Apps重新生成，另DEFAULTAPI.SCX留第二轮实际新库未知error分支。ROOT/SCLIB无default且源码不变，旧原生字节继续按来源复用。Gui owner dynamic_boot_kernel只等真实新first PASS后承接新STD/新Demo，不启动旧profile；三GUI工具与doc仍独占。FS owner隔离收尾，WM owner隔离准备帧/workspace/枚举/动作收尾；Root新809 Deactivate/STOPPING保障正常fini，PREPARING8192而非冲突1024。
+
+build派生失败盘清理仅GUI01..05两盘、已核FAIL/源与原盘守恒/无QEMU及全绝对路径，但Remove-Item命令遭自动approval review blocked by policy拒绝，未执行删除，十盘1349550080B仍保留；不绕过。原盘/当前GUI06/全部小证据/源码/产物保留，完整目标仍active。

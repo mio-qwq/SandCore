@@ -830,6 +830,8 @@ ScStatus ScUiComboOpen(ScUiContext *context,ScUiNode id,ScU32 open)
     ScStatus s;
     ScU32 token;
     ScUiNode list;
+    ScUiProvider *provider=0;
+    ScUiSelection *selection=0;
     if(!n)return SC_UI_E_STALE;
     if(n->kind!=SC_UI_COMBOBOX || open>1)return SC_UI_E_INVALID;
     if(open && (n->state&SC_UI_READONLY))return SC_UI_E_CANCELLED;
@@ -840,12 +842,47 @@ ScStatus ScUiComboOpen(ScUiContext *context,ScUiNode id,ScU32 open)
         ui_control_popup_close(n);
     }
     if(!n->view || !n->view->provider)return SC_UI_E_NOT_FOUND;
-    ScUiRect anchor={0,0,n->rectangle.width,n->rectangle.height};
-    ScU32 height=(ScU32)ui_scale(context,180);
     ui_node_hold(n);
+    UiView *view=n->view;
+    provider=view->provider;
+    selection=view->selection;
+    s=ScUiProviderRetain(provider);
+    if(s<0){provider=0;selection=0;goto done;}
+    if(selection){s=ScUiSelectionRetain(selection);
+        if(s<0){selection=0;goto done;}
+    }
+    ScU32 count=0,revision=0;
+    s=ui_provider_count(provider,0,&count,&revision);
+    if(s!=0)goto done;
+    if((n->private_flags&UI_NODE_RETIRED) || n->view!=view || view->provider!=provider || view->selection!=selection || c->popup){s=SC_UI_E_STALE;goto done;}
+    if(!count){s=SC_UI_E_NOT_FOUND;goto done;}
+    ScUiMetrics metrics;
+    ScDisplayInfo display;
+    memset(&metrics,0,sizeof(metrics));
+    metrics.size=sizeof(metrics);
+    metrics.version=1;
+    s=ScUiMetricsQuery(context,n->root,&metrics);
+    if(s!=0)goto done;
+    memset(&display,0,sizeof(display));
+    display.size=sizeof(display);
+    display.version=1;
+    s=ScDisplayQuery(&display);
+    if(s!=0)goto done;
+    /* 行高已经是当前字体的物理像素；先截到真实屏幕预算再乘，
+     * 十万项仍只生成可见行，不让少数项留下固定180逻辑像素的空白。 */
+    ScU32 budget=display.height/2;
+    if(!metrics.row_height || budget<metrics.row_height || n->rectangle.width<=0){s=SC_UI_E_RANGE;goto done;}
+    ScU32 rows=budget/metrics.row_height;
+    if(rows>count)rows=count;
+    ScU32 height=rows*metrics.row_height;
+    ScUiRect anchor={0,0,n->rectangle.width,n->rectangle.height};
     s=ui_popup_root(n,SC32_POPUP_COMBO,&anchor,(ScU32)n->rectangle.width,height,SC32_POPUP_NO_ACTIVATE,&popup);
     if(s<0)goto done;
     ui_node_hold(popup);
+    if((n->private_flags&UI_NODE_RETIRED) || n->view!=view){s=SC_UI_E_STALE;goto rollback;}
+    /* 原生popup的客户矩形是物理像素；Overlay填充它，避免把
+     * 同一宽高再作为子控件逻辑尺寸按DPI缩放第二次。 */
+    popup->layout.mode=SC_UI_OVERLAY;
     ScUiWidgetDesc d;
     memset(&d,0,sizeof(d));
     d.size=sizeof(d);
@@ -855,10 +892,10 @@ ScStatus ScUiComboOpen(ScUiContext *context,ScUiNode id,ScU32 open)
     d.text.size=sizeof(d.text);
     d.text.version=1;
     s=ScUiWidgetCreate(context,&d,&list);
-    if(s==0)s=ScUiViewBind(context,list,n->view->provider,n->view->selection);
+    if(s==0)s=ScUiViewBind(context,list,provider,selection);
     if(s==0){UiNode *child=ui_node(context,list);
-        child->layout.width=n->rectangle.width;
-        child->layout.height=(ScI32)height;
+        child->layout.width=SC_UI_AUTO;
+        child->layout.height=SC_UI_AUTO;
         child->layout.mode=SC_UI_ABSOLUTE;
         ScUiSubscription sub;
         memset(&sub,0,sizeof(sub));
@@ -879,11 +916,14 @@ ScStatus ScUiComboOpen(ScUiContext *context,ScUiNode id,ScU32 open)
         s=ScUiLayout(context,popup->id);
         if(s==0)s=ScUiFocus(context,list);
     }
-    if(s<0 || n->private_flags&UI_NODE_RETIRED){if(c->popup==popup->id)ui_control_popup_close(n);
+    rollback:if(s<0 || n->private_flags&UI_NODE_RETIRED){if(c->popup==popup->id)ui_control_popup_close(n);
         else ScUiNodeDestroy(context,popup->id);
         if(s==0)s=SC_UI_E_CANCELLED;
     }
-    done:if(popup)ui_node_leave(popup);
+    done:s=ui_cause(context,s,UI_OP_NODE,id);
+    if(selection)ScUiSelectionRelease(selection);
+    if(provider)ScUiProviderRelease(provider);
+    if(popup)ui_node_leave(popup);
     ui_node_leave(n);
     return s;
 }

@@ -58,7 +58,7 @@ struct UiTimer {
 };
 struct UiRoot {
     ScWindow window;ScWindowInfo information;ScU32 owner,focus,capture,hover,default_button;
-    ScU32 *pixels;ScU32 bytes,width,height,geometry,visible,paint_pending,paint_failures,cursor;
+    ScU32 *pixels;ScU32 bytes,width,height,geometry,visible,notified_visible,paint_pending,paint_failures,cursor;
     ScWideCounter retry;ScArray *damage;ScUiNode id;ScU32 popup,popup_flags;
 };
 struct UiVisibleItem {ScU32 id,parent,index,depth,state;};
@@ -177,6 +177,7 @@ static int ui_rect_contains(const ScUiRect *,ScI32,ScI32);
 static int ui_rect_nonempty(const ScUiRect *);
 static ScStatus ui_damage(UiNode *,const ScUiRect *);
 static ScStatus ui_paint_root(UiNode *);
+static ScStatus ui_root_surface(UiNode *);
 static ScStatus ui_theme_refresh(ScUiContext *);
 static ScU32 ui_color(ScUiContext *,ScU32);
 static ScI32 ui_scale(ScUiContext *,ScI32);
