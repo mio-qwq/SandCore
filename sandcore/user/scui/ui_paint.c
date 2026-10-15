@@ -322,6 +322,14 @@ ScStatus ScUiPainterIcon(ScUiPainter *p,const ScUiRect *r,ScUiIcon *icon,ScU32 s
     }
     return SC_UI_OK;
 }
+#include "ui_shell_paint.inc"
+
+static int ui_root_can_paint(const UiRoot *w)
+{
+    /* PREPARING只来自内核已授角色的两surface，仍保持visible=0；这里只
+     * 给真实首帧绘制资格，输入/动画timer继续沿普通实际可见性判断。 */
+    return w && (w->visible || (w->information.state&SC32_WINDOW_PREPARING));
+}
 static ScStatus ui_root_surface(UiNode *n)
 {
     UiRoot *w=n->window;
@@ -379,7 +387,7 @@ static ScStatus ui_paint_root(UiNode *root)
     ScWideCounter now;
     int began=0;
     if(!w || (root->private_flags&UI_NODE_RETIRED))return SC_UI_E_STALE;
-    if(!w->paint_pending || !w->visible)return SC_UI_PENDING;
+    if(!w->paint_pending || !ui_root_can_paint(w))return SC_UI_PENDING;
     if(ui_now(&now)==0 && ui_wide_compare(&now,&w->retry)<0)return SC_UI_PENDING;
     ui_node_hold(root);
     c->walking++;
@@ -426,6 +434,9 @@ static ScStatus ui_paint_root(UiNode *root)
         if(bounds.x!=claimed.x || bounds.y!=claimed.y || bounds.width!=claimed.width || bounds.height!=claimed.height){rectangles[0]=claimed;
             count=1;
             }}
+    /* 隐藏准备surface必须提交一次真正完整首帧，不能把几块局部损伤
+     * 的包围框当完整覆盖。WM以同geometry实际Submit核对，然后撤资格。 */
+    if(w->information.state&SC32_WINDOW_PREPARING){rectangles[0]=claimed;count=1;}
     revision=c->revision;
     for(i=0;i<count;i++){UiNode *n=root;
         while(n){ScUiPainter p;
@@ -509,6 +520,7 @@ static ScStatus ui_paint_root(UiNode *root)
         goto failed;
         }
     began=0;
+    if(w->information.state&SC32_WINDOW_PREPARING){s=ui_root_surface(root);if(s<0)goto failed;}
     w->paint_pending=0;
     w->paint_failures=0;
     w->retry.lo=w->retry.hi=0;

@@ -235,6 +235,18 @@ static int execute(const char *command,int uid,int gid,u32 realm,u32 session,int
     launch.session=session;launch.subject_uid=subject_uid;launch.subject_gid=subject_gid;
     launch_desktop=desktop;launch_set=1;int result=task_exec_scx(command);launch_set=launch_desktop=0;crypto_zero(&launch,sizeof(launch));return result;
 }
+static int shell_launch;
+int auth_launch_issued_shell(void){return launch_set && shell_launch;}
+int auth_session_shell_exec(u32 desktop)
+{
+    session_t *s=session_get(desktop);
+    if(task_pid()!=0 || !s || s->kind!=SESSION_NORMAL || s->closing || s->uid<0 || s->gid<0)return -5;
+    /* 内核只能启动固定发行host，且启动身份是该会话普通主体；不是
+     * AUTH_SERVICE/SYSTEM，不能因此取得MOD、跨SID、硬件或其它文件权。 */
+    shell_launch=1;
+    int child=execute("SYS/SHELL/SCSHELL.SCX",s->uid,s->gid,AUTH_NORMAL,0,s->uid,s->gid,desktop);
+    shell_launch=0;return child;
+}
 int auth_exec_ticket(int pid,u32 token,const char *command,int activate)
 {
     login_t *j=job(pid,token);

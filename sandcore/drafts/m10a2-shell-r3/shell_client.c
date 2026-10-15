@@ -79,7 +79,7 @@ ScStatus ScShellConnect(const ScShellConnectDesc *d,ScShell **out) {
     peer.version=1;
     status=ScIpcPeer(c.channel,&peer);
     if(status<0)goto fail;
-    if(!sh_same_identity(&peer,&c.peer)||!sh_subject(&peer,&self)||peer.pid!=c.host.pid||peer.generation!=c.host.generation|| peer.session!=c.host.session||c.host.state!=SC32_SHELL_ACTIVE) {
+    if(!sh_same_identity(&peer,&c.peer)||!sh_subject(&peer,&self)||peer.pid!=c.host.pid||peer.generation!=c.host.generation|| peer.session!=c.host.session||(c.host.state!=SC32_SHELL_PREPARED&&c.host.state!=SC32_SHELL_ACTIVE)) {
         status=SC_SHELL_E_ACCESS;
         goto fail;
     }

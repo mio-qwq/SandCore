@@ -289,7 +289,7 @@ static int host_control(int pid,u32 operation,u32 request,u32 output)
         return host_publish(pid,output,&result,sizeof(result));
     }
     if(connect){
-        if(p->state!=SC32_SHELL_ACTIVE || !p->pid)return SC32_E_AGAIN;
+        if((p->state!=SC32_SHELL_PREPARED && p->state!=SC32_SHELL_ACTIVE) || !p->pid)return SC32_E_AGAIN;
         ScShellConnectionInfo result;host_clear(&result,sizeof(result));
         result.size=sizeof(result);result.version=1;host_value(p,&result.host);
         error=sc32_broker_drop_endpoint((int)p->pid,p->endpoint,p->session,&result.peer);

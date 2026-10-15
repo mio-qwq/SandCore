@@ -464,6 +464,8 @@ static ScStatus ui_native_proc(ScWindow window,const ScMessage *m,void *context)
         goto done;
     }
     if(m->id==SC32_MSG_PAINT){ScContainerInfo info;
+        /* 隐藏host的准备资格只在真实PAINT后重新查事实，不轮询全部hidden root。 */
+        if(!w->visible){s=ui_root_surface(root);if(s<0)goto done;}
         ScUiRect r;
         w->paint_pending=1;
         memset(&info,0,sizeof(info));
@@ -493,6 +495,10 @@ static ScStatus ui_native_proc(ScWindow window,const ScMessage *m,void *context)
          * 不能因post-ACTIVATE查询提前置位就吞掉第一次真实VIS事件。 */
         w->notified_visible=w->visible;
         w->information.visibility_epoch=m->epoch;
+        /* 隐藏消息只撤可见输入资格；PREPARING是独立的内核首帧资格。
+         * 旧VIS可以晚于真实PAINT查询到达，不能抹掉刚取得的准备位；
+         * 首帧前后仍由ui_root_surface重新核对实际内核状态。 */
+        if(w->visible)w->information.state&=~SC32_WINDOW_PREPARING;
         if(w->visible)w->information.state|=SC32_WINDOW_VISIBLE;
         else w->information.state&=~SC32_WINDOW_VISIBLE;
         ui_timers_visibility(c,root->id,w->visible);
@@ -978,7 +984,7 @@ static ScU32 ui_timer_wait(ScUiContext *c,ScU32 timeout)
         ScU32 delta=ui_wide_compare(&now,&t->description.deadline)>=0?0:ui_wide_difference(&t->description.deadline,&now);
         if(nearest==SC32_INFINITE || delta<nearest)nearest=delta;
         }
-    for(r=c->roots;r;r=r->root_next)if(r->window && r->window->visible && r->window->paint_pending){ScU32 delta=ui_wide_compare(&now,&r->window->retry)>=0?0:ui_wide_difference(&r->window->retry,&now);
+    for(r=c->roots;r;r=r->root_next)if(r->window && ui_root_can_paint(r->window) && r->window->paint_pending){ScU32 delta=ui_wide_compare(&now,&r->window->retry)>=0?0:ui_wide_difference(&r->window->retry,&now);
         if(nearest==SC32_INFINITE || delta<nearest)nearest=delta;
         }
     return nearest;
@@ -1002,6 +1008,15 @@ ScStatus ScUiContextDispatch(ScUiContext *c,const ScMessage *message)
     s=ui_cause(c,s,UI_OP_EVENT,0);
     ui_object_leave(&c->object);
     return s;
+}
+ScStatus ScUiContextWaitTimeout(ScUiContext *c,ScU32 maximum,ScU32 *out)
+{
+    if(!out || (maximum>0x7fffffffu && maximum!=SC32_INFINITE))return SC_UI_E_INVALID;
+    ScStatus s=ui_object_enter((UiObject *)c,UI_CONTEXT);if(s<0)return s;
+    /* 混合GUI/IPC服务泵只借真实下一期限；不在宿主应用猜拖放的1tick
+     * 或为所有空闲GUI加固定高频poll。没有改变计时/消息分派语义。 */
+    ScU32 value=ui_drag_wait(c,ui_timer_wait(c,maximum));
+    *out=value;ui_object_leave(&c->object);return SC_UI_OK;
 }
 ScStatus ScUiContextStep(ScUiContext *c,ScU32 timeout)
 {
@@ -1047,7 +1062,7 @@ ScStatus ScUiContextStep(ScUiContext *c,ScU32 timeout)
     if(s<0)goto done;
     c->walking++;
     for(root=c->roots;root;root=root->root_next){
-        if(root->window && root->window->visible && root->window->paint_pending){ScStatus painted=ui_paint_root(root);
+        if(root->window && ui_root_can_paint(root->window) && root->window->paint_pending){ScStatus painted=ui_paint_root(root);
             if(painted<0 && c->description.error_procedure){ScUiEvent e;
                 ui_event_record(&e,root,SC_UI_EVENT_ERROR);
                 e.data=&c->error;

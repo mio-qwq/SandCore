@@ -1,6 +1,7 @@
 #include "sc32_file.h"
 #include "sc32_core.h"
 #include "fs.h"
+#include "fs_lease.h"
 #include "streams.h"
 #include "task.h"
 #include "paging.h"
@@ -11,7 +12,7 @@
 enum { FILE_HANDLE=1,DIRECTORY_HANDLE=2 };
 typedef struct {
     u32 id,owner,generation,previous,next,kind,description,member_previous,member_next;
-    u32 native_reference,closing,cursor,epoch;
+    u32 native_reference,closing,cursor,epoch,lease,lease_metadata_only;
     u32 completed_kind,completed_position,completed_length;
     Sc32FileReply completed_reply;
     char path[64];
@@ -77,6 +78,7 @@ int sc32_file_stop_step(int pid)
         file_handle_t *h=objpool_get(&handles,(int)o->head);if(!h){o->head=0;break;}
         /* 退出不写用户缓冲、不运行用户fini、不做无界磁盘flush。已
          * 接受正文保留，未发布growth候选撤销；明示durability在Flush。 */
+        if(h->lease && !fs_lease_detach_step(pid,h->id,h->lease))return 0;
         drop(h);o=objpool_get(&owners,pid);if(!o)return 1;
     }
     if(!o->head){objpool_release(&owners,pid);return 1;}return 0;
@@ -199,6 +201,8 @@ static int open_file(int pid,const u32 *q,u32 output)
 }
 static int duplicate_file(int pid,file_handle_t *original,u32 output)
 {
+    if(original->lease)return SC32_E_BUSY;
+    if(original->lease_metadata_only)return SC32_E_ACCESS;
     file_description_t *d=description(original);if(!d || !d->ready || original->closing)return SC32_E_BUSY;
     if(d->refs==0xffffffffu)return SC32_E_RANGE;
     file_handle_t *h=new_handle(pid,FILE_HANDLE);if(!h)return SC32_E_MEMORY;
@@ -228,6 +232,7 @@ static int directory(int pid,u32 operation,const u32 *q,u32 output)
     if(operation==SC32_D_OPEN){
         if(q[3] || q[4] || !reserved(q,5))return SC32_E_INVALID;
         char name[64];int status=path(pid,q[2],name);if(status)return status;
+        if(fs_lease_path_blocked(name,FS_LEASE_READ_OPEN))return SC32_E_BUSY;
         if(!fs_access(pid,name,FS_ACCESS_READ))return SC32_E_ACCESS;
         u32 info[2];if(fs_stat(name,info))return SC32_E_NOT_FOUND;if(info[0]!=2)return SC32_E_INVALID;
         file_handle_t *h=new_handle(pid,DIRECTORY_HANDLE);if(!h)return SC32_E_MEMORY;
@@ -236,7 +241,12 @@ static int directory(int pid,u32 operation,const u32 *q,u32 output)
         r.handle=h->id;r.epoch=h->epoch;return publish(pid,output,&r,sizeof(r));
     }
     file_handle_t *h=handle(pid,q[2],DIRECTORY_HANDLE);if(!h)return SC32_E_STALE;
-    if(operation==SC32_D_CLOSE){if(q[3] || !reserved(q,4))return SC32_E_INVALID;drop(h);return publish(pid,output,&r,sizeof(r));}
+    if(operation==SC32_D_CLOSE){
+        if(q[3] || !reserved(q,4))return SC32_E_INVALID;
+        if(h->lease && !fs_lease_detach_step(pid,h->id,h->lease))return SC32_E_BUSY;
+        drop(h);return publish(pid,output,&r,sizeof(r));
+    }
+    if(h->lease_metadata_only)return SC32_E_ACCESS;
     if(!reserved(q,5) || q[4]>SC32_DIRECTORY_BATCH_MAX)return SC32_E_RANGE;
     u32 bytes=q[4]*(u32)sizeof(ScDirectoryEntry);
     if(bytes && (!paging_user_write_range(TASK(pid).pd,q[3],bytes) || overlap(q[3],bytes,output,sizeof(r))))return SC32_E_INVALID;
@@ -270,6 +280,7 @@ int sc32_file_call(int pid,u32 operation,u32 request,u32 output)
     if(operation==SC32_F_STANDARD){if(q[2] || !reserved(q,4))return SC32_E_INVALID;return standard_file(pid,q[3],output);}
     file_handle_t *h=handle(pid,q[2],FILE_HANDLE);if(!h)return SC32_E_STALE;
     file_description_t *d=description(h);if(!d || !d->ready)return SC32_E_BUSY;
+    if(h->lease_metadata_only && operation!=SC32_F_QUERY && operation!=SC32_F_CLOSE)return SC32_E_ACCESS;
     Sc32FileReply r;int raw=0;u32 transferred=0;
     if(operation==SC32_F_READ || operation==SC32_F_WRITE){
         if(!reserved(q,5) || q[4]>SC32_FILE_IO_MAX)return SC32_E_RANGE;
@@ -320,6 +331,15 @@ int sc32_file_call(int pid,u32 operation,u32 request,u32 output)
     }
     if(!reserved(q,4) || (operation!=SC32_F_TRUNCATE && q[3]))return SC32_E_INVALID;
     if(operation==SC32_F_DUPLICATE)return duplicate_file(pid,h,output);
+    if(operation==SC32_F_CLOSE && h->lease_metadata_only){
+        if(h->lease && !fs_lease_detach_step(pid,h->id,h->lease))return SC32_E_BUSY;
+        file_reply(pid,h,d,&r,0,0);drop(h);r.handle=0;return publish(pid,output,&r,sizeof(r));
+    }
+    if(operation==SC32_F_CLOSE && h->lease){
+        int complete=fs_lease_file_private(d->object) || fs_lease_close_committed(h->lease,d->object);
+        if(!fs_lease_detach_step(pid,h->id,h->lease))return SC32_E_BUSY;
+        if(complete){file_reply(pid,h,d,&r,0,0);drop(h);r.handle=0;return publish(pid,output,&r,sizeof(r));}
+    }
     if(operation==SC32_F_QUERY || operation==SC32_F_TELL){
         if(d->standard>=0){u32 info[8];raw=streams_native_query(pid,h->native_reference,info);
             if(!raw && operation==SC32_F_TELL && !(info[6]&2u))raw=-12;
@@ -356,3 +376,5 @@ int sc32_file_call(int pid,u32 operation,u32 request,u32 output)
     }
     return status;
 }
+
+#include "sc32_file_lease.inc"

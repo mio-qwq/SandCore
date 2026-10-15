@@ -14,7 +14,8 @@ static ScStatus desk_paint_item(ScUiPainter *p,ScU32 i)
     if(item->selected){ScUiPainterFill(p,&r,SC32_COLOR_SELECT);desk_frame(p,&r,SC32_COLOR_ACCENT);}
     if(i==desk.drop_target)desk_frame(p,&r,SC32_COLOR_GOLD);
     ScI32 pixels=desk_scale(48);ScUiRect icon={r.x+(r.width-pixels)/2,r.y+desk_scale(8),pixels,pixels};
-    if(item->icon)ScUiPainterIcon(p,&icon,item->icon,item->selected?SC_UI_SELECTED:0);
+    /* Painter的state包含实际启用位，否则会按禁用态给真彩图标着灰。 */
+    if(item->icon)ScUiPainterIcon(p,&icon,item->icon,SC_UI_ENABLED|(item->selected?SC_UI_SELECTED:0));
     else if(item->kind==SC32_PATH_DIRECTORY){
         ScUiRect tab={icon.x+2,icon.y+pixels/5,pixels/2,pixels/5};
         ScUiPainterFill(p,&tab,SC32_COLOR_GOLD);
@@ -35,6 +36,9 @@ static ScStatus desk_paint_item(ScUiPainter *p,ScU32 i)
     }
     ScUiRect label={r.x+desk_scale(4),icon.y+pixels+desk_scale(5),r.width-desk_scale(8),r.height-pixels-desk_scale(18)};
     ScUiText text=desk_text(item->label);
+    if(!item->selected){ScUiRect shadow=label;shadow.x++;shadow.y++;
+        ScStatus drawn=ScUiPainterTextColor(p,&shadow,&text,SC_UI_FONT_BODY,SC_UI_TEXT_WRAP|SC_UI_TEXT_CENTER,
+            SC32_COLOR_DESKTOP_SHADOW);if(drawn<0)return drawn;}
     ScStatus s=ScUiPainterTextColor(p,&label,&text,SC_UI_FONT_BODY,SC_UI_TEXT_WRAP|SC_UI_TEXT_CENTER,
         item->selected?SC32_COLOR_SELECT_TEXT:SC32_COLOR_DESKTOP_TEXT);
     if(i==desk.focus){ScUiRect outline=r;outline.x+=2;outline.y+=2;outline.width-=4;outline.height-=4;

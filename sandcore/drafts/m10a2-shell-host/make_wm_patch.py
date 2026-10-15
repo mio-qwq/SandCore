@@ -83,8 +83,8 @@ replace('kernel/wm.c','''        if(GFX_W==320 || !desktop_wallpaper())scene_pai
         draw_icons();
         for(int i=0;i<nwins;i++)draw_window(i);
         draw_taskbar();native_draw_overlays();draw_fault();''','''        if(wm_shell_active(session_active())){
-            /* 用户surface负责桌面内容；只提供alpha的已登记主题基底。 */
-            gfx_rgb_fill(0,0,GFX_W,GFX_H,theme_color(TH_FACE));
+            /* 壁纸仍由内核原有单一路径缓存；R3透明层只负责图标内容。 */
+            if(GFX_W==320 || !desktop_wallpaper())scene_paint();
         }else{
             if(GFX_W==320 || !desktop_wallpaper())scene_paint();
             draw_icons();
@@ -138,7 +138,7 @@ replace('kernel/wm.c','    if(height>work_bottom())height=work_bottom();','    i
 replace('kernel/wm.c','    if(y>work_bottom()-height)y=work_bottom()-height;',
     '    if(y>wm_shell_work_bottom_for(session_task(pid))-height)y=wm_shell_work_bottom_for(session_task(pid))-height;')
 replace('kernel/wm.c','        |(p->gui.popup?SC32_WINDOW_POPUP:0)',
-    '        |(wm_shell_preparing(p)?SC32_WINDOW_PREPARING:0)\n        |(p->gui.popup?SC32_WINDOW_POPUP:0)')
+    '        |(p->session==session_active() && wm_shell_preparing(p)?SC32_WINDOW_PREPARING:0)\n        |(p->gui.popup?SC32_WINDOW_POPUP:0)')
 replace('kernel/wm.c','    if(p->gui.creating)return SC32_E_BUSY;\n    if(input->width<',
     '    if(p->shell_role)return SC32_E_NOT_SUPPORTED;\n    if(p->gui.creating)return SC32_E_BUSY;\n    if(input->width<')
 # control也需保留真实FOCUS；另外一处creating锚点在place替换后仍唯一。

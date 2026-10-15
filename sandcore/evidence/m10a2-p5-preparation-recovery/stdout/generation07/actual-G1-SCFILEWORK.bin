@@ -1,0 +1,10 @@
+/TMP/P5-f62d6a/ACTUALG1.SCX /TMP/P5-f62d6a/SRC/shellworker/SCFILEWORK.C /HOME/M10SHELL/GENERATED/SCFILEWORK.SCX --dynamic /TMP/P5-f62d6a/SRC/shellworker/SCFILEWORK.json; _m9_status=$?; printf "\n"; echo __M9_c2347bb874fd6cb1a107bfe0:$_m9_status
+SCCC / mio
+TMP/P5-f62d6a/SRC/shellworker/SCFILEWORK.C -> HOME/M10SHELL/GENERATED/SCFILEWORK.SCX
+Validating application manifest
+SCCC: preprocess -> C -> x86
+Preprocessing source and includes
+Parsing C and generating x86
+Linking and writing SCX
+SCCC OK SCX DYNAMIC
+Compilation complete

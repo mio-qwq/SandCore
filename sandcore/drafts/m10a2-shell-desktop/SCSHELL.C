@@ -4,6 +4,46 @@
 #include "desktop_tasks.inc"
 #include "desktop_actions.inc"
 
+/* 绘制错误通过公开回调立即发布，首帧失败不能只退化为激活超时。
+ * 日志只写本人账户配置目录，保留实际错误及窗口事实，不输出凭据。 */
+static ScStatus desk_ui_failure;
+static ScUiErrorInfo desk_ui_error_info;
+static ScStatus desk_ui_error(ScUiContext *ui,const ScUiEvent *event,void *context)
+{
+    (void)ui;(void)context;
+    if(event->type==SC_UI_EVENT_ERROR && event->data && event->bytes>=sizeof(desk_ui_error_info)){
+        memcpy(&desk_ui_error_info,event->data,sizeof(desk_ui_error_info));
+        if(desk_ui_error_info.code<0)desk_ui_failure=desk_ui_error_info.code;
+    }
+    return 0;
+}
+static void desk_startup_log(ScStatus status)
+{
+    if(!desk.store_path[0])return;
+    char path[68];strcpy(path,desk.store_path);char *slash=strrchr(path,'/');
+    if(!slash)return;
+    slash[1]=0;
+    if(strlen(path)+strlen("SHELL.LOG")>=sizeof(path))return;
+    strcat(path,"SHELL.LOG");
+    FILE *file=fopen(path,"w");if(!file)return;
+    ScUiErrorInfo error;memset(&error,0,sizeof(error));error.size=sizeof(error);error.version=1;
+    if(desk.ui)ScUiErrorQuery(desk.ui,&error);
+    fprintf(file,"startup=%d callback=%d ui=%d cause=%d raw=%d op=%u node=%u\n",
+        status,desk_ui_failure,error.code,error.cause_code,error.raw,error.operation,error.node);
+    ScUiContextInfo info;memset(&info,0,sizeof(info));info.size=sizeof(info);info.version=1;
+    if(desk.ui && ScUiContextQuery(desk.ui,&info)==0)
+        fprintf(file,"roots=%u visible=%u paints=%u:%u notification=%d\n",info.roots,info.visible_roots,
+            info.paint_count.hi,info.paint_count.lo,info.notification_error);
+    ScUiNode roots[2]={desk.desktop,desk.bar};
+    for(ScU32 i=0;i<2;i++)if(roots[i]){
+        ScWindowInfo window;memset(&window,0,sizeof(window));window.size=sizeof(window);window.version=1;
+        if(ScUiWindowNative(desk.ui,roots[i],&window)==0)
+            fprintf(file,"root=%u window=%u state=%u geometry=%u size=%u,%u\n",roots[i],window.window,
+                window.state,window.geometry_epoch,window.client_width,window.client_height);
+    }
+    fclose(file);
+}
+
 static ScStatus desk_service_event(const ScShellEvent *event,void *context)
 {
     (void)context;
@@ -15,6 +55,14 @@ static ScStatus desk_service_event(const ScShellEvent *event,void *context)
             return s;}
     }
     return 0;
+}
+/* ThemeQuery尺寸为逻辑像素；角色工作区与原生窗口使用物理像素。
+ * 同一换算同时用于初建和主题/DPI变更，避免32px逻辑任务栏触发
+ * 普通窗口40px最小高度校验，以及反复32/48px调整的布局反馈。 */
+static ScU32 desk_bar_pixels(ScU32 logical,ScU32 scale)
+{
+    if(!logical || !scale || logical>0xffffffffu/scale)return 0;
+    ScU32 pixels=logical*scale/100u;return pixels?pixels:1;
 }
 static ScStatus desk_root_event(ScUiContext *ui,const ScUiEvent *event,void *context)
 {
@@ -37,9 +85,11 @@ static ScStatus desk_root_event(ScUiContext *ui,const ScUiEvent *event,void *con
             desk.host.size=sizeof(desk.host);desk.host.version=1;s=ScShellHostQuery(&desk.host);
             ScThemeInfo theme;memset(&theme,0,sizeof(theme));theme.size=sizeof(theme);theme.version=1;
             if(s==0)s=ScThemeQuery(&theme);
-            if(s==0 && desk.active && theme.taskbar_height!=desk.bar_height){
-                s=ScShellHostWorkspace(desk.host.host_epoch,theme.taskbar_height,&desk.host);
-                if(s==0)desk.bar_height=theme.taskbar_height;
+            ScU32 height=s==0?desk_bar_pixels(theme.taskbar_height,metrics.scale_percent):0;
+            if(s==0 && !height)return SC32_E_RANGE;
+            if(s==0 && desk.active && height!=desk.bar_height){
+                s=ScShellHostWorkspace(desk.host.host_epoch,height,&desk.host);
+                if(s==0)desk.bar_height=height;
             }
         }
         return s;
@@ -55,26 +105,39 @@ static ScStatus desk_listen(ScUiNode node,ScUiEventProc callback)
 static ScStatus desk_canvas(ScUiNode root,ScUiClass kind,ScUiNode *out)
 {
     ScUiLayoutDesc parent;memset(&parent,0,sizeof(parent));parent.size=sizeof(parent);parent.version=1;
-    parent.mode=SC_UI_OVERLAY;parent.width=parent.height=SC_UI_AUTO;parent.max_width=parent.max_height=SC_UI_AUTO;
+    parent.mode=SC_UI_OVERLAY;parent.width=parent.height=SC_UI_AUTO;parent.max_width=parent.max_height=SC_UI_AUTO;parent.column_span=parent.row_span=1;
     ScStatus s=ScUiNodeSetLayout(desk.ui,root,&parent);if(s<0)return s;
     ScUiWidgetDesc desc;memset(&desc,0,sizeof(desc));desc.size=sizeof(desc);desc.version=1;
     desc.kind=kind;desc.parent=root;desc.flags=SC_UI_FOCUSABLE|SC_UI_TABSTOP;desc.text=desk_text("");
     s=ScUiWidgetCreate(desk.ui,&desc,out);
     ScUiLayoutDesc layout;memset(&layout,0,sizeof(layout));layout.size=sizeof(layout);layout.version=1;
     layout.mode=SC_UI_ABSOLUTE;layout.width=SC_UI_AUTO;layout.height=SC_UI_AUTO;
-    layout.max_width=SC_UI_AUTO;layout.max_height=SC_UI_AUTO;
+    layout.max_width=SC_UI_AUTO;layout.max_height=SC_UI_AUTO;layout.column_span=layout.row_span=1;
     if(s==0)s=ScUiNodeSetLayout(desk.ui,*out,&layout);
     return s;
+}
+/* 旧PathStat/Metadata的-1只有粗错误；需要区分不存在时使用现代
+ * FILE的明确NOT_FOUND。只查询代数，不读取程序正文，不保留FD。 */
+static ScStatus desk_file_revision(const char *path,ScU32 *revision)
+{
+    ScFileOpenDesc open;memset(&open,0,sizeof(open));open.size=sizeof(open);open.version=1;
+    open.path=path;open.flags=SC32_FILE_READ;ScFile file=0;
+    ScStatus status=ScFileOpen(&open,&file);if(status<0)return status;
+    ScFileInfo info;memset(&info,0,sizeof(info));info.size=sizeof(info);info.version=1;
+    status=ScFileQuery(file,&info);ScStatus closed=ScFileClose(file);
+    if(status<0)return status;
+    if(closed<0)return closed;
+    *revision=info.revision;return 0;
 }
 static ScStatus desk_seeds(void)
 {
     static const char *ids[]={"files","studio","debug","settings","notes","canvas","lens","monitor","calculator","terminal","palette","sound","session"};
     static const char *labels[]={"文件","开发工作室","调试器","设置","笔记","画板","图片","系统监视器","计算器","终端","调色板","音频","登录与会话"};
-    static const char *paths[]={"/APPS/FILES.SCX","/APPS/IDE.SCX","/APPS/DEBUGGER.SCX","/APPS/SETTINGS.SCX","/APPS/NOTE.SCX","/APPS/CANVAS.SCX","/APPS/LENS.SCX","/APPS/MONITOR.SCX","/APPS/CALC.SCX","/BIN/SHELL.SCX","/APPS/PALETTE.SCX","/APPS/SOUND.SCX","/APPS/SESSION.SCX"};
+    static const char *paths[]={"/APPS/FILES.SCX","/APPS/IDE.SCX","/APPS/DEBUGGER.SCX","/APPS/SETTINGS.SCX","/APPS/NOTE.SCX","/APPS/CANVAS.SCX","/APPS/LENS.SCX","/APPS/MONITOR.SCX","/APPS/CALC.SCX","/BIN/SH.SCX","/APPS/PALETTE.SCX","/APPS/SOUND.SCX","/APPS/SESSION.SCX"};
     static const char *icons[]={"@FILES","@STUDIO","@DEBUG","@SETTINGS","@NOTE","@CANVAS","@LENS","@MONITOR","@CALC","@SHELL","@PALETTE","@SOUND","@SESSION"};
     for(ScU32 i=0;i<sizeof(ids)/sizeof(ids[0]);i++){
-        ScPathStatInfo exists;memset(&exists,0,sizeof(exists));exists.size=sizeof(exists);exists.version=1;
-        ScStatus s=ScPathStat(paths[i],&exists);if(s==SC32_E_NOT_FOUND)continue;if(s<0)return s;
+        ScU32 revision=0;
+        ScStatus s=desk_file_revision(paths[i],&revision);if(s==SC32_E_NOT_FOUND)continue;if(s<0)return s;
         ScShellCatalogInfo info;memset(&info,0,sizeof(info));info.size=sizeof(info);info.version=1;
         s=ScShellCatalogQuery(desk.catalog,&info);if(s<0)return s;
         char id[48];snprintf(id,sizeof(id),"sandcore.%s",ids[i]);
@@ -104,28 +167,43 @@ static ScStatus desk_seeds(void)
     }
     return 0;
 }
+static ScStatus desk_directory(const char *path)
+{
+    ScPathStatInfo info;memset(&info,0,sizeof(info));info.size=sizeof(info);info.version=1;
+    ScStatus status=ScPathStat(path,&info);
+    if(status==0)return info.kind==SC32_PATH_DIRECTORY?0:SC32_E_INVALID;
+    if(status!=SC32_E_NOT_FOUND && status!=SC32_E_FAILED)return status;
+    /* 不把粗FAILED直接当作不存在：CreateEx只在确实缺名时发布，
+     * 已有对象永不覆盖；若另一任务抢先创建则重新核类型。 */
+    status=ScPathCreate(path,SC32_PATH_DIRECTORY,3);
+    if(status!=SC32_E_EXISTS)return status;
+    info.size=sizeof(info);info.version=1;status=ScPathStat(path,&info);
+    if(status==0 && info.kind!=SC32_PATH_DIRECTORY)return SC32_E_INVALID;
+    return status;
+}
 static ScStatus desk_paths(void)
 {
-    ScU32 length=0;char menu[68];ScStatus s=ScSessionPath("MENU.CFG",menu,sizeof(menu),&length);
+    ScU32 length=0;char menu[68],base[68];ScStatus s=ScSessionPath("MENU.CFG",menu,sizeof(menu),&length);
     if(s<0)return s;
-    if(!strcmp(menu,"/SYS/MENU.CFG"))strcpy(desk.desktop_path,"/DESK");
-    else {s=ScSessionPath("DESK",desk.desktop_path,sizeof(desk.desktop_path),&length);if(s<0)return s;}
-    ScPathStatInfo desktop;memset(&desktop,0,sizeof(desktop));desktop.size=sizeof(desktop);desktop.version=1;
-    s=ScPathStat(desk.desktop_path,&desktop);
-    if(s==SC32_E_NOT_FOUND)s=ScPathCreate(desk.desktop_path,SC32_PATH_DIRECTORY,3);
-    else if(s==0 && desktop.kind!=SC32_PATH_DIRECTORY)s=SC32_E_INVALID;
-    if(s<0)return s;
+    int legacy_default=!strcmp(menu,"/SYS/MENU.CFG");
     s=ScSessionPath("SHELL.CAT",desk.store_path,sizeof(desk.store_path),&length);if(s<0)return s;
-    s=ScSessionPath("SHELLSTATE",desk.recovery_directory,sizeof(desk.recovery_directory),&length);if(s<0)return s;
-    ScPathStatInfo state;memset(&state,0,sizeof(state));state.size=sizeof(state);state.version=1;
-    s=ScPathStat(desk.recovery_directory,&state);
-    if(s==SC32_E_NOT_FOUND)s=ScPathCreate(desk.recovery_directory,SC32_PATH_DIRECTORY,3);
-    else if(s==0 && state.kind!=SC32_PATH_DIRECTORY)s=SC32_E_INVALID;
-    if(s<0)return s;
-    ScPathInfo info;memset(&info,0,sizeof(info));info.size=sizeof(info);info.version=1;
-    s=ScPathMetadata(desk.store_path,&info);
-    if(s==0)desk.store_revision=info.generation;
-    else if(s==SC32_E_NOT_FOUND)desk.store_revision=0;else return s;
+    /* 默认账户保留旧SYS菜单和DESK，不向root拥有的SYS目录创建新文件。
+     * 新catalog/恢复记录使用该账户已有HOME内的私有配置目录；其它
+     * 账户沿公开SessionPath取得自己的目录，先建父目录再建子项。 */
+    if(legacy_default)strcpy(desk.store_path,"/HOME/.DESKTOP/SHELL.CAT");
+    strcpy(base,desk.store_path);char *slash=strrchr(base,'/');
+    if(!slash || slash==base)return SC32_E_INVALID;
+    *slash=0;
+    s=desk_directory(base);if(s<0)return s;
+    if(legacy_default)strcpy(desk.desktop_path,"/DESK");
+    else {s=ScSessionPath("DESK",desk.desktop_path,sizeof(desk.desktop_path),&length);if(s<0)return s;}
+    s=desk_directory(desk.desktop_path);if(s<0)return s;
+    int bytes=snprintf(desk.recovery_directory,sizeof(desk.recovery_directory),"%s/SHELLSTATE",base);
+    if(bytes<0 || (ScU32)bytes>=sizeof(desk.recovery_directory))return SC32_E_RANGE;
+    s=desk_directory(desk.recovery_directory);if(s<0)return s;
+    s=desk_file_revision(desk.store_path,&desk.store_revision);
+    if(s==SC32_E_NOT_FOUND)desk.store_revision=0;
+    else if(s<0)return s;
     ScShellCatalogInfo cat;memset(&cat,0,sizeof(cat));cat.size=sizeof(cat);cat.version=1;
     s=ScShellCatalogQuery(desk.catalog,&cat);if(s<0)return s;
     if(desk.store_revision){
@@ -165,6 +243,7 @@ static ScStatus desk_create(void)
         return SC32_E_ACCESS;
     ScUiContextDesc context;memset(&context,0,sizeof(context));context.size=sizeof(context);context.version=1;
     context.cache_budget_bytes=2097152;context.undo_budget_bytes=65536;context.scheduling_quantum=64;
+    context.error_procedure=desk_ui_error;
     s=ScUiContextCreate(&context,&desk.ui);if(s<0)return s;
     ScUiClassDesc custom;memset(&custom,0,sizeof(custom));custom.size=sizeof(custom);custom.version=1;
     custom.name="SandCore.Desktop";custom.paint=desk_paint;custom.event=desk_input;
@@ -175,12 +254,12 @@ static ScStatus desk_create(void)
     if(s==0)s=ScDisplayQuery(&display);
     ScThemeInfo theme;memset(&theme,0,sizeof(theme));theme.size=sizeof(theme);theme.version=1;
     if(s==0)s=ScThemeQuery(&theme);
-    if(s==0)desk.bar_height=theme.taskbar_height;
+    if(s==0){desk.bar_height=desk_bar_pixels(theme.taskbar_height,display.scale_percent);if(!desk.bar_height)s=SC32_E_RANGE;}
     ScUiWindowDesc window;memset(&window,0,sizeof(window));window.size=sizeof(window);window.version=1;
     window.title=desk_text("桌面");window.client_width=display.width;window.client_height=display.height;
     window.style=SC32_STYLE_HIDDEN;
     if(s==0)s=ScUiWindowCreate(desk.ui,&window,&desk.desktop);
-    window.title=desk_text("任务栏");window.client_height=theme.taskbar_height;
+    window.title=desk_text("任务栏");window.client_height=desk.bar_height<40?40:desk.bar_height;
     if(s==0)s=ScUiWindowCreate(desk.ui,&window,&desk.bar);
     if(s==0)s=desk_canvas(desk.desktop,desk.desktop_class,&desk.canvas);
     if(s==0){ScUiText help=desk_text("拖动排列图标；按住 Alt 拖到文件夹或其它窗口以操作文件。");
@@ -206,33 +285,66 @@ static ScStatus desk_create(void)
     if(s==0)s=ScUiWindowNative(desk.ui,desk.bar,&bar);
     ScShellHostDesc host;memset(&host,0,sizeof(host));host.size=sizeof(host);host.version=1;
     host.host_epoch=desk.host.host_epoch;host.endpoint=desk.endpoint;host.desktop=desktop.window;host.desktop_generation=desktop.generation;
-    host.taskbar=bar.window;host.taskbar_generation=bar.generation;host.taskbar_height=theme.taskbar_height;
+    host.taskbar=bar.window;host.taskbar_generation=bar.generation;host.taskbar_height=desk.bar_height;
     if(s==0)s=ScShellHostPrepare(&host,&desk.host);
     ScShellServiceDesc service;memset(&service,0,sizeof(service));service.size=sizeof(service);service.version=1;
     service.catalog=desk.catalog;service.endpoint=desk.endpoint;service.host_epoch=desk.host.host_epoch;
     service.frame_budget_bytes=65536;service.account_store=desk.store_path;service.procedure=desk_service_event;
     if(s==0)s=ScShellServiceCreate(&service,&desk.service);
     if(s<0)return s;
-    /* Prepare之后两张不可见surface只有一次真实首帧资格；Pump把自己的
-     * SCUI控件绘入，Activate返回AGAIN时继续等内核事实，不伪造可见位。 */
+    /* 服务发现与显示激活分开。隐藏会话继续处理IPC/文件工作，
+     * 只有真实选中后才允许两个角色首帧，并开始可见准备的超时。 */
     ScUiInvalidate(desk.ui,desk.desktop,0);ScUiInvalidate(desk.ui,desk.bar,0);
-    ScMonotonicClock begin;memset(&begin,0,sizeof(begin));begin.size=sizeof(begin);begin.version=1;
-    s=ScSystemMonotonic(&begin);if(s<0)return s;
-    for(;;){
-        s=ScUiContextStep(desk.ui,0);if(s<0)return s;
-        s=ScShellHostActivate(desk.host.host_epoch,&desk.host);if(s==0)break;
-        if(s!=SC32_E_AGAIN && s!=SC32_E_BUSY && s!=SC32_PENDING)return s;
-        ScMonotonicClock now;memset(&now,0,sizeof(now));now.size=sizeof(now);now.version=1;
-        s=ScSystemMonotonic(&now);if(s<0)return s;
-        ScU32 elapsed=now.ticks.lo-begin.ticks.lo;
-        ScU32 high=now.ticks.hi-begin.ticks.hi-(now.ticks.lo<begin.ticks.lo);
-        if(high || elapsed>begin.hz*5u)return SC32_E_FAILED;
-        ScU32 events=0;s=ScSystemWait(SC32_EVENT_INPUT|SC32_EVENT_VISIBILITY,1,&events);if(s<0)return s;
+    return 0;
+}
+static ScMonotonicClock desk_activation_checked,desk_activation_begin;
+static ScU32 desk_activation_visible,desk_activation_requested,desk_activation_dirty=1;
+static ScStatus desk_activate(void)
+{
+    if(desk.active)return 0;
+    if(desk_ui_failure<0)return desk_ui_failure;
+    ScMonotonicClock now;memset(&now,0,sizeof(now));now.size=sizeof(now);now.version=1;
+    ScStatus status=ScSystemMonotonic(&now);if(status<0)return status;
+    if(!now.hz)return SC32_E_VERSION;
+    if(desk_activation_dirty || !desk_activation_checked.hz
+       || now.ticks.hi!=desk_activation_checked.ticks.hi
+       || now.ticks.lo-desk_activation_checked.ticks.lo>=now.hz){
+        ScSessionPage page;ScSessionInfo row;
+        memset(&page,0,sizeof(page));page.size=sizeof(page);page.version=1;page.cursor=SC32_ENUM_BEGIN;
+        status=ScSessionEnumerate(&page,&row,1);if(status<0)return status;
+        ScU32 selected=page.visible_session==desk.identity.session;
+        if(selected && !desk_activation_visible){desk_activation_begin=now;desk_activation_requested=0;}
+        if(!selected)desk_activation_requested=0;
+        desk_activation_visible=selected;desk_activation_checked=now;desk_activation_dirty=0;
     }
-    desk.active=1;desk.task_dirty=1;
-    ScU32 format=SC32_CLIPBOARD_FILES;ScUiDropTargetDesc drop;memset(&drop,0,sizeof(drop));drop.size=sizeof(drop);drop.version=1;
-    drop.actions=SC_UI_DRAG_COPY|SC_UI_DRAG_MOVE;drop.formats=&format;drop.format_count=1;drop.procedure=desk_drop;
-    return ScUiDropTargetRegister(desk.ui,desk.canvas,&drop);
+    if(!desk_activation_visible)return SC_UI_PENDING;
+    status=ScShellHostActivate(desk.host.host_epoch,&desk.host);
+    if(status==0){
+        desk.active=1;desk.task_dirty=1;
+        ScWindowInfo window;memset(&window,0,sizeof(window));window.size=sizeof(window);window.version=1;
+        if(ScUiWindowNative(desk.ui,desk.desktop,&window)==0)desk.visible=(window.state&SC32_WINDOW_VISIBLE)!=0;
+        ScU32 format=SC32_CLIPBOARD_FILES;ScUiDropTargetDesc drop;
+        memset(&drop,0,sizeof(drop));drop.size=sizeof(drop);drop.version=1;
+        drop.actions=SC_UI_DRAG_COPY|SC_UI_DRAG_MOVE;drop.formats=&format;drop.format_count=1;drop.procedure=desk_drop;
+        return ScUiDropTargetRegister(desk.ui,desk.canvas,&drop);
+    }
+    if(status!=SC32_E_AGAIN && status!=SC32_E_BUSY && status!=SC32_PENDING)return status;
+    if(!desk_activation_requested){
+        /* PREPARED的隐藏位在选中前后仍是0，普通VIS变化未必会排PAINT。
+         * 只在首次可绘阶段请求仍缺首帧的surface，不每轮全帧失效。 */
+        ScUiNode roots[2]={desk.desktop,desk.bar};
+        for(ScU32 i=0;i<2;i++){
+            ScWindowInfo window;memset(&window,0,sizeof(window));window.size=sizeof(window);window.version=1;
+            ScStatus queried=ScUiWindowNative(desk.ui,roots[i],&window);if(queried<0)return queried;
+            if(window.state&SC32_WINDOW_PREPARING){ScStatus requested=ScUiInvalidate(desk.ui,roots[i],0);
+                if(requested<0)return requested;}
+        }
+        desk_activation_requested=1;
+    }
+    ScU32 elapsed=now.ticks.lo-desk_activation_begin.ticks.lo;
+    ScU32 high=now.ticks.hi-desk_activation_begin.ticks.hi-(now.ticks.lo<desk_activation_begin.ticks.lo);
+    if(high || elapsed>now.hz*5u)return SC32_E_FAILED;
+    return SC_UI_PENDING;
 }
 static void desk_close(void)
 {
@@ -278,10 +390,11 @@ int main(void)
     ScStatus status=desk_create();
     /* 独立启动没有继承TTY；保留实际公共错误作为退出码，使外部
      * 可信host故障记录能够解释回退原因，而非把全部失败压成1。 */
-    if(status<0){fprintf(stderr,"SCSHELL startup failed=%d\n",status);desk_close();return -status;}
+    if(status<0){fprintf(stderr,"SCSHELL startup failed=%d\n",status);desk_startup_log(status);desk_close();return -status;}
     while(!desk.quit){
         ScU32 business_ready=0;
         status=ScUiContextStep(desk.ui,0);if(status<0)break;
+        ScStatus activated=desk_activate();if(activated<0){status=activated;break;}
         status=ScShellServiceStep(desk.service,0);if(status<0 && status!=SC32_E_AGAIN)break;
         ScShellServiceInfo service;memset(&service,0,sizeof(service));service.size=sizeof(service);service.version=1;
         if(ScShellServiceQuery(desk.service,&service)==0 && (service.flags&SC_SHELL_SERVICE_READY))business_ready=1;
@@ -305,7 +418,7 @@ int main(void)
         while(*slot){DeskMenuWork *work=*slot;ScStatus s=ScShellMenuStep(work->menu,0);
             if(s==SC_SHELL_END){*slot=work->next;ScShellMenuRelease(work->menu);free(work);}
             else {if(s==SC_SHELL_READY)business_ready=1;else if(s<0)desk_error(s,desk.desktop_path);slot=&work->next;}}
-        if(desk.task_dirty || desk.task_scanning){ScStatus s=desk_tasks_step();if(s<0)desk_error(s,"");}
+        if(desk.active && (desk.task_dirty || desk.task_scanning)){ScStatus s=desk_tasks_step();if(s<0)desk_error(s,"");}
         if(desk.job){ScStatus s=desk.job_done?0:ScShellFileOperationStep(desk.job,0);
             if(s==SC_SHELL_READY)business_ready=1;
             ScStatus dialog=desk.progress?ScShellDialogStep(desk.progress):SC_SHELL_END;
@@ -335,8 +448,8 @@ int main(void)
         wait.event_mask=SC32_EVENT_INPUT|SC32_EVENT_VISIBILITY|SC32_EVENT_STREAM;wait.timeout=100;
         status=ScUiContextWaitTimeout(desk.ui,100,&wait.timeout);if(status<0)break;
         ScU32 events=0;status=ScBrokerWait(&wait,&events);if(status<0)break;
-        if(events&SC32_EVENT_VISIBILITY)desk.task_dirty=1;
+        if(events&SC32_EVENT_VISIBILITY){desk.task_dirty=1;desk_activation_dirty=1;}
     }
-    if(status<0)fprintf(stderr,"SCSHELL stopped=%d\n",status);
-    desk_close();return status<0?1:0;
+    if(status<0){fprintf(stderr,"SCSHELL stopped=%d\n",status);desk_startup_log(status);}
+    desk_close();return status<0?-status:0;
 }

@@ -1,13 +1,65 @@
 {
   "name": "SC32API.SCL",
   "abi_major": 1,
-  "abi_minor": 2,
-  "library_version": 3,
+  "abi_minor": 3,
+  "library_version": 4,
   "init": null,
   "fini": "Sc32Finalize",
   "exports": [
     {
+      "name": "ScBrokerReady",
+      "kind": "function"
+    },
+    {
+      "name": "ScBrokerWait",
+      "kind": "function"
+    },
+    {
       "name": "ScCallbackPin",
+      "kind": "function"
+    },
+    {
+      "name": "ScClipboardAbort",
+      "kind": "function"
+    },
+    {
+      "name": "ScClipboardBegin",
+      "kind": "function"
+    },
+    {
+      "name": "ScClipboardClear",
+      "kind": "function"
+    },
+    {
+      "name": "ScClipboardClose",
+      "kind": "function"
+    },
+    {
+      "name": "ScClipboardCommit",
+      "kind": "function"
+    },
+    {
+      "name": "ScClipboardFormats",
+      "kind": "function"
+    },
+    {
+      "name": "ScClipboardOffer",
+      "kind": "function"
+    },
+    {
+      "name": "ScClipboardOpen",
+      "kind": "function"
+    },
+    {
+      "name": "ScClipboardQuery",
+      "kind": "function"
+    },
+    {
+      "name": "ScClipboardRead",
+      "kind": "function"
+    },
+    {
+      "name": "ScClipboardWatch",
       "kind": "function"
     },
     {
@@ -39,6 +91,34 @@
       "kind": "function"
     },
     {
+      "name": "ScDropAt",
+      "kind": "function"
+    },
+    {
+      "name": "ScDropCancel",
+      "kind": "function"
+    },
+    {
+      "name": "ScDropComplete",
+      "kind": "function"
+    },
+    {
+      "name": "ScDropConnect",
+      "kind": "function"
+    },
+    {
+      "name": "ScDropRegister",
+      "kind": "function"
+    },
+    {
+      "name": "ScDropUnregister",
+      "kind": "function"
+    },
+    {
+      "name": "ScDropValidate",
+      "kind": "function"
+    },
+    {
       "name": "ScErrorFormat",
       "kind": "function"
     },
@@ -64,6 +144,54 @@
     },
     {
       "name": "ScFileGetStandard",
+      "kind": "function"
+    },
+    {
+      "name": "ScFileLeaseAcquire",
+      "kind": "function"
+    },
+    {
+      "name": "ScFileLeaseAdvance",
+      "kind": "function"
+    },
+    {
+      "name": "ScFileLeaseCancel",
+      "kind": "function"
+    },
+    {
+      "name": "ScFileLeaseCreatePinned",
+      "kind": "function"
+    },
+    {
+      "name": "ScFileLeaseOpenPinned",
+      "kind": "function"
+    },
+    {
+      "name": "ScFileLeasePublish",
+      "kind": "function"
+    },
+    {
+      "name": "ScFileLeaseQuery",
+      "kind": "function"
+    },
+    {
+      "name": "ScFileLeaseRelease",
+      "kind": "function"
+    },
+    {
+      "name": "ScFileLeaseRemove",
+      "kind": "function"
+    },
+    {
+      "name": "ScFileLeaseRename",
+      "kind": "function"
+    },
+    {
+      "name": "ScFileLeaseSetMode",
+      "kind": "function"
+    },
+    {
+      "name": "ScFileLeaseSnapshot",
       "kind": "function"
     },
     {
@@ -119,6 +247,46 @@
       "kind": "function"
     },
     {
+      "name": "ScIpcAccept",
+      "kind": "function"
+    },
+    {
+      "name": "ScIpcClose",
+      "kind": "function"
+    },
+    {
+      "name": "ScIpcConnect",
+      "kind": "function"
+    },
+    {
+      "name": "ScIpcCreate",
+      "kind": "function"
+    },
+    {
+      "name": "ScIpcListen",
+      "kind": "function"
+    },
+    {
+      "name": "ScIpcPeek",
+      "kind": "function"
+    },
+    {
+      "name": "ScIpcPeer",
+      "kind": "function"
+    },
+    {
+      "name": "ScIpcQuery",
+      "kind": "function"
+    },
+    {
+      "name": "ScIpcReceive",
+      "kind": "function"
+    },
+    {
+      "name": "ScIpcSend",
+      "kind": "function"
+    },
+    {
       "name": "ScJobCancel",
       "kind": "function"
     },
@@ -147,7 +315,39 @@
       "kind": "function"
     },
     {
+      "name": "ScMemoryCloseShared",
+      "kind": "function"
+    },
+    {
+      "name": "ScMemoryCreateShared",
+      "kind": "function"
+    },
+    {
       "name": "ScMemoryFreePages",
+      "kind": "function"
+    },
+    {
+      "name": "ScMemoryGrantShared",
+      "kind": "function"
+    },
+    {
+      "name": "ScMemoryMapShared",
+      "kind": "function"
+    },
+    {
+      "name": "ScMemoryOpenShared",
+      "kind": "function"
+    },
+    {
+      "name": "ScMemoryQueryShared",
+      "kind": "function"
+    },
+    {
+      "name": "ScMemoryRevokeShared",
+      "kind": "function"
+    },
+    {
+      "name": "ScMemoryUnmapShared",
       "kind": "function"
     },
     {
@@ -375,155 +575,47 @@
       "kind": "function"
     },
     {
-      "name": "ScBrokerReady",
+      "name": "ScProcessLaunch",
       "kind": "function"
     },
     {
-      "name": "ScBrokerWait",
+      "name": "ScShellHostActivate",
       "kind": "function"
     },
     {
-      "name": "ScClipboardAbort",
+      "name": "ScShellHostConnect",
       "kind": "function"
     },
     {
-      "name": "ScClipboardBegin",
+      "name": "ScShellHostDeactivate",
       "kind": "function"
     },
     {
-      "name": "ScClipboardClear",
+      "name": "ScShellHostPrepare",
       "kind": "function"
     },
     {
-      "name": "ScClipboardClose",
+      "name": "ScShellHostQuery",
       "kind": "function"
     },
     {
-      "name": "ScClipboardCommit",
+      "name": "ScShellHostRestart",
       "kind": "function"
     },
     {
-      "name": "ScClipboardFormats",
+      "name": "ScShellHostWindowAction",
       "kind": "function"
     },
     {
-      "name": "ScClipboardOffer",
+      "name": "ScShellHostWindowAt",
       "kind": "function"
     },
     {
-      "name": "ScClipboardOpen",
+      "name": "ScShellHostWindows",
       "kind": "function"
     },
     {
-      "name": "ScClipboardQuery",
-      "kind": "function"
-    },
-    {
-      "name": "ScClipboardRead",
-      "kind": "function"
-    },
-    {
-      "name": "ScClipboardWatch",
-      "kind": "function"
-    },
-    {
-      "name": "ScIpcAccept",
-      "kind": "function"
-    },
-    {
-      "name": "ScIpcClose",
-      "kind": "function"
-    },
-    {
-      "name": "ScIpcConnect",
-      "kind": "function"
-    },
-    {
-      "name": "ScIpcCreate",
-      "kind": "function"
-    },
-    {
-      "name": "ScIpcListen",
-      "kind": "function"
-    },
-    {
-      "name": "ScIpcPeek",
-      "kind": "function"
-    },
-    {
-      "name": "ScIpcPeer",
-      "kind": "function"
-    },
-    {
-      "name": "ScIpcQuery",
-      "kind": "function"
-    },
-    {
-      "name": "ScIpcReceive",
-      "kind": "function"
-    },
-    {
-      "name": "ScIpcSend",
-      "kind": "function"
-    },
-    {
-      "name": "ScMemoryCloseShared",
-      "kind": "function"
-    },
-    {
-      "name": "ScMemoryCreateShared",
-      "kind": "function"
-    },
-    {
-      "name": "ScMemoryGrantShared",
-      "kind": "function"
-    },
-    {
-      "name": "ScMemoryMapShared",
-      "kind": "function"
-    },
-    {
-      "name": "ScMemoryOpenShared",
-      "kind": "function"
-    },
-    {
-      "name": "ScMemoryQueryShared",
-      "kind": "function"
-    },
-    {
-      "name": "ScMemoryRevokeShared",
-      "kind": "function"
-    },
-    {
-      "name": "ScMemoryUnmapShared",
-      "kind": "function"
-    },
-    {
-      "name": "ScDropAt",
-      "kind": "function"
-    },
-    {
-      "name": "ScDropCancel",
-      "kind": "function"
-    },
-    {
-      "name": "ScDropComplete",
-      "kind": "function"
-    },
-    {
-      "name": "ScDropConnect",
-      "kind": "function"
-    },
-    {
-      "name": "ScDropRegister",
-      "kind": "function"
-    },
-    {
-      "name": "ScDropUnregister",
-      "kind": "function"
-    },
-    {
-      "name": "ScDropValidate",
+      "name": "ScShellHostWorkspace",
       "kind": "function"
     }
   ],

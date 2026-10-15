@@ -1,8 +1,8 @@
 {
   "name": "SCUI.SCL",
   "abi_major": 1,
-  "abi_minor": 0,
-  "library_version": 1,
+  "abi_minor": 1,
+  "library_version": 2,
   "init": null,
   "fini": "ScUiFinalize",
   "exports": [
@@ -104,6 +104,10 @@
     },
     {
       "name": "ScUiContextStop",
+      "kind": "function"
+    },
+    {
+      "name": "ScUiContextWaitTimeout",
       "kind": "function"
     },
     {
@@ -435,6 +439,14 @@
       "kind": "function"
     },
     {
+      "name": "ScUiPainterBounds",
+      "kind": "function"
+    },
+    {
+      "name": "ScUiPainterClear",
+      "kind": "function"
+    },
+    {
       "name": "ScUiPainterClip",
       "kind": "function"
     },
@@ -456,6 +468,10 @@
     },
     {
       "name": "ScUiPainterText",
+      "kind": "function"
+    },
+    {
+      "name": "ScUiPainterTextColor",
       "kind": "function"
     },
     {
@@ -1467,8 +1483,8 @@
     {
       "name": "SC32API.SCL",
       "abi_major": 1,
-      "min_minor": 2,
-      "min_version": 3
+      "min_minor": 3,
+      "min_version": 4
     },
     {
       "name": "SCCLIB.SCL",

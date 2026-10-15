@@ -666,3 +666,5 @@ INPUT等待，私有task尾部只标本次返回模式；唤醒返回新状态�
 WAIT40b在同一IF=0入口完整核request、真实GUI队列及对象ready，再沿旧mode0安装等待；不保存用户out/request跨睡眠，不改旧EVENTWAIT。共享VA60000000..64000000为真Shared PF标记PTE，private释放/旧debug写特例不得跨入。task退出先撤旧关联，后按预算拆broker映射，auth/session/pd/PID最后释放；初稿仍未客体验证。
 
 修订：2026-10-15，登记新私有selector与字布局/真实共享页/混合等待及退出顺序，旧SCAPI原字节保持。
+
+2026-10-16修订：M10a2 Phase5新增仅SYS_SC32=0x300内的新selector：lease0x700..0x70b（Acquire/Open/Create/Query/Snapshot/Publish/Rename/Remove/Release/Cancel/Advance/SetMode）；host0x800..0x80a（Launch/Query/Prepare/Activate/Connect/Workspace/WindowPage/WindowAction/Restart/Deactivate/WindowAt）。字段/记录宽度见SC32LEASE.H、SC32HOST.H和SCSHELL-DESIGN；真实owner、SID、代数及全部out写范围先验。没有复用旧忽略寄存器或改旧缓冲。host/client切片Runtime11通过，lease事务仍未获实际PASS。

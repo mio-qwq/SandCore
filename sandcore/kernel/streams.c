@@ -1,6 +1,7 @@
 #include "streams.h"
 #include "task.h"
 #include "auth.h"
+#include "session.h"
 #include "userspace.h"
 #include "fs.h"
 #include "process.h"
@@ -568,6 +569,8 @@ int streams_exec(int parent,const char *command,const i32 fds[3],u32 flags)
     if(job->parent_next>=0)((job_t *)objpool_get(&job_pool,job->parent_next))->parent_prev=token;
     STREAM_CONTEXT(parent).jobs_head=token;STREAM_CONTEXT(child).owned_job=token;return token;
 }
+#include "streams_launch.inc"
+
 int streams_wait(int parent,u32 token,u32 out[8])
 {
     job_t *j=owned_job(parent,token);if(j){

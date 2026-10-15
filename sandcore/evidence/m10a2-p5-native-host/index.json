@@ -1,0 +1,395 @@
+{
+  "scope": "P5_STABLE_NATIVE_HOST_CLIENT_SLICE_NOT_FULL_P5_OR_M10A2",
+  "full_P5": false,
+  "full_M10a2": false,
+  "files": [
+    {
+      "source": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-shell-native-runtime-11\\shell-runtime.json",
+      "archive": "reports/runtime11-stable.json",
+      "role": "runtime11-stable:RAW_REPORT",
+      "bytes": 368656,
+      "sha256": "52d7eafc44b17e6955146b7279c1468ea35fa5fd634e22334ac3f696fd0505ca"
+    },
+    {
+      "source": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-shell-native-runtime-11\\case-000.stdout.bin",
+      "archive": "stdout/runtime11-stable/warm-parent-Shell-command-cache.bin",
+      "role": "runtime11-stable:CASE_STDOUT:warm-parent-Shell-command-cache",
+      "bytes": 114,
+      "sha256": "88443f21c95bfdb370ec4bb7775c048a61ca46041b86d25105865556a12f4fef"
+    },
+    {
+      "source": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-shell-native-runtime-11\\case-001.stdout.bin",
+      "archive": "stdout/runtime11-stable/warm-existing-task-history.bin",
+      "role": "runtime11-stable:CASE_STDOUT:warm-existing-task-history",
+      "bytes": 132,
+      "sha256": "1149b3e1d9484c1c41a45dcbcb268b24b8bf3902dd91e32f39288878924178f7"
+    },
+    {
+      "source": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-shell-native-runtime-11\\case-002.stdout.bin",
+      "archive": "stdout/runtime11-stable/warm-parent-Shell-background-table.bin",
+      "role": "runtime11-stable:CASE_STDOUT:warm-parent-Shell-background-table",
+      "bytes": 151,
+      "sha256": "7a4ded3972da590ef8d5651253d26c8353bf4147539586b480a198c4be338dce"
+    },
+    {
+      "source": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-shell-native-runtime-11\\case-003.stdout.bin",
+      "archive": "stdout/runtime11-stable/warm-existing-path-I_O.bin",
+      "role": "runtime11-stable:CASE_STDOUT:warm-existing-path-I/O",
+      "bytes": 180,
+      "sha256": "c5cf45411dc959573338089155ef9ccd9bf96e25de2b1300b10194488465ffe1"
+    },
+    {
+      "source": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-shell-native-runtime-11\\case-005.stdout.bin",
+      "archive": "stdout/runtime11-stable/actual-G1-SHELLPROBE.bin",
+      "role": "runtime11-stable:CASE_STDOUT:actual-G1-SHELLPROBE",
+      "bytes": 523,
+      "sha256": "e43919191abc96c07fecf1a2622c6ea83e4fece0422b05fe0931f4b0937fb5ec"
+    },
+    {
+      "source": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-shell-native-runtime-11\\case-010.stdout.bin",
+      "archive": "stdout/runtime11-stable/sessions-before-native-host.bin",
+      "role": "runtime11-stable:CASE_STDOUT:sessions-before-native-host",
+      "bytes": 264,
+      "sha256": "7fd4445d08a7f968dbef57b5b3c9f8413bdf7fae34ee3f3e3afa35888177de3f"
+    },
+    {
+      "source": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-shell-native-runtime-11\\case-011.stdout.bin",
+      "archive": "stdout/runtime11-stable/ordinary-native-host-and-real-catalog.bin",
+      "role": "runtime11-stable:CASE_STDOUT:ordinary-native-host-and-real-catalog",
+      "bytes": 779,
+      "sha256": "c3263fe4b2b4a0e949f0b2e015e29f4cba69c81f2b9b67853618100d3a33f3c5"
+    },
+    {
+      "source": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-shell-native-runtime-11\\case-012.stdout.bin",
+      "archive": "stdout/runtime11-stable/show-actual-native-desktop.bin",
+      "role": "runtime11-stable:CASE_STDOUT:show-actual-native-desktop",
+      "bytes": 127,
+      "sha256": "7a35f230bc3df50231ebbc549aa23cfe83d3637120b2cb9eb30e09c5ae6cccc4"
+    },
+    {
+      "source": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-shell-native-runtime-11\\case-013.stdout.bin",
+      "archive": "stdout/runtime11-stable/restore-original-desktop.bin",
+      "role": "runtime11-stable:CASE_STDOUT:restore-original-desktop",
+      "bytes": 127,
+      "sha256": "ab532b14465844fbd2fc27f569f31cfec6d795edbb2296a3058003ff8ea3d2ea"
+    },
+    {
+      "source": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-shell-native-runtime-11\\case-014.stdout.bin",
+      "archive": "stdout/runtime11-stable/logout-native-desktop-session.bin",
+      "role": "runtime11-stable:CASE_STDOUT:logout-native-desktop-session",
+      "bytes": 129,
+      "sha256": "be66de72cafa3e5ae4087a277543271e329dc17d60b63534a01abb9f13874bd6"
+    },
+    {
+      "source": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-shell-native-runtime-11\\file-actual-G1-SHELLPROBE-log",
+      "archive": "compile/runtime11-stable/file-actual-G1-SHELLPROBE-log",
+      "role": "runtime11-stable:RAW_COMPILE_LOG_MAP",
+      "bytes": 20,
+      "sha256": "76f8bfd932a0325450d43f49241a7f0bd43a17c44b9635a626a5af81148f88a4"
+    },
+    {
+      "source": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-shell-native-runtime-11\\file-actual-G1-SHELLPROBE-map",
+      "archive": "compile/runtime11-stable/file-actual-G1-SHELLPROBE-map",
+      "role": "runtime11-stable:RAW_COMPILE_LOG_MAP",
+      "bytes": 1142,
+      "sha256": "eef4e13dd5a0de54b8bdb0f623889a9f2ec4863ddd6ca9cc0a8c6662db98f24f"
+    },
+    {
+      "source": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-shell-native-runtime-11\\console.txt",
+      "archive": "sessions/runtime11-stable/console.txt",
+      "role": "runtime11-stable:RAW_SESSION",
+      "bytes": 3572,
+      "sha256": "3701812d4e51371709a17ecbc5867add9b9d7db489ec869365aa5d3a79d334d0"
+    },
+    {
+      "source": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-shell-native-runtime-11\\debug-rx.bin",
+      "archive": "sessions/runtime11-stable/debug-rx.bin",
+      "role": "runtime11-stable:RAW_SESSION",
+      "bytes": 126,
+      "sha256": "e575f5376bb63f5c73aefde6602448f4c2eecf186e6c6a6727fc0c643ee589ce"
+    },
+    {
+      "source": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-shell-native-runtime-11\\qemu.log",
+      "archive": "sessions/runtime11-stable/qemu.log",
+      "role": "runtime11-stable:RAW_SESSION",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "source": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-shell-native-runtime-11\\session.json",
+      "archive": "sessions/runtime11-stable/session.json",
+      "role": "runtime11-stable:RAW_SESSION",
+      "bytes": 658954,
+      "sha256": "617dd544850400f736358aff16bbd5ea10c400c41312e00c889d0521f5e214d4"
+    },
+    {
+      "source": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-shell-native-runtime-11\\p5-first-actual-native-desktop.png",
+      "archive": "screenshots/runtime11-stable/p5-first-actual-native-desktop.png",
+      "role": "runtime11-stable:ACTUAL_SCREENSHOT",
+      "bytes": 22026,
+      "sha256": "a1aac247e29c1adf425b26c3c314cd39d73eef482fa3bbf782fa9d705e879bae"
+    },
+    {
+      "source": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-shell-native-runtime-11\\p5-first-actual-native-start-menu.png",
+      "archive": "screenshots/runtime11-stable/p5-first-actual-native-start-menu.png",
+      "role": "runtime11-stable:ACTUAL_SCREENSHOT",
+      "bytes": 40186,
+      "sha256": "4e4cc5844aa4a3bf704cacb94474cdb0b851ec384a63ee0e313953092f64ecd2"
+    },
+    {
+      "source": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-shell-native-runtime-11\\p5-first-actual-native-desktop-ready.png",
+      "archive": "screenshots/runtime11-stable/p5-first-actual-native-start-menu.png",
+      "role": "runtime11-stable:ACTUAL_SCREENSHOT",
+      "bytes": 40186,
+      "sha256": "4e4cc5844aa4a3bf704cacb94474cdb0b851ec384a63ee0e313953092f64ecd2"
+    },
+    {
+      "source": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-shell-native-generation-10\\shell-generation.json",
+      "archive": "reports/generation10.json",
+      "role": "generation10:RAW_REPORT",
+      "bytes": 250062,
+      "sha256": "f53a89ce16fdc969986dc23d6d046b6a00c18a708b05cb498e391d4835f8e153"
+    },
+    {
+      "source": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-shell-native-generation-10\\case-000.stdout.bin",
+      "archive": "stdout/generation10/warm-parent-Shell-command-cache.bin",
+      "role": "generation10:CASE_STDOUT:warm-parent-Shell-command-cache",
+      "bytes": 81,
+      "sha256": "70a7bfd594d931b52b9d73546b882f94a1f066b608f429b2d7e0b42fae6a379a"
+    },
+    {
+      "source": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-shell-native-generation-10\\case-001.stdout.bin",
+      "archive": "stdout/generation10/warm-existing-task-history.bin",
+      "role": "generation10:CASE_STDOUT:warm-existing-task-history",
+      "bytes": 99,
+      "sha256": "8abe7b00e96ed78b1c04ef1b7aae9c14b66469ad84b2f1b0b07c95c22b18613b"
+    },
+    {
+      "source": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-shell-native-generation-10\\case-002.stdout.bin",
+      "archive": "stdout/generation10/warm-parent-Shell-background-table.bin",
+      "role": "generation10:CASE_STDOUT:warm-parent-Shell-background-table",
+      "bytes": 118,
+      "sha256": "0a98d21dfac2568fb9f5982c8ecd0cb4b5e45c8977b9f52636391ff01c030aaf"
+    },
+    {
+      "source": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-shell-native-generation-10\\case-003.stdout.bin",
+      "archive": "stdout/generation10/warm-existing-path-I_O.bin",
+      "role": "generation10:CASE_STDOUT:warm-existing-path-I/O",
+      "bytes": 147,
+      "sha256": "1de01cd6c1988e7db050a8a289c85774f4a72f5e244f7df1616d50f221f06f01"
+    },
+    {
+      "source": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-shell-native-generation-10\\case-005.stdout.bin",
+      "archive": "stdout/generation10/actual-G1-SCSHELL.bin",
+      "role": "generation10:CASE_STDOUT:actual-G1-SCSHELL",
+      "bytes": 490,
+      "sha256": "c6c3a9b343948cb9ff132dbf4919158aff5194e63b7aaaba77e763a2d059b9d5"
+    },
+    {
+      "source": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-shell-native-generation-10\\file-actual-G1-SCSHELL-log",
+      "archive": "compile/generation10/file-actual-G1-SCSHELL-log",
+      "role": "generation10:RAW_COMPILE_LOG_MAP",
+      "bytes": 19,
+      "sha256": "068d8b8c3c5044c099e8134dbff66b5a4aac0543f4831a7c9f2bd496c6632b1d"
+    },
+    {
+      "source": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-shell-native-generation-10\\file-actual-G1-SCSHELL-map",
+      "archive": "compile/generation10/file-actual-G1-SCSHELL-map",
+      "role": "generation10:RAW_COMPILE_LOG_MAP",
+      "bytes": 26801,
+      "sha256": "b5da62aa6cb0a7e994758348304b75e2dcaf88f0641d7d7ea780299378d1bcb4"
+    },
+    {
+      "source": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-shell-native-generation-10\\console.txt",
+      "archive": "sessions/generation10/console.txt",
+      "role": "generation10:RAW_SESSION",
+      "bytes": 1251,
+      "sha256": "b1256ac6725652528846cf9ec8d8f5559e27402fda431715208aceb44fbd0153"
+    },
+    {
+      "source": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-shell-native-generation-10\\debug-rx.bin",
+      "archive": "sessions/runtime11-stable/debug-rx.bin",
+      "role": "generation10:RAW_SESSION",
+      "bytes": 126,
+      "sha256": "e575f5376bb63f5c73aefde6602448f4c2eecf186e6c6a6727fc0c643ee589ce"
+    },
+    {
+      "source": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-shell-native-generation-10\\qemu.log",
+      "archive": "sessions/runtime11-stable/qemu.log",
+      "role": "generation10:RAW_SESSION",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "source": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-shell-native-generation-10\\session.json",
+      "archive": "sessions/generation10/session.json",
+      "role": "generation10:RAW_SESSION",
+      "bytes": 468207,
+      "sha256": "a53d741aa1fe604b494ac2e6bcb8c36a8d2e19702e7811a4f238b93c4222463a"
+    },
+    {
+      "source": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-shell-native-generation-10\\native-libraries\\SCSHELL.SCL",
+      "archive": "native/10/SCSHELL.SCL",
+      "role": "ACTUAL_G1_GENERATED",
+      "bytes": 304712,
+      "sha256": "43e69326a4e227b08573d4a9f61c4742b5e6a7bbfc2b929e04a06b50363536a8"
+    },
+    {
+      "source": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-shell-native-generation-11\\shell-generation.json",
+      "archive": "reports/generation11.json",
+      "role": "generation11:RAW_REPORT",
+      "bytes": 251319,
+      "sha256": "1853f119db1cfde17313bc7f458ec7d23cdc0eceae6f55682dd5ec93c86adffe"
+    },
+    {
+      "source": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-shell-native-generation-11\\case-000.stdout.bin",
+      "archive": "stdout/generation11/warm-parent-Shell-command-cache.bin",
+      "role": "generation11:CASE_STDOUT:warm-parent-Shell-command-cache",
+      "bytes": 81,
+      "sha256": "c7571fb986ee3058c5a5a7de17e638a160a36c292b46bd14cdd96a5db658169b"
+    },
+    {
+      "source": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-shell-native-generation-11\\case-001.stdout.bin",
+      "archive": "stdout/generation11/warm-existing-task-history.bin",
+      "role": "generation11:CASE_STDOUT:warm-existing-task-history",
+      "bytes": 99,
+      "sha256": "cc8ac3a5cbc870dcd73bdffac6c09d434f7588c2654db19144264b98a4f6f5df"
+    },
+    {
+      "source": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-shell-native-generation-11\\case-002.stdout.bin",
+      "archive": "stdout/generation11/warm-parent-Shell-background-table.bin",
+      "role": "generation11:CASE_STDOUT:warm-parent-Shell-background-table",
+      "bytes": 118,
+      "sha256": "bd24d1057ca61d1edab07ec37962cb61835b8c62cdbe3b19fd960cce3b438606"
+    },
+    {
+      "source": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-shell-native-generation-11\\case-003.stdout.bin",
+      "archive": "stdout/generation11/warm-existing-path-I_O.bin",
+      "role": "generation11:CASE_STDOUT:warm-existing-path-I/O",
+      "bytes": 147,
+      "sha256": "1df229798b36f353912a3b42d65ef00a23b2a2b638aba47e798a5957624fd68a"
+    },
+    {
+      "source": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-shell-native-generation-11\\case-005.stdout.bin",
+      "archive": "stdout/generation11/actual-G1-DESKTOP.bin",
+      "role": "generation11:CASE_STDOUT:actual-G1-DESKTOP",
+      "bytes": 527,
+      "sha256": "62c8d78cfa368b954ff67afe96673005bc915f22368c5071417779529c770653"
+    },
+    {
+      "source": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-shell-native-generation-11\\file-actual-G1-DESKTOP-log",
+      "archive": "compile/runtime11-stable/file-actual-G1-SHELLPROBE-log",
+      "role": "generation11:RAW_COMPILE_LOG_MAP",
+      "bytes": 20,
+      "sha256": "76f8bfd932a0325450d43f49241a7f0bd43a17c44b9635a626a5af81148f88a4"
+    },
+    {
+      "source": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-shell-native-generation-11\\file-actual-G1-DESKTOP-map",
+      "archive": "compile/generation11/file-actual-G1-DESKTOP-map",
+      "role": "generation11:RAW_COMPILE_LOG_MAP",
+      "bytes": 11800,
+      "sha256": "b1e2132f926979f8e28d6ce0efb28a17360094df5c0030c22e7e4972c7afbf14"
+    },
+    {
+      "source": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-shell-native-generation-11\\console.txt",
+      "archive": "sessions/generation11/console.txt",
+      "role": "generation11:RAW_SESSION",
+      "bytes": 1288,
+      "sha256": "88775e2a0122c88342241af88a18b1042d9f97626b28e24baddc53de790daea3"
+    },
+    {
+      "source": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-shell-native-generation-11\\debug-rx.bin",
+      "archive": "sessions/runtime11-stable/debug-rx.bin",
+      "role": "generation11:RAW_SESSION",
+      "bytes": 126,
+      "sha256": "e575f5376bb63f5c73aefde6602448f4c2eecf186e6c6a6727fc0c643ee589ce"
+    },
+    {
+      "source": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-shell-native-generation-11\\qemu.log",
+      "archive": "sessions/runtime11-stable/qemu.log",
+      "role": "generation11:RAW_SESSION",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "source": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-shell-native-generation-11\\session.json",
+      "archive": "sessions/generation11/session.json",
+      "role": "generation11:RAW_SESSION",
+      "bytes": 463991,
+      "sha256": "45ffa417f67bcbb55869ac0f5e0af8b0ace88e39b15bfbcbc20e4eeb1ca06961"
+    },
+    {
+      "source": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-shell-native-generation-11\\native-artifacts\\SCSHELL.SCX",
+      "archive": "native/11/SCSHELL.SCX",
+      "role": "ACTUAL_G1_GENERATED",
+      "bytes": 125435,
+      "sha256": "b0cc79df7d86fd1762fad03a5abbfd1358ce4b15a6e27eb8214f3de47f108fad"
+    },
+    {
+      "source": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-shell-integration-stage-01\\reports\\native-issued-core-10\\build.json",
+      "archive": "build/native-issued-core-10.json",
+      "role": "EXACT_BUILD_RECORD",
+      "bytes": 134130,
+      "sha256": "a53c978035ccba4eeaa1058f8f8688219e0e69d5085a800f41e98508d563f064"
+    },
+    {
+      "source": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-shell-integration-stage-01\\reports\\unified-host-20\\build.json",
+      "archive": "build/unified-host-20.json",
+      "role": "EXACT_BUILD_RECORD",
+      "bytes": 133207,
+      "sha256": "f3ae994ae4868a22c2800443c6a95a435bd121d340704a4e8e8c99c57ecacabf"
+    },
+    {
+      "source": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-shell-integration-stage-01\\reports\\native-issued-core-11\\build.json",
+      "archive": "build/native-issued-core-11.json",
+      "role": "EXACT_BUILD_RECORD",
+      "bytes": 133910,
+      "sha256": "686458a1eedbc80f547d446c4f2aee9f99975c8160c22300ce9487fb71e4130b"
+    },
+    {
+      "source": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-shell-integration-stage-01\\reports\\source-promotion-01.json",
+      "archive": "source-promotion.json",
+      "role": "CONFLICT_CHECKED_SOURCE_PROMOTION_NOT_FULL_P5",
+      "bytes": 15329,
+      "sha256": "a6de781959c1cc83189ce1815524a57509df0831842cb33cf02e1747838f4ac0"
+    },
+    {
+      "source": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\tools\\promote_m10a2_shell_candidate.py",
+      "archive": "host/tools/promote_m10a2_shell_candidate.py",
+      "role": "CHECKPOINT_TIME_SOURCE",
+      "bytes": 3472,
+      "sha256": "0d6fa7918496b77025338c2fe8b2774648266c537a77c35cc7d8ad1b20701ca0"
+    },
+    {
+      "source": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\tools\\verify_m10a2_shell_runtime.py",
+      "archive": "host/tools/verify_m10a2_shell_runtime.py",
+      "role": "CHECKPOINT_TIME_SOURCE",
+      "bytes": 18491,
+      "sha256": "196502d34d862d00f0355ee33fffd4afe6bb17ff617b812995d607e8ffc80b0e"
+    },
+    {
+      "source": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\tools\\m10a2_shell_inspect.py",
+      "archive": "host/tools/m10a2_shell_inspect.py",
+      "role": "CHECKPOINT_TIME_SOURCE",
+      "bytes": 8981,
+      "sha256": "0a995aef0a42e42d265abf27afc04af9dd373159d89b50a3b909c3d316b1d342"
+    },
+    {
+      "source": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\tests\\m10a2\\SHELLPROBE.C",
+      "archive": "host/tests/m10a2/SHELLPROBE.C",
+      "role": "CHECKPOINT_TIME_SOURCE",
+      "bytes": 6140,
+      "sha256": "65b7529ca6258b6b097cba24779e5101eba06eba4af500cd4630881783330d2f"
+    },
+    {
+      "source": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\tests\\m10a2\\SHELLPROBE.json",
+      "archive": "host/tests/m10a2/SHELLPROBE.json",
+      "role": "CHECKPOINT_TIME_SOURCE",
+      "bytes": 2894,
+      "sha256": "6a236f86e61a5c6d42d9c44ae1f678a3504eb029536d4df7dba167b9aa59e891"
+    }
+  ],
+  "unique_files": 49,
+  "unique_bytes": 3460554,
+  "no_disks_copied": true
+}

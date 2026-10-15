@@ -8,12 +8,14 @@
 /* 控件树与回调只在本人Ring3拥有；完整正文由SCUI.SCL动态装载。 */
 
 enum {
-    SC_UI_ABI_MAJOR=1,SC_UI_ABI_MINOR=0,SC_UI_VERSION=1,
+    SC_UI_ABI_MAJOR=1,SC_UI_ABI_MINOR=1,SC_UI_VERSION=2,
     SC_UI_OK=0,SC_UI_HANDLED=1,SC_UI_VETO=2,SC_UI_END=3,SC_UI_PENDING=4,
     SC_UI_E_INVALID=-301,SC_UI_E_VERSION=-302,SC_UI_E_RANGE=-303,
     SC_UI_E_MEMORY=-304,SC_UI_E_STALE=-305,SC_UI_E_NOT_FOUND=-306,
     SC_UI_E_EXISTS=-307,SC_UI_E_BUSY=-308,SC_UI_E_UTF8=-309,
     SC_UI_E_IO=-310,SC_UI_E_CANCELLED=-311,SC_UI_E_NOT_SUPPORTED=-312,SC_UI_E_FAILED=-313,
+    SC_UI_TEXT_WRAP=1,SC_UI_TEXT_ELLIPSIS=2,SC_UI_TEXT_CENTER=4,SC_UI_TEXT_RIGHT=8,
+    SC_UI_TEXT_UNDERLINE=16,SC_UI_TEXT_STRIKE=32,
     SC_UI_WINDOW=1,SC_UI_PANEL=2,SC_UI_BUTTON=3,SC_UI_LABEL=4,
     SC_UI_CHECKBOX=5,SC_UI_RADIO=6,SC_UI_GROUPBOX=7,SC_UI_TEXTBOX=8,
     SC_UI_EDIT=9,SC_UI_COMBOBOX=10,SC_UI_SPINBOX=11,SC_UI_TAB=12,
@@ -181,6 +183,7 @@ ScStatus ScUiErrorQuery(const ScUiContext *,ScUiErrorInfo *out);
 ScStatus ScUiContextStop(ScUiContext *,ScI32 exit_code);
 ScStatus ScUiContextRun(ScUiContext *,ScI32 *exit_code);
 ScStatus ScUiContextStep(ScUiContext *,ScU32 timeout_ticks);
+ScStatus ScUiContextWaitTimeout(ScUiContext *,ScU32 maximum_ticks,ScU32 *out);
 ScStatus ScUiContextDispatch(ScUiContext *,const ScMessage *);
 ScStatus ScUiWindowCreate(ScUiContext *,const ScUiWindowDesc *,ScUiNode *out);
 ScStatus ScUiWindowNative(ScUiContext *,ScUiNode,ScWindowInfo *out);
@@ -223,6 +226,9 @@ ScStatus ScUiClassUnregister(ScUiContext *,ScUiClass);
 ScStatus ScUiPainterClip(ScUiPainter *,const ScUiRect *);
 ScStatus ScUiPainterRestore(ScUiPainter *);
 ScStatus ScUiPainterFill(ScUiPainter *,const ScUiRect *,ScU32 color_role);
+ScStatus ScUiPainterClear(ScUiPainter *,const ScUiRect *);
+ScStatus ScUiPainterTextColor(ScUiPainter *,const ScUiRect *,const ScUiText *,ScU32 font_role,ScU32 flags,ScU32 color_role);
+ScStatus ScUiPainterBounds(ScUiPainter *,ScUiRect *out);
 ScStatus ScUiPainterLine(ScUiPainter *,ScI32 x1,ScI32 y1,ScI32 x2,ScI32 y2,ScU32 color_role);
 ScStatus ScUiPainterText(ScUiPainter *,const ScUiRect *,const ScUiText *,ScU32 font_role,ScU32 flags);
 ScStatus ScUiPainterIcon(ScUiPainter *,const ScUiRect *,ScUiIcon *,ScU32 state);

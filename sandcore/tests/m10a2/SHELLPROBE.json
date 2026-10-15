@@ -29,6 +29,12 @@
       "size": 1
     },
     {
+      "name": "ScSessionControl",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
       "name": "ScShellCatalogQuery",
       "dependency": "SCSHELL.SCL",
       "kind": "function",

@@ -4,6 +4,12 @@ import argparse,hashlib,json,subprocess,time,shutil
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 
+def reference_path(value):
+    # 客体报告在Windows保存绝对路径，WSL构建只把同一C盘路径映射回来。
+    if len(value)>3 and value[1:3]==':\\':
+        value='/mnt/'+value[0].lower()+'/'+value[3:].replace('\\','/')
+    return Path(value).resolve()
+
 def snapshot(stage):
     result={}
     # 真实构建也读取字体、许可及第三方固定源；全部进入前后摘要闭包。
@@ -37,6 +43,18 @@ def main():
         image=args.shell_host_image.resolve()
         item=native.get('native_artifacts',{}).get('SCSHELL.SCX',{})
         actual=hashlib.sha256(image.read_bytes()).hexdigest()
+        generation_origin=None
+        if item.get('generated_this_vm') is not True:
+            origin=reference_path(item.get('generation_origin_report',''))
+            if not origin.is_relative_to((ROOT/'build').resolve()):raise ValueError('host origin outside build')
+            original=json.loads(origin.read_text(encoding='utf-8'))
+            produced=original.get('native_artifacts',{}).get('SCSHELL.SCX',{})
+            if (hashlib.sha256(origin.read_bytes()).hexdigest()!=item.get('generation_origin_report_sha256')
+                or original.get('status')!='P5_NATIVE_GENERATION_PASS' or produced.get('generated_this_vm') is not True
+                or produced.get('sha256')!=actual or reference_path(produced.get('path',''))!=image
+                or not native.get('reused_generation',{}).get('source_compile_closures',{}).get('SCSHELL.SCX')):
+                raise ValueError('reused host lacks its exact actual generation origin')
+            generation_origin=dict(report=str(origin),sha256=item['generation_origin_report_sha256'])
         runtime_changes={name:dict(before=native['source_snapshot'].get(name),after=before.get(name))
             for name in set(native['source_snapshot'])|set(before) if native['source_snapshot'].get(name)!=before.get(name)}
         if (native.get('status')!='P5_NATIVE_GENERATION_PASS' or native.get('current_inputs_unchanged') is not True
@@ -44,7 +62,7 @@ def main():
             or any(not name.startswith('kernel/') for name in runtime_changes)
             or any(before.get(name)!=value for name,value in native['source_input_sha256'].items())
             or item.get('sha256')!=actual or item.get('bytes')!=image.stat().st_size
-            or item.get('generated_this_vm') is not True or not args.core
+            or (item.get('generated_this_vm') is not True and not generation_origin) or not args.core
             or not image.is_relative_to((ROOT/'build').resolve())):
             raise ValueError('native host must be the exact guest-generated file for this candidate')
         # 原生成会话的CORE/ELF仍需可追溯；只保存这几份小产物，绝不复制磁盘。
@@ -55,6 +73,7 @@ def main():
         header=stage/'build/p5-unified-check/shell_host_issue.h'
         subprocess.run(['python3',str(stage/'tools/mk_shell_issue.py'),'--host',str(image),'--out',str(header)],check=True)
         issued=dict(path=str(image),bytes=image.stat().st_size,sha256=actual,
+            actual_host_generation_origin=generation_origin,
             generation_to_runtime_kernel_changes=runtime_changes,
             generation_report_sha256=hashlib.sha256(args.native_generation_report.read_bytes()).hexdigest(),
             header_sha256=hashlib.sha256(header.read_bytes()).hexdigest(),same_generated_bytes_selected=True)

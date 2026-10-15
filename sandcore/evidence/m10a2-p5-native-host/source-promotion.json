@@ -1,0 +1,364 @@
+{
+  "status": "SOURCE_PROMOTED_RUNTIME_SLICE_PASS_NOT_P5_COMPLETE",
+  "full_M10a2": false,
+  "full_P5": false,
+  "stage": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-shell-integration-stage-01",
+  "changes": {
+    "kernel/auth.c": {
+      "before": "198690195bebdb7bc5f547376d4e4eb1af7f186745a3ad3dcc6be10617df9c5d",
+      "after": "416cbc6b0a2b5fccc5baa80923a80f2419bb512fc3d20c5d31714676654f65e8"
+    },
+    "kernel/auth.h": {
+      "before": "ca90e078e7815e7adc8890b2f55f91685c1ca330b197e13116606651c27c319f",
+      "after": "5eac849da4ee1ec59c51c8812e231ff7e565135d7abfaf1b26169e87d7c19c4a"
+    },
+    "kernel/broker_shell.inc": {
+      "before": null,
+      "after": "d0e97851cd7600f8025e85ae3b6fedc3dcfe6867ad8bfc22fef9592b1261d06e"
+    },
+    "kernel/fs.c": {
+      "before": "e53c5cc1a5b5f61681679a6a917dc36cef0b6491021691c08bef610ac8d609e2",
+      "after": "645e4e87c43599f4d3ccc11257e5c8d7240bbd0eedf7bc1674b3d10645a3ed6a"
+    },
+    "kernel/fs_lease.h": {
+      "before": null,
+      "after": "d6d0715c2d9ee0f66b2c279f380a1af3e0e4dea28830d046b69ed99724684a14"
+    },
+    "kernel/fs_lease.inc": {
+      "before": null,
+      "after": "026a5952786594b43f5a1bb03c2d194accc0fa2097b80862256e3563723a30b3"
+    },
+    "kernel/fs_lease_cleanup.inc": {
+      "before": null,
+      "after": "e88f41075d63d381b1a4ef124b4b922d02d936ad653ea55e2e2ba1f94a656666"
+    },
+    "kernel/fs_lease_commit.inc": {
+      "before": null,
+      "after": "8f2586eeff4e1e73cd9e59cde98bc0fd8f36355644865841fdf654c50b255be9"
+    },
+    "kernel/fs_lease_index.inc": {
+      "before": null,
+      "after": "f1c40a0ac70450725f636e31e4d736b60b638f56d13d1db23d127d749b567744"
+    },
+    "kernel/fs_lease_native.inc": {
+      "before": null,
+      "after": "912ec0de00abb51d9bfbc9a785046084cfb5cd0bbb539db0c94a75b00818107a"
+    },
+    "kernel/fs_lease_open.inc": {
+      "before": null,
+      "after": "85d401113e2ce8d1f16b4941a41c5c354ca7f7269c1c1287d7385f368c17ca55"
+    },
+    "kernel/fs_lease_operation.inc": {
+      "before": null,
+      "after": "cb3dbb9e6539c7cecbd2edfce33cfab316b3d52794b7801883be5bccfa0728d4"
+    },
+    "kernel/fs_lease_private.inc": {
+      "before": null,
+      "after": "98112a6a3fd35e07e43606af04cacf1db97cd14ba6de069f6467d1f6a976942d"
+    },
+    "kernel/main.c": {
+      "before": "8bcd35ab9cef64561088cc422983bef406897ccdaf39bcd187d91a076d565a8b",
+      "after": "14723b827c2b6a048e8695d8416cd66653e09ddc0e61cd911d0abaa7450da78c"
+    },
+    "kernel/sc32_broker.c": {
+      "before": "e200e30126eee32f34befbf571c549cfec2d0c3198b4d1620ad4f1270fc4eb2c",
+      "after": "aaf86f806709fde7bd4a16f4cb8d8a78d71379714e02eb40928df964c255449e"
+    },
+    "kernel/sc32_broker.h": {
+      "before": "cd40b005e2f183cac23d1d1d58991cdbf69265f5020c4c30cd2220b13621e7cf",
+      "after": "57527681fa17d22fc582cfa698a080e0ee24f914caa70610280f216cfde5eb57"
+    },
+    "kernel/sc32_core.c": {
+      "before": "746768af720a1029439d5335b6d0bd81032b073c295d1de5def1e201f5d6c011",
+      "after": "47011ddf38036301edaf17b3a21f247e9d0471df6e95b713a71b073ba9bc2977"
+    },
+    "kernel/sc32_file.c": {
+      "before": "b81906524b9dea7c70bfa943c84417a51786fc9932a8aded6c5eb227457d9618",
+      "after": "5b7443f6b3417d0bbf73de8d3ecae13a89f0d6fe7efbc5f1fdb80d49362224a0"
+    },
+    "kernel/sc32_file_lease.inc": {
+      "before": null,
+      "after": "15be029e594fc4d19e095d10d87b23bd49c5b9b82c0158bd12199664ed41223a"
+    },
+    "kernel/sc32_host.c": {
+      "before": null,
+      "after": "828c5ecc0edd9edd7b3383a26d4c4f22c1e4b60b9fb01b4accb06f93e9b14533"
+    },
+    "kernel/sc32_host.h": {
+      "before": null,
+      "after": "0c6ba9750002290d33363466533c590e934170ce1087d2b3fb97ddb24f611a50"
+    },
+    "kernel/sc32_lease.c": {
+      "before": null,
+      "after": "6b9e2a39b135894dcb372716e1c2957a369d113e0ffdc68175eec0e18eb4a85b"
+    },
+    "kernel/sc32_lease.h": {
+      "before": null,
+      "after": "ad377a80874cfbb01dc2b9c584e0124d5c7fba823bd672209402e44da9c3ae02"
+    },
+    "kernel/session.c": {
+      "before": "f2e4e61cd226708c85a7623152677cacfe646bac8dccecf794152be4fb2cc69a",
+      "after": "24c7c3a9160d38bf1cfc46e192a341ac4f108be9e931b9e013a69ea3fc179d27"
+    },
+    "kernel/shell_issue.inc": {
+      "before": null,
+      "after": "7d6e34c5c30a38c039e9b2039a11793d5c09bd8829b1f0bf69226d0d58212082"
+    },
+    "kernel/streams.c": {
+      "before": "668a50c72d2ad023cdd4b31fde7b583ee48826b56328db0a104b0bcac61cf973",
+      "after": "1f0c624ccabc5c075708a5a081e427155fa03d3144ec8ae26ac0b6b31ce9392c"
+    },
+    "kernel/streams.h": {
+      "before": "4d45335aa08e14944504d565ec7d7e2923cb5b52458c6c030e6a0282740e9573",
+      "after": "1f95dc6ff591f348486bbbae1d08108b7367698347c2ff13ad77afcea8d1aab1"
+    },
+    "kernel/streams_launch.inc": {
+      "before": null,
+      "after": "f01b4323a6c23d51644abea81793547a0954698ab356e91df1a2d3a3aa232dc9"
+    },
+    "kernel/task.c": {
+      "before": "4e55b56a7baca7dd52849a87bb891dbb8fd42d216f62f9128f6d97706da1f513",
+      "after": "364f2c0027bbfff0e6314348e03e0084a3a6312d26b97dbc01ed8c6eff414326"
+    },
+    "kernel/task.h": {
+      "before": "c1ba2215d0ddfb38e74eb9ab56ded7d8bd58e6efca78955f80656a37e714e51f",
+      "after": "d007bfd1ca31a9fa00c206a71623a390195cfaa60fb4494a53cb75646c6dd53f"
+    },
+    "kernel/wm.c": {
+      "before": "f22357f64be1b7a1c1fab492981080ef58aa2d25c329be5b18cc4590c7c72bca",
+      "after": "5c796bfc62a7c2d2cf817014fec61a0ac009421dc730d27454ccdce19a73c223"
+    },
+    "kernel/wm_native.inc": {
+      "before": "d1bcd635c3161203e1d6df88455e72c3c9b617b9094ed4907726291b37654ce7",
+      "after": "60534f5e8f6061e8178f46c8694b4139c9cb3bd4ac00e7c34b785a9a9e84d152"
+    },
+    "kernel/wm_shell.inc": {
+      "before": null,
+      "after": "b83b41b118ed7d8d825068f36236099bfedb6ebb5dc6927ef5c7f3b877491fa4"
+    },
+    "user/hostapi/sc32_launch.c": {
+      "before": null,
+      "after": "b97e84afcb7c346ab03a94db432873e918e0fcbda1feaf0cdf0b738d8627e1f6"
+    },
+    "user/hostapi/SC32HOSTWIRE.H": {
+      "before": null,
+      "after": "8a20024966c16f5b6cf6851ef6641fc889c3a540068ca51ac358dfded499cfdd"
+    },
+    "user/leaseapi/leaseapi.c": {
+      "before": null,
+      "after": "0256db03d5dd105db863e24b52ae8029bedf057e64173a77011f77c44443782a"
+    },
+    "user/leaseapi/SC32LEASEWIRE.H": {
+      "before": null,
+      "after": "60adac3541e003cdd10c6d40e0b1e0f17d1b5d2e188afc5737ea6ca2ec2cdc4c"
+    },
+    "user/sc32/SC32API.C": {
+      "before": "a614fabaad6d553412c8655268871a1cbdaaa8524c46c7c065ba2088b8128eb8",
+      "after": "a77ffb6472bf6036804c4208ccac78273c7a93dd92e319833aa7a21a9ac8dddf"
+    },
+    "user/sc32/SC32API.json": {
+      "before": "687d1bca6cff7c0cdb072f644ea779eeddc3d1cee0c122283af98defc9cffae9",
+      "after": "98811fa892ee56376bc6f5610685e89a35fcd512884a626c2c6084154ff951c0"
+    },
+    "user/SC32API.H": {
+      "before": "f4c423c01a933922453e032c65f390347b21f1b96e39c52086a082ad7e6ae888",
+      "after": "7219e4794e80d9b71ddba4696c03fcf90ef48cb8ead5b64f5d66cae1d0bd8cbe"
+    },
+    "user/SC32GUI.H": {
+      "before": "470cb56da856c79630c3621e5f765641db798456fcb0bd643e9fa615cbc051a6",
+      "after": "171dc602ec71ba77ec3d5bd043e7ce9a3d6d8cd27814d43185d51a0a12e522f2"
+    },
+    "user/SC32HOST.H": {
+      "before": null,
+      "after": "5e360a8d21491503a8dfc9f1bb972d0319bf7f404eb3ba0ab1c7aa25c17950e1"
+    },
+    "user/SC32LEASE.H": {
+      "before": null,
+      "after": "e724f522bdc883df656d4851e7dbe45d1cb40282de05c7fee66ad09c7665f943"
+    },
+    "user/scshell/desktop/DESKTOP.H": {
+      "before": null,
+      "after": "c99f8f7e111086f9f8b833809eaacf4c7fd3d699bf91c740ddd3fde897cdf73f"
+    },
+    "user/scshell/desktop/desktop_actions.inc": {
+      "before": null,
+      "after": "20bde98cbcdd1a3afdfcafaf461667c63b01cb4d29cb75b7955dc6b5f1d0dc57"
+    },
+    "user/scshell/desktop/desktop_model.inc": {
+      "before": null,
+      "after": "34251cff74624d3f0361015951b778bc43b71abc899e150ddbdd2cf485ce5fbb"
+    },
+    "user/scshell/desktop/desktop_tasks.inc": {
+      "before": null,
+      "after": "fb800797a53ba021f6ce97946d255648ddc844c941ac9bdee7a82e5fab7b4f4d"
+    },
+    "user/scshell/desktop/desktop_view.inc": {
+      "before": null,
+      "after": "253db6c3534e2741dabb5d3f6af2554c921b4792b424ba8e414ab814175331c3"
+    },
+    "user/scshell/desktop/SCSHELL.C": {
+      "before": null,
+      "after": "cf1c6d25b5a5e381dd0aa0922c59a9146af51d2b7019076fbe09580e25aa877a"
+    },
+    "user/scshell/desktop/SCSHELL.json": {
+      "before": null,
+      "after": "9f3a5830f81a97c499ea15014d9a50f3b563d1ec5723a36bc59002545078ab13"
+    },
+    "user/scshell/SCSHELL.C": {
+      "before": null,
+      "after": "4b9db4d0c81c3d6e20e292008ccfba98f60b772f6e45e5148f4feec4518094a9"
+    },
+    "user/scshell/SCSHELL.json": {
+      "before": null,
+      "after": "d77a20665907e9b92975c5fc00726f12fdc1394ea134b93433e50f1fcb20aa74"
+    },
+    "user/scshell/SCSHELLPRIVATE.H": {
+      "before": null,
+      "after": "1f39c6761f333dab2cde32a33b81df88f1ff7b1676cdc5f7a1cb21133daaed19"
+    },
+    "user/scshell/SCSHELLWIRE.H": {
+      "before": null,
+      "after": "29971f90c023a6776f1b415ef4fa8e8982009e53248d90a47753540a4c4c8178"
+    },
+    "user/scshell/shell_base.c": {
+      "before": null,
+      "after": "a9662cbd3534f9ada82cfb5a06ab56620be1ca9050a7f7b9f03d328a50ba8439"
+    },
+    "user/scshell/shell_catalog.c": {
+      "before": null,
+      "after": "e319d6f76c55eec68c81569cd1d7957eca143de73f7acfe85db4482a7025b07d"
+    },
+    "user/scshell/shell_client.c": {
+      "before": null,
+      "after": "2062c6b95eb7cc4a1a6e7ba8e3962a3d2f6d461b73e53d7d9b1326102bd6c095"
+    },
+    "user/scshell/shell_clipboard.c": {
+      "before": null,
+      "after": "ae8cd147a196ff7ac3aa485940195cce105f7b4d8cf0e59efb0892dbed04282f"
+    },
+    "user/scshell/shell_dialog.c": {
+      "before": null,
+      "after": "dee1b61711c145debaaf4ce064f8330100589b231f9eb0f68bc82ee19d0b9c56"
+    },
+    "user/scshell/shell_finalize.c": {
+      "before": null,
+      "after": "4d98973146a1d16655f48cf8ccedf2b805a5f66f8a710dd5e7f572a20aa31e56"
+    },
+    "user/scshell/shell_job.c": {
+      "before": null,
+      "after": "466e3c6308de4d9cbe26c3c0096f7bb7d7c464b52b8fa5eaf96b24623f02d436"
+    },
+    "user/scshell/shell_launch.c": {
+      "before": null,
+      "after": "f3a8e4f577eab65afcc660c0ba3fc9808d5171c445bff370bf6a8a994f168d98"
+    },
+    "user/scshell/shell_legacy.c": {
+      "before": null,
+      "after": "eb7a9265c218e2e62ed6ef2a65caece6b659973de40432ae7021e7a87a3e5957"
+    },
+    "user/scshell/shell_menu.c": {
+      "before": null,
+      "after": "caff552d221704c59f8cc336130df1b15fc19fa019ee15ac9e0100e1d64061f4"
+    },
+    "user/scshell/shell_protocol.c": {
+      "before": null,
+      "after": "def2e35b8e19c7bc50c02240eaf2e03e69bd96c1e3251c695ac4eb95b278b6c7"
+    },
+    "user/scshell/shell_service.c": {
+      "before": null,
+      "after": "bf53f9b03f6e139fac269ae4ebaff53f5e839c619b01778a7cd03b7ed9345c91"
+    },
+    "user/scshell/shell_shortcut.c": {
+      "before": null,
+      "after": "0facaa96f632cfe408c1a2824aa347e745ff638da3147033ab3cde76da044acd"
+    },
+    "user/scshell/shell_store.c": {
+      "before": null,
+      "after": "32b991414bd63828ba1b26aca77b554871abd8d34a2666c6a87b269414b741b2"
+    },
+    "user/scshell/shell_store_step.c": {
+      "before": null,
+      "after": "afa19f13aa4aabddf3c67ab740cfac806d2043928bb557afdddf39e7d3377f76"
+    },
+    "user/SCSHELL.H": {
+      "before": null,
+      "after": "374d0e526687d507265d196c42cda9068a808eef688758d109347645aee6cf79"
+    },
+    "user/scui/SCUI.json": {
+      "before": "d0a658cb2d337984bdc2f581911f6fc29c6e8c0beaff41c9c620a4e180c76cdc",
+      "after": "80af3d0eb2b1ab4074cd29c4418ae52345efa60f4714894c143b7afe39c95e42"
+    },
+    "user/scui/SCUIPRIVATE.H": {
+      "before": "93665c973868ae816391021febf2ee02c93d47884513cfeb5ac8fa1d5e7089ed",
+      "after": "24968d2f4de1332f7642a5c464ce3011c73ee97e38ea497131442ffd0708dd8b"
+    },
+    "user/scui/ui_dispatch.c": {
+      "before": "6c89c41f0ed075860e24c72cd0f9521427e3615767c424b61828880e7cbb5388",
+      "after": "ab1b1901acb289ac712a8c570d05ffb786625a79fd81d6a124bdf6e25bcc0fc2"
+    },
+    "user/scui/ui_paint.c": {
+      "before": "d87e81ab2782de4a9373530c64a2a86995ff3543fac5aace795dcb3770757bd5",
+      "after": "e17e1f9d31e1f10cd485aca88c68009f5feed99ca6edf5ca70e704767b33cecb"
+    },
+    "user/scui/ui_shell_paint.inc": {
+      "before": null,
+      "after": "d41fc58d9d75c2a9bac48e77a071f2bc84ff875bfbd9fde9eca6eda9d3cf6ba4"
+    },
+    "user/SCUI.H": {
+      "before": "243fd456f7c037b710a565d290d0fc2655fee6310380966e97986536d7336e00",
+      "after": "09df52bc5171eca5af03bc959fef19b3980984ea9456ae193462d7ee0b39f0e4"
+    },
+    "user/shellworker/SCFILEWORK.C": {
+      "before": null,
+      "after": "798086b41d5d1f2c84649177c1f9ba92a146ae2489f62b2790dd7217d9eaac8b"
+    },
+    "user/shellworker/SCFILEWORK.json": {
+      "before": null,
+      "after": "44f7e8976ba74d01ea8b76e7dda5f5d8c7e06ef777ed24a10a4fe8138a70d2a1"
+    },
+    "user/shellworker/SCFILEWORKPRIVATE.H": {
+      "before": null,
+      "after": "f54ec9e1897ce9b3235e4e0af5be6772e6d3d973b5b7209c8d4e9a8bfdd8ce14"
+    },
+    "user/shellworker/worker_lease.c": {
+      "before": null,
+      "after": "386d61e5265186f098b52187ba90265efb365d3abae9ed79747ee92d16190452"
+    },
+    "user/shellworker/worker_plan.c": {
+      "before": null,
+      "after": "fbebc725f2d220ca9e5e8a2ec407c8f4f74fbae0b526dfd617ecaa9f09b748e2"
+    },
+    "user/shellworker/worker_protocol.c": {
+      "before": null,
+      "after": "82d92553289e3615817fee03779435c6e15fc05f1f79e01a12d3861e2c1ce047"
+    },
+    "user/shellworker/worker_recovery.c": {
+      "before": null,
+      "after": "1b75131a2d257c2cf497027d4390867d89c7cb89bc0ec8e0ca8f9aba6841349a"
+    },
+    "user/shellworker/worker_retry.c": {
+      "before": null,
+      "after": "8ff65aa0649ac3397eb0942a480d4bb9f59aee9c3e28022f5a657065b73e14c2"
+    },
+    "user/shellworker/worker_transfer.c": {
+      "before": null,
+      "after": "06b2c43517e0cc1890c8d0219d550367406d1933189c86b3330b02946d4b3e24"
+    },
+    "tools/mk_shell_issue.py": {
+      "before": null,
+      "after": "f1aab65d29c0d99cd543c27b415218607fcabcdd497abc58181442cb8d8e097d"
+    },
+    "Makefile": {
+      "before": "b1e8055cf698ea5a2aa17834473f3b9dd00d037d38f0fd0c645dd59cc2aa782d",
+      "after": "f42cee49b4ecbb402a9308fd52119ecec0277d7bd3d5518dc7de3c4ce8f8a814"
+    },
+    "m10a2.mk": {
+      "before": "d47ef6c774a4354278485cca6b63adb0d5f963f3530ec1052252118559ea7d26",
+      "after": "20396dda8897ed264f9744a0468313d31f744ec5bc1a0bc9fd63ce8b66baefef"
+    }
+  },
+  "generation_report_sha256": "1853f119db1cfde17313bc7f458ec7d23cdc0eceae6f55682dd5ec93c86adffe",
+  "runtime_report_sha256": "52d7eafc44b17e6955146b7279c1468ea35fa5fd634e22334ac3f696fd0505ca",
+  "scapi_sha256": "81a730450fcb3d310ed841ad3e5c70a3fed32aa7fbd10acac8b888ac7da9ffc1",
+  "remaining": "File jobs/clipboard/drop/layout persistence/window/session/SDK/component acceptance remains."
+}

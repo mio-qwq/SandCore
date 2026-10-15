@@ -1,0 +1,440 @@
+{
+  "kind": "application",
+  "name": "SCFILEWORK.SCX",
+  "dependencies": [
+    {
+      "name": "SC32API.SCL",
+      "abi_major": 1,
+      "min_minor": 3,
+      "min_version": 4
+    },
+    {
+      "name": "SCCLIB.SCL",
+      "abi_major": 1,
+      "min_minor": 0,
+      "min_version": 1
+    },
+    {
+      "name": "SCLIB.SCL",
+      "abi_major": 1,
+      "min_minor": 0,
+      "min_version": 1
+    }
+  ],
+  "imports": [
+    {
+      "name": "ScArrayCreate",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScArrayGet",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScArrayInsert",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScArrayRelease",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScBrokerWait",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScBufferAppend",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScBufferClear",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScBufferCreate",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScBufferQuery",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScBufferRelease",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScBufferReserve",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScBufferResize",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScBufferView",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScDirectoryClose",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScDirectoryNext",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScDirectoryOpen",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScErrorQuery",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScFileClose",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScFileFlush",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScFileLeaseAcquire",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScFileLeaseAdvance",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScFileLeaseCancel",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScFileLeaseCreatePinned",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScFileLeaseOpenPinned",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScFileLeasePublish",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScFileLeaseQuery",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScFileLeaseRelease",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScFileLeaseRemove",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScFileLeaseRename",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScFileLeaseSetMode",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScFileLeaseSnapshot",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScFileQuery",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScFileRead",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScFileWrite",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScHashBytes",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScHashCreate",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScHashGet",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScHashRelease",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScHashRemove",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScHashSet",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScIdentityQuery",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScIpcClose",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScIpcConnect",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScIpcPeek",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScIpcPeer",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScIpcReceive",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScIpcSend",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScPathJoin",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScPathMetadata",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScPathNormalize",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScProcessArguments",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScProcessSelf",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScProcessYield",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScStringCStr",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScStringRelease",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScSystemCapabilities",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUtf8Validate",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "atexit",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "calloc",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "free",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "malloc",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "memchr",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "memcpy",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "memset",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "qsort",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "strcmp",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "strlen",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "strncmp",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "strrchr",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    }
+  ]
+}

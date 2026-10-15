@@ -6,6 +6,7 @@
 #include "wm.h"
 #include "theme.h"
 #include "desktop.h"
+#include "sc32_host.h"
 #include "userspace.h"
 #include "interrupts.h"
 #include "fs.h"
@@ -29,7 +30,7 @@ u32 session_create(int uid,int gid,u32 kind,const char *name,const char *home)
     if(serial==0x7FFFFFFFu || kind>SESSION_LOCKED)return 0;
     u32 id=serial+1;if(objpool_claim(&sessions,(int)id))return 0;
     session_t *s=session_get(id);s->id=id;s->uid=uid;s->gid=gid;s->kind=kind;s->epoch=1;s->task_head=-1;
-    copy(s->name,name,32);copy(s->home,home,64);serial=id;return id;
+    copy(s->name,name,32);copy(s->home,home,64);serial=id;sc32_host_session_created(id);return id;
 }
 void session_init(int uid,int gid,const char *name,const char *home)
 {
@@ -52,7 +53,7 @@ int session_bind(int pid,u32 id)
 }
 static void release(session_t *s)
 {
-    u32 id=s->id;sc32_drop_session_discard(id);sc32_broker_session_discard(id);wm_session_destroy(id);desktop_session_destroy(id);theme_session_destroy(id);userspace_session_destroy(id);
+    u32 id=s->id;sc32_host_session_discard(id);sc32_drop_session_discard(id);sc32_broker_session_discard(id);wm_session_destroy(id);desktop_session_destroy(id);theme_session_destroy(id);userspace_session_destroy(id);
     objpool_release(&sessions,(int)id);
 }
 void session_unbind(int pid)

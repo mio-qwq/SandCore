@@ -36,3 +36,37 @@
 - M8封存继续；不借M10a2重启游戏/影片。只有完整目标达成才能标记完成。
 
 修订：2026-10-16，主代理恢复接手，保存完整目标、P4诊断真实缺口和P5整体构建/前端预检边界。
+
+## 2026-10-16 启动故障收敛
+
+P4检查点已推送main@9bfba51。P5 runtime04通过可信调试口记录实际启动退出码0x12d，即SC_UI_E_INVALID；ThemeQuery返回逻辑任务栏32px，而普通原生窗口要求客户区至少40px。桌面现按Display/SCUI实际scale转换物理高度，初始隐藏窗口取至少40px，Prepare仍使用精确任务栏高度；初建与主题/DPI更新同一换算，避免32/48反复调整。两个新布局描述补column_span/row_span=1，保原严格校验。unified-host-10通过，仅重新生成桌面generation03，其它真实库/worker按独立编译闭包复用。新桌面实际运行仍待验；runtime01..04原失败不改。
+
+静态核对原盘：SYS目录uid0/mode23，MENU.CFG与DESK归默认用户1000。新账户catalog/恢复目录不能直接在SYS创建；默认用户现代状态改存/HOME/.DESKTOP，其它用户沿SessionPath取得本人配置目录，先建父目录，再建DESK/SHELLSTATE。旧SYS菜单与DESK保留。此问题依据实际原盘元数据确定，未另启动已知会失败的VM。共享Shell对话框四处布局也补有效span，说明标签使用WRAP；因此本批重新生成SCSHELL库与桌面，其余按闭包复用。unified-host-11只因本批一行误导缩进Werror失败，已分行；后续不降低警告门槛。
+
+补充纠正：116并不能单凭数值判断为首帧超时。实际准备盘中/HOME/.DESKTOP仍不存在，进一步核对旧ScPathStat/Metadata对缺名的原-1只映射为粗FAILED；P5把它误当成现代NOT_FOUND，目录初始化因此提前返回。现目录在Stat失败时通过不覆盖已有对象的CreateEx条件创建，遇EXISTS再核类型；文件存在/代数使用现代ScFileOpen/Query/Close的明确NOT_FOUND，旧SCAPI及旧PathStat语义不变。终端种子指向当前BIN/SH.SCX。新公开SCUI错误回调和本人SHELL.LOG也保留，以便后续实际绘制错误不被隐藏。
+
+Generation05全部实际编译及owner检查通过，但原盘守恒被主控变量重名误判：复用origin report字典覆盖了original SHA变量。当前原盘仍为3db2e3cd9262343204e8c19af02847e98244732c5b5ad4397dd334be84fe7e64，独立QemuSession也记录原盘未变；source-preservation-audit.json保存读后审计，原FAIL报告不改。已改变量名及失败退出码。本批桌面源另有实际修复，继续生成新桌面，不把05误称当前完整通过。
+
+Generation06在编译前止于旧桌面warm条件，原FAIL保留。实际HOST引导桌面已呈现并存活：失败截图证明R3图标/任务栏，但背景为白色、图标被禁用态染灰，不能称视觉通过。WM角色分支改为沿原desktop_wallpaper单一路径绘壁纸，不绘旧图标；桌面PainterIcon补真实ENABLED位、标签加既有命名阴影角色，未加裸RGB。旧warm条件因此继续核真实壁纸缓存，而非为了放行测试放宽条件。另静态修worker把普通root的MANAGE误作硬件资格的问题，只允许该本人位，Broker身份仍拒硬件标志；完整身份、SID与内核权限核验保留。当前准备unified-host-16与仅受影响Desktop/Worker客体生成，其余三库及SCSHELL按原闭包复用。
+
+原生runtime06实际进入PREPARED，公开日志显示两张surface均为PREPARING|PAINT（8320），但SCUI paint_count为0，最终激活超时。已修仅P5的VIS处理：隐藏通知不清独立首帧资格，复显才清，实际绘制前后仍Query内核事实；不授输入或动画。unified-host-17与generation08仅SCUI实际G1生成及owner账通过，其余真实产物回原生成轮复用。Make的发行header在每次选择映像时按内容刷新，避免Native/HOST输入切换被mtime漏掉；接下来绑定已有GEN07同一原生桌面，不重编它。
+
+P5仍未闭环项包括真实文件job/clipboard/drop、持久布局/重启、其它窗口管理/会话隔离，以及host ABI草稿写明但当前SandFS规范化仍拒ASCII空格的路径范围；不能只凭首个host/client通过称P5完成。P6详细模型和真正多源对象/链接设计已另存M10A2-P6-DESIGN.md，仍属设计，不冒充代码。
+
+已静态确认路径空格缺口：kernel/fs.c::fs_normalize拒ASCII<33，typed launch分开path/args仍会走该旧规范化；草稿ABI中“装载器支持路径内空格”不能当作已实现。若补齐，须独立现代规范化/结构化目录与路径元数据入口，并保旧RESOLVE/命令切分/文本FSDIR的参数和错误语义，不能直接全局放开旧路径语法。本项在P5闭环清单中保留。
+
+只读runtime09快照已取得真实native状态：task1运行、Context stopped/dispatching/walking均0、quantum64、消息3、paint0；两个root pending1/8320/无失败、retry0，暂停仅0.172秒且无客体内存写入。进一步核对wm_shell_drawable确认真正阻塞是SID未选中：内核正确拒隐藏PaintBegin，旧desk_create却同步等待Activate并把隐藏时间算成失败。现保持隐藏绘制禁令：Window PREPARING只表示当前可提交；服务允许真实PREPARED endpoint连接，主循环在隐藏时继续IPC/文件工作；选中后再提交首帧/Activate/注册Drop，5秒仅计可见准备。窗口枚举动作仍要求ACTIVE。unified-host-18通过，generation09仅SCSHELL/desktop更新。Probe改为先在隐藏SID完成HELLO/catalog、观察200PIT，再由本人公开SessionControl选择自己的SID并等待真实ACTIVE，不能用允许隐藏画帧绕过性能合同。
+
+Generation09真实更新SCSHELL/desktop且owner账通过。统一静态扫描所有ACTIVE判断又发现ServiceStep保留了“非ACTIVE不处理”的旧门槛；已同样允许可信PREPARED，STOPPING/epoch/PID/gen/SID核验保留，未先启动已知会失败的客户端VM。unified-host-19之后只重新生成该库，桌面保留GEN09真实字节。
+
+后续文件job静态审阅已找到同类缺口：worker_transfer.c目标探测把旧ScPathMetadata的失败期待为NOT_FOUND，缺名实际为粗FAILED，会阻止正常COPY到新目标。下一批应增加独立现代typed路径元数据入口并迁移新消费者，保旧PathStat/Metadata/SCAPI错误语义；同时作为路径空格现代命名空间的底座，不把全部FAILED当不存在。当前先完成新的后台服务/显示激活真实闭环。
+
+Runtime10的定义内host/client/清理检查首次PASS，隐藏catalog29项/14关联、切换后ACTIVE、非host Activate拒绝-103、最终owner页账通过；但日志显示PID/epoch从8/1/1重启为3/11/2，尚不能验收稳定切换。实际原尺寸图片已查看，壁纸/彩色图标/阴影及多级Start呈现，首图仍属图标异步加载阶段。现桌面在首次可绘且Activate尚缺帧时仅一次Invalidate缺帧surface；Probe加强要求PID/gen/epoch在隐藏→显示间完全一致，不能依靠自动重试过关。unified-host-20及GEN11仅桌面更新已通过；准备新的精确绑定与稳定切换运行。
+
+Runtime10的只读私有快照解析结果无效，不能用其乱码字段证明状态：SCX BSS可能紧接变长metadata而未对齐，观察器把u32地址向下取整。已改按虚拟地址逐字节读取并处理跨页，未改客体内存。另把动态SCX BSS对齐记录为Phase6工具链的具体缺口（标量x86当前能运行，但不能让需要4/16对齐的数据依赖偶然metadata长度）；.map对象值仍须与实际重定位逐项核对，不虚称映射错误。
+
+## 主工作区整合检查点
+
+Runtime11保持同一host PID7/gen1/epoch1完成PREPARED后台HELLO/catalog→本人公开切换→ACTIVE，无中途重启；只读隐藏观察3条消息、paint0、两root visible0/state128，暂停0.172秒未写内存。最终13829→13829 PF，history/font/unexplained均0，源码/原盘保持。主代理已查看初始、Start和后续桌面图片；异步图标/壁纸仍需后续收敛视觉就绪，不能按文件名ready盲称全资源就绪。
+
+已运行promote_m10a2_shell_candidate，按旧baseline及明确的P4 context rebase核冲突，把实际候选88个源码路径整合到主工作区；SCAPI仍81a730...fc1。凭证build/m10a2-shell-integration-stage-01/reports/source-promotion-01.json。此后kernel/user/Make为主源，drafts保留原独立工作及沿革，不用旧patch覆盖当前源码。隔离构建目录继续复用，后续只同步明确变更的源，不复制磁盘或整树。full_P5/full_M10a2仍false，下一项现代typed路径元数据/worker目标缺名等真正文件事务闭环。

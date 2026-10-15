@@ -1,0 +1,10 @@
+/TMP/P5-4a70a3/ACTUALG1.SCX /TMP/P5-4a70a3/SRC/scui/SCUI.C /HOME/M10SHELL/GENERATED/SCUI.SCL --scl /TMP/P5-4a70a3/SRC/scui/SCUI.json; _m9_status=$?; printf "\n"; echo __M9_325858655942f3677a077470:$_m9_status
+SCCC / mio
+TMP/P5-4a70a3/SRC/scui/SCUI.C -> HOME/M10SHELL/GENERATED/SCUI.SCL
+Validating SCL manifest
+SCCC: preprocess -> C -> x86
+Preprocessing source and includes
+Parsing C and generating x86
+Linking and writing SCL
+SCCC OK SCL NATIVE
+Compilation complete

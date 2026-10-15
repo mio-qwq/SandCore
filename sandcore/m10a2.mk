@@ -186,3 +186,57 @@ $(BUILD)/aggregate-probe.o: tests/m10a2/AGGPROBE.C tests/m10a2/AGGABI.H $(STAMP)
 $(BUILD)/AGGPROBE.SCX: $(BUILD)/aggregate-probe.o tests/m10a2/AGGPROBE.json tools/mkdscx.py tools/scd_format.py
 	$(PY) tools/mkdscx.py $< $@ --manifest tests/m10a2/AGGPROBE.json
 m10a2-ui-artifacts: $(BUILD)/AGGCALLEE.SCL $(BUILD)/AGGPROBE.SCX
+
+# 租约正文保持独立新selector，短步清理由可信task/main接线。
+$(BUILD)/sc32_lease.o: kernel/sc32_lease.c kernel/sc32_lease.h kernel/fs_lease.h user/SC32LEASE.H user/leaseapi/SC32LEASEWIRE.H $(STAMP)
+	$(CC) $(CFLAGS) -Werror -c $< -o $@
+$(BUILD)/fs.o: $(wildcard kernel/fs_lease*.inc) kernel/fs_lease.h user/SC32LEASE.H user/leaseapi/SC32LEASEWIRE.H
+$(BUILD)/sc32_file.o: kernel/sc32_file_lease.inc kernel/fs_lease.h user/SC32LEASE.H
+$(BUILD)/sc32-library.o: user/leaseapi/leaseapi.c user/leaseapi/SC32LEASEWIRE.H user/SC32LEASE.H
+
+# 会话寿命启动底座；与Shell角色接线同批开启，旧受管作业不变。
+$(BUILD)/sc32_host.o: kernel/sc32_host.c kernel/sc32_host.h user/SC32HOST.H user/hostapi/SC32HOSTWIRE.H $(STAMP)
+	$(CC) $(CFLAGS) -Werror -c $< -o $@
+$(BUILD)/streams.o: kernel/streams_launch.inc
+$(BUILD)/sc32_broker.o: kernel/broker_shell.inc
+$(BUILD)/wm.o: kernel/wm_shell.inc kernel/sc32_host.h
+$(BUILD)/scui-library.o: user/scui/ui_shell_paint.inc
+SHELL_HOST_IMAGE ?= $(BUILD)/SCSHELL.SCX
+# 正式原生收尾显式指向已核来源的G1产物，不把HOST摘要授给不同字节。
+.PHONY: m10a2-shell-issue-force
+m10a2-shell-issue-force:
+$(BUILD)/shell_host_issue.h: $(SHELL_HOST_IMAGE) tools/mk_shell_issue.py m10a2-shell-issue-force
+	$(PY) tools/mk_shell_issue.py --host $(SHELL_HOST_IMAGE) --out $@
+$(BUILD)/task.o: kernel/shell_issue.inc $(BUILD)/shell_host_issue.h
+$(BUILD)/sc32-library.o: user/SC32HOST.H user/hostapi/SC32HOSTWIRE.H user/hostapi/sc32_launch.c
+
+# Phase5必须统一生成库、worker和桌面，再生成同字节发行摘要，最后链接CORE。
+# 这些明确目标不触发封存游戏/影片或全应用构建，也不修改用户原数据盘。
+M10A2_SHELL_DIR ?= build/m10a2-shell-bootstrap
+.PHONY: m10a2-shell-bootstrap m10a2-shell-artifacts m10a2-shell-install
+m10a2-shell-bootstrap:
+	$(MAKE) BUILD=$(M10A2_SHELL_DIR) M9_BUILD=1 M10_BUILD=1 $(M10A2_SHELL_DIR)/sandcore.img $(M10A2_SHELL_DIR)/fs/SYS/CORE/CORE.SKM m10a2-shell-artifacts m10a2-ui-resources m10a2-shell-install
+$(BUILD)/scshell-library.o: user/scshell/SCSHELL.C user/SCSHELL.H $(wildcard user/scshell/*.c user/scshell/*.H) user/SC32HOST.H user/SC32LEASE.H user/SCUI.H $(STAMP)
+	$(CC) $(CFLAGS) $(M10A2_SCL_CFLAGS) -Werror -x c -Iuser/stdlib -Iuser/sclib -Iuser -c $< -o $@
+$(BUILD)/SCSHELL.SCL: $(BUILD)/scshell-library.o user/scshell/SCSHELL.json tools/mkscl.py tools/scl_format.py
+	$(PY) tools/mkscl.py $< $@ --manifest user/scshell/SCSHELL.json
+$(BUILD)/scfilework.o: user/shellworker/SCFILEWORK.C $(wildcard user/shellworker/*.c user/shellworker/*.H) user/scshell/SCSHELLWIRE.H user/SCSHELL.H user/SC32LEASE.H $(STAMP)
+	$(CC) $(CFLAGS) $(M10A2_SCL_CFLAGS) -Werror -x c -Iuser/stdlib -Iuser/sclib -Iuser -c $< -o $@
+$(BUILD)/SCFILEWORK.SCX: $(BUILD)/scfilework.o user/shellworker/SCFILEWORK.json tools/mkdscx.py tools/scd_format.py
+	$(PY) tools/mkdscx.py $< $@ --manifest user/shellworker/SCFILEWORK.json
+$(BUILD)/scshell-desktop.o: user/scshell/desktop/SCSHELL.C $(wildcard user/scshell/desktop/*.inc user/scshell/desktop/*.H) user/SCSHELL.H user/SC32HOST.H user/SCUI.H $(STAMP)
+	$(CC) $(CFLAGS) $(M10A2_SCL_CFLAGS) -Werror -x c -Iuser/stdlib -Iuser/sclib -Iuser -c $< -o $@
+$(BUILD)/SCSHELL.SCX: $(BUILD)/scshell-desktop.o user/scshell/desktop/SCSHELL.json tools/mkdscx.py tools/scd_format.py
+	$(PY) tools/mkdscx.py $< $@ --manifest user/scshell/desktop/SCSHELL.json
+m10a2-shell-artifacts: $(BUILD)/SCLDR.SCL $(BUILD)/SC32API.SCL $(BUILD)/SCCLIB.SCL $(BUILD)/SCLIB.SCL $(BUILD)/SCUI.SCL $(BUILD)/SCSHELL.SCL $(BUILD)/SCFILEWORK.SCX $(BUILD)/SCSHELL.SCX
+M10A2_SHELL_LIB_NAMES := SCLDR SC32API SCCLIB SCLIB SCUI SCSHELL
+$(addprefix $(BUILD)/fs/SYS/LIB/,$(addsuffix .SCL,$(M10A2_SHELL_LIB_NAMES))): $(BUILD)/fs/SYS/LIB/%.SCL: $(BUILD)/%.SCL
+	mkdir -p $(dir $@)
+	cp $< $@
+$(BUILD)/fs/SYS/SHELL/SCSHELL.SCX: $(SHELL_HOST_IMAGE)
+	mkdir -p $(dir $@)
+	cp $< $@
+$(BUILD)/fs/SYS/SHELL/SCFILEWORK.SCX: $(BUILD)/SCFILEWORK.SCX
+	mkdir -p $(dir $@)
+	cp $< $@
+m10a2-shell-install: $(addprefix $(BUILD)/fs/SYS/LIB/,$(addsuffix .SCL,$(M10A2_SHELL_LIB_NAMES))) $(BUILD)/fs/SYS/SHELL/SCSHELL.SCX $(BUILD)/fs/SYS/SHELL/SCFILEWORK.SCX

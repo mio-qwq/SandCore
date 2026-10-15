@@ -1,0 +1,10 @@
+/TMP/P5-28f0ce/ACTUALG1.SCX /TMP/P5-28f0ce/SRC/scshell/desktop/SCSHELL.C /HOME/M10SHELL/GENERATED/SCSHELL.SCX --dynamic /TMP/P5-28f0ce/SRC/scshell/desktop/SCSHELL.json; _m9_status=$?; printf "\n"; echo __M9_147760b460eb728f70f69f7c:$_m9_status
+SCCC / mio
+TMP/P5-28f0ce/SRC/scshell/desktop/SCSHELL.C -> HOME/M10SHELL/GENERATED/SCSHELL.SCX
+Validating application manifest
+SCCC: preprocess -> C -> x86
+Preprocessing source and includes
+Parsing C and generating x86
+Linking and writing SCX
+SCCC OK SCX DYNAMIC
+Compilation complete

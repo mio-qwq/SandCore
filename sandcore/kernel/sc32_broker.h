@@ -5,6 +5,7 @@
 
 int sc32_broker_init(void);
 int sc32_broker_available(void);
+int sc32_broker_kernel_close(int pid,u32 handle);
 int sc32_broker_identity(int pid,ScBrokerIdentity *out);
 int sc32_broker_drop_endpoint(int owner,u32 endpoint,u32 session,ScBrokerIdentity *out);
 int sc32_broker_drop_connect(int source,int owner,u32 endpoint,Sc32BrokerToken *out);

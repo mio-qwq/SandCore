@@ -52,6 +52,7 @@ void task_notify_generation(int pid,u32 generation,u32 events);
 
 void task_init(void);                /* 分页 + GDT/TSS + 内核任务 0 */
 int  task_spawn(const char *name, u32 pd, u32 entry, u32 user_esp);
+int task_exec_scx_parts(const char *filename,const char *arguments);
 int  task_exec_scx(const char *path);/* 读 SCX → 建页目录 → 建任务 (SYS_EXEC) */
 /* SCX/SCL引导共享唯一暂存，不给每进程再留整文件副本。只允许IF=0
  * 可信零环取用，取得后直到复制完成不能开IRQ或执行用户回调。 */

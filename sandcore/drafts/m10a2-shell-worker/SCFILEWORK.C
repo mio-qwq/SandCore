@@ -44,7 +44,9 @@ static ScStatus sw_bootstrap(void)
     sw_record(&sw.identity,sizeof(sw.identity));
     status=ScIdentityQuery(&sw.identity);
     if(status)return status;
-    if(sw.identity.realm!=SC32_BROKER_REALM_NORMAL || sw.identity.flags || sw.identity.uid<0
+    /* 普通root的MANAGE不是硬件SYSTEM；Broker身份的flags另有定义，
+     * 不能把本人的管理位误作MOD能力而禁掉合法root文件操作。 */
+    if(sw.identity.realm!=SC32_BROKER_REALM_NORMAL || (sw.identity.flags&~SC32_IDENTITY_MANAGE) || sw.identity.uid<0
        || sw.identity.gid<0 || sw.identity.task_generation!=sw.self.generation)return SC32_E_ACCESS;
     ScCapabilities capabilities;
     sw_record(&capabilities,sizeof(capabilities));

@@ -122,7 +122,7 @@ $(BUILD)/font8_data.h: assets/font/phoenix-ascii.json tools/mkfont8.py | $(BUILD
 # ---------------- 产物规则 ----------------
 # 内核参与链接的全部目标文件。entry.o 必须排第一 (链接脚本里 _start 在前)。
 OBJS := entry.o main.o boot_scene.o idt.o interrupts.o timer.o keyboard.o mouse.o \
-        memory.o heap.o objpool.o task_store.o session.o core_boot.o paging.o gfx.o ttf.o display.o theme.o image.o image_service.o userspace.o desktop.o wm.o task.o process.o module.o ata.o fs.o serial.o auth.o crypto.o random.o crc.o streams.o management.o simd.o ringdebug.o audio.o rtc.o scl_boot.o scl_validate.o scd_validate.o sc32_core.o sc32_file.o sc32_gui.o sc32_raw.o sc32_font.o sc32_broker.o sc32_drop.o
+        memory.o heap.o objpool.o task_store.o session.o core_boot.o paging.o gfx.o ttf.o display.o theme.o image.o image_service.o userspace.o desktop.o wm.o task.o process.o module.o ata.o fs.o serial.o auth.o crypto.o random.o crc.o streams.o management.o simd.o ringdebug.o audio.o rtc.o scl_boot.o scl_validate.o scd_validate.o sc32_core.o sc32_file.o sc32_gui.o sc32_raw.o sc32_font.o sc32_broker.o sc32_drop.o sc32_host.o sc32_lease.o
 
 # mio：全部普通三环C源与私有include一并上盘，让Notes/计算器/
 # 游戏和通用客户端也能在系统内编辑编译。第三方解码服务单独由

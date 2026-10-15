@@ -77,3 +77,5 @@ Copy/Cut/Paste使用真实session clipboard事务及immutable snapshot，源退�
 2026-10-15：同批补真实Dialog按钮命令校验合同；追加VISIBILITY=37业务通知以真实OS消息驱动隐藏后台事务，先发布状态、只通知实际变化、不新增入口或结构。仅源码静态收齐，交主代理统一构建及隐藏两样本/恢复重画验收。
 
 2026-10-16：build23/refresh09实际补齐node0上下文CAPTURE/BUBBLE，并由原G1生成SCUI及Demo；GUI21真实Drop/ACK已成功但主控行首边界误超时，原失败保留。只借紧邻start前的一个换行修正主控，实际原日志回归及旧标记拒绝通过。GUI22最终DECLARED_NATIVE_FIVE_LIBRARY_ORDINARY_GUI_SECOND_ROUND_PASS，共91项，GUI_behavior_verified/source_disk_unchanged/current_inputs_unchanged均true；两主题、100/150/200%实际字宽/换行、溢出菜单、文件保存/错误、Drop提交及Complete、静止/隐藏零提交、窗口恢复、正常return与最终owner/PF归账通过。主代理已查看Classic与200%原尺寸截图。公开158入口/137导入未变，SCAPI原SHA保持。静止200PIT实际2.032秒、QEMU一核CPU0.171875秒；checkbox观察127PIT包含F12/串口，不冒充纯输入延迟。证据evidence/m10a2-p4-context-and-p5-generation/index.json，不代表整版完成。
+
+2026-10-16修订：Phase5主源ABI1.1/v2保留158入口，新增ScUiPainterClear/TextColor/Bounds/ContextWaitTimeout共162。透明桌面只清本人clip，图标传ENABLED，命名角色阴影与内核单一路径壁纸共同合成；Context混合泵按真实下一期限等待。隐藏Window不持首帧资格，实际选中后PREPARING才允许有限完整Submit/End，随后Activate；后台Shell服务不等待绘制。当前仅Runtime11阶段切片通过，不代表全部组件已重制。

@@ -1942,6 +1942,8 @@ static int br_close_handle(br_handle *handle)
     return 0;
 }
 
+#include "broker_shell.inc"
+
 static int br_close(int pid,u32 request,u32 output,u32 kind)
 {
     Sc32BrokerHandle input;

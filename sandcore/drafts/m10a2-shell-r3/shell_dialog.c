@@ -14,6 +14,7 @@ static ScStatus sh_widget(ScUiContext *ui,ScUiNode parent,ScU32 kind,const char 
     d.size=sizeof(d);
     d.version=1;
     d.kind=kind;
+    if(kind==SC_UI_LABEL)d.flags=SC_UI_WRAP;
     d.parent=parent;
     d.command=command;
     sh_ui_text(text,&d.text);
@@ -23,6 +24,8 @@ static ScStatus sh_widget(ScUiContext *ui,ScUiNode parent,ScU32 kind,const char 
     memset(&l,0,sizeof(l));
     l.size=sizeof(l);
     l.version=1;
+    /* span即使在非Grid布局也须显式有效，不把零初始化当作默认1。 */
+    l.column_span=l.row_span=1;
     l.width=SC_UI_AUTO;
     l.height=height;
     l.min_width=0;
@@ -302,6 +305,7 @@ static ScStatus sh_dialog_window(ScUiContext *ui,ScUiNode owner,const char *titl
     memset(&layout,0,sizeof(layout));
     layout.size=sizeof(layout);
     layout.version=1;
+    layout.column_span=layout.row_span=1;
     layout.mode=SC_UI_VBOX;
     layout.width=SC_UI_AUTO;
     layout.height=SC_UI_AUTO;
@@ -406,6 +410,7 @@ ScStatus ScShellProgress(ScUiContext *ui,ScUiNode owner,ScShellFileJob *job,ScSh
     memset(&layout,0,sizeof(layout));
     layout.size=sizeof(layout);
     layout.version=1;
+    layout.column_span=layout.row_span=1;
     layout.width=layout.height=SC_UI_AUTO;
     layout.max_width=layout.max_height=SC_UI_AUTO;
     layout.min_height=60;
@@ -613,6 +618,7 @@ static ScStatus sh_menu_confirm_delete(ScShellMenu *m) {
         memset(&layout,0,sizeof(layout));
         layout.size=sizeof(layout);
         layout.version=1;
+    layout.column_span=layout.row_span=1;
         layout.width=layout.height=SC_UI_AUTO;
         layout.max_width=layout.max_height=SC_UI_AUTO;
         layout.min_height=80;

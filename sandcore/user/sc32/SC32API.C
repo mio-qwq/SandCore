@@ -14,3 +14,6 @@ static void sc32_gui_finalize(void);
 #include "../fontapi/sc32_palette.c"
 #include "../brokerapi/sc32_broker.c"
 #include "../dropapi/sc32_drop.c"
+#include "../hostapi/sc32_launch.c"
+
+#include "../leaseapi/leaseapi.c"

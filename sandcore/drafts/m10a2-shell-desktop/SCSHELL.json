@@ -95,6 +95,24 @@
       "size": 1
     },
     {
+      "name": "ScFileClose",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScFileOpen",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScFileQuery",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
       "name": "ScHashCreate",
       "dependency": "SCLIB.SCL",
       "kind": "function",
@@ -581,12 +599,6 @@
       "size": 1
     },
     {
-      "name": "ScSystemWait",
-      "dependency": "SC32API.SCL",
-      "kind": "function",
-      "size": 1
-    },
-    {
       "name": "ScThemeQuery",
       "dependency": "SC32API.SCL",
       "kind": "function",
@@ -606,6 +618,12 @@
     },
     {
       "name": "ScUiContextCreate",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUiContextQuery",
       "dependency": "SCUI.SCL",
       "kind": "function",
       "size": 1
@@ -648,6 +666,12 @@
     },
     {
       "name": "ScUiDropTargetRegister",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUiErrorQuery",
       "dependency": "SCUI.SCL",
       "kind": "function",
       "size": 1
@@ -827,6 +851,18 @@
       "size": 1
     },
     {
+      "name": "fclose",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "fopen",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
       "name": "fprintf",
       "dependency": "SCCLIB.SCL",
       "kind": "function",
@@ -876,6 +912,12 @@
     },
     {
       "name": "snprintf",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "strcat",
       "dependency": "SCCLIB.SCL",
       "kind": "function",
       "size": 1

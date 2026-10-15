@@ -81,7 +81,7 @@ static int native_resize(win_t *w,int width,int height)
 
     window_extra_t *e=extra_of(w->handle);
     if(width>GFX_W)width=GFX_W;
-    if(height>work_bottom())height=work_bottom();
+    if(height>wm_shell_work_bottom_for(window_record(w->handle)->session))height=wm_shell_work_bottom_for(window_record(w->handle)->session);
     if(width<96)width=96;
     if(height<TITLE_H+40)height=TITLE_H+40;
     if(e->native) {
@@ -129,7 +129,7 @@ static int native_resize(win_t *w,int width,int height)
     }
     if(w->x+w->w>GFX_W)w->x=GFX_W-w->w;
     if(w->x<0)w->x=0;
-    if(w->y+w->h>work_bottom())w->y=work_bottom()-w->h;
+    if(w->y+w->h>wm_shell_work_bottom_for(window_record(w->handle)->session))w->y=wm_shell_work_bottom_for(window_record(w->handle)->session)-w->h;
     if(w->y<0)w->y=0;
     visibility_changed(w);
     return 0;
@@ -137,12 +137,13 @@ static int native_resize(win_t *w,int width,int height)
 void wm_display_changed(void)
 {
     popup_close_group(active_view,0,0);
+    wm_shell_display(active_view);
     active_view->display_width=GFX_W;active_view->display_height=GFX_H;active_view->display_scaling=display_scale();
     menu_open=context_open=0;
     resizing=-1;
     drag=-1;
     for(int i=0;i<nwins;i++)if(window_record(WINDOW(i).handle)->gui.mode){
-        window_record_t *p=window_record(WINDOW(i).handle);p->gui.display++;
+        window_record_t *p=window_record(WINDOW(i).handle);wm_shell_frame_invalidated(p);p->gui.display++;
         p->gui.paint_pending=p->gui.paint_ready=p->gui.painting=0;gui_attention(p);
         ScMessage m={0};m.id=SC32_MSG_DISPLAY;m.window=(u32)p->window.handle;
         m.generation=m.window;m.epoch=p->gui.display;sc32_gui_emit(p->window.owner,&m);
@@ -151,6 +152,7 @@ void wm_display_changed(void)
 
         win_t *w=&WINDOW(i);
         window_extra_t *e=extra_of(w->handle);
+        if(window_record(w->handle)->shell_role)continue;
         if(!e->native) {
 
             e->scale=GFX_W==320?1:(display_scale()+99)/100;
@@ -178,16 +180,16 @@ int wm_open_native_window(int pid,const char *title,int width,int height)
 {
 
     if(width>GFX_W)width=GFX_W;
-    if(height>work_bottom())height=work_bottom();
-    int result=win_create(pid,title,(GFX_W-width)/2,(work_bottom()-height)/2,width,height,1);
+    if(height>wm_shell_work_bottom_for(session_task(pid)))height=wm_shell_work_bottom_for(session_task(pid));
+    int result=win_create(pid,title,(GFX_W-width)/2,(wm_shell_work_bottom_for(session_task(pid))-height)/2,width,height,1);
     if(result>=0 && session_task(pid)==session_active())wm_request_compose();
     return result;
 }
 int wm_open_rgb_window(int pid,const char *title,int width,int height)
 {
     if(width>GFX_W)width=GFX_W;
-    if(height>work_bottom())height=work_bottom();
-    int result=win_create(pid,title,(GFX_W-width)/2,(work_bottom()-height)/2,width,height,2);
+    if(height>wm_shell_work_bottom_for(session_task(pid)))height=wm_shell_work_bottom_for(session_task(pid));
+    int result=win_create(pid,title,(GFX_W-width)/2,(wm_shell_work_bottom_for(session_task(pid))-height)/2,width,height,2);
     if(result>=0 && session_task(pid)==session_active())wm_request_compose();
     return result;
 }
@@ -281,11 +283,11 @@ int wm_user_place(int pid,int handle,int x,int y,int width,int height)
     win_t *w=owned_window(pid,handle);window_extra_t *e=w?extra_of(handle):0;
     /* 旧画布长度不能被程序定位请求改变；新增入口只接受原生窗口。
      * 先校验有界尺寸再加边框，避免负数/溢出绕过工作区限制。 */
-    if(!w || !e || !e->native || width<94 || height<40 || width>1920 || height>1080)return -1;
+    if(!w || !e || window_record(handle)->shell_role || !e->native || width<94 || height<40 || width>1920 || height>1080)return -1;
     if(native_resize(w,width+2,height+TITLE_H+1))return -1;
     if(x<0)x=0;if(y<0)y=0;
     if(x>GFX_W-w->w)x=GFX_W-w->w;
-    if(y>work_bottom()-w->h)y=work_bottom()-w->h;
+    if(y>wm_shell_work_bottom_for(window_record(w->handle)->session)-w->h)y=wm_shell_work_bottom_for(window_record(w->handle)->session)-w->h;
     if(x<0)x=0;if(y<0)y=0;
     w->x=x;w->y=y;e->hidden=e->maximized=0;visibility_changed(w);
     e->restore_x=x;e->restore_y=y;e->restore_w=w->w;e->restore_h=w->h;
@@ -295,7 +297,7 @@ int wm_window_control(int pid,int handle,int command)
 {
 
     win_t *w=owned_window(pid,handle);
-    if(!w)return -1;
+    if(!w || window_record(handle)->shell_role)return -1;
     window_extra_t *e=extra_of(handle);
     if(command<0 || command>2)return -1;
     gui_focus_defer++;
@@ -317,7 +319,7 @@ int wm_window_control(int pid,int handle,int command)
             e->restore_h=w->h;
 
         }
-        if(native_resize(w,GFX_W,work_bottom())){gui_focus_defer--;return -1;}
+        if(native_resize(w,GFX_W,wm_shell_work_bottom_for(window_record(handle)->session))){gui_focus_defer--;return -1;}
         w->x=w->y=0;
         e->maximized=1;
         e->hidden=0;
@@ -896,8 +898,8 @@ static int native_mouse(int x,int y,u8 buttons,u8 previous)
             return 1;
 
         }
-        win_raise(i);
-        i=nwins-1;
+        i=win_raise(i);
+        if(i<0)return 1;
         win_t *w=&WINDOW(i);
         window_extra_t *e=extra_of(w->handle);
         if(y<w->y+window_client_dy(w)) {

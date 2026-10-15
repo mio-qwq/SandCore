@@ -26,6 +26,7 @@
 #include "objpool.h"
 #include "crc.h"
 #include "sc32_file.h"
+#include "fs_lease.h"
 #define FS_LEGACY_SECTS 16384u
 #define FS_MAX_SECTS 524288u
 #define ALLOCATION_LEAF_SECTORS 512u
@@ -71,10 +72,11 @@ static u32 transaction_counter;
  * pin阻止旧replace/remove/rename接管同名对象；chmod不撤身份，逐次
  * 权限复验。候选只有内核extent/进度，绝不持有用户buffer跨陷入。 */
 typedef struct {
-    char name[64];entry_t candidate,previous;
+    char name[64];entry_t candidate,previous,draft;
     u32 id,refs,ready,index,pending,writer,owner,owner_generation;
     u32 position,length,target,copy_sector,zero_offset,reserved_start,reserved_count;
     u32 relocated,complete,accepted,uncertain;
+    u32 unpublished,invalidated,lease_head,flushed_revision;
     int result;
 } native_file_t;
 static objpool_t native_pool;
@@ -83,6 +85,7 @@ static u32 native_meta_bank,native_meta_generation,native_meta_count,native_meta
 static u32 native_directory_sequence=1;
 static u8 native_super[512];
 enum { N_OPEN=1,N_WRITE,N_TRUNCATE,N_FLUSH };
+#include "fs_lease_private.inc"
 static int same(const char *a,const char *b);
 static int child(const char *name,const char *parent);
 static int native_busy(const char *name)
@@ -160,7 +163,8 @@ static int protected(const char *name)
     || same(name,"SYS/RECOVERY") || child(name,"SYS/RECOVERY")
     /* 系统SCL是用户态代码，但启动来源必须稳定。root绕过普通rw
      * 不等于可替换系统库；宿主发行包与可信零环更新沿原内部接口。 */
-    || same(name,"SYS/LIB") || child(name,"SYS/LIB"); }
+    || same(name,"SYS/LIB") || child(name,"SYS/LIB")
+    || same(name,"SYS/SHELL") || child(name,"SYS/SHELL"); }
 static int module_path(const char *name)
 {return same(name,"SYS/MOD") || child(name,"SYS/MOD");}
 int fs_user_mutable(const char *path,int descendants)
@@ -176,7 +180,7 @@ int fs_user_mutable(const char *path,int descendants)
 }
 static int write_meta(void)
 {
-    if(fs_faulted || native_meta_owner || native_directory_sequence==0xffffffffu)return -1;
+    if(fs_faulted || native_meta_owner || fs_lease_volume_locked() || native_directory_sequence==0xffffffffu)return -1;
     if(ata_read_sectors(0,1,sector)) return -1;
     for(u32 i=0;i<dir_sectors*512;i++) meta[i]=0;
     u32 names=name_bytes();
@@ -213,6 +217,7 @@ static int write_meta(void)
 }
 static void release_directory(void)
 {
+    lease_volume_reset();
     if(dirents)pframe_free_run((u32)dirents,dir_pages);
     if(meta)pframe_free_run((u32)meta,meta_pages);
     if(allocation)pframe_free_run((u32)allocation,allocation_pages);
@@ -457,7 +462,7 @@ int fs_write(const char *path,const u8 *buf,u32 size)
 {
     char name[64];
     if(fs_normalize(path,name)<=0 || !dir_sectors || fs_faulted || size>fs_disk_sectors*512)return -1;
-    if(native_meta_owner || busy(name))return -6;
+    if(native_meta_owner || fs_lease_volume_locked() || fs_lease_path_blocked(name,FS_LEASE_CONTENT) || busy(name))return -6;
     u32 generation=version==5?new_generation():1;if(!generation)return -1;
     if(len(name)>=(int)name_bytes()) return -1; /* 旧盘保持旧名字上限。 */
     u32 info[2];
@@ -496,9 +501,10 @@ int fs_write(const char *path,const u8 *buf,u32 size)
 }
 int fs_mkdir(const char *path)
 {
-    if(native_meta_owner)return -6;
+    if(native_meta_owner || fs_lease_volume_locked())return -6;
     char name[64]; u32 info[2];
     if(version<4 || fs_normalize(path,name)<=0 || !fs_stat(name,info)) return -1;
+    if(fs_lease_path_blocked(name,FS_LEASE_TREE) || busy(name))return -6;
     if((u32)nfiles>=dir_capacity)return -1;
     for(int i=0;i<nfiles;i++) if(dirents[i].start_lba && child(name,dirents[i].name)) return -1;
     copy(dirents[nfiles].name,name); dirents[nfiles].start_lba=0; dirents[nfiles].size=0;
@@ -512,7 +518,7 @@ int fs_mkdir(const char *path)
 int fs_remove(const char *path)
 {
     char name[64]; if(fs_normalize(path,name)<=0) return -1;
-    int i=find(name);if(i<0)return -1;if(native_meta_owner || busy(name))return -6;
+    int i=find(name);if(i<0)return -1;if(native_meta_owner || fs_lease_volume_locked() || fs_lease_path_blocked(name,FS_LEASE_TREE) || busy(name))return -6;
     for(int j=0;j<nfiles;j++) if(child(dirents[j].name,name)) return -1;
     entry_t removed=dirents[i];
     for(int j=i;j<nfiles-1;j++) dirents[j]=dirents[j+1];
@@ -526,7 +532,8 @@ int fs_rename(const char *oldpath,const char *newpath)
 {
     char old[64],next[64]; u32 info[2];
     if(fs_normalize(oldpath,old)<=0 || fs_normalize(newpath,next)<=0 || fs_stat(old,info)) return -1;
-    if(native_meta_owner || busy(old) || busy(next))return -6;
+    if(native_meta_owner || fs_lease_volume_locked() || fs_lease_path_blocked(old,FS_LEASE_TREE)
+       || fs_lease_path_blocked(next,FS_LEASE_TREE) || busy(old) || busy(next))return -6;
     if(same(old,next)) return 0;
     if(child(next,old) || !fs_stat(next,info)) return -1;
     for(int i=0;i<nfiles;i++)
@@ -587,10 +594,10 @@ int fs_list_dir(const char *path,char *out,u32 capacity)
 }
 int fs_create_ex(int owner,const char *path,u32 kind,u32 mode)
 {
-    if(native_meta_owner)return -6;
+    if(native_meta_owner || fs_lease_volume_locked())return -6;
     char name[64];u32 info[2];if(version!=5 || !dir_sectors || fs_faulted || (kind!=1 && kind!=2) || mode>63 || fs_normalize(path,name)<=0)return -1;
     if(!fs_user_mutable(name,0) || !fs_access_parent(owner,name))return -5;
-    if(!fs_stat(name,info))return -8;if(busy(name))return -6;if((u32)nfiles>=dir_capacity)return -4;
+    if(!fs_stat(name,info))return -8;if(fs_lease_path_blocked(name,FS_LEASE_TREE) || busy(name))return -6;if((u32)nfiles>=dir_capacity)return -4;
     u32 generation=new_generation();if(!generation)return -4;u32 at=kind==1?allocate(0):0;if(kind==1 && !at)return -4;
     /* 临时文件必须首次发布就是仅本人rw，不能先采用默认权限，
      * 再靠另一个chmod陷入修正，中间给其它任务留下读取窗口。 */
@@ -665,7 +672,7 @@ int fs_metadata(const char *path,u32 out[8])
 }
 int fs_permissions(int pid,const char *path,int uid,int gid,u32 mode)
 {
-    if(native_meta_owner)return -6;
+    if(native_meta_owner || fs_lease_volume_locked())return -6;
     char name[64];if(version<5 || fs_normalize(path,name)<=0 || (mode&~63u))return -1;
     if(!fs_user_mutable(name,0) || !fs_access(pid,name,FS_ACCESS_META))return -5;
     int index=find(name);if(index<0)return -1;
@@ -708,7 +715,7 @@ int fs_stream_begin(int owner,const char *path,u32 capacity)
     char name[64];u32 info[2];
     if(!task_owned(owner) || version!=5 || fs_faulted || capacity>fs_disk_sectors*512
         || fs_normalize(path,name)<=0 || protected(name))return -1;
-    if(native_meta_owner || busy(name))return -6;
+    if(native_meta_owner || fs_lease_volume_locked() || fs_lease_path_blocked(name,FS_LEASE_CONTENT) || busy(name))return -6;
     if(owner && (!fs_user_mutable(name,0) || !fs_access(owner,name,FS_ACCESS_WRITE)))return -5;
     if(!fs_stat(name,info) && info[0]!=1)return -1;
     /* 内部串口路径也必须有真实父目录，不能接收一个悬空后代使卷下次
@@ -734,6 +741,7 @@ int fs_stream_begin(int owner,const char *path,u32 capacity)
 int fs_stream_write(int owner,u32 token,const void *data,u32 length)
 {
     transaction_t *t=stream(owner,token);if(!t)return -1;
+    if(fs_lease_path_blocked(t->name,FS_LEASE_CONTENT))return -6;
     if(t->failed || fs_faulted || length>t->capacity-t->used){t->failed=1;return -1;}
     if(owner && (!fs_user_mutable(t->name,0) || !fs_access(owner,t->name,FS_ACCESS_WRITE)))return -5;
     const u8 *input=(const u8 *)data;u32 offset=0;
@@ -771,7 +779,7 @@ int fs_stream_stop_step(int owner)
 int fs_stream_commit(int owner,u32 token)
 {
     transaction_t *t=stream(owner,token);if(!t || t->failed || fs_faulted)return -1;
-    if(native_meta_owner || native_busy(t->name))return -6;
+    if(native_meta_owner || fs_lease_volume_locked() || fs_lease_path_blocked(t->name,FS_LEASE_CONTENT) || native_busy(t->name))return -6;
     if(owner && (!fs_user_mutable(t->name,0) || !fs_access(owner,t->name,FS_ACCESS_WRITE)))return -5;
     int index=find(t->name),fresh=index<0;
     if((!fresh && dirents[index].generation!=t->original) || (fresh && t->original))return -6;
@@ -804,6 +812,8 @@ static native_file_t *native_object(u32 id)
 }
 static int native_index(native_file_t *n)
 {
+    if(n->invalidated)return FS_N_STALE;
+    if(n->unpublished)return 0;
     int i=find(n->name);
     if(i<0 || !dirents[i].start_lba)return FS_N_STALE;
     /* 其它文件删除会压缩目录，不能永久缓存旧数组下标当对象身份。 */
@@ -811,7 +821,8 @@ static int native_index(native_file_t *n)
 }
 static int native_access(int pid,native_file_t *n,u32 access)
 {
-    if(!task_owned(pid) || !n || !n->ready)return FS_N_STALE;
+    if(!task_owned(pid) || !n || !n->ready || n->invalidated)return FS_N_STALE;
+    if(n->unpublished)return lease_private_access(n,pid,access);
     if(native_index(n)<0)return FS_N_STALE;
     if(access&FS_NATIVE_WRITE){
         if(version!=5)return FS_N_NOT_SUPPORTED;
@@ -825,9 +836,9 @@ int fs_native_info(int pid,u32 object,u32 access,fs_native_info_t *out)
 {
     native_file_t *n=native_object(object);int error=native_access(pid,n,access);
     if(error)return error;
-    entry_t *e=dirents+n->index;
+    entry_t *e=native_current(n);
     out->length=e->size;out->object=n->id;out->revision=e->generation;
-    out->flags=(e->generation>published_object_generation?FS_NATIVE_DIRTY:0)
+    out->flags=(n->unpublished || e->generation>published_object_generation?FS_NATIVE_DIRTY:0)
         |(fs_faulted?FS_NATIVE_FAULTED:0)|(n->uncertain?FS_NATIVE_UNCERTAIN:0)
         |(n->pending && !n->complete?FS_NATIVE_GROWING:0);
     out->uid=e->uid;out->gid=e->gid;out->mode=e->mode;out->reserved=0;return 0;
@@ -841,6 +852,7 @@ static void native_pending_clear(native_file_t *n)
 void fs_native_cancel(u32 object,u32 writer)
 {
     native_file_t *n=native_object(object);if(!n || !n->pending || n->writer!=writer)return;
+    if(n->unpublished){lease_private_discard(n);return;}
     if(native_meta_owner==n->id)native_meta_owner=native_meta_sector=0;
     /* 未发布候选只在内存位图保留。元数据已成功提交时reserved已清零，
      * 不能把关闭/退出伪装成回滚一个已经对其他句柄可见的写入。 */
@@ -868,7 +880,9 @@ static void native_failed(native_file_t *n,int error,int uncertain)
 {
     if(native_meta_owner==n->id)native_meta_owner=native_meta_sector=0;
     if(uncertain){n->uncertain=1;fs_faulted=1;}
-    if(n->reserved_count)allocated(n->reserved_start,n->reserved_count,0);
+    if(n->unpublished && n->reserved_count){lease_record_t *r=lease_get(n->lease_head);
+        if(r){r->garbage_start=n->reserved_start;r->garbage_count=n->reserved_count;lease_work_add(r);}}
+    else if(n->reserved_count)allocated(n->reserved_start,n->reserved_count,0);
     n->reserved_start=n->reserved_count=0;n->result=error;n->complete=1;
 }
 static void native_serialize(u8 *p,const entry_t *e)
@@ -880,6 +894,8 @@ static void native_serialize(u8 *p,const entry_t *e)
 }
 static int native_publish_start(native_file_t *n)
 {
+    if(n->unpublished)return lease_private_commit(n);
+    if(fs_lease_volume_locked())return FS_N_AGAIN;
     if(native_meta_owner)return native_meta_owner==n->id?FS_N_AGAIN:FS_N_BUSY;
     if(fs_faulted)return FS_N_IO;
     if(native_directory_sequence==0xffffffffu)return FS_N_RANGE;
@@ -903,6 +919,9 @@ static int native_publish_step(native_file_t *n)
     if(n->complete)return n->result;
     if(native_meta_owner!=n->id)return FS_N_BUSY;
     int pid=(int)n->owner;
+    if(lease_native_guard(n,pid,n->writer,FS_NATIVE_WRITE)){
+        native_failed(n,FS_N_BUSY,0);native_completed(n);return FS_N_BUSY;
+    }
     if(!task_owned(pid) || task_generation(pid)!=n->owner_generation || protected(n->name)
        || (module_path(n->name) && !auth_can_mod(pid))
        || (n->ready?!fs_access(pid,n->name,FS_ACCESS_WRITE):!fs_access_parent(pid,n->name))){
@@ -952,13 +971,15 @@ static void native_pending_start(native_file_t *n,int pid,u32 writer,u32 kind,u3
     n->pending=kind;n->writer=writer;n->owner=(u32)pid;n->owner_generation=task_generation(pid);
     n->position=position;n->length=length;n->complete=n->accepted=n->relocated=0;n->result=0;
     n->copy_sector=0;n->reserved_start=n->reserved_count=0;
-    n->previous=n->candidate=dirents[n->index];n->zero_offset=n->previous.size;
+    n->previous=n->candidate=*native_current(n);n->zero_offset=n->previous.size;
 }
 int fs_native_open(int pid,u32 writer,const char *name,u32 flags,u32 mode,u32 *object)
 {
     if(!dir_sectors)return FS_N_IO;
     if(!task_owned(pid) || !writer || !name || !name[0] || (flags&~31u) || !(flags&3u) || mode>63u
        || ((flags&(FS_NATIVE_CREATE|FS_NATIVE_TRUNCATE|FS_NATIVE_APPEND)) && !(flags&FS_NATIVE_WRITE)))return FS_N_INVALID;
+    if(fs_lease_volume_locked())return FS_N_AGAIN;
+    if(lease_native_open_blocked(name,flags))return FS_N_BUSY;
     if(flags&FS_NATIVE_WRITE){if(version!=5)return FS_N_NOT_SUPPORTED;if(fs_faulted)return FS_N_IO;
         if(!fs_user_mutable(name,0))return FS_N_ACCESS;}
     native_file_t *n=*object?native_object(*object):0;
@@ -980,6 +1001,7 @@ int fs_native_open(int pid,u32 writer,const char *name,u32 flags,u32 mode,u32 *o
     for(int i=objpool_next(&native_pool,-1);i>=0;i=objpool_next(&native_pool,i)){
         native_file_t *candidate=objpool_get(&native_pool,i);
         if(!same(name,candidate->name))continue;
+        if(candidate->unpublished || candidate->invalidated)return FS_N_BUSY;
         if(!candidate->ready || candidate->pending)return FS_N_AGAIN;
         n=candidate;break;
     }
@@ -1011,7 +1033,7 @@ int fs_native_read(int pid,u32 object,void *out,u32 bytes,u32 offset,u32 *done)
 {
     if(bytes>65536u){*done=0;return FS_N_RANGE;}
     *done=0;native_file_t *n=native_object(object);int error=native_access(pid,n,FS_NATIVE_READ);if(error)return error;
-    entry_t *e=dirents+n->index;
+    entry_t *e=native_current(n);
     if(offset>=e->size || !bytes)return 0;
     u32 count=e->size-offset;if(count>bytes)count=bytes;
     while(*done<count){
@@ -1070,7 +1092,7 @@ static int native_growth_step(native_file_t *n)
 }
 static int native_bytes_write(native_file_t *n,const void *data,u32 bytes,u32 offset,u32 *done,int candidate)
 {
-    *done=0;u32 at=candidate?n->candidate.start_lba:dirents[n->index].start_lba;
+    *done=0;u32 at=candidate?n->candidate.start_lba:native_current(n)->start_lba;
     while(*done<bytes){
         u32 pos=offset+*done,within=pos&511u,count=512u-within;if(count>bytes-*done)count=bytes-*done;
         if(within || count<512u){if(ata_read_sectors(at+pos/512u,1,sector))return FS_N_IO;}
@@ -1091,7 +1113,9 @@ int fs_native_write(int pid,u32 object,u32 writer,const void *data,u32 bytes,u32
 {
     *done=0;native_file_t *n=native_object(object);int error=native_access(pid,n,FS_NATIVE_WRITE);
     if(error){if(n && n->writer==writer && !n->complete)fs_native_cancel(object,writer);return error;}
-    entry_t *e=dirents+n->index;u32 pos=append?(n->pending?n->position:e->size):offset;*position=pos;
+    if(fs_lease_volume_locked())return FS_N_AGAIN;
+    error=lease_native_guard(n,pid,writer,FS_NATIVE_WRITE);if(error)return error;
+    entry_t *e=native_current(n);u32 pos=append?(n->pending?n->position:e->size):offset;*position=pos;
     if(!bytes)return 0;if(bytes>65536u || pos>fs_disk_sectors*512u || bytes>fs_disk_sectors*512u-pos)return FS_N_RANGE;
     if(n->pending){
         if(!native_pending_match(n,pid,writer,N_WRITE,pos,bytes))return n->writer!=writer?FS_N_AGAIN:FS_N_BUSY;
@@ -1109,7 +1133,8 @@ int fs_native_write(int pid,u32 object,u32 writer,const void *data,u32 bytes,u32
             if(native_directory_sequence>=0xfffffffeu)return FS_N_RANGE;
             u32 generation=new_generation();if(!generation)return FS_N_RANGE;
             error=native_bytes_write(n,data,bytes,pos,done,0);
-            if(*done || n->uncertain){e->generation=generation;live_dirty=1;native_directory_sequence++;}
+            if(*done || n->uncertain){e->generation=generation;live_dirty=1;n->flushed_revision=0;
+                if(!n->unpublished)native_directory_sequence++;}
             return error;
         }
         native_pending_start(n,pid,writer,N_WRITE,pos,bytes);
@@ -1130,6 +1155,8 @@ int fs_native_truncate(int pid,u32 object,u32 writer,u32 length)
 {
     native_file_t *n=native_object(object);int error=native_access(pid,n,FS_NATIVE_WRITE);
     if(error){if(n && n->writer==writer && !n->complete)fs_native_cancel(object,writer);return error;}
+    if(fs_lease_volume_locked())return FS_N_AGAIN;
+    error=lease_native_guard(n,pid,writer,FS_NATIVE_WRITE);if(error)return error;
     if(length>fs_disk_sectors*512u)return FS_N_RANGE;
     if(n->pending){
         if(!native_pending_match(n,pid,writer,N_TRUNCATE,0,length))return n->writer!=writer?FS_N_AGAIN:FS_N_BUSY;
@@ -1138,13 +1165,13 @@ int fs_native_truncate(int pid,u32 object,u32 writer,u32 length)
         if(native_meta_owner)return FS_N_AGAIN;
     }else{
         if(native_meta_owner)return FS_N_AGAIN;
-        if(length==dirents[n->index].size)return 0;
+        if(length==native_current(n)->size)return 0;
         native_pending_start(n,pid,writer,N_TRUNCATE,0,length);
         if(length>n->previous.size){error=native_growth_start(n,length,0);if(error){native_failed(n,error,0);native_pending_clear(n);return error;}}
         else n->target=length;
     }
     if(length>n->previous.size){error=native_growth_step(n);if(error){if(error!=FS_N_AGAIN)native_pending_clear(n);return error;}}
-    entry_t *e=dirents+n->index;n->candidate.size=length;if(!length)n->candidate.start_lba=fs_data_start;
+    entry_t *e=native_current(n);n->candidate.size=length;if(!length)n->candidate.start_lba=fs_data_start;
     n->candidate.uid=e->uid;n->candidate.gid=e->gid;n->candidate.mode=e->mode;
     n->candidate.generation=new_generation();if(!n->candidate.generation){native_failed(n,FS_N_RANGE,0);return FS_N_RANGE;}
     error=native_publish_start(n);if(error!=FS_N_AGAIN){native_failed(n,error,0);native_pending_clear(n);}return error;
@@ -1153,6 +1180,13 @@ int fs_native_flush(int pid,u32 object,u32 writer)
 {
     native_file_t *n=native_object(object);int error=native_access(pid,n,FS_NATIVE_WRITE);
     if(error){if(n && n->writer==writer && !n->complete)fs_native_cancel(object,writer);return error;}
+    if(fs_lease_volume_locked())return FS_N_AGAIN;
+    error=lease_native_guard(n,pid,writer,FS_NATIVE_WRITE);if(error)return error;
+    if(n->unpublished){
+        if(n->pending)return FS_N_BUSY;
+        if(ata_flush())return FS_N_IO;
+        n->flushed_revision=n->draft.generation;return 0;
+    }
     if(n->pending){
         if(!native_pending_match(n,pid,writer,N_FLUSH,0,0))return n->writer!=writer?FS_N_AGAIN:FS_N_BUSY;
         if(n->complete){error=n->result;native_pending_clear(n);return error;}
@@ -1191,3 +1225,5 @@ int fs_native_directory_read(int pid,const char *name,u32 epoch,u32 cursor,fs_na
     }
     *next=0xffffffffu;return 1;
 }
+
+#include "fs_lease.inc"

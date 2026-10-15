@@ -275,3 +275,5 @@ task0按顺序路由，真实KEYUP/Ctrl/Alt/重复和每按钮坐标不由轮询
 
 修订：2026-10-15，接线新消息窗口与统一真实键鼠、PAINT/矩形提交；
 原WM规范保留，新的构建及Windows客体键鼠/截图证据仍待本批验证。
+
+2026-10-16修订：R3 Shell角色的两surface经Prepare、真实完整首帧和Activate接管桌面底层/任务栏层；PREPARED后台IPC与显示激活分开。隐藏SID不获Window PREPARING、不生成帧，背景服务继续；选中后由一次性损伤请求驱动首帧，正常窗口CLOSE/veto及80B旧前缀保留。HostWindowPage/Action/At只针对可信同SID普通对象，SYSTEM窗口不借入。实际Runtime11稳定切换/最终回收已记录，其它窗口行为待定向验收。

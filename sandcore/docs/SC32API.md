@@ -166,3 +166,5 @@ GUI100..1ff、FILE200..2ff、clipboard300、IPC400、shared500分别为私有ope
 本批尚未构建/运行。后续只测改动实际影响的新平台和SCUI、必要原ABI兼容/退出；P3未受影响的原source与证据保留，不重跑无关旧网络/游戏矩阵。
 
 修订：2026-10-15，保留86/增44正式函数和真实平台接线、版本及未验证边界。
+
+2026-10-16修订：Phase5主源新增SC32HOST.H/SC32LEASE.H，ABI1.3/v4，旧130导出保留，追加12个lease和11个host/typed launch入口共153。SYS_SC32=0x300新selector700..70b与800..80a，旧SCAPI及旧快照不变。可信host仅固定发行字节/普通真实会话，PREPARED可服务IPC，ACTIVE才允许窗口管理。lease正文已构建并实际G1生成，文件事务实际出口尚待验证。

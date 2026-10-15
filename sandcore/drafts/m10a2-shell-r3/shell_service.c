@@ -560,7 +560,7 @@ ScStatus ScShellServiceStep(ScShellService *s,ScU32 timeout) {
             status=SC_SHELL_E_STALE;
             goto done;
         }
-        if(current_host.state!=SC32_SHELL_ACTIVE) {
+        if(current_host.state!=SC32_SHELL_PREPARED&&current_host.state!=SC32_SHELL_ACTIVE) {
             status=SC_SHELL_PENDING;
             goto done;
         }

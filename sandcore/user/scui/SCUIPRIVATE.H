@@ -176,6 +176,7 @@ static void ui_rect_intersection(const ScUiRect *,const ScUiRect *,ScUiRect *);
 static int ui_rect_contains(const ScUiRect *,ScI32,ScI32);
 static int ui_rect_nonempty(const ScUiRect *);
 static ScStatus ui_damage(UiNode *,const ScUiRect *);
+static int ui_root_can_paint(const UiRoot *);
 static ScStatus ui_paint_root(UiNode *);
 static ScStatus ui_root_surface(UiNode *);
 static ScStatus ui_theme_refresh(ScUiContext *);

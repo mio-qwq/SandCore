@@ -135,9 +135,20 @@ def main():
             collection = 'native_libraries' if case[2] else 'native_artifacts'
             item = dict(prior[collection][name])
             actual = Path(item['path'])
-            refresh.pin(actual, args.reuse_generation_report.parent, item['sha256'], item['bytes'])
-            item.update(generated_this_vm=False, generation_origin_report=str(args.reuse_generation_report.resolve()),
-                generation_origin_report_sha256=sha(args.reuse_generation_report))
+            origin = Path(item.get('generation_origin_report', str(args.reuse_generation_report.resolve())))
+            origin_sha = item.get('generation_origin_report_sha256', sha(args.reuse_generation_report))
+            refresh.pin(origin, ROOT / 'build', origin_sha)
+            origin_record = refresh.read_json(origin)
+            produced = origin_record[collection][name]
+            if (origin_record.get('status') != 'P5_NATIVE_GENERATION_PASS'
+                    or produced.get('generated_this_vm') is not True
+                    or produced['sha256'] != item['sha256'] or produced['bytes'] != item['bytes']
+                    or Path(produced['path']).resolve() != actual.resolve()):
+                raise ValueError('复用产物必须回到真正生成它的那一轮：' + name)
+            refresh.pin(actual, origin.parent, item['sha256'], item['bytes'])
+            item.update(generated_this_vm=False, generation_origin_report=str(origin.resolve()),
+                generation_origin_report_sha256=origin_sha,
+                reuse_validation_report=str(args.reuse_generation_report.resolve()))
             report[collection][name] = item
             report['reused_generation']['source_compile_closures'][name] = values
     driver = sha(Path(__file__))
@@ -200,6 +211,8 @@ def main():
                     report['status'] = 'FAIL_OR_INTERRUPTED'
                 persist()
     print(report['status'], flush=True)
+    if report['status'] != 'P5_NATIVE_GENERATION_PASS':
+        raise SystemExit(1)
 
 
 if __name__ == '__main__':

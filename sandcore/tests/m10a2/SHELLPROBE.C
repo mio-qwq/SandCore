@@ -23,7 +23,7 @@ static ScStatus deadline(void)
     if(now.ticks.hi!=begin.ticks.hi || now.ticks.lo-begin.ticks.lo>15u*begin.hz)return SC32_E_FAILED;
     return 0;
 }
-static ScStatus host_ready(ScShellHostInfo *host)
+static ScStatus host_ready(ScShellHostInfo *host,ScU32 drawn)
 {
     ScU32 previous=0xffffffffu;
     for(;;){
@@ -35,7 +35,7 @@ static ScStatus host_ready(ScShellHostInfo *host)
                 host->state,host->session,host->pid,host->generation,host->host_epoch);
             fflush(0);previous=host->state;
         }
-        if(host->state==SC32_SHELL_ACTIVE)return 0;
+        if(host->state==SC32_SHELL_ACTIVE || (!drawn && host->state==SC32_SHELL_PREPARED))return 0;
         if(host->state==SC32_SHELL_RETRY_EXHAUSTED)return SC32_E_FAILED;
         status=deadline();if(status<0)return status;
         ScU32 events=0;
@@ -65,7 +65,8 @@ static ScStatus probe(void)
     record(&begin,sizeof(begin));
     status=ScSystemMonotonic(&begin);if(status<0)return status;
     ScShellHostInfo host;
-    status=host_ready(&host);if(status<0)return status;
+    status=host_ready(&host,0);if(status<0)return status;
+    ScU32 first_pid=host.pid,first_generation=host.generation,first_epoch=host.host_epoch;
     if(!host.pid || !host.generation || !host.endpoint || !host.desktop || !host.taskbar)return SC32_E_FAILED;
     ScShellHostInfo rejected;
     record(&rejected,sizeof(rejected));
@@ -99,6 +100,20 @@ static ScStatus probe(void)
     if(!contents.epoch || !contents.applications)return SC32_E_FAILED;
     printf("SHELLPROBE CATALOG applications=%u associations=%u layout=%u epoch=%u\n",
         contents.applications,contents.associations,contents.layout_items,contents.epoch);
+    printf("SHELLPROBE HIDDEN_CATALOG_READY host_state=%u\n",host.state);fflush(0);
+    /* 先在真实隐藏会话中服务IPC，再由本人公开控制请求切换显示。
+     * 这段200PIT观察不把时钟当FPS，也不借System改内核显示状态。 */
+    ScMonotonicClock hidden;record(&hidden,sizeof(hidden));
+    status=ScSystemMonotonic(&hidden);if(status<0)return status;
+    for(;;){
+        ScMonotonicClock now;record(&now,sizeof(now));status=ScSystemMonotonic(&now);if(status<0)return status;
+        if(now.ticks.hi!=hidden.ticks.hi || now.ticks.lo-hidden.ticks.lo>=200u)break;
+        ScU32 events=0;status=ScSystemWait(SC32_EVENT_AUTH,10,&events);if(status<0)return status;
+    }
+    status=ScSessionControl(identity.session,SC32_SESSION_SHOW);if(status<0)return status;
+    status=host_ready(&host,1);if(status<0)return status;
+    if(host.pid!=first_pid || host.generation!=first_generation || host.host_epoch!=first_epoch)return SC32_E_STALE;
+    printf("SHELLPROBE VISIBLE_ACTIVE sid=%u pid=%u/%u epoch=%u\n",host.session,host.pid,host.generation,host.host_epoch);
     return 0;
 }
 int main(void)

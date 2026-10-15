@@ -118,7 +118,7 @@ replace("user/scui/ui_dispatch.c", "ScStatus ScUiContextStep(ScUiContext *c,ScU3
     *out=value;ui_object_leave(&c->object);return SC_UI_OK;
 }
 ScStatus ScUiContextStep(ScUiContext *c,ScU32 timeout)''')
-replace("user/scui/ui_dispatch.c", "        w->information.visibility_epoch=m->epoch;", "        w->information.visibility_epoch=m->epoch;\n        w->information.state&=~SC32_WINDOW_PREPARING;")
+replace("user/scui/ui_dispatch.c", "        w->information.visibility_epoch=m->epoch;", "        w->information.visibility_epoch=m->epoch;\n        if(w->visible)w->information.state&=~SC32_WINDOW_PREPARING;")
 replace("user/scui/ui_dispatch.c", "if(r->window && r->window->visible && r->window->paint_pending)", "if(r->window && ui_root_can_paint(r->window) && r->window->paint_pending)")
 replace("user/scui/ui_dispatch.c", "if(root->window && root->window->visible && root->window->paint_pending)", "if(root->window && ui_root_can_paint(root->window) && root->window->paint_pending)")
 replace("Makefile", "sc32_font.o sc32_broker.o sc32_drop.o", "sc32_font.o sc32_broker.o sc32_drop.o sc32_host.o")
@@ -132,7 +132,7 @@ $(BUILD)/wm.o: kernel/wm_shell.inc kernel/sc32_host.h
 $(BUILD)/scui-library.o: user/scui/ui_shell_paint.inc
 SHELL_HOST_IMAGE ?= $(BUILD)/SCSHELL.SCX
 # 正式原生收尾显式指向已核来源的G1产物，不把HOST摘要授给不同字节。
-$(BUILD)/shell_host_issue.h: $(SHELL_HOST_IMAGE) tools/mk_shell_issue.py
+.PHONY: m10a2-shell-issue-force\nm10a2-shell-issue-force:\n$(BUILD)/shell_host_issue.h: $(SHELL_HOST_IMAGE) tools/mk_shell_issue.py m10a2-shell-issue-force
 \t$(PY) tools/mk_shell_issue.py --host $(SHELL_HOST_IMAGE) --out $@
 $(BUILD)/task.o: kernel/shell_issue.inc $(BUILD)/shell_host_issue.h
 $(BUILD)/sc32-library.o: user/SC32HOST.H user/hostapi/SC32HOSTWIRE.H user/hostapi/sc32_launch.c

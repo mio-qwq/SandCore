@@ -25,6 +25,7 @@ int streams_terminal_info(int pid,int fd,u32 out[8]);
 int streams_terminal_clear(int pid,int fd);
 int streams_event(int pid,int fd,u32 action);
 int streams_exec(int parent,const char *command,const i32 descriptors[3],u32 flags);
+int streams_launch_session(int parent,const char *path,const char *arguments);
 int streams_pipe_descriptors(int parent,const i32 descriptors[3]);
 int streams_exec_buffer(int parent,const void *script,u32 bytes,const i32 descriptors[3],const char *arguments);
 int streams_wait(int parent,u32 ticket,u32 out[8]);

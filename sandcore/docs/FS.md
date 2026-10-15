@@ -252,3 +252,5 @@ SYS/LIB，其余库仍从调用者显式绝对包目录读取。新gate只影响
 
 修订：2026-10-14，追加SYS/LIB及祖先保护、宿主正式库归属/发布与固定根
 真实subject读取合同；本批源码未构建/未运行，不复用旧PASS替代新行为。
+
+2026-10-16修订：Phase5主源新增本人/世代绑定的stable-read、exclusive-write、namespace lease和条件Publish/Rename/Remove/SetMode/Cancel/Release/Advance及META-only pin。私有候选、现权复验、完整snapshot、bank/CRC/superblock durable/uncertain和预算回收在正文接线；不把Source生成或Drop ACK当作磁盘提交。当前已统一构建/实际G1生成，COPY/MOVE等真正客体事务仍待验。旧Metadata缺名粗FAILED不改，新typed查询另行补齐。

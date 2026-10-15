@@ -9,6 +9,8 @@
 #include "mouse.h"
 #include "sc32_broker.h"
 #include "sc32_drop.h"
+#include "fs_lease.h"
+#include "../user/SC32HOST.H"
 #include "../user/sc32/SC32WIRE.H"
 
 #define SC32_PTE_PRESENT 0x001u
@@ -105,6 +107,9 @@ static int capabilities(int pid,u32 request,u32 output)
         |SC32_CAP_POPUPS|SC32_CAP_POINTER_CURSOR;
     if(sc32_broker_available())result.capabilities_lo|=SC32_CAP_CLIPBOARD|SC32_CAP_IPC|SC32_CAP_SHARED_MEMORY;
     if(sc32_drop_available())result.capabilities_lo|=SC32_CAP_DROP_TARGETS;
+    if(fs_lease_available())result.capabilities_hi|=SC32_CAP_LEASES_HI;
+    /* 能力位表示已接入的角色服务合同，不表示当前用户桌面已经ACTIVE。 */
+    result.capabilities_hi|=SC32_CAP_HOST_HI;
     result.max_path_bytes=SC32_PATH_CAPACITY;result.max_arguments_bytes=1024;
     if(mouse_wheel_available())result.capabilities_lo|=SC32_CAP_POINTER_WHEEL;
     result.page_size=PAGE_SIZE;result.pit_hz=timer_frequency_hz();

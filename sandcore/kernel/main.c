@@ -24,7 +24,9 @@
 #include "wm.h"
 #include "sc32_gui.h"
 #include "sc32_broker.h"
+#include "sc32_lease.h"
 #include "sc32_drop.h"
+#include "sc32_host.h"
 #include "desktop.h"
 #include "module.h"
 #include "ttf.h"
@@ -322,11 +324,13 @@ void kmain(void)
         int key;
         while((key=key_peek())>=0 && wm_key_input((char)key))key_pop();
         sc32_gui_pump();              /* 同FIFO路由真实通断/按钮，IRQ不执行GUI。 */
-        fs_native_poll();             /* 元数据短批次续进，不把整目录PIO压进一次陷入。 */
+        fs_native_poll();
+        sc32_lease_poll();             /* 元数据短批次续进，不把整目录PIO压进一次陷入。 */
         streams_poll();               /* 输入/管道状态按订阅链分批唤醒，避免全任务扫描。 */
 #ifdef M10_DISK_CORE
         network_poll();              /* 输入先入状态，再做有限网卡/协议批次。 */
 #endif
+        sc32_host_poll();           /* 仅推进真正待启动SID，固定路径普通身份。 */
         sc32_drop_poll();
         sc32_broker_poll();
         task_cleanup_poll();          /* 先撤稳定旁表引用，再给调度器回收页与内核栈。 */

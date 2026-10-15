@@ -17,7 +17,9 @@
 #include "task_store.h"
 #include "scl_boot.h"
 #include "sc32_core.h"
+#include "sc32_host.h"
 #include "sc32_file.h"
+#include "sc32_lease.h"
 #include "sc32_gui.h"
 #include "sc32_font.h"
 #include "sc32_broker.h"
@@ -579,6 +581,7 @@ void task_stop(int pid)
      * 同一接口供 SYS_EXIT 和窗口红叉使用，避免两条退出路径语义漂移。 */
     if (pid <= 0 || pid >= NTASK || TASK(pid).state == 0 || TASK(pid).state == 2) return;
     task_state_set(pid,2);          /* 先改变状态，避免关闭调试子进程时重复进入 */
+    sc32_host_owner_stopped(pid);  /* 立即撤桌面角色，真实资源沿原owner阶段回收。 */
     cleanup_revoke_pending++;
     task_record(pid)->cleanup_next=-1;
     if(cleanup_tail>=0)task_record(cleanup_tail)->cleanup_next=pid;else cleanup_head=pid;
@@ -626,13 +629,13 @@ void task_cleanup_poll(void)
 #endif
             )cleanup_revoke_pending--;
         }
-        if(p->cleanup_phase>=
+        if((p->cleanup_phase>=
 #ifdef M10_DISK_CORE
             10
 #else
             9
 #endif
-        ){p->queue=QUEUE_ZOMBIE;p->zombie_next=zombie_head;zombie_head=owner;}
+        ) && sc32_lease_stop_step(owner)){p->queue=QUEUE_ZOMBIE;p->zombie_next=zombie_head;zombie_head=owner;}
         else{
             if(cleanup_tail>=0)task_record(cleanup_tail)->cleanup_next=owner;else cleanup_head=owner;
             cleanup_tail=owner;
@@ -715,6 +718,10 @@ void syscall_c_common(u32 vec, u32 *frame)
             frame[11]=(u32)sc32_broker_call(current,frame[8],frame[10],frame[9]);
         else if(frame[8]==SC32_FONT_QUERY || frame[8]==SC32_FONT_GLYPH)
             frame[11]=(u32)sc32_font_call(current,frame[8],frame[10],frame[9]);
+        else if(frame[8]>=0x700u && frame[8]<0x720u)
+            frame[11]=(u32)sc32_lease_call(current,frame[8],frame[10],frame[9]);
+        else if(frame[8]>=0x800u && frame[8]<0x820u)
+            frame[11]=(u32)sc32_host_call(current,frame[8],frame[10],frame[9]);
         else frame[11]=(u32)sc32_core_call(current,frame[8],frame[10],frame[9]);
         break;
     case SYS_STATUS:
@@ -1303,23 +1310,34 @@ u8 *task_loader_stage(u32 bytes)
     return scx_stage;
 }
 
+#include "shell_issue.inc"
+
 int task_exec_scx(const char *path)
 {
-    /* EXEC 接受“路径 空格 参数串”。内核只切出首个路径，参数原样传给
-     * 用户程序解释；这样汇编器/记事本可以选择输入输出文件，内核无需
-     * 知道任何具体应用的语法。拷贝完再建任务，消除父子缓冲共享。 */
-    char filename[64];
-    int len = 0;
-    while (*path == ' ') path++;
-    while (path[len] && path[len] != ' ' && len < 63) { filename[len] = path[len]; len++; }
-    if (path[len] && path[len] != ' ') return -1;
-    filename[len] = 0;
+    /* 旧 EXEC 仍接受首个空格分隔的路径与至多127B参数，不改历史语义。 */
+    char filename[64];int len=0;
+    while(*path==' ')path++;
+    while(path[len] && path[len]!=' ' && len<63){filename[len]=path[len];len++;}
+    if(path[len] && path[len]!=' ')return -1;
+    filename[len]=0;
     if(!auth_launch_access(filename,FS_ACCESS_READ))return -5;
-    const char *arguments = path + len;
-    while (*arguments == ' ') arguments++;
-    int arglen = 0;
-    while (arguments[arglen] && arglen < 127) arglen++;
-    if (arguments[arglen]) return -1;
+    const char *arguments=path+len;
+    while(*arguments==' ')arguments++;
+    int arglen=0;while(arguments[arglen] && arglen<127)arglen++;
+    if(arguments[arglen])return -1;
+    return task_exec_scx_parts(filename,arguments);
+}
+
+int task_exec_scx_parts(const char *filename,const char *arguments)
+{
+    /* 新 typed launch 把路径与参数分开；旧wrapper仍负责自己的旧长度
+     * 边界。装载检查/页分配/动态SCX引导只有这一份正文，防止两条路径漂移。 */
+    if(!filename || !arguments)return -1;
+    u32 filelen=0;while(filename[filelen] && filelen<63)filelen++;
+    if(!filelen || filename[filelen])return -1;
+    u32 arglen=0;while(arguments[arglen] && arglen<1023)arglen++;
+    if(arguments[arglen])return -1;
+    if(!auth_launch_access(filename,FS_ACCESS_READ))return -5;
     /* M9首轮链接已证明大暂存挤出1..2MiB的BSS边界。SCX中转
      * 固定64页，只在首次合法装载时向PF申请，之后复用到重启；
      * 仍是IF=0加载路径的单一内核工作区，不随任务反复分配。
@@ -1336,6 +1354,7 @@ int task_exec_scx(const char *path)
     /* 图标只是容器资源，不搬进程序地址域。先校验整个容器，再仅读
      * 载荷，既保留旧装载上限，也支持“最大载荷+独立图标”大文件。 */
     if(fs_read_at(filename,scx_stage+36,load_size,36)!=(int)load_size)return -1;
+    if(auth_launch_issued_shell() && (icon_length || shell_issue_verify(scx_stage,36u+load_size)))return -5;
 
     u32 pd = paging_new_task_dir();
     if (!pd) return -4;
@@ -1381,7 +1400,10 @@ int task_exec_scx(const char *path)
         /* 页尾补零和独立栈都不是SCX正文。启动描述符须与已校验
          * 容器精确相等，不能靠“这一段恰好已映射”猜载荷/BSS身份。 */
         task_record(pid)->scx_load_size=load_size;task_record(pid)->scx_bss_size=bss_size;
-        for (int i = 0; i <= arglen; i++) TASK(pid).args[i] = arguments[i];
+        /* 168B旧任务前缀仍只容纳127B；新版ARGUMENTS2由streams保存完整参数。 */
+        u32 legacy_args=arglen<127?arglen:127;
+        for(u32 i=0;i<legacy_args;i++)TASK(pid).args[i]=arguments[i];
+        TASK(pid).args[legacy_args]=0;
         streams_set_arguments(pid,arguments);
         userspace_executable(pid,filename);
     }
