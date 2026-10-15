@@ -731,7 +731,7 @@ static ScStatus sh_read_file_revision(const char *path,ScBuffer **out,ScU32 *rev
     memset(&metadata,0,sizeof(metadata));
     metadata.size=sizeof(metadata);
     metadata.version=1;
-    s=ScPathMetadata(path,&metadata);
+    s=ScPathQuery(path,&metadata);
     if(s<0)return sh_cause(s,23,0);
     if(metadata.kind!=SC32_PATH_FILE)return SC_SHELL_E_INVALID;
     memset(&d,0,sizeof(d));

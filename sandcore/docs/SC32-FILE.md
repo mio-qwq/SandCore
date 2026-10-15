@@ -20,6 +20,7 @@
 | 0x220 | DIRECTORY_OPEN | OPEN布局，但flags/mode/reserved全0 |
 | 0x221 | DIRECTORY_NEXT | size/version/handle/rows/capacity/reserved3 |
 | 0x222 | DIRECTORY_CLOSE | HANDLE布局、value0 |
+| 0x223 | PATH_QUERY | size/version/path/flags0/reserved4；独立48B ScPathInfo输出 |
 
 FILE回复48B依次为 `size,version,handle,transferred,position,length,object,revision,flags,raw,endpoint_kind,endpoint_capabilities`。DIRECTORY回复32B依次为 `size,version,handle,count,cursor,epoch,flags,reserved`。所有字段32位、小端、4B对齐；只含本人地址和不透明编号，不返回内核指针。
 
@@ -97,3 +98,22 @@ v5显式父目录直接扫描后续记录，只有直属条目进入结果，不
 2026-10-14：固定File/Directory wire、独立身份/版本、六模式和有界随机IO/元数据续进、失败prefix/UNCERTAIN、真实标准端点引用/弱proxy与旧父事务边界；本批源码/静态接线收齐后由主代理统一构建与客体验证。
 
 2026-10-15：主代理统一构建、实际客体生成的库/公开应用与三窗口P0运行通过；首Shell背景表一页单列，暖PF及GUI池精确恢复，证据见evidence/m10a2-sc32；完整平台继续。
+
+## 2026-10-16：精确路径元数据查询
+
+新程序包含完全大写 `SC32PATH.H`，调用 `ScStatus ScPathQuery(const char *path, ScPathInfo *out)`；要求 SC32API ABI1.3、library_version5。库154项导出，原153项名称/参数/行为保持。`ScPathInfo` 为48B：size/version/kind/bytes、UID/GID/rw/flags/generation/reserved3，bytes是文件字节数，不是FD位置；generation为本次已提交目录对象代数。
+
+调用前设置out.size/out.version；原始路径至多127B，按当前CWD仅解析一次，SandFS规范名仍至多63B，当前空格/冒号/反斜杠规则未改变。请求32B精确v1，flags/reserved全零；输出声明完整RW范围先验。成功只写48B前缀；任何失败完整保留输出和未知尾部。
+
+查询只需要真实META/祖先遍历权限，不创建FILE/Directory对象、不读文件正文、不取得namespace或内容pin。先核可访问性再查名字，避免用NOT_FOUND泄露不可遍历目录的后代。可遍历目录内缺名返回NOT_FOUND；不可遍历为ACCESS；卷故障为IO；非v5为NOT_SUPPORTED。查询不提供跨yield稳定性，后续修改必须使用观察到的generation及lease条件提交，不能拿元数据快照充当权限票。
+
+旧ScPathStat/ScPathMetadata依然走原始粗错误合同；没有把旧FAILED全域转换成NOT_FOUND。新Shell/worker迁移到精确入口，避免把正常新目标误判为IO，也避免把真实权限/故障当作可创建空位。统一HOST构建24、真实客体generation12的四个受影响组件已通过；普通用户实际COPY/MOVE正在定向验证，尚不记为事务PASS。
+
+修订：2026-10-16，新增独立selector223/SC32PATH.H及错误、权限、输出和兼容合同，旧ABI/磁盘格式保持。
+
+
+2026-10-16事务修复：私有候选允许Publish到本人预留的同一名字，仍要求目标实际不存在、当前权限、已flush revision和完整条件提交；已发布对象同名Rename继续INVALID。索引原地提交只撤提交期slot1，保留拥有者slot0与子树，不做无效搬迁。首次FILEJOB失败的WORK.TRACE实际定位为planning1/recovery2/active0，原FAIL保留；新CORE14进行最小同工作流回归，尚未写PASS。
+
+worker诊断可由调用者本人设置SCSHELL_TRACE为普通可写路径，默认关闭；错误先冻结再写日志，日志IO失败不改变原始提交结果。不使用SYSTEM串口，不绕FS权限，不把日志当durable ACK。
+
+2026-10-16实际结果：FILEJOB04通过普通UID1000的精确路径查询、131079B COPY/MOVE、持久ACK、客体逐字节和宿主取回内容对照；两份832B恢复日志的头/frame CRC与START/提交/FINISH独立审计通过。退出/注销13830→13830 PF，各池/历史/字体/未归因增量0，输入/原盘保持。证据入口evidence/m10a2-p5-file-jobs/README.md。完整P5、主要组件和SDK仍未完成，持续目标active。

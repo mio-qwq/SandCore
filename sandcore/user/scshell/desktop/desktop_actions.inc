@@ -12,7 +12,7 @@ static ScStatus desk_open(ScU32 index)
     if(index>=desk.count || desk.items[index].removed)return SC_UI_E_STALE;
     DeskItem *item=desk.items+index;ScLaunchInfo out;memset(&out,0,sizeof(out));out.size=sizeof(out);out.version=1;
     ScPathInfo current;memset(&current,0,sizeof(current));current.size=sizeof(current);current.version=1;
-    ScStatus checked=ScPathMetadata(item->path,&current);if(checked<0)return checked;
+    ScStatus checked=ScPathQuery(item->path,&current);if(checked<0)return checked;
     if(current.generation!=item->observed_revision || current.kind!=item->kind){desk.refresh_pending=1;return SC_SHELL_E_STALE;}
     if(item->shortcut)return ScShellShortcutLaunch(item->shortcut,desk.catalog,&out);
     return ScShellOpen(desk.catalog,item->path,"open",&out);
@@ -276,7 +276,7 @@ static ScStatus desk_shortcut_properties(ScU32 index,ScU32 rename_only)
     ScShellShortcutDesc shortcut;memset(&shortcut,0,sizeof(shortcut));shortcut.size=sizeof(shortcut);shortcut.version=1;
     ScStatus s=ScShellShortcutDescribe(desk.items[index].shortcut,&shortcut);
     ScPathInfo metadata;memset(&metadata,0,sizeof(metadata));metadata.size=sizeof(metadata);metadata.version=1;
-    if(s==0)s=ScPathMetadata(desk.items[index].path,&metadata);
+    if(s==0)s=ScPathQuery(desk.items[index].path,&metadata);
     if(s==0 && metadata.generation!=desk.items[index].observed_revision){desk.refresh_pending=1;s=SC_SHELL_E_STALE;}
     ScConfig *initial=0;if(s==0)s=ScConfigCreate(&initial);
     const char *values[5]={shortcut.label,shortcut.target,shortcut.arguments,shortcut.icon,shortcut.application};
@@ -429,7 +429,7 @@ static ScStatus desk_drop(ScUiContext *ui,const ScUiEvent *event,void *context)
         strcpy(desk.drop_destination,desk.desktop_path);
         if(hit!=DESK_NONE && desk.items[hit].kind==SC32_PATH_DIRECTORY){
             ScPathInfo info;memset(&info,0,sizeof(info));info.size=sizeof(info);info.version=1;
-            ScStatus checked=ScPathMetadata(desk.items[hit].path,&info);if(checked<0)return checked;
+            ScStatus checked=ScPathQuery(desk.items[hit].path,&info);if(checked<0)return checked;
             if(info.kind!=SC32_PATH_DIRECTORY || info.generation!=desk.items[hit].observed_revision)return SC_SHELL_E_STALE;
             strcpy(desk.drop_destination,desk.items[hit].path);
         }

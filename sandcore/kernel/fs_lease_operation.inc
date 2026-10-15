@@ -126,7 +126,11 @@ static int lease_operation_condition(lease_record_t *r)
         if(r->handle_kind==2)for(int i=0;i<nfiles;i++)if(child(dirents[i].name,r->name))return SC32_E_BUSY;
         return 0;
     }
-    if(same(r->name,r->target) || child(r->target,r->name))return SC32_E_INVALID;
+    /* 私有候选尚不在目录中，可原地发布到本人预留的不存在名字。
+     * 这仍需走ABSENT/现权/flush/双bank提交；已发布对象同名Rename
+     * 继续拒绝，不能把没有磁盘副作用的空操作伪造成持久新revision。 */
+    if(child(r->target,r->name)
+       || (same(r->name,r->target) && !(r->flags&SC32_LEASE_FLAG_CANDIDATE)))return SC32_E_INVALID;
     status=lease_destination_condition(r);if(status)return status;
     if(r->handle_kind==2)return lease_tree_ready(r,r->target);
     return 0;
@@ -183,7 +187,9 @@ int fs_lease_begin(int pid,const Sc32LeasePublishRequest *q,const char *target_n
            || target->target_borrow_head || target->namespace_borrow_head)return SC32_E_INVALID;
         if(target->handle_kind==2 && q->expected_target_object)return SC32_E_INVALID;
     }
-    if(r==ns || target==ns || (ns && lease_ancestor(r->id,ns->id)))return SC32_E_INVALID;
+    /* ABSENT且无父grant时target/ns合法地同时为NULL；只有真实的
+     * 目标租约与namespace是同一对象才冲突，不能把两个空值当别名。 */
+    if(r==ns || (target && target==ns) || (ns && lease_ancestor(r->id,ns->id)))return SC32_E_INVALID;
     u32 previous_operation=r->operation;
     r->operation=rename?SC32_LEASE_OP_RENAME:SC32_LEASE_OP_PUBLISH;
     r->expected_source_object=q->expected_source_object;r->expected_source_revision=q->expected_source_revision;

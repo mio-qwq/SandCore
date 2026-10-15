@@ -1,6 +1,7 @@
 #ifndef SANDCORE_SCSHELL_H
 #define SANDCORE_SCSHELL_H
 #include <SC32HOST.H>
+#include <SC32PATH.H>
 #include <SC32LEASE.H>
 #include <SCUI.H>
 

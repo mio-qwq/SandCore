@@ -1,0 +1,38 @@
+SandShell M9
+SYSTEM /SYS [SYSTEM] # true; _m9_status=$?; echo __SCUI_CMD_6fe903c100a4766172ee9121:$_m9_status:__SCUI_CMD_6fe903c100a4766172ee9121_END
+__SCUI_CMD_6fe903c100a4766172ee9121:0:__SCUI_CMD_6fe903c100a4766172ee9121_END
+SYSTEM /SYS [SYSTEM] # ls /HOME/M10SHELL/HOST; _m9_status=$?; echo __SCUI_CMD_f111a969d1df80c050b1fa54:$_m9_status:__SCUI_CMD_f111a969d1df80c050b1fa54_END
+__SCUI_CMD_f111a969d1df80c050b1fa54:0:__SCUI_CMD_f111a969d1df80c050b1fa54_END
+SYSTEM /SYS [SYSTEM] # echo STDLIB_BG_WARM & wait; _m9_status=$?; echo __SCUI_CMD_6250d32c75318f774139af82:$_m9_status:__SCUI_CMD_6250d32c75318f774139af82_END
+STDLIB_BG_WARM
+__SCUI_CMD_6250d32c75318f774139af82:0:__SCUI_CMD_6250d32c75318f774139af82_END
+SYSTEM /SYS [SYSTEM] # printf warm > /HOME/M10SHELL/WARM.DAT; cat /HOME/M10SHELL/WARM.DAT; _m9_status=$?; echo __SCUI_CMD_a09a5c9631d9ca09fb8fbee3:$_m9_status:__SCUI_CMD_a09a5c9631d9ca09fb8fbee3_END
+warm__SCUI_CMD_a09a5c9631d9ca09fb8fbee3:0:__SCUI_CMD_a09a5c9631d9ca09fb8fbee3_END
+SYSTEM /SYS [SYSTEM] # /TMP/P5RT-74f609/ACTUALG1.SCX /TMP/P5RT-74f609/FILEJOBPROBE.C /HOME/M10SHELL/GENERATED/FILEJOBPROBE.SCX --dynamic /TMP/P5RT-74f609/FILEJOBPROBE.json; _m9_status=$?; echo __SCUI_CMD_31887deaa376df217dc7b677:$_m9_status:__SCUI_CMD_31887deaa376df217dc7b677_END
+SCCC / mio
+TMP/P5RT-74f609/FILEJOBPROBE.C -> HOME/M10SHELL/GENERATED/FILEJOBPROBE.SCX
+Validating application manifest
+SCCC: preprocess -> C -> x86
+Preprocessing source and includes
+Parsing C and generating x86
+Linking and writing SCX
+SCCC OK SCX DYNAMIC
+Compilation complete
+__SCUI_CMD_31887deaa376df217dc7b677:0:__SCUI_CMD_31887deaa376df217dc7b677_END
+SYSTEM /SYS [SYSTEM] # sessionctl list; _m9_status=$?; echo __SCUI_CMD_aaaa2be16df75a708d431d59:$_m9_status:__SCUI_CMD_aaaa2be16df75a708d431d59_END
+ID  UID  GID  TYPE  ACTIVE  TASKS  NAME
+1  1000  1000  user  yes  1  mio
+2  -1  -1  SYSTEM  no  3  SYSTEM
+3  -2  -2  LOCKED  no  0  Locked
+__SCUI_CMD_aaaa2be16df75a708d431d59:0:__SCUI_CMD_aaaa2be16df75a708d431d59_END
+SYSTEM /SYS [SYSTEM] # printf '%s\n' '' '/HOME/M10SHELL/GENERATED/FILEJOBPROBE.SCX; _p5=$?; echo __P5_RESULT_85cea888eecd3967:$_p5; exit $_p5' | su mio; _m9_status=$?; echo __SCUI_CMD_ffdc0c47d15f17eca7ae28b5:$_m9_status:__SCUI_CMD_ffdc0c47d15f17eca7ae28b5_END
+Password: 
+FILEJOB ID uid=1000 sid=4 generation=1
+FILEJOB PATH_QUERY metadata_missing_access_and_untouched_output_PASS
+FILEJOB STATE operation=1 state=1 stage=0 item=0 status=0 cause=0 domain=0 raw=0
+FILEJOB STATE operation=1 state=2 stage=0 item=0 status=0 cause=0 domain=0 raw=0
+FILEJOB STATE operation=1 state=8 stage=0 item=0 status=-101 cause=-101 domain=2 raw=-101
+FILEJOB FAIL checkpoint=4 status=-116 shell=0 cause=0 domain=0 raw=0
+__P5_RESULT_85cea888eecd3967:1
+__SCUI_CMD_ffdc0c47d15f17eca7ae28b5:0:__SCUI_CMD_ffdc0c47d15f17eca7ae28b5_END
+SYSTEM /SYS [SYSTEM] # 

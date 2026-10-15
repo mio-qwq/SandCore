@@ -452,7 +452,7 @@ env -u OS make -j4
 
 | 版本 | 状态 |
 |---|---|
-| M10a2 — The Application Platform Era | SCL与SC32基础/原生库/消息窗口已实际运行，四库/SCUI GUI已有真实阶段证据；P5原生生成完成但启动故障修复中，组件/SDK与整版未验收 |
+| M10a2 — The Application Platform Era | SCL与SC32基础/原生库/消息窗口已实际运行，四库/SCUI GUI已有真实阶段证据；P5原生host稳定切换及普通用户COPY/MOVE/精确元数据通过，剪贴板/拖放/布局与组件/SDK整版未验收 |
 | M10a1 | 2026-10-07 验收通过，GitHub Preview 预发布，含追加 curl；统一使用 main |
 | M9 | 2026-10-05 验收通过，正式发布 |
 | M8a | 批准的部分正式发布；原 M8 未完成部分继续封存 |

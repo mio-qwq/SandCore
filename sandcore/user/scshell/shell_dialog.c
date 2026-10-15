@@ -344,7 +344,7 @@ ScStatus ScShellProperties(ScUiContext *ui,ScUiNode owner,const char *path,ScShe
     memset(&d->metadata,0,sizeof(d->metadata));
     d->metadata.size=sizeof(d->metadata);
     d->metadata.version=1;
-    s=ScPathMetadata(d->path,&d->metadata);
+    s=ScPathQuery(d->path,&d->metadata);
     if(s<0)goto fail;
     s=sh_widget(ui,d->root,SC_UI_TEXTBOX,d->path,0,30,&path_node);
     if(s<0)goto fail;

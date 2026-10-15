@@ -668,3 +668,6 @@ WAIT40b在同一IF=0入口完整核request、真实GUI队列及对象ready，再
 修订：2026-10-15，登记新私有selector与字布局/真实共享页/混合等待及退出顺序，旧SCAPI原字节保持。
 
 2026-10-16修订：M10a2 Phase5新增仅SYS_SC32=0x300内的新selector：lease0x700..0x70b（Acquire/Open/Create/Query/Snapshot/Publish/Rename/Remove/Release/Cancel/Advance/SetMode）；host0x800..0x80a（Launch/Query/Prepare/Activate/Connect/Workspace/WindowPage/WindowAction/Restart/Deactivate/WindowAt）。字段/记录宽度见SC32LEASE.H、SC32HOST.H和SCSHELL-DESIGN；真实owner、SID、代数及全部out写范围先验。没有复用旧忽略寄存器或改旧缓冲。host/client切片Runtime11通过，lease事务仍未获实际PASS。
+
+
+2026-10-16修订：SYS_SC32=0x300新增selector0x223 PATH_QUERY。ECX本人32B请求(size/version/path/flags0/reserved4)，EDX本人ScPathInfo48B可扩展输出；只在成功写规范前缀。真实META/祖先权限先于缺名查询，不初始化FD池，错误域精确映射。对应公开SC32PATH.H、SC32API v5，旧syscall/SCAPI/PathStat/Metadata均保持。

@@ -1,5 +1,20 @@
 #include "SCFILEWORKPRIVATE.H"
 
+/* 诊断由本人环境显式选择普通可写文件，仍逐次受真实FS权限约束。
+ * 不使用硬件调试串口，不把状态日志改成提交ACK；失败原因先冻结，
+ * 再做可失败的日志IO，避免诊断覆盖原始ScErrorInfo。默认完全关闭。 */
+static void sw_failure_trace(void)
+{
+    char path[128];ScU32 count=0;
+    if(ScProcessEnvironment("SCSHELL_TRACE",path,sizeof(path),&count) || !count)return;
+    FILE *stream=fopen(path,"a");if(!stream)return;
+    fprintf(stream,"worker=%u/%u status=%d cause=%d domain=%u raw=%d state=%u planning=%u roots=%u items=%u recovery=%u active_phase=%u\n",
+        sw.self.pid,sw.self.generation,sw.failure,sw.failure_cause.code,sw.failure_cause.domain,
+        sw.failure_cause.raw,sw.state,sw.planning_complete,sw.root_count,sw.item_counter,
+        sw.recovery_phase,sw.active?sw.active->phase:0);
+    fclose(stream);
+}
+
 /* 聚合只包含worker自己的职责片段。四大库始终来自独立SCL，
  * 不包含SCAPI/内核结构/汇编，也不静态复制库正文。 */
 #include "worker_lease.c"
@@ -327,6 +342,7 @@ int main(void)
         }
         else if(sw.started){status=sw_job_step();
             if(status){sw_fail(status);
+                sw_failure_trace();
                 sw.finished=1;
             }}
         else if(sw.cancelled)sw.finished=1;

@@ -240,3 +240,5 @@ $(BUILD)/fs/SYS/SHELL/SCFILEWORK.SCX: $(BUILD)/SCFILEWORK.SCX
 	mkdir -p $(dir $@)
 	cp $< $@
 m10a2-shell-install: $(addprefix $(BUILD)/fs/SYS/LIB/,$(addsuffix .SCL,$(M10A2_SHELL_LIB_NAMES))) $(BUILD)/fs/SYS/SHELL/SCSHELL.SCX $(BUILD)/fs/SYS/SHELL/SCFILEWORK.SCX
+
+$(BUILD)/sc32-library.o: user/SC32PATH.H $(wildcard user/pathapi/*.c user/pathapi/*.H)

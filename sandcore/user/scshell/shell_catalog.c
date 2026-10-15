@@ -594,7 +594,7 @@ ScStatus ScShellCatalogAssociation(const ScShellCatalog *c,const char *type,cons
     return sh_output(out,&info,sizeof(info));
 }
 ScStatus ScShellCatalogResolve(const ScShellCatalog *c,const char *path,const char *verb,ScShellApplication **out,ScU32 *verb_index) {
-    ScPathStatInfo st;
+    ScPathInfo st;
     ScPathParts parts;
     ScShellAssociationInfo a;
     char type[256];
@@ -604,7 +604,7 @@ ScStatus ScShellCatalogResolve(const ScShellCatalog *c,const char *path,const ch
     memset(&st,0,sizeof(st));
     st.size=sizeof(st);
     st.version=1;
-    s=ScPathStat(path,&st);
+    s=ScPathQuery(path,&st);
     if(s<0)return sh_cause(s,11,0);
     if(st.kind==SC32_PATH_DIRECTORY)strcpy(type,"directory");
     else {

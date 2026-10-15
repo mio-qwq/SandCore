@@ -70,3 +70,15 @@ Runtime10的只读私有快照解析结果无效，不能用其乱码字段证�
 Runtime11保持同一host PID7/gen1/epoch1完成PREPARED后台HELLO/catalog→本人公开切换→ACTIVE，无中途重启；只读隐藏观察3条消息、paint0、两root visible0/state128，暂停0.172秒未写内存。最终13829→13829 PF，history/font/unexplained均0，源码/原盘保持。主代理已查看初始、Start和后续桌面图片；异步图标/壁纸仍需后续收敛视觉就绪，不能按文件名ready盲称全资源就绪。
 
 已运行promote_m10a2_shell_candidate，按旧baseline及明确的P4 context rebase核冲突，把实际候选88个源码路径整合到主工作区；SCAPI仍81a730...fc1。凭证build/m10a2-shell-integration-stage-01/reports/source-promotion-01.json。此后kernel/user/Make为主源，drafts保留原独立工作及沿革，不用旧patch覆盖当前源码。隔离构建目录继续复用，后续只同步明确变更的源，不复制磁盘或整树。full_P5/full_M10a2仍false，下一项现代typed路径元数据/worker目标缺名等真正文件事务闭环。
+
+后续在主源实现现代ScPathQuery：独立SC32PATH.H、selector223、48B既有ScPathInfo输出，真实META权限、精确缺名/权限/IO、失败不写out、不初始化FILE池；旧PathStat/Metadata源码保持。SC32ABI1.3保留、库升v5/154导出，新Shell/worker依赖v5；BaseHeader仅版本常量改变。新源29路径经sync-typed-path-query-01凭证同步到原隔离构建，未复制盘，旧Stage未知差异会拒绝覆盖。此批尚在unified-host-21构建，未有新的原生或文件job运行证据。
+
+
+Typed查询批次：unified-host-21/22/23分别暴露并修复不存在fs_native_available、ScPathInfo.bytes字段误写、worker公开头缺失；原失败日志保留。unified-host-24整体HOST通过；typed-path-query-01真实SCCC宿主前端四组件通过；generation12在Windows双盘客体内真实生成SC32/SCSHELL/worker/desktop且编译owner账通过，未改SCUI通过独立版本宏兼容闭包复用。native-issued-core-12精确绑定新桌面125405B/SHA f1549ad10a4bd208c338aed37487e36268d47b9b0f8611ad2fa2efede66836c4。FILEJOBPROBE仅公开头/动态库，真实普通UID1000、缺名/拒权输出保持、131079B跨两块COPY/MOVE及独立逐字节/取回比对正在首次运行；不是完整P5或M10a2完成。main499e4c3已以ls-remote确认推送。
+
+
+FILEJOB01/02实际typed查询通过，COPY在恢复日志Publish阶段INVALID；02取回本人WORK.TRACE定位planning1/items1/recovery2/active0。直接原因是候选以recovery_path私有创建后原地发布，被lease_operation_condition无条件same-name禁令拒绝。现主源只允许CANDIDATE同名Publish，现权/ABSENT/flush/双bank合同保留，lease_move_index同叶只撤slot1。worker增加本人环境显式开启的失败诊断（默认关闭，不走硬件串口，原错先冻结），GEN13真实仅更新worker，其余产物保持实际origin。CORE14仅两处kernel修复，绑定GEN13/同一GEN12桌面，无需重编用户闭包。回归尚在进行。
+
+FILEJOB03仍停recovery2；核对fs_lease_begin发现第二个确定错误：ABSENT且无namespace时target==ns为NULL==NULL，被当作同一真实对象拒绝。改成target非空后再比；CORE15复用GEN13用户产物做相同回归，未扩大用例。
+
+2026-10-16实际结果：FILEJOB04通过普通UID1000的精确路径查询、131079B COPY/MOVE、持久ACK、客体逐字节和宿主取回内容对照；两份832B恢复日志的头/frame CRC与START/提交/FINISH独立审计通过。退出/注销13830→13830 PF，各池/历史/字体/未归因增量0，输入/原盘保持。证据入口evidence/m10a2-p5-file-jobs/README.md。完整P5、主要组件和SDK仍未完成，持续目标active。

@@ -168,3 +168,8 @@ GUI100..1ff、FILE200..2ff、clipboard300、IPC400、shared500分别为私有ope
 修订：2026-10-15，保留86/增44正式函数和真实平台接线、版本及未验证边界。
 
 2026-10-16修订：Phase5主源新增SC32HOST.H/SC32LEASE.H，ABI1.3/v4，旧130导出保留，追加12个lease和11个host/typed launch入口共153。SYS_SC32=0x300新selector700..70b与800..80a，旧SCAPI及旧快照不变。可信host仅固定发行字节/普通真实会话，PREPARED可服务IPC，ACTIVE才允许窗口管理。lease正文已构建并实际G1生成，文件事务实际出口尚待验证。
+
+
+2026-10-16增量：SC32API保持ABI1.3，库版本升5/154导出，新增独立公开SC32PATH.H的ScPathQuery。selector223精确返回已有48B ScPathInfo，META权限/缺名/IO分别报告且失败不写out，不创建FD；旧PathStat/Metadata错误及SCAPI原字节保持。新Shell和worker要求v5，旧SCUI实际原生字节按公开声明及类型完全相同、版本宏未被实现使用的闭包证据直接复用，不能宣称重新编译。参数及限制见SC32-FILE.md。HOST24与实际G1 generation12通过，文件工作流验证尚在进行。
+
+2026-10-16实际结果：FILEJOB04通过普通UID1000的精确路径查询、131079B COPY/MOVE、持久ACK、客体逐字节和宿主取回内容对照；两份832B恢复日志的头/frame CRC与START/提交/FINISH独立审计通过。退出/注销13830→13830 PF，各池/历史/字体/未归因增量0，输入/原盘保持。证据入口evidence/m10a2-p5-file-jobs/README.md。完整P5、主要组件和SDK仍未完成，持续目标active。

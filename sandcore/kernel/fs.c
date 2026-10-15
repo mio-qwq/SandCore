@@ -1227,3 +1227,5 @@ int fs_native_directory_read(int pid,const char *name,u32 epoch,u32 cursor,fs_na
 }
 
 #include "fs_lease.inc"
+
+#include "fs_path_query.inc"

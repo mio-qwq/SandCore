@@ -2,7 +2,7 @@
   "name": "SC32API.SCL",
   "abi_major": 1,
   "abi_minor": 3,
-  "library_version": 4,
+  "library_version": 5,
   "init": null,
   "fini": "Sc32Finalize",
   "exports": [
@@ -616,6 +616,10 @@
     },
     {
       "name": "ScShellHostWorkspace",
+      "kind": "function"
+    },
+    {
+      "name": "ScPathQuery",
       "kind": "function"
     }
   ],

@@ -18,6 +18,8 @@ int fs_access_identity(const char *path,int uid,int gid,u32 access);
 int fs_access(int pid,const char *path,u32 access);
 int fs_access_parent(int pid,const char *path);
 int fs_metadata(const char *path,u32 out[8]);
+/* 现代META查询保留精确缺名/权限/IO错误，不打开文件正文。 */
+int fs_path_query(int owner,const char *path,u32 out[8]);
 void fs_storage_info2(u32 out[16]);
 int fs_permissions(int pid,const char *path,int uid,int gid,u32 mode);
 /* M9流式替换：容量提前保留，正文顺序追加，commit才发布新目录。

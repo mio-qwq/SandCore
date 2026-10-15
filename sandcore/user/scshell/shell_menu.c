@@ -690,7 +690,7 @@ static ScStatus sh_menu_conflict_open(ScShellMenu *m) {
         memset(&target,0,sizeof(target));
         target.size=sizeof(target);
         target.version=1;
-        if(ScPathMetadata(m->conflict_snapshot.source,&source)<0||ScPathMetadata(m->conflict_snapshot.destination,&target)<0||source.kind!=SC32_PATH_DIRECTORY||target.kind!=SC32_PATH_DIRECTORY)buttons[3].flags=SC_UI_MENU_DISABLED;
+        if(ScPathQuery(m->conflict_snapshot.source,&source)<0||ScPathQuery(m->conflict_snapshot.destination,&target)<0||source.kind!=SC32_PATH_DIRECTORY||target.kind!=SC32_PATH_DIRECTORY)buttons[3].flags=SC_UI_MENU_DISABLED;
     }
     d.size=sizeof(d);
     d.version=1;

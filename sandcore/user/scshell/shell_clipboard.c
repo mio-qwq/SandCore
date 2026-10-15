@@ -131,7 +131,7 @@ static ScStatus sh_clip_files_encode(const ScShellFileItem *items,ScU32 count,Sc
         memset(&info,0,sizeof(info));
         info.size=sizeof(info);
         info.version=1;
-        s=ScPathMetadata(owned[i].source,&info);
+        s=ScPathQuery(owned[i].source,&info);
         if(s<0)goto done;
         if(info.kind!=owned[i].kind|| ((owned[i].flags&SC_SHELL_ITEM_EXPECT_SOURCE)&&info.generation!=owned[i].expected_source_revision)) {
             s=SC_SHELL_E_STALE;
@@ -199,7 +199,7 @@ static ScStatus sh_clip_files_decode(const void *bytes,ScU32 count,ScShellFileIt
         memset(&info,0,sizeof(info));
         info.size=sizeof(info);
         info.version=1;
-        s=ScPathMetadata(path,&info);
+        s=ScPathQuery(path,&info);
         if(s<0)goto fail;
         items[i].kind=info.kind;
         /* 较旧revision交给worker产生真实冲突，不把同名新对象默认为旧源。 */ pos+=row.record_bytes;

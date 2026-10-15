@@ -93,7 +93,7 @@ ScStatus ScShellOpen(const ScShellCatalog *catalog,const char *path,const char *
     ScHashDesc hd;
     ScU32 index,marker=1;
     ScPathParts parts;
-    ScPathStatInfo stat;
+    ScPathInfo stat;
     ScStatus s;
     char *current=0;
     if(sh_record(out,sizeof(*out))<0)return SC_SHELL_E_INVALID;
@@ -115,7 +115,7 @@ ScStatus ScShellOpen(const ScShellCatalog *catalog,const char *path,const char *
         memset(&stat,0,sizeof(stat));
         stat.size=sizeof(stat);
         stat.version=1;
-        s=ScPathStat(current,&stat);
+        s=ScPathQuery(current,&stat);
         if(s<0)break;
         memset(&parts,0,sizeof(parts));
         parts.size=sizeof(parts);

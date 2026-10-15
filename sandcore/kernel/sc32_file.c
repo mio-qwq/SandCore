@@ -8,6 +8,7 @@
 #include "userspace.h"
 #include "objpool.h"
 #include "../user/sc32/SC32FILEWIRE.H"
+#include "../user/pathapi/SC32PATHWIRE.H"
 
 enum { FILE_HANDLE=1,DIRECTORY_HANDLE=2 };
 typedef struct {
@@ -143,6 +144,8 @@ static int overlap(u32 a,u32 bytes,u32 b,u32 other)
 {return bytes && other && a<=0xffffffffu-bytes && b<=0xffffffffu-other && a<b+other && b<a+bytes;}
 static int reserved(const u32 *words,u32 first)
 {for(u32 i=first;i<8;i++)if(words[i])return 0;return 1;}
+#include "sc32_path_query.inc"
+
 static void file_reply(int pid,file_handle_t *h,file_description_t *d,Sc32FileReply *r,int raw,u32 transferred)
 {
     clear(r,sizeof(*r));r->size=sizeof(*r);r->version=1;r->handle=h?h->id:0;r->raw=raw;r->transferred=transferred;
@@ -267,6 +270,7 @@ static int directory(int pid,u32 operation,const u32 *q,u32 output)
 }
 int sc32_file_call(int pid,u32 operation,u32 request,u32 output)
 {
+    if(operation==SC32_P_QUERY)return path_query(pid,request,output);
     if(operation!=SC32_F_OPEN && operation!=SC32_F_READ && operation!=SC32_F_WRITE && operation!=SC32_F_SEEK
        && operation!=SC32_F_TELL && operation!=SC32_F_FLUSH && operation!=SC32_F_CLOSE && operation!=SC32_F_QUERY
        && operation!=SC32_F_TRUNCATE && operation!=SC32_F_DUPLICATE && operation!=SC32_F_STANDARD

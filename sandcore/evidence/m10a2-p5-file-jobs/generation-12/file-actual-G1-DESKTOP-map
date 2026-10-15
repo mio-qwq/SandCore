@@ -1,0 +1,248 @@
+SCDMAP1MIO
+00400040 desk_copy TMP/P5-998251/SRC/scshell/desktop/desktop_model.inc:7
+004000CB desk_display_name TMP/P5-998251/SRC/scshell/desktop/desktop_model.inc:20
+004002B3 desk_text TMP/P5-998251/SRC/scshell/desktop/desktop_model.inc:24
+0040034F desk_path_key TMP/P5-998251/SRC/scshell/desktop/desktop_model.inc:29
+00400491 desk_reserve TMP/P5-998251/SRC/scshell/desktop/desktop_model.inc:38
+0040063F desk_items_free TMP/P5-998251/SRC/scshell/desktop/desktop_model.inc:46
+00400771 desk_scale TMP/P5-998251/SRC/scshell/desktop/desktop_model.inc:50
+004007B5 desk_item_rect TMP/P5-998251/SRC/scshell/desktop/desktop_model.inc:60
+004009D1 desk_intersects TMP/P5-998251/SRC/scshell/desktop/desktop_model.inc:65
+00400B30 desk_invalidate_item TMP/P5-998251/SRC/scshell/desktop/desktop_model.inc:69
+00400BF1 desk_cell_hash TMP/P5-998251/SRC/scshell/desktop/desktop_model.inc:73
+00400C24 desk_floor TMP/P5-998251/SRC/scshell/desktop/desktop_model.inc:77
+00400CAE desk_cell TMP/P5-998251/SRC/scshell/desktop/desktop_model.inc:87
+00400E3B desk_index TMP/P5-998251/SRC/scshell/desktop/desktop_model.inc:118
+004014BD desk_hit TMP/P5-998251/SRC/scshell/desktop/desktop_model.inc:136
+0040194C desk_layout_restore TMP/P5-998251/SRC/scshell/desktop/desktop_model.inc:167
+00402134 desk_layout_changed TMP/P5-998251/SRC/scshell/desktop/desktop_model.inc:171
+0040219E desk_layout_save TMP/P5-998251/SRC/scshell/desktop/desktop_model.inc:193
+00402813 desk_layout_apply TMP/P5-998251/SRC/scshell/desktop/desktop_model.inc:215
+00402CF6 desk_refresh TMP/P5-998251/SRC/scshell/desktop/desktop_model.inc:292
+00404218 desk_icon_unlink TMP/P5-998251/SRC/scshell/desktop/desktop_model.inc:298
+004042F6 desk_icons_step TMP/P5-998251/SRC/scshell/desktop/desktop_model.inc:333
+00404BAD desk_frame TMP/P5-998251/SRC/scshell/desktop/desktop_view.inc:9
+00404DF1 desk_paint_item TMP/P5-998251/SRC/scshell/desktop/desktop_view.inc:47
+00405AA7 desk_paint TMP/P5-998251/SRC/scshell/desktop/desktop_view.inc:75
+0040632D desk_select TMP/P5-998251/SRC/scshell/desktop/desktop_view.inc:79
+00406438 desk_select_only TMP/P5-998251/SRC/scshell/desktop/desktop_view.inc:83
+004064BE desk_focus_item TMP/P5-998251/SRC/scshell/desktop/desktop_view.inc:98
+00406903 desk_gesture_cancel TMP/P5-998251/SRC/scshell/desktop/desktop_view.inc:104
+00406A59 desk_range TMP/P5-998251/SRC/scshell/desktop/desktop_view.inc:115
+00406D33 desk_box_update TMP/P5-998251/SRC/scshell/desktop/desktop_view.inc:139
+00407472 desk_input TMP/P5-998251/SRC/scshell/desktop/desktop_view.inc:285
+00409FAD desk_tasks_step TMP/P5-998251/SRC/scshell/desktop/desktop_tasks.inc:30
+0040A98B desk_tasks_action TMP/P5-998251/SRC/scshell/desktop/desktop_tasks.inc:40
+0040AB95 desk_tasks_arrange TMP/P5-998251/SRC/scshell/desktop/desktop_tasks.inc:63
+0040B0EE desk_bar_paint TMP/P5-998251/SRC/scshell/desktop/desktop_tasks.inc:104
+0040BDFA desk_task_menu TMP/P5-998251/SRC/scshell/desktop/desktop_tasks.inc:117
+0040C163 desk_bar_input TMP/P5-998251/SRC/scshell/desktop/desktop_tasks.inc:169
+0040CE3D desk_error TMP/P5-998251/SRC/scshell/desktop/desktop_actions.inc:9
+0040D0C1 desk_open TMP/P5-998251/SRC/scshell/desktop/desktop_actions.inc:19
+0040D36C desk_selected TMP/P5-998251/SRC/scshell/desktop/desktop_actions.inc:31
+0040D75E desk_begin_transfer TMP/P5-998251/SRC/scshell/desktop/desktop_actions.inc:41
+0040D8EF desk_recovery TMP/P5-998251/SRC/scshell/desktop/desktop_actions.inc:51
+0040DAA4 desk_menu_extra TMP/P5-998251/SRC/scshell/desktop/desktop_actions.inc:57
+0040DBB7 desk_menu_prepare TMP/P5-998251/SRC/scshell/desktop/desktop_actions.inc:91
+0040E4A0 desk_menu TMP/P5-998251/SRC/scshell/desktop/desktop_actions.inc:93
+0040E4DB desk_job_event TMP/P5-998251/SRC/scshell/desktop/desktop_actions.inc:141
+0040F107 desk_job_display TMP/P5-998251/SRC/scshell/desktop/desktop_actions.inc:148
+0040F1F3 desk_clipboard TMP/P5-998251/SRC/scshell/desktop/desktop_actions.inc:164
+0040F46E desk_logout_reply TMP/P5-998251/SRC/scshell/desktop/desktop_actions.inc:176
+0040F634 desk_edit_done TMP/P5-998251/SRC/scshell/desktop/desktop_actions.inc:184
+0040F749 desk_layout_conflict_reply TMP/P5-998251/SRC/scshell/desktop/desktop_actions.inc:197
+0040FA32 desk_layout_conflict TMP/P5-998251/SRC/scshell/desktop/desktop_actions.inc:211
+0040FDC7 desk_edit_apply TMP/P5-998251/SRC/scshell/desktop/desktop_actions.inc:271
+00411129 desk_shortcut_properties TMP/P5-998251/SRC/scshell/desktop/desktop_actions.inc:302
+00411B8F desk_shortcut_create TMP/P5-998251/SRC/scshell/desktop/desktop_actions.inc:329
+004124B8 desk_command TMP/P5-998251/SRC/scshell/desktop/desktop_actions.inc:366
+00412EF2 desk_drop_reply TMP/P5-998251/SRC/scshell/desktop/desktop_actions.inc:412
+00413996 desk_drop TMP/P5-998251/SRC/scshell/desktop/desktop_actions.inc:457
+004146F8 desk_ui_error TMP/P5-998251/SRC/scshell/desktop/SCSHELL.C:19
+00414802 desk_startup_log TMP/P5-998251/SRC/scshell/desktop/SCSHELL.C:45
+00414D47 desk_service_event TMP/P5-998251/SRC/scshell/desktop/SCSHELL.C:58
+00414E52 desk_bar_pixels TMP/P5-998251/SRC/scshell/desktop/SCSHELL.C:66
+00414F2A desk_root_event TMP/P5-998251/SRC/scshell/desktop/SCSHELL.C:98
+0041568C desk_listen TMP/P5-998251/SRC/scshell/desktop/SCSHELL.C:104
+0041574C desk_canvas TMP/P5-998251/SRC/scshell/desktop/SCSHELL.C:118
+00415ADE desk_file_revision TMP/P5-998251/SRC/scshell/desktop/SCSHELL.C:131
+00415CB1 desk_seeds TMP/P5-998251/SRC/scshell/desktop/SCSHELL.C:169
+0041663E desk_directory TMP/P5-998251/SRC/scshell/desktop/SCSHELL.C:183
+00416872 desk_paths TMP/P5-998251/SRC/scshell/desktop/SCSHELL.C:219
+00416ECB desk_account TMP/P5-998251/SRC/scshell/desktop/SCSHELL.C:228
+004170BC desk_create TMP/P5-998251/SRC/scshell/desktop/SCSHELL.C:299
+0041840D desk_activate TMP/P5-998251/SRC/scshell/desktop/SCSHELL.C:348
+00418E27 desk_close TMP/P5-998251/SRC/scshell/desktop/SCSHELL.C:367
+00419307 desk_clock TMP/P5-998251/SRC/scshell/desktop/SCSHELL.C:387
+004197B8 main TMP/P5-998251/SRC/scshell/desktop/SCSHELL.C:455
+REQUIRE 00000000 SC32API.SCL 1
+REQUIRE 00000001 SCCLIB.SCL 1
+REQUIRE 00000002 SCLIB.SCL 1
+REQUIRE 00000003 SCSHELL.SCL 1
+REQUIRE 00000004 SCUI.SCL 1
+IMPORT 00000000 ScBrokerWait 1
+IMPORT 00000001 ScClipboardQuery 1
+IMPORT 00000002 ScDirectoryClose 1
+IMPORT 00000003 ScDirectoryNext 1
+IMPORT 00000004 ScDirectoryOpen 1
+IMPORT 00000005 ScDisplayQuery 1
+IMPORT 00000006 ScFileClose 1
+IMPORT 00000007 ScFileOpen 1
+IMPORT 00000008 ScFileQuery 1
+IMPORT 00000009 ScIdentityQuery 1
+IMPORT 0000000A ScIpcClose 1
+IMPORT 0000000B ScIpcCreate 1
+IMPORT 0000000C ScIpcListen 1
+IMPORT 0000000D ScPathCreate 1
+IMPORT 0000000E ScPathQuery 1
+IMPORT 0000000F ScProcessSelf 1
+IMPORT 00000010 ScProcessYield 1
+IMPORT 00000011 ScSessionControl 1
+IMPORT 00000012 ScSessionEnumerate 1
+IMPORT 00000013 ScSessionPath 1
+IMPORT 00000014 ScShellHostActivate 1
+IMPORT 00000015 ScShellHostDeactivate 1
+IMPORT 00000016 ScShellHostPrepare 1
+IMPORT 00000017 ScShellHostQuery 1
+IMPORT 00000018 ScShellHostWindowAction 1
+IMPORT 00000019 ScShellHostWindowAt 1
+IMPORT 0000001A ScShellHostWindows 1
+IMPORT 0000001B ScShellHostWorkspace 1
+IMPORT 0000001C ScSystemClock 1
+IMPORT 0000001D ScSystemMonotonic 1
+IMPORT 0000001E ScThemeQuery 1
+IMPORT 0000001F __scc_standard 1
+IMPORT 00000020 abs 1
+IMPORT 00000021 calloc 1
+IMPORT 00000022 fclose 1
+IMPORT 00000023 fopen 1
+IMPORT 00000024 fprintf 1
+IMPORT 00000025 free 1
+IMPORT 00000026 malloc 1
+IMPORT 00000027 memchr 1
+IMPORT 00000028 memcmp 1
+IMPORT 00000029 memcpy 1
+IMPORT 0000002A memset 1
+IMPORT 0000002B realloc 1
+IMPORT 0000002C snprintf 1
+IMPORT 0000002D strcat 1
+IMPORT 0000002E strchr 1
+IMPORT 0000002F strcmp 1
+IMPORT 00000030 strcpy 1
+IMPORT 00000031 strlen 1
+IMPORT 00000032 strncmp 1
+IMPORT 00000033 strrchr 1
+IMPORT 00000034 ScConfigCreate 1
+IMPORT 00000035 ScConfigGet 1
+IMPORT 00000036 ScConfigRelease 1
+IMPORT 00000037 ScConfigSet 1
+IMPORT 00000038 ScHashCreate 1
+IMPORT 00000039 ScHashGet 1
+IMPORT 0000003A ScHashRelease 1
+IMPORT 0000003B ScHashRemove 1
+IMPORT 0000003C ScHashSet 1
+IMPORT 0000003D ScUtf8Decode 1
+IMPORT 0000003E ScShellApplicationRelease 1
+IMPORT 0000003F ScShellCatalogApplyLayout 1
+IMPORT 00000040 ScShellCatalogCreate 1
+IMPORT 00000041 ScShellCatalogFind 1
+IMPORT 00000042 ScShellCatalogImportLegacyMenu 1
+IMPORT 00000043 ScShellCatalogLayout 1
+IMPORT 00000044 ScShellCatalogLoad 1
+IMPORT 00000045 ScShellCatalogQuery 1
+IMPORT 00000046 ScShellCatalogRegister 1
+IMPORT 00000047 ScShellCatalogRelease 1
+IMPORT 00000048 ScShellCatalogSetAssociation 1
+IMPORT 00000049 ScShellCatalogStoreRevision 1
+IMPORT 0000004A ScShellClipboardCopyFiles 1
+IMPORT 0000004B ScShellClipboardCutFiles 1
+IMPORT 0000004C ScShellClipboardPaste 1
+IMPORT 0000004D ScShellClipboardReconcile 1
+IMPORT 0000004E ScShellConfirm 1
+IMPORT 0000004F ScShellDialogClose 1
+IMPORT 00000050 ScShellDialogStep 1
+IMPORT 00000051 ScShellDragBegin 1
+IMPORT 00000052 ScShellDropFiles 1
+IMPORT 00000053 ScShellErrorDialog 1
+IMPORT 00000054 ScShellErrorQuery 1
+IMPORT 00000055 ScShellFileOperationCancel 1
+IMPORT 00000056 ScShellFileOperationClose 1
+IMPORT 00000057 ScShellFileOperationQuery 1
+IMPORT 00000058 ScShellFileOperationStep 1
+IMPORT 00000059 ScShellIconLoad 1
+IMPORT 0000005A ScShellLaunch 1
+IMPORT 0000005B ScShellLayoutCreate 1
+IMPORT 0000005C ScShellLayoutGet 1
+IMPORT 0000005D ScShellLayoutQuery 1
+IMPORT 0000005E ScShellLayoutRelease 1
+IMPORT 0000005F ScShellMenuBuild 1
+IMPORT 00000060 ScShellMenuExecute 1
+IMPORT 00000061 ScShellMenuNative 1
+IMPORT 00000062 ScShellMenuRelease 1
+IMPORT 00000063 ScShellMenuStep 1
+IMPORT 00000064 ScShellOpen 1
+IMPORT 00000065 ScShellProgress 1
+IMPORT 00000066 ScShellServiceClose 1
+IMPORT 00000067 ScShellServiceCreate 1
+IMPORT 00000068 ScShellServiceQuery 1
+IMPORT 00000069 ScShellServiceStep 1
+IMPORT 0000006A ScShellShortcutCreate 1
+IMPORT 0000006B ScShellShortcutDescribe 1
+IMPORT 0000006C ScShellShortcutLaunch 1
+IMPORT 0000006D ScShellShortcutRead 1
+IMPORT 0000006E ScShellShortcutRelease 1
+IMPORT 0000006F ScShellShortcutWrite 1
+IMPORT 00000070 ScShellStoreBegin 1
+IMPORT 00000071 ScShellStoreClose 1
+IMPORT 00000072 ScShellStoreQuery 1
+IMPORT 00000073 ScShellStoreStep 1
+IMPORT 00000074 ScUiCapture 1
+IMPORT 00000075 ScUiClassRegister 1
+IMPORT 00000076 ScUiContextCreate 1
+IMPORT 00000077 ScUiContextQuery 1
+IMPORT 00000078 ScUiContextRelease 1
+IMPORT 00000079 ScUiContextStep 1
+IMPORT 0000007A ScUiContextWaitTimeout 1
+IMPORT 0000007B ScUiDialogQuery 1
+IMPORT 0000007C ScUiDialogRelease 1
+IMPORT 0000007D ScUiDragCancel 1
+IMPORT 0000007E ScUiDropTargetRegister 1
+IMPORT 0000007F ScUiErrorQuery 1
+IMPORT 00000080 ScUiFocus 1
+IMPORT 00000081 ScUiIconRelease 1
+IMPORT 00000082 ScUiInvalidate 1
+IMPORT 00000083 ScUiListen 1
+IMPORT 00000084 ScUiMenuClose 1
+IMPORT 00000085 ScUiMenuCreate 1
+IMPORT 00000086 ScUiMenuInsert 1
+IMPORT 00000087 ScUiMenuOpen 1
+IMPORT 00000088 ScUiMenuRelease 1
+IMPORT 00000089 ScUiMessageBox 1
+IMPORT 0000008A ScUiMetricsQuery 1
+IMPORT 0000008B ScUiNodeQuery 1
+IMPORT 0000008C ScUiNodeSetLayout 1
+IMPORT 0000008D ScUiPainterBounds 1
+IMPORT 0000008E ScUiPainterClear 1
+IMPORT 0000008F ScUiPainterFill 1
+IMPORT 00000090 ScUiPainterIcon 1
+IMPORT 00000091 ScUiPainterLine 1
+IMPORT 00000092 ScUiPainterText 1
+IMPORT 00000093 ScUiPainterTextColor 1
+IMPORT 00000094 ScUiPropertySheet 1
+IMPORT 00000095 ScUiTooltipSet 1
+IMPORT 00000096 ScUiWidgetCreate 1
+IMPORT 00000097 ScUiWindowCreate 1
+IMPORT 00000098 ScUiWindowNative 1
+OBJECT 0041E9B9 desk 1248
+OBJECT 0041AC38 keys 20
+OBJECT 0041EE99 desk_ui_failure 4
+OBJECT 0041EE9D desk_ui_error_info 48
+OBJECT 0041B0C0 ids 52
+OBJECT 0041B174 labels 52
+OBJECT 0041B27C paths 52
+OBJECT 0041B314 icons 52
+OBJECT 0041EECD desk_activation_checked 32
+OBJECT 0041EEED desk_activation_begin 32
+OBJECT 0041EF0D desk_activation_visible 4
+OBJECT 0041EF11 desk_activation_requested 4
+OBJECT 0041B4F8 desk_activation_dirty 4

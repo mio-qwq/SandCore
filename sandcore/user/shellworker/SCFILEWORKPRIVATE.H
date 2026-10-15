@@ -4,6 +4,7 @@
 #include "SC32API.H"
 #include "SC32BROKER.H"
 #include "SC32LEASE.H"
+#include <SC32PATH.H>
 #include "SCLIB.H"
 /* 共享唯一协议头；不复制到worker目录，也不公开进SDK。 */
 #include "../scshell/SCSHELLWIRE.H"

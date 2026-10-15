@@ -32,7 +32,7 @@ static ScStatus sw_retry_step(void)
         }
         ScPathInfo info;
         sw_record(&info,sizeof(info));
-        status=ScPathMetadata(item->source,&info);
+        status=ScPathQuery(item->source,&info);
         if(status || info.kind!=2 || info.generation!=item->source_revision){sw_retry_problem(status?status:SC32_E_STALE);
             return SC32_PENDING;
         }

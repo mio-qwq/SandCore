@@ -48,6 +48,32 @@ def closure(stage, cases=CASES):
     return seen
 
 
+def compatible_reuse_closure(stage, values, origin):
+    changes={name:(origin['source_input_sha256'].get(name),value) for name,value in values.items()
+        if origin['source_input_sha256'].get(name)!=value}
+    if not changes:return []
+    # 增量DLL更新不要求旧caller重新编译。这里只接受一个已保存原字节、
+    # 且整个caller闭包都没有使用的版本宏变化；类型/声明/实现仍须原SHA。
+    header='user/SC32API.H'
+    if set(changes)!={header}:raise ValueError('复用产物的真实编译依赖改变：'+str(sorted(changes)))
+    archive=ROOT/'evidence/m10a2-p5-preparation-recovery/candidate/user/SC32API.H'
+    before,after=changes[header]
+    if sha(archive)!=before:raise ValueError('旧版本头缺原始字节凭证')
+    old,new=archive.read_bytes(),(stage/header).read_bytes()
+    pattern=rb'(?m)^#define SC32_LIBRARY_VERSION ([0-9]+)u\r?$'
+    a,b=re.findall(pattern,old),re.findall(pattern,new)
+    if (len(a)!=1 or len(b)!=1 or not int(a[0])<int(b[0])<=0xffffffff
+        or re.sub(pattern,b'#define SC32_LIBRARY_VERSION <VERSION>',old)
+        !=re.sub(pattern,b'#define SC32_LIBRARY_VERSION <VERSION>',new)):
+        raise ValueError('版本头改变超出单一兼容版本常量')
+    for name in values:
+        if name!=header and re.search(rb'\bSC32_LIBRARY_VERSION\b',(stage/name).read_bytes()):
+            raise ValueError('caller真正使用版本宏，不能免编译复用：'+name)
+    return [dict(kind='UNUSED_MONOTONIC_LIBRARY_VERSION_MACRO_ONLY',header=header,
+        original_sha256=before,current_sha256=after,original_header_archive=str(archive),
+        original_version=int(a[0]),current_version=int(b[0]),all_declarations_and_types_identical=True)]
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     for name in ('stage', 'build-report', 'out'):
@@ -77,7 +103,7 @@ def main():
     prefix = '/TMP/P5-' + secrets.token_hex(3)
     package = '/HOME/M10SHELL'
     extra = {prefix[1:] + '/SRC/' + name[5:]: (stage / name).read_bytes() for name in files}
-    public = list(first.PUBLIC_HEADERS) + ['SC32HOST.H', 'SC32LEASE.H', 'SCSHELL.H']
+    public = list(first.PUBLIC_HEADERS) + ['SC32HOST.H', 'SC32LEASE.H', 'SC32PATH.H', 'SCSHELL.H']
     for name in public:
         extra['SYS/INC/' + name] = (stage / 'user' / name).read_bytes()
     for name in first.STANDARD_HEADERS:
@@ -124,13 +150,11 @@ def main():
                 or prior.get('source_disk_unchanged') is not True or prior['compiler']['sha256'] != sha(compiler_file)):
             raise ValueError('复用来源缺完整生成与保持记录')
         report['reused_generation'] = dict(report=str(args.reuse_generation_report.resolve()),
-            sha256=sha(args.reuse_generation_report), source_compile_closures={})
+            sha256=sha(args.reuse_generation_report), source_compile_closures={},abi_compatibility={})
         for case in CASES:
             if case in selected:
                 continue
             values = closure(stage, [case])
-            if any(prior['source_input_sha256'].get(name) != value for name,value in values.items()):
-                raise ValueError('未选产物的真实编译闭包已经改变：' + case[0])
             name = Path(case[1]).name + ('.SCL' if case[2] else '.SCX')
             collection = 'native_libraries' if case[2] else 'native_artifacts'
             item = dict(prior[collection][name])
@@ -146,11 +170,13 @@ def main():
                     or Path(produced['path']).resolve() != actual.resolve()):
                 raise ValueError('复用产物必须回到真正生成它的那一轮：' + name)
             refresh.pin(actual, origin.parent, item['sha256'], item['bytes'])
+            compatibility=compatible_reuse_closure(stage,values,origin_record)
             item.update(generated_this_vm=False, generation_origin_report=str(origin.resolve()),
                 generation_origin_report_sha256=origin_sha,
                 reuse_validation_report=str(args.reuse_generation_report.resolve()))
             report[collection][name] = item
             report['reused_generation']['source_compile_closures'][name] = values
+            if compatibility:report['reused_generation']['abi_compatibility'][name]=compatibility
     driver = sha(Path(__file__))
 
     def persist():

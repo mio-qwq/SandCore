@@ -81,9 +81,9 @@ static ScStatus sw_begin_conflict(SwItem *item,ScStatus status)
     sw_record(&info,sizeof(info));
     item->conflict_source_revision=0;
     item->conflict_destination_revision=0;
-    if(item->source[0] && !ScPathMetadata(item->source,&info))item->conflict_source_revision=info.generation;
+    if(item->source[0] && !ScPathQuery(item->source,&info))item->conflict_source_revision=info.generation;
     sw_record(&info,sizeof(info));
-    if(item->destination[0] && !ScPathMetadata(item->destination,&info))item->conflict_destination_revision=info.generation;
+    if(item->destination[0] && !ScPathQuery(item->destination,&info))item->conflict_destination_revision=info.generation;
     item->conflict_epoch=++sw.conflict_counter;
     item->phase=SW_CONFLICT;
     sw.state=SHW_CONFLICT;
@@ -174,7 +174,7 @@ static ScStatus sw_source_open(SwItem *item)
         }
         ScPathInfo metadata;
         sw_record(&metadata,sizeof(metadata));
-        status=ScPathMetadata(item->source,&metadata);
+        status=ScPathQuery(item->source,&metadata);
         if(status)return status;
         if(metadata.kind!=1 || metadata.generation!=item->source_revision)return SC32_E_STALE;
         item->source_mode=metadata.rw;
@@ -186,7 +186,7 @@ static ScStatus sw_target(SwItem *item)
 {
     ScPathInfo info;
     sw_record(&info,sizeof(info));
-    ScStatus status=ScPathMetadata(item->destination,&info);
+    ScStatus status=ScPathQuery(item->destination,&info);
     if(status!=0 && status!=SC32_E_NOT_FOUND)return status;
     int exists=!status;
     if(item->decision_check && (exists?info.generation:0)!=item->decision_expected_destination)return SC32_E_STALE;
@@ -407,7 +407,7 @@ static ScStatus sw_item_step(SwItem *item)
         if(item->kind==2 && sw.operation==SW_COPY){
             ScPathInfo info;
             sw_record(&info,sizeof(info));
-            status=ScPathMetadata(item->source,&info);
+            status=ScPathQuery(item->source,&info);
             if(status || !sw_can_read(info.uid,info.gid,info.rw)){item->skip_children=1;
                 return sw_begin_conflict(item,status?status:SC32_E_ACCESS);
             }
@@ -634,7 +634,7 @@ static ScStatus sw_decide(const ScShellWireJobDecision *decision,const char *pat
         if(item->root->plan_failed && item->kind==1){
             ScPathInfo actual;
             sw_record(&actual,sizeof(actual));
-            ScStatus checked=ScPathMetadata(item->source,&actual);
+            ScStatus checked=ScPathQuery(item->source,&actual);
             if(checked)return sw_begin_conflict(item,checked);
             if(actual.kind!=item->root->kind || actual.generation!=item->conflict_source_revision)return sw_begin_conflict(item,SC32_E_STALE);
             item->root->plan_failed=0;
@@ -644,7 +644,7 @@ static ScStatus sw_decide(const ScShellWireJobDecision *decision,const char *pat
             if(item->kind!=2)return SC32_E_INVALID;
             ScPathInfo info;
             sw_record(&info,sizeof(info));
-            ScStatus checked=ScPathMetadata(item->destination,&info);
+            ScStatus checked=ScPathQuery(item->destination,&info);
             if(checked || info.kind!=2 || info.generation!=item->conflict_destination_revision)return SC32_E_STALE;
             item->merge=1;
             item->overwrite=0;

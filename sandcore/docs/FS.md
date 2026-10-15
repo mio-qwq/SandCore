@@ -254,3 +254,8 @@ SYS/LIB，其余库仍从调用者显式绝对包目录读取。新gate只影响
 真实subject读取合同；本批源码未构建/未运行，不复用旧PASS替代新行为。
 
 2026-10-16修订：Phase5主源新增本人/世代绑定的stable-read、exclusive-write、namespace lease和条件Publish/Rename/Remove/SetMode/Cancel/Release/Advance及META-only pin。私有候选、现权复验、完整snapshot、bank/CRC/superblock durable/uncertain和预算回收在正文接线；不把Source生成或Drop ACK当作磁盘提交。当前已统一构建/实际G1生成，COPY/MOVE等真正客体事务仍待验。旧Metadata缺名粗FAILED不改，新typed查询另行补齐。
+
+
+2026-10-16修订：fs_path_query为SC32 selector223提供精确META查询；仅观察当前v5已提交目录，不开正文/FD，不pin或遍历子树。先核祖先权限，再区分缺名，坏卷明确IO；输出在成功后一次复制。旧元数据函数与盘上96B条目、代数/双bank/CRC合同均未改变。当前已整体构建及G1生成，COPY/MOVE实际事务结果另记。
+
+2026-10-16实际结果：FILEJOB04通过普通UID1000的精确路径查询、131079B COPY/MOVE、持久ACK、客体逐字节和宿主取回内容对照；两份832B恢复日志的头/frame CRC与START/提交/FINISH独立审计通过。退出/注销13830→13830 PF，各池/历史/字体/未归因增量0，输入/原盘保持。证据入口evidence/m10a2-p5-file-jobs/README.md。完整P5、主要组件和SDK仍未完成，持续目标active。

@@ -6,7 +6,7 @@
       "name": "SC32API.SCL",
       "abi_major": 1,
       "min_minor": 3,
-      "min_version": 4
+      "min_version": 5
     },
     {
       "name": "SCCLIB.SCL",
@@ -311,19 +311,25 @@
       "size": 1
     },
     {
-      "name": "ScPathMetadata",
-      "dependency": "SC32API.SCL",
-      "kind": "function",
-      "size": 1
-    },
-    {
       "name": "ScPathNormalize",
       "dependency": "SCLIB.SCL",
       "kind": "function",
       "size": 1
     },
     {
+      "name": "ScPathQuery",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
       "name": "ScProcessArguments",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScProcessEnvironment",
       "dependency": "SC32API.SCL",
       "kind": "function",
       "size": 1
@@ -372,6 +378,24 @@
     },
     {
       "name": "calloc",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "fclose",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "fopen",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "fprintf",
       "dependency": "SCCLIB.SCL",
       "kind": "function",
       "size": 1

@@ -82,6 +82,9 @@ static int lease_move_budget(lease_record_t *r)
 static void lease_move_index(lease_record_t *r)
 {
     u32 old=r->node[0],next=r->node[1];
+    /* 原地Publish只撤slot1的提交期预留，保持slot0及子树索引原样。
+     * 不拆装同一叶子，避免把无名称变化的提交误作目录分支搬迁。 */
+    if(old==next){lease_unlink(r,1);return;}
     if(r->handle_kind==2){
         u32 branch=lease_child(old,'/');
         if(branch){

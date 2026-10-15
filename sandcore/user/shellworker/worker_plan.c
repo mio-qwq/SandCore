@@ -146,7 +146,7 @@ static ScStatus sw_plan_root(SwRoot *root)
         else{
             ScPathInfo info;
             sw_record(&info,sizeof(info));
-            ScStatus status=ScPathMetadata(root->source,&info);
+            ScStatus status=ScPathQuery(root->source,&info);
             if(status){ScStatus failed=status;
                 row.kind=root->kind;
                 row.revision=root->expected_revision;

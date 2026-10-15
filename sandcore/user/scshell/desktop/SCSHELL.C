@@ -169,15 +169,15 @@ static ScStatus desk_seeds(void)
 }
 static ScStatus desk_directory(const char *path)
 {
-    ScPathStatInfo info;memset(&info,0,sizeof(info));info.size=sizeof(info);info.version=1;
-    ScStatus status=ScPathStat(path,&info);
+    ScPathInfo info;memset(&info,0,sizeof(info));info.size=sizeof(info);info.version=1;
+    ScStatus status=ScPathQuery(path,&info);
     if(status==0)return info.kind==SC32_PATH_DIRECTORY?0:SC32_E_INVALID;
     if(status!=SC32_E_NOT_FOUND && status!=SC32_E_FAILED)return status;
     /* 不把粗FAILED直接当作不存在：CreateEx只在确实缺名时发布，
      * 已有对象永不覆盖；若另一任务抢先创建则重新核类型。 */
     status=ScPathCreate(path,SC32_PATH_DIRECTORY,3);
     if(status!=SC32_E_EXISTS)return status;
-    info.size=sizeof(info);info.version=1;status=ScPathStat(path,&info);
+    info.size=sizeof(info);info.version=1;status=ScPathQuery(path,&info);
     if(status==0 && info.kind!=SC32_PATH_DIRECTORY)return SC32_E_INVALID;
     return status;
 }

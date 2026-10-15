@@ -601,7 +601,7 @@ ScStatus ScShellIconLoad(ScUiContext *ui,const char *spec,const char *executable
             memset(&metadata,0,sizeof(metadata));
             metadata.size=sizeof(metadata);
             metadata.version=1;
-            s=ScPathMetadata(path,&metadata);
+            s=ScPathQuery(path,&metadata);
         } else s=SC_SHELL_E_NOT_FOUND;
         if(s<0)snprintf(path,sizeof(path),"/SYS/ICONS/%s.SCB",spec+1);
         s=sh_absolute(path,&absolute);
@@ -626,7 +626,7 @@ ScStatus ScShellIconLoad(ScUiContext *ui,const char *spec,const char *executable
     memset(&metadata,0,sizeof(metadata));
     metadata.size=sizeof(metadata);
     metadata.version=1;
-    s=ScPathMetadata(absolute,&metadata);
+    s=ScPathQuery(absolute,&metadata);
     if(s<0)metadata.generation=0;
     memset(&theme,0,sizeof(theme));
     theme.size=sizeof(theme);

@@ -54,7 +54,11 @@ def main():
     parser.add_argument('--accel', choices=('tcg', 'whpx'), default='tcg')
     parser.add_argument('--reuse-probe', type=Path)
     parser.add_argument('--inspect-layout', type=Path)
+    parser.add_argument('--file-jobs', action='store_true', help='定向验证真实typed查询及COPY/MOVE worker')
     args = parser.parse_args()
+    probe_name = 'FILEJOBPROBE' if args.file_jobs else 'SHELLPROBE'
+    if args.file_jobs and (args.reuse_probe or args.inspect_layout):
+        parser.error('文件事务使用本轮真实编译，不借用host专用Probe/观察器')
     if os.name != 'nt':
         parser.error('仅Windows QEMU')
     stage, out = args.stage.resolve(), args.out.resolve()
@@ -112,15 +116,17 @@ def main():
             or (build / 'fs/SYS/CORE/CORE.SKM').read_bytes()[128:] != (build / 'core.bin').read_bytes()):
         raise ValueError('CORE必须绑定本轮安装的同一原生host')
     prefix, package = '/TMP/P5RT-' + secrets.token_hex(3), '/HOME/M10SHELL'
-    for name in list(first.PUBLIC_HEADERS) + ['SC32HOST.H', 'SC32LEASE.H', 'SCSHELL.H']:
+    for name in list(first.PUBLIC_HEADERS) + ['SC32HOST.H', 'SC32LEASE.H', 'SC32PATH.H', 'SCSHELL.H']:
         extra['SYS/INC/' + name] = (stage / 'user' / name).read_bytes()
     for name in first.STANDARD_HEADERS:
         extra['SYS/INC/' + name] = (stage / 'user/stdlib' / name).read_bytes()
     for name in ('sclib/SCLIB.H', 'runtime/SCLDR.H'):
         extra['SYS/INC/' + Path(name).name] = (stage / 'user' / name).read_bytes()
     for suffix in ('.C', '.json'):
-        path = ROOT / 'tests/m10a2' / ('SHELLPROBE' + suffix)
-        extra[prefix[1:] + '/SHELLPROBE' + suffix] = path.read_bytes();pins[path] = sha(path)
+        path = ROOT / 'tests/m10a2' / (probe_name + suffix)
+        extra[prefix[1:] + '/' + probe_name + suffix] = path.read_bytes();pins[path] = sha(path)
+    if args.file_jobs:
+        extra[package[1:] + '/OP-SOURCE.BIN'] = bytes((i * 37 + 19) & 255 for i in range(131079))
     compiler_item = old['native_artifacts']['SCCC1.SCX']
     compiler_file = native_path(compiler_item['path']);pins[compiler_file] = refresh.PUBLICATION_G1_SHA
     compiler = prefix + '/ACTUALG1.SCX';extra[compiler[1:]] = compiler_file.read_bytes()
@@ -168,6 +174,8 @@ def main():
         core_report_sha256=sha(args.core_report), generation_report_sha256=sha(args.generation_report),
         core_sha256=sha(build / 'fs/SYS/CORE/CORE.SKM'), compiler=dict(sha256=refresh.PUBLICATION_G1_SHA),
         input_sha256={str(path): value for path, value in pins.items()}, full_M10a2=False)
+    if args.file_jobs:
+        report['scope'] = 'P5_TYPED_PATH_QUERY_AND_REAL_COPY_MOVE_BINARY_WORKFLOW'
 
     def persist():
         (out / 'shell-runtime.json').write_text(json.dumps(report, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
@@ -190,13 +198,13 @@ def main():
             try:
                 harness = refresh.RefreshHarness(vm, guest, report, symbols, persist, first.local_elf_symbols(build / 'core.elf'))
                 wait_first_desktop(guest, symbols, report);guest.connect();harness.warm()
-                target = package + '/GENERATED/SHELLPROBE.SCX'
+                target = package + '/GENERATED/' + probe_name + '.SCX'
                 if probe_reuse:
                     report['probe_compile_reuse'] = probe_reuse
                 else:
-                    harness.compile('actual-G1-SHELLPROBE', compiler, prefix + '/SHELLPROBE.C', target,
-                        prefix + '/SHELLPROBE.json', refresh.read_json(ROOT / 'tests/m10a2/SHELLPROBE.json'),
-                        False, out / 'native-artifacts/SHELLPROBE.SCX', compiler_sha256=refresh.PUBLICATION_G1_SHA)
+                    harness.compile('actual-G1-' + probe_name, compiler, prefix + '/' + probe_name + '.C', target,
+                        prefix + '/' + probe_name + '.json', refresh.read_json(ROOT / 'tests/m10a2' / (probe_name + '.json')),
+                        False, out / 'native-artifacts' / (probe_name + '.SCX'), compiler_sha256=refresh.PUBLICATION_G1_SHA)
                 before, observed_before = harness.quiet();resources_before = harness.resources()
                 original_rows = sessions(harness.run('sessions-before-native-host', 'sessionctl list')['output'].encode())
                 previous = next(row['id'] for row in original_rows if row['active'])
@@ -230,35 +238,60 @@ def main():
                         persist()
 
                     guest.prepared_observer=observe_prepared
-                item = harness.run('ordinary-native-host-and-real-catalog', "printf '%s\\n' '' '" + inner + "' | su mio",
-                    contains=(b'SHELLPROBE PASS ordinary_native_host_and_real_catalog_IPC', (marker + ':0').encode()),
-                    forbidden=(b'SHELLPROBE FAIL', b'[AUTH] login failed'), timeout=90)
-                sid = re.search(r'SHELLPROBE HOST state=3 sid=(\d+) pid=(\d+)/(\d+) epoch=(\d+)', item['output'])
+                expected = (b'FILEJOB PASS typed_query_copy_move_and_actual_binary_content' if args.file_jobs
+                    else b'SHELLPROBE PASS ordinary_native_host_and_real_catalog_IPC')
+                item = harness.run('ordinary-native-file-jobs' if args.file_jobs else 'ordinary-native-host-and-real-catalog',
+                    "printf '%s\\n' '' '" + inner + "' | su mio",
+                    contains=(expected, (marker + ':0').encode()),
+                    forbidden=(b'FILEJOB FAIL', b'SHELLPROBE FAIL', b'[AUTH] login failed'), timeout=150 if args.file_jobs else 90)
+                if args.file_jobs:
+                    sid = re.search(r'FILEJOB ID uid=1000 sid=(\d+) generation=(\d+)', item['output'])
+                    if not sid:raise ValueError('缺少普通用户文件事务身份')
+                    report['ordinary_file_job_identity'] = dict(uid=1000, session=int(sid[1]), generation=int(sid[2]))
+                    for name in ('OP-SOURCE.BIN','OP-MOVE.BIN','CP.LOG','MV.LOG'):
+                        actual = out / name
+                        guest.client.get(package + '/' + name, actual)
+                        matches = (actual.read_bytes() == extra[package[1:] + '/OP-SOURCE.BIN']) if name.endswith('.BIN') else None
+                        report.setdefault('actual_file_results',[]).append(dict(name=name,bytes=actual.stat().st_size,
+                            sha256=sha(actual),binary_content_matches=matches))
+                        if matches is False:raise ValueError('独立取回的二进制内容不同：'+name)
+                    harness.screen('p5-real-native-file-jobs-complete')
+                else:
+                    sid = re.search(r'SHELLPROBE HOST state=3 sid=(\d+) pid=(\d+)/(\d+) epoch=(\d+)', item['output'])
                 if not sid:
                     raise ValueError('缺少公开ACTIVE host身份')
-                report['actual_host_identity'] = dict(session=int(sid[1]), pid=int(sid[2]), generation=int(sid[3]), epoch=int(sid[4]))
-                harness.run('show-actual-native-desktop', 'sessionctl show ' + sid[1])
-                harness.screen('p5-first-actual-native-desktop')
-                inputs = ScuiInput(vm, guest, symbols, report['physical_input'].append)
-                # 自绘Start的真实本地范围为x<88*scale，窗口贴屏底。
-                # 点击其内部；不把没有实现的Win键当作菜单已打开证据。
-                inputs.click(24, physical_word(vm, symbols['gfx_height']) - 16)
-                guest.stop.wait(.4)
-                harness.screen('p5-first-actual-native-start-menu')
-                vm.hmp('sendkey esc')
-                guest.stop.wait(.2)
-                harness.screen('p5-first-actual-native-desktop-ready')
+                if not args.file_jobs:
+                    report['actual_host_identity'] = dict(session=int(sid[1]), pid=int(sid[2]), generation=int(sid[3]), epoch=int(sid[4]))
+                    harness.run('show-actual-native-desktop', 'sessionctl show ' + sid[1])
+                    harness.screen('p5-first-actual-native-desktop')
+                    inputs = ScuiInput(vm, guest, symbols, report['physical_input'].append)
+                    # 自绘Start的真实本地范围为x<88*scale，窗口贴屏底。
+                    # 点击其内部；不把没有实现的Win键当作菜单已打开证据。
+                    inputs.click(24, physical_word(vm, symbols['gfx_height']) - 16)
+                    guest.stop.wait(.4)
+                    harness.screen('p5-first-actual-native-start-menu')
+                    vm.hmp('sendkey esc')
+                    guest.stop.wait(.2)
+                    harness.screen('p5-first-actual-native-desktop-ready')
                 harness.run('restore-original-desktop', 'sessionctl show ' + str(previous))
                 harness.run('logout-native-desktop-session', 'sessionctl logout ' + sid[1])
                 after, observed_after = harness.quiet()
                 ledger, okay = harness.ledger(before, after, resources_before, harness.resources(), True)
                 harness.append(dict(name='native-host-client-session-final-owner-page-account', **ledger,
                     before_observations=observed_before, after_observations=observed_after), okay)
-                report['status'] = 'P5_FIRST_NATIVE_HOST_CLIENT_PASS'
+                report['status'] = 'P5_TYPED_PATH_AND_REAL_FILE_JOBS_PASS' if args.file_jobs else 'P5_FIRST_NATIVE_HOST_CLIENT_PASS'
             except BaseException as error:
                 report.update(status='FAIL_OR_INTERRUPTED', error=dict(message=str(error), traceback=traceback.format_exc()))
                 report['failure_console_tail'] = bytes(guest.console[-16000:]).decode('utf-8', 'replace')
                 report['failure_debug_tail'] = bytes(guest.debug[-16000:]).decode('utf-8', 'replace')
+                if args.file_jobs:
+                    try:
+                        trace = out / 'WORK.TRACE'
+                        guest.client.get('/HOME/M10SHELL/WORK.TRACE',trace)
+                        report['actual_worker_trace'] = dict(path=str(trace),sha256=sha(trace),
+                            text=trace.read_text(encoding='utf-8',errors='replace'))
+                    except Exception as trace_error:
+                        report['worker_trace_capture_error'] = repr(trace_error)
                 try:
                     log = out / 'native-desktop-startup.log'
                     guest.client.get('/HOME/.DESKTOP/SHELL.LOG', log)
@@ -288,6 +321,8 @@ def main():
                 if changed or not report['source_disk_unchanged']:report['status'] = 'FAIL_OR_INTERRUPTED'
                 persist()
     print(report['status'], flush=True)
+    if report['status'] not in ('P5_FIRST_NATIVE_HOST_CLIENT_PASS','P5_TYPED_PATH_AND_REAL_FILE_JOBS_PASS'):
+        raise SystemExit(1)
 
 
 if __name__ == '__main__':
