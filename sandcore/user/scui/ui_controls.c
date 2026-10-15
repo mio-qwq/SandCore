@@ -257,7 +257,18 @@ static ScStatus ui_controls_measure(UiNode *n,const ScUiSize *constraint,ScUiSiz
     m.version=1;
     s=ui_text_measure(n->owner,n->font_role,&text,SC_UI_AUTO,0,&m);
     if(s<0)return s;
-    if(m.width>(ScU32)(INT_MAX-pad*2) || line>(ScU32)(INT_MAX-pad*2))return SC_UI_E_RANGE;
+    if((n->kind==SC_UI_LABEL || n->kind==SC_UI_TOOLTIP) && constraint->width>0){ScUiTextMetrics wrapped;
+        ScI32 width=constraint->width;
+        if(n->kind==SC_UI_TOOLTIP)width-=ui_scale(n->owner,8);
+        if(n->icon)width-=ui_scale(n->owner,20);
+        if(width<1)width=1;
+        /* Label绘制使用真实物理宽度换行；自然宽度保持不变，
+         * 只更新高度，使第二遍候选安排不会反过来改变水平分配。 */
+        s=ui_text_measure(n->owner,n->font_role,&text,width,UI_TEXT_WRAP,&wrapped);
+        if(s<0)return s;
+        m.height=wrapped.height;
+    }
+    if(m.width>(ScU32)(INT_MAX-pad*2) || m.height>(ScU32)(INT_MAX-pad*2) || line>(ScU32)(INT_MAX-pad*2))return SC_UI_E_RANGE;
     switch(n->kind){
     case SC_UI_BUTTON:out->width=(ScI32)m.width+pad*3;
         if(out->width<ui_scale(n->owner,72))out->width=ui_scale(n->owner,72);
@@ -268,6 +279,9 @@ static ScStatus ui_controls_measure(UiNode *n,const ScUiSize *constraint,ScUiSiz
         break;
     case SC_UI_LABEL:case SC_UI_TOOLTIP:out->width=(ScI32)m.width;
         out->height=(ScI32)m.height;
+        if(n->kind==SC_UI_TOOLTIP){ScI32 inset=ui_scale(n->owner,8);
+            if(!ui_signed_add(out->width,inset,&out->width) || !ui_signed_add(out->height,inset,&out->height))return SC_UI_E_RANGE;
+        }
         break;
     case SC_UI_COMBOBOX:out->width=(ScI32)m.width+pad*4;
         if(out->width<ui_scale(n->owner,140))out->width=ui_scale(n->owner,140);
@@ -1269,7 +1283,8 @@ static ScStatus ui_controls_event(UiNode *n,const ScUiEvent *e)
             }
             return SC_UI_HANDLED;
         }
-        if(e->type==SC_UI_EVENT_KEY_UP && c->pressed_key==e->key){c->pressed_key=0;
+        /* 未由Space/Enter置位时，修饰键等零符号释放不能触发按钮。 */
+        if(e->type==SC_UI_EVENT_KEY_UP && c->pressed_key && c->pressed_key==e->key){c->pressed_key=0;
             n->state&=~SC_UI_PRESSED;
             ui_tree_effective(n);
             ui_node_damage(n);

@@ -1,0 +1,10 @@
+/TMP/P5-7d8478/ACTUALG1.SCX /TMP/P5-7d8478/SRC/sc32/SC32API.C /HOME/M10SHELL/GENERATED/SC32API.SCL --scl /TMP/P5-7d8478/SRC/sc32/SC32API.json; _m9_status=$?; printf "\n"; echo __M9_142b0b92311af200c3f6c8ed:$_m9_status
+SCCC / mio
+TMP/P5-7d8478/SRC/sc32/SC32API.C -> HOME/M10SHELL/GENERATED/SC32API.SCL
+Validating SCL manifest
+SCCC: preprocess -> C -> x86
+Preprocessing source and includes
+Parsing C and generating x86
+Linking and writing SCL
+SCCC OK SCL NATIVE
+Compilation complete

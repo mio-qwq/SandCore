@@ -1,0 +1,615 @@
+--- a/sandcore/kernel/wm.c
++++ b/sandcore/kernel/wm.c
+@@ -34,6 +34,7 @@
+ #include "streams.h"
+ #include "sc32_gui.h"
+ #include "sc32_drop.h"
++#include "sc32_host.h"
+ 
+ extern void scene_paint(void);        /* main.c: 沙漠壁纸 (画进后台缓冲) */
+ 
+@@ -89,6 +90,7 @@
+     u32 owner_generation,owner_previous,owner_next,session,visibility_epoch;
+     int repaint;
+     int z_index,creation_index;
++    u32 shell_role,shell_ancestor,shell_submitted_geometry,shell_submitted_paint,shell_ready_geometry;
+     gui_window_t gui;
+ } window_record_t;
+ typedef char window_prefix_keeps_abi[(sizeof(win_t)==80)?1:-1];
+@@ -105,10 +107,29 @@
+     u8 mouse_previous_buttons;
+     int display_width,display_height,display_scaling;
+     int top_cache,top_known;
++    u32 shell_session,shell_pid,shell_generation,shell_desktop,shell_taskbar;
++    u32 shell_height,shell_prepared,shell_active,shell_focus,shell_windows_epoch;
+     u64 title_hover;
+ } desktop_view_t;
+ static objpool_t view_pool;
+ static desktop_view_t *active_view;
++static int wm_shell_preparing(window_record_t *p);
++static int wm_shell_ancestor_visible(window_record_t *p);
++static int wm_shell_drawable(window_record_t *p);
++static int wm_shell_work_bottom_for(u32 sid);
++static void wm_shell_changed(u32 sid);
++static int wm_shell_raise_destination(desktop_view_t *view,window_record_t *p);
++static void wm_shell_focus_set(window_record_t *p);
++static void wm_shell_created(desktop_view_t *view,window_record_t *p);
++static int wm_shell_top(desktop_view_t *view);
++static int wm_shell_mouse(int x,int y,u8 buttons,u8 previous);
++static int wm_shell_draw_surface(window_record_t *p);
++static void wm_shell_frame_invalidated(window_record_t *p);
++static void wm_shell_submitted(window_record_t *p,const ScSubmitDesc *input,const ScSubmitRect *rectangles);
++static void wm_shell_paint_complete(window_record_t *p,const Sc32PaintEnd *input);
++static void wm_shell_paint_cancelled(window_record_t *p);
++static void wm_shell_closing(window_record_t *p);
++static void wm_shell_display(desktop_view_t *view);
+ static desktop_view_t *view_get(u32 id){return objpool_get(&view_pool,(int)id);}
+ #define nwins (active_view->count)
+ #define ntasks (active_view->task_count)
+@@ -147,8 +168,8 @@
+ static window_record_t *popup_input_target(window_record_t *p);
+ static u32 popup_focus_group(int handle);
+ static u32 pointer_cursor_shape(void);
+-static int window_client_dx(win_t *w){window_record_t *p=window_record(w->handle);return p && p->gui.popup?0:1;}
+-static int window_client_dy(win_t *w){window_record_t *p=window_record(w->handle);return p && p->gui.popup?0:TITLE_H;}
++static int window_client_dx(win_t *w){window_record_t *p=window_record(w->handle);return p && (p->gui.popup || p->shell_role)?0:1;}
++static int window_client_dy(win_t *w){window_record_t *p=window_record(w->handle);return p && (p->gui.popup || p->shell_role)?0:TITLE_H;}
+ static void visibility_changed(win_t *w);
+ static int gui_can_show(window_record_t *record);
+ static int gui_eligible(window_record_t *record);
+@@ -298,11 +319,15 @@
+ static int top_visible(void)
+ {
+     if(active_view->top_known)return active_view->top_cache;
++    if(wm_shell_active(session_active())){
++        int result=wm_shell_top(active_view);
++        active_view->top_cache=result;active_view->top_known=1;return result;
++    }
+     int result=-1;for(int i=nwins-1;i>=0;i--){window_record_t *p=window_record(WINDOW(i).handle);
+         if(p && gui_can_show(p) && !(p->gui.popup && (p->gui.popup_flags&SC32_POPUP_NO_ACTIVATE))){result=i;break;}}
+     active_view->top_cache=result;active_view->top_known=1;return result;
+ }
+-static int work_bottom(void){return GFX_H-(GFX_W==320?16:32*display_scale()/100);}
++static int work_bottom(void){return wm_shell_work_bottom_for(session_active());}
+ static int dirty = 1;
+ /* 未知范围请求只升级不降级；局部矩形取并集，原始窗口结构不加
+  * 字段。合成持有期间其它任务不能改请求，所以一帧结束可整体清空。 */
+@@ -428,7 +453,7 @@
+     dirty=1;
+ }
+ void wm_request_clock(void)
+-{wm_damage_rect(0,work_bottom(),GFX_W,GFX_H-work_bottom());}
++{if(!wm_shell_active(session_active()))wm_damage_rect(0,work_bottom(),GFX_W,GFX_H-work_bottom());}
+ int  wm_dirty(void)           { return dirty || cursor_dirty; }
+ 
+ /* ---------------- 窗口句柄 API (系统调用落地) ---------------- */
+@@ -468,7 +493,7 @@
+     if(!native && GFX_W!=320) {
+         ex->scale=(display_scale()+99)/100;
+         np->w=np->cw*ex->scale+2;np->h=np->ch*ex->scale+TITLE_H+1;
+-        np->x=(GFX_W-np->w)/2;np->y=(work_bottom()-np->h)/2;
++        np->x=(GFX_W-np->w)/2;np->y=(wm_shell_work_bottom_for(id)-np->h)/2;
+     }
+     /* RGB工具的首帧之前仍有堆/字体/资源初始化。用当前主题表面
+      * 建立等待画布，避免桌面合成把大块控制台黑色抢先闪到屏幕。
+@@ -494,6 +519,11 @@
+     record->session=id;record->visibility_epoch=1;record->repaint=1;
+     view->order[view->count]=handle;next_handle++;
+     view->count++;
++    record->gui.geometry=record->gui.input=record->gui.theme=record->gui.display=1;
++    record->gui.last_x=np->x;record->gui.last_y=np->y;
++    record->gui.last_w=np->w;record->gui.last_h=np->h;
++    record->gui.last_cw=np->cw;record->gui.last_ch=np->ch;
++    wm_shell_created(view,record);
+     view->top_known=0;
+     if(view==active_view)taskbar_reveal(handle);
+     gui_focus_update();
+@@ -504,6 +534,7 @@
+ {
+     window_record_t *record=window_record(handle);if(!record)return;
+     desktop_view_t *view=view_get(record->session);if(!view)return;
++    wm_shell_closing(record);
+     /* 关闭一个终端也必须撤销附着作业，即使父应用还有别的窗口。
+      * 在wins重排之前通知，子任务关闭其它窗口后重新寻找当前句柄。
+      * 不保留跨task_stop的数组下标，避免递归关闭移动了窗口。 */
+@@ -530,6 +561,7 @@
+         view->task_count--;
+     }
+     view->count--;
++    wm_shell_changed(record->session);
+     view->top_known=0;
+     objpool_release(&window_pool,handle);
+     window_record_t *drag_record=window_record(drag_handle),*resize_record=window_record(resize_handle);
+@@ -541,18 +573,21 @@
+     gui_focus_update();
+ }
+ 
+-static void win_raise(int idx)
+-{
+-    if(idx<0 || idx>=nwins)return;
++static int win_raise(int idx)
++{
++    if(idx<0 || idx>=nwins)return -1;
+     int allowed=gui_modal_target(WINDOW(idx).handle);
+     window_record_t *target=window_record(allowed);
+     if(target && target->session==session_active())idx=target->z_index;
+     int previous=top_visible();if(previous>=0)task_notify(WINDOW(previous).owner,TASK_EVENT_INPUT);
+     int handle=window_order[idx],drag_handle=drag>=0?WINDOW(drag).handle:0,resize_handle=resizing>=0?WINDOW(resizing).handle:0;
+-    for (int i = idx; i < nwins - 1; i++) {
++    window_record_t *raised=window_record(handle);
++    int destination=wm_shell_raise_destination(active_view,raised);
++    for (int i = idx; i < destination; i++) {
+         window_order[i]=window_order[i+1];window_record(window_order[i])->z_index=i;
+     }
+-    window_order[nwins-1]=handle;window_record(handle)->z_index=nwins-1;
++    window_order[destination]=handle;window_record(handle)->z_index=destination;
++    wm_shell_focus_set(raised);
+     active_view->top_known=0;
+     window_record_t *drag_record=window_record(drag_handle),*resize_record=window_record(resize_handle);
+     drag=drag_record?drag_record->z_index:-1;resizing=resize_record?resize_record->z_index:-1;
+@@ -560,6 +595,7 @@
+     if(!window_record(handle)->gui.popup)popup_raise_group((u32)handle);
+     task_notify(window_record(handle)->window.owner,TASK_EVENT_INPUT);
+     gui_focus_update();
++    raised=window_record(handle);return raised?raised->z_index:-1;
+ }
+ 
+ /* ---------------- 用户窗口 API (系统调用落地) ---------------- */
+@@ -629,7 +665,7 @@
+         window_record_t *p=window_record(view->order[i]);p->visibility_epoch++;
+         if(!p->visibility_epoch)p->visibility_epoch=1;p->repaint=1;p->terminal.theme=0;
+         task_notify_generation(p->window.owner,p->owner_generation,TASK_EVENT_VISIBILITY);
+-        if(p->gui.mode){p->gui.theme++;ScMessage m={0};m.id=SC32_MSG_THEME;m.window=(u32)p->window.handle;
++        if(p->gui.mode){wm_shell_frame_invalidated(p);p->gui.theme++;ScMessage m={0};m.id=SC32_MSG_THEME;m.window=(u32)p->window.handle;
+             m.generation=m.window;m.epoch=p->gui.theme;sc32_gui_emit(p->window.owner,&m);
+             p->gui.paint_pending=p->gui.paint_ready=p->gui.painting=0;gui_attention(p);
+             Sc32Invalidate invalidate={36,1,(u32)p->window.handle,(u32)p->window.handle,0,0,(u32)p->window.cw,(u32)p->window.ch,0};
+@@ -827,6 +863,7 @@
+ {
+     win_t *w = &WINDOW(i);
+     window_extra_t *ex=extra_of(w->handle);if(!gui_can_show(window_record(w->handle)))return;
++    if(wm_shell_draw_surface(window_record(w->handle)))return;
+     if(GFX_W!=320 || window_record(w->handle)->gui.popup){native_draw_window(i);return;}
+     int focused = window_record(w->handle)->gui.mode?gui_focus_any==w->handle:i==top_visible();
+ 
+@@ -1069,10 +1106,16 @@
+             if(had_cursor)cursor_restore();
+             gfx_clip(damage_x0,damage_y0,damage_x1-damage_x0,damage_y1-damage_y0);
+         }
+-        if(GFX_W==320 || !desktop_wallpaper())scene_paint();
+-        draw_icons();
++        if(wm_shell_active(session_active())){
++            /* 用户surface负责桌面内容；只提供alpha的已登记主题基底。 */
++            gfx_rgb_fill(0,0,GFX_W,GFX_H,theme_color(TH_FACE));
++        }else{
++            if(GFX_W==320 || !desktop_wallpaper())scene_paint();
++            draw_icons();
++        }
+         for(int i=0;i<nwins;i++)draw_window(i);
+-        draw_taskbar();native_draw_overlays();draw_fault();
++        if(!wm_shell_active(session_active()))draw_taskbar();
++        native_draw_overlays();draw_fault();
+         gfx_clip_reset();
+         if(!relative_active()){cursor_capture(mouse_x(),mouse_y());draw_cursor_at(cursor_x,cursor_y);}
+         else cursor_saved=0;
+@@ -1132,6 +1175,9 @@
+     if(popup_index>=0 && window_record(WINDOW(popup_index).handle)->gui.popup){
+         window_record_t *p=window_record(WINDOW(popup_index).handle);
+         if((b&1) && !(pbtn&1) && !(p->gui.popup_flags&SC32_POPUP_NO_ACTIVATE))win_raise(popup_index);
++        cursor_dirty=1;pmx=x;pmy=y;pbtn=b;return;
++    }
++    if(wm_shell_mouse(x,y,b,pbtn)){
+         cursor_dirty=1;pmx=x;pmy=y;pbtn=b;return;
+     }
+     if(terminal_mouse(x,y,b,pbtn)){cursor_dirty=1;pmx=x;pmy=y;pbtn=b;return;}
+@@ -1194,8 +1240,8 @@
+             }
+         }
+         if (w >= 0) {
+-            win_raise(w);
+-            w = nwins - 1;
++            w=win_raise(w);
++            if(w<0){pmx=x;pmy=y;pbtn=b;return;}
+             if (x >= WINDOW(w).x + WINDOW(w).w - 12 && x < WINDOW(w).x + WINDOW(w).w - 2
+              && y >= WINDOW(w).y + 2 && y < WINDOW(w).y + 12) {
+                 gui_close_request(&WINDOW(w));
+@@ -1314,6 +1360,7 @@
+     if(objpool_claim(&view_pool,(int)id))return -4;
+     if(theme_session_prepare(id) || desktop_session_prepare(id)){objpool_release(&view_pool,(int)id);return -4;}
+     desktop_view_t *view=view_get(id);view->dragging=view->resize=view->context_win=view->context_item=-1;
++    view->shell_session=id;view->shell_windows_epoch=1;
+     view->display_width=GFX_W;view->display_height=GFX_H;view->display_scaling=display_scale();
+     view->mouse_previous_x=view->mouse_previous_y=-1;
+     char path[64];u8 mode;
+@@ -1379,7 +1426,9 @@
+     *error=SC32_OK;return p;
+ }
+ static int gui_can_show(window_record_t *p)
+-{return p && !p->extra.hidden && (!p->gui.mode || (!p->gui.creating && !p->gui.owner_hidden));}
++{return p && task_owned(p->window.owner) && TASK(p->window.owner).state!=2
++    && (!p->shell_role || wm_shell_active(p->session)) && wm_shell_ancestor_visible(p)
++    && !p->extra.hidden && (!p->gui.mode || (!p->gui.creating && !p->gui.owner_hidden));}
+ static int gui_modal_target(int handle)
+ {
+     window_record_t *p=window_record(handle);
+@@ -1449,6 +1498,8 @@
+     if(gui_capture_handle && gui_capture_handle!=handle)gui_capture_release(1);
+     if(relative_handle && relative_handle!=handle)relative_release();
+     gui_focus_any=handle;
++    if(old)wm_shell_changed(old->session);
++    if(next && (!old || next->session!=old->session))wm_shell_changed(next->session);
+     if(old && old->gui.cursor){old->gui.cursor=0;cursor_dirty=1;}
+     if(!sc32_gui_routing())wm_sc32_loss_epoch();
+     if(old && old->gui.mode){old->gui.input++;gui_message(old,SC32_MSG_FOCUS,old->gui.input,0,(u32)handle,0,0);}
+@@ -1462,6 +1513,7 @@
+ static void gui_link_parent(window_record_t *p,window_record_t *parent)
+ {
+     gui_window_t *g=&p->gui;g->parent=parent?(u32)parent->window.handle:0;
++    p->shell_ancestor=parent?(parent->shell_role?(u32)parent->window.handle:parent->shell_ancestor):0;
+     if(parent){g->next_child=parent->gui.first_child;
+         if(g->next_child)window_record((int)g->next_child)->gui.previous_child=(u32)p->window.handle;
+         parent->gui.first_child=(u32)p->window.handle;
+@@ -1477,7 +1529,7 @@
+     if(before)before->gui.next_child=g->next_child;else if(parent)parent->gui.first_child=g->next_child;
+     if(after)after->gui.previous_child=g->previous_child;
+     if(parent && parent->gui.modal_child==(u32)p->window.handle)parent->gui.modal_child=0;
+-    g->parent=g->previous_child=g->next_child=0;
++    g->parent=g->previous_child=g->next_child=0;p->shell_ancestor=0;
+ }
+ static u32 gui_next_descendant(u32 root,u32 current)
+ {
+@@ -1495,6 +1547,7 @@
+     u32 handle=gui_next_descendant((u32)root->window.handle,(u32)root->window.handle);
+     while(handle){window_record_t *p=window_record((int)handle),*parent=window_record((int)p->gui.parent);
+         u32 hidden=p->gui.owner_hidden,disabled=p->gui.owner_disabled;
++        p->shell_ancestor=parent->shell_role?(u32)parent->window.handle:parent->shell_ancestor;
+         p->gui.owner_hidden=parent->gui.owner_hidden || parent->extra.hidden || parent->gui.creating;
+         p->gui.owner_disabled=parent->gui.owner_disabled || (parent->gui.style&SC32_STYLE_DISABLED);
+         /* 祖先变化是真实可见性/输入资格变化，同样撤top缓存。否则
+@@ -1520,13 +1573,21 @@
+ static void gui_commit(win_t *w)
+ {
+     window_record_t *p=window_record(w->handle);
+-    if(!p || !p->gui.mode || gui_mutation || TASK(w->owner).state==2)return;
++    if(!p || gui_mutation || TASK(w->owner).state==2)return;
+     gui_window_t *g=&p->gui;int visible=window_visible(w);
++    int dimensions=g->last_cw!=w->cw || g->last_ch!=w->ch || g->last_w!=w->w || g->last_h!=w->h;
++    if(dimensions || g->last_x!=w->x || g->last_y!=w->y || g->last_visible!=visible)wm_shell_changed(p->session);
++    if(!g->mode){
++        if(dimensions && ++g->geometry==0)g->geometry=1;
++        g->last_x=w->x;g->last_y=w->y;g->last_w=w->w;g->last_h=w->h;
++        g->last_cw=w->cw;g->last_ch=w->ch;g->last_visible=visible;return;
++    }
+     if(g->last_cw!=w->cw || g->last_ch!=w->ch || g->last_x!=w->x || g->last_y!=w->y
+         || g->last_visible!=visible)sc32_drop_window_changed((u32)w->handle);
+     if(g->last_cw!=w->cw || g->last_ch!=w->ch || g->last_w!=w->w || g->last_h!=w->h){
+         if(!g->popup)popup_close_group(view_get(p->session),0,(u32)w->handle);
+         g->geometry++;if(!g->geometry)g->geometry=1;g->painting=0;g->input++;
++        wm_shell_frame_invalidated(p);
+         if(!sc32_gui_routing())wm_sc32_loss_epoch();
+         /* 新尺寸是全新的客户坐标域。旧大矩形不能并进缩小后的损伤，
+          * 旧PAINT顺序也不能排在已发布的新SIZE之前。 */
+@@ -1577,7 +1638,7 @@
+     if(!(p->gui.style&SC32_STYLE_CLOSE) || p->gui.creating || p->gui.close_pending)return;
+     p->gui.close_pending=p->gui.close_ready=1;ScMessage *m=&p->gui.close_message;*m=(ScMessage){0};
+     m->id=SC32_MSG_CLOSE;m->window=(u32)w->handle;m->generation=m->window;m->epoch=p->gui.input;
+-    sc32_gui_stamp(w->owner,m);gui_attention(p);sc32_gui_notify(w->owner);
++    sc32_gui_stamp(w->owner,m);gui_attention(p);wm_shell_changed(p->session);sc32_gui_notify(w->owner);
+ }
+ int wm_sc32_create(int pid,const Sc32WindowCreate *input,const char *title,Sc32WindowRef *out)
+ {
+@@ -1587,15 +1648,16 @@
+     window_record_t *parent=0;int error;
+     if(input->owner_window){parent=gui_record(pid,input->owner_window,input->owner_generation,&error);if(!parent)return error;
+         if(parent->gui.popup)return SC32_E_NOT_SUPPORTED;
++        if(parent->shell_role && !wm_shell_active(parent->session))return SC32_E_AGAIN;
+         if((input->style&SC32_STYLE_MODAL) && parent->gui.modal_child)return SC32_E_BUSY;}
+     int width=(int)input->client_width+2,height=(int)input->client_height+TITLE_H+1;
+     if(width>GFX_W)width=GFX_W;
+-    if(height>work_bottom())height=work_bottom();
++    if(height>wm_shell_work_bottom_for(session_task(pid)))height=wm_shell_work_bottom_for(session_task(pid));
+     int x=input->x,y=input->y;
+     if(x<0)x=0;
+     if(y<0)y=0;
+     if(x>GFX_W-width)x=GFX_W-width;
+-    if(y>work_bottom()-height)y=work_bottom()-height;
++    if(y>wm_shell_work_bottom_for(session_task(pid))-height)y=wm_shell_work_bottom_for(session_task(pid))-height;
+     int handle=win_create(pid,title,x,y,width,height,-2);if(handle<0)return SC32_E_MEMORY;
+     window_record_t *p=window_record(handle);gui_window_t *g=&p->gui;
+     g->mode=g->creating=g->geometry=g->input=g->theme=g->display=1;g->style=input->style;
+@@ -1644,6 +1706,7 @@
+         |((p->gui.style&SC32_STYLE_MODAL)?SC32_WINDOW_MODAL:0)|(gui_eligible(p)?SC32_WINDOW_INPUT:0)
+         |(p->gui.close_pending?SC32_WINDOW_CLOSING:0)|(p->gui.paint_pending?SC32_WINDOW_PAINT:0)
+         |(p->gui.creating?SC32_WINDOW_CREATING:0)|(gui_capture_handle==(int)handle?SC32_WINDOW_CAPTURED:0)
++        |(wm_shell_preparing(p)?SC32_WINDOW_PREPARING:0)
+         |(p->gui.popup?SC32_WINDOW_POPUP:0)|((p->gui.popup_flags&SC32_POPUP_NO_ACTIVATE)?SC32_WINDOW_NO_ACTIVATE:0)
+         |((p->gui.popup_flags&SC32_POPUP_HIT_TRANSPARENT)?SC32_WINDOW_HIT_TRANSPARENT:0);
+     out->geometry_epoch=p->gui.geometry;out->visibility_epoch=p->visibility_epoch;out->input_epoch=p->gui.input;
+@@ -1652,6 +1715,7 @@
+ int wm_sc32_place(int pid,const Sc32WindowPlace *input,ScWindowInfo *out)
+ {
+     int error;window_record_t *p=gui_record(pid,input->window,input->generation,&error);if(!p)return error;
++    if(p->shell_role)return SC32_E_NOT_SUPPORTED;
+     if(p->gui.creating)return SC32_E_BUSY;
+     if(input->width<(p->gui.popup?1u:94u) || input->height<(p->gui.popup?1u:40u) || input->width>1920 || input->height>1080)return SC32_E_INVALID;
+     if(p->gui.popup){
+@@ -1672,6 +1736,7 @@
+ int wm_sc32_control(int pid,const Sc32WindowAction *input,ScWindowInfo *out)
+ {
+     int error;window_record_t *p=gui_record(pid,input->window,input->generation,&error);if(!p)return error;
++    if(p->shell_role && input->action!=SC32_WINDOW_FOCUS)return SC32_E_NOT_SUPPORTED;
+     if(p->gui.creating)return SC32_E_BUSY;
+     if(input->action>SC32_WINDOW_FOCUS)return SC32_E_INVALID;
+     if(p->gui.popup && input->action>=SC32_WINDOW_MINIMIZE && input->action<=SC32_WINDOW_RESTORE)return SC32_E_NOT_SUPPORTED;
+@@ -1692,12 +1757,13 @@
+ int wm_sc32_owner(int pid,const Sc32WindowOwner *input,ScWindowInfo *out)
+ {
+     int error;window_record_t *p=gui_record(pid,input->window,input->generation,&error);if(!p)return error;
+-    if(p->gui.popup)return SC32_E_NOT_SUPPORTED;
++    if(p->gui.popup || p->shell_role)return SC32_E_NOT_SUPPORTED;
+     if(input->style&~127u || (!input->owner_window && input->owner_generation)
+         || ((input->style&SC32_STYLE_MODAL) && !input->owner_window))return SC32_E_INVALID;
+     window_record_t *parent=0;
+     if(input->owner_window){parent=gui_record(pid,input->owner_window,input->owner_generation,&error);if(!parent)return error;
+         if(parent->gui.popup)return SC32_E_NOT_SUPPORTED;
++        if(parent->shell_role && !wm_shell_active(parent->session))return SC32_E_AGAIN;
+         for(window_record_t *q=parent;q;q=window_record((int)q->gui.parent))if(q==p)return SC32_E_INVALID;
+         if((input->style&SC32_STYLE_MODAL) && parent->gui.modal_child && parent->gui.modal_child!=input->window)return SC32_E_BUSY;}
+     gui_focus_defer++;
+@@ -1716,7 +1782,7 @@
+         if(n+(int)(text-first)>11)break;
+         while(first<text)p->window.title[n++]=*first++;
+     }
+-    p->window.title[n]=0;window_changed(&p->window);return SC32_OK;
++    p->window.title[n]=0;wm_shell_changed(p->session);window_changed(&p->window);return SC32_OK;
+ }
+ int wm_sc32_capture(int pid,u32 handle,u32 generation,u32 enabled)
+ {
+@@ -1755,19 +1821,19 @@
+     g->paint_pending=1;if(++g->paint_epoch==0)g->paint_epoch=1;
+     /* 隐藏/创建中的窗口只累计模型损伤，既不排PAINT又不唤醒绘图。
+      * 恢复时以新VISIBILITY之后的完整重画重新建立投递顺序。 */
+-    if(!window_visible(&p->window) || g->creating){g->paint_ready=0;gui_attention(p);return SC32_OK;}
++    if(!wm_shell_drawable(p) || g->creating){g->paint_ready=0;gui_attention(p);return SC32_OK;}
+     ScMessage *message=&g->paint_message;
+     if(!g->paint_ready){*message=(ScMessage){0};message->id=SC32_MSG_PAINT;message->window=input->window;
+         message->generation=input->generation;sc32_gui_stamp(pid,message);g->paint_ready=1;}
+     else message->flags|=SC32_MSG_COALESCED;
+     message->epoch=g->geometry;message->data[0]=(u32)g->paint_x0;message->data[1]=(u32)g->paint_y0;
+     message->data[2]=(u32)(g->paint_x1-g->paint_x0);message->data[3]=(u32)(g->paint_y1-g->paint_y0);
+-    message->data[4]=g->paint_epoch;gui_attention(p);if(window_visible(&p->window))sc32_gui_notify(pid);return SC32_OK;
++    message->data[4]=g->paint_epoch;gui_attention(p);if(wm_shell_drawable(p))sc32_gui_notify(pid);return SC32_OK;
+ }
+ int wm_sc32_paint_begin(int pid,u32 handle,u32 generation,ScPaintInfo *out)
+ {
+     int error;window_record_t *p=gui_record(pid,handle,generation,&error);if(!p)return error;
+-    if(!window_visible(&p->window))return SC32_E_AGAIN;
++    if(!wm_shell_drawable(p))return SC32_E_AGAIN;
+     if(p->gui.painting)return SC32_E_BUSY;
+     if(!p->gui.paint_pending)return SC32_E_AGAIN;
+     p->gui.painting=p->gui.paint_epoch;p->gui.painting_geometry=p->gui.geometry;
+@@ -1781,16 +1847,18 @@
+ int wm_sc32_paint_end(int pid,const Sc32PaintEnd *input)
+ {
+     int error;window_record_t *p=gui_record(pid,input->window,input->generation,&error);if(!p)return error;
++    if(!wm_shell_drawable(p))return SC32_E_STALE;
+     gui_window_t *g=&p->gui;
+     if(!g->painting || input->paint_epoch!=g->painting || input->geometry_epoch!=g->geometry
+         || input->geometry_epoch!=g->painting_geometry)return SC32_E_STALE;
+     g->painting=0;
+     if(input->paint_epoch==g->paint_epoch)g->paint_pending=g->paint_ready=0;
+-    else if(!g->paint_ready && window_visible(&p->window)){
++    else if(!g->paint_ready && wm_shell_drawable(p)){
+         /* 回调可重入GET并先领走新PAINT，Begin仍因旧claim返回BUSY。
+          * End不能因那次消费忘掉新损伤；新顺序重投仍未确认的矩形。 */
+         sc32_gui_stamp(pid,&g->paint_message);g->paint_ready=1;
+     }
++    wm_shell_paint_complete(p,input);
+     gui_attention(p);if(g->paint_ready)sc32_gui_notify(pid);return SC32_OK;
+ }
+ int wm_sc32_paint_cancel(int pid,const Sc32PaintEnd *input)
+@@ -1802,8 +1870,9 @@
+     /* 字体/OOM/用户paint过程失败时只撤claim，不确认原损伤或其间
+      * 新损伤。待办保存在活窗口，无需额外申请队列候选，失败路径也
+      * 能恢复下一次PAINT；R3持续失败须按deadline退避而非忙重试。 */
++    wm_shell_paint_cancelled(p);
+     g->painting=g->painting_geometry=0;
+-    if(g->paint_pending && !g->paint_ready && window_visible(&p->window) && !g->creating){
++    if(g->paint_pending && !g->paint_ready && wm_shell_drawable(p) && !g->creating){
+         sc32_gui_stamp(pid,&g->paint_message);g->paint_ready=1;
+     }
+     gui_attention(p);if(g->paint_ready)sc32_gui_notify(pid);return SC32_OK;
+@@ -1812,7 +1881,7 @@
+ {
+     int error;window_record_t *p=gui_record(pid,input->window,input->generation,&error);if(!p)return error;
+     if(input->geometry_epoch!=p->gui.geometry)return SC32_E_STALE;
+-    if(!window_visible(&p->window))return SC32_E_AGAIN;
++    if(!wm_shell_drawable(p))return SC32_E_AGAIN;
+     if(((u32)input->pixels&3u) || !input->width || !input->height || input->width>0xFFFFFFFFu/4 || input->stride<input->width*4
+         || (input->stride&3u) || input->height-1>(0xFFFFFFFFu-input->width*4)/input->stride
+         || (input->height-1)*input->stride+input->width*4>input->bytes)return SC32_E_RANGE;
+@@ -1848,20 +1917,24 @@
+     if((opaque&0xFF000000u)!=0xFF000000u)p->extra.opaque=0;
+     else if(input->rectangle_count==1 && !rectangles[0].destination_x && !rectangles[0].destination_y
+         && rectangles[0].width==(u32)p->window.cw && rectangles[0].height==(u32)p->window.ch)p->extra.opaque=1;
+-    if(changed)wm_damage_rect(p->window.x+window_client_dx(&p->window)+x0,p->window.y+window_client_dy(&p->window)+y0,x1-x0,y1-y0);
++    wm_shell_submitted(p,input,rectangles);
++    if(changed && window_visible(&p->window))wm_damage_rect(p->window.x+window_client_dx(&p->window)+x0,p->window.y+window_client_dy(&p->window)+y0,x1-x0,y1-y0);
+     return SC32_OK;
+ }
+ int wm_sc32_cancel_close(int pid,u32 handle,u32 generation)
+ {
+     int error;window_record_t *p=gui_record(pid,handle,generation,&error);if(!p)return error;
+-    p->gui.close_pending=p->gui.close_ready=0;gui_attention(p);return SC32_OK;
++    int changed=p->gui.close_pending || p->gui.close_ready;
++    p->gui.close_pending=p->gui.close_ready=0;gui_attention(p);
++    if(changed)wm_shell_changed(p->session);
++    return SC32_OK;
+ }
+ int wm_sc32_pending(int pid,ScMessage *message,int consume)
+ {
+     window_record_t *chosen=0;ScMessage *best=0;
+     for(u32 h=sc32_gui_attention_head(pid);h;){window_record_t *p=window_record((int)h);if(!p)break;
+         ScMessage *a=p->gui.close_ready?&p->gui.close_message:0;
+-        ScMessage *b=p->gui.paint_ready && window_visible(&p->window) && !p->gui.creating?&p->gui.paint_message:0;
++        ScMessage *b=p->gui.paint_ready && wm_shell_drawable(p) && !p->gui.creating?&p->gui.paint_message:0;
+         if(!a || (b && (b->sequence_hi<a->sequence_hi || (b->sequence_hi==a->sequence_hi && b->sequence_lo<a->sequence_lo))))a=b;
+         if(a && (!best || a->sequence_hi<best->sequence_hi || (a->sequence_hi==best->sequence_hi && a->sequence_lo<best->sequence_lo))){best=a;chosen=p;}
+         h=p->gui.attention_next;
+@@ -1883,7 +1956,7 @@
+ {
+     u32 count=0;
+     for(u32 h=sc32_gui_attention_head(pid);h;){window_record_t *p=window_record((int)h);if(!p)break;
+-        count+=(p->gui.close_ready!=0)+(p->gui.paint_ready && window_visible(&p->window) && !p->gui.creating);
++        count+=(p->gui.close_ready!=0)+(p->gui.paint_ready && wm_shell_drawable(p) && !p->gui.creating);
+         h=p->gui.attention_next;}
+     return count;
+ }
+@@ -1909,6 +1982,8 @@
+ }
+ void wm_sc32_owner_stopped(int pid)
+ {
++    desktop_view_t *stopped_view=view_get(session_task(pid));
++    if(stopped_view){stopped_view->top_known=0;wm_shell_changed(session_task(pid));}
+     /* 退出先撤唯一capture与焦点，不为永不恢复的进程逐窗复制键状态。
+      * attention与消息页随后按预算清，窗口由既有owner链分步释放。 */
+     window_record_t *captured=window_record(gui_capture_handle);
+@@ -1975,13 +2050,13 @@
+     int capture=gui_capture_handle;
+     int original_index=hit_window(event->x,event->y);
+     int chrome=drag>=0 || resizing>=0 || menu_open || context_open || fault_focus
+-        || event->y>=work_bottom() || relative_active();
++        || (event->y>=work_bottom() && !wm_shell_active(session_active())) || relative_active();
+     window_record_t *original=original_index>=0?window_record(WINDOW(original_index).handle):0;
+     /* 系统菜单关闭或modal重定向可能让点击后命中的窗变化。按点击
+      * 前的实际消费资格保留屏障，不能把系统/被阻断父窗的按钮事实
+      * 再投给刚置顶或刚显现的客户区。 */
+     if(original && original->gui.mode && !gui_eligible(original))chrome=1;
+-    if(original && !original->gui.popup && (event->x<=original->window.x || event->y<original->window.y+TITLE_H
++    if(original && !original->gui.popup && !original->shell_role && (event->x<=original->window.x || event->y<original->window.y+TITLE_H
+         || event->x>=original->window.x+original->window.w-1 || event->y>=original->window.y+original->window.h-1))chrome=1;
+     if(!capture)wm_mouse_event(event->x,event->y,(u8)event->buttons);
+     else{cursor_dirty=1;active_view->mouse_previous_x=event->x;active_view->mouse_previous_y=event->y;active_view->mouse_previous_buttons=(u8)event->buttons;}
+@@ -2007,3 +2082,5 @@
+         m.data[2]=event->buttons;m.data[3]=1u<<button;m.data[4]=event->modifiers;gui_input_message(p,&m,event->tick);}
+     return 1;
+ }
++
++#include "wm_shell.inc"
+--- a/sandcore/kernel/wm_native.inc
++++ b/sandcore/kernel/wm_native.inc
+@@ -81,7 +81,7 @@
+ 
+     window_extra_t *e=extra_of(w->handle);
+     if(width>GFX_W)width=GFX_W;
+-    if(height>work_bottom())height=work_bottom();
++    if(height>wm_shell_work_bottom_for(window_record(w->handle)->session))height=wm_shell_work_bottom_for(window_record(w->handle)->session);
+     if(width<96)width=96;
+     if(height<TITLE_H+40)height=TITLE_H+40;
+     if(e->native) {
+@@ -129,7 +129,7 @@
+     }
+     if(w->x+w->w>GFX_W)w->x=GFX_W-w->w;
+     if(w->x<0)w->x=0;
+-    if(w->y+w->h>work_bottom())w->y=work_bottom()-w->h;
++    if(w->y+w->h>wm_shell_work_bottom_for(window_record(w->handle)->session))w->y=wm_shell_work_bottom_for(window_record(w->handle)->session)-w->h;
+     if(w->y<0)w->y=0;
+     visibility_changed(w);
+     return 0;
+@@ -137,12 +137,13 @@
+ void wm_display_changed(void)
+ {
+     popup_close_group(active_view,0,0);
++    wm_shell_display(active_view);
+     active_view->display_width=GFX_W;active_view->display_height=GFX_H;active_view->display_scaling=display_scale();
+     menu_open=context_open=0;
+     resizing=-1;
+     drag=-1;
+     for(int i=0;i<nwins;i++)if(window_record(WINDOW(i).handle)->gui.mode){
+-        window_record_t *p=window_record(WINDOW(i).handle);p->gui.display++;
++        window_record_t *p=window_record(WINDOW(i).handle);wm_shell_frame_invalidated(p);p->gui.display++;
+         p->gui.paint_pending=p->gui.paint_ready=p->gui.painting=0;gui_attention(p);
+         ScMessage m={0};m.id=SC32_MSG_DISPLAY;m.window=(u32)p->window.handle;
+         m.generation=m.window;m.epoch=p->gui.display;sc32_gui_emit(p->window.owner,&m);
+@@ -151,6 +152,7 @@
+ 
+         win_t *w=&WINDOW(i);
+         window_extra_t *e=extra_of(w->handle);
++        if(window_record(w->handle)->shell_role)continue;
+         if(!e->native) {
+ 
+             e->scale=GFX_W==320?1:(display_scale()+99)/100;
+@@ -178,16 +180,16 @@
+ {
+ 
+     if(width>GFX_W)width=GFX_W;
+-    if(height>work_bottom())height=work_bottom();
+-    int result=win_create(pid,title,(GFX_W-width)/2,(work_bottom()-height)/2,width,height,1);
++    if(height>wm_shell_work_bottom_for(session_task(pid)))height=wm_shell_work_bottom_for(session_task(pid));
++    int result=win_create(pid,title,(GFX_W-width)/2,(wm_shell_work_bottom_for(session_task(pid))-height)/2,width,height,1);
+     if(result>=0 && session_task(pid)==session_active())wm_request_compose();
+     return result;
+ }
+ int wm_open_rgb_window(int pid,const char *title,int width,int height)
+ {
+     if(width>GFX_W)width=GFX_W;
+-    if(height>work_bottom())height=work_bottom();
+-    int result=win_create(pid,title,(GFX_W-width)/2,(work_bottom()-height)/2,width,height,2);
++    if(height>wm_shell_work_bottom_for(session_task(pid)))height=wm_shell_work_bottom_for(session_task(pid));
++    int result=win_create(pid,title,(GFX_W-width)/2,(wm_shell_work_bottom_for(session_task(pid))-height)/2,width,height,2);
+     if(result>=0 && session_task(pid)==session_active())wm_request_compose();
+     return result;
+ }
+@@ -281,11 +283,11 @@
+     win_t *w=owned_window(pid,handle);window_extra_t *e=w?extra_of(handle):0;
+     /* 旧画布长度不能被程序定位请求改变；新增入口只接受原生窗口。
+      * 先校验有界尺寸再加边框，避免负数/溢出绕过工作区限制。 */
+-    if(!w || !e || !e->native || width<94 || height<40 || width>1920 || height>1080)return -1;
++    if(!w || !e || window_record(handle)->shell_role || !e->native || width<94 || height<40 || width>1920 || height>1080)return -1;
+     if(native_resize(w,width+2,height+TITLE_H+1))return -1;
+     if(x<0)x=0;if(y<0)y=0;
+     if(x>GFX_W-w->w)x=GFX_W-w->w;
+-    if(y>work_bottom()-w->h)y=work_bottom()-w->h;
++    if(y>wm_shell_work_bottom_for(window_record(w->handle)->session)-w->h)y=wm_shell_work_bottom_for(window_record(w->handle)->session)-w->h;
+     if(x<0)x=0;if(y<0)y=0;
+     w->x=x;w->y=y;e->hidden=e->maximized=0;visibility_changed(w);
+     e->restore_x=x;e->restore_y=y;e->restore_w=w->w;e->restore_h=w->h;
+@@ -295,7 +297,7 @@
+ {
+ 
+     win_t *w=owned_window(pid,handle);
+-    if(!w)return -1;
++    if(!w || window_record(handle)->shell_role)return -1;
+     window_extra_t *e=extra_of(handle);
+     if(command<0 || command>2)return -1;
+     gui_focus_defer++;
+@@ -317,7 +319,7 @@
+             e->restore_h=w->h;
+ 
+         }
+-        if(native_resize(w,GFX_W,work_bottom())){gui_focus_defer--;return -1;}
++        if(native_resize(w,GFX_W,wm_shell_work_bottom_for(window_record(handle)->session))){gui_focus_defer--;return -1;}
+         w->x=w->y=0;
+         e->maximized=1;
+         e->hidden=0;
+@@ -896,8 +898,8 @@
+             return 1;
+ 
+         }
+-        win_raise(i);
+-        i=nwins-1;
++        i=win_raise(i);
++        if(i<0)return 1;
+         win_t *w=&WINDOW(i);
+         window_extra_t *e=extra_of(w->handle);
+         if(y<w->y+window_client_dy(w)) {
+--- a/sandcore/user/SC32GUI.H
++++ b/sandcore/user/SC32GUI.H
+@@ -58,6 +58,7 @@
+ #define SC32_WINDOW_PAINT 128u
+ #define SC32_WINDOW_CREATING 256u
+ #define SC32_WINDOW_CAPTURED 512u
++#define SC32_WINDOW_PREPARING 8192u
+ #define SC32_WINDOW_SHOW 0u
+ #define SC32_WINDOW_HIDE 1u
+ #define SC32_WINDOW_MINIMIZE 2u

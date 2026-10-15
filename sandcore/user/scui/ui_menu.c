@@ -693,7 +693,7 @@ done:ScHashRelease(ids);
     ScArrayRelease(stack);
     return s;
 }
-ScStatus ScUiMenuOpen(ScUiContext *c,ScUiNode owner_id,ScUiMenu *menu,ScI32 x,ScI32 y,ScU32 flags,ScU32 *out)
+static ScStatus ui_menu_open_range(ScUiContext *c,ScUiNode owner_id,ScUiMenu *menu,ScI32 x,ScI32 y,ScU32 first,ScU32 flags,ScU32 *out)
 {
     UiNode *owner=ui_root(c,owner_id),*node;
     UiPopup *p=0;
@@ -719,6 +719,7 @@ ScStatus ScUiMenuOpen(ScUiContext *c,ScUiNode owner_id,ScUiMenu *menu,ScI32 x,Sc
     p->context=c;
     p->owner=owner->id;
     p->menu=menu;
+    p->first_row=p->range_first=first;
     p->hot=UINT_MAX;
     p->row_height=(ScI32)metrics.row_height;
     if(c->next_token==UINT_MAX){s=SC_UI_E_RANGE;
@@ -726,7 +727,7 @@ ScStatus ScUiMenuOpen(ScUiContext *c,ScUiNode owner_id,ScUiMenu *menu,ScI32 x,Sc
         }
     p->token=c->next_token++;
     count=ui_menu_count(menu);
-    if(!count){s=SC_UI_E_INVALID;
+    if(first>=count){s=SC_UI_E_INVALID;
         goto failed;
         }
     s=ui_event(owner,SC_UI_EVENT_OPENING,menu,0);
@@ -738,10 +739,10 @@ ScStatus ScUiMenuOpen(ScUiContext *c,ScUiNode owner_id,ScUiMenu *menu,ScI32 x,Sc
         goto failed;
         }
     count=ui_menu_count(menu);
-    if(!count){s=SC_UI_E_INVALID;
+    if(first>=count){s=SC_UI_E_INVALID;
         goto failed;
         }
-    for(i=0;i<count;i++){UiMenuEntry *item=ui_menu_at(menu,i);
+    for(i=first;i<count;i++){UiMenuEntry *item=ui_menu_at(menu,i);
         ScUiText text;
         ScUiTextMetrics m;
         char shortcut[48];
@@ -767,7 +768,7 @@ ScStatus ScUiMenuOpen(ScUiContext *c,ScUiNode owner_id,ScUiMenu *menu,ScI32 x,Sc
             }
         if(need>width)width=need;
         }
-    if(!ui_multiply(count,(ScU32)p->row_height,&height) || height>UINT_MAX-8){s=SC_UI_E_RANGE;
+    if(!ui_multiply(count-first,(ScU32)p->row_height,&height) || height>UINT_MAX-8){s=SC_UI_E_RANGE;
         goto failed;
         }
     height+=8;
@@ -786,7 +787,7 @@ ScStatus ScUiMenuOpen(ScUiContext *c,ScUiNode owner_id,ScUiMenu *menu,ScI32 x,Sc
     if(c->popups)c->popups->previous=p;
     c->popups=p;
     count=ui_menu_count(menu);
-    for(i=0;i<count;i++)if(!(ui_menu_flags(c,ui_menu_at(menu,i))&(SC_UI_MENU_DISABLED|SC_UI_MENU_SEPARATOR))){p->hot=i;
+    for(i=first;i<count;i++)if(!(ui_menu_flags(c,ui_menu_at(menu,i))&(SC_UI_MENU_DISABLED|SC_UI_MENU_SEPARATOR))){p->hot=i;
         break;
         }
     ui_node_damage(node);
@@ -803,6 +804,9 @@ done:s=ui_cause(c,s,UI_OP_MENU,0);
     ui_node_leave(owner);
     ui_object_leave(&c->object);
     return s;
+}
+ScStatus ScUiMenuOpen(ScUiContext *c,ScUiNode owner_id,ScUiMenu *menu,ScI32 x,ScI32 y,ScU32 flags,ScU32 *out)
+{return ui_menu_open_range(c,owner_id,menu,x,y,0,flags,out);
 }
 static UiPopup *ui_popup(UiNode *node)
 {UiPopup *p;
@@ -837,6 +841,64 @@ static ScStatus ui_menu_item_width(UiNode *n,UiMenuEntry *entry,ScI32 *out)
     *out=(ScI32)width;
     return SC_UI_OK;
 }
+static ScStatus ui_menu_band(UiNode *n,ScU32 *visible,ScI32 *edge)
+{
+    ScU32 i,count=ui_menu_count(n->menu);
+    ScI32 used=0,width,available=n->rectangle.width;
+    ScStatus s;
+    if(available<0)available=0;
+    for(i=0;i<count;i++){
+        s=ui_menu_item_width(n,ui_menu_at(n->menu,i),&width);
+        if(s<0)return s;
+        if(width>available-used)break;
+        used+=width;
+    }
+    *visible=count;
+    *edge=available;
+    if(i==count)return SC_UI_OK;
+    /* 只量可见前缀，不在每次鼠标事件中遍历巨大的隐藏菜单。
+     * Chevron保留真实输入区域，末项从不画进客户区以外。 */
+    ScI32 chevron=ui_scale(n->owner,24);
+    if(chevron>available)chevron=available;
+    available-=chevron;
+    used=0;
+    for(i=0;i<count;i++){
+        s=ui_menu_item_width(n,ui_menu_at(n->menu,i),&width);
+        if(s<0)return s;
+        if(width>available-used)break;
+        used+=width;
+    }
+    *visible=i;
+    *edge=available;
+    return SC_UI_OK;
+}
+static ScStatus ui_menu_overflow(UiNode *n)
+{
+    ScUiContext *c=n->owner;
+    ScU32 first,token,revision;
+    ScI32 edge,x,y;
+    ScStatus s;
+    ScUiMenu *menu=n->menu;
+    ui_node_hold(n);
+    s=ScUiMenuRetain(menu);
+    if(s<0)goto done;
+    revision=menu->revision;
+    s=ui_menu_band(n,&first,&edge);
+    if(s<0 || first==ui_menu_count(menu))goto release;
+    if(!ui_signed_add(n->rectangle.x,edge,&x) || !ui_signed_add(n->rectangle.y,n->rectangle.height,&y)){s=SC_UI_E_RANGE;
+        goto release;
+    }
+    ui_menu_close_owner(c,n->root);
+    if(n->private_flags&UI_NODE_RETIRED){s=SC_UI_E_CANCELLED;goto release;}
+    s=ui_menu_open_range(c,n->root,menu,x,y,first,0,&token);
+    if(s==0){UiPopup *p;
+        if((n->private_flags&UI_NODE_RETIRED) || n->menu!=menu || menu->revision!=revision){ScUiMenuClose(c,token);s=SC_UI_E_STALE;}
+        else for(p=c->popups;p;p=p->next)if(p->token==token){p->source=n->id;p->source_item=0;break;}
+    }
+release:ScUiMenuRelease(menu);
+done:ui_node_leave(n);
+    return s;
+}
 static ScStatus ui_menu_measure(UiNode *n,ScUiSize *out)
 {
     ScU32 i,width=0;
@@ -867,8 +929,8 @@ static ScStatus ui_menu_paint(UiNode *n,ScUiPainter *paint)
     ScUiContext *c=n->owner;
     ScUiMenu *m=n->menu;
     UiPopup *popup=ui_popup(n);
-    ScU32 i,first=0,count;
-    ScI32 x=0,row_height;
+    ScU32 i,first=0,count,total=0,visible=0;
+    ScI32 x=0,row_height,overflow_edge=0;
     ScUiRect whole;
     if(popup){m=popup->menu;
         first=popup->first_row;
@@ -884,6 +946,11 @@ static ScStatus ui_menu_paint(UiNode *n,ScUiPainter *paint)
     if(!m)return SC_UI_OK;
     m->object.depth++;
     count=ui_menu_count(m);
+    total=count;
+    if(!popup){ScStatus status=ui_menu_band(n,&visible,&overflow_edge);
+        if(status<0){ui_object_leave(&m->object);return status;}
+        count=visible;
+    }
     for(i=first;i<count;i++){UiMenuEntry *item=ui_menu_at(m,i);
         ScUiRect row,text_rect;
         ScUiText label;
@@ -974,6 +1041,23 @@ static ScStatus ui_menu_paint(UiNode *n,ScUiPainter *paint)
             return SC_UI_E_RANGE;
             }
     }
+    if(!popup && visible<total){ScUiRect button;
+        ScI32 cx,cy,step=ui_scale(c,3),separation=ui_scale(c,5),d;
+        int hot=n->menu_hot==total;
+        button.x=overflow_edge;
+        button.y=0;
+        button.width=whole.width-overflow_edge;
+        button.height=whole.height;
+        if(n->kind==SC_UI_TOOLBAR){if(hot || n->menu_pressed==0)ui_border(paint,&button,n->menu_pressed==0);}
+        else if(hot)ui_fill(paint,&button,SC32_COLOR_SELECT);
+        paint->text_role=!(n->effective&SC_UI_ENABLED)?SC32_COLOR_MUTED:hot && n->kind!=SC_UI_TOOLBAR?SC32_COLOR_SELECT_TEXT:SC32_COLOR_TEXT;
+        cx=button.x+button.width/2-step;
+        cy=button.height/2;
+        for(d=0;d<step;d++){
+            ScUiPainterLine(paint,cx+d,cy-step+d,cx+d,cy+step-d,paint->text_role);
+            ScUiPainterLine(paint,cx+separation+d,cy-step+d,cx+separation+d,cy+step-d,paint->text_role);
+        }
+    }
     ui_object_leave(&m->object);
     return SC_UI_OK;
 }
@@ -998,8 +1082,12 @@ static ScStatus ui_menu_activate(UiNode *n,UiMenuEntry *entry,ScU32 row)
             x=px-ox+n->rectangle.width-2;
             y=py-oy+2+(ScI32)(row-p->first_row)*p->row_height;
             }
-        else{ScU32 i;
-            for(i=0;i<row;i++){ScI32 width;
+        else{ScU32 i,visible;
+            ScI32 edge;
+            s=ui_menu_band(n,&visible,&edge);
+            if(s<0){ScUiMenuRelease(submenu);return s;}
+            if(row>=visible){if(!ui_signed_add(n->rectangle.x,edge,&x)){ScUiMenuRelease(submenu);return SC_UI_E_RANGE;}}
+            else for(i=0;i<row;i++){ScI32 width;
                 s=ui_menu_item_width(n,ui_menu_at(n->menu,i),&width);
                 if(s<0 || !ui_signed_add(x,width,&x)){ScUiMenuRelease(submenu);
                     return s<0?s:SC_UI_E_RANGE;
@@ -1013,11 +1101,19 @@ static ScStatus ui_menu_activate(UiNode *n,UiMenuEntry *entry,ScU32 row)
                 if(p){child->parent_popup=p->token;
                     child->source=p->source;
                     child->source_item=p->source_item;
+                    if(!child->source_item){UiNode *source=ui_node(c,p->source);
+                        if(source && source->kind==SC_UI_MENUBAR)child->source_item=entry_id;
+                    }
                     p->child_popup=token;
                     }
-                else if(n->kind==SC_UI_MENUBAR){child->source=n->id;
+                else if(n->kind==SC_UI_MENUBAR || n->kind==SC_UI_TOOLBAR){child->source=n->id;
                     child->source_item=entry_id;
+                    ScU32 visible;
+                    ScI32 edge;
                     n->menu_hot=row;
+                    if(ui_menu_band(n,&visible,&edge)==0 && row>=visible)n->menu_hot=ui_menu_count(n->menu);
+                    /* Alt/F10没有鼠标hover替我们损伤bar，必须发布实际新高亮。 */
+                    ui_node_damage(n);
                     }
                 break;
                 }}
@@ -1025,8 +1121,9 @@ static ScStatus ui_menu_activate(UiNode *n,UiMenuEntry *entry,ScU32 row)
         return s<0?s:SC_UI_HANDLED;
         }
     {ScU32 command=entry->description.command;
-        ScUiNode source=p?owner:n->id;
+        ScUiNode source=p?(p->source?p->source:owner):n->id;
         ui_menu_close_owner(c,owner);
+        if(!ui_node(c,source))return SC_UI_E_CANCELLED;
         return ScUiCommand(c,source,command);
         }
 }
@@ -1050,15 +1147,20 @@ static ScStatus ui_menu_event(UiNode *n,const ScUiEvent *e)
     UiPopup *p=ui_popup(n);
     ScUiMenu *m=p?p->menu:n->menu;
     ScUiContext *c=n->owner;
-    ScU32 count,index=UINT_MAX,i;
+    ScU32 count,index=UINT_MAX,i,visible=0;
+    ScI32 overflow_edge=0;
     if(!m || e->type==SC_UI_EVENT_CREATE || e->type==SC_UI_EVENT_DESTROY)return SC_UI_OK;
     count=ui_menu_count(m);
     if(!count)return SC_UI_OK;
+    if(p && p->range_first>=count){ScUiMenuClose(c,p->token);return SC_UI_HANDLED;}
+    if(!p){ScStatus status=ui_menu_band(n,&visible,&overflow_edge);
+        if(status<0)return status;
+    }
     if(e->type==SC_UI_EVENT_POINTER_MOVE || e->type==SC_UI_EVENT_POINTER_DOWN || e->type==SC_UI_EVENT_POINTER_UP){
         ScU32 left=!e->message || (e->message->data[3]&1u);
         if(p && e->x>=0 && e->x<n->rectangle.width && e->y>=2 && e->y<n->rectangle.height)index=p->first_row+(ScU32)(e->y-2)/(ScU32)p->row_height;
         else if(!p && e->y>=0 && e->y<n->rectangle.height){ScI32 x=0;
-            for(i=0;i<count;i++){ScI32 width,end;
+            for(i=0;i<visible;i++){ScI32 width,end;
                 ScStatus s=ui_menu_item_width(n,ui_menu_at(m,i),&width);
                 if(s<0)return s;
                 if(!ui_signed_add(x,width,&end))return SC_UI_E_RANGE;
@@ -1066,8 +1168,10 @@ static ScStatus ui_menu_event(UiNode *n,const ScUiEvent *e)
                     break;
                     }
                 x=end;
-                }}
-        if(index>=count)index=UINT_MAX;
+                }
+            if(index==UINT_MAX && visible<count && e->x>=overflow_edge && e->x<n->rectangle.width)index=count;
+        }
+        if(index>count || (index==count && (p || visible==count)))index=UINT_MAX;
         if(p){if(p->hot!=index){p->hot=index;
                 ui_node_damage(n);
                 if(p->hover_timer){ScUiTimerCancel(c,p->hover_timer);
@@ -1090,9 +1194,9 @@ static ScStatus ui_menu_event(UiNode *n,const ScUiEvent *e)
             ui_node_damage(n);
             }
         if(n->kind==SC_UI_TOOLBAR){
-            if(e->type==SC_UI_EVENT_POINTER_DOWN && left && index!=UINT_MAX && !(ui_menu_flags(c,ui_menu_at(m,index))&(SC_UI_MENU_DISABLED|SC_UI_MENU_SEPARATOR))){ScStatus s=ScUiCapture(c,n->id,1);
+            if(e->type==SC_UI_EVENT_POINTER_DOWN && left && index!=UINT_MAX && (index==count || !(ui_menu_flags(c,ui_menu_at(m,index))&(SC_UI_MENU_DISABLED|SC_UI_MENU_SEPARATOR)))){ScStatus s=ScUiCapture(c,n->id,1);
                 if(s<0)return s;
-                n->menu_pressed=ui_menu_at(m,index)->id;
+                n->menu_pressed=index==count?0:ui_menu_at(m,index)->id;
                 n->state|=SC_UI_PRESSED;
                 ui_tree_effective(n);
                 ui_node_damage(n);
@@ -1104,18 +1208,22 @@ static ScStatus ui_menu_event(UiNode *n,const ScUiEvent *e)
                 ui_tree_effective(n);
                 ScUiCapture(c,n->id,0);
                 ui_node_damage(n);
-                if(index!=UINT_MAX && ui_menu_at(m,index)->id==pressed){ScStatus s=ui_menu_activate(n,ui_menu_at(m,index),index);
+                if(index==count && !pressed){ScStatus s=ui_menu_overflow(n);
+                    return s<0?s:SC_UI_HANDLED;
+                }
+                if(index<count && ui_menu_at(m,index)->id==pressed){ScStatus s=ui_menu_activate(n,ui_menu_at(m,index),index);
                     return s<0?s:SC_UI_HANDLED;
                     }
                 return SC_UI_HANDLED;
                 }
         }
-        else if(index!=UINT_MAX && left && ((p && e->type==SC_UI_EVENT_POINTER_UP) || (!p && e->type==SC_UI_EVENT_POINTER_DOWN))){ScStatus s=ui_menu_activate(n,ui_menu_at(m,index),index);
+        else if(index!=UINT_MAX && left && ((p && e->type==SC_UI_EVENT_POINTER_UP) || (!p && e->type==SC_UI_EVENT_POINTER_DOWN))){ScStatus s=index==count?ui_menu_overflow(n):ui_menu_activate(n,ui_menu_at(m,index),index);
             return s<0?s:SC_UI_HANDLED;
             }
         if(!p && n->kind==SC_UI_MENUBAR && e->type==SC_UI_EVENT_POINTER_MOVE && index!=UINT_MAX){UiPopup *open;
             for(open=c->popups;open;open=open->next)if(!open->retired && open->source==n->id && !open->parent_popup)break;
-            if(open && open->source_item!=ui_menu_at(m,index)->id)return ui_menu_activate(n,ui_menu_at(m,index),index);
+            if(open && index==count && open->source_item)return ui_menu_overflow(n);
+            if(open && index<count && open->source_item!=ui_menu_at(m,index)->id)return ui_menu_activate(n,ui_menu_at(m,index),index);
             }
         return p?SC_UI_HANDLED:SC_UI_OK;
     }
@@ -1126,7 +1234,8 @@ static ScStatus ui_menu_event(UiNode *n,const ScUiEvent *e)
         ui_node_damage(n);
         return SC_UI_OK;
         }
-    if(n->kind==SC_UI_TOOLBAR && e->type==SC_UI_EVENT_FOCUS_IN && n->menu_hot>=count){for(i=0;i<count;i++)if(!(ui_menu_flags(c,ui_menu_at(m,i))&(SC_UI_MENU_DISABLED|SC_UI_MENU_SEPARATOR))){n->menu_hot=i;
+    if(n->kind==SC_UI_TOOLBAR && e->type==SC_UI_EVENT_FOCUS_IN && n->menu_hot>=visible){n->menu_hot=visible<count?count:UINT_MAX;
+        for(i=0;i<visible;i++)if(!(ui_menu_flags(c,ui_menu_at(m,i))&(SC_UI_MENU_DISABLED|SC_UI_MENU_SEPARATOR))){n->menu_hot=i;
             ui_node_damage(n);
             break;
             }
@@ -1137,7 +1246,9 @@ static ScStatus ui_menu_event(UiNode *n,const ScUiEvent *e)
         return SC_UI_OK;
         }
     if(p && e->type==SC_UI_EVENT_WHEEL && e->message){ScI32 delta=(ScI32)e->message->data[2];
-        if(delta>0)p->first_row=p->first_row>(ScU32)delta?p->first_row-(ScU32)delta:0;
+        if(delta>0){if(p->first_row-p->range_first>(ScU32)delta)p->first_row-=(ScU32)delta;
+            else p->first_row=p->range_first;
+        }
         else if(delta<0 && p->first_row<count-1){ScU32 amount=0u-(ScU32)delta;
             p->first_row=amount>count-1-p->first_row?count-1:p->first_row+amount;
             }
@@ -1161,11 +1272,11 @@ static ScStatus ui_menu_event(UiNode *n,const ScUiEvent *e)
         if(e->key==SC32_KEY_UP || e->key==SC32_KEY_DOWN || e->key==SC32_KEY_HOME || e->key==SC32_KEY_END){ScI32 step=e->key==SC32_KEY_UP?-1:1;
             index=p->hot;
             if(e->key==SC32_KEY_HOME)index=count-1;
-            if(e->key==SC32_KEY_END){index=0;
+            if(e->key==SC32_KEY_END){index=p->range_first;
                 step=-1;
                 }
-            for(i=0;i<count;i++){if(index==UINT_MAX)index=step>0?0:count-1;
-                else index=step>0?(index+1)%count:index?index-1:count-1;
+            for(i=p->range_first;i<count;i++){if(index==UINT_MAX || index<p->range_first || index>=count)index=step>0?p->range_first:count-1;
+                else index=step>0?(index+1<count?index+1:p->range_first):index>p->range_first?index-1:count-1;
                 if(!(ui_menu_flags(c,ui_menu_at(m,index))&(SC_UI_MENU_DISABLED|SC_UI_MENU_SEPARATOR)))break;
                 }
             if(i==count)index=UINT_MAX;
@@ -1178,7 +1289,7 @@ static ScStatus ui_menu_event(UiNode *n,const ScUiEvent *e)
             ui_node_damage(n);
             return SC_UI_HANDLED;
             }
-        for(i=0;i<count;i++)if(ui_menu_at(m,i)->mnemonic==e->key){ScStatus s=ui_menu_activate(n,ui_menu_at(m,i),i);
+        for(i=p->range_first;i<count;i++)if(ui_menu_at(m,i)->mnemonic==e->key){ScStatus s=ui_menu_activate(n,ui_menu_at(m,i),i);
             return s<0?s:SC_UI_HANDLED;
             }
     }
@@ -1190,16 +1301,17 @@ static ScStatus ui_menu_event(UiNode *n,const ScUiEvent *e)
         }
     if(n->kind==SC_UI_TOOLBAR && e->type==SC_UI_EVENT_KEY_DOWN){
         if(e->key==SC32_KEY_LEFT || e->key==SC32_KEY_RIGHT){ScI32 direction=e->key==SC32_KEY_RIGHT?1:-1;
-            index=n->menu_hot;
-            for(i=0;i<count;i++){if(index==UINT_MAX)index=direction>0?0:count-1;
-                else index=direction>0?(index+1)%count:index?index-1:count-1;
-                if(!(ui_menu_flags(c,ui_menu_at(m,index))&(SC_UI_MENU_SEPARATOR|SC_UI_MENU_DISABLED)))break;
+            ScU32 slots=visible+(visible<count?1u:0u);
+            index=n->menu_hot==count?visible:n->menu_hot;
+            for(i=0;i<slots;i++){if(index==UINT_MAX || index>=slots)index=direction>0?0:slots-1;
+                else index=direction>0?(index+1)%slots:index?index-1:slots-1;
+                if(index==visible || !(ui_menu_flags(c,ui_menu_at(m,index))&(SC_UI_MENU_SEPARATOR|SC_UI_MENU_DISABLED)))break;
                 }
-            n->menu_hot=i==count?UINT_MAX:index;
+            n->menu_hot=i==slots?UINT_MAX:index==visible?count:index;
             ui_node_damage(n);
             return SC_UI_HANDLED;
             }
-        if((e->key==' ' || e->key=='\n') && !(e->modifiers&(SC32_MOD_ALT|SC32_MOD_CONTROL)) && n->menu_hot<count){n->menu_pressed=ui_menu_at(m,n->menu_hot)->id;
+        if((e->key==' ' || e->key=='\n') && !(e->modifiers&(SC32_MOD_ALT|SC32_MOD_CONTROL)) && (n->menu_hot<visible || (visible<count && n->menu_hot==count))){n->menu_pressed=n->menu_hot==count?0:ui_menu_at(m,n->menu_hot)->id;
             n->menu_key=e->key;
             n->state|=SC_UI_PRESSED;
             ui_tree_effective(n);
@@ -1207,13 +1319,18 @@ static ScStatus ui_menu_event(UiNode *n,const ScUiEvent *e)
             return SC_UI_HANDLED;
             }
     }
-    if(n->kind==SC_UI_TOOLBAR && e->type==SC_UI_EVENT_KEY_UP && n->menu_key==e->key){ScU32 pressed=n->menu_pressed;
+    /* key=0是无逻辑符号的真实释放，不是已按下的Space/Enter。
+     * 必须先有键盘按下状态，才可消费对应释放；否则会抹掉鼠标按压。 */
+    if(n->kind==SC_UI_TOOLBAR && e->type==SC_UI_EVENT_KEY_UP && n->menu_key && n->menu_key==e->key){ScU32 pressed=n->menu_pressed;
         n->menu_pressed=UINT_MAX;
         n->menu_key=0;
         n->state&=~SC_UI_PRESSED;
         ui_tree_effective(n);
         ui_node_damage(n);
-        if(n->menu_hot<count && ui_menu_at(m,n->menu_hot)->id==pressed){ScStatus s=ui_menu_activate(n,ui_menu_at(m,n->menu_hot),n->menu_hot);
+        if(n->menu_hot==count && visible<count && !pressed){ScStatus s=ui_menu_overflow(n);
+            return s<0?s:SC_UI_HANDLED;
+        }
+        if(n->menu_hot<visible && ui_menu_at(m,n->menu_hot)->id==pressed){ScStatus s=ui_menu_activate(n,ui_menu_at(m,n->menu_hot),n->menu_hot);
             return s<0?s:SC_UI_HANDLED;
             }
         return SC_UI_HANDLED;

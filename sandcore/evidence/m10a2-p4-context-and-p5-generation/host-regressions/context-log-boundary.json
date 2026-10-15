@@ -1,0 +1,9 @@
+{
+  "status": "PASS",
+  "cases": [
+    "actual-GUI21-DROP-and-ACK-at-exact-console-start",
+    "old-business-markers-before-start-rejected"
+  ],
+  "actual_stdout_sha256": "463947005c8981c778f17885e34c76571f249005243d940e4634deb727a1d7de",
+  "driver_sha256": "7f0cd2aa1fff2ac6704369450067ee3fd143d2aee1c8e4a63af4acf7ece38e50"
+}

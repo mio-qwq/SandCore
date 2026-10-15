@@ -1,0 +1,920 @@
+{
+  "kind": "application",
+  "name": "SCSHELL.SCX",
+  "dependencies": [
+    {
+      "name": "SC32API.SCL",
+      "abi_major": 1,
+      "min_minor": 3,
+      "min_version": 4
+    },
+    {
+      "name": "SCCLIB.SCL",
+      "abi_major": 1,
+      "min_minor": 0,
+      "min_version": 1
+    },
+    {
+      "name": "SCLIB.SCL",
+      "abi_major": 1,
+      "min_minor": 0,
+      "min_version": 1
+    },
+    {
+      "name": "SCSHELL.SCL",
+      "abi_major": 1,
+      "min_minor": 0,
+      "min_version": 1
+    },
+    {
+      "name": "SCUI.SCL",
+      "abi_major": 1,
+      "min_minor": 1,
+      "min_version": 2
+    }
+  ],
+  "imports": [
+    {
+      "name": "ScBrokerWait",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScClipboardQuery",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScConfigCreate",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScConfigGet",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScConfigRelease",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScConfigSet",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScDirectoryClose",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScDirectoryNext",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScDirectoryOpen",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScDisplayQuery",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScHashCreate",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScHashGet",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScHashRelease",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScHashRemove",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScHashSet",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScIdentityQuery",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScIpcClose",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScIpcCreate",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScIpcListen",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScPathCreate",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScPathMetadata",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScPathStat",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScProcessSelf",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScProcessYield",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScSessionControl",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScSessionEnumerate",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScSessionPath",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellApplicationRelease",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellCatalogApplyLayout",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellCatalogCreate",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellCatalogFind",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellCatalogImportLegacyMenu",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellCatalogLayout",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellCatalogLoad",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellCatalogQuery",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellCatalogRegister",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellCatalogRelease",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellCatalogSetAssociation",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellCatalogStoreRevision",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellClipboardCopyFiles",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellClipboardCutFiles",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellClipboardPaste",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellClipboardReconcile",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellConfirm",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellDialogClose",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellDialogStep",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellDragBegin",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellDropFiles",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellErrorDialog",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellErrorQuery",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellFileOperationCancel",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellFileOperationClose",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellFileOperationQuery",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellFileOperationStep",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellHostActivate",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellHostDeactivate",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellHostPrepare",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellHostQuery",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellHostWindowAction",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellHostWindowAt",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellHostWindows",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellHostWorkspace",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellIconLoad",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellLaunch",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellLayoutCreate",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellLayoutGet",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellLayoutQuery",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellLayoutRelease",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellMenuBuild",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellMenuExecute",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellMenuNative",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellMenuRelease",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellMenuStep",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellOpen",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellProgress",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellServiceClose",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellServiceCreate",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellServiceQuery",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellServiceStep",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellShortcutCreate",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellShortcutDescribe",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellShortcutLaunch",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellShortcutRead",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellShortcutRelease",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellShortcutWrite",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellStoreBegin",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellStoreClose",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellStoreQuery",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellStoreStep",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScSystemClock",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScSystemMonotonic",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScSystemWait",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScThemeQuery",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUiCapture",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUiClassRegister",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUiContextCreate",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUiContextRelease",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUiContextStep",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUiContextWaitTimeout",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUiDialogQuery",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUiDialogRelease",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUiDragCancel",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUiDropTargetRegister",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUiFocus",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUiIconRelease",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUiInvalidate",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUiListen",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUiMenuClose",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUiMenuCreate",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUiMenuInsert",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUiMenuOpen",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUiMenuRelease",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUiMessageBox",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUiMetricsQuery",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUiNodeQuery",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUiNodeSetLayout",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUiPainterBounds",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUiPainterClear",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUiPainterFill",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUiPainterIcon",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUiPainterLine",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUiPainterText",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUiPainterTextColor",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUiPropertySheet",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUiTooltipSet",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUiWidgetCreate",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUiWindowCreate",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUiWindowNative",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUtf8Decode",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "__scc_standard",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "abs",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "calloc",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "fprintf",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "free",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "malloc",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "memchr",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "memcmp",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "memcpy",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "memset",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "realloc",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "snprintf",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "strchr",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "strcmp",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "strcpy",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "strlen",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "strncmp",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "strrchr",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    }
+  ]
+}

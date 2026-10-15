@@ -40,6 +40,8 @@ Menu/Toolbar/Button/Shortcut共用Command。MenuItem拥有label/help/caption并�
 
 COMMAND_QUERY有真实生产者：显式Query、MenuOpen及执行Command前刷新，目标为Context订阅node0。data借用ScUiCommandDesc，仅flags是in/out；label/icon/shortcut只读。查询保持label/icon引用，重入CommandSet/Remove优先新发布记录，同链不递归Query。paint热路径只读发布状态，避免每次绘制都进用户query。设备触发Command保留tick/epoch/sequence/message，普通调用为程序来源。
 
+2026-10-16：node0订阅的TARGET仍只接无目标上下文事件；其CAPTURE/BUBBLE阶段分别包围完整控件路径，包括本次消息批中新建的popup。先持有节点路径，再调用上下文捕获；非零返回停止后续分发，销毁目标安全终止。坐标保留原事件坐标，current为0；不重复触发TARGET，也不改变原控件路径的阶段和顺序。Demo诊断键使用这一公开捕获入口，不能把仅注册node0当作旧实现已支持全局键观察的证据。待本批实际生成和GUI验证。
+
 只消费真实64B ScMessage。KEYDOWN导航，TEXT插Unicode，KEYUP真实释放。BUTTON data[2]是当前buttons、data[3]是changed mask；仅真实left边沿开始/提交left动作。WHEEL data[2/3]竖/横，与按钮布局不同。祖先hide/disable也撤后代focus/capture/hover；loss不补UP。hover转目标先Arrow reset再设Editor/Splitter/列边形状，focus恢复与按下再次确认；非聚焦ACCESS不算设置成功，capture/drag期间不覆盖它们的cursor。
 
 ScBrokerWait原子等GUI INPUT+broker STREAM；无活事务不10Hz轮询端点，活事务/timer给有限deadline。Timer用动态最小堆与节点拥有链，周期保持原deadline相位，TimerEvent.missed为真实双字计数，DRAW_ONLY按node effective visible及native root visible移出激活堆，后台timer继续。quantum是公平服务预算，不是对象数量上限。
@@ -73,3 +75,5 @@ Copy/Cut/Paste使用真实session clipboard事务及immutable snapshot，源退�
 2026-10-15：为真实内部modal/覆盖确认及开发者root发现新增ScUiContextRootNext第158实体入口，O(1)活链值查询、END/STALE不改out；本批尚未发布，ABI1.0/v1保持，未自行构建或运行。
 
 2026-10-15：同批补真实Dialog按钮命令校验合同；追加VISIBILITY=37业务通知以真实OS消息驱动隐藏后台事务，先发布状态、只通知实际变化、不新增入口或结构。仅源码静态收齐，交主代理统一构建及隐藏两样本/恢复重画验收。
+
+2026-10-16：build23/refresh09实际补齐node0上下文CAPTURE/BUBBLE，并由原G1生成SCUI及Demo；GUI21真实Drop/ACK已成功但主控行首边界误超时，原失败保留。只借紧邻start前的一个换行修正主控，实际原日志回归及旧标记拒绝通过。GUI22最终DECLARED_NATIVE_FIVE_LIBRARY_ORDINARY_GUI_SECOND_ROUND_PASS，共91项，GUI_behavior_verified/source_disk_unchanged/current_inputs_unchanged均true；两主题、100/150/200%实际字宽/换行、溢出菜单、文件保存/错误、Drop提交及Complete、静止/隐藏零提交、窗口恢复、正常return与最终owner/PF归账通过。主代理已查看Classic与200%原尺寸截图。公开158入口/137导入未变，SCAPI原SHA保持。静止200PIT实际2.032秒、QEMU一核CPU0.171875秒；checkbox观察127PIT包含F12/串口，不冒充纯输入延迟。证据evidence/m10a2-p4-context-and-p5-generation/index.json，不代表整版完成。

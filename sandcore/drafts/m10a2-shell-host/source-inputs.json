@@ -1,0 +1,70 @@
+{
+  "status": "ISOLATED_SOURCE_NOT_BUILT_NOT_RUN",
+  "inputs": {
+    "kernel/task.h": "c1ba2215d0ddfb38e74eb9ab56ded7d8bd58e6efca78955f80656a37e714e51f",
+    "kernel/task.c": "4e55b56a7baca7dd52849a87bb891dbb8fd42d216f62f9128f6d97706da1f513",
+    "kernel/streams.c": "668a50c72d2ad023cdd4b31fde7b583ee48826b56328db0a104b0bcac61cf973",
+    "kernel/streams.h": "4d45335aa08e14944504d565ec7d7e2923cb5b52458c6c030e6a0282740e9573",
+    "kernel/auth.h": "ca90e078e7815e7adc8890b2f55f91685c1ca330b197e13116606651c27c319f",
+    "kernel/auth.c": "198690195bebdb7bc5f547376d4e4eb1af7f186745a3ad3dcc6be10617df9c5d",
+    "kernel/session.c": "f2e4e61cd226708c85a7623152677cacfe646bac8dccecf794152be4fb2cc69a",
+    "kernel/main.c": "8bcd35ab9cef64561088cc422983bef406897ccdaf39bcd187d91a076d565a8b",
+    "kernel/fs.c": "e53c5cc1a5b5f61681679a6a917dc36cef0b6491021691c08bef610ac8d609e2",
+    "kernel/sc32_broker.h": "cd40b005e2f183cac23d1d1d58991cdbf69265f5020c4c30cd2220b13621e7cf",
+    "kernel/sc32_broker.c": "e200e30126eee32f34befbf571c549cfec2d0c3198b4d1620ad4f1270fc4eb2c",
+    "user/sc32/SC32API.C": "a614fabaad6d553412c8655268871a1cbdaaa8524c46c7c065ba2088b8128eb8",
+    "user/scui/SCUIPRIVATE.H": "58cfa650473ebce84e6e4a40c749bc058c494755184a0c3463094bc7963ec46f",
+    "user/SCUI.H": "243fd456f7c037b710a565d290d0fc2655fee6310380966e97986536d7336e00",
+    "user/scui/SCUI.json": "d0a658cb2d337984bdc2f581911f6fc29c6e8c0beaff41c9c620a4e180c76cdc",
+    "user/scui/ui_paint.c": "d87e81ab2782de4a9373530c64a2a86995ff3543fac5aace795dcb3770757bd5",
+    "user/scui/ui_dispatch.c": "40cfb74fab18cc05888684b53a41e14c303613252b80a6157fc7113c821e5e9e",
+    "Makefile": "b1e8055cf698ea5a2aa17834473f3b9dd00d037d38f0fd0c645dd59cc2aa782d",
+    "m10a2.mk": "d47ef6c774a4354278485cca6b63adb0d5f963f3530ec1052252118559ea7d26"
+  },
+  "new_files": [
+    {
+      "path": "kernel/broker_shell.inc",
+      "sha256": "d0e97851cd7600f8025e85ae3b6fedc3dcfe6867ad8bfc22fef9592b1261d06e"
+    },
+    {
+      "path": "kernel/sc32_host.c",
+      "sha256": "2bdab5266a4cd128c3712da82ee6ab5445bf950f759bc96a397c0b1dcc37a71a"
+    },
+    {
+      "path": "kernel/sc32_host.h",
+      "sha256": "0c6ba9750002290d33363466533c590e934170ce1087d2b3fb97ddb24f611a50"
+    },
+    {
+      "path": "kernel/shell_issue.inc",
+      "sha256": "7d6e34c5c30a38c039e9b2039a11793d5c09bd8829b1f0bf69226d0d58212082"
+    },
+    {
+      "path": "kernel/streams_launch.inc",
+      "sha256": "f01b4323a6c23d51644abea81793547a0954698ab356e91df1a2d3a3aa232dc9"
+    },
+    {
+      "path": "kernel/wm_shell.inc",
+      "sha256": "b83b41b118ed7d8d825068f36236099bfedb6ebb5dc6927ef5c7f3b877491fa4"
+    },
+    {
+      "path": "user/SC32HOST.H",
+      "sha256": "5e360a8d21491503a8dfc9f1bb972d0319bf7f404eb3ba0ab1c7aa25c17950e1"
+    },
+    {
+      "path": "user/hostapi/SC32HOSTWIRE.H",
+      "sha256": "8a20024966c16f5b6cf6851ef6641fc889c3a540068ca51ac358dfded499cfdd"
+    },
+    {
+      "path": "user/hostapi/sc32_launch.c",
+      "sha256": "b97e84afcb7c346ab03a94db432873e918e0fcbda1feaf0cdf0b738d8627e1f6"
+    },
+    {
+      "path": "user/scui/ui_shell_paint.inc",
+      "sha256": "d41fc58d9d75c2a9bac48e77a071f2bc84ff875bfbd9fde9eca6eda9d3cf6ba4"
+    },
+    {
+      "path": "tools/mk_shell_issue.py",
+      "sha256": "f1aab65d29c0d99cd543c27b415218607fcabcdd497abc58181442cb8d8e097d"
+    }
+  ]
+}

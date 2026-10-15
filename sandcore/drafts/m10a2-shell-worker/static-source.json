@@ -1,0 +1,29 @@
+{
+  "status": "STATIC_SOURCE_READING_ONLY_NOT_COMPILED_NOT_RUN",
+  "imports": 69,
+  "imports_missing": [],
+  "imports_extra": [],
+  "public_declarations_missing": [],
+  "private_definitions_missing": [],
+  "literal_include_missing": [],
+  "literal_include_files": 23,
+  "literal_source_bytes": 178590,
+  "macro_name_upper_bound": 251,
+  "dependency_sha256": {
+    "drafts/m10a2-shell-fs/user/SC32LEASE.H": "e724f522bdc883df656d4851e7dbe45d1cb40282de05c7fee66ad09c7665f943",
+    "drafts/m10a2-shell-r3/SCSHELLWIRE.H": "29971f90c023a6776f1b415ef4fa8e8982009e53248d90a47753540a4c4c8178",
+    "user/SC32API.H": "f4c423c01a933922453e032c65f390347b21f1b96e39c52086a082ad7e6ae888",
+    "user/SC32BROKER.H": "41a92354b7138d378181fbcf93ecbc6ff27bb88eea3008dbaa9380790a254ac8",
+    "user/SC32FONT.H": "a748bfc260e9cf222ec405a45cc78292bfc648d8d1cc7e4e6746898675268126",
+    "user/SC32GUI.H": "470cb56da856c79630c3621e5f765641db798456fcb0bd643e9fa615cbc051a6",
+    "user/SC32PALETTE.H": "36afa347d4339f99e3d4d18e77694666cdf30960a364b412fcd8131cce1ec20b",
+    "user/SC32POPUP.H": "3005dbe6a3d48097723aee7a2bf2f66f7059f5ea6e4afca277886ea6a957023b",
+    "user/sclib/SCLIB.H": "a6c3cc3946fb690e1384b4462aa710d3e872697fa390e6c3be2123423434243d",
+    "user/SCTYPES.H": "f705794dfb569a00241613b1e19b5bd0c8875fdd68e074c72c5fb9bbf6a690d2",
+    "user/stdlib/stdarg.h": "51a09fb007529c51d7f758f849d917726c82859e78f9cb79f16f21555a4855ef",
+    "user/stdlib/stddef.h": "a58026688294d4ca51c5929355f79f9a9d219b1e4e1f5e08a89ecf67d863c33c",
+    "user/stdlib/stdio.h": "68a12b4347f9cd9d2d8c12fe470c940462cf5c759ece23855108c4fed7278c0e",
+    "user/stdlib/stdlib.h": "38c7d2aeff9a9c75e92651551dde646a42de5d1b46e1c027751a97f092023ebd",
+    "user/stdlib/string.h": "fd638710dde87186847aff374cdf0884e6cca3a57b8443851012b7729eacdee3"
+  }
+}

@@ -109,3 +109,19 @@ Dialog只处理自己的命令：FileDialog为内部导航/建目录/过滤/排�
 2026-10-15：Root保存main恢复点0d78cd4并统一build13通过，仅kernel/wm.c和四Core产物变化，现代有资格焦点F12进入raw、旧窗口入口保留。GUI主控新增固定`--core-route-only-reuse`：逐项核432输入/17输出的同集合及精确单WM/四Core差，核归档build12的Core/ELF/SYM和128B头后旧payload；生成与历史平台/文本执行保原Core来源，本轮新Core另记真实GUI。当前五库、G1、三App、SDK、启动字节和全部include闭包的只读preflight通过，未重生成库；GUI行为仍待续验。
 
 2026-10-15：GUI06实际普通PID4代数3/SID4、现代F12及Checkbox输入通过，三张原尺寸截图均已检查；全轮仍FAIL，保留真实布局裁剪、Combo空白和F7不切页证据。只读原native机器码确认Demo的switch default未进入分派链，Root已定位并窄修Compiler reserved default标签解析，未在Demo绕过。收齐控件真实Count/行高/屏幕预算与物理Overlay、Demo完整viewport/说明换行；导入导出和公共ABI未改。下一统一构建及实际新G1/受影响库/App来源待验证，本次源码改动不继承旧GUI PASS。
+
+### 实际后续故障与本批窄修
+
+GUI12 已真实运行当前 G1 的 SCUI 和 Demo，普通 PID4/gen3、SID4。100000项全选、完整正文输入/Undo/Redo/剪贴板、真实两窗 ticket/IPC DROP/COMPLETE、属性校验/Apply、文件取消/覆盖保存/权限错误、两主题、DPI 数值、resize还原与局部损伤均留下实际证据；整轮仍 FAIL，没有正常退出或最终 owner 收束证据。200%实际图存在工具栏末项和Resources文案裁切，不能以字号数值正确替代视觉通过。
+
+当前框架在 Toolbar/MenuBar 空间不足时保留Chevron，将隐藏原Menu范围显示在真实Popup中；保留原菜单引用、命令、disabled/checked、图标、快捷键与submenu，未复制用户context/drop。鼠标边沿及键盘方向/Space/Enter可以访问该范围，滚轮/Home/End不越回可见前缀。`UiPopup.range_first`仅是本库私有范围下界，公共158入口及ABI保持。
+
+Label的自然宽度保持原语义，高度按实际分配宽度进行换行测量；布局在同一候选内先得到Splitter/Dock/padding后的宽度，再自底向上更新高度及VBox flex余量，最终才发布。custom arrange只调用最终一遍，回调修改revision或失败仍整树回滚。Demo Resources首行显式声明 `SC_UI_WRAP`，窗口尺寸与命令不削减；因此须真正重新生成Demo，不能只换新SCUI后继续使用旧Demo字节。
+
+业务printf保持SCCLIB正常管道全缓冲。宿主先保本次业务输入前的绝对console起点，再用已有有限真实F12的正常fflush观察DROP/COMPLETE、COMMAND、SAVED和APPLY；不会重发业务操作或把旧次标记当新结果。Menu/Property截图等待真实Window的PAINT标记清除，不再以固定0.3秒猜首帧。
+
+GUI12原console同时包含隐藏sample1 tick27323和sample2 tick27523，visible均0、paints均0:320、submitted均0:450029368。第二行带真实SYSTEM提示符前缀；旧finditer还会消耗相邻行共享的换行，导致遗漏。新解析使用真正行首锚及可选提示符，已在原字节上读出两条、差200 PIT；不修改原FAIL报告、不修改定时器实现、不在隐藏时发送F12。恢复重画与退出回收仍待后续真实运行。
+
+2026-10-15：收齐GUI12实际高DPI裁切对应的框架overflow、两遍候选换行布局与Demo单行WRAP，修正真实日志/隐藏行解析和首Paint截图前置条件；源码仅静态审阅，新库及新Demo客体字节、视觉/恢复/退出验收仍未验证。
+
+2026-10-16：build23/refresh09实际补齐node0上下文CAPTURE/BUBBLE，并由原G1生成SCUI及Demo；GUI21真实Drop/ACK已成功但主控行首边界误超时，原失败保留。只借紧邻start前的一个换行修正主控，实际原日志回归及旧标记拒绝通过。GUI22最终DECLARED_NATIVE_FIVE_LIBRARY_ORDINARY_GUI_SECOND_ROUND_PASS，共91项，GUI_behavior_verified/source_disk_unchanged/current_inputs_unchanged均true；两主题、100/150/200%实际字宽/换行、溢出菜单、文件保存/错误、Drop提交及Complete、静止/隐藏零提交、窗口恢复、正常return与最终owner/PF归账通过。主代理已查看Classic与200%原尺寸截图。公开158入口/137导入未变，SCAPI原SHA保持。静止200PIT实际2.032秒、QEMU一核CPU0.171875秒；checkbox观察127PIT包含F12/串口，不冒充纯输入延迟。证据evidence/m10a2-p4-context-and-p5-generation/index.json，不代表整版完成。

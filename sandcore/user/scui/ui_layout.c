@@ -87,7 +87,7 @@ static void ui_intrinsic_padding(UiNode *n,ScI32 *padding)
         padding[1]=ui_scale(n->owner,22);
         }
 }
-static ScStatus ui_measure_node(UiNode *n,ScArray *plan,ScHash *map,ScUiSize *out)
+static ScStatus ui_measure_node(UiNode *n,ScArray *plan,ScHash *map,ScUiSize *out,int wrapped_width)
 {
     ScUiContext *c=n->owner;
     ScUiSize constraint,preferred;
@@ -97,6 +97,12 @@ static ScStatus ui_measure_node(UiNode *n,ScArray *plan,ScHash *map,ScUiSize *ou
     ScU32 children=0;
     constraint.width=(ScI32)ui_root(c,n->id)->window->information.client_width;
     constraint.height=(ScI32)ui_root(c,n->id)->window->information.client_height;
+    if(wrapped_width && (n->kind==SC_UI_LABEL || n->kind==SC_UI_TOOLTIP)){UiPlacement candidate;
+        ScU32 index;
+        s=ui_plan_get(plan,map,n->id,&candidate,&index);
+        if(s<0)return s;
+        constraint.width=candidate.rectangle.width;
+    }
     preferred.width=0;
     preferred.height=0;
     if(n->custom && n->custom->description.measure){n->custom->depth++;
@@ -159,6 +165,7 @@ static ScStatus ui_arrange_children(UiNode *n,ScArray *plan,ScHash *map)
     ScU32 pi,children=0,total_weight=0;
     UiNode *child;
     ScUiRect inner,remaining;
+    ScI32 shrink_space=0,shrink_total=0;
     ScI32 main_total=0,free_space=0,cursor_x=0,cursor_y=0,line_height=0,gap=ui_scale(c,(ScI32)n->layout.gap),padding[4],intrinsic[4],padding_x,padding_y;
     ScStatus s;
     ScU32 grid_rows=1,i;
@@ -191,13 +198,27 @@ static ScStatus ui_arrange_children(UiNode *n,ScArray *plan,ScHash *map)
             if(size>INT_MAX-main_total || child->layout.flex_weight>UINT_MAX-total_weight)return SC_UI_E_RANGE;
             main_total+=size;
             total_weight+=child->layout.flex_weight;
+            if(child->layout.flex_weight){ScI32 capacity;
+                capacity=n->layout.mode==SC_UI_HBOX
+                    ?p.preferred.width-ui_scale(c,child->layout.min_width)
+                    :p.preferred.height-ui_scale(c,child->layout.min_height);
+                if(capacity<0 || capacity>INT_MAX-shrink_total)return SC_UI_E_RANGE;
+                shrink_total+=capacity;
+                }
             children++;
         }
         if(children>1){if(gap>0 && children-1>(ScU32)INT_MAX/(ScU32)gap)return SC_UI_E_RANGE;
             if(!ui_signed_add(main_total,(ScI32)(children-1)*gap,&main_total))return SC_UI_E_RANGE;
             }
         free_space=(n->layout.mode==SC_UI_HBOX?inner.width:inner.height)-main_total;
-        if(free_space<0)free_space=0;
+        if(free_space<0){
+            /* 空间不足只收缩有flex的控件，并保留声明的最小尺寸。
+             * 按可收缩量分配亏空，将整数余数交给后续兄弟，保证
+             * 线性遍历后的像素守恒；固定侧栏、margin与gap不变。 */
+            shrink_space=-free_space;
+            if(shrink_space>shrink_total)shrink_space=shrink_total;
+            free_space=0;
+            }
     }
     cursor_x=inner.x;
     cursor_y=inner.y;
@@ -222,7 +243,16 @@ static ScStatus ui_arrange_children(UiNode *n,ScArray *plan,ScHash *map)
             }
         else if(n->layout.mode==SC_UI_HBOX || n->layout.mode==SC_UI_VBOX || n->layout.mode==SC_UI_SCROLL_LAYOUT){
             ScI32 extra=0;
-            if(total_weight && child->layout.flex_weight){ScU32 weight=child->layout.flex_weight;
+            if(shrink_space && shrink_total && child->layout.flex_weight){ScI32 capacity;
+                capacity=n->layout.mode==SC_UI_HBOX
+                    ?p.preferred.width-ui_scale(c,child->layout.min_width)
+                    :p.preferred.height-ui_scale(c,child->layout.min_height);
+                ScI32 take=(ScI32)ui_fraction((ScU32)shrink_space,(ScU32)capacity,(ScU32)shrink_total);
+                shrink_space-=take;
+                shrink_total-=capacity;
+                extra=-take;
+                }
+            else if(total_weight && child->layout.flex_weight){ScU32 weight=child->layout.flex_weight;
                 /* 余数在后续兄弟间继续分配，最后一个flex恰好吃完。 */
                 extra=(ScI32)ui_fraction((ScU32)free_space,weight,total_weight);
                 free_space-=extra;
@@ -329,7 +359,7 @@ static ScStatus ui_layout_root(UiNode *root)
     ScArray *plan=0;
     ScHash *map=0;
     UiNode *n;
-    ScU32 count=0,i,revision=c->revision;
+    ScU32 count=0,i,pass,revision=c->revision;
     ScStatus s;
     if(!root->window || (root->private_flags&UI_NODE_RETIRED))return SC_UI_E_STALE;
     if(c->layout_depth)return SC_UI_E_BUSY;
@@ -355,47 +385,52 @@ static ScStatus ui_layout_root(UiNode *root)
         if(n==root)break;
         n=n->next;
         }
-    for(i=count;i;i--){UiPlacement p;
-        ScArrayGet(plan,i-1,&p);
-        n=ui_node(c,p.node);
-        if(!n){s=SC_UI_E_CANCELLED;
-            goto done;
-            }
-        ui_node_hold(n);
-        s=ui_measure_node(n,plan,map,&p.preferred);
-        ui_node_leave(n);
-        if(s!=0 || revision!=c->revision){if(s>=0)s=SC_UI_E_BUSY;
-            goto done;
-            }
-        s=ScArraySet(plan,i-1,&p);
-        if(s<0)goto done;
-        }
-    {UiPlacement p;
-        ScArrayGet(plan,0,&p);
-        p.rectangle.x=p.rectangle.y=0;
-        p.rectangle.width=(ScI32)root->window->information.client_width;
-        p.rectangle.height=(ScI32)root->window->information.client_height;
-        p.clip=p.rectangle;
-        p.child_clip=p.clip;
-        ScArraySet(plan,0,&p);
-        }
-    for(i=0;i<count;i++){UiPlacement p;
-        ScArrayGet(plan,i,&p);
-        n=ui_node(c,p.node);
-        if(!n){s=SC_UI_E_CANCELLED;
-            goto done;
-            }
-        s=ui_arrange_children(n,plan,map);
-        if(s<0)goto done;
-        if(n->custom && n->custom->description.arrange){ui_node_hold(n);
-            n->custom->depth++;
-            s=n->custom->description.arrange(c,n->id,&p.rectangle,n->custom->description.context);
-            n->custom->depth--;
+    /* 第一遍得到Splitter、Dock和父padding后的真实宽度；第二遍
+     * 将Label换行高度自底向上传回VBox，再算flex余量和兄弟位置。
+     * 两遍共用候选，不发布中间帧，应用arrange只在最终一遍调用。 */
+    for(pass=0;pass<2;pass++){
+        for(i=count;i;i--){UiPlacement p;
+            ScArrayGet(plan,i-1,&p);
+            n=ui_node(c,p.node);
+            if(!n){s=SC_UI_E_CANCELLED;
+                goto done;
+                }
+            ui_node_hold(n);
+            s=ui_measure_node(n,plan,map,&p.preferred,pass!=0);
             ui_node_leave(n);
+            if(s!=0 || revision!=c->revision){if(s>=0)s=SC_UI_E_BUSY;
+                goto done;
+                }
+            s=ScArraySet(plan,i-1,&p);
+            if(s<0)goto done;
             }
-        if(s!=0 || revision!=c->revision){if(s>=0)s=SC_UI_E_BUSY;
-            goto done;
-            }}
+        {UiPlacement p;
+            ScArrayGet(plan,0,&p);
+            p.rectangle.x=p.rectangle.y=0;
+            p.rectangle.width=(ScI32)root->window->information.client_width;
+            p.rectangle.height=(ScI32)root->window->information.client_height;
+            p.clip=p.rectangle;
+            p.child_clip=p.clip;
+            ScArraySet(plan,0,&p);
+            }
+        for(i=0;i<count;i++){UiPlacement p;
+            ScArrayGet(plan,i,&p);
+            n=ui_node(c,p.node);
+            if(!n){s=SC_UI_E_CANCELLED;
+                goto done;
+                }
+            s=ui_arrange_children(n,plan,map);
+            if(s<0)goto done;
+            if(pass && n->custom && n->custom->description.arrange){ui_node_hold(n);
+                n->custom->depth++;
+                s=n->custom->description.arrange(c,n->id,&p.rectangle,n->custom->description.context);
+                n->custom->depth--;
+                ui_node_leave(n);
+                }
+            if(s!=0 || revision!=c->revision){if(s>=0)s=SC_UI_E_BUSY;
+                goto done;
+                }}
+    }
     if(c->revision==UINT_MAX){s=SC_UI_E_RANGE;
         goto done;
         }

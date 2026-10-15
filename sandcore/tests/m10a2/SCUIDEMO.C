@@ -23,7 +23,7 @@ typedef struct {ScUiNode node;
 DemoRootObserver;
 typedef struct {
     ScUiContext *ui;
-    ScUiNode root,second,menu,toolbar,status,tree,tabs,pages[6],check,radio,spin,combo,progress,table,edit,second_edit,layout,dock,drag_source,second_exit;
+    ScUiNode root,second,menu,toolbar,status,tree,tabs,pages[6],check,radio,spin,combo,progress,table,edit,second_edit,layout,dock,drag_source,second_exit,resource_label;
     ScUiDocument *document;
     ScUiProvider *tree_provider,*combo_provider;
     ScUiSelection *tree_selection,*combo_selection,*table_selection;
@@ -43,6 +43,33 @@ typedef struct {
 }
 Demo;
 static Demo demo;
+/* 有界只读事件记录用于复核真实键鼠顺序；事件处理时不做串口输出。
+ * 仅F12显示最近64条，绝不合成输入、改控件状态或重发业务操作。 */
+typedef struct {ScU32 sequence,type,key,buttons,edge,state,window_state;
+    ScI32 x,y;
+} DemoToolbarEvent;
+static DemoToolbarEvent demo_toolbar_events[64];
+static ScU32 demo_toolbar_sequence;
+static ScStatus demo_toolbar_observe(ScUiContext *context,const ScUiEvent *event,void *opaque)
+{
+    (void)opaque;
+    if(event->type!=SC_UI_EVENT_POINTER_DOWN && event->type!=SC_UI_EVENT_POINTER_UP
+        && event->type!=SC_UI_EVENT_KEY_DOWN && event->type!=SC_UI_EVENT_KEY_UP
+        && event->type!=SC_UI_EVENT_FOCUS_IN && event->type!=SC_UI_EVENT_FOCUS_OUT
+        && event->type!=SC_UI_EVENT_CAPTURE_LOST && event->type!=SC_UI_EVENT_INPUT_SYNC)return 0;
+    DemoToolbarEvent *out=&demo_toolbar_events[demo_toolbar_sequence%64];
+    memset(out,0,sizeof(*out));
+    out->sequence=++demo_toolbar_sequence;
+    out->type=event->type;out->key=event->key;out->buttons=event->buttons;
+    out->edge=event->message?event->message->data[3]:0;
+    out->x=event->x;out->y=event->y;
+    ScUiNodeInfo node;ScWindowInfo window;
+    memset(&node,0,sizeof(node));node.size=sizeof(node);node.version=1;
+    memset(&window,0,sizeof(window));window.size=sizeof(window);window.version=1;
+    if(ScUiNodeQuery(context,event->node,&node)==0){out->state=node.state;
+        if(ScWindowQuery(node.native_window,&window)==0)out->window_state=window.state;}
+    return 0;
+}
 static void demo_snapshot(void);
 static ScStatus demo_observe_roots(void);
 static ScStatus demo_hidden_observe(void);
@@ -89,6 +116,18 @@ static ScStatus demo_widget(ScU32 parent,ScU32 kind,const char *label,ScU32 comm
     d.parent=parent;
     d.text=demo_text(label);
     d.command=command;
+    return demo_check(ScUiWidgetCreate(demo.ui,&d,out),"WidgetCreate");
+}
+static ScStatus demo_wrapped_label(ScU32 parent,const char *text,ScU32 *out)
+{
+    ScUiWidgetDesc d;
+    memset(&d,0,sizeof(d));
+    d.size=sizeof(d);
+    d.version=1;
+    d.kind=SC_UI_LABEL;
+    d.parent=parent;
+    d.flags=SC_UI_WRAP;
+    d.text=demo_text(text);
     return demo_check(ScUiWidgetCreate(demo.ui,&d,out),"WidgetCreate");
 }
 static ScStatus demo_layout(ScU32 id,ScU32 mode,ScI32 width,ScI32 height,ScU32 flex,ScU32 dock)
@@ -999,7 +1038,7 @@ static ScStatus demo_other_pages(void)
     if(s==0)s=demo_widget(demo.pages[4],SC_UI_BUTTON,"Open / 多选 / 目录",DEMO_OPEN,&node);
     if(s==0)s=demo_widget(demo.pages[4],SC_UI_BUTTON,"Save / Overwrite",DEMO_SAVE,&node);
     if(s==0)s=demo_widget(demo.pages[4],SC_UI_BUTTON,"Properties / Apply / Cancel",DEMO_PROPERTIES,&node);
-    if(s==0)s=demo_widget(demo.pages[5],SC_UI_LABEL,"Phoenix 12 / 16 · Classic / Aurora · 命名角色 · 有预算缓存",0,&label);
+    if(s==0)s=demo_wrapped_label(demo.pages[5],"Phoenix 12 / 16 · Classic / Aurora · 命名角色 · 有预算缓存",&demo.resource_label);
     if(s==0)s=demo_widget(demo.pages[5],SC_UI_LABEL,"Dense: 中文 ABC 0123",0,&label);
     if(s==0)s=ScUiNodeSetFont(demo.ui,label,SC_UI_FONT_DENSE);
     if(s==0)s=demo_widget(demo.pages[5],SC_UI_LABEL,"Heading: 应用平台",0,&label);
@@ -1114,6 +1153,7 @@ static ScStatus demo_ready(void)
     if(s==0)s=demo_other_pages();
     if(s==0)s=demo_menu();
     if(s==0)s=demo_listen(demo.root,demo_command,SC_UI_TARGET_PHASE|SC_UI_BUBBLE_PHASE);
+    if(s==0)s=demo_listen(demo.toolbar,demo_toolbar_observe,SC_UI_TARGET_PHASE);
     window.title=demo_text("SCUI / Shared document & drag");
     window.x=1380;
     window.y=100;
@@ -1484,20 +1524,14 @@ static ScStatus demo_observe_roots(void)
         found.size=sizeof(found);
         found.version=1;
         if(ScHashGet(demo.root_observer_index,&root,4,&found)==0)continue;
-        /* 新modal/root先登记真正键盘观察者，使F12不会被内部dialog当未知完成命令。 */
+        /* 可见性仍按活root观察；F12在context级一次订阅，避免popup在
+         * 同一Step消息批中创建后，先于外层RootNext登记收到诊断键。 */
         ScUiSubscription subscription;
         memset(&subscription,0,sizeof(subscription));
         subscription.size=sizeof(subscription);
         subscription.version=1;
-        subscription.type=SC_UI_EVENT_KEY_DOWN;
-        subscription.phases=SC_UI_CAPTURE_PHASE|SC_UI_TARGET_PHASE;
-        subscription.priority=1000;
-        subscription.procedure=demo_root_key;
         DemoRootObserver observer={root,0,0};
-        if(root!=demo.root && root!=demo.second){
-            status=ScUiListen(demo.ui,root,&subscription,&observer.token);
-            if(status<0)return status;
-        }
+        subscription.priority=1000;
         subscription.type=SC_UI_EVENT_VISIBILITY;
         subscription.phases=SC_UI_TARGET_PHASE;
         subscription.procedure=demo_root_visibility;
@@ -1541,6 +1575,7 @@ static void demo_snapshot(void)
     demo_geometry(demo.second_edit,"shared-edit");
     demo_geometry(demo.drag_source,"drag-source");
     demo_geometry(demo.second_exit,"exit");
+    demo_geometry(demo.resource_label,"resource-label");
     demo_metrics(demo.root,"main");
     demo_metrics(demo.second,"second");
     demo_edit_selection(demo.edit,"edit");
@@ -1577,6 +1612,11 @@ static void demo_snapshot(void)
     context.size=sizeof(context);
     context.version=1;
     if(ScUiContextQuery(demo.ui,&context)==0)printf("SCUI CONTEXT roots=%u nodes=%u timers=%u listeners=%u visible=%u surface=%u cache=%u messages=%u:%u paints=%u:%u submitted=%u:%u error=%d\n",context.roots,context.nodes,context.timers,context.listeners,context.visible_roots,context.surface_bytes,context.cache_bytes,context.received_messages.hi,context.received_messages.lo,context.paint_count.hi,context.paint_count.lo,context.submitted_bytes.hi,context.submitted_bytes.lo,context.notification_error);
+    ScU32 trace_first=demo_toolbar_sequence>64?demo_toolbar_sequence-64:0;
+    for(ScU32 i=trace_first;i<demo_toolbar_sequence;i++){DemoToolbarEvent *t=&demo_toolbar_events[i%64];
+        printf("SCUI TBTRACE seq=%u type=%u key=%u buttons=%u edge=%u state=%u window=%u x=%d y=%d\n",
+            t->sequence,t->type,t->key,t->buttons,t->edge,t->state,t->window_state,t->x,t->y);
+    }
     printf("SCUI SNAPSHOT END count=%u\n",count);
     fflush(stdout);
 }
@@ -1588,6 +1628,12 @@ int main(void)
         demo_release();
         return 1;
     }
+    ScUiSubscription diagnostic;
+    memset(&diagnostic,0,sizeof(diagnostic));diagnostic.size=sizeof(diagnostic);diagnostic.version=1;
+    diagnostic.type=SC_UI_EVENT_KEY_DOWN;diagnostic.phases=SC_UI_CAPTURE_PHASE|SC_UI_TARGET_PHASE;
+    diagnostic.priority=2000;diagnostic.procedure=demo_root_key;
+    ScU32 diagnostic_token=0;s=ScUiListen(demo.ui,0,&diagnostic,&diagnostic_token);
+    if(s<0){demo_check(s,"ContextDiagnosticListener");demo_release();return 1;}
     ScUiContextInfo context;
     ScUiMetrics metrics;
     memset(&context,0,sizeof(context));

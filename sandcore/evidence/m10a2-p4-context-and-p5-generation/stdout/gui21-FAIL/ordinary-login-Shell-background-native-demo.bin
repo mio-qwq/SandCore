@@ -1,0 +1,2 @@
+printf '%s\n' '' 'id > /HOME/M10UI/GUI-IDENTITY.TXT && /HOME/M10UI/NATIVE_APPS/SCUIDEMO.SCX; _gui=$?; echo __SCUI_RESULT_f3432aadbbb33947:$_gui; exit $_gui' | su mio & echo __SCUI_JOB_24c34d492926662d:$!; _m9_status=$?; echo __SCUI_CMD_a827730bf25c8f51d6a18b0b:$_m9_status:__SCUI_CMD_a827730bf25c8f51d6a18b0b_END
+__SCUI_JOB_24c34d492926662d:2

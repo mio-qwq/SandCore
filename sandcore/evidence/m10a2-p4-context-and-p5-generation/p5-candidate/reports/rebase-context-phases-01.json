@@ -1,0 +1,7 @@
+{
+  "source_sha256": "6c89c41f0ed075860e24c72cd0f9521427e3615767c424b61828880e7cbb5388",
+  "before_sha256": "9210e5dac6503013cdba2b1cd7bdb251e93fc71dfda91a22c866997e0d46c345",
+  "after_sha256": "812dfc4def8854107e67329f4f9f9dd5a2c84128b46edbd08de26179ec6250e5",
+  "function": "ui_emit",
+  "other_candidate_code_preserved": true
+}

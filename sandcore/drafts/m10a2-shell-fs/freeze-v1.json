@@ -1,0 +1,97 @@
+{
+  "status": "ISOLATED_SOURCE_FREEZE_NOT_APPLIED_NOT_BUILT_NOT_RUN",
+  "schema": 1,
+  "date": "2026-10-15",
+  "current_sources_changed": [],
+  "gate": "SYS0x300",
+  "selectors": [
+    1792,
+    1802
+  ],
+  "error_operations": [
+    3840,
+    3850
+  ],
+  "abi_major": 1,
+  "abi_minor_proposed": 3,
+  "library_version_proposed": 4,
+  "capabilities_hi_bit": 0,
+  "files": {
+    "ABI.md": {
+      "bytes": 15101,
+      "sha256": "c633b2e3cf73ecda239488af42546d9459ea5a2f444cd0a77e3447b8731a469d"
+    },
+    "integration-inputs.json": {
+      "bytes": 1727,
+      "sha256": "ad3504a13f9374b99040d9aaaa799a492a58c8bf6f3c3c51aa3f7bb233445117"
+    },
+    "integration.patch": {
+      "bytes": 34349,
+      "sha256": "385c02dcb9c0ecedde6f735d0c1fd57db039039f94fa3e115200bf60bf8f8a18"
+    },
+    "kernel/fs_lease.h": {
+      "bytes": 2383,
+      "sha256": "31fa8e68116fdc65dca76e843bd886f3b46e30baceca36b65d8428df5636931a"
+    },
+    "kernel/fs_lease.inc": {
+      "bytes": 367,
+      "sha256": "026a5952786594b43f5a1bb03c2d194accc0fa2097b80862256e3563723a30b3"
+    },
+    "kernel/fs_lease_cleanup.inc": {
+      "bytes": 11877,
+      "sha256": "2111744655783bc39089e036685406a14b0d23db03062a14dedfa59d40ec71b6"
+    },
+    "kernel/fs_lease_commit.inc": {
+      "bytes": 11294,
+      "sha256": "97b86e6df17aac09f59071dea3b57dfcf08d68eb80fbd65e2bac736ec8524e26"
+    },
+    "kernel/fs_lease_index.inc": {
+      "bytes": 13304,
+      "sha256": "dff502b0ee297729beedb9f9c58541756dfa71bfb69980f901a3fd1104208ccf"
+    },
+    "kernel/fs_lease_native.inc": {
+      "bytes": 5014,
+      "sha256": "ee1f7def452006a37866d4d8bce29e1686dea326e7ea84b57187d21eb35a5c6e"
+    },
+    "kernel/fs_lease_open.inc": {
+      "bytes": 10272,
+      "sha256": "8df057038ab0f3b6fd1d6b5cf11c967d7fabd8b508c6b91047ef6d52d5584898"
+    },
+    "kernel/fs_lease_operation.inc": {
+      "bytes": 11903,
+      "sha256": "3870dc4b5cb3f23433c32a2c99a3c234bb29d6fe8c6c06ab75bccab9b3ba3753"
+    },
+    "kernel/fs_lease_private.inc": {
+      "bytes": 2763,
+      "sha256": "ff0af8a9485250764dd6b6f00a7c26b55cd81abcdc2626daf6bce43683b8d560"
+    },
+    "kernel/sc32_file_lease.inc": {
+      "bytes": 3136,
+      "sha256": "7365b7ede8504dd861ca45c9299a6a529499c2903ef0bb287272e81e3db5f46b"
+    },
+    "kernel/sc32_lease.c": {
+      "bytes": 5510,
+      "sha256": "db31b5268e47043cd859097e333cf2c11549a8e6357e1d20cd77ccbd7e5354fc"
+    },
+    "kernel/sc32_lease.h": {
+      "bytes": 213,
+      "sha256": "ad377a80874cfbb01dc2b9c584e0124d5c7fba823bd672209402e44da9c3ae02"
+    },
+    "make_integration_patch.py": {
+      "bytes": 15490,
+      "sha256": "0f88398452a422e8260b3582779f26bf0ce7d8d149f6c5be6356205602d6b7ff"
+    },
+    "user/leaseapi/leaseapi.c": {
+      "bytes": 6359,
+      "sha256": "f2a590b629f97e6bf68b06e8513384630387cb4a390d33a65bb0333d69e91e0e"
+    },
+    "user/leaseapi/SC32LEASEWIRE.H": {
+      "bytes": 1788,
+      "sha256": "d8a85deb2cb8dc2229910b973606426033742a018de1ecd76fa1c1c23669c988"
+    },
+    "user/SC32LEASE.H": {
+      "bytes": 6035,
+      "sha256": "6b6fe98c0348760709293963ae46a785c5365faf7aefbdb6e7cb6e1a4eb5a33f"
+    }
+  }
+}

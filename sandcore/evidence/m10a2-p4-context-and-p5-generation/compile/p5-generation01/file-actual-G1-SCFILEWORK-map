@@ -1,0 +1,159 @@
+SCDMAP1MIO
+00400040 sw_record TMP/P5-7d8478/SRC/shellworker/worker_lease.c:6
+004000A8 sw_counter_add TMP/P5-7d8478/SRC/shellworker/worker_lease.c:12
+0040013B sw_counter_subtract TMP/P5-7d8478/SRC/shellworker/worker_lease.c:17
+004001B5 sw_same TMP/P5-7d8478/SRC/shellworker/worker_lease.c:27
+00400359 sw_child TMP/P5-7d8478/SRC/shellworker/worker_lease.c:38
+0040051C sw_path TMP/P5-7d8478/SRC/shellworker/worker_lease.c:60
+00400864 sw_join TMP/P5-7d8478/SRC/shellworker/worker_lease.c:71
+00400951 sw_error TMP/P5-7d8478/SRC/shellworker/worker_lease.c:82
+00400AA8 sw_lease_valid TMP/P5-7d8478/SRC/shellworker/worker_lease.c:87
+00400BF5 sw_lease_accept TMP/P5-7d8478/SRC/shellworker/worker_lease.c:98
+00400F2A sw_control TMP/P5-7d8478/SRC/shellworker/worker_lease.c:105
+00400FC7 sw_lease_open TMP/P5-7d8478/SRC/shellworker/worker_lease.c:124
+004011A1 sw_namespace_open TMP/P5-7d8478/SRC/shellworker/worker_lease.c:157
+004014E8 sw_lease_query TMP/P5-7d8478/SRC/shellworker/worker_lease.c:167
+0040159C sw_lease_advance TMP/P5-7d8478/SRC/shellworker/worker_lease.c:177
+00401650 sw_lease_release TMP/P5-7d8478/SRC/shellworker/worker_lease.c:203
+004018D0 sw_lease_publish TMP/P5-7d8478/SRC/shellworker/worker_lease.c:232
+00401C7E sw_lease_remove TMP/P5-7d8478/SRC/shellworker/worker_lease.c:246
+00401DFE sw_lease_cancel TMP/P5-7d8478/SRC/shellworker/worker_lease.c:256
+00401E9D sw_lease_mode TMP/P5-7d8478/SRC/shellworker/worker_lease.c:271
+00402034 sw_lease_metadata TMP/P5-7d8478/SRC/shellworker/worker_lease.c:288
+004021D7 sw_source_parent TMP/P5-7d8478/SRC/shellworker/worker_lease.c:291
+0040227D sw_destination_parent TMP/P5-7d8478/SRC/shellworker/worker_lease.c:294
+00402323 sw_can_read TMP/P5-7d8478/SRC/shellworker/worker_lease.c:300
+00402405 sw_key TMP/P5-7d8478/SRC/shellworker/worker_plan.c:9
+0040250A sw_find_item TMP/P5-7d8478/SRC/shellworker/worker_plan.c:20
+004025FE sw_plan_add TMP/P5-7d8478/SRC/shellworker/worker_plan.c:107
+004032E7 sw_entry_from_meta TMP/P5-7d8478/SRC/shellworker/worker_plan.c:118
+004033F5 sw_plan_problem TMP/P5-7d8478/SRC/shellworker/worker_plan.c:126
+00403489 sw_plan_root TMP/P5-7d8478/SRC/shellworker/worker_plan.c:220
+00404102 sw_path_compare TMP/P5-7d8478/SRC/shellworker/worker_plan.c:227
+00404162 sw_item_compare TMP/P5-7d8478/SRC/shellworker/worker_plan.c:235
+0040433C sw_root_compare TMP/P5-7d8478/SRC/shellworker/worker_plan.c:241
+004043FE sw_plan_finish TMP/P5-7d8478/SRC/shellworker/worker_plan.c:293
+00404E18 sw_identity_same TMP/P5-7d8478/SRC/shellworker/worker_protocol.c:11
+00405114 sw_queue TMP/P5-7d8478/SRC/shellworker/worker_protocol.c:50
+0040560C sw_protocol_flush TMP/P5-7d8478/SRC/shellworker/worker_protocol.c:68
+004057BD sw_progress TMP/P5-7d8478/SRC/shellworker/worker_protocol.c:102
+00405CDE sw_emit_progress TMP/P5-7d8478/SRC/shellworker/worker_protocol.c:108
+00405D36 sw_ack TMP/P5-7d8478/SRC/shellworker/worker_protocol.c:149
+004065AC sw_emit_result TMP/P5-7d8478/SRC/shellworker/worker_protocol.c:156
+00406614 sw_emit_conflict TMP/P5-7d8478/SRC/shellworker/worker_protocol.c:167
+0040676D sw_mark_range TMP/P5-7d8478/SRC/shellworker/worker_protocol.c:177
+004068BC sw_wire_path TMP/P5-7d8478/SRC/shellworker/worker_protocol.c:189
+00406BAA sw_parse_plan TMP/P5-7d8478/SRC/shellworker/worker_protocol.c:314
+00408B89 sw_sequence_next TMP/P5-7d8478/SRC/shellworker/worker_protocol.c:319
+00408C80 sw_control_frame TMP/P5-7d8478/SRC/shellworker/worker_protocol.c:361
+004095A3 sw_protocol_pump TMP/P5-7d8478/SRC/shellworker/worker_protocol.c:444
+0040A690 sw_crc TMP/P5-7d8478/SRC/shellworker/worker_recovery.c:21
+0040A7AD sw_journal_flush TMP/P5-7d8478/SRC/shellworker/worker_recovery.c:63
+0040ABDC sw_journal_record TMP/P5-7d8478/SRC/shellworker/worker_recovery.c:111
+0040B16B sw_journal_create TMP/P5-7d8478/SRC/shellworker/worker_recovery.c:163
+0040B781 sw_pending_result TMP/P5-7d8478/SRC/shellworker/worker_transfer.c:11
+0040B84C sw_deliver_results TMP/P5-7d8478/SRC/shellworker/worker_transfer.c:24
+0040B9A2 sw_success TMP/P5-7d8478/SRC/shellworker/worker_transfer.c:29
+0040BAE1 sw_close_active TMP/P5-7d8478/SRC/shellworker/worker_transfer.c:40
+0040BC42 sw_finish_item TMP/P5-7d8478/SRC/shellworker/worker_transfer.c:74
+0040C35C sw_begin_conflict TMP/P5-7d8478/SRC/shellworker/worker_transfer.c:95
+0040C5DA sw_candidate_path TMP/P5-7d8478/SRC/shellworker/worker_transfer.c:125
+0040CA14 sw_create_candidate TMP/P5-7d8478/SRC/shellworker/worker_transfer.c:141
+0040CC2B sw_source_open TMP/P5-7d8478/SRC/shellworker/worker_transfer.c:184
+0040D245 sw_target TMP/P5-7d8478/SRC/shellworker/worker_transfer.c:214
+0040D90B sw_wait_operation TMP/P5-7d8478/SRC/shellworker/worker_transfer.c:233
+0040DB9C sw_cover_renamed TMP/P5-7d8478/SRC/shellworker/worker_transfer.c:249
+0040DDBF sw_io_failure TMP/P5-7d8478/SRC/shellworker/worker_transfer.c:257
+0040DE8F sw_copy_read TMP/P5-7d8478/SRC/shellworker/worker_transfer.c:282
+0040E277 sw_copy_write TMP/P5-7d8478/SRC/shellworker/worker_transfer.c:302
+0040E57B sw_directory_finalize TMP/P5-7d8478/SRC/shellworker/worker_transfer.c:343
+0040EB0A sw_item_step TMP/P5-7d8478/SRC/shellworker/worker_transfer.c:593
+0041151C sw_new_destination TMP/P5-7d8478/SRC/shellworker/worker_transfer.c:617
+00411B67 sw_decide TMP/P5-7d8478/SRC/shellworker/worker_transfer.c:703
+00412BD6 sw_retry_begin TMP/P5-7d8478/SRC/shellworker/worker_retry.c:13
+00412E43 sw_retry_problem TMP/P5-7d8478/SRC/shellworker/worker_retry.c:18
+00412E7E sw_retry_step TMP/P5-7d8478/SRC/shellworker/worker_retry.c:166
+004142F9 sw_fail TMP/P5-7d8478/SRC/shellworker/SCFILEWORK.C:22
+00414428 sw_number TMP/P5-7d8478/SRC/shellworker/SCFILEWORK.C:38
+004146C2 sw_bootstrap TMP/P5-7d8478/SRC/shellworker/SCFILEWORK.C:108
+00415392 sw_wait_channel TMP/P5-7d8478/SRC/shellworker/SCFILEWORK.C:124
+004154C8 sw_job_step TMP/P5-7d8478/SRC/shellworker/SCFILEWORK.C:196
+00415D30 sw_final TMP/P5-7d8478/SRC/shellworker/SCFILEWORK.C:221
+00416127 sw_cleanup_lease TMP/P5-7d8478/SRC/shellworker/SCFILEWORK.C:232
+004161AF sw_cleanup TMP/P5-7d8478/SRC/shellworker/SCFILEWORK.C:271
+00416607 sw_stop_current TMP/P5-7d8478/SRC/shellworker/SCFILEWORK.C:281
+0041677F main TMP/P5-7d8478/SRC/shellworker/SCFILEWORK.C:362
+REQUIRE 00000000 SC32API.SCL 1
+REQUIRE 00000001 SCCLIB.SCL 1
+REQUIRE 00000002 SCLIB.SCL 1
+IMPORT 00000000 ScBrokerWait 1
+IMPORT 00000001 ScDirectoryClose 1
+IMPORT 00000002 ScDirectoryNext 1
+IMPORT 00000003 ScDirectoryOpen 1
+IMPORT 00000004 ScErrorQuery 1
+IMPORT 00000005 ScFileClose 1
+IMPORT 00000006 ScFileFlush 1
+IMPORT 00000007 ScFileLeaseAcquire 1
+IMPORT 00000008 ScFileLeaseAdvance 1
+IMPORT 00000009 ScFileLeaseCancel 1
+IMPORT 0000000A ScFileLeaseCreatePinned 1
+IMPORT 0000000B ScFileLeaseOpenPinned 1
+IMPORT 0000000C ScFileLeasePublish 1
+IMPORT 0000000D ScFileLeaseQuery 1
+IMPORT 0000000E ScFileLeaseRelease 1
+IMPORT 0000000F ScFileLeaseRemove 1
+IMPORT 00000010 ScFileLeaseRename 1
+IMPORT 00000011 ScFileLeaseSetMode 1
+IMPORT 00000012 ScFileLeaseSnapshot 1
+IMPORT 00000013 ScFileQuery 1
+IMPORT 00000014 ScFileRead 1
+IMPORT 00000015 ScFileWrite 1
+IMPORT 00000016 ScIdentityQuery 1
+IMPORT 00000017 ScIpcClose 1
+IMPORT 00000018 ScIpcConnect 1
+IMPORT 00000019 ScIpcPeek 1
+IMPORT 0000001A ScIpcPeer 1
+IMPORT 0000001B ScIpcReceive 1
+IMPORT 0000001C ScIpcSend 1
+IMPORT 0000001D ScPathMetadata 1
+IMPORT 0000001E ScProcessArguments 1
+IMPORT 0000001F ScProcessSelf 1
+IMPORT 00000020 ScProcessYield 1
+IMPORT 00000021 ScSystemCapabilities 1
+IMPORT 00000022 atexit 1
+IMPORT 00000023 calloc 1
+IMPORT 00000024 free 1
+IMPORT 00000025 malloc 1
+IMPORT 00000026 memchr 1
+IMPORT 00000027 memcpy 1
+IMPORT 00000028 memset 1
+IMPORT 00000029 qsort 1
+IMPORT 0000002A strcmp 1
+IMPORT 0000002B strlen 1
+IMPORT 0000002C strncmp 1
+IMPORT 0000002D strrchr 1
+IMPORT 0000002E ScArrayCreate 1
+IMPORT 0000002F ScArrayGet 1
+IMPORT 00000030 ScArrayInsert 1
+IMPORT 00000031 ScArrayRelease 1
+IMPORT 00000032 ScBufferAppend 1
+IMPORT 00000033 ScBufferClear 1
+IMPORT 00000034 ScBufferCreate 1
+IMPORT 00000035 ScBufferQuery 1
+IMPORT 00000036 ScBufferRelease 1
+IMPORT 00000037 ScBufferReserve 1
+IMPORT 00000038 ScBufferResize 1
+IMPORT 00000039 ScBufferView 1
+IMPORT 0000003A ScHashBytes 1
+IMPORT 0000003B ScHashCreate 1
+IMPORT 0000003C ScHashGet 1
+IMPORT 0000003D ScHashRelease 1
+IMPORT 0000003E ScHashRemove 1
+IMPORT 0000003F ScHashSet 1
+IMPORT 00000040 ScPathJoin 1
+IMPORT 00000041 ScPathNormalize 1
+IMPORT 00000042 ScStringCStr 1
+IMPORT 00000043 ScStringRelease 1
+IMPORT 00000044 ScUtf8Validate 1
+OBJECT 0041825E sw 1544
+OBJECT 00416E40 digits 37

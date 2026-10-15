@@ -1,0 +1,23 @@
+# SCSHELL 服务与桌面正文合同
+
+状态：隔离实现中的冻结值接口，尚未构建或运行。SCSHELL.SCX由主代理实现，库不会把仅客户端或本地catalog称为已有daemon。公开入口在本目录SCSHELL.H；跨进程值记录唯一来源为SCSHELLWIRE.H。
+
+服务正文创建真实SCUI context、desktop/taskbar原生窗口和本人SESSION endpoint，Listen后用ScShellHostPrepare绑定。ScShellServiceCreate接该endpoint、真实host_epoch、拥有的catalog和账户配置绝对路径；它核当前HostQuery的PID/gen/SID及本人LISTENING端点，不能任命角色。库保留endpoint借用，Close只关接受的channels，不关root持有的listener或调用HostDeactivate。UI退出由服务正文先ScShellHostDeactivate再ServiceClose/销Context/return。首帧与Activate仍由真实WM/SCUI合同决定。
+
+可直接使用的公共记录：VerbDesc48、ApplicationDesc64、ApplicationInfo64、AssociationDesc48、AssociationInfo32、CatalogInfo32、LayoutItem48、LayoutInfo32、ServiceDesc48、ServiceInfo32。指针只在同进程有效，所有输入在返回前复制；Describe/Get返回的字符串借不可变对象，至该对象Release为止。catalog mutation按expected_epoch严格CAS，0不是忽略。第一次空catalog epoch=1。account_store非空才接受ACCOUNT层远程写；先完整序列化候选及条件publish成功，再替换活动catalog。SID层由真实sender PID/gen绑定，真实退出撤临时项；EOF自身不伪装进程EXIT。
+
+Root的桌面可直接调用ScShellCatalogRegister/Find/Resolve/Applications/SetAssociation、ScShellCatalogLayout/ApplyLayout与ScShellMenuBuild/Native/Execute。SYSTEM种子是服务自身显式装入的只读底层；远程REGISTER不能写SYSTEM层。client只能与host同普通UID/GID/subject/SID通信；payload自报身份无效。目录/关联只给显示和选择，不给执行、文件权限或可信服务角色。
+
+消息头固定48B与worker相同，但服务opcode为0x100族；HELLO100/ACK101、QUERY110、REGISTER120、UNREGISTER121、ASSOCIATION122、LAYOUT123、CHANGED131。HELLO body32为size/version/protocol/features/host_epoch/catalog_epoch/max_frame_bytes/flags；seq0。客户端首请求seq1，此后双字单调不复用。每次mutation的header.state_epoch是要求的catalog epoch；HELLO中的host_epoch必须与内核绑定相同。输出header.state_epoch是结果catalog epoch。每个frame真实sender必须等于Accept/HostConnect记录的完整peer；NORMAL realm且flags0，SID/UID/GID/subject相等。
+
+QUERY body16(size/version/expected_epoch/flags0)成功返回完整Catalog64+body快照；expected_epoch0表示无前置版本的只读查询，非零不等返回STALE。其它mutation必须精确epoch，返回Reply32(size/version/epoch/token/revision/flags/reserved2)。失败reply status保留Shell负码；未确定提交的EOF/重启返回UNKNOWN，不自动重放任何已入队mutation。
+
+REGISTER body是Application112+Verb64数组+字符串；token/revision/owner/uid/gid必须全0。账户或SID层layer1/2，flags仅HIDDEN/DISABLED/TRANSIENT；SID实际强制TRANSIENT并记录peer。UNREGISTER bodyName32+id；ASSOCIATION bodyAssociation48+strings（revision字段为预期旧关联revision，首次为0）；LAYOUT bodyLayoutSet32+count个逐条LayoutItem48/字符串。所有string记录bytes包括唯一末NUL，4B补0；offset相对当前record，绝不含VA。完整body受调用方配置动态budget与真实OOM约束，frame含头≤65536B；大body用相同seq/opcode/epoch连续offset分片，除最后片均MORE。禁止重叠、跳跃、重复提交、未知flag、非零padding和无界算术。
+
+Catalog文件与QUERY快照使用64B Catalog头，magic=SCAT/0x54414353、version1、header_bytes64、body_bytes、body CRC32、epoch/next_token、app/assoc/layout数量与布局元数据。body顺序为逐条Application112记录、Association48记录、LayoutItem48记录；record_bytes使每条可独立整区校验。每条offset以本条起点计。进程owner只是SID临时项的观察，持久账户导入不恢复旧PID权限。CRC只检测损坏，不授身份/原子/磁盘持久保证。
+
+服务Step每轮至多64帧（预算，不是客户端/注册总量上限），输出背压保拥有frame重试；Receive先Peek并完整分配，容量失败不消费。退出回调重入走depth/retired保护。临时项存在时最多每100PIT作有界真实PID/gen复验；空服务没有周期轮询。ScBrokerWait使用STREAM实际ready，UI由应用自己的SCUI泵继续；不能在GUI主线程无限等待service而停键鼠。
+
+库的ScShellLaunch/Open在调用者本地ScProcessLaunch，service不替请求方启动、打开文件或删源。App profile MODERN仅实际1023B arguments，LEGACY严格127B；文档路径作为已编码普通参数，不拼shell/eval。任务栏真正跨窗动作仍由root的Host API执行。
+
+修订：2026-10-15，冻结桌面/library职责、公开值尺寸与0x100服务协议；SOURCE_ONLY，无构建、生成或执行声明。

@@ -1,0 +1,655 @@
+SandShell M9
+SYSTEM /SYS [SYSTEM] # true; _m9_status=$?; echo __SCUI_CMD_e96cd2f8dc54985acb2cd7ee:$_m9_status:__SCUI_CMD_e96cd2f8dc54985acb2cd7ee_END
+__SCUI_CMD_e96cd2f8dc54985acb2cd7ee:0:__SCUI_CMD_e96cd2f8dc54985acb2cd7ee_END
+SYSTEM /SYS [SYSTEM] # ls /HOME/M10UI/HOST; _m9_status=$?; echo __SCUI_CMD_974a9643510a4a181eb2e637:$_m9_status:__SCUI_CMD_974a9643510a4a181eb2e637_END
+PLATFORMPROBE.SCX
+SCUIDEMO.SCX
+SCUITEXT.SCX
+__SCUI_CMD_974a9643510a4a181eb2e637:0:__SCUI_CMD_974a9643510a4a181eb2e637_END
+SYSTEM /SYS [SYSTEM] # echo STDLIB_BG_WARM & wait; _m9_status=$?; echo __SCUI_CMD_983ec15e7bd796b8a47a6656:$_m9_status:__SCUI_CMD_983ec15e7bd796b8a47a6656_END
+STDLIB_BG_WARM
+__SCUI_CMD_983ec15e7bd796b8a47a6656:0:__SCUI_CMD_983ec15e7bd796b8a47a6656_END
+SYSTEM /SYS [SYSTEM] # printf warm > /HOME/M10UI/WARM.DAT; cat /HOME/M10UI/WARM.DAT; _m9_status=$?; echo __SCUI_CMD_4e10e8a6072c547bc6a679ae:$_m9_status:__SCUI_CMD_4e10e8a6072c547bc6a679ae_END
+warm__SCUI_CMD_4e10e8a6072c547bc6a679ae:0:__SCUI_CMD_4e10e8a6072c547bc6a679ae_END
+SYSTEM /SYS [SYSTEM] # printf '%s\n' '' 'id; /HOME/M10UI/NATIVE_APPS/SCUITEXT.SCX; _ui=$?; echo __UI_LOGIN_b981c40aec8ef0fa:$_ui; exit 0' | su mio; _m9_status=$?; echo __SCUI_CMD_61a3ef882c40a79d5643d603:$_m9_status:__SCUI_CMD_61a3ef882c40a79d5643d603_END
+Password: 
+uid=1000 gid=1000 realm=0
+SCUI_TEXT_PASS version=15.1 cases=3013 boundaries=12948
+__UI_LOGIN_b981c40aec8ef0fa:0
+__SCUI_CMD_61a3ef882c40a79d5643d603:0:__SCUI_CMD_61a3ef882c40a79d5643d603_END
+SYSTEM /SYS [SYSTEM] # sessionctl list; _m9_status=$?; echo __SCUI_CMD_7af2ef2c5cddd3cd735d3fde:$_m9_status:__SCUI_CMD_7af2ef2c5cddd3cd735d3fde_END
+ID  UID  GID  TYPE  ACTIVE  TASKS  NAME
+1  1000  1000  user  yes  0  mio
+2  -1  -1  SYSTEM  no  3  SYSTEM
+3  -2  -2  LOCKED  no  0  Locked
+__SCUI_CMD_7af2ef2c5cddd3cd735d3fde:0:__SCUI_CMD_7af2ef2c5cddd3cd735d3fde_END
+SYSTEM /SYS [SYSTEM] # printf '%s\n' '' 'printf PENDING > /HOME/M10UI/GUI-IDENTITY.TXT; exit $?' | su mio; _m9_status=$?; echo __SCUI_CMD_d6d44509c038342ddd303281:$_m9_status:__SCUI_CMD_d6d44509c038342ddd303281_END
+Password: 
+__SCUI_CMD_d6d44509c038342ddd303281:0:__SCUI_CMD_d6d44509c038342ddd303281_END
+SYSTEM /SYS [SYSTEM] # printf '%s\n' '' 'id > /HOME/M10UI/GUI-IDENTITY.TXT && /HOME/M10UI/NATIVE_APPS/SCUIDEMO.SCX; _gui=$?; echo __SCUI_RESULT_f3432aadbbb33947:$_gui; exit $_gui' | su mio & echo __SCUI_JOB_24c34d492926662d:$!; _m9_status=$?; echo __SCUI_CMD_a827730bf25c8f51d6a18b0b:$_m9_status:__SCUI_CMD_a827730bf25c8f51d6a18b0b_END
+__SCUI_JOB_24c34d492926662d:2
+__SCUI_CMD_a827730bf25c8f51d6a18b0b:0:__SCUI_CMD_a827730bf25c8f51d6a18b0b_END
+SYSTEM /SYS [SYSTEM] # Password: 
+SCUI READY roots=2 nodes=72 virtual=100000 font=16/24 scale=150
+SCUI SNAPSHOT BEGIN count=1
+SCUI WINDOW role=main root=1 window=1 generation=1 pid=4 pidgen=5 session=6 x=60 y=50 w=1282 h=877 cw=1280 ch=840 state=128 geometry=1 visibility=2
+SCUI WINDOW role=second root=68 window=2 generation=2 pid=4 pidgen=5 session=6 x=1380 y=100 w=502 h=637 cw=500 ch=600 state=128 geometry=1 visibility=2
+SCUI NODE role=main id=1 root=1 parent=0 kind=1 x=0 y=0 w=1280 h=840 state=3 textBytes=27 textStatus=0 textHex=53435549202f20436f6e74726f6c73202620576f726b666c6f7773
+SCUI NODE role=second id=68 root=68 parent=0 kind=1 x=0 y=0 w=500 h=600 state=3 textBytes=29 textStatus=0 textHex=53435549202f2053686172656420646f63756d656e7420262064726167
+SCUI NODE role=menu id=2 root=1 parent=1 kind=15 x=0 y=0 w=1280 h=36 state=3 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=toolbar id=3 root=1 parent=1 kind=16 x=0 y=45 w=1280 h=48 state=3 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=status id=4 root=1 parent=1 kind=17 x=0 y=804 w=1280 h=36 state=3 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=tabs id=8 root=1 parent=5 kind=12 x=312 y=102 w=968 h=693 state=3 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=table id=36 root=1 parent=10 kind=24 x=312 y=141 w=0 h=0 state=2 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=check id=19 root=1 parent=15 kind=5 x=324 y=228 w=944 h=35 state=67 textBytes=33 textStatus=0 textHex=e4b889e68081efbc9ae69caae98089202f20e5b7b2e98089202f20e6b7b7e59088
+SCUI NODE role=spin id=29 root=1 parent=27 kind=11 x=543 y=377 w=210 h=41 state=3 textBytes=2 textStatus=0 textHex=3235
+SCUI NODE role=combo id=28 root=1 parent=27 kind=10 x=324 y=377 w=210 h=41 state=3 textBytes=7 textStatus=0 textHex=436c6173736963
+SCUI NODE role=edit id=40 root=1 parent=11 kind=9 x=312 y=141 w=0 h=0 state=2 textBytes=162 textStatus=0 textHex=5343554920646f63756d656e74202f20555446380d0ae4b8ade69687e4b88e20415343494920e4bdbfe794a8e79c9fe5ae9e2050686f656e697820e5baa6e9878fe380820a436f6d62696e696e673a2065cc813b20656d6f6a693a20f09f91a9e2808df09f92bb3b20666c61673a20f09f87a8f09f87b30a5461623a096c696e653b20756e646f202f207265646f20e4bf9de79599e4bf9de5ad98e782b9e380820a
+SCUI NODE role=shared-edit id=71 root=68 parent=68 kind=9 x=0 y=117 w=500 h=433 state=3 textBytes=162 textStatus=0 textHex=5343554920646f63756d656e74202f20555446380d0ae4b8ade69687e4b88e20415343494920e4bdbfe794a8e79c9fe5ae9e2050686f656e697820e5baa6e9878fe380820a436f6d62696e696e673a2065cc813b20656d6f6a693a20f09f91a9e2808df09f92bb3b20666c61673a20f09f87a8f09f87b30a5461623a096c696e653b20756e646f202f207265646f20e4bf9de79599e4bf9de5ad98e782b9e380820a
+SCUI NODE role=drag-source id=70 root=68 parent=68 kind=3 x=0 y=67 w=500 h=41 state=3 textBytes=19 textStatus=0 textHex=e68b96e694bee69687e69cac202f2044726167
+SCUI NODE role=exit id=72 root=68 parent=68 kind=3 x=0 y=559 w=500 h=41 state=3 textBytes=4 textStatus=0 textHex=45786974
+SCUI NODE role=resource-label id=62 root=1 parent=14 kind=4 x=312 y=141 w=0 h=0 state=2 textBytes=70 textStatus=0 textHex=50686f656e6978203132202f20313620c2b720436c6173736963202f204175726f726120c2b720e591bde5908de8a792e889b220c2b720e69c89e9a284e7ae97e7bc93e5ad98
+SCUI METRICS role=main root=1 scalePercent=150 fontFace=16 fontPixels=24 fontEpoch=2 themeEpoch=1 displayEpoch=1 rowHeight=32 menuHeight=36 toolbarHeight=48 statusHeight=36
+SCUI METRICS role=second root=68 scalePercent=150 fontFace=16 fontPixels=24 fontEpoch=2 themeEpoch=1 displayEpoch=1 rowHeight=32 menuHeight=36 toolbarHeight=48 statusHeight=36
+SCUI EDIT_SELECTION role=edit id=40 root=1 anchor=0 caret=0 affinity=0 revision=1 flags=0
+SCUI EDIT_SELECTION role=shared-edit id=71 root=68 anchor=0 caret=0 affinity=0 revision=1 flags=0
+SCUI THEME style=0 generation=1 radius=10 border=1 titleHeight=24 taskbarHeight=32
+SCUI DISPLAY action=snapshot scalePercent=150 w=1920 h=1080 backend=1 generation=1 previewSeconds=0
+SCUI DOCUMENT bytes=162 lines=5 revision=1 saved=1 flags=4 undo=0 redo=0 canUndo=0 canRedo=0
+SCUI SELECTION count=0 current=0 anchor=0 revision=1
+SCUI CONTEXT roots=2 nodes=72 timers=0 listeners=5 visible=0 surface=5500800 cache=307398 messages=0:0 paints=0:0 submitted=0:0 error=0
+SCUI SNAPSHOT END count=1
+sessionctl list; _m9_status=$?; echo __SCUI_CMD_df61a162fb5f66f806eb4a02:$_m9_status:__SCUI_CMD_df61a162fb5f66f806eb4a02_END
+ID  UID  GID  TYPE  ACTIVE  TASKS  NAME
+1  1000  1000  user  yes  0  mio
+2  -1  -1  SYSTEM  no  6  SYSTEM
+3  -2  -2  LOCKED  no  0  Locked
+6  1000  1000  user  no  2  mio
+__SCUI_CMD_df61a162fb5f66f806eb4a02:0:__SCUI_CMD_df61a162fb5f66f806eb4a02_END
+SYSTEM /SYS [SYSTEM] # ps; _m9_status=$?; echo __SCUI_CMD_44c828c4e18377f351660a76:$_m9_status:__SCUI_CMD_44c828c4e18377f351660a76_END
+PID UID GID STATE NAME
+0 -1 -1 1 kernel
+1 -1 -1 1 SH.SCX
+2 -1 -1 1 SH.SCX
+3 1000 1000 1 SH.SCX
+4 1000 1000 1 SCUIDEMO.SC
+5 -1 -1 1 SH.SCX
+6 -1 -1 1 su.scx
+7 -1 -1 1 ps.scx
+__SCUI_CMD_44c828c4e18377f351660a76:0:__SCUI_CMD_44c828c4e18377f351660a76_END
+SYSTEM /SYS [SYSTEM] # sessionctl show 6; _m9_status=$?; echo __SCUI_CMD_7dcf30659b6767d2c1aea501:$_m9_status:__SCUI_CMD_7dcf30659b6767d2c1aea501_END
+__SCUI_CMD_7dcf30659b6767d2c1aea501:0:__SCUI_CMD_7dcf30659b6767d2c1aea501_END
+SYSTEM /SYS [SYSTEM] # sessionctl list; _m9_status=$?; echo __SCUI_CMD_f1ac2fd4c52f7f0d440a258f:$_m9_status:__SCUI_CMD_f1ac2fd4c52f7f0d440a258f_END
+ID  UID  GID  TYPE  ACTIVE  TASKS  NAME
+1  1000  1000  user  no  0  mio
+2  -1  -1  SYSTEM  no  6  SYSTEM
+3  -2  -2  LOCKED  no  0  Locked
+6  1000  1000  user  yes  2  mio
+__SCUI_CMD_f1ac2fd4c52f7f0d440a258f:0:__SCUI_CMD_f1ac2fd4c52f7f0d440a258f_END
+SYSTEM /SYS [SYSTEM] # SCUI SNAPSHOT BEGIN count=2
+SCUI WINDOW role=main root=1 window=1 generation=1 pid=4 pidgen=5 session=6 x=60 y=50 w=1282 h=877 cw=1280 ch=840 state=33 geometry=1 visibility=3
+SCUI WINDOW role=second root=68 window=2 generation=2 pid=4 pidgen=5 session=6 x=1380 y=100 w=502 h=637 cw=500 ch=600 state=35 geometry=1 visibility=3
+SCUI NODE role=main id=1 root=1 parent=0 kind=1 x=0 y=0 w=1280 h=840 state=3 textBytes=27 textStatus=0 textHex=53435549202f20436f6e74726f6c73202620576f726b666c6f7773
+SCUI NODE role=second id=68 root=68 parent=0 kind=1 x=0 y=0 w=500 h=600 state=3 textBytes=29 textStatus=0 textHex=53435549202f2053686172656420646f63756d656e7420262064726167
+SCUI NODE role=menu id=2 root=1 parent=1 kind=15 x=0 y=0 w=1280 h=36 state=3 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=toolbar id=3 root=1 parent=1 kind=16 x=0 y=45 w=1280 h=48 state=3 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=status id=4 root=1 parent=1 kind=17 x=0 y=804 w=1280 h=36 state=3 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=tabs id=8 root=1 parent=5 kind=12 x=312 y=102 w=968 h=693 state=3 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=table id=36 root=1 parent=10 kind=24 x=312 y=141 w=0 h=0 state=2 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=check id=19 root=1 parent=15 kind=5 x=324 y=228 w=944 h=35 state=67 textBytes=33 textStatus=0 textHex=e4b889e68081efbc9ae69caae98089202f20e5b7b2e98089202f20e6b7b7e59088
+SCUI NODE role=spin id=29 root=1 parent=27 kind=11 x=543 y=377 w=210 h=41 state=3 textBytes=2 textStatus=0 textHex=3235
+SCUI NODE role=combo id=28 root=1 parent=27 kind=10 x=324 y=377 w=210 h=41 state=3 textBytes=7 textStatus=0 textHex=436c6173736963
+SCUI NODE role=edit id=40 root=1 parent=11 kind=9 x=312 y=141 w=0 h=0 state=2 textBytes=162 textStatus=0 textHex=5343554920646f63756d656e74202f20555446380d0ae4b8ade69687e4b88e20415343494920e4bdbfe794a8e79c9fe5ae9e2050686f656e697820e5baa6e9878fe380820a436f6d62696e696e673a2065cc813b20656d6f6a693a20f09f91a9e2808df09f92bb3b20666c61673a20f09f87a8f09f87b30a5461623a096c696e653b20756e646f202f207265646f20e4bf9de79599e4bf9de5ad98e782b9e380820a
+SCUI NODE role=shared-edit id=71 root=68 parent=68 kind=9 x=0 y=117 w=500 h=433 state=3 textBytes=162 textStatus=0 textHex=5343554920646f63756d656e74202f20555446380d0ae4b8ade69687e4b88e20415343494920e4bdbfe794a8e79c9fe5ae9e2050686f656e697820e5baa6e9878fe380820a436f6d62696e696e673a2065cc813b20656d6f6a693a20f09f91a9e2808df09f92bb3b20666c61673a20f09f87a8f09f87b30a5461623a096c696e653b20756e646f202f207265646f20e4bf9de79599e4bf9de5ad98e782b9e380820a
+SCUI NODE role=drag-source id=70 root=68 parent=68 kind=3 x=0 y=67 w=500 h=41 state=7 textBytes=19 textStatus=0 textHex=e68b96e694bee69687e69cac202f2044726167
+SCUI NODE role=exit id=72 root=68 parent=68 kind=3 x=0 y=559 w=500 h=41 state=3 textBytes=4 textStatus=0 textHex=45786974
+SCUI NODE role=resource-label id=62 root=1 parent=14 kind=4 x=312 y=141 w=0 h=0 state=2 textBytes=70 textStatus=0 textHex=50686f656e6978203132202f20313620c2b720436c6173736963202f204175726f726120c2b720e591bde5908de8a792e889b220c2b720e69c89e9a284e7ae97e7bc93e5ad98
+SCUI METRICS role=main root=1 scalePercent=150 fontFace=16 fontPixels=24 fontEpoch=2 themeEpoch=1 displayEpoch=1 rowHeight=32 menuHeight=36 toolbarHeight=48 statusHeight=36
+SCUI METRICS role=second root=68 scalePercent=150 fontFace=16 fontPixels=24 fontEpoch=2 themeEpoch=1 displayEpoch=1 rowHeight=32 menuHeight=36 toolbarHeight=48 statusHeight=36
+SCUI EDIT_SELECTION role=edit id=40 root=1 anchor=0 caret=0 affinity=0 revision=1 flags=0
+SCUI EDIT_SELECTION role=shared-edit id=71 root=68 anchor=0 caret=0 affinity=0 revision=1 flags=0
+SCUI THEME style=0 generation=1 radius=10 border=1 titleHeight=24 taskbarHeight=32
+SCUI DISPLAY action=snapshot scalePercent=150 w=1920 h=1080 backend=1 generation=1 previewSeconds=0
+SCUI DOCUMENT bytes=162 lines=5 revision=1 saved=1 flags=4 undo=0 redo=0 canUndo=0 canRedo=0
+SCUI SELECTION count=0 current=0 anchor=0 revision=1
+SCUI CONTEXT roots=2 nodes=72 timers=0 listeners=7 visible=2 surface=5500800 cache=337800 messages=0:6 paints=0:2 submitted=0:5500800 error=0
+SCUI SNAPSHOT END count=2
+SCUI COMMAND id=121 result=0
+SCUI SNAPSHOT BEGIN count=3
+SCUI WINDOW role=main root=1 window=1 generation=1 pid=4 pidgen=5 session=6 x=60 y=50 w=1282 h=877 cw=1280 ch=840 state=35 geometry=1 visibility=3
+SCUI WINDOW role=second root=68 window=2 generation=2 pid=4 pidgen=5 session=6 x=1380 y=100 w=502 h=637 cw=500 ch=600 state=33 geometry=1 visibility=3
+SCUI NODE role=main id=1 root=1 parent=0 kind=1 x=0 y=0 w=1280 h=840 state=3 textBytes=27 textStatus=0 textHex=53435549202f20436f6e74726f6c73202620576f726b666c6f7773
+SCUI NODE role=second id=68 root=68 parent=0 kind=1 x=0 y=0 w=500 h=600 state=3 textBytes=29 textStatus=0 textHex=53435549202f2053686172656420646f63756d656e7420262064726167
+SCUI NODE role=menu id=2 root=1 parent=1 kind=15 x=0 y=0 w=1280 h=36 state=3 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=toolbar id=3 root=1 parent=1 kind=16 x=0 y=45 w=1280 h=48 state=7 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=status id=4 root=1 parent=1 kind=17 x=0 y=804 w=1280 h=36 state=3 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=tabs id=8 root=1 parent=5 kind=12 x=312 y=102 w=968 h=693 state=3 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=table id=36 root=1 parent=10 kind=24 x=312 y=141 w=0 h=0 state=2 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=check id=19 root=1 parent=15 kind=5 x=324 y=228 w=944 h=35 state=67 textBytes=33 textStatus=0 textHex=e4b889e68081efbc9ae69caae98089202f20e5b7b2e98089202f20e6b7b7e59088
+SCUI NODE role=spin id=29 root=1 parent=27 kind=11 x=543 y=377 w=210 h=41 state=3 textBytes=2 textStatus=0 textHex=3235
+SCUI NODE role=combo id=28 root=1 parent=27 kind=10 x=324 y=377 w=210 h=41 state=3 textBytes=7 textStatus=0 textHex=436c6173736963
+SCUI NODE role=edit id=40 root=1 parent=11 kind=9 x=312 y=141 w=0 h=0 state=2 textBytes=162 textStatus=0 textHex=5343554920646f63756d656e74202f20555446380d0ae4b8ade69687e4b88e20415343494920e4bdbfe794a8e79c9fe5ae9e2050686f656e697820e5baa6e9878fe380820a436f6d62696e696e673a2065cc813b20656d6f6a693a20f09f91a9e2808df09f92bb3b20666c61673a20f09f87a8f09f87b30a5461623a096c696e653b20756e646f202f207265646f20e4bf9de79599e4bf9de5ad98e782b9e380820a
+SCUI NODE role=shared-edit id=71 root=68 parent=68 kind=9 x=0 y=117 w=500 h=433 state=3 textBytes=162 textStatus=0 textHex=5343554920646f63756d656e74202f20555446380d0ae4b8ade69687e4b88e20415343494920e4bdbfe794a8e79c9fe5ae9e2050686f656e697820e5baa6e9878fe380820a436f6d62696e696e673a2065cc813b20656d6f6a693a20f09f91a9e2808df09f92bb3b20666c61673a20f09f87a8f09f87b30a5461623a096c696e653b20756e646f202f207265646f20e4bf9de79599e4bf9de5ad98e782b9e380820a
+SCUI NODE role=drag-source id=70 root=68 parent=68 kind=3 x=0 y=67 w=500 h=41 state=3 textBytes=19 textStatus=0 textHex=e68b96e694bee69687e69cac202f2044726167
+SCUI NODE role=exit id=72 root=68 parent=68 kind=3 x=0 y=559 w=500 h=41 state=3 textBytes=4 textStatus=0 textHex=45786974
+SCUI NODE role=resource-label id=62 root=1 parent=14 kind=4 x=312 y=141 w=0 h=0 state=2 textBytes=70 textStatus=0 textHex=50686f656e6978203132202f20313620c2b720436c6173736963202f204175726f726120c2b720e591bde5908de8a792e889b220c2b720e69c89e9a284e7ae97e7bc93e5ad98
+SCUI METRICS role=main root=1 scalePercent=150 fontFace=16 fontPixels=24 fontEpoch=2 themeEpoch=1 displayEpoch=1 rowHeight=32 menuHeight=36 toolbarHeight=48 statusHeight=36
+SCUI METRICS role=second root=68 scalePercent=150 fontFace=16 fontPixels=24 fontEpoch=2 themeEpoch=1 displayEpoch=1 rowHeight=32 menuHeight=36 toolbarHeight=48 statusHeight=36
+SCUI EDIT_SELECTION role=edit id=40 root=1 anchor=0 caret=0 affinity=0 revision=1 flags=0
+SCUI EDIT_SELECTION role=shared-edit id=71 root=68 anchor=0 caret=0 affinity=0 revision=1 flags=0
+SCUI THEME style=0 generation=1 radius=10 border=1 titleHeight=24 taskbarHeight=32
+SCUI DISPLAY action=snapshot scalePercent=150 w=1920 h=1080 backend=1 generation=1 previewSeconds=0
+SCUI DOCUMENT bytes=162 lines=5 revision=1 saved=1 flags=4 undo=0 redo=0 canUndo=0 canRedo=0
+SCUI SELECTION count=0 current=0 anchor=0 revision=1
+SCUI CONTEXT roots=2 nodes=72 timers=0 listeners=7 visible=2 surface=5500800 cache=337800 messages=0:14 paints=0:4 submitted=0:5828560 error=0
+SCUI TBTRACE seq=1 type=3 key=0 buttons=0 edge=0 state=7 window=163 x=0 y=-45
+SCUI TBTRACE seq=2 type=5 key=4358 buttons=0 edge=0 state=7 window=163 x=0 y=-45
+SCUI TBTRACE seq=3 type=6 key=4358 buttons=0 edge=0 state=7 window=163 x=0 y=-45
+SCUI SNAPSHOT END count=3
+SCUI SNAPSHOT BEGIN count=4
+SCUI WINDOW role=main root=1 window=1 generation=1 pid=4 pidgen=5 session=6 x=60 y=50 w=1282 h=877 cw=1280 ch=840 state=163 geometry=1 visibility=3
+SCUI WINDOW role=second root=68 window=2 generation=2 pid=4 pidgen=5 session=6 x=1380 y=100 w=502 h=637 cw=500 ch=600 state=33 geometry=1 visibility=3
+SCUI NODE role=main id=1 root=1 parent=0 kind=1 x=0 y=0 w=1280 h=840 state=3 textBytes=27 textStatus=0 textHex=53435549202f20436f6e74726f6c73202620576f726b666c6f7773
+SCUI NODE role=second id=68 root=68 parent=0 kind=1 x=0 y=0 w=500 h=600 state=3 textBytes=29 textStatus=0 textHex=53435549202f2053686172656420646f63756d656e7420262064726167
+SCUI NODE role=menu id=2 root=1 parent=1 kind=15 x=0 y=0 w=1280 h=36 state=3 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=toolbar id=3 root=1 parent=1 kind=16 x=0 y=45 w=1280 h=48 state=3 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=status id=4 root=1 parent=1 kind=17 x=0 y=804 w=1280 h=36 state=3 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=tabs id=8 root=1 parent=5 kind=12 x=312 y=102 w=968 h=693 state=3 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=table id=36 root=1 parent=10 kind=24 x=312 y=141 w=0 h=0 state=2 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=check id=19 root=1 parent=15 kind=5 x=324 y=228 w=944 h=35 state=15 textBytes=33 textStatus=0 textHex=e4b889e68081efbc9ae69caae98089202f20e5b7b2e98089202f20e6b7b7e59088
+SCUI NODE role=spin id=29 root=1 parent=27 kind=11 x=543 y=377 w=210 h=41 state=3 textBytes=2 textStatus=0 textHex=3235
+SCUI NODE role=combo id=28 root=1 parent=27 kind=10 x=324 y=377 w=210 h=41 state=3 textBytes=7 textStatus=0 textHex=436c6173736963
+SCUI NODE role=edit id=40 root=1 parent=11 kind=9 x=312 y=141 w=0 h=0 state=2 textBytes=162 textStatus=0 textHex=5343554920646f63756d656e74202f20555446380d0ae4b8ade69687e4b88e20415343494920e4bdbfe794a8e79c9fe5ae9e2050686f656e697820e5baa6e9878fe380820a436f6d62696e696e673a2065cc813b20656d6f6a693a20f09f91a9e2808df09f92bb3b20666c61673a20f09f87a8f09f87b30a5461623a096c696e653b20756e646f202f207265646f20e4bf9de79599e4bf9de5ad98e782b9e380820a
+SCUI NODE role=shared-edit id=71 root=68 parent=68 kind=9 x=0 y=117 w=500 h=433 state=3 textBytes=162 textStatus=0 textHex=5343554920646f63756d656e74202f20555446380d0ae4b8ade69687e4b88e20415343494920e4bdbfe794a8e79c9fe5ae9e2050686f656e697820e5baa6e9878fe380820a436f6d62696e696e673a2065cc813b20656d6f6a693a20f09f91a9e2808df09f92bb3b20666c61673a20f09f87a8f09f87b30a5461623a096c696e653b20756e646f202f207265646f20e4bf9de79599e4bf9de5ad98e782b9e380820a
+SCUI NODE role=drag-source id=70 root=68 parent=68 kind=3 x=0 y=67 w=500 h=41 state=3 textBytes=19 textStatus=0 textHex=e68b96e694bee69687e69cac202f2044726167
+SCUI NODE role=exit id=72 root=68 parent=68 kind=3 x=0 y=559 w=500 h=41 state=3 textBytes=4 textStatus=0 textHex=45786974
+SCUI NODE role=resource-label id=62 root=1 parent=14 kind=4 x=312 y=141 w=0 h=0 state=2 textBytes=70 textStatus=0 textHex=50686f656e6978203132202f20313620c2b720436c6173736963202f204175726f726120c2b720e591bde5908de8a792e889b220c2b720e69c89e9a284e7ae97e7bc93e5ad98
+SCUI METRICS role=main root=1 scalePercent=150 fontFace=16 fontPixels=24 fontEpoch=2 themeEpoch=1 displayEpoch=1 rowHeight=32 menuHeight=36 toolbarHeight=48 statusHeight=36
+SCUI METRICS role=second root=68 scalePercent=150 fontFace=16 fontPixels=24 fontEpoch=2 themeEpoch=1 displayEpoch=1 rowHeight=32 menuHeight=36 toolbarHeight=48 statusHeight=36
+SCUI EDIT_SELECTION role=edit id=40 root=1 anchor=0 caret=0 affinity=0 revision=1 flags=0
+SCUI EDIT_SELECTION role=shared-edit id=71 root=68 anchor=0 caret=0 affinity=0 revision=1 flags=0
+SCUI THEME style=0 generation=1 radius=10 border=1 titleHeight=24 taskbarHeight=32
+SCUI DISPLAY action=snapshot scalePercent=150 w=1920 h=1080 backend=1 generation=1 previewSeconds=0
+SCUI DOCUMENT bytes=162 lines=5 revision=1 saved=1 flags=4 undo=0 redo=0 canUndo=0 canRedo=0
+SCUI SELECTION count=0 current=0 anchor=0 revision=1
+SCUI CONTEXT roots=2 nodes=72 timers=0 listeners=7 visible=2 surface=5500800 cache=337800 messages=0:23 paints=0:6 submitted=0:10175056 error=0
+SCUI TBTRACE seq=1 type=3 key=0 buttons=0 edge=0 state=7 window=163 x=0 y=-45
+SCUI TBTRACE seq=2 type=5 key=4358 buttons=0 edge=0 state=7 window=163 x=0 y=-45
+SCUI TBTRACE seq=3 type=6 key=4358 buttons=0 edge=0 state=7 window=163 x=0 y=-45
+SCUI TBTRACE seq=4 type=6 key=4364 buttons=0 edge=0 state=7 window=35 x=0 y=-45
+SCUI TBTRACE seq=5 type=4 key=0 buttons=0 edge=0 state=3 window=163 x=0 y=-45
+SCUI SNAPSHOT END count=4
+SCUI SNAPSHOT BEGIN count=5
+SCUI WINDOW role=main root=1 window=1 generation=1 pid=4 pidgen=5 session=6 x=60 y=50 w=1282 h=877 cw=1280 ch=840 state=35 geometry=1 visibility=3
+SCUI WINDOW role=second root=68 window=2 generation=2 pid=4 pidgen=5 session=6 x=1380 y=100 w=502 h=637 cw=500 ch=600 state=33 geometry=1 visibility=3
+SCUI NODE role=main id=1 root=1 parent=0 kind=1 x=0 y=0 w=1280 h=840 state=3 textBytes=27 textStatus=0 textHex=53435549202f20436f6e74726f6c73202620576f726b666c6f7773
+SCUI NODE role=second id=68 root=68 parent=0 kind=1 x=0 y=0 w=500 h=600 state=3 textBytes=29 textStatus=0 textHex=53435549202f2053686172656420646f63756d656e7420262064726167
+SCUI NODE role=menu id=2 root=1 parent=1 kind=15 x=0 y=0 w=1280 h=36 state=3 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=toolbar id=3 root=1 parent=1 kind=16 x=0 y=45 w=1280 h=48 state=3 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=status id=4 root=1 parent=1 kind=17 x=0 y=804 w=1280 h=36 state=3 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=tabs id=8 root=1 parent=5 kind=12 x=312 y=102 w=968 h=693 state=3 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=table id=36 root=1 parent=10 kind=24 x=312 y=141 w=0 h=0 state=2 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=check id=19 root=1 parent=15 kind=5 x=324 y=228 w=944 h=35 state=3 textBytes=33 textStatus=0 textHex=e4b889e68081efbc9ae69caae98089202f20e5b7b2e98089202f20e6b7b7e59088
+SCUI NODE role=spin id=29 root=1 parent=27 kind=11 x=543 y=377 w=210 h=41 state=3 textBytes=2 textStatus=0 textHex=3235
+SCUI NODE role=combo id=28 root=1 parent=27 kind=10 x=324 y=377 w=210 h=41 state=1039 textBytes=7 textStatus=0 textHex=436c6173736963
+SCUI NODE role=edit id=40 root=1 parent=11 kind=9 x=312 y=141 w=0 h=0 state=2 textBytes=162 textStatus=0 textHex=5343554920646f63756d656e74202f20555446380d0ae4b8ade69687e4b88e20415343494920e4bdbfe794a8e79c9fe5ae9e2050686f656e697820e5baa6e9878fe380820a436f6d62696e696e673a2065cc813b20656d6f6a693a20f09f91a9e2808df09f92bb3b20666c61673a20f09f87a8f09f87b30a5461623a096c696e653b20756e646f202f207265646f20e4bf9de79599e4bf9de5ad98e782b9e380820a
+SCUI NODE role=shared-edit id=71 root=68 parent=68 kind=9 x=0 y=117 w=500 h=433 state=3 textBytes=162 textStatus=0 textHex=5343554920646f63756d656e74202f20555446380d0ae4b8ade69687e4b88e20415343494920e4bdbfe794a8e79c9fe5ae9e2050686f656e697820e5baa6e9878fe380820a436f6d62696e696e673a2065cc813b20656d6f6a693a20f09f91a9e2808df09f92bb3b20666c61673a20f09f87a8f09f87b30a5461623a096c696e653b20756e646f202f207265646f20e4bf9de79599e4bf9de5ad98e782b9e380820a
+SCUI NODE role=drag-source id=70 root=68 parent=68 kind=3 x=0 y=67 w=500 h=41 state=3 textBytes=19 textStatus=0 textHex=e68b96e694bee69687e69cac202f2044726167
+SCUI NODE role=exit id=72 root=68 parent=68 kind=3 x=0 y=559 w=500 h=41 state=3 textBytes=4 textStatus=0 textHex=45786974
+SCUI NODE role=resource-label id=62 root=1 parent=14 kind=4 x=312 y=141 w=0 h=0 state=2 textBytes=70 textStatus=0 textHex=50686f656e6978203132202f20313620c2b720436c6173736963202f204175726f726120c2b720e591bde5908de8a792e889b220c2b720e69c89e9a284e7ae97e7bc93e5ad98
+SCUI METRICS role=main root=1 scalePercent=150 fontFace=16 fontPixels=24 fontEpoch=2 themeEpoch=1 displayEpoch=1 rowHeight=32 menuHeight=36 toolbarHeight=48 statusHeight=36
+SCUI METRICS role=second root=68 scalePercent=150 fontFace=16 fontPixels=24 fontEpoch=2 themeEpoch=1 displayEpoch=1 rowHeight=32 menuHeight=36 toolbarHeight=48 statusHeight=36
+SCUI EDIT_SELECTION role=edit id=40 root=1 anchor=0 caret=0 affinity=0 revision=1 flags=0
+SCUI EDIT_SELECTION role=shared-edit id=71 root=68 anchor=0 caret=0 affinity=0 revision=1 flags=0
+SCUI THEME style=0 generation=1 radius=10 border=1 titleHeight=24 taskbarHeight=32
+SCUI DISPLAY action=snapshot scalePercent=150 w=1920 h=1080 backend=1 generation=1 previewSeconds=0
+SCUI WINDOW role=root-73 root=73 window=3 generation=3 pid=4 pidgen=5 session=6 x=385 y=504 w=210 h=96 cw=210 ch=96 state=3105 geometry=1 visibility=2
+SCUI METRICS role=root-73 root=73 scalePercent=150 fontFace=16 fontPixels=24 fontEpoch=2 themeEpoch=1 displayEpoch=1 rowHeight=32 menuHeight=36 toolbarHeight=48 statusHeight=36
+SCUI NODE role=root-73 id=73 root=73 parent=0 kind=2 x=0 y=0 w=210 h=96 state=3 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=root-74 id=74 root=73 parent=73 kind=14 x=0 y=0 w=210 h=96 state=7 textBytes=0 textStatus=0 textHex=-
+SCUI DOCUMENT bytes=162 lines=5 revision=1 saved=1 flags=4 undo=0 redo=0 canUndo=0 canRedo=0
+SCUI SELECTION count=0 current=0 anchor=0 revision=1
+SCUI CONTEXT roots=3 nodes=74 timers=0 listeners=9 visible=3 surface=5581440 cache=344556 messages=0:43 paints=0:11 submitted=0:14893876 error=0
+SCUI TBTRACE seq=1 type=3 key=0 buttons=0 edge=0 state=7 window=163 x=0 y=-45
+SCUI TBTRACE seq=2 type=5 key=4358 buttons=0 edge=0 state=7 window=163 x=0 y=-45
+SCUI TBTRACE seq=3 type=6 key=4358 buttons=0 edge=0 state=7 window=163 x=0 y=-45
+SCUI TBTRACE seq=4 type=6 key=4364 buttons=0 edge=0 state=7 window=35 x=0 y=-45
+SCUI TBTRACE seq=5 type=4 key=0 buttons=0 edge=0 state=3 window=163 x=0 y=-45
+SCUI SNAPSHOT END count=5
+SCUI SNAPSHOT BEGIN count=6
+SCUI WINDOW role=main root=1 window=1 generation=1 pid=4 pidgen=5 session=6 x=60 y=50 w=1282 h=877 cw=1280 ch=840 state=35 geometry=1 visibility=3
+SCUI WINDOW role=second root=68 window=2 generation=2 pid=4 pidgen=5 session=6 x=1380 y=100 w=502 h=637 cw=500 ch=600 state=33 geometry=1 visibility=3
+SCUI NODE role=main id=1 root=1 parent=0 kind=1 x=0 y=0 w=1280 h=840 state=3 textBytes=27 textStatus=0 textHex=53435549202f20436f6e74726f6c73202620576f726b666c6f7773
+SCUI NODE role=second id=68 root=68 parent=0 kind=1 x=0 y=0 w=500 h=600 state=3 textBytes=29 textStatus=0 textHex=53435549202f2053686172656420646f63756d656e7420262064726167
+SCUI NODE role=menu id=2 root=1 parent=1 kind=15 x=0 y=0 w=1280 h=36 state=3 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=toolbar id=3 root=1 parent=1 kind=16 x=0 y=45 w=1280 h=48 state=3 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=status id=4 root=1 parent=1 kind=17 x=0 y=804 w=1280 h=36 state=3 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=tabs id=8 root=1 parent=5 kind=12 x=312 y=102 w=968 h=693 state=3 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=table id=36 root=1 parent=10 kind=24 x=312 y=141 w=0 h=0 state=2 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=check id=19 root=1 parent=15 kind=5 x=324 y=228 w=944 h=35 state=3 textBytes=33 textStatus=0 textHex=e4b889e68081efbc9ae69caae98089202f20e5b7b2e98089202f20e6b7b7e59088
+SCUI NODE role=spin id=29 root=1 parent=27 kind=11 x=543 y=377 w=210 h=41 state=3 textBytes=2 textStatus=0 textHex=3235
+SCUI NODE role=combo id=28 root=1 parent=27 kind=10 x=324 y=377 w=210 h=41 state=1039 textBytes=6 textStatus=0 textHex=4175726f7261
+SCUI NODE role=edit id=40 root=1 parent=11 kind=9 x=312 y=141 w=0 h=0 state=2 textBytes=162 textStatus=0 textHex=5343554920646f63756d656e74202f20555446380d0ae4b8ade69687e4b88e20415343494920e4bdbfe794a8e79c9fe5ae9e2050686f656e697820e5baa6e9878fe380820a436f6d62696e696e673a2065cc813b20656d6f6a693a20f09f91a9e2808df09f92bb3b20666c61673a20f09f87a8f09f87b30a5461623a096c696e653b20756e646f202f207265646f20e4bf9de79599e4bf9de5ad98e782b9e380820a
+SCUI NODE role=shared-edit id=71 root=68 parent=68 kind=9 x=0 y=117 w=500 h=433 state=3 textBytes=162 textStatus=0 textHex=5343554920646f63756d656e74202f20555446380d0ae4b8ade69687e4b88e20415343494920e4bdbfe794a8e79c9fe5ae9e2050686f656e697820e5baa6e9878fe380820a436f6d62696e696e673a2065cc813b20656d6f6a693a20f09f91a9e2808df09f92bb3b20666c61673a20f09f87a8f09f87b30a5461623a096c696e653b20756e646f202f207265646f20e4bf9de79599e4bf9de5ad98e782b9e380820a
+SCUI NODE role=drag-source id=70 root=68 parent=68 kind=3 x=0 y=67 w=500 h=41 state=3 textBytes=19 textStatus=0 textHex=e68b96e694bee69687e69cac202f2044726167
+SCUI NODE role=exit id=72 root=68 parent=68 kind=3 x=0 y=559 w=500 h=41 state=3 textBytes=4 textStatus=0 textHex=45786974
+SCUI NODE role=resource-label id=62 root=1 parent=14 kind=4 x=312 y=141 w=0 h=0 state=2 textBytes=70 textStatus=0 textHex=50686f656e6978203132202f20313620c2b720436c6173736963202f204175726f726120c2b720e591bde5908de8a792e889b220c2b720e69c89e9a284e7ae97e7bc93e5ad98
+SCUI METRICS role=main root=1 scalePercent=150 fontFace=16 fontPixels=24 fontEpoch=2 themeEpoch=1 displayEpoch=1 rowHeight=32 menuHeight=36 toolbarHeight=48 statusHeight=36
+SCUI METRICS role=second root=68 scalePercent=150 fontFace=16 fontPixels=24 fontEpoch=2 themeEpoch=1 displayEpoch=1 rowHeight=32 menuHeight=36 toolbarHeight=48 statusHeight=36
+SCUI EDIT_SELECTION role=edit id=40 root=1 anchor=0 caret=0 affinity=0 revision=1 flags=0
+SCUI EDIT_SELECTION role=shared-edit id=71 root=68 anchor=0 caret=0 affinity=0 revision=1 flags=0
+SCUI THEME style=0 generation=1 radius=10 border=1 titleHeight=24 taskbarHeight=32
+SCUI DISPLAY action=snapshot scalePercent=150 w=1920 h=1080 backend=1 generation=1 previewSeconds=0
+SCUI WINDOW role=root-73 root=73 window=3 generation=3 pid=4 pidgen=5 session=6 x=385 y=504 w=210 h=96 cw=210 ch=96 state=3105 geometry=1 visibility=2
+SCUI METRICS role=root-73 root=73 scalePercent=150 fontFace=16 fontPixels=24 fontEpoch=2 themeEpoch=1 displayEpoch=1 rowHeight=32 menuHeight=36 toolbarHeight=48 statusHeight=36
+SCUI NODE role=root-73 id=73 root=73 parent=0 kind=2 x=0 y=0 w=210 h=96 state=3 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=root-74 id=74 root=73 parent=73 kind=14 x=0 y=0 w=210 h=96 state=7 textBytes=0 textStatus=0 textHex=-
+SCUI DOCUMENT bytes=162 lines=5 revision=1 saved=1 flags=4 undo=0 redo=0 canUndo=0 canRedo=0
+SCUI SELECTION count=0 current=0 anchor=0 revision=1
+SCUI CONTEXT roots=3 nodes=74 timers=0 listeners=9 visible=3 surface=5581440 cache=344556 messages=0:49 paints=0:13 submitted=0:19275316 error=0
+SCUI TBTRACE seq=1 type=3 key=0 buttons=0 edge=0 state=7 window=163 x=0 y=-45
+SCUI TBTRACE seq=2 type=5 key=4358 buttons=0 edge=0 state=7 window=163 x=0 y=-45
+SCUI TBTRACE seq=3 type=6 key=4358 buttons=0 edge=0 state=7 window=163 x=0 y=-45
+SCUI TBTRACE seq=4 type=6 key=4364 buttons=0 edge=0 state=7 window=35 x=0 y=-45
+SCUI TBTRACE seq=5 type=4 key=0 buttons=0 edge=0 state=3 window=163 x=0 y=-45
+SCUI SNAPSHOT END count=6
+SCUI SNAPSHOT BEGIN count=7
+SCUI WINDOW role=main root=1 window=1 generation=1 pid=4 pidgen=5 session=6 x=60 y=50 w=1282 h=877 cw=1280 ch=840 state=35 geometry=1 visibility=3
+SCUI WINDOW role=second root=68 window=2 generation=2 pid=4 pidgen=5 session=6 x=1380 y=100 w=502 h=637 cw=500 ch=600 state=33 geometry=1 visibility=3
+SCUI NODE role=main id=1 root=1 parent=0 kind=1 x=0 y=0 w=1280 h=840 state=3 textBytes=27 textStatus=0 textHex=53435549202f20436f6e74726f6c73202620576f726b666c6f7773
+SCUI NODE role=second id=68 root=68 parent=0 kind=1 x=0 y=0 w=500 h=600 state=3 textBytes=29 textStatus=0 textHex=53435549202f2053686172656420646f63756d656e7420262064726167
+SCUI NODE role=menu id=2 root=1 parent=1 kind=15 x=0 y=0 w=1280 h=36 state=3 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=toolbar id=3 root=1 parent=1 kind=16 x=0 y=45 w=1280 h=48 state=3 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=status id=4 root=1 parent=1 kind=17 x=0 y=804 w=1280 h=36 state=3 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=tabs id=8 root=1 parent=5 kind=12 x=312 y=102 w=968 h=693 state=3 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=table id=36 root=1 parent=10 kind=24 x=312 y=141 w=0 h=0 state=2 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=check id=19 root=1 parent=15 kind=5 x=324 y=228 w=944 h=35 state=3 textBytes=33 textStatus=0 textHex=e4b889e68081efbc9ae69caae98089202f20e5b7b2e98089202f20e6b7b7e59088
+SCUI NODE role=spin id=29 root=1 parent=27 kind=11 x=543 y=377 w=210 h=41 state=3 textBytes=2 textStatus=0 textHex=3235
+SCUI NODE role=combo id=28 root=1 parent=27 kind=10 x=324 y=377 w=210 h=41 state=15 textBytes=6 textStatus=0 textHex=4175726f7261
+SCUI NODE role=edit id=40 root=1 parent=11 kind=9 x=312 y=141 w=0 h=0 state=2 textBytes=162 textStatus=0 textHex=5343554920646f63756d656e74202f20555446380d0ae4b8ade69687e4b88e20415343494920e4bdbfe794a8e79c9fe5ae9e2050686f656e697820e5baa6e9878fe380820a436f6d62696e696e673a2065cc813b20656d6f6a693a20f09f91a9e2808df09f92bb3b20666c61673a20f09f87a8f09f87b30a5461623a096c696e653b20756e646f202f207265646f20e4bf9de79599e4bf9de5ad98e782b9e380820a
+SCUI NODE role=shared-edit id=71 root=68 parent=68 kind=9 x=0 y=117 w=500 h=433 state=3 textBytes=162 textStatus=0 textHex=5343554920646f63756d656e74202f20555446380d0ae4b8ade69687e4b88e20415343494920e4bdbfe794a8e79c9fe5ae9e2050686f656e697820e5baa6e9878fe380820a436f6d62696e696e673a2065cc813b20656d6f6a693a20f09f91a9e2808df09f92bb3b20666c61673a20f09f87a8f09f87b30a5461623a096c696e653b20756e646f202f207265646f20e4bf9de79599e4bf9de5ad98e782b9e380820a
+SCUI NODE role=drag-source id=70 root=68 parent=68 kind=3 x=0 y=67 w=500 h=41 state=3 textBytes=19 textStatus=0 textHex=e68b96e694bee69687e69cac202f2044726167
+SCUI NODE role=exit id=72 root=68 parent=68 kind=3 x=0 y=559 w=500 h=41 state=3 textBytes=4 textStatus=0 textHex=45786974
+SCUI NODE role=resource-label id=62 root=1 parent=14 kind=4 x=312 y=141 w=0 h=0 state=2 textBytes=70 textStatus=0 textHex=50686f656e6978203132202f20313620c2b720436c6173736963202f204175726f726120c2b720e591bde5908de8a792e889b220c2b720e69c89e9a284e7ae97e7bc93e5ad98
+SCUI METRICS role=main root=1 scalePercent=150 fontFace=16 fontPixels=24 fontEpoch=2 themeEpoch=1 displayEpoch=1 rowHeight=32 menuHeight=36 toolbarHeight=48 statusHeight=36
+SCUI METRICS role=second root=68 scalePercent=150 fontFace=16 fontPixels=24 fontEpoch=2 themeEpoch=1 displayEpoch=1 rowHeight=32 menuHeight=36 toolbarHeight=48 statusHeight=36
+SCUI EDIT_SELECTION role=edit id=40 root=1 anchor=0 caret=0 affinity=0 revision=1 flags=0
+SCUI EDIT_SELECTION role=shared-edit id=71 root=68 anchor=0 caret=0 affinity=0 revision=1 flags=0
+SCUI THEME style=0 generation=1 radius=10 border=1 titleHeight=24 taskbarHeight=32
+SCUI DISPLAY action=snapshot scalePercent=150 w=1920 h=1080 backend=1 generation=1 previewSeconds=0
+SCUI DOCUMENT bytes=162 lines=5 revision=1 saved=1 flags=4 undo=0 redo=0 canUndo=0 canRedo=0
+SCUI SELECTION count=0 current=0 anchor=0 revision=1
+SCUI CONTEXT roots=2 nodes=72 timers=0 listeners=7 visible=2 surface=5500800 cache=344556 messages=0:55 paints=0:14 submitted=0:19309756 error=0
+SCUI TBTRACE seq=1 type=3 key=0 buttons=0 edge=0 state=7 window=163 x=0 y=-45
+SCUI TBTRACE seq=2 type=5 key=4358 buttons=0 edge=0 state=7 window=163 x=0 y=-45
+SCUI TBTRACE seq=3 type=6 key=4358 buttons=0 edge=0 state=7 window=163 x=0 y=-45
+SCUI TBTRACE seq=4 type=6 key=4364 buttons=0 edge=0 state=7 window=35 x=0 y=-45
+SCUI TBTRACE seq=5 type=4 key=0 buttons=0 edge=0 state=3 window=163 x=0 y=-45
+SCUI SNAPSHOT END count=7
+SCUI COMMAND id=122 result=0
+SCUI SNAPSHOT BEGIN count=8
+SCUI WINDOW role=main root=1 window=1 generation=1 pid=4 pidgen=5 session=6 x=60 y=50 w=1282 h=877 cw=1280 ch=840 state=35 geometry=1 visibility=3
+SCUI WINDOW role=second root=68 window=2 generation=2 pid=4 pidgen=5 session=6 x=1380 y=100 w=502 h=637 cw=500 ch=600 state=33 geometry=1 visibility=3
+SCUI NODE role=main id=1 root=1 parent=0 kind=1 x=0 y=0 w=1280 h=840 state=3 textBytes=27 textStatus=0 textHex=53435549202f20436f6e74726f6c73202620576f726b666c6f7773
+SCUI NODE role=second id=68 root=68 parent=0 kind=1 x=0 y=0 w=500 h=600 state=3 textBytes=29 textStatus=0 textHex=53435549202f2053686172656420646f63756d656e7420262064726167
+SCUI NODE role=menu id=2 root=1 parent=1 kind=15 x=0 y=0 w=1280 h=36 state=3 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=toolbar id=3 root=1 parent=1 kind=16 x=0 y=45 w=1280 h=48 state=3 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=status id=4 root=1 parent=1 kind=17 x=0 y=804 w=1280 h=36 state=3 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=tabs id=8 root=1 parent=5 kind=12 x=312 y=102 w=968 h=693 state=3 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=table id=36 root=1 parent=10 kind=24 x=312 y=179 w=968 h=616 state=3 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=check id=19 root=1 parent=15 kind=5 x=324 y=174 w=0 h=0 state=2 textBytes=33 textStatus=0 textHex=e4b889e68081efbc9ae69caae98089202f20e5b7b2e98089202f20e6b7b7e59088
+SCUI NODE role=spin id=29 root=1 parent=27 kind=11 x=324 y=174 w=0 h=0 state=2 textBytes=2 textStatus=0 textHex=3235
+SCUI NODE role=combo id=28 root=1 parent=27 kind=10 x=324 y=174 w=0 h=0 state=14 textBytes=6 textStatus=0 textHex=4175726f7261
+SCUI NODE role=edit id=40 root=1 parent=11 kind=9 x=312 y=141 w=0 h=0 state=2 textBytes=162 textStatus=0 textHex=5343554920646f63756d656e74202f20555446380d0ae4b8ade69687e4b88e20415343494920e4bdbfe794a8e79c9fe5ae9e2050686f656e697820e5baa6e9878fe380820a436f6d62696e696e673a2065cc813b20656d6f6a693a20f09f91a9e2808df09f92bb3b20666c61673a20f09f87a8f09f87b30a5461623a096c696e653b20756e646f202f207265646f20e4bf9de79599e4bf9de5ad98e782b9e380820a
+SCUI NODE role=shared-edit id=71 root=68 parent=68 kind=9 x=0 y=117 w=500 h=433 state=3 textBytes=162 textStatus=0 textHex=5343554920646f63756d656e74202f20555446380d0ae4b8ade69687e4b88e20415343494920e4bdbfe794a8e79c9fe5ae9e2050686f656e697820e5baa6e9878fe380820a436f6d62696e696e673a2065cc813b20656d6f6a693a20f09f91a9e2808df09f92bb3b20666c61673a20f09f87a8f09f87b30a5461623a096c696e653b20756e646f202f207265646f20e4bf9de79599e4bf9de5ad98e782b9e380820a
+SCUI NODE role=drag-source id=70 root=68 parent=68 kind=3 x=0 y=67 w=500 h=41 state=3 textBytes=19 textStatus=0 textHex=e68b96e694bee69687e69cac202f2044726167
+SCUI NODE role=exit id=72 root=68 parent=68 kind=3 x=0 y=559 w=500 h=41 state=3 textBytes=4 textStatus=0 textHex=45786974
+SCUI NODE role=resource-label id=62 root=1 parent=14 kind=4 x=312 y=141 w=0 h=0 state=2 textBytes=70 textStatus=0 textHex=50686f656e6978203132202f20313620c2b720436c6173736963202f204175726f726120c2b720e591bde5908de8a792e889b220c2b720e69c89e9a284e7ae97e7bc93e5ad98
+SCUI METRICS role=main root=1 scalePercent=150 fontFace=16 fontPixels=24 fontEpoch=2 themeEpoch=1 displayEpoch=1 rowHeight=32 menuHeight=36 toolbarHeight=48 statusHeight=36
+SCUI METRICS role=second root=68 scalePercent=150 fontFace=16 fontPixels=24 fontEpoch=2 themeEpoch=1 displayEpoch=1 rowHeight=32 menuHeight=36 toolbarHeight=48 statusHeight=36
+SCUI EDIT_SELECTION role=edit id=40 root=1 anchor=0 caret=0 affinity=0 revision=1 flags=0
+SCUI EDIT_SELECTION role=shared-edit id=71 root=68 anchor=0 caret=0 affinity=0 revision=1 flags=0
+SCUI THEME style=0 generation=1 radius=10 border=1 titleHeight=24 taskbarHeight=32
+SCUI DISPLAY action=snapshot scalePercent=150 w=1920 h=1080 backend=1 generation=1 previewSeconds=0
+SCUI DOCUMENT bytes=162 lines=5 revision=1 saved=1 flags=4 undo=0 redo=0 canUndo=0 canRedo=0
+SCUI SELECTION count=0 current=0 anchor=0 revision=1
+SCUI CONTEXT roots=2 nodes=72 timers=0 listeners=7 visible=2 surface=5500800 cache=354690 messages=0:60 paints=0:15 submitted=0:23610556 error=0
+SCUI TBTRACE seq=1 type=3 key=0 buttons=0 edge=0 state=7 window=163 x=0 y=-45
+SCUI TBTRACE seq=2 type=5 key=4358 buttons=0 edge=0 state=7 window=163 x=0 y=-45
+SCUI TBTRACE seq=3 type=6 key=4358 buttons=0 edge=0 state=7 window=163 x=0 y=-45
+SCUI TBTRACE seq=4 type=6 key=4364 buttons=0 edge=0 state=7 window=35 x=0 y=-45
+SCUI TBTRACE seq=5 type=4 key=0 buttons=0 edge=0 state=3 window=163 x=0 y=-45
+SCUI SNAPSHOT END count=8
+SCUI SNAPSHOT BEGIN count=9
+SCUI WINDOW role=main root=1 window=1 generation=1 pid=4 pidgen=5 session=6 x=60 y=50 w=1282 h=877 cw=1280 ch=840 state=163 geometry=1 visibility=3
+SCUI WINDOW role=second root=68 window=2 generation=2 pid=4 pidgen=5 session=6 x=1380 y=100 w=502 h=637 cw=500 ch=600 state=33 geometry=1 visibility=3
+SCUI NODE role=main id=1 root=1 parent=0 kind=1 x=0 y=0 w=1280 h=840 state=3 textBytes=27 textStatus=0 textHex=53435549202f20436f6e74726f6c73202620576f726b666c6f7773
+SCUI NODE role=second id=68 root=68 parent=0 kind=1 x=0 y=0 w=500 h=600 state=3 textBytes=29 textStatus=0 textHex=53435549202f2053686172656420646f63756d656e7420262064726167
+SCUI NODE role=menu id=2 root=1 parent=1 kind=15 x=0 y=0 w=1280 h=36 state=3 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=toolbar id=3 root=1 parent=1 kind=16 x=0 y=45 w=1280 h=48 state=3 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=status id=4 root=1 parent=1 kind=17 x=0 y=804 w=1280 h=36 state=3 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=tabs id=8 root=1 parent=5 kind=12 x=312 y=102 w=968 h=693 state=3 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=table id=36 root=1 parent=10 kind=24 x=312 y=179 w=968 h=616 state=15 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=check id=19 root=1 parent=15 kind=5 x=324 y=174 w=0 h=0 state=2 textBytes=33 textStatus=0 textHex=e4b889e68081efbc9ae69caae98089202f20e5b7b2e98089202f20e6b7b7e59088
+SCUI NODE role=spin id=29 root=1 parent=27 kind=11 x=324 y=174 w=0 h=0 state=2 textBytes=2 textStatus=0 textHex=3235
+SCUI NODE role=combo id=28 root=1 parent=27 kind=10 x=324 y=174 w=0 h=0 state=2 textBytes=6 textStatus=0 textHex=4175726f7261
+SCUI NODE role=edit id=40 root=1 parent=11 kind=9 x=312 y=141 w=0 h=0 state=2 textBytes=162 textStatus=0 textHex=5343554920646f63756d656e74202f20555446380d0ae4b8ade69687e4b88e20415343494920e4bdbfe794a8e79c9fe5ae9e2050686f656e697820e5baa6e9878fe380820a436f6d62696e696e673a2065cc813b20656d6f6a693a20f09f91a9e2808df09f92bb3b20666c61673a20f09f87a8f09f87b30a5461623a096c696e653b20756e646f202f207265646f20e4bf9de79599e4bf9de5ad98e782b9e380820a
+SCUI NODE role=shared-edit id=71 root=68 parent=68 kind=9 x=0 y=117 w=500 h=433 state=3 textBytes=162 textStatus=0 textHex=5343554920646f63756d656e74202f20555446380d0ae4b8ade69687e4b88e20415343494920e4bdbfe794a8e79c9fe5ae9e2050686f656e697820e5baa6e9878fe380820a436f6d62696e696e673a2065cc813b20656d6f6a693a20f09f91a9e2808df09f92bb3b20666c61673a20f09f87a8f09f87b30a5461623a096c696e653b20756e646f202f207265646f20e4bf9de79599e4bf9de5ad98e782b9e380820a
+SCUI NODE role=drag-source id=70 root=68 parent=68 kind=3 x=0 y=67 w=500 h=41 state=3 textBytes=19 textStatus=0 textHex=e68b96e694bee69687e69cac202f2044726167
+SCUI NODE role=exit id=72 root=68 parent=68 kind=3 x=0 y=559 w=500 h=41 state=3 textBytes=4 textStatus=0 textHex=45786974
+SCUI NODE role=resource-label id=62 root=1 parent=14 kind=4 x=312 y=141 w=0 h=0 state=2 textBytes=70 textStatus=0 textHex=50686f656e6978203132202f20313620c2b720436c6173736963202f204175726f726120c2b720e591bde5908de8a792e889b220c2b720e69c89e9a284e7ae97e7bc93e5ad98
+SCUI METRICS role=main root=1 scalePercent=150 fontFace=16 fontPixels=24 fontEpoch=2 themeEpoch=1 displayEpoch=1 rowHeight=32 menuHeight=36 toolbarHeight=48 statusHeight=36
+SCUI METRICS role=second root=68 scalePercent=150 fontFace=16 fontPixels=24 fontEpoch=2 themeEpoch=1 displayEpoch=1 rowHeight=32 menuHeight=36 toolbarHeight=48 statusHeight=36
+SCUI EDIT_SELECTION role=edit id=40 root=1 anchor=0 caret=0 affinity=0 revision=1 flags=0
+SCUI EDIT_SELECTION role=shared-edit id=71 root=68 anchor=0 caret=0 affinity=0 revision=1 flags=0
+SCUI THEME style=0 generation=1 radius=10 border=1 titleHeight=24 taskbarHeight=32
+SCUI DISPLAY action=snapshot scalePercent=150 w=1920 h=1080 backend=1 generation=1 previewSeconds=0
+SCUI DOCUMENT bytes=162 lines=5 revision=1 saved=1 flags=4 undo=0 redo=0 canUndo=0 canRedo=0
+SCUI SELECTION count=100000 current=100000 anchor=1 revision=3
+SCUI CONTEXT roots=2 nodes=72 timers=0 listeners=7 visible=2 surface=5500800 cache=354690 messages=0:72 paints=0:17 submitted=0:28565180 error=0
+SCUI TBTRACE seq=1 type=3 key=0 buttons=0 edge=0 state=7 window=163 x=0 y=-45
+SCUI TBTRACE seq=2 type=5 key=4358 buttons=0 edge=0 state=7 window=163 x=0 y=-45
+SCUI TBTRACE seq=3 type=6 key=4358 buttons=0 edge=0 state=7 window=163 x=0 y=-45
+SCUI TBTRACE seq=4 type=6 key=4364 buttons=0 edge=0 state=7 window=35 x=0 y=-45
+SCUI TBTRACE seq=5 type=4 key=0 buttons=0 edge=0 state=3 window=163 x=0 y=-45
+SCUI SNAPSHOT END count=9
+SCUI COMMAND id=123 result=0
+SCUI SNAPSHOT BEGIN count=10
+SCUI WINDOW role=main root=1 window=1 generation=1 pid=4 pidgen=5 session=6 x=60 y=50 w=1282 h=877 cw=1280 ch=840 state=35 geometry=1 visibility=3
+SCUI WINDOW role=second root=68 window=2 generation=2 pid=4 pidgen=5 session=6 x=1380 y=100 w=502 h=637 cw=500 ch=600 state=33 geometry=1 visibility=3
+SCUI NODE role=main id=1 root=1 parent=0 kind=1 x=0 y=0 w=1280 h=840 state=3 textBytes=27 textStatus=0 textHex=53435549202f20436f6e74726f6c73202620576f726b666c6f7773
+SCUI NODE role=second id=68 root=68 parent=0 kind=1 x=0 y=0 w=500 h=600 state=3 textBytes=29 textStatus=0 textHex=53435549202f2053686172656420646f63756d656e7420262064726167
+SCUI NODE role=menu id=2 root=1 parent=1 kind=15 x=0 y=0 w=1280 h=36 state=3 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=toolbar id=3 root=1 parent=1 kind=16 x=0 y=45 w=1280 h=48 state=3 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=status id=4 root=1 parent=1 kind=17 x=0 y=804 w=1280 h=36 state=3 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=tabs id=8 root=1 parent=5 kind=12 x=312 y=102 w=968 h=693 state=3 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=table id=36 root=1 parent=10 kind=24 x=312 y=141 w=0 h=0 state=14 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=check id=19 root=1 parent=15 kind=5 x=324 y=174 w=0 h=0 state=2 textBytes=33 textStatus=0 textHex=e4b889e68081efbc9ae69caae98089202f20e5b7b2e98089202f20e6b7b7e59088
+SCUI NODE role=spin id=29 root=1 parent=27 kind=11 x=324 y=174 w=0 h=0 state=2 textBytes=2 textStatus=0 textHex=3235
+SCUI NODE role=combo id=28 root=1 parent=27 kind=10 x=324 y=174 w=0 h=0 state=2 textBytes=6 textStatus=0 textHex=4175726f7261
+SCUI NODE role=edit id=40 root=1 parent=11 kind=9 x=312 y=192 w=968 h=603 state=3 textBytes=162 textStatus=0 textHex=5343554920646f63756d656e74202f20555446380d0ae4b8ade69687e4b88e20415343494920e4bdbfe794a8e79c9fe5ae9e2050686f656e697820e5baa6e9878fe380820a436f6d62696e696e673a2065cc813b20656d6f6a693a20f09f91a9e2808df09f92bb3b20666c61673a20f09f87a8f09f87b30a5461623a096c696e653b20756e646f202f207265646f20e4bf9de79599e4bf9de5ad98e782b9e380820a
+SCUI NODE role=shared-edit id=71 root=68 parent=68 kind=9 x=0 y=117 w=500 h=433 state=3 textBytes=162 textStatus=0 textHex=5343554920646f63756d656e74202f20555446380d0ae4b8ade69687e4b88e20415343494920e4bdbfe794a8e79c9fe5ae9e2050686f656e697820e5baa6e9878fe380820a436f6d62696e696e673a2065cc813b20656d6f6a693a20f09f91a9e2808df09f92bb3b20666c61673a20f09f87a8f09f87b30a5461623a096c696e653b20756e646f202f207265646f20e4bf9de79599e4bf9de5ad98e782b9e380820a
+SCUI NODE role=drag-source id=70 root=68 parent=68 kind=3 x=0 y=67 w=500 h=41 state=3 textBytes=19 textStatus=0 textHex=e68b96e694bee69687e69cac202f2044726167
+SCUI NODE role=exit id=72 root=68 parent=68 kind=3 x=0 y=559 w=500 h=41 state=3 textBytes=4 textStatus=0 textHex=45786974
+SCUI NODE role=resource-label id=62 root=1 parent=14 kind=4 x=312 y=141 w=0 h=0 state=2 textBytes=70 textStatus=0 textHex=50686f656e6978203132202f20313620c2b720436c6173736963202f204175726f726120c2b720e591bde5908de8a792e889b220c2b720e69c89e9a284e7ae97e7bc93e5ad98
+SCUI METRICS role=main root=1 scalePercent=150 fontFace=16 fontPixels=24 fontEpoch=2 themeEpoch=1 displayEpoch=1 rowHeight=32 menuHeight=36 toolbarHeight=48 statusHeight=36
+SCUI METRICS role=second root=68 scalePercent=150 fontFace=16 fontPixels=24 fontEpoch=2 themeEpoch=1 displayEpoch=1 rowHeight=32 menuHeight=36 toolbarHeight=48 statusHeight=36
+SCUI EDIT_SELECTION role=edit id=40 root=1 anchor=0 caret=0 affinity=0 revision=1 flags=0
+SCUI EDIT_SELECTION role=shared-edit id=71 root=68 anchor=0 caret=0 affinity=0 revision=1 flags=0
+SCUI THEME style=0 generation=1 radius=10 border=1 titleHeight=24 taskbarHeight=32
+SCUI DISPLAY action=snapshot scalePercent=150 w=1920 h=1080 backend=1 generation=1 previewSeconds=0
+SCUI DOCUMENT bytes=162 lines=5 revision=1 saved=1 flags=4 undo=0 redo=0 canUndo=0 canRedo=0
+SCUI SELECTION count=100000 current=100000 anchor=1 revision=3
+SCUI CONTEXT roots=2 nodes=72 timers=0 listeners=7 visible=2 surface=5500800 cache=354690 messages=0:80 paints=0:20 submitted=0:37820604 error=0
+SCUI TBTRACE seq=1 type=3 key=0 buttons=0 edge=0 state=7 window=163 x=0 y=-45
+SCUI TBTRACE seq=2 type=5 key=4358 buttons=0 edge=0 state=7 window=163 x=0 y=-45
+SCUI TBTRACE seq=3 type=6 key=4358 buttons=0 edge=0 state=7 window=163 x=0 y=-45
+SCUI TBTRACE seq=4 type=6 key=4364 buttons=0 edge=0 state=7 window=35 x=0 y=-45
+SCUI TBTRACE seq=5 type=4 key=0 buttons=0 edge=0 state=3 window=163 x=0 y=-45
+SCUI SNAPSHOT END count=10
+SCUI SNAPSHOT BEGIN count=11
+SCUI WINDOW role=main root=1 window=1 generation=1 pid=4 pidgen=5 session=6 x=60 y=50 w=1282 h=877 cw=1280 ch=840 state=35 geometry=1 visibility=3
+SCUI WINDOW role=second root=68 window=2 generation=2 pid=4 pidgen=5 session=6 x=1380 y=100 w=502 h=637 cw=500 ch=600 state=33 geometry=1 visibility=3
+SCUI NODE role=main id=1 root=1 parent=0 kind=1 x=0 y=0 w=1280 h=840 state=3 textBytes=27 textStatus=0 textHex=53435549202f20436f6e74726f6c73202620576f726b666c6f7773
+SCUI NODE role=second id=68 root=68 parent=0 kind=1 x=0 y=0 w=500 h=600 state=3 textBytes=29 textStatus=0 textHex=53435549202f2053686172656420646f63756d656e7420262064726167
+SCUI NODE role=menu id=2 root=1 parent=1 kind=15 x=0 y=0 w=1280 h=36 state=3 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=toolbar id=3 root=1 parent=1 kind=16 x=0 y=45 w=1280 h=48 state=3 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=status id=4 root=1 parent=1 kind=17 x=0 y=804 w=1280 h=36 state=3 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=tabs id=8 root=1 parent=5 kind=12 x=312 y=102 w=968 h=693 state=3 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=table id=36 root=1 parent=10 kind=24 x=312 y=141 w=0 h=0 state=2 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=check id=19 root=1 parent=15 kind=5 x=324 y=174 w=0 h=0 state=2 textBytes=33 textStatus=0 textHex=e4b889e68081efbc9ae69caae98089202f20e5b7b2e98089202f20e6b7b7e59088
+SCUI NODE role=spin id=29 root=1 parent=27 kind=11 x=324 y=174 w=0 h=0 state=2 textBytes=2 textStatus=0 textHex=3235
+SCUI NODE role=combo id=28 root=1 parent=27 kind=10 x=324 y=174 w=0 h=0 state=2 textBytes=6 textStatus=0 textHex=4175726f7261
+SCUI NODE role=edit id=40 root=1 parent=11 kind=9 x=312 y=192 w=968 h=603 state=7 textBytes=163 textStatus=0 textHex=534355492078646f63756d656e74202f20555446380d0ae4b8ade69687e4b88e20415343494920e4bdbfe794a8e79c9fe5ae9e2050686f656e697820e5baa6e9878fe380820a436f6d62696e696e673a2065cc813b20656d6f6a693a20f09f91a9e2808df09f92bb3b20666c61673a20f09f87a8f09f87b30a5461623a096c696e653b20756e646f202f207265646f20e4bf9de79599e4bf9de5ad98e782b9e380820a
+SCUI NODE role=shared-edit id=71 root=68 parent=68 kind=9 x=0 y=117 w=500 h=433 state=3 textBytes=163 textStatus=0 textHex=534355492078646f63756d656e74202f20555446380d0ae4b8ade69687e4b88e20415343494920e4bdbfe794a8e79c9fe5ae9e2050686f656e697820e5baa6e9878fe380820a436f6d62696e696e673a2065cc813b20656d6f6a693a20f09f91a9e2808df09f92bb3b20666c61673a20f09f87a8f09f87b30a5461623a096c696e653b20756e646f202f207265646f20e4bf9de79599e4bf9de5ad98e782b9e380820a
+SCUI NODE role=drag-source id=70 root=68 parent=68 kind=3 x=0 y=67 w=500 h=41 state=3 textBytes=19 textStatus=0 textHex=e68b96e694bee69687e69cac202f2044726167
+SCUI NODE role=exit id=72 root=68 parent=68 kind=3 x=0 y=559 w=500 h=41 state=3 textBytes=4 textStatus=0 textHex=45786974
+SCUI NODE role=resource-label id=62 root=1 parent=14 kind=4 x=312 y=141 w=0 h=0 state=2 textBytes=70 textStatus=0 textHex=50686f656e6978203132202f20313620c2b720436c6173736963202f204175726f726120c2b720e591bde5908de8a792e889b220c2b720e69c89e9a284e7ae97e7bc93e5ad98
+SCUI METRICS role=main root=1 scalePercent=150 fontFace=16 fontPixels=24 fontEpoch=2 themeEpoch=1 displayEpoch=1 rowHeight=32 menuHeight=36 toolbarHeight=48 statusHeight=36
+SCUI METRICS role=second root=68 scalePercent=150 fontFace=16 fontPixels=24 fontEpoch=2 themeEpoch=1 displayEpoch=1 rowHeight=32 menuHeight=36 toolbarHeight=48 statusHeight=36
+SCUI EDIT_SELECTION role=edit id=40 root=1 anchor=6 caret=6 affinity=0 revision=2 flags=0
+SCUI EDIT_SELECTION role=shared-edit id=71 root=68 anchor=0 caret=0 affinity=0 revision=2 flags=0
+SCUI THEME style=0 generation=1 radius=10 border=1 titleHeight=24 taskbarHeight=32
+SCUI DISPLAY action=snapshot scalePercent=150 w=1920 h=1080 backend=1 generation=1 previewSeconds=0
+SCUI DOCUMENT bytes=163 lines=5 revision=2 saved=1 flags=6 undo=309 redo=0 canUndo=1 canRedo=0
+SCUI SELECTION count=100000 current=100000 anchor=1 revision=3
+SCUI CONTEXT roots=2 nodes=72 timers=1 listeners=7 visible=2 surface=5500800 cache=354690 messages=0:94 paints=0:26 submitted=0:52844988 error=0
+SCUI TBTRACE seq=1 type=3 key=0 buttons=0 edge=0 state=7 window=163 x=0 y=-45
+SCUI TBTRACE seq=2 type=5 key=4358 buttons=0 edge=0 state=7 window=163 x=0 y=-45
+SCUI TBTRACE seq=3 type=6 key=4358 buttons=0 edge=0 state=7 window=163 x=0 y=-45
+SCUI TBTRACE seq=4 type=6 key=4364 buttons=0 edge=0 state=7 window=35 x=0 y=-45
+SCUI TBTRACE seq=5 type=4 key=0 buttons=0 edge=0 state=3 window=163 x=0 y=-45
+SCUI SNAPSHOT END count=11
+SCUI SNAPSHOT BEGIN count=12
+SCUI WINDOW role=main root=1 window=1 generation=1 pid=4 pidgen=5 session=6 x=60 y=50 w=1282 h=877 cw=1280 ch=840 state=35 geometry=1 visibility=3
+SCUI WINDOW role=second root=68 window=2 generation=2 pid=4 pidgen=5 session=6 x=1380 y=100 w=502 h=637 cw=500 ch=600 state=33 geometry=1 visibility=3
+SCUI NODE role=main id=1 root=1 parent=0 kind=1 x=0 y=0 w=1280 h=840 state=3 textBytes=27 textStatus=0 textHex=53435549202f20436f6e74726f6c73202620576f726b666c6f7773
+SCUI NODE role=second id=68 root=68 parent=0 kind=1 x=0 y=0 w=500 h=600 state=3 textBytes=29 textStatus=0 textHex=53435549202f2053686172656420646f63756d656e7420262064726167
+SCUI NODE role=menu id=2 root=1 parent=1 kind=15 x=0 y=0 w=1280 h=36 state=3 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=toolbar id=3 root=1 parent=1 kind=16 x=0 y=45 w=1280 h=48 state=3 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=status id=4 root=1 parent=1 kind=17 x=0 y=804 w=1280 h=36 state=3 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=tabs id=8 root=1 parent=5 kind=12 x=312 y=102 w=968 h=693 state=3 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=table id=36 root=1 parent=10 kind=24 x=312 y=141 w=0 h=0 state=2 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=check id=19 root=1 parent=15 kind=5 x=324 y=174 w=0 h=0 state=2 textBytes=33 textStatus=0 textHex=e4b889e68081efbc9ae69caae98089202f20e5b7b2e98089202f20e6b7b7e59088
+SCUI NODE role=spin id=29 root=1 parent=27 kind=11 x=324 y=174 w=0 h=0 state=2 textBytes=2 textStatus=0 textHex=3235
+SCUI NODE role=combo id=28 root=1 parent=27 kind=10 x=324 y=174 w=0 h=0 state=2 textBytes=6 textStatus=0 textHex=4175726f7261
+SCUI NODE role=edit id=40 root=1 parent=11 kind=9 x=312 y=192 w=968 h=603 state=7 textBytes=162 textStatus=0 textHex=5343554920646f63756d656e74202f20555446380d0ae4b8ade69687e4b88e20415343494920e4bdbfe794a8e79c9fe5ae9e2050686f656e697820e5baa6e9878fe380820a436f6d62696e696e673a2065cc813b20656d6f6a693a20f09f91a9e2808df09f92bb3b20666c61673a20f09f87a8f09f87b30a5461623a096c696e653b20756e646f202f207265646f20e4bf9de79599e4bf9de5ad98e782b9e380820a
+SCUI NODE role=shared-edit id=71 root=68 parent=68 kind=9 x=0 y=117 w=500 h=433 state=3 textBytes=162 textStatus=0 textHex=5343554920646f63756d656e74202f20555446380d0ae4b8ade69687e4b88e20415343494920e4bdbfe794a8e79c9fe5ae9e2050686f656e697820e5baa6e9878fe380820a436f6d62696e696e673a2065cc813b20656d6f6a693a20f09f91a9e2808df09f92bb3b20666c61673a20f09f87a8f09f87b30a5461623a096c696e653b20756e646f202f207265646f20e4bf9de79599e4bf9de5ad98e782b9e380820a
+SCUI NODE role=drag-source id=70 root=68 parent=68 kind=3 x=0 y=67 w=500 h=41 state=3 textBytes=19 textStatus=0 textHex=e68b96e694bee69687e69cac202f2044726167
+SCUI NODE role=exit id=72 root=68 parent=68 kind=3 x=0 y=559 w=500 h=41 state=3 textBytes=4 textStatus=0 textHex=45786974
+SCUI NODE role=resource-label id=62 root=1 parent=14 kind=4 x=312 y=141 w=0 h=0 state=2 textBytes=70 textStatus=0 textHex=50686f656e6978203132202f20313620c2b720436c6173736963202f204175726f726120c2b720e591bde5908de8a792e889b220c2b720e69c89e9a284e7ae97e7bc93e5ad98
+SCUI METRICS role=main root=1 scalePercent=150 fontFace=16 fontPixels=24 fontEpoch=2 themeEpoch=1 displayEpoch=1 rowHeight=32 menuHeight=36 toolbarHeight=48 statusHeight=36
+SCUI METRICS role=second root=68 scalePercent=150 fontFace=16 fontPixels=24 fontEpoch=2 themeEpoch=1 displayEpoch=1 rowHeight=32 menuHeight=36 toolbarHeight=48 statusHeight=36
+SCUI EDIT_SELECTION role=edit id=40 root=1 anchor=5 caret=5 affinity=0 revision=3 flags=0
+SCUI EDIT_SELECTION role=shared-edit id=71 root=68 anchor=0 caret=0 affinity=0 revision=3 flags=0
+SCUI THEME style=0 generation=1 radius=10 border=1 titleHeight=24 taskbarHeight=32
+SCUI DISPLAY action=snapshot scalePercent=150 w=1920 h=1080 backend=1 generation=1 previewSeconds=0
+SCUI DOCUMENT bytes=162 lines=5 revision=3 saved=1 flags=4 undo=0 redo=309 canUndo=0 canRedo=1
+SCUI SELECTION count=100000 current=100000 anchor=1 revision=3
+SCUI CONTEXT roots=2 nodes=72 timers=1 listeners=7 visible=2 surface=5500800 cache=354690 messages=0:102 paints=0:29 submitted=0:60680604 error=0
+SCUI TBTRACE seq=1 type=3 key=0 buttons=0 edge=0 state=7 window=163 x=0 y=-45
+SCUI TBTRACE seq=2 type=5 key=4358 buttons=0 edge=0 state=7 window=163 x=0 y=-45
+SCUI TBTRACE seq=3 type=6 key=4358 buttons=0 edge=0 state=7 window=163 x=0 y=-45
+SCUI TBTRACE seq=4 type=6 key=4364 buttons=0 edge=0 state=7 window=35 x=0 y=-45
+SCUI TBTRACE seq=5 type=4 key=0 buttons=0 edge=0 state=3 window=163 x=0 y=-45
+SCUI SNAPSHOT END count=12
+SCUI SNAPSHOT BEGIN count=13
+SCUI WINDOW role=main root=1 window=1 generation=1 pid=4 pidgen=5 session=6 x=60 y=50 w=1282 h=877 cw=1280 ch=840 state=35 geometry=1 visibility=3
+SCUI WINDOW role=second root=68 window=2 generation=2 pid=4 pidgen=5 session=6 x=1380 y=100 w=502 h=637 cw=500 ch=600 state=33 geometry=1 visibility=3
+SCUI NODE role=main id=1 root=1 parent=0 kind=1 x=0 y=0 w=1280 h=840 state=3 textBytes=27 textStatus=0 textHex=53435549202f20436f6e74726f6c73202620576f726b666c6f7773
+SCUI NODE role=second id=68 root=68 parent=0 kind=1 x=0 y=0 w=500 h=600 state=3 textBytes=29 textStatus=0 textHex=53435549202f2053686172656420646f63756d656e7420262064726167
+SCUI NODE role=menu id=2 root=1 parent=1 kind=15 x=0 y=0 w=1280 h=36 state=3 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=toolbar id=3 root=1 parent=1 kind=16 x=0 y=45 w=1280 h=48 state=3 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=status id=4 root=1 parent=1 kind=17 x=0 y=804 w=1280 h=36 state=3 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=tabs id=8 root=1 parent=5 kind=12 x=312 y=102 w=968 h=693 state=3 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=table id=36 root=1 parent=10 kind=24 x=312 y=141 w=0 h=0 state=2 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=check id=19 root=1 parent=15 kind=5 x=324 y=174 w=0 h=0 state=2 textBytes=33 textStatus=0 textHex=e4b889e68081efbc9ae69caae98089202f20e5b7b2e98089202f20e6b7b7e59088
+SCUI NODE role=spin id=29 root=1 parent=27 kind=11 x=324 y=174 w=0 h=0 state=2 textBytes=2 textStatus=0 textHex=3235
+SCUI NODE role=combo id=28 root=1 parent=27 kind=10 x=324 y=174 w=0 h=0 state=2 textBytes=6 textStatus=0 textHex=4175726f7261
+SCUI NODE role=edit id=40 root=1 parent=11 kind=9 x=312 y=192 w=968 h=603 state=7 textBytes=163 textStatus=0 textHex=534355492078646f63756d656e74202f20555446380d0ae4b8ade69687e4b88e20415343494920e4bdbfe794a8e79c9fe5ae9e2050686f656e697820e5baa6e9878fe380820a436f6d62696e696e673a2065cc813b20656d6f6a693a20f09f91a9e2808df09f92bb3b20666c61673a20f09f87a8f09f87b30a5461623a096c696e653b20756e646f202f207265646f20e4bf9de79599e4bf9de5ad98e782b9e380820a
+SCUI NODE role=shared-edit id=71 root=68 parent=68 kind=9 x=0 y=117 w=500 h=433 state=3 textBytes=163 textStatus=0 textHex=534355492078646f63756d656e74202f20555446380d0ae4b8ade69687e4b88e20415343494920e4bdbfe794a8e79c9fe5ae9e2050686f656e697820e5baa6e9878fe380820a436f6d62696e696e673a2065cc813b20656d6f6a693a20f09f91a9e2808df09f92bb3b20666c61673a20f09f87a8f09f87b30a5461623a096c696e653b20756e646f202f207265646f20e4bf9de79599e4bf9de5ad98e782b9e380820a
+SCUI NODE role=drag-source id=70 root=68 parent=68 kind=3 x=0 y=67 w=500 h=41 state=3 textBytes=19 textStatus=0 textHex=e68b96e694bee69687e69cac202f2044726167
+SCUI NODE role=exit id=72 root=68 parent=68 kind=3 x=0 y=559 w=500 h=41 state=3 textBytes=4 textStatus=0 textHex=45786974
+SCUI NODE role=resource-label id=62 root=1 parent=14 kind=4 x=312 y=141 w=0 h=0 state=2 textBytes=70 textStatus=0 textHex=50686f656e6978203132202f20313620c2b720436c6173736963202f204175726f726120c2b720e591bde5908de8a792e889b220c2b720e69c89e9a284e7ae97e7bc93e5ad98
+SCUI METRICS role=main root=1 scalePercent=150 fontFace=16 fontPixels=24 fontEpoch=2 themeEpoch=1 displayEpoch=1 rowHeight=32 menuHeight=36 toolbarHeight=48 statusHeight=36
+SCUI METRICS role=second root=68 scalePercent=150 fontFace=16 fontPixels=24 fontEpoch=2 themeEpoch=1 displayEpoch=1 rowHeight=32 menuHeight=36 toolbarHeight=48 statusHeight=36
+SCUI EDIT_SELECTION role=edit id=40 root=1 anchor=6 caret=6 affinity=0 revision=4 flags=0
+SCUI EDIT_SELECTION role=shared-edit id=71 root=68 anchor=0 caret=0 affinity=0 revision=4 flags=0
+SCUI THEME style=0 generation=1 radius=10 border=1 titleHeight=24 taskbarHeight=32
+SCUI DISPLAY action=snapshot scalePercent=150 w=1920 h=1080 backend=1 generation=1 previewSeconds=0
+SCUI DOCUMENT bytes=163 lines=5 revision=4 saved=1 flags=6 undo=309 redo=0 canUndo=1 canRedo=0
+SCUI SELECTION count=100000 current=100000 anchor=1 revision=3
+SCUI CONTEXT roots=2 nodes=72 timers=1 listeners=7 visible=2 surface=5500800 cache=354690 messages=0:110 paints=0:32 submitted=0:68516220 error=0
+SCUI TBTRACE seq=1 type=3 key=0 buttons=0 edge=0 state=7 window=163 x=0 y=-45
+SCUI TBTRACE seq=2 type=5 key=4358 buttons=0 edge=0 state=7 window=163 x=0 y=-45
+SCUI TBTRACE seq=3 type=6 key=4358 buttons=0 edge=0 state=7 window=163 x=0 y=-45
+SCUI TBTRACE seq=4 type=6 key=4364 buttons=0 edge=0 state=7 window=35 x=0 y=-45
+SCUI TBTRACE seq=5 type=4 key=0 buttons=0 edge=0 state=3 window=163 x=0 y=-45
+SCUI SNAPSHOT END count=13
+SCUI SNAPSHOT BEGIN count=14
+SCUI WINDOW role=main root=1 window=1 generation=1 pid=4 pidgen=5 session=6 x=60 y=50 w=1282 h=877 cw=1280 ch=840 state=35 geometry=1 visibility=3
+SCUI WINDOW role=second root=68 window=2 generation=2 pid=4 pidgen=5 session=6 x=1380 y=100 w=502 h=637 cw=500 ch=600 state=33 geometry=1 visibility=3
+SCUI NODE role=main id=1 root=1 parent=0 kind=1 x=0 y=0 w=1280 h=840 state=3 textBytes=27 textStatus=0 textHex=53435549202f20436f6e74726f6c73202620576f726b666c6f7773
+SCUI NODE role=second id=68 root=68 parent=0 kind=1 x=0 y=0 w=500 h=600 state=3 textBytes=29 textStatus=0 textHex=53435549202f2053686172656420646f63756d656e7420262064726167
+SCUI NODE role=menu id=2 root=1 parent=1 kind=15 x=0 y=0 w=1280 h=36 state=3 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=toolbar id=3 root=1 parent=1 kind=16 x=0 y=45 w=1280 h=48 state=3 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=status id=4 root=1 parent=1 kind=17 x=0 y=804 w=1280 h=36 state=3 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=tabs id=8 root=1 parent=5 kind=12 x=312 y=102 w=968 h=693 state=3 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=table id=36 root=1 parent=10 kind=24 x=312 y=141 w=0 h=0 state=2 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=check id=19 root=1 parent=15 kind=5 x=324 y=174 w=0 h=0 state=2 textBytes=33 textStatus=0 textHex=e4b889e68081efbc9ae69caae98089202f20e5b7b2e98089202f20e6b7b7e59088
+SCUI NODE role=spin id=29 root=1 parent=27 kind=11 x=324 y=174 w=0 h=0 state=2 textBytes=2 textStatus=0 textHex=3235
+SCUI NODE role=combo id=28 root=1 parent=27 kind=10 x=324 y=174 w=0 h=0 state=2 textBytes=6 textStatus=0 textHex=4175726f7261
+SCUI NODE role=edit id=40 root=1 parent=11 kind=9 x=312 y=192 w=968 h=603 state=7 textBytes=163 textStatus=0 textHex=534355492078646f63756d656e74202f20555446380d0ae4b8ade69687e4b88e20415343494920e4bdbfe794a8e79c9fe5ae9e2050686f656e697820e5baa6e9878fe380820a436f6d62696e696e673a2065cc813b20656d6f6a693a20f09f91a9e2808df09f92bb3b20666c61673a20f09f87a8f09f87b30a5461623a096c696e653b20756e646f202f207265646f20e4bf9de79599e4bf9de5ad98e782b9e380820a
+SCUI NODE role=shared-edit id=71 root=68 parent=68 kind=9 x=0 y=117 w=500 h=433 state=3 textBytes=163 textStatus=0 textHex=534355492078646f63756d656e74202f20555446380d0ae4b8ade69687e4b88e20415343494920e4bdbfe794a8e79c9fe5ae9e2050686f656e697820e5baa6e9878fe380820a436f6d62696e696e673a2065cc813b20656d6f6a693a20f09f91a9e2808df09f92bb3b20666c61673a20f09f87a8f09f87b30a5461623a096c696e653b20756e646f202f207265646f20e4bf9de79599e4bf9de5ad98e782b9e380820a
+SCUI NODE role=drag-source id=70 root=68 parent=68 kind=3 x=0 y=67 w=500 h=41 state=3 textBytes=19 textStatus=0 textHex=e68b96e694bee69687e69cac202f2044726167
+SCUI NODE role=exit id=72 root=68 parent=68 kind=3 x=0 y=559 w=500 h=41 state=3 textBytes=4 textStatus=0 textHex=45786974
+SCUI NODE role=resource-label id=62 root=1 parent=14 kind=4 x=312 y=141 w=0 h=0 state=2 textBytes=70 textStatus=0 textHex=50686f656e6978203132202f20313620c2b720436c6173736963202f204175726f726120c2b720e591bde5908de8a792e889b220c2b720e69c89e9a284e7ae97e7bc93e5ad98
+SCUI METRICS role=main root=1 scalePercent=150 fontFace=16 fontPixels=24 fontEpoch=2 themeEpoch=1 displayEpoch=1 rowHeight=32 menuHeight=36 toolbarHeight=48 statusHeight=36
+SCUI METRICS role=second root=68 scalePercent=150 fontFace=16 fontPixels=24 fontEpoch=2 themeEpoch=1 displayEpoch=1 rowHeight=32 menuHeight=36 toolbarHeight=48 statusHeight=36
+SCUI EDIT_SELECTION role=edit id=40 root=1 anchor=0 caret=163 affinity=0 revision=4 flags=0
+SCUI EDIT_SELECTION role=shared-edit id=71 root=68 anchor=0 caret=0 affinity=0 revision=4 flags=0
+SCUI THEME style=0 generation=1 radius=10 border=1 titleHeight=24 taskbarHeight=32
+SCUI DISPLAY action=snapshot scalePercent=150 w=1920 h=1080 backend=1 generation=1 previewSeconds=0
+SCUI DOCUMENT bytes=163 lines=5 revision=4 saved=1 flags=6 undo=309 redo=0 canUndo=1 canRedo=0
+SCUI SELECTION count=100000 current=100000 anchor=1 revision=3
+SCUI CONTEXT roots=2 nodes=72 timers=1 listeners=7 visible=2 surface=5500800 cache=354690 messages=0:117 paints=0:34 submitted=0:73370172 error=0
+SCUI TBTRACE seq=1 type=3 key=0 buttons=0 edge=0 state=7 window=163 x=0 y=-45
+SCUI TBTRACE seq=2 type=5 key=4358 buttons=0 edge=0 state=7 window=163 x=0 y=-45
+SCUI TBTRACE seq=3 type=6 key=4358 buttons=0 edge=0 state=7 window=163 x=0 y=-45
+SCUI TBTRACE seq=4 type=6 key=4364 buttons=0 edge=0 state=7 window=35 x=0 y=-45
+SCUI TBTRACE seq=5 type=4 key=0 buttons=0 edge=0 state=3 window=163 x=0 y=-45
+SCUI SNAPSHOT END count=14
+SCUI SNAPSHOT BEGIN count=15
+SCUI WINDOW role=main root=1 window=1 generation=1 pid=4 pidgen=5 session=6 x=60 y=50 w=1282 h=877 cw=1280 ch=840 state=35 geometry=1 visibility=3
+SCUI WINDOW role=second root=68 window=2 generation=2 pid=4 pidgen=5 session=6 x=1380 y=100 w=502 h=637 cw=500 ch=600 state=33 geometry=1 visibility=3
+SCUI NODE role=main id=1 root=1 parent=0 kind=1 x=0 y=0 w=1280 h=840 state=3 textBytes=27 textStatus=0 textHex=53435549202f20436f6e74726f6c73202620576f726b666c6f7773
+SCUI NODE role=second id=68 root=68 parent=0 kind=1 x=0 y=0 w=500 h=600 state=3 textBytes=29 textStatus=0 textHex=53435549202f2053686172656420646f63756d656e7420262064726167
+SCUI NODE role=menu id=2 root=1 parent=1 kind=15 x=0 y=0 w=1280 h=36 state=3 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=toolbar id=3 root=1 parent=1 kind=16 x=0 y=45 w=1280 h=48 state=3 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=status id=4 root=1 parent=1 kind=17 x=0 y=804 w=1280 h=36 state=3 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=tabs id=8 root=1 parent=5 kind=12 x=312 y=102 w=968 h=693 state=3 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=table id=36 root=1 parent=10 kind=24 x=312 y=141 w=0 h=0 state=2 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=check id=19 root=1 parent=15 kind=5 x=324 y=174 w=0 h=0 state=2 textBytes=33 textStatus=0 textHex=e4b889e68081efbc9ae69caae98089202f20e5b7b2e98089202f20e6b7b7e59088
+SCUI NODE role=spin id=29 root=1 parent=27 kind=11 x=324 y=174 w=0 h=0 state=2 textBytes=2 textStatus=0 textHex=3235
+SCUI NODE role=combo id=28 root=1 parent=27 kind=10 x=324 y=174 w=0 h=0 state=2 textBytes=6 textStatus=0 textHex=4175726f7261
+SCUI NODE role=edit id=40 root=1 parent=11 kind=9 x=312 y=192 w=968 h=603 state=7 textBytes=163 textStatus=0 textHex=534355492078646f63756d656e74202f20555446380d0ae4b8ade69687e4b88e20415343494920e4bdbfe794a8e79c9fe5ae9e2050686f656e697820e5baa6e9878fe380820a436f6d62696e696e673a2065cc813b20656d6f6a693a20f09f91a9e2808df09f92bb3b20666c61673a20f09f87a8f09f87b30a5461623a096c696e653b20756e646f202f207265646f20e4bf9de79599e4bf9de5ad98e782b9e380820a
+SCUI NODE role=shared-edit id=71 root=68 parent=68 kind=9 x=0 y=117 w=500 h=433 state=3 textBytes=163 textStatus=0 textHex=534355492078646f63756d656e74202f20555446380d0ae4b8ade69687e4b88e20415343494920e4bdbfe794a8e79c9fe5ae9e2050686f656e697820e5baa6e9878fe380820a436f6d62696e696e673a2065cc813b20656d6f6a693a20f09f91a9e2808df09f92bb3b20666c61673a20f09f87a8f09f87b30a5461623a096c696e653b20756e646f202f207265646f20e4bf9de79599e4bf9de5ad98e782b9e380820a
+SCUI NODE role=drag-source id=70 root=68 parent=68 kind=3 x=0 y=67 w=500 h=41 state=3 textBytes=19 textStatus=0 textHex=e68b96e694bee69687e69cac202f2044726167
+SCUI NODE role=exit id=72 root=68 parent=68 kind=3 x=0 y=559 w=500 h=41 state=3 textBytes=4 textStatus=0 textHex=45786974
+SCUI NODE role=resource-label id=62 root=1 parent=14 kind=4 x=312 y=141 w=0 h=0 state=2 textBytes=70 textStatus=0 textHex=50686f656e6978203132202f20313620c2b720436c6173736963202f204175726f726120c2b720e591bde5908de8a792e889b220c2b720e69c89e9a284e7ae97e7bc93e5ad98
+SCUI METRICS role=main root=1 scalePercent=150 fontFace=16 fontPixels=24 fontEpoch=2 themeEpoch=1 displayEpoch=1 rowHeight=32 menuHeight=36 toolbarHeight=48 statusHeight=36
+SCUI METRICS role=second root=68 scalePercent=150 fontFace=16 fontPixels=24 fontEpoch=2 themeEpoch=1 displayEpoch=1 rowHeight=32 menuHeight=36 toolbarHeight=48 statusHeight=36
+SCUI EDIT_SELECTION role=edit id=40 root=1 anchor=163 caret=163 affinity=0 revision=5 flags=0
+SCUI EDIT_SELECTION role=shared-edit id=71 root=68 anchor=163 caret=163 affinity=0 revision=5 flags=0
+SCUI THEME style=0 generation=1 radius=10 border=1 titleHeight=24 taskbarHeight=32
+SCUI DISPLAY action=snapshot scalePercent=150 w=1920 h=1080 backend=1 generation=1 previewSeconds=0
+SCUI DOCUMENT bytes=163 lines=5 revision=5 saved=1 flags=6 undo=1185 redo=0 canUndo=1 canRedo=0
+SCUI SELECTION count=100000 current=100000 anchor=1 revision=3
+SCUI CONTEXT roots=2 nodes=72 timers=1 listeners=7 visible=2 surface=5500800 cache=354690 messages=0:129 paints=0:38 submitted=0:83540604 error=0
+SCUI TBTRACE seq=1 type=3 key=0 buttons=0 edge=0 state=7 window=163 x=0 y=-45
+SCUI TBTRACE seq=2 type=5 key=4358 buttons=0 edge=0 state=7 window=163 x=0 y=-45
+SCUI TBTRACE seq=3 type=6 key=4358 buttons=0 edge=0 state=7 window=163 x=0 y=-45
+SCUI TBTRACE seq=4 type=6 key=4364 buttons=0 edge=0 state=7 window=35 x=0 y=-45
+SCUI TBTRACE seq=5 type=4 key=0 buttons=0 edge=0 state=3 window=163 x=0 y=-45
+SCUI SNAPSHOT END count=15
+SCUI DROP bytes=42 sender=4/5
+SCUI DRAG COMPLETE action=1 sender=4/5
+SCUI SNAPSHOT BEGIN count=16
+SCUI WINDOW role=main root=1 window=1 generation=1 pid=4 pidgen=5 session=6 x=60 y=50 w=1282 h=877 cw=1280 ch=840 state=33 geometry=1 visibility=3
+SCUI WINDOW role=second root=68 window=2 generation=2 pid=4 pidgen=5 session=6 x=1380 y=100 w=502 h=637 cw=500 ch=600 state=35 geometry=1 visibility=3
+SCUI NODE role=main id=1 root=1 parent=0 kind=1 x=0 y=0 w=1280 h=840 state=3 textBytes=27 textStatus=0 textHex=53435549202f20436f6e74726f6c73202620576f726b666c6f7773
+SCUI NODE role=second id=68 root=68 parent=0 kind=1 x=0 y=0 w=500 h=600 state=3 textBytes=29 textStatus=0 textHex=53435549202f2053686172656420646f63756d656e7420262064726167
+SCUI NODE role=menu id=2 root=1 parent=1 kind=15 x=0 y=0 w=1280 h=36 state=3 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=toolbar id=3 root=1 parent=1 kind=16 x=0 y=45 w=1280 h=48 state=3 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=status id=4 root=1 parent=1 kind=17 x=0 y=804 w=1280 h=36 state=3 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=tabs id=8 root=1 parent=5 kind=12 x=312 y=102 w=968 h=693 state=3 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=table id=36 root=1 parent=10 kind=24 x=312 y=141 w=0 h=0 state=2 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=check id=19 root=1 parent=15 kind=5 x=324 y=174 w=0 h=0 state=2 textBytes=33 textStatus=0 textHex=e4b889e68081efbc9ae69caae98089202f20e5b7b2e98089202f20e6b7b7e59088
+SCUI NODE role=spin id=29 root=1 parent=27 kind=11 x=324 y=174 w=0 h=0 state=2 textBytes=2 textStatus=0 textHex=3235
+SCUI NODE role=combo id=28 root=1 parent=27 kind=10 x=324 y=174 w=0 h=0 state=2 textBytes=6 textStatus=0 textHex=4175726f7261
+SCUI NODE role=edit id=40 root=1 parent=11 kind=9 x=312 y=192 w=968 h=603 state=3 textBytes=204 textStatus=0 textHex=534355492078646f63756d656e74202f20555446380d0ae4b8ade69687e4b88e20415343494920e4bdbfe794a8e79c9fe5ae9e2050686f656e697820e5baa6e9878fe380820a436f6d62696e696e673a2065cc813b20656d6f6a693a20f09f91a9e2808df09f92bb3b20666c61673a20f09f87a8f09f87b30a5461623a096c696e653b20756e646f202f207265646f20e4bf9de79599e4bf9de5ad98e782b9e380820a44726167676564207468726f75676820746865207265616c2062726f6b6572202f20e68b96e694be0a
+SCUI NODE role=shared-edit id=71 root=68 parent=68 kind=9 x=0 y=117 w=500 h=433 state=3 textBytes=204 textStatus=0 textHex=534355492078646f63756d656e74202f20555446380d0ae4b8ade69687e4b88e20415343494920e4bdbfe794a8e79c9fe5ae9e2050686f656e697820e5baa6e9878fe380820a436f6d62696e696e673a2065cc813b20656d6f6a693a20f09f91a9e2808df09f92bb3b20666c61673a20f09f87a8f09f87b30a5461623a096c696e653b20756e646f202f207265646f20e4bf9de79599e4bf9de5ad98e782b9e380820a44726167676564207468726f75676820746865207265616c2062726f6b6572202f20e68b96e694be0a
+SCUI NODE role=drag-source id=70 root=68 parent=68 kind=3 x=0 y=67 w=500 h=41 state=15 textBytes=19 textStatus=0 textHex=e68b96e694bee69687e69cac202f2044726167
+SCUI NODE role=exit id=72 root=68 parent=68 kind=3 x=0 y=559 w=500 h=41 state=3 textBytes=4 textStatus=0 textHex=45786974
+SCUI NODE role=resource-label id=62 root=1 parent=14 kind=4 x=312 y=141 w=0 h=0 state=2 textBytes=70 textStatus=0 textHex=50686f656e6978203132202f20313620c2b720436c6173736963202f204175726f726120c2b720e591bde5908de8a792e889b220c2b720e69c89e9a284e7ae97e7bc93e5ad98
+SCUI METRICS role=main root=1 scalePercent=150 fontFace=16 fontPixels=24 fontEpoch=2 themeEpoch=1 displayEpoch=1 rowHeight=32 menuHeight=36 toolbarHeight=48 statusHeight=36
+SCUI METRICS role=second root=68 scalePercent=150 fontFace=16 fontPixels=24 fontEpoch=2 themeEpoch=1 displayEpoch=1 rowHeight=32 menuHeight=36 toolbarHeight=48 statusHeight=36
+SCUI EDIT_SELECTION role=edit id=40 root=1 anchor=204 caret=204 affinity=0 revision=6 flags=0
+SCUI EDIT_SELECTION role=shared-edit id=71 root=68 anchor=204 caret=204 affinity=0 revision=6 flags=0
+SCUI THEME style=0 generation=1 radius=10 border=1 titleHeight=24 taskbarHeight=32
+SCUI DISPLAY action=snapshot scalePercent=150 w=1920 h=1080 backend=1 generation=1 previewSeconds=0
+SCUI DOCUMENT bytes=204 lines=6 revision=6 saved=1 flags=6 undo=1446 redo=0 canUndo=1 canRedo=0
+SCUI SELECTION count=100000 current=100000 anchor=1 revision=3
+SCUI CONTEXT roots=2 nodes=72 timers=0 listeners=7 visible=2 surface=5500800 cache=361446 messages=0:173 paints=0:48 submitted=0:101585660 error=0
+SCUI TBTRACE seq=1 type=3 key=0 buttons=0 edge=0 state=7 window=163 x=0 y=-45
+SCUI TBTRACE seq=2 type=5 key=4358 buttons=0 edge=0 state=7 window=163 x=0 y=-45
+SCUI TBTRACE seq=3 type=6 key=4358 buttons=0 edge=0 state=7 window=163 x=0 y=-45
+SCUI TBTRACE seq=4 type=6 key=4364 buttons=0 edge=0 state=7 window=35 x=0 y=-45
+SCUI TBTRACE seq=5 type=4 key=0 buttons=0 edge=0 state=3 window=163 x=0 y=-45
+SCUI SNAPSHOT END count=16
+SCUI SNAPSHOT BEGIN count=17
+SCUI WINDOW role=main root=1 window=1 generation=1 pid=4 pidgen=5 session=6 x=60 y=50 w=1282 h=877 cw=1280 ch=840 state=33 geometry=1 visibility=3
+SCUI WINDOW role=second root=68 window=2 generation=2 pid=4 pidgen=5 session=6 x=1380 y=100 w=502 h=637 cw=500 ch=600 state=35 geometry=1 visibility=3
+SCUI NODE role=main id=1 root=1 parent=0 kind=1 x=0 y=0 w=1280 h=840 state=3 textBytes=27 textStatus=0 textHex=53435549202f20436f6e74726f6c73202620576f726b666c6f7773
+SCUI NODE role=second id=68 root=68 parent=0 kind=1 x=0 y=0 w=500 h=600 state=3 textBytes=29 textStatus=0 textHex=53435549202f2053686172656420646f63756d656e7420262064726167
+SCUI NODE role=menu id=2 root=1 parent=1 kind=15 x=0 y=0 w=1280 h=36 state=3 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=toolbar id=3 root=1 parent=1 kind=16 x=0 y=45 w=1280 h=48 state=3 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=status id=4 root=1 parent=1 kind=17 x=0 y=804 w=1280 h=36 state=3 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=tabs id=8 root=1 parent=5 kind=12 x=312 y=102 w=968 h=693 state=3 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=table id=36 root=1 parent=10 kind=24 x=312 y=141 w=0 h=0 state=2 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=check id=19 root=1 parent=15 kind=5 x=324 y=174 w=0 h=0 state=2 textBytes=33 textStatus=0 textHex=e4b889e68081efbc9ae69caae98089202f20e5b7b2e98089202f20e6b7b7e59088
+SCUI NODE role=spin id=29 root=1 parent=27 kind=11 x=324 y=174 w=0 h=0 state=2 textBytes=2 textStatus=0 textHex=3235
+SCUI NODE role=combo id=28 root=1 parent=27 kind=10 x=324 y=174 w=0 h=0 state=2 textBytes=6 textStatus=0 textHex=4175726f7261
+SCUI NODE role=edit id=40 root=1 parent=11 kind=9 x=312 y=192 w=968 h=603 state=3 textBytes=204 textStatus=0 textHex=534355492078646f63756d656e74202f20555446380d0ae4b8ade69687e4b88e20415343494920e4bdbfe794a8e79c9fe5ae9e2050686f656e697820e5baa6e9878fe380820a436f6d62696e696e673a2065cc813b20656d6f6a693a20f09f91a9e2808df09f92bb3b20666c61673a20f09f87a8f09f87b30a5461623a096c696e653b20756e646f202f207265646f20e4bf9de79599e4bf9de5ad98e782b9e380820a44726167676564207468726f75676820746865207265616c2062726f6b6572202f20e68b96e694be0a
+SCUI NODE role=shared-edit id=71 root=68 parent=68 kind=9 x=0 y=117 w=500 h=433 state=3 textBytes=204 textStatus=0 textHex=534355492078646f63756d656e74202f20555446380d0ae4b8ade69687e4b88e20415343494920e4bdbfe794a8e79c9fe5ae9e2050686f656e697820e5baa6e9878fe380820a436f6d62696e696e673a2065cc813b20656d6f6a693a20f09f91a9e2808df09f92bb3b20666c61673a20f09f87a8f09f87b30a5461623a096c696e653b20756e646f202f207265646f20e4bf9de79599e4bf9de5ad98e782b9e380820a44726167676564207468726f75676820746865207265616c2062726f6b6572202f20e68b96e694be0a
+SCUI NODE role=drag-source id=70 root=68 parent=68 kind=3 x=0 y=67 w=500 h=41 state=7 textBytes=19 textStatus=0 textHex=e68b96e694bee69687e69cac202f2044726167
+SCUI NODE role=exit id=72 root=68 parent=68 kind=3 x=0 y=559 w=500 h=41 state=3 textBytes=4 textStatus=0 textHex=45786974
+SCUI NODE role=resource-label id=62 root=1 parent=14 kind=4 x=312 y=141 w=0 h=0 state=2 textBytes=70 textStatus=0 textHex=50686f656e6978203132202f20313620c2b720436c6173736963202f204175726f726120c2b720e591bde5908de8a792e889b220c2b720e69c89e9a284e7ae97e7bc93e5ad98
+SCUI METRICS role=main root=1 scalePercent=150 fontFace=16 fontPixels=24 fontEpoch=2 themeEpoch=1 displayEpoch=1 rowHeight=32 menuHeight=36 toolbarHeight=48 statusHeight=36
+SCUI METRICS role=second root=68 scalePercent=150 fontFace=16 fontPixels=24 fontEpoch=2 themeEpoch=1 displayEpoch=1 rowHeight=32 menuHeight=36 toolbarHeight=48 statusHeight=36
+SCUI EDIT_SELECTION role=edit id=40 root=1 anchor=204 caret=204 affinity=0 revision=6 flags=0
+SCUI EDIT_SELECTION role=shared-edit id=71 root=68 anchor=204 caret=204 affinity=0 revision=6 flags=0
+SCUI THEME style=0 generation=1 radius=10 border=1 titleHeight=24 taskbarHeight=32
+SCUI DISPLAY action=snapshot scalePercent=150 w=1920 h=1080 backend=1 generation=1 previewSeconds=0
+SCUI DOCUMENT bytes=204 lines=6 revision=6 saved=1 flags=6 undo=1446 redo=0 canUndo=1 canRedo=0
+SCUI SELECTION count=100000 current=100000 anchor=1 revision=3
+SCUI CONTEXT roots=2 nodes=72 timers=0 listeners=7 visible=2 surface=5500800 cache=361446 messages=0:177 paints=0:49 submitted=0:101667660 error=0
+SCUI TBTRACE seq=1 type=3 key=0 buttons=0 edge=0 state=7 window=163 x=0 y=-45
+SCUI TBTRACE seq=2 type=5 key=4358 buttons=0 edge=0 state=7 window=163 x=0 y=-45
+SCUI TBTRACE seq=3 type=6 key=4358 buttons=0 edge=0 state=7 window=163 x=0 y=-45
+SCUI TBTRACE seq=4 type=6 key=4364 buttons=0 edge=0 state=7 window=35 x=0 y=-45
+SCUI TBTRACE seq=5 type=4 key=0 buttons=0 edge=0 state=3 window=163 x=0 y=-45
+SCUI SNAPSHOT END count=17
+SCUI SNAPSHOT BEGIN count=18
+SCUI WINDOW role=main root=1 window=1 generation=1 pid=4 pidgen=5 session=6 x=60 y=50 w=1282 h=877 cw=1280 ch=840 state=33 geometry=1 visibility=3
+SCUI WINDOW role=second root=68 window=2 generation=2 pid=4 pidgen=5 session=6 x=1380 y=100 w=502 h=637 cw=500 ch=600 state=35 geometry=1 visibility=3
+SCUI NODE role=main id=1 root=1 parent=0 kind=1 x=0 y=0 w=1280 h=840 state=3 textBytes=27 textStatus=0 textHex=53435549202f20436f6e74726f6c73202620576f726b666c6f7773
+SCUI NODE role=second id=68 root=68 parent=0 kind=1 x=0 y=0 w=500 h=600 state=3 textBytes=29 textStatus=0 textHex=53435549202f2053686172656420646f63756d656e7420262064726167
+SCUI NODE role=menu id=2 root=1 parent=1 kind=15 x=0 y=0 w=1280 h=36 state=3 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=toolbar id=3 root=1 parent=1 kind=16 x=0 y=45 w=1280 h=48 state=3 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=status id=4 root=1 parent=1 kind=17 x=0 y=804 w=1280 h=36 state=3 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=tabs id=8 root=1 parent=5 kind=12 x=312 y=102 w=968 h=693 state=3 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=table id=36 root=1 parent=10 kind=24 x=312 y=141 w=0 h=0 state=2 textBytes=0 textStatus=0 textHex=-
+SCUI NODE role=check id=19 root=1 parent=15 kind=5 x=324 y=174 w=0 h=0 state=2 textBytes=33 textStatus=0 textHex=e4b889e68081efbc9ae69caae98089202f20e5b7b2e98089202f20e6b7b7e59088
+SCUI NODE role=spin id=29 root=1 parent=27 kind=11 x=324 y=174 w=0 h=0 state=2 textBytes=2 textStatus=0 textHex=3235
+SCUI NODE role=combo id=28 root=1 parent=27 kind=10 x=324 y=174 w=0 h=0 state=2 textBytes=6 textStatus=0 textHex=4175726f7261
+SCUI NODE role=edit id=40 root=1 parent=11 kind=9 x=312 y=192 w=968 h=603 state=3 textBytes=204 textStatus=0 textHex=534355492078646f63756d656e74202f20555446380d0ae4b8ade69687e4b88e20415343494920e4bdbfe794a8e79c9fe5ae9e2050686f656e697820e5baa6e9878fe380820a436f6d62696e696e673a2065cc813b20656d6f6a693a20f09f91a9e2808df09f92bb3b20666c61673a20f09f87a8f09f87b30a5461623a096c696e653b20756e646f202f207265646f20e4bf9de79599e4bf9de5ad98e782b9e380820a44726167676564207468726f75676820746865207265616c2062726f6b6572202f20e68b96e694be0a
+SCUI NODE role=shared-edit id=71 root=68 parent=68 kind=9 x=0 y=117 w=500 h=433 state=3 textBytes=204 textStatus=0 textHex=534355492078646f63756d656e74202f20555446380d0ae4b8ade69687e4b88e20415343494920e4bdbfe794a8e79c9fe5ae9e2050686f656e697820e5baa6e9878fe380820a436f6d62696e696e673a2065cc813b20656d6f6a693a20f09f91a9e2808df09f92bb3b20666c61673a20f09f87a8f09f87b30a5461623a096c696e653b20756e646f202f207265646f20e4bf9de79599e4bf9de5ad98e782b9e380820a44726167676564207468726f75676820746865207265616c2062726f6b6572202f20e68b96e694be0a
+SCUI NODE role=drag-source id=70 root=68 parent=68 kind=3 x=0 y=67 w=500 h=41 state=7 textBytes=19 textStatus=0 textHex=e68b96e694bee69687e69cac202f2044726167
+SCUI NODE role=exit id=72 root=68 parent=68 kind=3 x=0 y=559 w=500 h=41 state=3 textBytes=4 textStatus=0 textHex=45786974
+SCUI NODE role=resource-label id=62 root=1 parent=14 kind=4 x=312 y=141 w=0 h=0 state=2 textBytes=70 textStatus=0 textHex=50686f656e6978203132202f20313620c2b720436c6173736963202f204175726f726120c2b720e591bde5908de8a792e889b220c2b720e69c89e9a284e7ae97e7bc93e5ad98
+SCUI METRICS role=main root=1 scalePercent=150 fontFace=16 fontPixels=24 fontEpoch=2 themeEpoch=1 displayEpoch=1 rowHeight=32 menuHeight=36 toolbarHeight=48 statusHeight=36
+SCUI METRICS role=second root=68 scalePercent=150 fontFace=16 fontPixels=24 fontEpoch=2 themeEpoch=1 displayEpoch=1 rowHeight=32 menuHeight=36 toolbarHeight=48 statusHeight=36
+SCUI EDIT_SELECTION role=edit id=40 root=1 anchor=204 caret=204 affinity=0 revision=6 flags=0
+SCUI EDIT_SELECTION role=shared-edit id=71 root=68 anchor=204 caret=204 affinity=0 revision=6 flags=0
+SCUI THEME style=0 generation=1 radius=10 border=1 titleHeight=24 taskbarHeight=32
+SCUI DISPLAY action=snapshot scalePercent=150 w=1920 h=1080 backend=1 generation=1 previewSeconds=0
+SCUI DOCUMENT bytes=204 lines=6 revision=6 saved=1 flags=6 undo=1446 redo=0 canUndo=1 canRedo=0
+SCUI SELECTION count=100000 current=100000 anchor=1 revision=3
+SCUI CONTEXT roots=2 nodes=72 timers=0 listeners=7 visible=2 surface=5500800 cache=361446 messages=0:179 paints=0:49 submitted=0:101667660 error=0
+SCUI TBTRACE seq=1 type=3 key=0 buttons=0 edge=0 state=7 window=163 x=0 y=-45
+SCUI TBTRACE seq=2 type=5 key=4358 buttons=0 edge=0 state=7 window=163 x=0 y=-45
+SCUI TBTRACE seq=3 type=6 key=4358 buttons=0 edge=0 state=7 window=163 x=0 y=-45
+SCUI TBTRACE seq=4 type=6 key=4364 buttons=0 edge=0 state=7 window=35 x=0 y=-45
+SCUI TBTRACE seq=5 type=4 key=0 buttons=0 edge=0 state=3 window=163 x=0 y=-45
+SCUI SNAPSHOT END count=18

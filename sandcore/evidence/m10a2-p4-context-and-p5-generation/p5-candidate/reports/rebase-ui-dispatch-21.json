@@ -1,0 +1,9 @@
+{
+  "status": "STAGED_CAPTURE_FIX_REBASED_NOT_BUILT",
+  "path": "user/scui/ui_dispatch.c",
+  "before_sha256": "08473839b60e8a9921aa804fa17bf35809c1f8e1e805ed4e287e6d4d98dfa0f2",
+  "after_sha256": "9210e5dac6503013cdba2b1cd7bdb251e93fc71dfda91a22c866997e0d46c345",
+  "active_sha256": "598cdfefa757f3418c75f46520f3288224415bc28296130e0e31a30fe6d7fdec",
+  "outside_capture_block_preserved": true,
+  "active_sources_modified": false
+}

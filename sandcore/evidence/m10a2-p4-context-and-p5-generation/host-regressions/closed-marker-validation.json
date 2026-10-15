@@ -1,0 +1,34 @@
+{
+  "scope": "HOST_PROTOCOL_GRAMMAR_NOT_GUEST",
+  "source_sha256": "d02826876a2665f3bd96b2273553f99809358f37ce5d61074eff46fac42d5d7c",
+  "cases": [
+    {
+      "name": "ordinary",
+      "passed": true
+    },
+    {
+      "name": "prompt-prefix",
+      "passed": true
+    },
+    {
+      "name": "prompt-suffix",
+      "passed": true
+    },
+    {
+      "name": "echo-variable",
+      "passed": true
+    },
+    {
+      "name": "truncated-end",
+      "passed": true
+    },
+    {
+      "name": "wrong-nonce",
+      "passed": true
+    },
+    {
+      "name": "non-numeric-status",
+      "passed": true
+    }
+  ]
+}

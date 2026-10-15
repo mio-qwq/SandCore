@@ -92,6 +92,14 @@ static ScStatus ui_emit(ScUiContext *c,UiNode *target,ScUiEvent *event)
     info.size=sizeof(info);
     info.version=1;
     ScArrayQuery(path,&info);
+    /* node0的TARGET仍只接无目标上下文事件；CAPTURE/BUBBLE则包围
+     * 完整控件路径。先持有整条路径，允许观察者销窗而不悬空target；
+     * 新建popup也立即受同一上下文订阅约束，不依赖外层消息批返回。 */
+    s=ui_deliver(c,0,&e,SC_UI_CAPTURE_PHASE,watermark);
+    if(s)goto release;
+    if(c->object.closing || (target->private_flags&UI_NODE_RETIRED)){s=SC_UI_E_CANCELLED;
+        goto release;
+        }
     for(i=info.length;i>1;i--){ScArrayGet(path,i-1,&n);
         e.x=ui_relative_coordinate(x,n->rectangle.x);
         e.y=ui_relative_coordinate(y,n->rectangle.y);
@@ -107,6 +115,9 @@ static ScStatus ui_emit(ScUiContext *c,UiNode *target,ScUiEvent *event)
         e.y=ui_relative_coordinate(y,n->rectangle.y);
         s=ui_deliver(c,n,&e,SC_UI_BUBBLE_PHASE,watermark);
         if(s)break;
+        }
+    if(!s){e.x=x;e.y=y;
+        s=ui_deliver(c,0,&e,SC_UI_BUBBLE_PHASE,watermark);
         }
 release:
     memset(&info,0,sizeof(info));
@@ -516,7 +527,19 @@ static ScStatus ui_native_proc(ScWindow window,const ScMessage *m,void *context)
             }
         goto done;
         }
-    if(m->id==SC32_MSG_CAPTURELOST || m->id==SC32_MSG_QUEUELOSS){w->cursor=UINT_MAX;
+    if(m->id==SC32_MSG_CAPTURELOST || m->id==SC32_MSG_QUEUELOSS){
+        if(m->id==SC32_MSG_CAPTURELOST){ScInputSnapshot current;
+            memset(&current,0,sizeof(current));
+            current.size=sizeof(current);
+            current.version=1;
+            /* 释放旧捕获会排入通知；同一UP可立即为新菜单重新捕获。
+             * 仅在内核确认本窗当前仍持有另一代捕获时忽略旧通知，
+             * 防止它销毁新popup。真实失去捕获及QUEUELOSS仍完整清理。
+             * 不重发键鼠、不根据计时猜测，也不修改内核既有事件ABI。 */
+            if(ScInputQuery(window,&current)==0 && current.captured
+                && current.input_epoch!=m->epoch)goto done;
+        }
+        w->cursor=UINT_MAX;
         ui_input_cancel(root,SC_UI_EVENT_CAPTURE_LOST);
         ui_menu_close_owner(c,root->id);
         ui_event_record(&e,root,SC_UI_EVENT_CAPTURE_LOST);

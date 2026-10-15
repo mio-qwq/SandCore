@@ -1,0 +1,12 @@
+printf '%s\n' '' 'id; /HOME/M10UI/NATIVE_APPS/PLATFORMPROBE.SCX all /HOME/M10UI/NATIVE_APPS/PLATFORMPROBE.SCX; _ui=$?; echo __UI_LOGIN_74063b5e13618624:$_ui; exit 0' | su mio; _m9_status=$?; printf "\n"; echo __M9_e417a3ecff6bbbc643cc7fd2:$_m9_status
+Password: 
+uid=1000 gid=1000 realm=0
+PLATFORM_ID pid=6 gen=2 uid_bits=1000 realm=0 sid=4 flags=0
+PLATFORM_ID pid=2 gen=10 uid_bits=1000 realm=0 sid=4 flags=0
+PLATFORM_CHILD_PASS
+PLATFORM_SHARED_PTE before=99 mapped=135 after=99 tables_before=4 tables_after=4 filled=4
+PLATFORM_CLIPBOARD_PASS
+PLATFORM_IPC_SHARED_PASS
+PLATFORM_FONT_PALETTE_PASS
+PLATFORM_FOUNDATION_PASS checks=87
+__UI_LOGIN_74063b5e13618624:0

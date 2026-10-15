@@ -1,0 +1,72 @@
+# SandFS v5 租约与条件命名事务（隔离实现合同）
+
+状态：SOURCE DRAFT，尚未接入、构建或运行。所有本批文件只在本目录；Phase4输入、SCAPI原字节、v5记录/超级块格式不变。正式接线由Root在当前验证结束后应用针对性patch，不复制旧树或磁盘。
+
+## ABI与身份
+
+隔离目录保持拟正式相对树：user/SC32LEASE.H、user/leaseapi/SC32LEASEWIRE.H及kernel/片段；SC32API.H/io.h等现依赖只在正式整合时解析，不复制旧SDK别名。全部cdecl且只用现有ScU32/ScI32/ScStatus/ScFile/ScDirectory，不新增虚假的窄类型。SYS0x300仍以EBX=selector、ECX=RO request、EDX=RW out；0x700..0x70a依次Acquire/OpenPinned/CreatePinned/Query/Snapshot/Publish/Rename/Remove/Release/Cancel/Advance，新增0x70b为SetMode，0x70c..0x71f保留。这里的selector不是SC32PRIVATE OP_FILE_BASE=0x700（错误操作域），更不是旧syscall700。
+
+固定v1宽度：Acquire/Open64B；Publish/Rename96B；Remove/SetMode48B；Control32B；Snapshot request40B、page32B、entry128B；Info160B。输入size精确相等/version1、reserved/未用字段0；输出声明size必须至少规范宽且最多65536，整个声明范围RW先验，成功写规范size且未知尾部保持。所有指针数据也先完整RO或RW检验，RO输入合法；rows整capacity区域及输出整声明区域不能重叠。前置拒绝不改out。进入已拥有的实际operation后，失败/PENDING写有效Info，raw始终填写；用户层以raw=INT_MIN临时哨兵区分。零row容量允许NULL且不推进。
+
+Lease ID单调31位、不回绕/复用；generation取创建序号，所有对既有lease的请求必须同时匹配。owner PID和PID-generation只从可信caller取得、只输出，用户不能指定代办者；每一批和最后超级块写前重新核原owner/代数/退出态及真实UID/GID/权限。不能借PID0或普通GUI身份获得SYSTEM权。FS object_id是活open-pin观察，revision沿现v5修改序号；目录object_id=0，只用真实revision、固定snapshot_epoch与本人lease。没有持久birth-ID/inode/mtime发明。
+
+## 绑定与冲突
+
+READ_STABLE绑定一个本人真实普通FILE句柄，阻止正文写/截断/替换/改名/删除；其它读者可读，权限变化仍允许并会使旧revision条件失效。WRITE_EXCLUSIVE只允许绑定writer句柄的现代IO；同PID其它句柄、dup别名或旧path操作没有绕锁资格。Acquire WRITE要求该description没有别名、无其它native pin/事务/pending。Lease自身额外持真实FS pin；关闭绑定handle先取消/解绑lease，最后才降原FILE pin。
+
+NAMESPACE绑定本人目录handle并固定取得时当前META可见的子树成员。默认是独占命名/正文保护；flags READ_ONLY_NAMESPACE仅用于稳定读取，不能用于条件修改。取得时祖先租约只由显式namespace_lease/gen授权，不能因同PID猜继承；try-acquire冲突直接BUSY，不持锁睡眠。与另一租约重叠必须有显式父租约链。锁覆盖规范rootless名字及祖先关系，旧mkdir/create/write/streambegin/write/commit/remove/rename和现代open/write/truncate/flush全部走同一冲突hook；chmod/chown不被稳定租约屏蔽，提交期间真实volume短锁沿旧合同BUSY。
+
+命名查询用动态路径索引，现代IO用FS对象的lease链，避免每字节全卷/全任务扫描。Namespace取得只扫描实际卷记录一次复制固定成员，不做PIO；之后无关目录压缩/epoch变化不拼入新成员。捕获要求锁根R，条目仅需当前META可见，目录本身无R仍可列出；祖先无R的深层名字不进入快照，一个不可读文件不导致整个计划失败。Snapshot为取得时事实，完整绝对path（不是leaf），每页至多64行；整页发布前先复验锁根R和各条当前META，撤权时整页ACCESS且不部分发布。普通正文读取仍单独要求fileR，深入目录仍要求该目录R。worker在namespace内用OpenPinned/CreatePinned取得具体授权描述符，普通旧调用不携带这个授权。嵌套lease从父owner链挂child链；父Release/Close先有界撤child再释放自身。
+
+OpenPinned.flags可取METADATA_ONLY=2，只对existing FILE+READ_STABLE或DIR+NAMESPACE且open_flags0、create_mode0有效；Acquire/Create不接受此位，exact revision仍必需。它核真实META/祖先R并取得身份强pin与排他名字保护，不要求对象自身R/W；Info.flags256明确标识。描述符只能Query/Close，IO/seek/flush/DirNext/Snapshot均ACCESS；租约Release后描述符仍保留元数据限制，不能用旧句柄恢复IO或重Acquire读取。元数据目录不捕获快照，epoch0、SNAPSHOT清、members0表示未枚举而非空目录；也不能作子项namespace grant。条件Rename/Remove/EXACT覆盖只核真实直接parentR/W、META、对象revision、保护后代/外来pin，每个batch继续复验，不因自身无R/W收窄旧合法命名操作。READ_ONLY父grant仍绝对禁止修改，metadata模式不能绕过。
+
+ScFileLeaseSetMode使用独立48B ScLeaseModeDesc：size/version/lease/generation/expected_object/expected_revision/expected_snapshot_epoch/final_mode/flags/reserved[3]；flags和reserved必须0，mode<=63，文件epoch0、目录object0。只接受已发布本人live lease，READ_ONLY父链仍禁止修改。按旧fs_permissions核META、auth_uid真正owner或auth_can_manage，SYSTEM所属记录仍要求auth_can_mod，不能借pin提权；不额外要求fileW、parentW，不改UID/GID/名字/extent。接受后一次operation_sequence，Info.operation=SET_MODE6；只在source exact dirent更改mode与new_generation，复用16sector目录bank/CRC/超级块提交。每批与最后写前重验真实owner/身份/权限；失败候选不发布，不确定超级块结果fault卷且不给DURABLE。确认后更新revision、使旧目录snapshot失效，保持原名字强pin。目录复制先mode3发布并完成子项，再后序SetMode恢复最终权限，不能用旧同步全bank chmod冒充有界实现。
+
+## 私有候选与条件提交
+
+CreatePinned原子地核不存在/父权限、保留完整名字并分配FILE/FS对象/lease；任一分配失败无目录发布、无空间泄漏。候选不可从路径打开/list看见，初始mode必须3；正常FILE读写/seek/flush访问真实私有extent，不整文件R3缓存。最终Publish将正式名与最终mode一起写目录，消除先发布临时名字再撤权导致无法取消的问题。只有扩展时迁移extent，原位小IO不复制整文件。默认不继承来源UID/GID，使用真实创建者主体。
+
+Publish仅接受私有候选；Rename仅接受已发布source。source exact object/revision（目录object0+revision+snapshot_epoch）必需。EXPECT_ABSENT要求目标不存在且target lease/object/revision全0；EXPECT_EXACT要求本人target lease及其exact观察，外国pin/事务BUSY，文件不能替代目录或反之，非空目录不被覆盖。祖先真实目录、权限、所有保护后代、最终63B rootless长度、冲突及容量在接受前全部核，最后提交前再核。目标名在operation存内核值并固定保留，跨续进不含用户VA、不会再次叠CWD。
+
+同卷目录Rename把完整受锁子树名称与revision做元数据候选，一次v5目录提交后生效，不重复复制文件正文。Remove只允许文件/真正空目录；递归删除由worker后序逐项事务，不能把整个树称为原子删除。已确认目标publish保持lease保护至MOVE source remove结束；IPC ACK/Drop Complete不能成为FS删除授权或持久提交证据。
+
+OpenPinned existing必须非零exact revision；不用的新kind字段/flags/reserved全部0。READ_ONLY父namespace不能授权WRITE/Create/Publish/Rename/Remove。受理返回SC32_PENDING并给一次性operation_sequence。后续Query只查询；Advance仅推进已受理operation，不能重放原publish/append。sequence0仅Query选择当前，所有控制动作必须exact sequence（初始READY为0）；不匹配STALE。对仍活对象的重复Query与同序号终态Cancel幂等，Cancel不能回滚COMMITTED。所有Control.flags=0；Release撤完pin/快照/候选后复制本次RELEASED结果，再最终回收ID记录，之后重复Query/Cancel/Release均STALE，caller成功后清本地ref。没有默认tombstone/FORGET两阶段，不制造不必要历史资源增长。后台poll也只借内核值，每次元数据最多16sector；正文迁移/零洞沿现128sector预算。全卷只在这次metadata快照至超级块确定结果期间短锁，普通读/WM/无关ready仍推进；不能把每次wait当成重跑整个候选。
+
+备用bank写/CRC按16sector增量；原目录和旧extent在确定超级块提交前保留。提交前明确失败/取消丢候选bank，原目录保持；最终超级块IO/flush不明则state UNCERTAIN、卷faulted，保留可能引用的所有extent、不再修改、不给DURABLE ACK。成功是驱动实际完成/flush后的COMMITTED，不承诺物理扇区撕裂原子性。发布后取消不回滚已发布对象。Query的result/raw是实际已知结果，不用超时猜提交结果。
+
+## 关闭、退出与集成挂钩
+
+原FILE增加本人lease head；租约存绑定ID/gen，不持可能被drop回收的descriptor指针。FILE Close/owner cleanup先调用lease_detach_step，若还需child/metadata安全点则保留handle与FS pin并返回续进；每步至多32个lease/child。取消私有候选撤owned extent；已发布内容永不因Release或exit删除。owner清理只沿本PID/gen链，不扫描所有任务/句柄；poll全局仅一个真实metadata operation。退出先lease（含候选与operation）、再FILE、再旧streams/FS事务，最后页目录，不能释放仍被poll借用的record。
+
+拟内部文件：fs_lease.inc包含到fs.c（可用真实dirents/native/allocation/CRC静态函数），sc32_lease.c/h处理gate/范围/结果，sc32_file_lease.inc提供本人FILE binding/reserve/attach/rebind/detach，leaseapi.c组合进SC32API.C，integration.patch只表达最小现文件挂钩。正式manifest加入12个真实实现出口；cap/version由Root统一，不提前声称支持。
+
+## 收齐源码与正式接线建议
+
+当前隔离目录中的kernel片段全部是真实正文，聚合顺序为index→native→open→operation→commit→cleanup；private片段在native_file_t定义后提供record与前向声明，FILE片段在sc32_file.c末尾访问真正的owner/description。user/leaseapi/leaseapi.c完整定义12个公开函数，仅复用SC32库私有桥。没有库正文静态复制进worker，也没有NOT_SUPPORTED代替v5操作；v1..v4明确不具备这个v5租约合同，原API继续按历史格式处理。
+
+Root已认可同批SC32 ABI1.3/library_version4；LEASE可用位为capabilities_hi bit0，仅v5实际挂载且notfaulted置位。诊断error-operation为0xf00..0xf0b，selector为0x700..0x70b，避免与Shared 0xd00/Drop0xe00等域混淆。Root将同时合并host9出口，旧major与记录v1不变。
+
+make_integration_patch.py仅读取正式目标源码并生成本目录integration.patch/integration-inputs.json，不把patch应用到现树、不构建、不启动程序/VM。patch只包含fs.c/sc32_file.c/task.c/main.c/sc32_core.c/Makefile/m10a2.mk/SC32API聚合/公开版本/manifest的必要现文件增量；新正文已在本目录正式相对结构，不再复制整份进patch。Root按new_files清单先将15个新正文复制到正式目标再应用挂钩。input清单保存生成时每个正式目标真实SHA。整合前Root复核这份基线，若其它正式任务改变相同锚点，应按新事实更新proposal，不能把旧patch强塞过去。现Phase4仍冻结；生成patch不代表这些代码已经编译或执行。
+
+实际构建/安装采集还需Root同批把user/leaseapi纳入新的Phase5 input/SRC目录，将SC32LEASE.H放公开SDK INC（WIRE/PRIVATE不进公开INC）；这不是本批修改现验证tools的授权。m10a2.mk提案已有sc32_lease.o真实规则与FS/FILE/SC32聚合的新增include依赖，现有-MMD/.d机制继续记录闭包。Root现有Host9与后续SCSHELL接线若同改版本/manifest/core，应合并这些少量源差，而不是整树复制。
+
+实现中的关键细节：
+
+- published native_current核当前缓存slot的真实name；漂移才对这个对象执行现native_index，失效返回NULL。Query/条件操作/已确认Close读取均走它，无关remove压缩目录不会借别人的revision。目录Query只在仍有handle+primary名字锁且未REVOKED时取当前revision，已Remove/取消保最后真实结果，不认同名重建。
+- 根目录NAMESPACE只能READ_ONLY；namespace锁根R用于遍历，默认可修改token不是额外权限，所有保护后代仍核验。READ_ONLY token不能授权任何修改；parent chain只证明范围/owner/存活/非READ_ONLY，另核具体操作权限。创建/发布/删除/改名核真正直接parent R/W，现存正文写核fileW与祖先R。移动整个只读目录不额外要求该目录自己W；不借范围锁提权，也不收窄原合法rename。私有候选正文仍核其mode/fileW与祖先R，未见旧暂存名的publish只需真实目的parentR/W。CreatePinned可建立空目录候选；其父目录必须已经可见，先发布空目录，再在其保持的namespace保护下逐项创建/发布子项，不生成v5无法挂载的悬空后代。目录COPY/merge本来就是逐项提交，整树Rename则用一个metadata候选。
+- OpenPinned existing必须exact revision；创建候选mode严格3。READ/WRITE普通FILE与已有绑定的dup别名不混用；WRITE Acquire要求description aliases1/native唯一ref，持lease时新Duplicate返回BUSY。已有别名不能绕READ_STABLE；条件rename/remove/覆盖要求唯一实际description与恰好descriptor+lease两份FS pin，否则BUSY。
+- 条件source/target/path/epoch在接受前、取得volume锁前完整复核；锁内每batch复核原owner、源与目的的当前权限。稳定权限记录不会因整个bitmap重扫而被反复枚举。已接受operation一次sequence；失败preflight保query可见的旧operation结果，不推进sequence。目标reservation与borrower链不含用户指针。
+- 最终superblock实际完成并flush之后，在同一IF0步骤交换完整dirents指针、转移路径index/名字/显式parent grant、使被覆盖target descriptor失效。整棵源树的native/lease/FILE名字保持一致；不同目录的普通native索引懒刷新。未确认前原目录/旧extent仍在；确认后旧metadata RAM分16页、旧extent分128sector回收，不在一次PIO内清整树。
+- COMMITTED/DURABLE表示最近一次命名operation已确认，不代替随后普通FILE修改的Flush。私有候选Publish要求flushed_revision等于当前实际revision；afterwrite须再次真正ScFileFlush。已经确认且未再修改的绑定FILE Close可直接降引用，避免最终mode只读后为了无新数据的close再要求写权。其它旧/未lease Close行为保持。
+- Snapshot固定取得时成员与属性，entry.path为完整绝对路径。cursor是此snapshot的索引；零capacity不消费，FINISHED只由真实末尾给出。无关全卷epoch不改变成员；自己rename/publish导致身份迁移后原snapshot失效。IO/页仍按当前权限校验，旧快照不是永久授权或birth ID。
+- 所有actual pending/error输出填写规范size/version/raw；preflight拒绝不写。正常Query纯查询；Cancel不能撤已COMMITTED目录。Cancel未提交operation清它的secondary reservation/borrow关系并分步撤候选；Release等安全GC完成，复制本次本地RELEASED信息后free，成功后任何重复控制STALE。只有已受理Release尚待领取的短期completion记录可能留到下一Advance/Release；不是默认历史tombstone，owner退出自动最终free。
+- FILE Close逻辑解绑发生在metadata已确认或可丢候选bank的安全点。未结束GC只借租约自有强FS pin/内核数组，不借descriptor/pd；因此旧FILE退出phase1不等大extent回收。task的最终ZOMBIE条件再调用sc32_lease_stop_step完成真实拥有者链，放在原broker/WM/streams授权撤销之后、pd释放之前，原8/7全局revoke barrier终点不延长。
+- 后台只沿真实工作队列；单次16 metadata sector、128 extent sector、16候选RAM页/1 snapshot页，停止一长任务不清所有任务。初始namespace扫描与少量目录指针/路径提交是一次有界v5内存遍历，无PIO。极限目录和典型IO成本尚无测量，不能据此宣称性能达标；后续Root按实际必要风险定向验。
+
+## 尚未验证与交付边界
+
+已收齐的是这份隔离底座的候选源码和可应用提案。尚未在正式树接线；没有GCC/SCCC构建、真实guest执行、ACL/IO故障/资源账或性能PASS。SCSHELL库、服务、worker、默认桌面/Files2完整用户工作流由后续Phase5分工实施，本目录不冒充它们。当前Phase4有效结果原样保留；这里的旧接口修改仍需Root同一正式接线批次的少量兼容检查，不制造新大矩阵。
+
+修订：2026-10-15，收齐隔离动态租约/不可见候选/条件v5提交/强pin关闭与短步GC/gate/R3桥，补索引漂移和同名重建身份保护；patch未应用，源码未构建未运行。
+
+修订：2026-10-15，freeze2补META可见性快照、existing-only元数据身份pin与12号条件SetMode；保留freeze-v1来源和逐文件delta，仍未应用、未构建、未运行。

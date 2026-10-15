@@ -1,0 +1,1 @@
+sessionctl show 6; _m9_status=$?; echo __SCUI_CMD_7dcf30659b6767d2c1aea501:$_m9_status:__SCUI_CMD_7dcf30659b6767d2c1aea501_END

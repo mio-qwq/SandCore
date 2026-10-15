@@ -1,0 +1,8 @@
+{
+  "reason": "真实对象未定义符号与候选manifest不一致，重新从当前完整桌面源码生成",
+  "path": "user/scshell/desktop/SCSHELL.json",
+  "before_sha256": "d2b7c7a79d79f9004fcd54a6869853a0404cc84d2ae53fb2b703c03b79171394",
+  "after_sha256": "b284f582b840f23f8555723ee835a4c3e89990aa1c4006c93a78d9a4e16ca078",
+  "source": "b284f582b840f23f8555723ee835a4c3e89990aa1c4006c93a78d9a4e16ca078",
+  "active_kernel_modified": false
+}

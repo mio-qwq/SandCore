@@ -22,7 +22,10 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--build-report', required=True)
     parser.add_argument('--tag', required=True)
-    parser.add_argument('--scui-only', action='store_true', help='只预检本次受影响SCUI，不重复既有Apps/ABI输入')
+    selection=parser.add_mutually_exclusive_group()
+    selection.add_argument('--scui-only', action='store_true', help='只预检本次受影响SCUI，不重复既有Apps/ABI输入')
+    selection.add_argument('--case', action='append', choices=('SCUI','SCUIDEMO','PLATFORMPROBE','SCUITEXT','AGGCALLEE','AGGPROBE','DEFAULTAPI'),
+        help='只预检实际受影响的输入，可重复给出')
     args = parser.parse_args()
     if not args.tag or any(c not in 'abcdefghijklmnopqrstuvwxyz0123456789-' for c in args.tag):
         parser.error('invalid tag')
@@ -40,7 +43,7 @@ def main():
         executes_generated_compiler=False, guest_compilation_or_execution=False,
         build_report=str(proof_path), build_report_sha256=sha(proof_path),
         adapter_source_sha256=sha(ROOT / 'tests/m10a2/test_scd_format.py'),
-        driver_sha256=sha(Path(__file__)), requested_scope='SCUI_ONLY' if args.scui_only else 'FULL_UI_BATCH', cases=[])
+        driver_sha256=sha(Path(__file__)), requested_scope='SCUI_ONLY' if args.scui_only else args.case or 'FULL_UI_BATCH', cases=[])
     started = time.monotonic()
     status = 1
     try:
@@ -94,6 +97,8 @@ def main():
             '/TMP/UICHECK/DEFAULTAPI.json','SCX'))
         if args.scui_only:
             cases=[case for case in cases if case[0]=='SCUI']
+        elif args.case:
+            cases=[case for case in cases if case[0] in args.case]
         for name, source, mode, manifest, extension in cases:
             target = '/HOME/' + name + '.' + extension
             command = [str(compiler), '/', str(vfs), source, target, mode, manifest, '0']

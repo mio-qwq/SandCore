@@ -1,0 +1,139 @@
+{
+  "status": "STATIC_CANDIDATE_NOT_COMPILED_NOT_RUN",
+  "exports": 96,
+  "imports": 165,
+  "definitions": 97,
+  "macro_note": "stdio/errno public macro runtime references included",
+  "inputs": [
+    {
+      "path": "drafts/m10a2-shell-fs/user/SC32LEASE.H",
+      "bytes": 6950,
+      "sha256": "e724f522bdc883df656d4851e7dbe45d1cb40282de05c7fee66ad09c7665f943"
+    },
+    {
+      "path": "drafts/m10a2-shell-host/user/SC32HOST.H",
+      "bytes": 3902,
+      "sha256": "5e360a8d21491503a8dfc9f1bb972d0319bf7f404eb3ba0ab1c7aa25c17950e1"
+    },
+    {
+      "path": "drafts/m10a2-shell-r3/SCSHELL.C",
+      "bytes": 531,
+      "sha256": "4b9db4d0c81c3d6e20e292008ccfba98f60b772f6e45e5148f4feec4518094a9"
+    },
+    {
+      "path": "drafts/m10a2-shell-r3/SCSHELL.H",
+      "bytes": 17294,
+      "sha256": "374d0e526687d507265d196c42cda9068a808eef688758d109347645aee6cf79"
+    },
+    {
+      "path": "drafts/m10a2-shell-r3/SCSHELLPRIVATE.H",
+      "bytes": 8753,
+      "sha256": "1f39c6761f333dab2cde32a33b81df88f1ff7b1676cdc5f7a1cb21133daaed19"
+    },
+    {
+      "path": "drafts/m10a2-shell-r3/SCSHELLWIRE.H",
+      "bytes": 8035,
+      "sha256": "29971f90c023a6776f1b415ef4fa8e8982009e53248d90a47753540a4c4c8178"
+    },
+    {
+      "path": "drafts/m10a2-shell-r3/shell_base.c",
+      "bytes": 9393,
+      "sha256": "42a6c0204818a87d5674abe10ae950d2a58952fac6de41c99cfa143ee7d5d2f6"
+    },
+    {
+      "path": "drafts/m10a2-shell-r3/shell_catalog.c",
+      "bytes": 28478,
+      "sha256": "e319d6f76c55eec68c81569cd1d7957eca143de73f7acfe85db4482a7025b07d"
+    },
+    {
+      "path": "drafts/m10a2-shell-r3/shell_client.c",
+      "bytes": 16907,
+      "sha256": "3356efe6b75a830fd7879afe41e9996b1f29d519ed11977ee497cf308a5951d0"
+    },
+    {
+      "path": "drafts/m10a2-shell-r3/shell_clipboard.c",
+      "bytes": 15142,
+      "sha256": "3674c56d005b4c85df6a5dd2b8bb6a51361f27c5f2710d74501755edd668e017"
+    },
+    {
+      "path": "drafts/m10a2-shell-r3/shell_dialog.c",
+      "bytes": 25254,
+      "sha256": "753256b7770a021656eb0f3d2456d85f0e2923b17edef8c0db69f2fc18b3ca50"
+    },
+    {
+      "path": "drafts/m10a2-shell-r3/shell_finalize.c",
+      "bytes": 1297,
+      "sha256": "4d98973146a1d16655f48cf8ccedf2b805a5f66f8a710dd5e7f572a20aa31e56"
+    },
+    {
+      "path": "drafts/m10a2-shell-r3/shell_job.c",
+      "bytes": 23989,
+      "sha256": "466e3c6308de4d9cbe26c3c0096f7bb7d7c464b52b8fa5eaf96b24623f02d436"
+    },
+    {
+      "path": "drafts/m10a2-shell-r3/shell_launch.c",
+      "bytes": 6046,
+      "sha256": "f3a8e4f577eab65afcc660c0ba3fc9808d5171c445bff370bf6a8a994f168d98"
+    },
+    {
+      "path": "drafts/m10a2-shell-r3/shell_legacy.c",
+      "bytes": 5686,
+      "sha256": "eb7a9265c218e2e62ed6ef2a65caece6b659973de40432ae7021e7a87a3e5957"
+    },
+    {
+      "path": "drafts/m10a2-shell-r3/shell_menu.c",
+      "bytes": 30026,
+      "sha256": "caff552d221704c59f8cc336130df1b15fc19fa019ee15ac9e0100e1d64061f4"
+    },
+    {
+      "path": "drafts/m10a2-shell-r3/shell_protocol.c",
+      "bytes": 5177,
+      "sha256": "def2e35b8e19c7bc50c02240eaf2e03e69bd96c1e3251c695ac4eb95b278b6c7"
+    },
+    {
+      "path": "drafts/m10a2-shell-r3/shell_service.c",
+      "bytes": 27062,
+      "sha256": "36800f83bc8e093f642ab9fbe18a21dba9cf0e4775b821926ef9d774ae4562d8"
+    },
+    {
+      "path": "drafts/m10a2-shell-r3/shell_shortcut.c",
+      "bytes": 24305,
+      "sha256": "0facaa96f632cfe408c1a2824aa347e745ff638da3147033ab3cde76da044acd"
+    },
+    {
+      "path": "drafts/m10a2-shell-r3/shell_store.c",
+      "bytes": 34568,
+      "sha256": "32b991414bd63828ba1b26aca77b554871abd8d34a2666c6a87b269414b741b2"
+    },
+    {
+      "path": "drafts/m10a2-shell-r3/shell_store_step.c",
+      "bytes": 11436,
+      "sha256": "afa19f13aa4aabddf3c67ab740cfac806d2043928bb557afdddf39e7d3377f76"
+    },
+    {
+      "path": "user/sc32/SC32API.json",
+      "bytes": 10747,
+      "sha256": "687d1bca6cff7c0cdb072f644ea779eeddc3d1cee0c122283af98defc9cffae9"
+    },
+    {
+      "path": "user/sclib/SCLIB.json",
+      "bytes": 16070,
+      "sha256": "5d52279d4324a2f6a139300c3ad9b3a828a0a5fbce52e90ffbab033c566275c1"
+    },
+    {
+      "path": "user/scui/SCUI.json",
+      "bytes": 28212,
+      "sha256": "d0a658cb2d337984bdc2f581911f6fc29c6e8c0beaff41c9c620a4e180c76cdc"
+    },
+    {
+      "path": "user/stdlib/errno.h",
+      "bytes": 564,
+      "sha256": "d8ada0445358aaa7462eae03a900519673b7477a8fa4d98cbfdd2fc34e525e8a"
+    },
+    {
+      "path": "user/stdlib/SCCLIB.json",
+      "bytes": 8623,
+      "sha256": "47c30942713fc2c87dc69d46191100853017c27ae85a0a762b699277800663cb"
+    }
+  ]
+}

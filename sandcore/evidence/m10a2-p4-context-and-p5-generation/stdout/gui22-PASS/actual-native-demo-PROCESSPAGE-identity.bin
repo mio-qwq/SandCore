@@ -1,0 +1,10 @@
+ps; _m9_status=$?; echo __SCUI_CMD_01ef512e523f36e836660624:$_m9_status:__SCUI_CMD_01ef512e523f36e836660624_END
+PID UID GID STATE NAME
+0 -1 -1 1 kernel
+1 -1 -1 1 SH.SCX
+2 -1 -1 1 SH.SCX
+3 -1 -1 1 SH.SCX
+4 -1 -1 1 su.scx
+5 1000 1000 1 SH.SCX
+6 1000 1000 1 SCUIDEMO.SC
+7 -1 -1 1 ps.scx

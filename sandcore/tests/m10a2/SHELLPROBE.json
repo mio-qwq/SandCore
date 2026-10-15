@@ -1,0 +1,134 @@
+{
+  "kind": "application",
+  "name": "SHELLPROBE.SCX",
+  "dependencies": [
+    {
+      "name": "SC32API.SCL",
+      "abi_major": 1,
+      "min_minor": 3,
+      "min_version": 4
+    },
+    {
+      "name": "SCCLIB.SCL",
+      "abi_major": 1,
+      "min_minor": 0,
+      "min_version": 1
+    },
+    {
+      "name": "SCSHELL.SCL",
+      "abi_major": 1,
+      "min_minor": 0,
+      "min_version": 1
+    }
+  ],
+  "imports": [
+    {
+      "name": "ScIdentityQuery",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellCatalogQuery",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellCatalogRelease",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellClose",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellConnect",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellHostActivate",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellHostQuery",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellQuery",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellQueryCatalog",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellRequestCatalog",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellRequestClose",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellRequestQuery",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellStep",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScSystemMonotonic",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScSystemWait",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "fflush",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "memset",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "printf",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    }
+  ]
+}

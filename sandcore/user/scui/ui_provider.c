@@ -1155,6 +1155,63 @@ static ScStatus ui_view_select(UiNode *n,UiView *v,ScU32 item,ScU32 modifiers)
         }
     return s;
 }
+static int ui_view_all_current(UiNode *n,UiView *v,ScU32 revision,ScU32 selection_revision,ScU32 total)
+{
+    return !v->retired && !(n->private_flags&UI_NODE_RETIRED) && n->view==v
+        && !n->owner->object.closing && !v->selection->object.closing
+        && (n->effective&(SC_UI_VISIBLE|SC_UI_ENABLED))==(SC_UI_VISIBLE|SC_UI_ENABLED)
+        && v->revision==revision && v->provider->revision==revision
+        && v->selection->revision==selection_revision && v->total==total;
+}
+static ScStatus ui_view_select_all(UiNode *n,UiView *v)
+{
+    ScU32 revision=v->revision,selection_revision=v->selection->revision,total=v->total;
+    ScStatus s;
+    if(!ui_view_all_current(n,v,revision,selection_revision,total))return SC_UI_E_STALE;
+    if(!total)return ScUiSelectionClear(v->selection);
+    if(!v->tree){UiVisibleItem first,last;
+        s=ui_view_row(n,v,0,&first);
+        if(s==0 && !ui_view_all_current(n,v,revision,selection_revision,total))s=SC_UI_E_STALE;
+        if(s==0)s=ui_view_row(n,v,total-1,&last);
+        if(s==0 && !ui_view_all_current(n,v,revision,selection_revision,total))s=SC_UI_E_STALE;
+        /* root0不是可选ID；完整平表范围已有一次提交的universe/例外路径。 */
+        if(s==0)s=ScUiSelectionRange(v->selection,first.id,last.id,SC_UI_REPLACE);
+        return s;
+    }
+    ScArray *segments=0;
+    ScU32 *ids=0,bytes=0,used=0;
+    ScView source,current;
+    UiView rows=*v;
+    memset(&source,0,sizeof(source));
+    source.size=sizeof(source);
+    source.version=1;
+    s=ScArrayView(v->visible,&source);
+    if(s==0)s=ui_array_new(sizeof(UiTreeSegment),&segments);
+    if(s==0)s=ScArrayInsert(segments,0,source.data,source.bytes/sizeof(UiTreeSegment));
+    if(s==0 && !ui_multiply(total,sizeof(*ids),&bytes))s=SC_UI_E_RANGE;
+    if(s==0){ids=(ScU32 *)malloc(bytes);
+        if(!ids)s=SC_UI_E_MEMORY;
+    }
+    rows.visible=segments;
+    /* 只复制展开分支的段索引与ID候选，不为每个数据项建立控件。
+     * provider回调可重入改变Tree，枚举始终读拥有的旧段，提交前再核当前段。 */
+    for(ScU32 i=0;s==0 && i<total;i++){UiVisibleItem item;
+        s=ui_view_row(n,&rows,i,&item);
+        if(s==0 && !ui_view_all_current(n,v,revision,selection_revision,total))s=SC_UI_E_STALE;
+        if(s==0 && (item.state&SC_UI_ENABLED))ids[used++]=item.id;
+        if((i&4095u)==4095u)ScProcessYield();
+    }
+    memset(&current,0,sizeof(current));
+    current.size=sizeof(current);
+    current.version=1;
+    if(s==0)s=ScArrayView(v->visible,&current);
+    if(s==0)s=ScArrayView(segments,&source);
+    if(s==0 && (current.bytes!=source.bytes || (source.bytes && memcmp(current.data,source.data,source.bytes))))s=SC_UI_E_STALE;
+    if(s==0)s=ui_selection_ids(v->selection,ids,used,SC_UI_REPLACE);
+    free(ids);
+    ScArrayRelease(segments);
+    return s;
+}
 static ScStatus ui_view_event(UiNode *n,const ScUiEvent *event)
 {
     UiView *v=n->view;
@@ -1238,7 +1295,7 @@ static ScStatus ui_view_event(UiNode *n,const ScUiEvent *event)
         }
     if(event->type==SC_UI_EVENT_KEY_DOWN){ScU32 row=0,step=0;
         UiVisibleItem current;
-        if(event->key=='a' && (event->modifiers&SC32_MOD_CONTROL)){s=ScUiSelectionSet(v->selection,0,SC_UI_ADD);
+        if(event->key=='a' && (event->modifiers&SC32_MOD_CONTROL)){s=ui_view_select_all(n,v);
             goto handled;
             }
         if(v->selection->current)ui_view_item_position(n,v,v->selection->current,&row);

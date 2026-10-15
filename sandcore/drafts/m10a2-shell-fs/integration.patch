@@ -1,0 +1,932 @@
+--- a/sandcore/kernel/fs.c
++++ b/sandcore/kernel/fs.c
+@@ -26,6 +26,7 @@
+ #include "objpool.h"
+ #include "crc.h"
+ #include "sc32_file.h"
++#include "fs_lease.h"
+ #define FS_LEGACY_SECTS 16384u
+ #define FS_MAX_SECTS 524288u
+ #define ALLOCATION_LEAF_SECTORS 512u
+@@ -71,10 +72,11 @@
+  * pin阻止旧replace/remove/rename接管同名对象；chmod不撤身份，逐次
+  * 权限复验。候选只有内核extent/进度，绝不持有用户buffer跨陷入。 */
+ typedef struct {
+-    char name[64];entry_t candidate,previous;
++    char name[64];entry_t candidate,previous,draft;
+     u32 id,refs,ready,index,pending,writer,owner,owner_generation;
+     u32 position,length,target,copy_sector,zero_offset,reserved_start,reserved_count;
+     u32 relocated,complete,accepted,uncertain;
++    u32 unpublished,invalidated,lease_head,flushed_revision;
+     int result;
+ } native_file_t;
+ static objpool_t native_pool;
+@@ -83,6 +85,7 @@
+ static u32 native_directory_sequence=1;
+ static u8 native_super[512];
+ enum { N_OPEN=1,N_WRITE,N_TRUNCATE,N_FLUSH };
++#include "fs_lease_private.inc"
+ static int same(const char *a,const char *b);
+ static int child(const char *name,const char *parent);
+ static int native_busy(const char *name)
+@@ -176,7 +179,7 @@
+ }
+ static int write_meta(void)
+ {
+-    if(fs_faulted || native_meta_owner || native_directory_sequence==0xffffffffu)return -1;
++    if(fs_faulted || native_meta_owner || fs_lease_volume_locked() || native_directory_sequence==0xffffffffu)return -1;
+     if(ata_read_sectors(0,1,sector)) return -1;
+     for(u32 i=0;i<dir_sectors*512;i++) meta[i]=0;
+     u32 names=name_bytes();
+@@ -213,6 +216,7 @@
+ }
+ static void release_directory(void)
+ {
++    lease_volume_reset();
+     if(dirents)pframe_free_run((u32)dirents,dir_pages);
+     if(meta)pframe_free_run((u32)meta,meta_pages);
+     if(allocation)pframe_free_run((u32)allocation,allocation_pages);
+@@ -457,7 +461,7 @@
+ {
+     char name[64];
+     if(fs_normalize(path,name)<=0 || !dir_sectors || fs_faulted || size>fs_disk_sectors*512)return -1;
+-    if(native_meta_owner || busy(name))return -6;
++    if(native_meta_owner || fs_lease_volume_locked() || fs_lease_path_blocked(name,FS_LEASE_CONTENT) || busy(name))return -6;
+     u32 generation=version==5?new_generation():1;if(!generation)return -1;
+     if(len(name)>=(int)name_bytes()) return -1; /* 旧盘保持旧名字上限。 */
+     u32 info[2];
+@@ -496,9 +500,10 @@
+ }
+ int fs_mkdir(const char *path)
+ {
+-    if(native_meta_owner)return -6;
++    if(native_meta_owner || fs_lease_volume_locked())return -6;
+     char name[64]; u32 info[2];
+     if(version<4 || fs_normalize(path,name)<=0 || !fs_stat(name,info)) return -1;
++    if(fs_lease_path_blocked(name,FS_LEASE_TREE) || busy(name))return -6;
+     if((u32)nfiles>=dir_capacity)return -1;
+     for(int i=0;i<nfiles;i++) if(dirents[i].start_lba && child(name,dirents[i].name)) return -1;
+     copy(dirents[nfiles].name,name); dirents[nfiles].start_lba=0; dirents[nfiles].size=0;
+@@ -512,7 +517,7 @@
+ int fs_remove(const char *path)
+ {
+     char name[64]; if(fs_normalize(path,name)<=0) return -1;
+-    int i=find(name);if(i<0)return -1;if(native_meta_owner || busy(name))return -6;
++    int i=find(name);if(i<0)return -1;if(native_meta_owner || fs_lease_volume_locked() || fs_lease_path_blocked(name,FS_LEASE_TREE) || busy(name))return -6;
+     for(int j=0;j<nfiles;j++) if(child(dirents[j].name,name)) return -1;
+     entry_t removed=dirents[i];
+     for(int j=i;j<nfiles-1;j++) dirents[j]=dirents[j+1];
+@@ -526,7 +531,8 @@
+ {
+     char old[64],next[64]; u32 info[2];
+     if(fs_normalize(oldpath,old)<=0 || fs_normalize(newpath,next)<=0 || fs_stat(old,info)) return -1;
+-    if(native_meta_owner || busy(old) || busy(next))return -6;
++    if(native_meta_owner || fs_lease_volume_locked() || fs_lease_path_blocked(old,FS_LEASE_TREE)
++       || fs_lease_path_blocked(next,FS_LEASE_TREE) || busy(old) || busy(next))return -6;
+     if(same(old,next)) return 0;
+     if(child(next,old) || !fs_stat(next,info)) return -1;
+     for(int i=0;i<nfiles;i++)
+@@ -587,10 +593,10 @@
+ }
+ int fs_create_ex(int owner,const char *path,u32 kind,u32 mode)
+ {
+-    if(native_meta_owner)return -6;
++    if(native_meta_owner || fs_lease_volume_locked())return -6;
+     char name[64];u32 info[2];if(version!=5 || !dir_sectors || fs_faulted || (kind!=1 && kind!=2) || mode>63 || fs_normalize(path,name)<=0)return -1;
+     if(!fs_user_mutable(name,0) || !fs_access_parent(owner,name))return -5;
+-    if(!fs_stat(name,info))return -8;if(busy(name))return -6;if((u32)nfiles>=dir_capacity)return -4;
++    if(!fs_stat(name,info))return -8;if(fs_lease_path_blocked(name,FS_LEASE_TREE) || busy(name))return -6;if((u32)nfiles>=dir_capacity)return -4;
+     u32 generation=new_generation();if(!generation)return -4;u32 at=kind==1?allocate(0):0;if(kind==1 && !at)return -4;
+     /* 临时文件必须首次发布就是仅本人rw，不能先采用默认权限，
+      * 再靠另一个chmod陷入修正，中间给其它任务留下读取窗口。 */
+@@ -665,7 +671,7 @@
+ }
+ int fs_permissions(int pid,const char *path,int uid,int gid,u32 mode)
+ {
+-    if(native_meta_owner)return -6;
++    if(native_meta_owner || fs_lease_volume_locked())return -6;
+     char name[64];if(version<5 || fs_normalize(path,name)<=0 || (mode&~63u))return -1;
+     if(!fs_user_mutable(name,0) || !fs_access(pid,name,FS_ACCESS_META))return -5;
+     int index=find(name);if(index<0)return -1;
+@@ -708,7 +714,7 @@
+     char name[64];u32 info[2];
+     if(!task_owned(owner) || version!=5 || fs_faulted || capacity>fs_disk_sectors*512
+         || fs_normalize(path,name)<=0 || protected(name))return -1;
+-    if(native_meta_owner || busy(name))return -6;
++    if(native_meta_owner || fs_lease_volume_locked() || fs_lease_path_blocked(name,FS_LEASE_CONTENT) || busy(name))return -6;
+     if(owner && (!fs_user_mutable(name,0) || !fs_access(owner,name,FS_ACCESS_WRITE)))return -5;
+     if(!fs_stat(name,info) && info[0]!=1)return -1;
+     /* 内部串口路径也必须有真实父目录，不能接收一个悬空后代使卷下次
+@@ -734,6 +740,7 @@
+ int fs_stream_write(int owner,u32 token,const void *data,u32 length)
+ {
+     transaction_t *t=stream(owner,token);if(!t)return -1;
++    if(fs_lease_path_blocked(t->name,FS_LEASE_CONTENT))return -6;
+     if(t->failed || fs_faulted || length>t->capacity-t->used){t->failed=1;return -1;}
+     if(owner && (!fs_user_mutable(t->name,0) || !fs_access(owner,t->name,FS_ACCESS_WRITE)))return -5;
+     const u8 *input=(const u8 *)data;u32 offset=0;
+@@ -771,7 +778,7 @@
+ int fs_stream_commit(int owner,u32 token)
+ {
+     transaction_t *t=stream(owner,token);if(!t || t->failed || fs_faulted)return -1;
+-    if(native_meta_owner || native_busy(t->name))return -6;
++    if(native_meta_owner || fs_lease_volume_locked() || fs_lease_path_blocked(t->name,FS_LEASE_CONTENT) || native_busy(t->name))return -6;
+     if(owner && (!fs_user_mutable(t->name,0) || !fs_access(owner,t->name,FS_ACCESS_WRITE)))return -5;
+     int index=find(t->name),fresh=index<0;
+     if((!fresh && dirents[index].generation!=t->original) || (fresh && t->original))return -6;
+@@ -804,6 +811,8 @@
+ }
+ static int native_index(native_file_t *n)
+ {
++    if(n->invalidated)return FS_N_STALE;
++    if(n->unpublished)return 0;
+     int i=find(n->name);
+     if(i<0 || !dirents[i].start_lba)return FS_N_STALE;
+     /* 其它文件删除会压缩目录，不能永久缓存旧数组下标当对象身份。 */
+@@ -811,7 +820,8 @@
+ }
+ static int native_access(int pid,native_file_t *n,u32 access)
+ {
+-    if(!task_owned(pid) || !n || !n->ready)return FS_N_STALE;
++    if(!task_owned(pid) || !n || !n->ready || n->invalidated)return FS_N_STALE;
++    if(n->unpublished)return lease_private_access(n,pid,access);
+     if(native_index(n)<0)return FS_N_STALE;
+     if(access&FS_NATIVE_WRITE){
+         if(version!=5)return FS_N_NOT_SUPPORTED;
+@@ -825,9 +835,9 @@
+ {
+     native_file_t *n=native_object(object);int error=native_access(pid,n,access);
+     if(error)return error;
+-    entry_t *e=dirents+n->index;
++    entry_t *e=native_current(n);
+     out->length=e->size;out->object=n->id;out->revision=e->generation;
+-    out->flags=(e->generation>published_object_generation?FS_NATIVE_DIRTY:0)
++    out->flags=(n->unpublished || e->generation>published_object_generation?FS_NATIVE_DIRTY:0)
+         |(fs_faulted?FS_NATIVE_FAULTED:0)|(n->uncertain?FS_NATIVE_UNCERTAIN:0)
+         |(n->pending && !n->complete?FS_NATIVE_GROWING:0);
+     out->uid=e->uid;out->gid=e->gid;out->mode=e->mode;out->reserved=0;return 0;
+@@ -841,6 +851,7 @@
+ void fs_native_cancel(u32 object,u32 writer)
+ {
+     native_file_t *n=native_object(object);if(!n || !n->pending || n->writer!=writer)return;
++    if(n->unpublished){lease_private_discard(n);return;}
+     if(native_meta_owner==n->id)native_meta_owner=native_meta_sector=0;
+     /* 未发布候选只在内存位图保留。元数据已成功提交时reserved已清零，
+      * 不能把关闭/退出伪装成回滚一个已经对其他句柄可见的写入。 */
+@@ -868,7 +879,9 @@
+ {
+     if(native_meta_owner==n->id)native_meta_owner=native_meta_sector=0;
+     if(uncertain){n->uncertain=1;fs_faulted=1;}
+-    if(n->reserved_count)allocated(n->reserved_start,n->reserved_count,0);
++    if(n->unpublished && n->reserved_count){lease_record_t *r=lease_get(n->lease_head);
++        if(r){r->garbage_start=n->reserved_start;r->garbage_count=n->reserved_count;lease_work_add(r);}}
++    else if(n->reserved_count)allocated(n->reserved_start,n->reserved_count,0);
+     n->reserved_start=n->reserved_count=0;n->result=error;n->complete=1;
+ }
+ static void native_serialize(u8 *p,const entry_t *e)
+@@ -880,6 +893,8 @@
+ }
+ static int native_publish_start(native_file_t *n)
+ {
++    if(n->unpublished)return lease_private_commit(n);
++    if(fs_lease_volume_locked())return FS_N_AGAIN;
+     if(native_meta_owner)return native_meta_owner==n->id?FS_N_AGAIN:FS_N_BUSY;
+     if(fs_faulted)return FS_N_IO;
+     if(native_directory_sequence==0xffffffffu)return FS_N_RANGE;
+@@ -903,6 +918,9 @@
+     if(n->complete)return n->result;
+     if(native_meta_owner!=n->id)return FS_N_BUSY;
+     int pid=(int)n->owner;
++    if(lease_native_guard(n,pid,n->writer,FS_NATIVE_WRITE)){
++        native_failed(n,FS_N_BUSY,0);native_completed(n);return FS_N_BUSY;
++    }
+     if(!task_owned(pid) || task_generation(pid)!=n->owner_generation || protected(n->name)
+        || (module_path(n->name) && !auth_can_mod(pid))
+        || (n->ready?!fs_access(pid,n->name,FS_ACCESS_WRITE):!fs_access_parent(pid,n->name))){
+@@ -952,13 +970,15 @@
+     n->pending=kind;n->writer=writer;n->owner=(u32)pid;n->owner_generation=task_generation(pid);
+     n->position=position;n->length=length;n->complete=n->accepted=n->relocated=0;n->result=0;
+     n->copy_sector=0;n->reserved_start=n->reserved_count=0;
+-    n->previous=n->candidate=dirents[n->index];n->zero_offset=n->previous.size;
++    n->previous=n->candidate=*native_current(n);n->zero_offset=n->previous.size;
+ }
+ int fs_native_open(int pid,u32 writer,const char *name,u32 flags,u32 mode,u32 *object)
+ {
+     if(!dir_sectors)return FS_N_IO;
+     if(!task_owned(pid) || !writer || !name || !name[0] || (flags&~31u) || !(flags&3u) || mode>63u
+        || ((flags&(FS_NATIVE_CREATE|FS_NATIVE_TRUNCATE|FS_NATIVE_APPEND)) && !(flags&FS_NATIVE_WRITE)))return FS_N_INVALID;
++    if(fs_lease_volume_locked())return FS_N_AGAIN;
++    if(lease_native_open_blocked(name,flags))return FS_N_BUSY;
+     if(flags&FS_NATIVE_WRITE){if(version!=5)return FS_N_NOT_SUPPORTED;if(fs_faulted)return FS_N_IO;
+         if(!fs_user_mutable(name,0))return FS_N_ACCESS;}
+     native_file_t *n=*object?native_object(*object):0;
+@@ -980,6 +1000,7 @@
+     for(int i=objpool_next(&native_pool,-1);i>=0;i=objpool_next(&native_pool,i)){
+         native_file_t *candidate=objpool_get(&native_pool,i);
+         if(!same(name,candidate->name))continue;
++        if(candidate->unpublished || candidate->invalidated)return FS_N_BUSY;
+         if(!candidate->ready || candidate->pending)return FS_N_AGAIN;
+         n=candidate;break;
+     }
+@@ -1011,7 +1032,7 @@
+ {
+     if(bytes>65536u){*done=0;return FS_N_RANGE;}
+     *done=0;native_file_t *n=native_object(object);int error=native_access(pid,n,FS_NATIVE_READ);if(error)return error;
+-    entry_t *e=dirents+n->index;
++    entry_t *e=native_current(n);
+     if(offset>=e->size || !bytes)return 0;
+     u32 count=e->size-offset;if(count>bytes)count=bytes;
+     while(*done<count){
+@@ -1070,7 +1091,7 @@
+ }
+ static int native_bytes_write(native_file_t *n,const void *data,u32 bytes,u32 offset,u32 *done,int candidate)
+ {
+-    *done=0;u32 at=candidate?n->candidate.start_lba:dirents[n->index].start_lba;
++    *done=0;u32 at=candidate?n->candidate.start_lba:native_current(n)->start_lba;
+     while(*done<bytes){
+         u32 pos=offset+*done,within=pos&511u,count=512u-within;if(count>bytes-*done)count=bytes-*done;
+         if(within || count<512u){if(ata_read_sectors(at+pos/512u,1,sector))return FS_N_IO;}
+@@ -1091,7 +1112,9 @@
+ {
+     *done=0;native_file_t *n=native_object(object);int error=native_access(pid,n,FS_NATIVE_WRITE);
+     if(error){if(n && n->writer==writer && !n->complete)fs_native_cancel(object,writer);return error;}
+-    entry_t *e=dirents+n->index;u32 pos=append?(n->pending?n->position:e->size):offset;*position=pos;
++    if(fs_lease_volume_locked())return FS_N_AGAIN;
++    error=lease_native_guard(n,pid,writer,FS_NATIVE_WRITE);if(error)return error;
++    entry_t *e=native_current(n);u32 pos=append?(n->pending?n->position:e->size):offset;*position=pos;
+     if(!bytes)return 0;if(bytes>65536u || pos>fs_disk_sectors*512u || bytes>fs_disk_sectors*512u-pos)return FS_N_RANGE;
+     if(n->pending){
+         if(!native_pending_match(n,pid,writer,N_WRITE,pos,bytes))return n->writer!=writer?FS_N_AGAIN:FS_N_BUSY;
+@@ -1109,7 +1132,8 @@
+             if(native_directory_sequence>=0xfffffffeu)return FS_N_RANGE;
+             u32 generation=new_generation();if(!generation)return FS_N_RANGE;
+             error=native_bytes_write(n,data,bytes,pos,done,0);
+-            if(*done || n->uncertain){e->generation=generation;live_dirty=1;native_directory_sequence++;}
++            if(*done || n->uncertain){e->generation=generation;live_dirty=1;n->flushed_revision=0;
++                if(!n->unpublished)native_directory_sequence++;}
+             return error;
+         }
+         native_pending_start(n,pid,writer,N_WRITE,pos,bytes);
+@@ -1130,6 +1154,8 @@
+ {
+     native_file_t *n=native_object(object);int error=native_access(pid,n,FS_NATIVE_WRITE);
+     if(error){if(n && n->writer==writer && !n->complete)fs_native_cancel(object,writer);return error;}
++    if(fs_lease_volume_locked())return FS_N_AGAIN;
++    error=lease_native_guard(n,pid,writer,FS_NATIVE_WRITE);if(error)return error;
+     if(length>fs_disk_sectors*512u)return FS_N_RANGE;
+     if(n->pending){
+         if(!native_pending_match(n,pid,writer,N_TRUNCATE,0,length))return n->writer!=writer?FS_N_AGAIN:FS_N_BUSY;
+@@ -1138,13 +1164,13 @@
+         if(native_meta_owner)return FS_N_AGAIN;
+     }else{
+         if(native_meta_owner)return FS_N_AGAIN;
+-        if(length==dirents[n->index].size)return 0;
++        if(length==native_current(n)->size)return 0;
+         native_pending_start(n,pid,writer,N_TRUNCATE,0,length);
+         if(length>n->previous.size){error=native_growth_start(n,length,0);if(error){native_failed(n,error,0);native_pending_clear(n);return error;}}
+         else n->target=length;
+     }
+     if(length>n->previous.size){error=native_growth_step(n);if(error){if(error!=FS_N_AGAIN)native_pending_clear(n);return error;}}
+-    entry_t *e=dirents+n->index;n->candidate.size=length;if(!length)n->candidate.start_lba=fs_data_start;
++    entry_t *e=native_current(n);n->candidate.size=length;if(!length)n->candidate.start_lba=fs_data_start;
+     n->candidate.uid=e->uid;n->candidate.gid=e->gid;n->candidate.mode=e->mode;
+     n->candidate.generation=new_generation();if(!n->candidate.generation){native_failed(n,FS_N_RANGE,0);return FS_N_RANGE;}
+     error=native_publish_start(n);if(error!=FS_N_AGAIN){native_failed(n,error,0);native_pending_clear(n);}return error;
+@@ -1153,6 +1179,13 @@
+ {
+     native_file_t *n=native_object(object);int error=native_access(pid,n,FS_NATIVE_WRITE);
+     if(error){if(n && n->writer==writer && !n->complete)fs_native_cancel(object,writer);return error;}
++    if(fs_lease_volume_locked())return FS_N_AGAIN;
++    error=lease_native_guard(n,pid,writer,FS_NATIVE_WRITE);if(error)return error;
++    if(n->unpublished){
++        if(n->pending)return FS_N_BUSY;
++        if(ata_flush())return FS_N_IO;
++        n->flushed_revision=n->draft.generation;return 0;
++    }
+     if(n->pending){
+         if(!native_pending_match(n,pid,writer,N_FLUSH,0,0))return n->writer!=writer?FS_N_AGAIN:FS_N_BUSY;
+         if(n->complete){error=n->result;native_pending_clear(n);return error;}
+@@ -1191,3 +1224,5 @@
+     }
+     *next=0xffffffffu;return 1;
+ }
++
++#include "fs_lease.inc"
+--- a/sandcore/kernel/sc32_file.c
++++ b/sandcore/kernel/sc32_file.c
+@@ -1,6 +1,7 @@
+ #include "sc32_file.h"
+ #include "sc32_core.h"
+ #include "fs.h"
++#include "fs_lease.h"
+ #include "streams.h"
+ #include "task.h"
+ #include "paging.h"
+@@ -11,7 +12,7 @@
+ enum { FILE_HANDLE=1,DIRECTORY_HANDLE=2 };
+ typedef struct {
+     u32 id,owner,generation,previous,next,kind,description,member_previous,member_next;
+-    u32 native_reference,closing,cursor,epoch;
++    u32 native_reference,closing,cursor,epoch,lease,lease_metadata_only;
+     u32 completed_kind,completed_position,completed_length;
+     Sc32FileReply completed_reply;
+     char path[64];
+@@ -77,6 +78,7 @@
+         file_handle_t *h=objpool_get(&handles,(int)o->head);if(!h){o->head=0;break;}
+         /* 退出不写用户缓冲、不运行用户fini、不做无界磁盘flush。已
+          * 接受正文保留，未发布growth候选撤销；明示durability在Flush。 */
++        if(h->lease && !fs_lease_detach_step(pid,h->id,h->lease))return 0;
+         drop(h);o=objpool_get(&owners,pid);if(!o)return 1;
+     }
+     if(!o->head){objpool_release(&owners,pid);return 1;}return 0;
+@@ -199,6 +201,8 @@
+ }
+ static int duplicate_file(int pid,file_handle_t *original,u32 output)
+ {
++    if(original->lease)return SC32_E_BUSY;
++    if(original->lease_metadata_only)return SC32_E_ACCESS;
+     file_description_t *d=description(original);if(!d || !d->ready || original->closing)return SC32_E_BUSY;
+     if(d->refs==0xffffffffu)return SC32_E_RANGE;
+     file_handle_t *h=new_handle(pid,FILE_HANDLE);if(!h)return SC32_E_MEMORY;
+@@ -228,6 +232,7 @@
+     if(operation==SC32_D_OPEN){
+         if(q[3] || q[4] || !reserved(q,5))return SC32_E_INVALID;
+         char name[64];int status=path(pid,q[2],name);if(status)return status;
++        if(fs_lease_path_blocked(name,FS_LEASE_READ_OPEN))return SC32_E_BUSY;
+         if(!fs_access(pid,name,FS_ACCESS_READ))return SC32_E_ACCESS;
+         u32 info[2];if(fs_stat(name,info))return SC32_E_NOT_FOUND;if(info[0]!=2)return SC32_E_INVALID;
+         file_handle_t *h=new_handle(pid,DIRECTORY_HANDLE);if(!h)return SC32_E_MEMORY;
+@@ -236,7 +241,12 @@
+         r.handle=h->id;r.epoch=h->epoch;return publish(pid,output,&r,sizeof(r));
+     }
+     file_handle_t *h=handle(pid,q[2],DIRECTORY_HANDLE);if(!h)return SC32_E_STALE;
+-    if(operation==SC32_D_CLOSE){if(q[3] || !reserved(q,4))return SC32_E_INVALID;drop(h);return publish(pid,output,&r,sizeof(r));}
++    if(operation==SC32_D_CLOSE){
++        if(q[3] || !reserved(q,4))return SC32_E_INVALID;
++        if(h->lease && !fs_lease_detach_step(pid,h->id,h->lease))return SC32_E_BUSY;
++        drop(h);return publish(pid,output,&r,sizeof(r));
++    }
++    if(h->lease_metadata_only)return SC32_E_ACCESS;
+     if(!reserved(q,5) || q[4]>SC32_DIRECTORY_BATCH_MAX)return SC32_E_RANGE;
+     u32 bytes=q[4]*(u32)sizeof(ScDirectoryEntry);
+     if(bytes && (!paging_user_write_range(TASK(pid).pd,q[3],bytes) || overlap(q[3],bytes,output,sizeof(r))))return SC32_E_INVALID;
+@@ -270,6 +280,7 @@
+     if(operation==SC32_F_STANDARD){if(q[2] || !reserved(q,4))return SC32_E_INVALID;return standard_file(pid,q[3],output);}
+     file_handle_t *h=handle(pid,q[2],FILE_HANDLE);if(!h)return SC32_E_STALE;
+     file_description_t *d=description(h);if(!d || !d->ready)return SC32_E_BUSY;
++    if(h->lease_metadata_only && operation!=SC32_F_QUERY && operation!=SC32_F_CLOSE)return SC32_E_ACCESS;
+     Sc32FileReply r;int raw=0;u32 transferred=0;
+     if(operation==SC32_F_READ || operation==SC32_F_WRITE){
+         if(!reserved(q,5) || q[4]>SC32_FILE_IO_MAX)return SC32_E_RANGE;
+@@ -320,6 +331,15 @@
+     }
+     if(!reserved(q,4) || (operation!=SC32_F_TRUNCATE && q[3]))return SC32_E_INVALID;
+     if(operation==SC32_F_DUPLICATE)return duplicate_file(pid,h,output);
++    if(operation==SC32_F_CLOSE && h->lease_metadata_only){
++        if(h->lease && !fs_lease_detach_step(pid,h->id,h->lease))return SC32_E_BUSY;
++        file_reply(pid,h,d,&r,0,0);drop(h);r.handle=0;return publish(pid,output,&r,sizeof(r));
++    }
++    if(operation==SC32_F_CLOSE && h->lease){
++        int complete=fs_lease_file_private(d->object) || fs_lease_close_committed(h->lease,d->object);
++        if(!fs_lease_detach_step(pid,h->id,h->lease))return SC32_E_BUSY;
++        if(complete){file_reply(pid,h,d,&r,0,0);drop(h);r.handle=0;return publish(pid,output,&r,sizeof(r));}
++    }
+     if(operation==SC32_F_QUERY || operation==SC32_F_TELL){
+         if(d->standard>=0){u32 info[8];raw=streams_native_query(pid,h->native_reference,info);
+             if(!raw && operation==SC32_F_TELL && !(info[6]&2u))raw=-12;
+@@ -356,3 +376,5 @@
+     }
+     return status;
+ }
++
++#include "sc32_file_lease.inc"
+--- a/sandcore/kernel/task.c
++++ b/sandcore/kernel/task.c
+@@ -18,6 +18,7 @@
+ #include "scl_boot.h"
+ #include "sc32_core.h"
+ #include "sc32_file.h"
++#include "sc32_lease.h"
+ #include "sc32_gui.h"
+ #include "sc32_font.h"
+ #include "sc32_broker.h"
+@@ -626,13 +627,13 @@
+ #endif
+             )cleanup_revoke_pending--;
+         }
+-        if(p->cleanup_phase>=
++        if((p->cleanup_phase>=
+ #ifdef M10_DISK_CORE
+             10
+ #else
+             9
+ #endif
+-        ){p->queue=QUEUE_ZOMBIE;p->zombie_next=zombie_head;zombie_head=owner;}
++        ) && sc32_lease_stop_step(owner)){p->queue=QUEUE_ZOMBIE;p->zombie_next=zombie_head;zombie_head=owner;}
+         else{
+             if(cleanup_tail>=0)task_record(cleanup_tail)->cleanup_next=owner;else cleanup_head=owner;
+             cleanup_tail=owner;
+@@ -715,6 +716,8 @@
+             frame[11]=(u32)sc32_broker_call(current,frame[8],frame[10],frame[9]);
+         else if(frame[8]==SC32_FONT_QUERY || frame[8]==SC32_FONT_GLYPH)
+             frame[11]=(u32)sc32_font_call(current,frame[8],frame[10],frame[9]);
++        else if(frame[8]>=0x700u && frame[8]<0x720u)
++            frame[11]=(u32)sc32_lease_call(current,frame[8],frame[10],frame[9]);
+         else frame[11]=(u32)sc32_core_call(current,frame[8],frame[10],frame[9]);
+         break;
+     case SYS_STATUS:
+--- a/sandcore/kernel/main.c
++++ b/sandcore/kernel/main.c
+@@ -24,6 +24,7 @@
+ #include "wm.h"
+ #include "sc32_gui.h"
+ #include "sc32_broker.h"
++#include "sc32_lease.h"
+ #include "sc32_drop.h"
+ #include "desktop.h"
+ #include "module.h"
+@@ -322,7 +323,8 @@
+         int key;
+         while((key=key_peek())>=0 && wm_key_input((char)key))key_pop();
+         sc32_gui_pump();              /* 同FIFO路由真实通断/按钮，IRQ不执行GUI。 */
+-        fs_native_poll();             /* 元数据短批次续进，不把整目录PIO压进一次陷入。 */
++        fs_native_poll();
++        sc32_lease_poll();             /* 元数据短批次续进，不把整目录PIO压进一次陷入。 */
+         streams_poll();               /* 输入/管道状态按订阅链分批唤醒，避免全任务扫描。 */
+ #ifdef M10_DISK_CORE
+         network_poll();              /* 输入先入状态，再做有限网卡/协议批次。 */
+--- a/sandcore/kernel/sc32_core.c
++++ b/sandcore/kernel/sc32_core.c
+@@ -9,6 +9,7 @@
+ #include "mouse.h"
+ #include "sc32_broker.h"
+ #include "sc32_drop.h"
++#include "fs_lease.h"
+ #include "../user/sc32/SC32WIRE.H"
+ 
+ #define SC32_PTE_PRESENT 0x001u
+@@ -105,6 +106,7 @@
+         |SC32_CAP_POPUPS|SC32_CAP_POINTER_CURSOR;
+     if(sc32_broker_available())result.capabilities_lo|=SC32_CAP_CLIPBOARD|SC32_CAP_IPC|SC32_CAP_SHARED_MEMORY;
+     if(sc32_drop_available())result.capabilities_lo|=SC32_CAP_DROP_TARGETS;
++    if(fs_lease_available())result.capabilities_hi|=SC32_CAP_LEASES_HI;
+     result.max_path_bytes=SC32_PATH_CAPACITY;result.max_arguments_bytes=1024;
+     if(mouse_wheel_available())result.capabilities_lo|=SC32_CAP_POINTER_WHEEL;
+     result.page_size=PAGE_SIZE;result.pit_hz=timer_frequency_hz();
+--- a/sandcore/Makefile
++++ b/sandcore/Makefile
+@@ -122,7 +122,7 @@
+ # ---------------- 产物规则 ----------------
+ # 内核参与链接的全部目标文件。entry.o 必须排第一 (链接脚本里 _start 在前)。
+ OBJS := entry.o main.o boot_scene.o idt.o interrupts.o timer.o keyboard.o mouse.o \
+-        memory.o heap.o objpool.o task_store.o session.o core_boot.o paging.o gfx.o ttf.o display.o theme.o image.o image_service.o userspace.o desktop.o wm.o task.o process.o module.o ata.o fs.o serial.o auth.o crypto.o random.o crc.o streams.o management.o simd.o ringdebug.o audio.o rtc.o scl_boot.o scl_validate.o scd_validate.o sc32_core.o sc32_file.o sc32_gui.o sc32_raw.o sc32_font.o sc32_broker.o sc32_drop.o
++        memory.o heap.o objpool.o task_store.o session.o core_boot.o paging.o gfx.o ttf.o display.o theme.o image.o image_service.o userspace.o desktop.o wm.o task.o process.o module.o ata.o fs.o serial.o auth.o crypto.o random.o crc.o streams.o management.o simd.o ringdebug.o audio.o rtc.o scl_boot.o scl_validate.o scd_validate.o sc32_core.o sc32_file.o sc32_gui.o sc32_raw.o sc32_font.o sc32_broker.o sc32_drop.o sc32_lease.o
+ 
+ # mio：全部普通三环C源与私有include一并上盘，让Notes/计算器/
+ # 游戏和通用客户端也能在系统内编辑编译。第三方解码服务单独由
+--- a/sandcore/m10a2.mk
++++ b/sandcore/m10a2.mk
+@@ -186,3 +186,10 @@
+ $(BUILD)/AGGPROBE.SCX: $(BUILD)/aggregate-probe.o tests/m10a2/AGGPROBE.json tools/mkdscx.py tools/scd_format.py
+ 	$(PY) tools/mkdscx.py $< $@ --manifest tests/m10a2/AGGPROBE.json
+ m10a2-ui-artifacts: $(BUILD)/AGGCALLEE.SCL $(BUILD)/AGGPROBE.SCX
++
++# 租约正文保持独立新selector，短步清理由可信task/main接线。
++$(BUILD)/sc32_lease.o: kernel/sc32_lease.c kernel/sc32_lease.h kernel/fs_lease.h user/SC32LEASE.H user/leaseapi/SC32LEASEWIRE.H $(STAMP)
++	$(CC) $(CFLAGS) -Werror -c $< -o $@
++$(BUILD)/fs.o: $(wildcard kernel/fs_lease*.inc) kernel/fs_lease.h user/SC32LEASE.H user/leaseapi/SC32LEASEWIRE.H
++$(BUILD)/sc32_file.o: kernel/sc32_file_lease.inc kernel/fs_lease.h user/SC32LEASE.H
++$(BUILD)/sc32-library.o: user/leaseapi/leaseapi.c user/leaseapi/SC32LEASEWIRE.H user/SC32LEASE.H
+--- a/sandcore/user/sc32/SC32API.C
++++ b/sandcore/user/sc32/SC32API.C
+@@ -14,3 +14,5 @@
+ #include "../fontapi/sc32_palette.c"
+ #include "../brokerapi/sc32_broker.c"
+ #include "../dropapi/sc32_drop.c"
++
++#include "../leaseapi/leaseapi.c"
+--- a/sandcore/user/SC32API.H
++++ b/sandcore/user/SC32API.H
+@@ -6,8 +6,8 @@
+ /* 正式cdecl API。只声明本基础切片的真实入口，寄存器桥留在库内部。
+  * 记录调用前填size/version；成功返回规范size，未定义尾部保持不变。 */
+ #define SC32_ABI_MAJOR 1u
+-#define SC32_ABI_MINOR 2u
+-#define SC32_LIBRARY_VERSION 3u
++#define SC32_ABI_MINOR 3u
++#define SC32_LIBRARY_VERSION 4u
+ #define SC32_RECORD_VERSION 1u
+ #define SC32_PATH_CAPACITY 65u
+ #define SC32_INFINITE 0xFFFFFFFFu
+--- a/sandcore/user/sc32/SC32API.json
++++ b/sandcore/user/sc32/SC32API.json
+@@ -1,16 +1,68 @@
+ {
+   "name": "SC32API.SCL",
+   "abi_major": 1,
+-  "abi_minor": 2,
+-  "library_version": 3,
++  "abi_minor": 3,
++  "library_version": 4,
+   "init": null,
+   "fini": "Sc32Finalize",
+   "exports": [
+     {
++      "name": "ScBrokerReady",
++      "kind": "function"
++    },
++    {
++      "name": "ScBrokerWait",
++      "kind": "function"
++    },
++    {
+       "name": "ScCallbackPin",
+       "kind": "function"
+     },
+     {
++      "name": "ScClipboardAbort",
++      "kind": "function"
++    },
++    {
++      "name": "ScClipboardBegin",
++      "kind": "function"
++    },
++    {
++      "name": "ScClipboardClear",
++      "kind": "function"
++    },
++    {
++      "name": "ScClipboardClose",
++      "kind": "function"
++    },
++    {
++      "name": "ScClipboardCommit",
++      "kind": "function"
++    },
++    {
++      "name": "ScClipboardFormats",
++      "kind": "function"
++    },
++    {
++      "name": "ScClipboardOffer",
++      "kind": "function"
++    },
++    {
++      "name": "ScClipboardOpen",
++      "kind": "function"
++    },
++    {
++      "name": "ScClipboardQuery",
++      "kind": "function"
++    },
++    {
++      "name": "ScClipboardRead",
++      "kind": "function"
++    },
++    {
++      "name": "ScClipboardWatch",
++      "kind": "function"
++    },
++    {
+       "name": "ScDefaultWindowProc",
+       "kind": "function"
+     },
+@@ -39,6 +91,34 @@
+       "kind": "function"
+     },
+     {
++      "name": "ScDropAt",
++      "kind": "function"
++    },
++    {
++      "name": "ScDropCancel",
++      "kind": "function"
++    },
++    {
++      "name": "ScDropComplete",
++      "kind": "function"
++    },
++    {
++      "name": "ScDropConnect",
++      "kind": "function"
++    },
++    {
++      "name": "ScDropRegister",
++      "kind": "function"
++    },
++    {
++      "name": "ScDropUnregister",
++      "kind": "function"
++    },
++    {
++      "name": "ScDropValidate",
++      "kind": "function"
++    },
++    {
+       "name": "ScErrorFormat",
+       "kind": "function"
+     },
+@@ -67,6 +147,54 @@
+       "kind": "function"
+     },
+     {
++      "name": "ScFileLeaseAcquire",
++      "kind": "function"
++    },
++    {
++      "name": "ScFileLeaseAdvance",
++      "kind": "function"
++    },
++    {
++      "name": "ScFileLeaseCancel",
++      "kind": "function"
++    },
++    {
++      "name": "ScFileLeaseCreatePinned",
++      "kind": "function"
++    },
++    {
++      "name": "ScFileLeaseOpenPinned",
++      "kind": "function"
++    },
++    {
++      "name": "ScFileLeasePublish",
++      "kind": "function"
++    },
++    {
++      "name": "ScFileLeaseQuery",
++      "kind": "function"
++    },
++    {
++      "name": "ScFileLeaseRelease",
++      "kind": "function"
++    },
++    {
++      "name": "ScFileLeaseRemove",
++      "kind": "function"
++    },
++    {
++      "name": "ScFileLeaseRename",
++      "kind": "function"
++    },
++    {
++      "name": "ScFileLeaseSetMode",
++      "kind": "function"
++    },
++    {
++      "name": "ScFileLeaseSnapshot",
++      "kind": "function"
++    },
++    {
+       "name": "ScFileOpen",
+       "kind": "function"
+     },
+@@ -119,6 +247,46 @@
+       "kind": "function"
+     },
+     {
++      "name": "ScIpcAccept",
++      "kind": "function"
++    },
++    {
++      "name": "ScIpcClose",
++      "kind": "function"
++    },
++    {
++      "name": "ScIpcConnect",
++      "kind": "function"
++    },
++    {
++      "name": "ScIpcCreate",
++      "kind": "function"
++    },
++    {
++      "name": "ScIpcListen",
++      "kind": "function"
++    },
++    {
++      "name": "ScIpcPeek",
++      "kind": "function"
++    },
++    {
++      "name": "ScIpcPeer",
++      "kind": "function"
++    },
++    {
++      "name": "ScIpcQuery",
++      "kind": "function"
++    },
++    {
++      "name": "ScIpcReceive",
++      "kind": "function"
++    },
++    {
++      "name": "ScIpcSend",
++      "kind": "function"
++    },
++    {
+       "name": "ScJobCancel",
+       "kind": "function"
+     },
+@@ -147,10 +315,42 @@
+       "kind": "function"
+     },
+     {
++      "name": "ScMemoryCloseShared",
++      "kind": "function"
++    },
++    {
++      "name": "ScMemoryCreateShared",
++      "kind": "function"
++    },
++    {
+       "name": "ScMemoryFreePages",
+       "kind": "function"
+     },
+     {
++      "name": "ScMemoryGrantShared",
++      "kind": "function"
++    },
++    {
++      "name": "ScMemoryMapShared",
++      "kind": "function"
++    },
++    {
++      "name": "ScMemoryOpenShared",
++      "kind": "function"
++    },
++    {
++      "name": "ScMemoryQueryShared",
++      "kind": "function"
++    },
++    {
++      "name": "ScMemoryRevokeShared",
++      "kind": "function"
++    },
++    {
++      "name": "ScMemoryUnmapShared",
++      "kind": "function"
++    },
++    {
+       "name": "ScMessageDispatch",
+       "kind": "function"
+     },
+@@ -372,158 +572,6 @@
+     },
+     {
+       "name": "ScWindowSubmit",
+-      "kind": "function"
+-    },
+-    {
+-      "name": "ScBrokerReady",
+-      "kind": "function"
+-    },
+-    {
+-      "name": "ScBrokerWait",
+-      "kind": "function"
+-    },
+-    {
+-      "name": "ScClipboardAbort",
+-      "kind": "function"
+-    },
+-    {
+-      "name": "ScClipboardBegin",
+-      "kind": "function"
+-    },
+-    {
+-      "name": "ScClipboardClear",
+-      "kind": "function"
+-    },
+-    {
+-      "name": "ScClipboardClose",
+-      "kind": "function"
+-    },
+-    {
+-      "name": "ScClipboardCommit",
+-      "kind": "function"
+-    },
+-    {
+-      "name": "ScClipboardFormats",
+-      "kind": "function"
+-    },
+-    {
+-      "name": "ScClipboardOffer",
+-      "kind": "function"
+-    },
+-    {
+-      "name": "ScClipboardOpen",
+-      "kind": "function"
+-    },
+-    {
+-      "name": "ScClipboardQuery",
+-      "kind": "function"
+-    },
+-    {
+-      "name": "ScClipboardRead",
+-      "kind": "function"
+-    },
+-    {
+-      "name": "ScClipboardWatch",
+-      "kind": "function"
+-    },
+-    {
+-      "name": "ScIpcAccept",
+-      "kind": "function"
+-    },
+-    {
+-      "name": "ScIpcClose",
+-      "kind": "function"
+-    },
+-    {
+-      "name": "ScIpcConnect",
+-      "kind": "function"
+-    },
+-    {
+-      "name": "ScIpcCreate",
+-      "kind": "function"
+-    },
+-    {
+-      "name": "ScIpcListen",
+-      "kind": "function"
+-    },
+-    {
+-      "name": "ScIpcPeek",
+-      "kind": "function"
+-    },
+-    {
+-      "name": "ScIpcPeer",
+-      "kind": "function"
+-    },
+-    {
+-      "name": "ScIpcQuery",
+-      "kind": "function"
+-    },
+-    {
+-      "name": "ScIpcReceive",
+-      "kind": "function"
+-    },
+-    {
+-      "name": "ScIpcSend",
+-      "kind": "function"
+-    },
+-    {
+-      "name": "ScMemoryCloseShared",
+-      "kind": "function"
+-    },
+-    {
+-      "name": "ScMemoryCreateShared",
+-      "kind": "function"
+-    },
+-    {
+-      "name": "ScMemoryGrantShared",
+-      "kind": "function"
+-    },
+-    {
+-      "name": "ScMemoryMapShared",
+-      "kind": "function"
+-    },
+-    {
+-      "name": "ScMemoryOpenShared",
+-      "kind": "function"
+-    },
+-    {
+-      "name": "ScMemoryQueryShared",
+-      "kind": "function"
+-    },
+-    {
+-      "name": "ScMemoryRevokeShared",
+-      "kind": "function"
+-    },
+-    {
+-      "name": "ScMemoryUnmapShared",
+-      "kind": "function"
+-    },
+-    {
+-      "name": "ScDropAt",
+-      "kind": "function"
+-    },
+-    {
+-      "name": "ScDropCancel",
+-      "kind": "function"
+-    },
+-    {
+-      "name": "ScDropComplete",
+-      "kind": "function"
+-    },
+-    {
+-      "name": "ScDropConnect",
+-      "kind": "function"
+-    },
+-    {
+-      "name": "ScDropRegister",
+-      "kind": "function"
+-    },
+-    {
+-      "name": "ScDropUnregister",
+-      "kind": "function"
+-    },
+-    {
+-      "name": "ScDropValidate",
+       "kind": "function"
+     }
+   ],

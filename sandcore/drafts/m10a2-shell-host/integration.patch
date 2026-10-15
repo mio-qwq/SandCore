@@ -1,0 +1,1840 @@
+--- a/sandcore/kernel/task.h
++++ b/sandcore/kernel/task.h
+@@ -52,6 +52,7 @@
+ 
+ void task_init(void);                /* 分页 + GDT/TSS + 内核任务 0 */
+ int  task_spawn(const char *name, u32 pd, u32 entry, u32 user_esp);
++int task_exec_scx_parts(const char *filename,const char *arguments);
+ int  task_exec_scx(const char *path);/* 读 SCX → 建页目录 → 建任务 (SYS_EXEC) */
+ /* SCX/SCL引导共享唯一暂存，不给每进程再留整文件副本。只允许IF=0
+  * 可信零环取用，取得后直到复制完成不能开IRQ或执行用户回调。 */
+--- a/sandcore/kernel/task.c
++++ b/sandcore/kernel/task.c
+@@ -17,6 +17,7 @@
+ #include "task_store.h"
+ #include "scl_boot.h"
+ #include "sc32_core.h"
++#include "sc32_host.h"
+ #include "sc32_file.h"
+ #include "sc32_gui.h"
+ #include "sc32_font.h"
+@@ -579,6 +580,7 @@
+      * 同一接口供 SYS_EXIT 和窗口红叉使用，避免两条退出路径语义漂移。 */
+     if (pid <= 0 || pid >= NTASK || TASK(pid).state == 0 || TASK(pid).state == 2) return;
+     task_state_set(pid,2);          /* 先改变状态，避免关闭调试子进程时重复进入 */
++    sc32_host_owner_stopped(pid);  /* 立即撤桌面角色，真实资源沿原owner阶段回收。 */
+     cleanup_revoke_pending++;
+     task_record(pid)->cleanup_next=-1;
+     if(cleanup_tail>=0)task_record(cleanup_tail)->cleanup_next=pid;else cleanup_head=pid;
+@@ -715,6 +717,8 @@
+             frame[11]=(u32)sc32_broker_call(current,frame[8],frame[10],frame[9]);
+         else if(frame[8]==SC32_FONT_QUERY || frame[8]==SC32_FONT_GLYPH)
+             frame[11]=(u32)sc32_font_call(current,frame[8],frame[10],frame[9]);
++        else if(frame[8]>=0x800u && frame[8]<0x820u)
++            frame[11]=(u32)sc32_host_call(current,frame[8],frame[10],frame[9]);
+         else frame[11]=(u32)sc32_core_call(current,frame[8],frame[10],frame[9]);
+         break;
+     case SYS_STATUS:
+@@ -1303,23 +1307,34 @@
+     return scx_stage;
+ }
+ 
++#include "shell_issue.inc"
++
+ int task_exec_scx(const char *path)
+ {
+-    /* EXEC 接受“路径 空格 参数串”。内核只切出首个路径，参数原样传给
+-     * 用户程序解释；这样汇编器/记事本可以选择输入输出文件，内核无需
+-     * 知道任何具体应用的语法。拷贝完再建任务，消除父子缓冲共享。 */
+-    char filename[64];
+-    int len = 0;
+-    while (*path == ' ') path++;
+-    while (path[len] && path[len] != ' ' && len < 63) { filename[len] = path[len]; len++; }
+-    if (path[len] && path[len] != ' ') return -1;
+-    filename[len] = 0;
++    /* 旧 EXEC 仍接受首个空格分隔的路径与至多127B参数，不改历史语义。 */
++    char filename[64];int len=0;
++    while(*path==' ')path++;
++    while(path[len] && path[len]!=' ' && len<63){filename[len]=path[len];len++;}
++    if(path[len] && path[len]!=' ')return -1;
++    filename[len]=0;
+     if(!auth_launch_access(filename,FS_ACCESS_READ))return -5;
+-    const char *arguments = path + len;
+-    while (*arguments == ' ') arguments++;
+-    int arglen = 0;
+-    while (arguments[arglen] && arglen < 127) arglen++;
+-    if (arguments[arglen]) return -1;
++    const char *arguments=path+len;
++    while(*arguments==' ')arguments++;
++    int arglen=0;while(arguments[arglen] && arglen<127)arglen++;
++    if(arguments[arglen])return -1;
++    return task_exec_scx_parts(filename,arguments);
++}
++
++int task_exec_scx_parts(const char *filename,const char *arguments)
++{
++    /* 新 typed launch 把路径与参数分开；旧wrapper仍负责自己的旧长度
++     * 边界。装载检查/页分配/动态SCX引导只有这一份正文，防止两条路径漂移。 */
++    if(!filename || !arguments)return -1;
++    u32 filelen=0;while(filename[filelen] && filelen<63)filelen++;
++    if(!filelen || filename[filelen])return -1;
++    u32 arglen=0;while(arguments[arglen] && arglen<1023)arglen++;
++    if(arguments[arglen])return -1;
++    if(!auth_launch_access(filename,FS_ACCESS_READ))return -5;
+     /* M9首轮链接已证明大暂存挤出1..2MiB的BSS边界。SCX中转
+      * 固定64页，只在首次合法装载时向PF申请，之后复用到重启；
+      * 仍是IF=0加载路径的单一内核工作区，不随任务反复分配。
+@@ -1336,6 +1351,7 @@
+     /* 图标只是容器资源，不搬进程序地址域。先校验整个容器，再仅读
+      * 载荷，既保留旧装载上限，也支持“最大载荷+独立图标”大文件。 */
+     if(fs_read_at(filename,scx_stage+36,load_size,36)!=(int)load_size)return -1;
++    if(auth_launch_issued_shell() && (icon_length || shell_issue_verify(scx_stage,36u+load_size)))return -5;
+ 
+     u32 pd = paging_new_task_dir();
+     if (!pd) return -4;
+@@ -1381,7 +1397,10 @@
+         /* 页尾补零和独立栈都不是SCX正文。启动描述符须与已校验
+          * 容器精确相等，不能靠“这一段恰好已映射”猜载荷/BSS身份。 */
+         task_record(pid)->scx_load_size=load_size;task_record(pid)->scx_bss_size=bss_size;
+-        for (int i = 0; i <= arglen; i++) TASK(pid).args[i] = arguments[i];
++        /* 168B旧任务前缀仍只容纳127B；新版ARGUMENTS2由streams保存完整参数。 */
++        u32 legacy_args=arglen<127?arglen:127;
++        for(u32 i=0;i<legacy_args;i++)TASK(pid).args[i]=arguments[i];
++        TASK(pid).args[legacy_args]=0;
+         streams_set_arguments(pid,arguments);
+         userspace_executable(pid,filename);
+     }
+--- a/sandcore/kernel/streams.c
++++ b/sandcore/kernel/streams.c
+@@ -1,6 +1,7 @@
+ #include "streams.h"
+ #include "task.h"
+ #include "auth.h"
++#include "session.h"
+ #include "userspace.h"
+ #include "fs.h"
+ #include "process.h"
+@@ -568,6 +569,8 @@
+     if(job->parent_next>=0)((job_t *)objpool_get(&job_pool,job->parent_next))->parent_prev=token;
+     STREAM_CONTEXT(parent).jobs_head=token;STREAM_CONTEXT(child).owned_job=token;return token;
+ }
++#include "streams_launch.inc"
++
+ int streams_wait(int parent,u32 token,u32 out[8])
+ {
+     job_t *j=owned_job(parent,token);if(j){
+--- a/sandcore/kernel/streams.h
++++ b/sandcore/kernel/streams.h
+@@ -25,6 +25,7 @@
+ int streams_terminal_clear(int pid,int fd);
+ int streams_event(int pid,int fd,u32 action);
+ int streams_exec(int parent,const char *command,const i32 descriptors[3],u32 flags);
++int streams_launch_session(int parent,const char *path,const char *arguments);
+ int streams_pipe_descriptors(int parent,const i32 descriptors[3]);
+ int streams_exec_buffer(int parent,const void *script,u32 bytes,const i32 descriptors[3],const char *arguments);
+ int streams_wait(int parent,u32 ticket,u32 out[8]);
+--- a/sandcore/kernel/auth.h
++++ b/sandcore/kernel/auth.h
+@@ -41,8 +41,10 @@
+ void auth_serial_end(void);
+ int auth_serial_exec(u32 session,const char *command);
+ int auth_service_exec(const char *command,int delegate);
++int auth_session_shell_exec(u32 desktop); /* 可信内核固定路径，以普通会话主体启动。 */
+ int auth_login_screen_exec(u32 desktop); /* 可信内核仅启动固定、受保护的登录程序。 */
+ int auth_launch_access(const char *path,u32 access);
++int auth_launch_issued_shell(void); /* 仅固定host启动事务，普通EXEC不能设置。 */
+ int auth_network_exec(int pid,const char *command,const i32 descriptors[3]);
+ /* M10a1：仅内核任务存储器使用，资源按真实任务申请。 */
+ u32 auth_task_bytes(void);
+--- a/sandcore/kernel/auth.c
++++ b/sandcore/kernel/auth.c
+@@ -235,6 +235,18 @@
+     launch.session=session;launch.subject_uid=subject_uid;launch.subject_gid=subject_gid;
+     launch_desktop=desktop;launch_set=1;int result=task_exec_scx(command);launch_set=launch_desktop=0;crypto_zero(&launch,sizeof(launch));return result;
+ }
++static int shell_launch;
++int auth_launch_issued_shell(void){return launch_set && shell_launch;}
++int auth_session_shell_exec(u32 desktop)
++{
++    session_t *s=session_get(desktop);
++    if(task_pid()!=0 || !s || s->kind!=SESSION_NORMAL || s->closing || s->uid<0 || s->gid<0)return -5;
++    /* 内核只能启动固定发行host，且启动身份是该会话普通主体；不是
++     * AUTH_SERVICE/SYSTEM，不能因此取得MOD、跨SID、硬件或其它文件权。 */
++    shell_launch=1;
++    int child=execute("SYS/SHELL/SCSHELL.SCX",s->uid,s->gid,AUTH_NORMAL,0,s->uid,s->gid,desktop);
++    shell_launch=0;return child;
++}
+ int auth_exec_ticket(int pid,u32 token,const char *command,int activate)
+ {
+     login_t *j=job(pid,token);
+--- a/sandcore/kernel/session.c
++++ b/sandcore/kernel/session.c
+@@ -6,6 +6,7 @@
+ #include "wm.h"
+ #include "theme.h"
+ #include "desktop.h"
++#include "sc32_host.h"
+ #include "userspace.h"
+ #include "interrupts.h"
+ #include "fs.h"
+@@ -29,7 +30,7 @@
+     if(serial==0x7FFFFFFFu || kind>SESSION_LOCKED)return 0;
+     u32 id=serial+1;if(objpool_claim(&sessions,(int)id))return 0;
+     session_t *s=session_get(id);s->id=id;s->uid=uid;s->gid=gid;s->kind=kind;s->epoch=1;s->task_head=-1;
+-    copy(s->name,name,32);copy(s->home,home,64);serial=id;return id;
++    copy(s->name,name,32);copy(s->home,home,64);serial=id;sc32_host_session_created(id);return id;
+ }
+ void session_init(int uid,int gid,const char *name,const char *home)
+ {
+@@ -52,7 +53,7 @@
+ }
+ static void release(session_t *s)
+ {
+-    u32 id=s->id;sc32_drop_session_discard(id);sc32_broker_session_discard(id);wm_session_destroy(id);desktop_session_destroy(id);theme_session_destroy(id);userspace_session_destroy(id);
++    u32 id=s->id;sc32_host_session_discard(id);sc32_drop_session_discard(id);sc32_broker_session_discard(id);wm_session_destroy(id);desktop_session_destroy(id);theme_session_destroy(id);userspace_session_destroy(id);
+     objpool_release(&sessions,(int)id);
+ }
+ void session_unbind(int pid)
+--- a/sandcore/kernel/main.c
++++ b/sandcore/kernel/main.c
+@@ -25,6 +25,7 @@
+ #include "sc32_gui.h"
+ #include "sc32_broker.h"
+ #include "sc32_drop.h"
++#include "sc32_host.h"
+ #include "desktop.h"
+ #include "module.h"
+ #include "ttf.h"
+@@ -327,6 +328,7 @@
+ #ifdef M10_DISK_CORE
+         network_poll();              /* 输入先入状态，再做有限网卡/协议批次。 */
+ #endif
++        sc32_host_poll();           /* 仅推进真正待启动SID，固定路径普通身份。 */
+         sc32_drop_poll();
+         sc32_broker_poll();
+         task_cleanup_poll();          /* 先撤稳定旁表引用，再给调度器回收页与内核栈。 */
+--- a/sandcore/kernel/fs.c
++++ b/sandcore/kernel/fs.c
+@@ -160,7 +160,8 @@
+     || same(name,"SYS/RECOVERY") || child(name,"SYS/RECOVERY")
+     /* 系统SCL是用户态代码，但启动来源必须稳定。root绕过普通rw
+      * 不等于可替换系统库；宿主发行包与可信零环更新沿原内部接口。 */
+-    || same(name,"SYS/LIB") || child(name,"SYS/LIB"); }
++    || same(name,"SYS/LIB") || child(name,"SYS/LIB")
++    || same(name,"SYS/SHELL") || child(name,"SYS/SHELL"); }
+ static int module_path(const char *name)
+ {return same(name,"SYS/MOD") || child(name,"SYS/MOD");}
+ int fs_user_mutable(const char *path,int descendants)
+--- a/sandcore/kernel/sc32_broker.h
++++ b/sandcore/kernel/sc32_broker.h
+@@ -5,6 +5,7 @@
+ 
+ int sc32_broker_init(void);
+ int sc32_broker_available(void);
++int sc32_broker_kernel_close(int pid,u32 handle);
+ int sc32_broker_identity(int pid,ScBrokerIdentity *out);
+ int sc32_broker_drop_endpoint(int owner,u32 endpoint,u32 session,ScBrokerIdentity *out);
+ int sc32_broker_drop_connect(int source,int owner,u32 endpoint,Sc32BrokerToken *out);
+--- a/sandcore/kernel/sc32_broker.c
++++ b/sandcore/kernel/sc32_broker.c
+@@ -1942,6 +1942,8 @@
+     return 0;
+ }
+ 
++#include "broker_shell.inc"
++
+ static int br_close(int pid,u32 request,u32 output,u32 kind)
+ {
+     Sc32BrokerHandle input;
+--- a/sandcore/user/sc32/SC32API.C
++++ b/sandcore/user/sc32/SC32API.C
+@@ -14,3 +14,4 @@
+ #include "../fontapi/sc32_palette.c"
+ #include "../brokerapi/sc32_broker.c"
+ #include "../dropapi/sc32_drop.c"
++#include "../hostapi/sc32_launch.c"
+--- a/sandcore/user/scui/SCUIPRIVATE.H
++++ b/sandcore/user/scui/SCUIPRIVATE.H
+@@ -176,6 +176,7 @@
+ static int ui_rect_contains(const ScUiRect *,ScI32,ScI32);
+ static int ui_rect_nonempty(const ScUiRect *);
+ static ScStatus ui_damage(UiNode *,const ScUiRect *);
++static int ui_root_can_paint(const UiRoot *);
+ static ScStatus ui_paint_root(UiNode *);
+ static ScStatus ui_root_surface(UiNode *);
+ static ScStatus ui_theme_refresh(ScUiContext *);
+--- a/sandcore/user/SCUI.H
++++ b/sandcore/user/SCUI.H
+@@ -8,12 +8,14 @@
+ /* 控件树与回调只在本人Ring3拥有；完整正文由SCUI.SCL动态装载。 */
+ 
+ enum {
+-    SC_UI_ABI_MAJOR=1,SC_UI_ABI_MINOR=0,SC_UI_VERSION=1,
++    SC_UI_ABI_MAJOR=1,SC_UI_ABI_MINOR=1,SC_UI_VERSION=2,
+     SC_UI_OK=0,SC_UI_HANDLED=1,SC_UI_VETO=2,SC_UI_END=3,SC_UI_PENDING=4,
+     SC_UI_E_INVALID=-301,SC_UI_E_VERSION=-302,SC_UI_E_RANGE=-303,
+     SC_UI_E_MEMORY=-304,SC_UI_E_STALE=-305,SC_UI_E_NOT_FOUND=-306,
+     SC_UI_E_EXISTS=-307,SC_UI_E_BUSY=-308,SC_UI_E_UTF8=-309,
+     SC_UI_E_IO=-310,SC_UI_E_CANCELLED=-311,SC_UI_E_NOT_SUPPORTED=-312,SC_UI_E_FAILED=-313,
++    SC_UI_TEXT_WRAP=1,SC_UI_TEXT_ELLIPSIS=2,SC_UI_TEXT_CENTER=4,SC_UI_TEXT_RIGHT=8,
++    SC_UI_TEXT_UNDERLINE=16,SC_UI_TEXT_STRIKE=32,
+     SC_UI_WINDOW=1,SC_UI_PANEL=2,SC_UI_BUTTON=3,SC_UI_LABEL=4,
+     SC_UI_CHECKBOX=5,SC_UI_RADIO=6,SC_UI_GROUPBOX=7,SC_UI_TEXTBOX=8,
+     SC_UI_EDIT=9,SC_UI_COMBOBOX=10,SC_UI_SPINBOX=11,SC_UI_TAB=12,
+@@ -181,6 +183,7 @@
+ ScStatus ScUiContextStop(ScUiContext *,ScI32 exit_code);
+ ScStatus ScUiContextRun(ScUiContext *,ScI32 *exit_code);
+ ScStatus ScUiContextStep(ScUiContext *,ScU32 timeout_ticks);
++ScStatus ScUiContextWaitTimeout(ScUiContext *,ScU32 maximum_ticks,ScU32 *out);
+ ScStatus ScUiContextDispatch(ScUiContext *,const ScMessage *);
+ ScStatus ScUiWindowCreate(ScUiContext *,const ScUiWindowDesc *,ScUiNode *out);
+ ScStatus ScUiWindowNative(ScUiContext *,ScUiNode,ScWindowInfo *out);
+@@ -223,6 +226,9 @@
+ ScStatus ScUiPainterClip(ScUiPainter *,const ScUiRect *);
+ ScStatus ScUiPainterRestore(ScUiPainter *);
+ ScStatus ScUiPainterFill(ScUiPainter *,const ScUiRect *,ScU32 color_role);
++ScStatus ScUiPainterClear(ScUiPainter *,const ScUiRect *);
++ScStatus ScUiPainterTextColor(ScUiPainter *,const ScUiRect *,const ScUiText *,ScU32 font_role,ScU32 flags,ScU32 color_role);
++ScStatus ScUiPainterBounds(ScUiPainter *,ScUiRect *out);
+ ScStatus ScUiPainterLine(ScUiPainter *,ScI32 x1,ScI32 y1,ScI32 x2,ScI32 y2,ScU32 color_role);
+ ScStatus ScUiPainterText(ScUiPainter *,const ScUiRect *,const ScUiText *,ScU32 font_role,ScU32 flags);
+ ScStatus ScUiPainterIcon(ScUiPainter *,const ScUiRect *,ScUiIcon *,ScU32 state);
+--- a/sandcore/user/scui/SCUI.json
++++ b/sandcore/user/scui/SCUI.json
+@@ -1,8 +1,8 @@
+ {
+   "name": "SCUI.SCL",
+   "abi_major": 1,
+-  "abi_minor": 0,
+-  "library_version": 1,
++  "abi_minor": 1,
++  "library_version": 2,
+   "init": null,
+   "fini": "ScUiFinalize",
+   "exports": [
+@@ -107,6 +107,10 @@
+       "kind": "function"
+     },
+     {
++      "name": "ScUiContextWaitTimeout",
++      "kind": "function"
++    },
++    {
+       "name": "ScUiDialogClose",
+       "kind": "function"
+     },
+@@ -435,6 +439,14 @@
+       "kind": "function"
+     },
+     {
++      "name": "ScUiPainterBounds",
++      "kind": "function"
++    },
++    {
++      "name": "ScUiPainterClear",
++      "kind": "function"
++    },
++    {
+       "name": "ScUiPainterClip",
+       "kind": "function"
+     },
+@@ -456,6 +468,10 @@
+     },
+     {
+       "name": "ScUiPainterText",
++      "kind": "function"
++    },
++    {
++      "name": "ScUiPainterTextColor",
+       "kind": "function"
+     },
+     {
+--- a/sandcore/user/scui/ui_paint.c
++++ b/sandcore/user/scui/ui_paint.c
+@@ -322,6 +322,14 @@
+     }
+     return SC_UI_OK;
+ }
++#include "ui_shell_paint.inc"
++
++static int ui_root_can_paint(const UiRoot *w)
++{
++    /* PREPARING只来自内核已授角色的两surface，仍保持visible=0；这里只
++     * 给真实首帧绘制资格，输入/动画timer继续沿普通实际可见性判断。 */
++    return w && (w->visible || (w->information.state&SC32_WINDOW_PREPARING));
++}
+ static ScStatus ui_root_surface(UiNode *n)
+ {
+     UiRoot *w=n->window;
+@@ -379,7 +387,7 @@
+     ScWideCounter now;
+     int began=0;
+     if(!w || (root->private_flags&UI_NODE_RETIRED))return SC_UI_E_STALE;
+-    if(!w->paint_pending || !w->visible)return SC_UI_PENDING;
++    if(!w->paint_pending || !ui_root_can_paint(w))return SC_UI_PENDING;
+     if(ui_now(&now)==0 && ui_wide_compare(&now,&w->retry)<0)return SC_UI_PENDING;
+     ui_node_hold(root);
+     c->walking++;
+@@ -426,6 +434,9 @@
+         if(bounds.x!=claimed.x || bounds.y!=claimed.y || bounds.width!=claimed.width || bounds.height!=claimed.height){rectangles[0]=claimed;
+             count=1;
+             }}
++    /* 隐藏准备surface必须提交一次真正完整首帧，不能把几块局部损伤
++     * 的包围框当完整覆盖。WM以同geometry实际Submit核对，然后撤资格。 */
++    if(w->information.state&SC32_WINDOW_PREPARING){rectangles[0]=claimed;count=1;}
+     revision=c->revision;
+     for(i=0;i<count;i++){UiNode *n=root;
+         while(n){ScUiPainter p;
+@@ -509,6 +520,7 @@
+         goto failed;
+         }
+     began=0;
++    if(w->information.state&SC32_WINDOW_PREPARING){s=ui_root_surface(root);if(s<0)goto failed;}
+     w->paint_pending=0;
+     w->paint_failures=0;
+     w->retry.lo=w->retry.hi=0;
+--- a/sandcore/user/scui/ui_dispatch.c
++++ b/sandcore/user/scui/ui_dispatch.c
+@@ -453,6 +453,8 @@
+         goto done;
+     }
+     if(m->id==SC32_MSG_PAINT){ScContainerInfo info;
++        /* 隐藏host的准备资格只在真实PAINT后重新查事实，不轮询全部hidden root。 */
++        if(!w->visible){s=ui_root_surface(root);if(s<0)goto done;}
+         ScUiRect r;
+         w->paint_pending=1;
+         memset(&info,0,sizeof(info));
+@@ -482,6 +484,7 @@
+          * 不能因post-ACTIVATE查询提前置位就吞掉第一次真实VIS事件。 */
+         w->notified_visible=w->visible;
+         w->information.visibility_epoch=m->epoch;
++        w->information.state&=~SC32_WINDOW_PREPARING;
+         if(w->visible)w->information.state|=SC32_WINDOW_VISIBLE;
+         else w->information.state&=~SC32_WINDOW_VISIBLE;
+         ui_timers_visibility(c,root->id,w->visible);
+@@ -955,7 +958,7 @@
+         ScU32 delta=ui_wide_compare(&now,&t->description.deadline)>=0?0:ui_wide_difference(&t->description.deadline,&now);
+         if(nearest==SC32_INFINITE || delta<nearest)nearest=delta;
+         }
+-    for(r=c->roots;r;r=r->root_next)if(r->window && r->window->visible && r->window->paint_pending){ScU32 delta=ui_wide_compare(&now,&r->window->retry)>=0?0:ui_wide_difference(&r->window->retry,&now);
++    for(r=c->roots;r;r=r->root_next)if(r->window && ui_root_can_paint(r->window) && r->window->paint_pending){ScU32 delta=ui_wide_compare(&now,&r->window->retry)>=0?0:ui_wide_difference(&r->window->retry,&now);
+         if(nearest==SC32_INFINITE || delta<nearest)nearest=delta;
+         }
+     return nearest;
+@@ -979,6 +982,15 @@
+     s=ui_cause(c,s,UI_OP_EVENT,0);
+     ui_object_leave(&c->object);
+     return s;
++}
++ScStatus ScUiContextWaitTimeout(ScUiContext *c,ScU32 maximum,ScU32 *out)
++{
++    if(!out || (maximum>0x7fffffffu && maximum!=SC32_INFINITE))return SC_UI_E_INVALID;
++    ScStatus s=ui_object_enter((UiObject *)c,UI_CONTEXT);if(s<0)return s;
++    /* 混合GUI/IPC服务泵只借真实下一期限；不在宿主应用猜拖放的1tick
++     * 或为所有空闲GUI加固定高频poll。没有改变计时/消息分派语义。 */
++    ScU32 value=ui_drag_wait(c,ui_timer_wait(c,maximum));
++    *out=value;ui_object_leave(&c->object);return SC_UI_OK;
+ }
+ ScStatus ScUiContextStep(ScUiContext *c,ScU32 timeout)
+ {
+@@ -1024,7 +1036,7 @@
+     if(s<0)goto done;
+     c->walking++;
+     for(root=c->roots;root;root=root->root_next){
+-        if(root->window && root->window->visible && root->window->paint_pending){ScStatus painted=ui_paint_root(root);
++        if(root->window && ui_root_can_paint(root->window) && root->window->paint_pending){ScStatus painted=ui_paint_root(root);
+             if(painted<0 && c->description.error_procedure){ScUiEvent e;
+                 ui_event_record(&e,root,SC_UI_EVENT_ERROR);
+                 e.data=&c->error;
+--- a/sandcore/Makefile
++++ b/sandcore/Makefile
+@@ -122,7 +122,7 @@
+ # ---------------- 产物规则 ----------------
+ # 内核参与链接的全部目标文件。entry.o 必须排第一 (链接脚本里 _start 在前)。
+ OBJS := entry.o main.o boot_scene.o idt.o interrupts.o timer.o keyboard.o mouse.o \
+-        memory.o heap.o objpool.o task_store.o session.o core_boot.o paging.o gfx.o ttf.o display.o theme.o image.o image_service.o userspace.o desktop.o wm.o task.o process.o module.o ata.o fs.o serial.o auth.o crypto.o random.o crc.o streams.o management.o simd.o ringdebug.o audio.o rtc.o scl_boot.o scl_validate.o scd_validate.o sc32_core.o sc32_file.o sc32_gui.o sc32_raw.o sc32_font.o sc32_broker.o sc32_drop.o
++        memory.o heap.o objpool.o task_store.o session.o core_boot.o paging.o gfx.o ttf.o display.o theme.o image.o image_service.o userspace.o desktop.o wm.o task.o process.o module.o ata.o fs.o serial.o auth.o crypto.o random.o crc.o streams.o management.o simd.o ringdebug.o audio.o rtc.o scl_boot.o scl_validate.o scd_validate.o sc32_core.o sc32_file.o sc32_gui.o sc32_raw.o sc32_font.o sc32_broker.o sc32_drop.o sc32_host.o
+ 
+ # mio：全部普通三环C源与私有include一并上盘，让Notes/计算器/
+ # 游戏和通用客户端也能在系统内编辑编译。第三方解码服务单独由
+--- a/sandcore/m10a2.mk
++++ b/sandcore/m10a2.mk
+@@ -186,3 +186,17 @@
+ $(BUILD)/AGGPROBE.SCX: $(BUILD)/aggregate-probe.o tests/m10a2/AGGPROBE.json tools/mkdscx.py tools/scd_format.py
+ 	$(PY) tools/mkdscx.py $< $@ --manifest tests/m10a2/AGGPROBE.json
+ m10a2-ui-artifacts: $(BUILD)/AGGCALLEE.SCL $(BUILD)/AGGPROBE.SCX
++
++# 会话寿命启动底座；与Shell角色接线同批开启，旧受管作业不变。
++$(BUILD)/sc32_host.o: kernel/sc32_host.c kernel/sc32_host.h user/SC32HOST.H user/hostapi/SC32HOSTWIRE.H $(STAMP)
++	$(CC) $(CFLAGS) -Werror -c $< -o $@
++$(BUILD)/streams.o: kernel/streams_launch.inc
++$(BUILD)/sc32_broker.o: kernel/broker_shell.inc
++$(BUILD)/wm.o: kernel/wm_shell.inc kernel/sc32_host.h
++$(BUILD)/scui-library.o: user/scui/ui_shell_paint.inc
++SHELL_HOST_IMAGE ?= $(BUILD)/SCSHELL.SCX
++# 正式原生收尾显式指向已核来源的G1产物，不把HOST摘要授给不同字节。
++$(BUILD)/shell_host_issue.h: $(SHELL_HOST_IMAGE) tools/mk_shell_issue.py
++	$(PY) tools/mk_shell_issue.py --host $(SHELL_HOST_IMAGE) --out $@
++$(BUILD)/task.o: kernel/shell_issue.inc $(BUILD)/shell_host_issue.h
++$(BUILD)/sc32-library.o: user/SC32HOST.H user/hostapi/SC32HOSTWIRE.H user/hostapi/sc32_launch.c
+--- /dev/null
++++ b/sandcore/kernel/broker_shell.inc
+@@ -0,0 +1,8 @@
++/* 放在br_close_handle真实正文之后。只有可信内核服务错误回滚调用，
++ * 仍核本人PID/gen/资源种类，不允许按另一个进程的裸编号关闭端点。 */
++int sc32_broker_kernel_close(int pid,u32 id)
++{
++    br_handle *handle=br_handle_get(pid,id,0);
++    if(!handle || (handle->kind!=BR_ENDPOINT && handle->kind!=BR_CHANNEL))return SC32_E_STALE;
++    return br_close_handle(handle);
++}
+--- /dev/null
++++ b/sandcore/kernel/sc32_host.c
+@@ -0,0 +1,375 @@
++#include "sc32_host.h"
++#include "sc32_core.h"
++#include "task.h"
++#include "paging.h"
++#include "auth.h"
++#include "session.h"
++#include "streams.h"
++#include "objpool.h"
++#include "timer.h"
++#include "sc32_broker.h"
++#include "../user/hostapi/SC32HOSTWIRE.H"
++
++typedef char host_launch_wire_size[(sizeof(Sc32HostLaunch)==32)?1:-1];
++typedef char host_launch_result_size[(sizeof(ScLaunchInfo)==64)?1:-1];
++typedef char host_info_size[(sizeof(ScShellHostInfo)==96)?1:-1];
++typedef char host_prepare_size[(sizeof(ScShellHostDesc)==48)?1:-1];
++typedef char host_connection_size[(sizeof(ScShellConnectionInfo)==160)?1:-1];
++typedef char host_window_size[(sizeof(ScShellWindowInfo)==320)?1:-1];
++typedef char host_action_size[(sizeof(ScShellWindowAction)==64)?1:-1];
++typedef char host_point_size[(sizeof(ScShellHostPoint)==32)?1:-1];
++
++typedef struct host_session host_session;
++struct host_session {
++    u32 session,epoch,pid,generation,endpoint,state,attempts,activated,deadline,queued;
++    host_session *previous,*next;
++};
++typedef struct {u32 session,generation;} host_owner;
++static objpool_t host_sessions,host_owners;
++static host_session *host_first,*host_last;
++static int host_started;
++
++static void host_clear(void *out,u32 bytes)
++{for(u32 i=0;i<bytes;i++)((u8 *)out)[i]=0;}
++
++static int host_init(void)
++{
++    if(host_started)return 0;
++    if(objpool_init(&host_sessions,sizeof(host_session),0))return SC32_E_MEMORY;
++    if(objpool_init(&host_owners,sizeof(host_owner),0)){
++        objpool_destroy(&host_sessions);return SC32_E_MEMORY;
++    }
++    host_started=1;return 0;
++}
++static host_session *host_get(u32 sid)
++{return host_started?objpool_get(&host_sessions,(int)sid):0;}
++static int host_scope(int pid,session_t **out)
++{
++    u32 identity[8];
++    if(pid<=0 || !task_owned(pid) || TASK(pid).state!=1 || auth_info(pid,identity)
++        || (int)identity[1]<0 || (int)identity[2]<0 || identity[3]!=AUTH_NORMAL)return SC32_E_ACCESS;
++    session_t *scope=session_get(session_task(pid));
++    if(!scope || scope->kind!=SESSION_NORMAL || scope->closing)return SC32_E_ACCESS;
++    *out=scope;return 0;
++}
++int sc32_host_is_host(int pid,u32 sid)
++{
++    host_session *p=host_get(sid);session_t *scope;
++    return p && p->state!=SC32_SHELL_STOPPING && !host_scope(pid,&scope) && scope->id==sid && p->pid==(u32)pid
++        && p->generation==task_generation(pid);
++}
++void sc32_host_windows_changed(u32 sid)
++{
++    host_session *p=host_get(sid);
++    if(p && p->pid)task_notify_generation((int)p->pid,p->generation,TASK_EVENT_VISIBILITY);
++}
++static void host_unqueue(host_session *p)
++{
++    if(!p->queued)return;
++    if(p->previous)p->previous->next=p->next;else host_first=p->next;
++    if(p->next)p->next->previous=p->previous;else host_last=p->previous;
++    p->previous=p->next=0;p->queued=0;
++}
++static void host_queue(host_session *p,u32 delay)
++{
++    host_unqueue(p);p->deadline=sc_ticks+delay;
++    /* 只在会话启动/故障发生时插入。热poll只看已排序队首，不每tick扫
++     * 全部会话；所有重试期限不超过数秒，沿用PIT有符号差的回绕合同。 */
++    host_session *after=host_first;
++    while(after && (i32)(after->deadline-p->deadline)<=0)after=after->next;
++    p->next=after;p->previous=after?after->previous:host_last;
++    if(p->previous)p->previous->next=p;else host_first=p;
++    if(after)after->previous=p;else host_last=p;
++    p->queued=1;task_kernel_wake();
++}
++void sc32_host_session_created(u32 sid)
++{
++    session_t *scope=session_get(sid);
++    if(!scope || scope->kind!=SESSION_NORMAL || scope->uid<0 || scope->gid<0 || host_init())return;
++    if(host_get(sid) || objpool_claim(&host_sessions,(int)sid))return;
++    host_session *p=host_get(sid);p->session=sid;p->epoch=1;
++    host_queue(p,0);
++}
++void sc32_host_session_discard(u32 sid)
++{
++    host_session *p=host_get(sid);if(!p)return;
++    host_unqueue(p);
++    if(p->pid){
++        wm_shell_detach((int)p->pid,p->generation);
++        objpool_release(&host_owners,(int)p->pid);
++    }
++    objpool_release(&host_sessions,(int)sid);
++}
++void sc32_host_owner_stopped(int pid)
++{
++    if(!host_started || pid<=0)return;
++    host_owner *owner=objpool_get(&host_owners,pid);
++    if(!owner || owner->generation!=task_generation(pid))return;
++    host_session *p=host_get(owner->session);
++    objpool_release(&host_owners,pid);
++    if(!p || p->pid!=(u32)pid || p->generation!=task_generation(pid))return;
++    wm_shell_detach(pid,p->generation);
++    if(p->activated && (u32)(sc_ticks-p->activated)>=6000u)p->attempts=0;
++    p->pid=p->generation=p->endpoint=p->activated=0;
++    if(p->epoch<0xFFFFFFFFu)p->epoch++;
++    p->state=SC32_SHELL_OFFLINE;
++    session_t *scope=session_get(p->session);
++    if(scope && !scope->closing){
++        if(p->attempts<4 && p->epoch<0xFFFFFFFFu)host_queue(p,100u);
++        else p->state=SC32_SHELL_RETRY_EXHAUSTED;
++    }
++}
++void sc32_host_poll(void)
++{
++    if(!host_first || (i32)(sc_ticks-host_first->deadline)<0)return;
++    host_session *p=host_first;host_unqueue(p);
++    session_t *scope=session_get(p->session);
++    if(!scope || scope->closing || scope->kind!=SESSION_NORMAL || p->pid)return;
++    if(p->attempts>=4){p->state=SC32_SHELL_RETRY_EXHAUSTED;return;}
++    p->attempts++;
++    /* 只有可信内核启动器能产生这项绑定。固定受保护发行路径不是普通
++     * IPC名，也不接受用户给PID/身份；孩子仍是本会话普通主体，没有提权。 */
++    int child=auth_session_shell_exec(p->session);
++    if(child>0){
++        if(!objpool_claim(&host_owners,child)){
++            host_owner *owner=objpool_get(&host_owners,child);
++            owner->session=p->session;owner->generation=task_generation(child);
++            p->pid=(u32)child;p->generation=owner->generation;p->state=SC32_SHELL_STARTING;
++            return;
++        }
++        task_stop(child);
++    }
++    p->state=p->attempts<4?SC32_SHELL_OFFLINE:SC32_SHELL_RETRY_EXHAUSTED;
++    if(p->attempts<4)host_queue(p,300u);
++}
++static void host_value(host_session *p,ScShellHostInfo *out)
++{
++    host_clear(out,sizeof(*out));out->size=sizeof(*out);out->version=1;
++    if(!p)return;
++    out->session=out->session_generation=p->session;
++    out->host_epoch=p->epoch;out->pid=p->pid;out->generation=p->generation;
++    out->endpoint=p->endpoint;out->state=p->state;
++    wm_shell_info(p->session,out);
++}
++static int host_publish(int pid,u32 output,const void *value,u32 bytes)
++{return paging_user_copy(TASK(pid).pd,output,(void *)value,bytes,1)?SC32_E_INVALID:0;}
++static int host_record(int pid,host_session **out,int owner)
++{
++    session_t *scope;int error=host_scope(pid,&scope);if(error)return error;
++    host_session *p=host_get(scope->id);
++    if(!p)return SC32_E_NOT_FOUND;
++    if(owner && !sc32_host_is_host(pid,scope->id))return SC32_E_ACCESS;
++    *out=p;return 0;
++}
++
++/* 显式字节数包括唯一末尾 NUL。先验证完整 RO 范围，再复制可信局部值；
++ * 不逐字读取用户指针，也不把参数地址留给之后运行的子进程。 */
++static int host_text(int pid,u32 address,u32 bytes,char *out,u32 capacity)
++{
++    if(!bytes || bytes>capacity || !address)return SC32_E_INVALID;
++    if(paging_user_copy(TASK(pid).pd,address,out,bytes,0))return SC32_E_INVALID;
++    for(u32 i=0;i+1<bytes;i++)if(!out[i])return SC32_E_INVALID;
++    return out[bytes-1]?SC32_E_INVALID:SC32_OK;
++}
++
++static int host_launch(int pid,u32 request,u32 output)
++{
++    int error=sc32_core_output(pid,output,sizeof(ScLaunchInfo));
++    if(error)return error;
++    Sc32HostLaunch input;
++    error=sc32_core_input(pid,request,&input,sizeof(input));
++    if(error)return error;
++    if(input.flags || input.reserved)return SC32_E_INVALID;
++    char path[128],arguments[1024];
++    error=host_text(pid,input.path,input.path_bytes,path,sizeof(path));
++    if(error)return error;
++    error=host_text(pid,input.arguments,input.argument_bytes,arguments,sizeof(arguments));
++    if(error)return error;
++    int child=streams_launch_session(pid,path,arguments);
++    if(child<1)return child==-2?SC32_E_NOT_FOUND:child==-4?SC32_E_MEMORY:
++        child==-5?SC32_E_ACCESS:SC32_E_INVALID;
++    ScLaunchInfo result;
++    host_clear(&result,sizeof(result));
++    result.size=sizeof(result);result.version=1;
++    result.pid=(u32)child;result.generation=task_generation(child);
++    result.session=session_task(child);result.uid=auth_uid(child);result.gid=auth_gid(child);
++    u32 identity[8];
++    if(auth_info(child,identity)){
++        task_stop(child);
++        return SC32_E_FAILED;
++    }
++    result.realm=identity[3];
++    /* 输出已在任何 spawn 前验完整声明范围；同 IF=0 期间本人页表没有
++     * 用户执行机会。防御性复制失败仍撤未运行孩子，不能留下未知启动。 */
++    if(paging_user_copy(TASK(pid).pd,output,&result,sizeof(result),1)){
++        task_stop(child);
++        return SC32_E_INVALID;
++    }
++    return SC32_OK;
++}
++
++static int host_query(int pid,u32 request,u32 output,int restart)
++{
++    if(request)return SC32_E_INVALID;
++    int error=sc32_core_output(pid,output,sizeof(ScShellHostInfo));
++    if(error)return error;
++    host_session *p;
++    error=host_record(pid,&p,0);
++    if(error==SC32_E_NOT_FOUND && restart){
++        session_t *scope;error=host_scope(pid,&scope);
++        if(error)return error;
++        sc32_host_session_created(scope->id);error=host_record(pid,&p,0);
++        if(error==SC32_E_NOT_FOUND)return SC32_E_MEMORY;
++    }
++    if(error)return error;
++    if(restart){
++        if(p->pid)return SC32_E_BUSY;
++        if(p->epoch==0xFFFFFFFFu)return SC32_E_RANGE;
++        p->attempts=0;p->state=SC32_SHELL_OFFLINE;host_queue(p,0);
++    }
++    ScShellHostInfo result;host_value(p,&result);
++    return host_publish(pid,output,&result,sizeof(result));
++}
++static int host_prepare(int pid,u32 request,u32 output)
++{
++    int error=sc32_core_output(pid,output,sizeof(ScShellHostInfo));
++    if(error)return error;
++    ScShellHostDesc input;
++    error=sc32_core_input(pid,request,&input,sizeof(input));if(error)return error;
++    if(input.flags || input.reserved[0] || input.reserved[1] || !input.endpoint
++        || !input.desktop || !input.desktop_generation || !input.taskbar
++        || !input.taskbar_generation || input.desktop==input.taskbar)return SC32_E_INVALID;
++    host_session *p;
++    error=host_record(pid,&p,1);if(error)return error;
++    if(input.host_epoch!=p->epoch)return SC32_E_STALE;
++    if(p->state==SC32_SHELL_ACTIVE)return SC32_E_BUSY;
++    ScBrokerIdentity identity;
++    error=sc32_broker_drop_endpoint(pid,input.endpoint,p->session,&identity);if(error)return error;
++    error=wm_shell_prepare(pid,input.desktop,input.desktop_generation,
++        input.taskbar,input.taskbar_generation,input.taskbar_height);
++    if(error)return error;
++    p->endpoint=input.endpoint;p->state=SC32_SHELL_PREPARED;
++    ScShellHostInfo result;host_value(p,&result);
++    return host_publish(pid,output,&result,sizeof(result));
++}
++static int host_control(int pid,u32 operation,u32 request,u32 output)
++{
++    int connect=operation==SC32_H_CONNECT;
++    int error=sc32_core_output(pid,output,connect?sizeof(ScShellConnectionInfo):sizeof(ScShellHostInfo));
++    if(error)return error;
++    Sc32HostControl input;
++    error=sc32_core_input(pid,request,&input,sizeof(input));if(error)return error;
++    if(input.flags || input.reserved[0] || input.reserved[1] || input.reserved[2]
++        || (operation!=SC32_H_WORKSPACE && input.value))return SC32_E_INVALID;
++    host_session *p;
++    int deactivate=operation==SC32_H_DEACTIVATE;
++    error=host_record(pid,&p,!connect && !deactivate);if(error)return error;
++    if((!connect || input.host_epoch) && input.host_epoch!=p->epoch)return SC32_E_STALE;
++    if(deactivate){
++        if(p->pid!=(u32)pid || p->generation!=task_generation(pid))return SC32_E_ACCESS;
++        if(p->state!=SC32_SHELL_STOPPING){
++            wm_shell_detach(pid,p->generation);
++            p->endpoint=0;p->state=SC32_SHELL_STOPPING;
++        }
++        /* PID/gen保留到真实EXIT，Restart仍BUSY；正常stdio/fini与return
++         * 能完整执行，不因销角色窗被强行提前Stop或丢掉退出码。 */
++        ScShellHostInfo result;host_value(p,&result);
++        return host_publish(pid,output,&result,sizeof(result));
++    }
++    if(connect){
++        if(p->state!=SC32_SHELL_ACTIVE || !p->pid)return SC32_E_AGAIN;
++        ScShellConnectionInfo result;host_clear(&result,sizeof(result));
++        result.size=sizeof(result);result.version=1;host_value(p,&result.host);
++        error=sc32_broker_drop_endpoint((int)p->pid,p->endpoint,p->session,&result.peer);
++        if(error)return error;
++        Sc32BrokerToken token;
++        error=sc32_broker_drop_connect(pid,(int)p->pid,p->endpoint,&token);if(error)return error;
++        result.channel=token.handle;
++        error=host_publish(pid,output,&result,sizeof(result));
++        if(error)(void)sc32_broker_kernel_close(pid,token.handle);
++        return error;
++    }
++    ScBrokerIdentity identity;
++    error=sc32_broker_drop_endpoint(pid,p->endpoint,p->session,&identity);if(error)return error;
++    if(operation==SC32_H_ACTIVATE){
++        if(p->state!=SC32_SHELL_PREPARED)return SC32_E_BUSY;
++        error=wm_shell_activate(pid);if(error)return error;
++        p->state=SC32_SHELL_ACTIVE;p->activated=sc_ticks;
++    }else{
++        if(p->state!=SC32_SHELL_ACTIVE)return SC32_E_BUSY;
++        error=wm_shell_workspace(pid,input.value);if(error)return error;
++    }
++    ScShellHostInfo result;host_value(p,&result);
++    return host_publish(pid,output,&result,sizeof(result));
++}
++static int host_windows(int pid,u32 request,u32 output)
++{
++    int error=sc32_core_output(pid,output,sizeof(ScShellWindowPage));if(error)return error;
++    Sc32HostWindows input;
++    error=sc32_core_input(pid,request,&input,sizeof(input));if(error)return error;
++    if(input.reserved || !input.capacity || input.capacity>64u || !input.rows
++        || input.after==0xFFFFFFFFu)return SC32_E_INVALID;
++    host_session *p;
++    error=host_record(pid,&p,1);if(error)return error;
++    if(input.host_epoch!=p->epoch)return SC32_E_STALE;
++    if(p->state!=SC32_SHELL_ACTIVE)return SC32_E_BUSY;
++    u32 bytes=input.capacity*sizeof(ScShellWindowInfo);
++    if(!paging_user_write_range(TASK(pid).pd,input.rows,bytes))return SC32_E_INVALID;
++    /* 一个320B局部record重复使用，绝不在4KiB内核栈开64行数组。窗口
++     * 总量动态；64只是一陷入的拷贝预算，cursor/finished给真实后续状态。 */
++    ScShellWindowPage page;host_clear(&page,sizeof(page));page.size=sizeof(page);page.version=1;
++    page.cursor=input.after;
++    for(u32 i=0;i<input.capacity && page.examined<64u;i++){
++        ScShellWindowInfo row;u32 cursor,epoch,examined;int finished;
++        error=wm_shell_window_next(pid,page.cursor,64u-page.examined,&row,&cursor,&epoch,&examined,&finished);
++        if(error)return error;
++        if(input.expected_epoch && input.expected_epoch!=epoch)return SC32_E_STALE;
++        page.epoch=epoch;page.cursor=cursor;page.examined+=examined;
++        if(finished){page.flags|=1u;break;}
++        if(!row.window.window)break;
++        if(paging_user_copy(TASK(pid).pd,input.rows+i*sizeof(row),&row,sizeof(row),1))return SC32_E_INVALID;
++        page.count++;
++    }
++    return host_publish(pid,output,&page,sizeof(page));
++}
++static int host_window_action(int pid,u32 request,u32 output)
++{
++    int error=sc32_core_output(pid,output,sizeof(ScWindowInfo));if(error)return error;
++    ScShellWindowAction input;
++    error=sc32_core_input(pid,request,&input,sizeof(input));if(error)return error;
++    if(input.flags || input.reserved[0] || input.reserved[1] || input.reserved[2]
++        || input.action>SC32_SHELL_ACTION_CLOSE)return SC32_E_INVALID;
++    host_session *p;
++    error=host_record(pid,&p,1);if(error)return error;
++    if(input.host_epoch!=p->epoch)return SC32_E_STALE;
++    if(p->state!=SC32_SHELL_ACTIVE)return SC32_E_BUSY;
++    ScWindowInfo result;
++    error=wm_shell_window_action(pid,&input,&result);if(error)return error;
++    return host_publish(pid,output,&result,sizeof(result));
++}
++static int host_window_at(int pid,u32 request,u32 output)
++{
++    int error=sc32_core_output(pid,output,sizeof(ScWindowInfo));if(error)return error;
++    ScShellHostPoint input;error=sc32_core_input(pid,request,&input,sizeof(input));if(error)return error;
++    if(input.flags || input.reserved[0] || input.reserved[1])return SC32_E_INVALID;
++    host_session *p;error=host_record(pid,&p,1);if(error)return error;
++    if(input.host_epoch!=p->epoch)return SC32_E_STALE;
++    if(p->state!=SC32_SHELL_ACTIVE)return SC32_E_BUSY;
++    ScWindowInfo result;error=wm_shell_window_at(pid,input.x,input.y,&result);if(error)return error;
++    return host_publish(pid,output,&result,sizeof(result));
++}
++int sc32_host_call(int pid,u32 operation,u32 request,u32 output)
++{
++    switch(operation){
++    case SC32_H_LAUNCH:return host_launch(pid,request,output);
++    case SC32_H_QUERY:return host_query(pid,request,output,0);
++    case SC32_H_PREPARE:return host_prepare(pid,request,output);
++    case SC32_H_ACTIVATE:case SC32_H_CONNECT:case SC32_H_WORKSPACE:case SC32_H_DEACTIVATE:
++        return host_control(pid,operation,request,output);
++    case SC32_H_WINDOWS:return host_windows(pid,request,output);
++    case SC32_H_WINDOW_ACTION:return host_window_action(pid,request,output);
++    case SC32_H_WINDOW_AT:return host_window_at(pid,request,output);
++    case SC32_H_RESTART:return host_query(pid,request,output,1);
++    default:return SC32_E_NOT_SUPPORTED;
++    }
++}
+--- /dev/null
++++ b/sandcore/kernel/sc32_host.h
+@@ -0,0 +1,24 @@
++#ifndef SANDCORE_SC32_HOST_H
++#define SANDCORE_SC32_HOST_H
++#include "io.h"
++#include "../user/hostapi/SC32HOSTWIRE.H"
++int sc32_host_call(int pid,u32 operation,u32 request,u32 output);
++void sc32_host_session_created(u32 session);
++void sc32_host_session_discard(u32 session);
++void sc32_host_owner_stopped(int pid);
++void sc32_host_poll(void);
++int sc32_host_is_host(int pid,u32 session);
++void sc32_host_windows_changed(u32 session);
++
++/* WM与角色正文只交换可信值；清理入口不依赖已撤销的用户凭据。 */
++int wm_shell_prepare(int pid,u32 desktop,u32 dgen,u32 bar,u32 bgen,u32 height);
++int wm_shell_activate(int pid);
++int wm_shell_workspace(int pid,u32 height);
++void wm_shell_detach(int pid,u32 generation);
++int wm_shell_active(u32 session);
++void wm_shell_info(u32 session,ScShellHostInfo *out);
++int wm_shell_window_next(int pid,u32 after,u32 budget,ScShellWindowInfo *row,
++    u32 *cursor,u32 *epoch,u32 *examined,int *finished);
++int wm_shell_window_action(int pid,const ScShellWindowAction *action,ScWindowInfo *out);
++int wm_shell_window_at(int pid,int x,int y,ScWindowInfo *out);
++#endif
+--- /dev/null
++++ b/sandcore/kernel/shell_issue.inc
+@@ -0,0 +1,13 @@
++#include "crypto.h"
++#include "shell_host_issue.h"
++
++/* 只核已经读入唯一SCX暂存的真实字节，随后从同一内存映像建pd；
++ * 不先hash磁盘再重读另一个版本，不把固定文件名或迁移后的SYSTEM
++ * 元数据当发行来源。摘要由正式构建从实际SCSHELL.SCX生成，无通配。 */
++static int shell_issue_verify(const u8 *image,u32 bytes)
++{
++    if(!image || bytes!=shell_host_issued_bytes)return -5;
++    u8 digest[32];sha256(image,bytes,digest);
++    int accepted=crypto_equal(digest,shell_host_issued_sha256,sizeof(digest));
++    crypto_zero(digest,sizeof(digest));return accepted?0:-5;
++}
+--- /dev/null
++++ b/sandcore/kernel/streams_launch.inc
+@@ -0,0 +1,19 @@
++/* 在 streams.c 的私有 endpoint/attach 实现之后包含；新入口不建立 job。
++ * 关闭 task_spawn 暂时继承的三条流发生在同一 IF=0 陷入内，子进程尚未
++ * 得到调度，因此管道不会留下隐藏 writer，终端关闭也不会连带杀子。 */
++int streams_launch_session(int parent,const char *path,const char *arguments)
++{
++    if(parent<=0 || parent!=task_pid() || !task_owned(parent)
++        || TASK(parent).state!=1 || !path || !arguments)return -1;
++    u32 identity[8];
++    if(auth_info(parent,identity) || (int)identity[1]<0 || (int)identity[2]<0
++        || identity[3]!=AUTH_NORMAL)return -5;
++    session_t *scope=session_get(session_task(parent));
++    if(!scope || scope->kind!=SESSION_NORMAL || scope->closing)return -5;
++    char resolved[64];
++    if(userspace_resolve(parent,path,resolved,sizeof(resolved))<0 || !resolved[0])return -1;
++    int child=task_exec_scx_parts(resolved,arguments);
++    if(child<1)return child;
++    for(int i=0;i<3;i++)streams_close(child,i,0);
++    return child;
++}
+--- /dev/null
++++ b/sandcore/kernel/wm_shell.inc
+@@ -0,0 +1,600 @@
++/* 会话桌面host只是两张本人Ring3画布的可信角色，不是零环控件树。
++ * 80B win_t和旧FRAME长度不变；角色/首帧/焦点只加在动态私有尾部。
++ * 本片段尚未接入工作源、未构建或运行，integration-wm.patch负责接线。 */
++enum { WM_SHELL_DESKTOP=1,WM_SHELL_TASKBAR=2 };
++
++typedef struct {
++    window_record_t *record;
++    u32 pixels,pages;
++    int x,y,width,height,cw,ch,scale;
++} wm_shell_candidate_t;
++
++static void wm_shell_zero(void *value,u32 bytes)
++{
++    u8 *out=value;
++    for(u32 i=0;i<bytes;i++)out[i]=0;
++}
++
++static desktop_view_t *wm_shell_scope(int pid)
++{
++    if(pid<=0 || !task_owned(pid) || TASK(pid).state!=1)return 0;
++    u32 sid=session_task(pid);
++    session_t *scope=session_get(sid);
++    if(!scope || scope->closing || scope->kind!=SESSION_NORMAL
++        || !sc32_host_is_host(pid,sid))return 0;
++    return view_get(sid);
++}
++
++static int wm_shell_pair(desktop_view_t *view,window_record_t **desktop,window_record_t **bar)
++{
++    if(!view || !view->shell_prepared || !view->shell_pid)return 0;
++    int pid=(int)view->shell_pid;
++    if(!task_owned(pid) || TASK(pid).state!=1
++        || task_generation(pid)!=view->shell_generation
++        || !sc32_host_is_host(pid,view->shell_session))return 0;
++    window_record_t *d=window_record((int)view->shell_desktop);
++    window_record_t *b=window_record((int)view->shell_taskbar);
++    if(!d || !b || d==b || d->shell_role!=WM_SHELL_DESKTOP
++        || b->shell_role!=WM_SHELL_TASKBAR || d->session!=view->shell_session
++        || b->session!=view->shell_session || d->window.owner!=pid || b->window.owner!=pid
++        || d->owner_generation!=view->shell_generation
++        || b->owner_generation!=view->shell_generation)return 0;
++    if(desktop)*desktop=d;
++    if(bar)*bar=b;
++    return 1;
++}
++
++int wm_shell_active(u32 sid)
++{
++    desktop_view_t *view=view_get(sid);
++    return view && view->shell_active && wm_shell_pair(view,0,0);
++}
++
++static int wm_shell_preparing(window_record_t *p)
++{
++    if(!p || !p->shell_role)return 0;
++    desktop_view_t *view=view_get(p->session);
++    return view && !view->shell_active && wm_shell_pair(view,0,0)
++        && p->shell_ready_geometry!=p->gui.geometry;
++}
++
++static int wm_shell_ancestor_visible(window_record_t *p)
++{
++    if(!p->shell_ancestor)return 1;
++    window_record_t *root=window_record((int)p->shell_ancestor);
++    /* Role根固定无parent；只查一个稳定根，不在每次合成/输入递归
++     * 走完整owner树。角色撤销即失去显示/输入资格，页由原owner链收。 */
++    return root && root->shell_role && root->session==p->session && wm_shell_active(p->session)
++        && !root->extra.hidden && !root->gui.creating && !root->gui.owner_hidden;
++}
++
++static int wm_shell_drawable(window_record_t *p)
++{
++    return p && (window_visible(&p->window)
++        || (p->session==session_active() && wm_shell_preparing(p)));
++}
++
++static int wm_shell_work_bottom_for(u32 sid)
++{
++    desktop_view_t *view=view_get(sid);
++    if(view && wm_shell_active(sid))return GFX_H-(int)view->shell_height;
++    return GFX_H-(GFX_W==320?16:32*display_scale()/100);
++}
++
++static void wm_shell_changed(u32 sid)
++{
++    desktop_view_t *view=view_get(sid);
++    if(!view)return;
++    if(view->shell_windows_epoch<0xFFFFFFFFu)view->shell_windows_epoch++;
++    sc32_host_windows_changed(sid);
++}
++
++static int wm_shell_layer(window_record_t *p)
++{
++    if(p->shell_role==WM_SHELL_DESKTOP)return 0;
++    if(p->gui.popup)return 3;
++    if(p->shell_role==WM_SHELL_TASKBAR)return 2;
++    return 1;
++}
++
++static int wm_shell_raise_destination(desktop_view_t *view,window_record_t *p)
++{
++    int layer=wm_shell_layer(p);
++    if(!layer)return 0;
++    int at=view->count-1;
++    while(at>=0){
++        if(at==p->z_index || wm_shell_layer(window_record(view->order[at]))>layer){at--;continue;}
++        break;
++    }
++    return at<p->z_index?at+1:at;
++}
++
++static void wm_shell_move_order(desktop_view_t *view,window_record_t *p,int destination)
++{
++    int from=p->z_index,handle=p->window.handle;
++    int moving=view->dragging>=0?view->order[view->dragging]:0;
++    int resizing_handle=view->resize>=0?view->order[view->resize]:0;
++    if(destination<from){
++        for(int i=from;i>destination;i--){
++            view->order[i]=view->order[i-1];
++            window_record(view->order[i])->z_index=i;
++        }
++    }else{
++        for(int i=from;i<destination;i++){
++            view->order[i]=view->order[i+1];
++            window_record(view->order[i])->z_index=i;
++        }
++    }
++    view->order[destination]=handle;p->z_index=destination;view->top_known=0;
++    window_record_t *drag_record=window_record(moving),*resize_record=window_record(resizing_handle);
++    view->dragging=drag_record?drag_record->z_index:-1;
++    view->resize=resize_record?resize_record->z_index:-1;
++}
++
++static void wm_shell_created(desktop_view_t *view,window_record_t *p)
++{
++    /* 新普通窗放在taskbar层之前，popup仍在瞬态层。向后只跳过真实
++     * 上层对象，不在每次鼠标移动扫描所有普通窗口。 */
++    wm_shell_move_order(view,p,wm_shell_raise_destination(view,p));
++    if(p->session==session_active() && !p->extra.hidden && !p->gui.popup)wm_shell_focus_set(p);
++    wm_shell_changed(p->session);
++}
++
++static void wm_shell_focus_set(window_record_t *p)
++{
++    desktop_view_t *view=view_get(p->session);
++    if(!view || !wm_shell_active(p->session))return;
++    if(p->gui.popup && (p->gui.popup_flags&SC32_POPUP_NO_ACTIVATE))return;
++    view->shell_focus=(u32)p->window.handle;view->top_known=0;
++}
++
++static int wm_shell_top(desktop_view_t *view)
++{
++    window_record_t *focused=window_record((int)view->shell_focus);
++    if(focused && focused->session==view->shell_session && gui_eligible(focused)
++        && !(focused->gui.popup_flags&SC32_POPUP_NO_ACTIVATE))return focused->z_index;
++    for(int i=view->count-1;i>=0;i--){
++        window_record_t *p=window_record(view->order[i]);
++        if(p->shell_role || !gui_eligible(p) || (p->gui.popup_flags&SC32_POPUP_NO_ACTIVATE))continue;
++        view->shell_focus=(u32)p->window.handle;return i;
++    }
++    window_record_t *desktop=window_record((int)view->shell_desktop);
++    if(desktop && gui_eligible(desktop)){
++        view->shell_focus=(u32)desktop->window.handle;return desktop->z_index;
++    }
++    view->shell_focus=0;return -1;
++}
++
++static int wm_shell_mouse(int x,int y,u8 buttons,u8 previous)
++{
++    if(!wm_shell_active(session_active()))return 0;
++    int index=hit_window(x,y);
++    window_record_t *p=index>=0?window_record(WINDOW(index).handle):0;
++    if(!p || !p->shell_role)return 0;
++    if(buttons&~previous){
++        window_record_t *target=window_record(gui_modal_target(p->window.handle));
++        if(target && gui_eligible(target))(void)win_raise(target->z_index);
++    }
++    /* 专层整个矩形都是客户区，右键也必须给Ring3，不能落入旧Start/
++     * 桌面菜单或右下角resize。此处只维护焦点，真实raw沿仍由route投递。 */
++    return 1;
++}
++
++static int wm_shell_draw_surface(window_record_t *p)
++{
++    if(!p->shell_role)return 0;
++    win_t *w=&p->window;
++    if(p->extra.opaque)gfx_opaque_blit(w->x,w->y,w->cw,w->ch,(u32 *)w->canvas,w->cw);
++    else gfx_argb_blit(w->x,w->y,w->cw,w->ch,(u32 *)w->canvas,w->cw);
++    return 1;
++}
++
++static void wm_shell_frame_invalidated(window_record_t *p)
++{
++    if(!p->shell_role)return;
++    p->shell_ready_geometry=p->shell_submitted_geometry=p->shell_submitted_paint=0;
++}
++
++static void wm_shell_submitted(window_record_t *p,const ScSubmitDesc *input,const ScSubmitRect *rectangles)
++{
++    if(!wm_shell_preparing(p) || !p->gui.painting)return;
++    for(u32 i=0;i<input->rectangle_count;i++){
++        const ScSubmitRect *r=rectangles+i;
++        if(!r->destination_x && !r->destination_y && r->width==(u32)p->window.cw
++            && r->height==(u32)p->window.ch){
++            p->shell_submitted_geometry=p->gui.geometry;
++            p->shell_submitted_paint=p->gui.painting;
++            return;
++        }
++    }
++}
++
++static void wm_shell_paint_complete(window_record_t *p,const Sc32PaintEnd *input)
++{
++    if(!wm_shell_preparing(p) || p->shell_submitted_geometry!=input->geometry_epoch
++        || p->shell_submitted_paint!=input->paint_epoch)return;
++    /* 只有真实完整Submit与同一claim的成功End才能完成有限首帧。
++     * 此后的隐藏损伤留到Activate；不能因caret或新模型再不断排PAINT。 */
++    p->shell_ready_geometry=p->gui.geometry;p->gui.paint_ready=0;
++    p->shell_submitted_geometry=p->shell_submitted_paint=0;
++    wm_shell_changed(p->session);
++}
++
++static void wm_shell_paint_cancelled(window_record_t *p)
++{
++    p->shell_submitted_geometry=p->shell_submitted_paint=0;
++}
++
++static void wm_shell_remove_task_button(desktop_view_t *view,window_record_t *p)
++{
++    int at=p->creation_index;
++    if(at<0)return;
++    for(int i=at;i<view->task_count-1;i++){
++        view->created[i]=view->created[i+1];window_record(view->created[i])->creation_index=i;
++    }
++    view->task_count--;p->creation_index=-1;
++    if(view->bar_first>=view->task_count)view->bar_first=0;
++}
++
++static int wm_shell_height_valid(u32 height)
++{
++    int remaining=GFX_H-TITLE_H-40;
++    return remaining>0 && height && height<=(u32)remaining;
++}
++
++static int wm_shell_candidate(wm_shell_candidate_t *c,window_record_t *p,int x,int y,
++    int width,int height,int role,int bottom)
++{
++    c->record=p;c->x=x;c->y=y;c->scale=p->extra.scale;
++    c->cw=p->window.cw;c->ch=p->window.ch;
++    if(role){c->cw=width;c->ch=height;c->scale=1;}
++    else if(p->extra.native){
++        if(width>GFX_W)width=GFX_W;
++        if(height>bottom)height=bottom;
++        if(width<96)width=96;
++        if(height<TITLE_H+40)height=TITLE_H+40;
++        c->cw=width-2;c->ch=height-TITLE_H-1;
++    }else{
++        int sx=(width-2)/c->cw,sy=(height-TITLE_H-1)/c->ch;
++        c->scale=sx<sy?sx:sy;
++        if(c->scale<1)c->scale=1;
++        if(c->scale>4)c->scale=4;
++        width=c->cw*c->scale+2;height=c->ch*c->scale+TITLE_H+1;
++    }
++    c->width=width;c->height=height;
++    if(!role){
++        if(c->x>GFX_W-width)c->x=GFX_W-width;
++        if(c->y>bottom-height)c->y=bottom-height;
++        if(c->x<0)c->x=0;
++        if(c->y<0)c->y=0;
++    }
++    if(c->cw!=p->window.cw || c->ch!=p->window.ch){
++        if(c->cw<1 || c->ch<1 || c->cw>1920 || c->ch>1080)return SC32_E_RANGE;
++        u32 bytes=(u32)c->cw*(u32)c->ch*(p->extra.format==2?4u:1u);
++        c->pages=(bytes+4095u)/4096u;c->pixels=pframe_alloc_run(c->pages);
++        if(!c->pixels)return SC32_E_MEMORY;
++    }
++    return SC32_OK;
++}
++
++static void wm_shell_candidates_free(wm_shell_candidate_t *c,u32 count)
++{
++    for(u32 i=0;i<count;i++)if(c[i].pixels)pframe_free_run(c[i].pixels,c[i].pages);
++}
++
++static int wm_shell_resize_group(desktop_view_t *view,window_record_t *desktop,
++    window_record_t *bar,u32 height,int ordinary)
++{
++    u32 capacity=2u+(ordinary?(u32)view->task_count:0u),count=0;
++    if(capacity>0xFFFFF000u/sizeof(wm_shell_candidate_t))return SC32_E_RANGE;
++    u32 metadata_pages=(capacity*sizeof(wm_shell_candidate_t)+4095u)/4096u;
++    wm_shell_candidate_t *list=(wm_shell_candidate_t *)pframe_alloc_run(metadata_pages);
++    if(!list)return SC32_E_MEMORY;
++    wm_shell_zero(list,capacity*sizeof(*list));
++    int bottom=GFX_H-(int)height,error;
++    error=wm_shell_candidate(list,desktop,0,0,GFX_W,bottom,1,bottom);count=1;
++    if(!error){error=wm_shell_candidate(list+1,bar,0,bottom,GFX_W,(int)height,1,bottom);count=2;}
++    if(!error && ordinary){
++        for(int i=0;i<view->task_count;i++){
++            window_record_t *p=window_record(view->created[i]);
++            if(!p || p->shell_role || TASK(p->window.owner).state==2)continue;
++            int x=p->window.x,y=p->window.y,w=p->window.w,h=p->window.h;
++            if(p->extra.maximized){x=y=0;w=GFX_W;h=bottom;}
++            else if(h>bottom && (!p->gui.mode || (p->gui.style&SC32_STYLE_RESIZE)))h=bottom;
++            error=wm_shell_candidate(list+count,p,x,y,w,h,0,bottom);count++;
++            if(error)break;
++        }
++    }
++    if(error){wm_shell_candidates_free(list,count);pframe_free_run((u32)list,metadata_pages);return error;}
++    /* 两surface与所有受工作区影响的画布先预留完整候选，任何OOM都
++     * 不改旧工作区或像素。候选整行复制只发生在低频布局事务；IRQ
++     * 可继续排真实输入，用户任务/主循环不会读到半提交或陈旧指针。 */
++    task_render_hold(1);sti();
++    for(u32 i=0;i<count;i++)if(list[i].pixels){
++        wm_shell_candidate_t *c=list+i;window_record_t *p=c->record;
++        for(int y=0;y<c->ch;y++)for(int x=0;x<c->cw;x++){
++            u32 pixel=x<p->window.cw && y<p->window.ch?canvas_pixel(&p->window,(u32)y*(u32)p->window.cw+(u32)x)
++                :(p->extra.format==2?0xFF000000u|theme_color(TH_FACE):PAL_CON_BG);
++            if(p->extra.format==2)((u32 *)c->pixels)[(u32)y*(u32)c->cw+(u32)x]=pixel;
++            else ((u8 *)c->pixels)[(u32)y*(u32)c->cw+(u32)x]=(u8)pixel;
++        }
++    }
++    cli();task_render_hold(0);
++    gui_mutation++;
++    view->shell_height=height;
++    for(u32 i=0;i<count;i++){
++        wm_shell_candidate_t *c=list+i;window_record_t *p=c->record;
++        if(c->pixels){
++            pframe_free_run((u32)p->window.canvas,p->extra.pages);
++            p->window.canvas=(u8 *)c->pixels;p->extra.pages=c->pages;c->pixels=0;
++        }
++        p->window.x=c->x;p->window.y=c->y;p->window.w=c->width;p->window.h=c->height;
++        p->window.cw=c->cw;p->window.ch=c->ch;p->extra.scale=c->scale;
++        if(p==desktop || p==bar)p->extra.native=1;
++    }
++    gui_mutation--;
++    for(u32 i=0;i<count;i++)gui_commit(&list[i].record->window);
++    pframe_free_run((u32)list,metadata_pages);
++    wm_shell_changed(view->shell_session);
++    if(view==active_view)wm_request_compose();
++    return SC32_OK;
++}
++
++int wm_shell_prepare(int pid,u32 desktop,u32 dgen,u32 bar,u32 bgen,u32 height)
++{
++    desktop_view_t *view=wm_shell_scope(pid);
++    if(!view)return SC32_E_ACCESS;
++    if(!wm_shell_height_valid(height))return SC32_E_RANGE;
++    int error;window_record_t *d=gui_record(pid,desktop,dgen,&error);
++    if(!d)return error;
++    window_record_t *b=gui_record(pid,bar,bgen,&error);if(!b)return error;
++    if(d==b || d->session!=view->shell_session || b->session!=view->shell_session
++        || d->extra.format!=2 || b->extra.format!=2 || d->gui.creating || b->gui.creating
++        || d->gui.popup || b->gui.popup || d->gui.parent || b->gui.parent
++        || d->gui.first_child || b->gui.first_child || d->terminal.text || b->terminal.text
++        || d->gui.painting || b->gui.painting)return SC32_E_INVALID;
++    if(view->shell_active)return SC32_E_BUSY;
++    if(view->shell_prepared && (view->shell_pid!=(u32)pid || view->shell_generation!=task_generation(pid)
++        || view->shell_desktop!=desktop || view->shell_taskbar!=bar))return SC32_E_BUSY;
++    if(view->shell_prepared && view->shell_height==height)return SC32_OK;
++    /* Resize候选在授专层之前准备；失败连标题/任务按钮/隐藏状态也不改。 */
++    error=wm_shell_resize_group(view,d,b,height,0);if(error)return error;
++    gui_focus_defer++;
++    view->shell_pid=(u32)pid;view->shell_generation=task_generation(pid);
++    view->shell_desktop=desktop;view->shell_taskbar=bar;view->shell_prepared=1;
++    d->shell_role=WM_SHELL_DESKTOP;b->shell_role=WM_SHELL_TASKBAR;
++    wm_shell_frame_invalidated(d);wm_shell_frame_invalidated(b);
++    d->extra.hidden=b->extra.hidden=1;
++    d->gui.minimized=b->gui.minimized=0;
++    wm_shell_remove_task_button(view,d);wm_shell_remove_task_button(view,b);
++    wm_shell_move_order(view,d,0);
++    wm_shell_move_order(view,b,wm_shell_raise_destination(view,b));
++    visibility_changed(&d->window);visibility_changed(&b->window);
++    Sc32Invalidate a={36,1,desktop,dgen,0,0,(u32)d->window.cw,(u32)d->window.ch,0};
++    Sc32Invalidate z={36,1,bar,bgen,0,0,(u32)b->window.cw,(u32)b->window.ch,0};
++    (void)wm_sc32_invalidate(pid,&a);(void)wm_sc32_invalidate(pid,&z);
++    gui_focus_defer--;gui_focus_update();
++    wm_shell_changed(view->shell_session);
++    return SC32_OK;
++}
++
++int wm_shell_activate(int pid)
++{
++    desktop_view_t *view=wm_shell_scope(pid);window_record_t *d,*b;
++    if(!view)return SC32_E_ACCESS;
++    if(!wm_shell_pair(view,&d,&b))return SC32_E_STALE;
++    if(view->shell_active)return SC32_E_BUSY;
++    if(d->shell_ready_geometry!=d->gui.geometry || b->shell_ready_geometry!=b->gui.geometry)return SC32_E_AGAIN;
++    int error=wm_shell_resize_group(view,d,b,view->shell_height,1);if(error)return error;
++    /* 默认桌面继续存在直到候选已完整真实提交。这里一次发布层级、
++     * 工作区与VISIBILITY，后续模型损伤走正常可见PAINT，不抢应用焦点。 */
++    gui_focus_defer++;
++    view->shell_active=1;view->shell_focus=0;view->menu=view->context=0;
++    d->extra.hidden=b->extra.hidden=0;view->top_known=0;
++    visibility_changed(&d->window);visibility_changed(&b->window);
++    gui_focus_defer--;gui_focus_update();
++    wm_shell_changed(view->shell_session);
++    if(view==active_view)wm_request_compose();
++    return SC32_OK;
++}
++
++int wm_shell_workspace(int pid,u32 height)
++{
++    desktop_view_t *view=wm_shell_scope(pid);window_record_t *d,*b;
++    if(!view || !view->shell_active)return SC32_E_ACCESS;
++    if(!wm_shell_pair(view,&d,&b))return SC32_E_STALE;
++    if(!wm_shell_height_valid(height))return SC32_E_RANGE;
++    if(view->shell_height==height)return SC32_OK;
++    return wm_shell_resize_group(view,d,b,height,1);
++}
++
++void wm_shell_detach(int pid,u32 generation)
++{
++    if(pid<=0 || !task_owned(pid) || task_generation(pid)!=generation)return;
++    desktop_view_t *view=view_get(session_task(pid));
++    if(!view || view->shell_pid!=(u32)pid || view->shell_generation!=generation)return;
++    u32 sid=view->shell_session,desktop=view->shell_desktop,bar=view->shell_taskbar;
++    /* 先撤绑定，重复owner-stopped不会递归停止或重复拆角色。窗口页
++     * 仍由旧owner阶段释放；这里不给陈旧PID/gen新权限。 */
++    view->shell_pid=view->shell_generation=view->shell_desktop=view->shell_taskbar=0;
++    view->shell_prepared=view->shell_active=view->shell_height=view->shell_focus=0;
++    view->top_known=0;view->menu=view->context=0;
++    gui_focus_defer++;
++    popup_close_group(view,0,desktop);popup_close_group(view,0,bar);
++    u32 surfaces[2]={desktop,bar};
++    for(u32 i=0;i<2;i++){
++        window_record_t *p=window_record((int)surfaces[i]);
++        if(!p || p->window.owner!=pid || p->owner_generation!=generation)continue;
++        p->extra.hidden=1;p->gui.painting=p->gui.paint_ready=0;gui_attention(p);
++        visibility_changed(&p->window);
++    }
++    if(gui_capture_handle && window_record(gui_capture_handle)
++        && window_record(gui_capture_handle)->window.owner==pid)gui_capture_release(3);
++    if(relative_owner==pid)relative_release();
++    gui_focus_defer--;gui_focus_update();wm_shell_changed(sid);
++    if(view==active_view)wm_request_compose();
++}
++
++static void wm_shell_closing(window_record_t *p)
++{
++    desktop_view_t *view=view_get(p->session);
++    if(!p->shell_role || !view || !view->shell_prepared || view->shell_pid!=(u32)p->window.owner
++        || view->shell_generation!=p->owner_generation)return;
++    int pid=p->window.owner;u32 generation=p->owner_generation;
++    wm_shell_detach(pid,generation);
++    if(task_owned(pid) && task_generation(pid)==generation && TASK(pid).state!=2)task_stop(pid);
++}
++
++static void wm_shell_display(desktop_view_t *view)
++{
++    window_record_t *d,*b;
++    if(!wm_shell_pair(view,&d,&b))return;
++    u32 height=view->shell_height;
++    if(!wm_shell_height_valid(height))height=(u32)(GFX_H-TITLE_H-40);
++    wm_shell_frame_invalidated(d);wm_shell_frame_invalidated(b);
++    int error=height?wm_shell_resize_group(view,d,b,height,1):SC32_E_RANGE;
++    if(error){int pid=(int)view->shell_pid;u32 generation=view->shell_generation;
++        /* 硬件显示模式已经提交，不能沿旧surface尺寸宣称新桌面可用。
++         * 撤角色显示真实旧回退，普通应用仍活；重启沿可信host链处理。 */
++        wm_shell_detach(pid,generation);task_stop(pid);
++    }
++}
++
++void wm_shell_info(u32 sid,ScShellHostInfo *out)
++{
++    desktop_view_t *view=view_get(sid);window_record_t *d,*b;
++    out->work_x=out->work_y=0;out->work_width=(u32)GFX_W;
++    out->work_height=(u32)wm_shell_work_bottom_for(sid);
++    u32 display[8];display_info(display);out->display_epoch=display[4];
++    if(!wm_shell_pair(view,&d,&b))return;
++    out->desktop=(u32)d->window.handle;out->desktop_generation=out->desktop;
++    out->taskbar=(u32)b->window.handle;out->taskbar_generation=out->taskbar;
++    if(!view->shell_active && (d->shell_ready_geometry!=d->gui.geometry
++        || b->shell_ready_geometry!=b->gui.geometry))out->flags|=SC32_SHELL_PREPARING;
++}
++
++static int wm_shell_manageable(window_record_t *p,u32 sid)
++{
++    if(!p || p->session!=sid || p->shell_role || p->gui.popup || !task_owned(p->window.owner)
++        || task_generation(p->window.owner)!=p->owner_generation || session_task(p->window.owner)!=sid
++        || (TASK(p->window.owner).state!=1 && TASK(p->window.owner).state!=3))return 0;
++    u32 identity[8];
++    return !auth_info(p->window.owner,identity) && (int)identity[1]>=0
++        && (int)identity[2]>=0 && identity[3]==AUTH_NORMAL;
++}
++
++static void wm_shell_window_value(window_record_t *p,ScWindowInfo *out)
++{
++    if(p->gui.mode){(void)wm_sc32_query(p->window.owner,(u32)p->window.handle,(u32)p->window.handle,out);return;}
++    wm_shell_zero(out,sizeof(*out));out->size=sizeof(*out);out->version=1;
++    out->window=out->generation=(u32)p->window.handle;
++    out->owner_pid=(u32)p->window.owner;out->owner_generation=p->owner_generation;out->session=p->session;
++    out->x=p->window.x;out->y=p->window.y;out->width=p->window.w;out->height=p->window.h;
++    out->client_width=(u32)p->window.cw;out->client_height=(u32)p->window.ch;out->format=(u32)p->extra.format;
++    out->state=(window_visible(&p->window)?SC32_WINDOW_VISIBLE:0)
++        |(gui_focus_any==p->window.handle?SC32_WINDOW_FOCUSED:0)
++        |(p->extra.hidden?SC32_WINDOW_MINIMIZED:0)|(p->extra.maximized?SC32_WINDOW_MAXIMIZED:0)
++        |(gui_eligible(p)?SC32_WINDOW_INPUT:0)|(TASK(p->window.owner).state==2?SC32_WINDOW_CLOSING:0);
++    out->geometry_epoch=p->gui.geometry;out->visibility_epoch=p->visibility_epoch;
++    out->input_epoch=p->gui.input;out->theme_epoch=p->gui.theme;out->display_epoch=p->gui.display;
++}
++
++int wm_shell_window_at(int pid,int x,int y,ScWindowInfo *out)
++{
++    desktop_view_t *view=wm_shell_scope(pid);
++    if(!view || !view->shell_active || view->shell_session!=session_active())return SC32_E_ACCESS;
++    if(x<0 || y<0 || x>=GFX_W || y>=GFX_H)return SC32_E_RANGE;
++    int index=hit_window(x,y);window_record_t *p=index<0?0:window_record(WINDOW(index).handle);
++    if(!p || !window_visible(&p->window))return SC32_E_NOT_FOUND;
++    if(p->session!=view->shell_session || !task_owned(p->window.owner)
++        || task_generation(p->window.owner)!=p->owner_generation || TASK(p->window.owner).state!=1)return SC32_E_ACCESS;
++    u32 identity[8];
++    if(auth_info(p->window.owner,identity) || (int)identity[1]<0 || (int)identity[2]<0
++        || identity[3]!=AUTH_NORMAL)return SC32_E_ACCESS;
++    /* 使用WM真实hit/z序，不能用creation分页顺序猜覆盖；无票/无指针，
++     * 后续拖放仍独立查可接收target与完整真实sender。 */
++    wm_shell_window_value(p,out);return SC32_OK;
++}
++
++int wm_shell_window_next(int pid,u32 after,u32 budget,ScShellWindowInfo *row,
++    u32 *cursor,u32 *epoch,u32 *examined,int *finished)
++{
++    desktop_view_t *view=wm_shell_scope(pid);
++    if(!view || !view->shell_active)return SC32_E_ACCESS;
++    if(after>0x7FFFFFFFu || !budget || budget>64u)return SC32_E_INVALID;
++    if(view->shell_windows_epoch==0xFFFFFFFFu)return SC32_E_RANGE;
++    wm_shell_zero(row,sizeof(*row));*cursor=after;*epoch=view->shell_windows_epoch;*examined=0;*finished=0;
++    /* created按从不复用的handle递增，专层/popup已经不在此索引。
++     * 二分后在本人SID最多过滤64条，不扫其它SID或历史句柄空洞；
++     * 64是一次检查预算，空页仍给真实推进cursor。 */
++    int low=0,high=view->task_count;
++    while(low<high){int middle=low+(high-low)/2;
++        if((u32)view->created[middle]<=after)low=middle+1;else high=middle;
++    }
++    for(;low<view->task_count && *examined<budget;low++){
++        int handle=view->created[low];window_record_t *p=window_record(handle);
++        *cursor=(u32)handle;(*examined)++;
++        if(!wm_shell_manageable(p,view->shell_session))continue;
++        row->size=sizeof(*row);row->version=1;wm_shell_window_value(p,&row->window);
++        const char *title=p->gui.mode?p->gui.title:p->window.title;
++        for(u32 n=0;n<127 && title[n];n++)row->title[n]=title[n];
++        if(userspace_query(p->window.owner,3,0,row->executable,sizeof(row->executable))<0)return SC32_E_STALE;
++        return SC32_OK;
++    }
++    if(low==view->task_count)*finished=1;
++    return SC32_OK;
++}
++
++int wm_shell_window_action(int pid,const ScShellWindowAction *action,ScWindowInfo *out)
++{
++    desktop_view_t *view=wm_shell_scope(pid);
++    if(!view || !view->shell_active)return SC32_E_ACCESS;
++    window_record_t *p=action->window && action->window<=0x7FFFFFFFu?window_record((int)action->window):0;
++    if(!p || action->generation!=action->window || action->pid!=(u32)p->window.owner
++        || action->pid_generation!=p->owner_generation)return SC32_E_STALE;
++    if(!wm_shell_manageable(p,view->shell_session))return SC32_E_ACCESS;
++    if(action->action>SC32_SHELL_ACTION_CLOSE || (action->action!=SC32_SHELL_ACTION_PLACE
++        && (action->x || action->y || action->width || action->height)))return SC32_E_INVALID;
++    if(p->gui.mode && (p->gui.creating || (p->gui.style&SC32_STYLE_DISABLED) || p->gui.owner_disabled))return SC32_E_ACCESS;
++    if(p->gui.mode && gui_modal_target(p->window.handle)!=p->window.handle
++        && action->action!=SC32_SHELL_ACTION_FOCUS && action->action!=SC32_SHELL_ACTION_RESTORE)return SC32_E_ACCESS;
++    int error=0;
++    if(action->action==SC32_SHELL_ACTION_FOCUS){
++        window_record_t *target=window_record(gui_modal_target(p->window.handle));
++        if(p->session!=session_active() || !target || !gui_eligible(target))return SC32_E_ACCESS;
++        (void)win_raise(target->z_index);wm_request_compose();
++    }else if(action->action==SC32_SHELL_ACTION_MINIMIZE || action->action==SC32_SHELL_ACTION_MAXIMIZE
++        || action->action==SC32_SHELL_ACTION_RESTORE){
++        u32 style=action->action==SC32_SHELL_ACTION_MINIMIZE?SC32_STYLE_MINIMIZE:SC32_STYLE_MAXIMIZE;
++        if(p->gui.mode && action->action!=SC32_SHELL_ACTION_RESTORE && !(p->gui.style&style))return SC32_E_NOT_SUPPORTED;
++        int command=action->action==SC32_SHELL_ACTION_MINIMIZE?0:action->action==SC32_SHELL_ACTION_MAXIMIZE?1:2;
++        if(wm_window_control(p->window.owner,p->window.handle,command))return SC32_E_MEMORY;
++        if(command==2 && p->session==session_active()){
++            window_record_t *target=window_record(gui_modal_target(p->window.handle));
++            if(target && gui_eligible(target))(void)win_raise(target->z_index);
++        }
++    }else if(action->action==SC32_SHELL_ACTION_PLACE){
++        if(action->width<94 || action->height<40 || action->width>1920 || action->height>1080)return SC32_E_RANGE;
++        if(p->gui.mode && (action->width!=(u32)p->window.cw || action->height!=(u32)p->window.ch)
++            && !(p->gui.style&SC32_STYLE_RESIZE))return SC32_E_NOT_SUPPORTED;
++        if(p->gui.mode){Sc32WindowPlace place={32,1,action->window,action->generation,action->x,action->y,action->width,action->height};
++            error=wm_sc32_place(p->window.owner,&place,out);if(error)return error;
++        }else{
++            if(native_resize(&p->window,(int)action->width+2,(int)action->height+TITLE_H+1))return SC32_E_MEMORY;
++            p->window.x=action->x;p->window.y=action->y;
++            if(p->window.x>GFX_W-p->window.w)p->window.x=GFX_W-p->window.w;
++            int bottom=wm_shell_work_bottom_for(p->session);
++            if(p->window.y>bottom-p->window.h)p->window.y=bottom-p->window.h;
++            if(p->window.x<0)p->window.x=0;
++            if(p->window.y<0)p->window.y=0;
++            p->extra.maximized=0;visibility_changed(&p->window);window_changed(&p->window);
++        }
++    }else{
++        if(p->gui.mode && (!(p->gui.style&SC32_STYLE_CLOSE) || p->gui.close_pending))return p->gui.close_pending?SC32_E_BUSY:SC32_E_NOT_SUPPORTED;
++        /* 现代CLOSE只排本人真实请求，应用仍能veto；旧窗口原合同是
++         * 停止owner，不能偷偷把它改成单窗Destroy或给普通应用新权限。 */
++        gui_close_request(&p->window);
++    }
++    wm_shell_window_value(p,out);wm_shell_changed(p->session);
++    return SC32_OK;
++}
+--- /dev/null
++++ b/sandcore/user/SC32HOST.H
+@@ -0,0 +1,94 @@
++#ifndef SANDCORE_SC32HOST_H
++#define SANDCORE_SC32HOST_H
++#include "SC32API.H"
++#include "SC32GUI.H"
++#include "SC32BROKER.H"
++
++/* 独立的会话寿命启动入口；旧受管 ScProcessSpawn 的退出连带关系不改。
++ * path 与 arguments 分开传入，路径内空格不再被命令解释器误切。 */
++typedef struct {
++    ScU32 size,version;
++    const char *path;
++    const char *arguments;
++    ScU32 flags,reserved[3];
++} ScLaunchDesc;
++
++typedef struct {
++    ScU32 size,version,pid,generation,session;
++    ScI32 uid,gid;
++    ScU32 realm,flags,reserved[7];
++} ScLaunchInfo;
++
++/* flags 必须为零；仅真实普通会话中的普通主体可调用。成功不创建 job，
++ * 不继承任何标准流引用。环境/CWD/凭据按当前真实调用者快照继承。
++ * 子进程到自行退出或本会话注销为止；发起者退出不终止子进程。 */
++ScStatus ScProcessLaunch(const ScLaunchDesc *desc,ScLaunchInfo *out);
++
++enum {
++    SC32_CAP_HOST_HI=2u,SC32_SHELL_PREPARING=1u,
++    SC32_SHELL_OFFLINE=0u,SC32_SHELL_STARTING=1u,
++    SC32_SHELL_PREPARED=2u,SC32_SHELL_ACTIVE=3u,
++    SC32_SHELL_RETRY_EXHAUSTED=4u,SC32_SHELL_STOPPING=5u,
++    SC32_SHELL_WINDOWS_BEGIN=0u,SC32_SHELL_WINDOWS_FINISHED=1u,
++    SC32_SHELL_ACTION_FOCUS=0u,SC32_SHELL_ACTION_MINIMIZE=1u,
++    SC32_SHELL_ACTION_MAXIMIZE=2u,SC32_SHELL_ACTION_RESTORE=3u,
++    SC32_SHELL_ACTION_PLACE=4u,SC32_SHELL_ACTION_CLOSE=5u
++};
++typedef struct {
++    ScU32 size,version,session,session_generation,host_epoch,pid,generation;
++    ScU32 endpoint,state,desktop,desktop_generation,taskbar,taskbar_generation;
++    ScI32 work_x,work_y;
++    ScU32 work_width,work_height,display_epoch,flags,reserved[5];
++} ScShellHostInfo;
++
++typedef struct {
++    ScU32 size,version,host_epoch,endpoint,desktop,desktop_generation;
++    ScU32 taskbar,taskbar_generation,taskbar_height,flags,reserved[2];
++} ScShellHostDesc;
++
++typedef struct {
++    ScU32 size,version,channel;
++    ScShellHostInfo host;
++    ScBrokerIdentity peer;
++    ScU32 reserved;
++} ScShellConnectionInfo;
++
++typedef struct {
++    ScU32 size,version;
++    ScWindowInfo window;
++    char title[128],executable[68];
++    ScU32 reserved[5];
++} ScShellWindowInfo;
++
++typedef struct {
++    ScU32 size,version,cursor,count,epoch,examined,flags,reserved;
++} ScShellWindowPage;
++
++typedef struct {
++    ScU32 size,version,host_epoch,window,generation,pid,pid_generation,action;
++    ScI32 x,y;
++    ScU32 width,height,flags,reserved[3];
++} ScShellWindowAction;
++
++typedef struct {
++    ScU32 size,version,host_epoch;ScI32 x,y;ScU32 flags,reserved[2];
++} ScShellHostPoint;
++
++/* 角色由内核固定发行路径启动事务授予。Query不授角色；普通程序不能
++ * 通过相同文件名、UID、IPC名字或窗口编号任命自己为桌面host。 */
++ScStatus ScShellHostQuery(ScShellHostInfo *out);
++ScStatus ScShellHostPrepare(const ScShellHostDesc *desc,ScShellHostInfo *out);
++ScStatus ScShellHostActivate(ScU32 host_epoch,ScShellHostInfo *out);
++ScStatus ScShellHostConnect(ScU32 expected_epoch,ScShellConnectionInfo *out);
++ScStatus ScShellHostWorkspace(ScU32 host_epoch,ScU32 height,ScShellHostInfo *out);
++ScStatus ScShellHostWindows(ScU32 host_epoch,ScU32 after,ScU32 expected_epoch,
++    ScShellWindowInfo *rows,ScU32 capacity,ScShellWindowPage *out);
++ScStatus ScShellHostWindowAction(const ScShellWindowAction *action,ScWindowInfo *out);
++/* 只给当前可见同SID普通窗口的值；用于区分桌面布局拖动和跨窗FILES拖起。
++ * 不铸Drop票、不授文件权；真正Drop仍必须另走SC32DROP验证。 */
++ScStatus ScShellHostWindowAt(const ScShellHostPoint *point,ScWindowInfo *out);
++ScStatus ScShellHostRestart(ScShellHostInfo *out);
++/* 正常清理先主动撤角色，再销窗口/释放Context/return；不会中途Stop
++ * 正在运行fini的本人。异常丢surface仍由内核停止并按有限策略恢复。 */
++ScStatus ScShellHostDeactivate(ScU32 host_epoch,ScShellHostInfo *out);
++#endif
+--- /dev/null
++++ b/sandcore/user/hostapi/SC32HOSTWIRE.H
+@@ -0,0 +1,27 @@
++#ifndef SANDCORE_SC32HOSTWIRE_H
++#define SANDCORE_SC32HOSTWIRE_H
++#include "../SC32HOST.H"
++
++/* 此 selector 位于新 SYS_SC32 gate 内，不借旧 SPAWN2 flags 扩语义。 */
++#define SC32_H_LAUNCH 0x800u
++#define SC32_H_QUERY 0x801u
++#define SC32_H_PREPARE 0x802u
++#define SC32_H_ACTIVATE 0x803u
++#define SC32_H_CONNECT 0x804u
++#define SC32_H_WORKSPACE 0x805u
++#define SC32_H_WINDOWS 0x806u
++#define SC32_H_WINDOW_ACTION 0x807u
++#define SC32_H_RESTART 0x808u
++#define SC32_H_DEACTIVATE 0x809u
++#define SC32_H_WINDOW_AT 0x80au
++#define SC32_H_OPERATION 0x1000u
++typedef struct {
++    ScU32 size,version,path,path_bytes,arguments,argument_bytes,flags,reserved;
++} Sc32HostLaunch;
++typedef struct {
++    ScU32 size,version,host_epoch,value,flags,reserved[3];
++} Sc32HostControl;
++typedef struct {
++    ScU32 size,version,host_epoch,after,expected_epoch,rows,capacity,reserved;
++} Sc32HostWindows;
++#endif
+--- /dev/null
++++ b/sandcore/user/hostapi/sc32_launch.c
+@@ -0,0 +1,105 @@
++#include "../sc32/SC32PRIVATE.H"
++#include "SC32HOSTWIRE.H"
++
++/* Error.operation与selector分域，避免碰已有GUI的800诊断编号。 */
++static ScStatus sc32_host_invalid(ScI32 code,ScU32 selector)
++{return sc32_invalid(code,SC32_H_OPERATION+selector-SC32_H_LAUNCH);}
++static ScStatus sc32_host_native(ScI32 raw,ScU32 selector)
++{return sc32_native(raw,SC32_H_OPERATION+selector-SC32_H_LAUNCH);}
++
++ScStatus ScProcessLaunch(const ScLaunchDesc *desc,ScLaunchInfo *out)
++{
++    ScStatus checked=sc32_record_out(out,sizeof(ScLaunchInfo));
++    if(checked<0)return sc32_host_invalid(checked,SC32_H_LAUNCH);
++    checked=sc32_record_in(desc,sizeof(ScLaunchDesc));
++    if(checked<0)return sc32_host_invalid(checked,SC32_H_LAUNCH);
++    ScLaunchDesc value=*desc;
++    if(value.flags || value.reserved[0] || value.reserved[1] || value.reserved[2])
++        return sc32_host_invalid(SC32_E_INVALID,SC32_H_LAUNCH);
++    ScU32 path_bytes,argument_bytes;
++    checked=sc32_string(value.path,127,&path_bytes);
++    if(checked<0)return sc32_host_invalid(checked,SC32_H_LAUNCH);
++    const char *arguments=value.arguments?value.arguments:"";
++    checked=sc32_string(arguments,1023,&argument_bytes);
++    if(checked<0)return sc32_host_invalid(checked,SC32_H_LAUNCH);
++    Sc32HostLaunch request={32,1,(ScU32)value.path,path_bytes+1,
++        (ScU32)arguments,argument_bytes+1,0,0};
++    return sc32_host_native(sc32_call(SC32_WIRE_GATE,SC32_H_LAUNCH,
++        (ScI32)&request,(ScI32)out,0,0,0),SC32_H_LAUNCH);
++}
++
++static ScStatus sc32_host_query(ScU32 operation,ScShellHostInfo *out)
++{
++    ScStatus checked=sc32_record_out(out,sizeof(ScShellHostInfo));
++    if(checked<0)return sc32_host_invalid(checked,operation);
++    return sc32_host_native(sc32_call(SC32_WIRE_GATE,(ScI32)operation,0,
++        (ScI32)out,0,0,0),operation);
++}
++ScStatus ScShellHostQuery(ScShellHostInfo *out)
++{return sc32_host_query(SC32_H_QUERY,out);}
++ScStatus ScShellHostRestart(ScShellHostInfo *out)
++{return sc32_host_query(SC32_H_RESTART,out);}
++ScStatus ScShellHostPrepare(const ScShellHostDesc *desc,ScShellHostInfo *out)
++{
++    ScStatus checked=sc32_record_out(out,sizeof(ScShellHostInfo));
++    if(checked<0)return sc32_host_invalid(checked,SC32_H_PREPARE);
++    checked=sc32_record_in(desc,sizeof(ScShellHostDesc));
++    if(checked<0)return sc32_host_invalid(checked,SC32_H_PREPARE);
++    ScShellHostDesc value=*desc;
++    return sc32_host_native(sc32_call(SC32_WIRE_GATE,SC32_H_PREPARE,
++        (ScI32)&value,(ScI32)out,0,0,0),SC32_H_PREPARE);
++}
++static ScStatus sc32_host_control(ScU32 operation,ScU32 epoch,ScU32 value,
++    void *out,ScU32 bytes)
++{
++    ScStatus checked=sc32_record_out(out,bytes);
++    if(checked<0)return sc32_host_invalid(checked,operation);
++    Sc32HostControl input={32,1,epoch,value,0,{0,0,0}};
++    return sc32_host_native(sc32_call(SC32_WIRE_GATE,(ScI32)operation,
++        (ScI32)&input,(ScI32)out,0,0,0),operation);
++}
++ScStatus ScShellHostActivate(ScU32 epoch,ScShellHostInfo *out)
++{return sc32_host_control(SC32_H_ACTIVATE,epoch,0,out,sizeof(*out));}
++ScStatus ScShellHostConnect(ScU32 epoch,ScShellConnectionInfo *out)
++{return sc32_host_control(SC32_H_CONNECT,epoch,0,out,sizeof(*out));}
++ScStatus ScShellHostWorkspace(ScU32 epoch,ScU32 height,ScShellHostInfo *out)
++{return sc32_host_control(SC32_H_WORKSPACE,epoch,height,out,sizeof(*out));}
++ScStatus ScShellHostDeactivate(ScU32 epoch,ScShellHostInfo *out)
++{return sc32_host_control(SC32_H_DEACTIVATE,epoch,0,out,sizeof(*out));}
++ScStatus ScShellHostWindows(ScU32 host_epoch,ScU32 after,ScU32 expected_epoch,
++    ScShellWindowInfo *rows,ScU32 capacity,ScShellWindowPage *out)
++{
++    ScStatus checked=sc32_record_out(out,sizeof(ScShellWindowPage));
++    if(checked<0)return sc32_host_invalid(checked,SC32_H_WINDOWS);
++    if(!capacity || capacity>64u || !rows || after==0xFFFFFFFFu)
++        return sc32_host_invalid(SC32_E_INVALID,SC32_H_WINDOWS);
++    checked=sc32_out(rows,capacity*sizeof(*rows));
++    if(checked<0)return sc32_host_invalid(checked,SC32_H_WINDOWS);
++    if(sc32_overlap(rows,capacity*sizeof(*rows),out,out->size))
++        return sc32_host_invalid(SC32_E_INVALID,SC32_H_WINDOWS);
++    Sc32HostWindows input={32,1,host_epoch,after,expected_epoch,(ScU32)rows,capacity,0};
++    return sc32_host_native(sc32_call(SC32_WIRE_GATE,SC32_H_WINDOWS,
++        (ScI32)&input,(ScI32)out,0,0,0),SC32_H_WINDOWS);
++}
++ScStatus ScShellHostWindowAction(const ScShellWindowAction *action,ScWindowInfo *out)
++{
++    ScStatus checked=sc32_record_out(out,sizeof(ScWindowInfo));
++    if(checked<0)return sc32_host_invalid(checked,SC32_H_WINDOW_ACTION);
++    checked=sc32_record_in(action,sizeof(ScShellWindowAction));
++    if(checked<0)return sc32_host_invalid(checked,SC32_H_WINDOW_ACTION);
++    ScShellWindowAction input=*action;
++    return sc32_host_native(sc32_call(SC32_WIRE_GATE,SC32_H_WINDOW_ACTION,
++        (ScI32)&input,(ScI32)out,0,0,0),SC32_H_WINDOW_ACTION);
++}
++ScStatus ScShellHostWindowAt(const ScShellHostPoint *point,ScWindowInfo *out)
++{
++    ScStatus checked=sc32_record_out(out,sizeof(ScWindowInfo));
++    if(checked<0)return sc32_host_invalid(checked,SC32_H_WINDOW_AT);
++    checked=sc32_record_in(point,sizeof(ScShellHostPoint));
++    if(checked<0)return sc32_host_invalid(checked,SC32_H_WINDOW_AT);
++    ScShellHostPoint input=*point;
++    if(input.flags || input.reserved[0] || input.reserved[1])
++        return sc32_host_invalid(SC32_E_INVALID,SC32_H_WINDOW_AT);
++    return sc32_host_native(sc32_call(SC32_WIRE_GATE,SC32_H_WINDOW_AT,
++        (ScI32)&input,(ScI32)out,0,0,0),SC32_H_WINDOW_AT);
++}
+--- /dev/null
++++ b/sandcore/user/scui/ui_shell_paint.inc
+@@ -0,0 +1,31 @@
++/* Phase5新增正式Painter入口。透明表示本surface没有内容，不是新的
++ * RGB调色板色；让R3桌面图标层复用既有壁纸合成，不再复制整幅背景。 */
++ScStatus ScUiPainterClear(ScUiPainter *p,const ScUiRect *local)
++{
++    ScUiRect area;
++    if(!p || !local)return SC_UI_E_INVALID;
++    if(!ui_painter_rect(p,local,&area))return p->error;
++    for(ScI32 y=0;y<area.height;y++){
++        ScU32 *row=p->root->pixels+(ScU32)(area.y+y)*p->root->width+(ScU32)area.x;
++        memset(row,0,(ScU32)area.width*4u);
++    }
++    return p->error;
++}
++
++/* 文字颜色仍是现有主题命名角色；临时更改只活在本次调用，不能污染
++ * 后续控件或借用不透明Painter设置裸RGB。旧Text入口语义原样保留。 */
++ScStatus ScUiPainterTextColor(ScUiPainter *p,const ScUiRect *r,const ScUiText *text,
++    ScU32 font_role,ScU32 flags,ScU32 color_role)
++{
++    if(!p || color_role>=24u)return SC_UI_E_INVALID;
++    ScU32 previous=p->text_role;p->text_role=color_role;
++    ScStatus result=ScUiPainterText(p,r,text,font_role,flags);
++    p->text_role=previous;return result;
++}
++
++ScStatus ScUiPainterBounds(ScUiPainter *p,ScUiRect *out)
++{
++    if(!p || !out)return SC_UI_E_INVALID;
++    ScUiRect value=p->clip;value.x-=p->origin_x;value.y-=p->origin_y;
++    *out=value;return p->error;
++}
+--- /dev/null
++++ b/sandcore/tools/mk_shell_issue.py
+@@ -0,0 +1,32 @@
++#!/usr/bin/env python3
++"""从实际发行动态host生成CORE内的公开内容摘要；不生成/读取任何私钥。"""
++import argparse
++import hashlib
++from pathlib import Path
++import sys
++
++ROOT=Path(__file__).resolve().parents[1]
++sys.path.insert(0,str(ROOT/'tools'))
++import scd_format
++
++def main():
++    parser=argparse.ArgumentParser(description=__doc__)
++    parser.add_argument('--host',type=Path,required=True)
++    parser.add_argument('--out',type=Path,required=True)
++    args=parser.parse_args()
++    body=args.host.read_bytes()
++    contract=scd_format.validate_scx(body)
++    if args.host.name.upper()!='SCSHELL.SCX' or len(body)>262144:
++        raise ValueError('只接实际无图标的固定SCSHELL动态SCX发行映像')
++    if not any(d['name']=='SCSHELL.SCL' for d in contract['dependencies']):
++        raise ValueError('正式host必须实际依赖SCSHELL.SCL，不是临时空角色夹具')
++    value=hashlib.sha256(body).digest()
++    if not any(value):raise ValueError('不得产生全零通配摘要')
++    text=('#ifndef SANDCORE_SHELL_HOST_ISSUE_H\n#define SANDCORE_SHELL_HOST_ISSUE_H\n'
++        'static const u32 shell_host_issued_bytes=%du;\n' % len(body)
++        +'static const u8 shell_host_issued_sha256[32]={'+','.join('0x%02x'%x for x in value)+'};\n#endif\n')
++    args.out.parent.mkdir(parents=True,exist_ok=True)
++    if not args.out.is_file() or args.out.read_text(encoding='ascii')!=text:
++        args.out.write_text(text,encoding='ascii',newline='\n')
++    print('ISSUED_RING3_HOST_BYTES',len(body),'SHA256',value.hex())
++if __name__=='__main__':main()

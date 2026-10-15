@@ -1,0 +1,2 @@
+echo STDLIB_BG_WARM & wait; _m9_status=$?; printf "\n"; echo __M9_1ed00978bdff4cac409c49f2:$_m9_status
+STDLIB_BG_WARM

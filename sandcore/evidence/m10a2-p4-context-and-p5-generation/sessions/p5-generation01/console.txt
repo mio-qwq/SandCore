@@ -1,0 +1,75 @@
+SandShell M9
+SYSTEM /SYS [SYSTEM] # true; _m9_status=$?; printf "\n"; echo __M9_d8c5470c6f99d6e6c852b354:$_m9_status
+
+__M9_d8c5470c6f99d6e6c852b354:0
+SYSTEM /SYS [SYSTEM] # ls /HOME/M10SHELL/HOST; _m9_status=$?; printf "\n"; echo __M9_2073b3d292c0d00eb97a9585:$_m9_status
+
+__M9_2073b3d292c0d00eb97a9585:0
+SYSTEM /SYS [SYSTEM] # echo STDLIB_BG_WARM & wait; _m9_status=$?; printf "\n"; echo __M9_1ed00978bdff4cac409c49f2:$_m9_status
+STDLIB_BG_WARM
+
+__M9_1ed00978bdff4cac409c49f2:0
+SYSTEM /SYS [SYSTEM] # printf warm > /HOME/M10SHELL/WARM.DAT; cat /HOME/M10SHELL/WARM.DAT; _m9_status=$?; printf "\n"; echo __M9_b7f4eefacdd78b91e239558a:$_m9_status
+warm
+__M9_b7f4eefacdd78b91e239558a:0
+SYSTEM /SYS [SYSTEM] # /TMP/P5-7d8478/ACTUALG1.SCX /TMP/P5-7d8478/SRC/sc32/SC32API.C /HOME/M10SHELL/GENERATED/SC32API.SCL --scl /TMP/P5-7d8478/SRC/sc32/SC32API.json; _m9_status=$?; printf "\n"; echo __M9_142b0b92311af200c3f6c8ed:$_m9_status
+SCCC / mio
+TMP/P5-7d8478/SRC/sc32/SC32API.C -> HOME/M10SHELL/GENERATED/SC32API.SCL
+Validating SCL manifest
+SCCC: preprocess -> C -> x86
+Preprocessing source and includes
+Parsing C and generating x86
+Linking and writing SCL
+SCCC OK SCL NATIVE
+Compilation complete
+
+__M9_142b0b92311af200c3f6c8ed:0
+SYSTEM /SYS [SYSTEM] # /TMP/P5-7d8478/ACTUALG1.SCX /TMP/P5-7d8478/SRC/scui/SCUI.C /HOME/M10SHELL/GENERATED/SCUI.SCL --scl /TMP/P5-7d8478/SRC/scui/SCUI.json; _m9_status=$?; printf "\n"; echo __M9_d40e9d70505150a523c2ba7e:$_m9_status
+SCCC / mio
+TMP/P5-7d8478/SRC/scui/SCUI.C -> HOME/M10SHELL/GENERATED/SCUI.SCL
+Validating SCL manifest
+SCCC: preprocess -> C -> x86
+Preprocessing source and includes
+Parsing C and generating x86
+Linking and writing SCL
+SCCC OK SCL NATIVE
+Compilation complete
+
+__M9_d40e9d70505150a523c2ba7e:0
+SYSTEM /SYS [SYSTEM] # /TMP/P5-7d8478/ACTUALG1.SCX /TMP/P5-7d8478/SRC/scshell/SCSHELL.C /HOME/M10SHELL/GENERATED/SCSHELL.SCL --scl /TMP/P5-7d8478/SRC/scshell/SCSHELL.json; _m9_status=$?; printf "\n"; echo __M9_6b42c76c6080cfc47d9be272:$_m9_status
+SCCC / mio
+TMP/P5-7d8478/SRC/scshell/SCSHELL.C -> HOME/M10SHELL/GENERATED/SCSHELL.SCL
+Validating SCL manifest
+SCCC: preprocess -> C -> x86
+Preprocessing source and includes
+Parsing C and generating x86
+Linking and writing SCL
+SCCC OK SCL NATIVE
+Compilation complete
+
+__M9_6b42c76c6080cfc47d9be272:0
+SYSTEM /SYS [SYSTEM] # /TMP/P5-7d8478/ACTUALG1.SCX /TMP/P5-7d8478/SRC/shellworker/SCFILEWORK.C /HOME/M10SHELL/GENERATED/SCFILEWORK.SCX --dynamic /TMP/P5-7d8478/SRC/shellworker/SCFILEWORK.json; _m9_status=$?; printf "\n"; echo __M9_69aec7412de81628e6e0845d:$_m9_status
+SCCC / mio
+TMP/P5-7d8478/SRC/shellworker/SCFILEWORK.C -> HOME/M10SHELL/GENERATED/SCFILEWORK.SCX
+Validating application manifest
+SCCC: preprocess -> C -> x86
+Preprocessing source and includes
+Parsing C and generating x86
+Linking and writing SCX
+SCCC OK SCX DYNAMIC
+Compilation complete
+
+__M9_69aec7412de81628e6e0845d:0
+SYSTEM /SYS [SYSTEM] # /TMP/P5-7d8478/ACTUALG1.SCX /TMP/P5-7d8478/SRC/scshell/desktop/SCSHELL.C /HOME/M10SHELL/GENERATED/SCSHELL.SCX --dynamic /TMP/P5-7d8478/SRC/scshell/desktop/SCSHELL.json; _m9_status=$?; printf "\n"; echo __M9_470bf995b51c3175a85d45b2:$_m9_status
+SCCC / mio
+TMP/P5-7d8478/SRC/scshell/desktop/SCSHELL.C -> HOME/M10SHELL/GENERATED/SCSHELL.SCX
+Validating application manifest
+SCCC: preprocess -> C -> x86
+Preprocessing source and includes
+Parsing C and generating x86
+Linking and writing SCX
+SCCC OK SCX DYNAMIC
+Compilation complete
+
+__M9_470bf995b51c3175a85d45b2:0
+SYSTEM /SYS [SYSTEM] # 

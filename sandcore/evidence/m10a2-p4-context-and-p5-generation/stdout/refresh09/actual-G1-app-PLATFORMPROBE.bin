@@ -1,0 +1,10 @@
+/HOME/M10UI/COMPILER/SCCC1.SCX /TMP/UI-af0b4f/PLATFORMPROBE.C /HOME/M10UI/NATIVE_APPS/PLATFORMPROBE.SCX --dynamic /TMP/UI-af0b4f/PLATFORMPROBE.json; _m9_status=$?; printf "\n"; echo __M9_54b78f910a82c1492368ea91:$_m9_status
+SCCC / mio
+TMP/UI-af0b4f/PLATFORMPROBE.C -> HOME/M10UI/NATIVE_APPS/PLATFORMPROBE.SCX
+Validating application manifest
+SCCC: preprocess -> C -> x86
+Preprocessing source and includes
+Parsing C and generating x86
+Linking and writing SCX
+SCCC OK SCX DYNAMIC
+Compilation complete

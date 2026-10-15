@@ -1,0 +1,34 @@
+{
+  "status": "SOURCE_CALL_MANIFEST_NOT_COMPILED_NOT_RUN",
+  "imports": 147,
+  "sources": {
+    "DESKTOP.H": {
+      "bytes": 4421,
+      "sha256": "c99f8f7e111086f9f8b833809eaacf4c7fd3d699bf91c740ddd3fde897cdf73f"
+    },
+    "SCSHELL.C": {
+      "bytes": 23227,
+      "sha256": "9005ad08b36c7aa42de7a8acad81f0ba81fd34c7d0acc10c13da4dc866fd1eeb"
+    },
+    "desktop_actions.inc": {
+      "bytes": 31423,
+      "sha256": "20bde98cbcdd1a3afdfcafaf461667c63b01cb4d29cb75b7955dc6b5f1d0dc57"
+    },
+    "desktop_model.inc": {
+      "bytes": 18108,
+      "sha256": "34251cff74624d3f0361015951b778bc43b71abc899e150ddbdd2cf485ce5fbb"
+    },
+    "desktop_tasks.inc": {
+      "bytes": 10291,
+      "sha256": "fb800797a53ba021f6ce97946d255648ddc844c941ac9bdee7a82e5fab7b4f4d"
+    },
+    "desktop_view.inc": {
+      "bytes": 17812,
+      "sha256": "ba8c60ed9920bffef58e896219e42c9c71d310231d5e798d94ab5d60febe4113"
+    }
+  },
+  "contracts": {
+    "drafts/m10a2-shell-r3/SCSHELL.H": "374d0e526687d507265d196c42cda9068a808eef688758d109347645aee6cf79",
+    "drafts/m10a2-shell-host/user/SC32HOST.H": "5e360a8d21491503a8dfc9f1bb972d0319bf7f404eb3ba0ab1c7aa25c17950e1"
+  }
+}

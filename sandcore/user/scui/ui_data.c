@@ -1091,11 +1091,12 @@ static ScStatus ui_selection_ids(ScUiSelection *selection,const ScU32 *ids,ScU32
 {
     ScStatus s;
     ScHash *candidate=0;
-    ScU32 revision,all_revision,all_count;
+    ScU32 revision,all_revision,all_count,selection_revision;
     unsigned char present=1;
     if(action>SC_UI_TOGGLE || (!ids && count) || (!(selection->flags&SC_UI_SELECTION_MULTI) && count>1))return SC_UI_E_INVALID;
     s=ui_object_enter((UiObject *)selection,UI_SELECTION);
     if(s<0)return s;
+    selection_revision=selection->revision;
     revision=selection->provider->revision;
     all_revision=selection->all_revision;
     all_count=selection->all_count;
@@ -1165,6 +1166,7 @@ static ScStatus ui_selection_ids(ScUiSelection *selection,const ScU32 *ids,ScU32
         else if(in)s=ScHashRemove(candidate,&ids[i],4);
     }
     if(s==0 && selection->provider->revision!=revision)s=SC_UI_E_STALE;
+    if(s==0 && selection->revision!=selection_revision)s=SC_UI_E_STALE;
     if(s==0){ScU32 current=count?ids[count-1]:0,anchor=action==SC_UI_REPLACE?(count?ids[0]:0):selection->anchor;
         s=ui_selection_commit(selection,candidate,all_revision,all_count,current,anchor,0);
         if(s==0)candidate=0;
@@ -1185,6 +1187,7 @@ ScStatus ScUiSelectionRange(ScUiSelection *selection,ScU32 first,ScU32 last,ScU3
 {
     ScStatus s=ui_object_enter((UiObject *)selection,UI_SELECTION);
     if(s<0)return s;
+    ScU32 selection_revision=selection->revision;
     ScUiDataRequest request;
     ScUiDataReply a,b;
     ScU32 *ids=0,bytes=0;
@@ -1255,6 +1258,8 @@ ScStatus ScUiSelectionRange(ScUiSelection *selection,ScU32 first,ScU32 last,ScU3
                 }
             }
             if(s==0 && selection->provider->revision!=revision)s=SC_UI_E_STALE;
+            /* provider枚举可合法重入清空选择，候选不能覆盖该显式修改。 */
+            if(s==0 && selection->revision!=selection_revision)s=SC_UI_E_STALE;
             if(s==0){s=ui_selection_commit(selection,empty,revision,total,last,first,universe);
                 if(s==0){empty=0;
                     universe=0;
@@ -1274,6 +1279,7 @@ ScStatus ScUiSelectionRange(ScUiSelection *selection,ScU32 first,ScU32 last,ScU3
     for(ScU32 i=0;s==0 && i<count;i++){ScU32 revision,state;
         s=ui_provider_item(selection->provider,a.parent,begin+i,&ids[i],&revision,&state);
     }
+    if(s==0 && selection->revision!=selection_revision)s=SC_UI_E_STALE;
     if(s==0)s=ui_selection_ids(selection,ids,count,action);
     free(ids);
     ui_object_leave(&selection->object);

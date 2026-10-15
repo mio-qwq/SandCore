@@ -1,0 +1,84 @@
+{
+  "scope": "HOST_PURE_PAYLOAD_VALIDATION_NOT_GUEST",
+  "checks": [
+    {
+      "name": "current-complete-payload-and-pinned-build-delta",
+      "passed": true
+    },
+    {
+      "name": "tampered-current-demo",
+      "passed": true
+    },
+    {
+      "name": "tampered-previous-demo",
+      "passed": true
+    },
+    {
+      "name": "undeclared-build-output",
+      "passed": true
+    },
+    {
+      "name": "undeclared-source",
+      "passed": true
+    },
+    {
+      "name": "missing-old-payload-entry",
+      "passed": true
+    }
+  ],
+  "changes": {
+    "user/scui/SCUIPRIVATE.H": {
+      "before": "fb3eb69f44f7c69b3abba3bdb8920b797e2dd0e3ce1e42b6390c40312755f4a8",
+      "after": "93665c973868ae816391021febf2ee02c93d47884513cfeb5ac8fa1d5e7089ed",
+      "kind": "SCUI_IMPLEMENTATION"
+    },
+    "user/scui/ui_controls.c": {
+      "before": "3ce102911565c406bfec8fd383c401ccfc940615504273590e787aad7be4cc97",
+      "after": "853f4555af72a086420f7d8ebc39e534dd09894da590b0b6aab222d18595d820",
+      "kind": "SCUI_IMPLEMENTATION"
+    },
+    "user/scui/ui_data.c": {
+      "before": "d73dc2c8ef3ffafb2bcc493aace143bc7fd59c65fb0872d9dc28e4e3b252e1bd",
+      "after": "fdb60e57dbb086613a333075cafa6ec3919d6b1afa427b86870085914883acc6",
+      "kind": "SCUI_IMPLEMENTATION"
+    },
+    "user/scui/ui_dispatch.c": {
+      "before": "8c88e5332bcfb0d854e21eed54f0a0088d3bc79fc7f230eb90e387e82a22af07",
+      "after": "40cfb74fab18cc05888684b53a41e14c303613252b80a6157fc7113c821e5e9e",
+      "kind": "SCUI_IMPLEMENTATION"
+    },
+    "user/scui/ui_layout.c": {
+      "before": "47b6f1fd25a5cdf7c3688349780065e1a32515d840adaa18a063080cac73943e",
+      "after": "2719565e49b4d76a6f9ec338a06f67f2630f6852bc621209deac98fd13cc6bbc",
+      "kind": "SCUI_IMPLEMENTATION"
+    },
+    "user/scui/ui_menu.c": {
+      "before": "e7253c037db1f415ee25b5bac338c2bf2346c76410ff70b4a0b957ba9b9f785a",
+      "after": "6dff97d80f8d39df51d8640cd7a330e10bd12236e5da7e953d7ee5ece0248eae",
+      "kind": "SCUI_IMPLEMENTATION"
+    },
+    "user/scui/ui_provider.c": {
+      "before": "dff955162f2666427fc1e9972771021005ffa72573797ffd92284b44d7c6f302",
+      "after": "acdae2b9a38fbef3513340342c564cd9f702a15a867a1eb33d074c5a11882c79",
+      "kind": "SCUI_IMPLEMENTATION"
+    },
+    "user/scui/ui_tree.c": {
+      "before": "500dc36bd845f2f65fd00d8a7c258e83cc80c95686af50763e91484ee55c61e7",
+      "after": "7d8297e6e9bbc65645e9874af8903a734bb86752fe3926fca86543794ffda226",
+      "kind": "SCUI_IMPLEMENTATION"
+    },
+    "tests/m10a2/SCUIDEMO.C": {
+      "before": "b2a2f81b5791b87cd751ad51126675c1a54833f1bb8d7bb1609056438ae6165c",
+      "after": "dc666a7acbb373d0504ac67c1cea5c39f4eedb40902b7cf309aa3ec2dab6f259",
+      "kind": "SCUI_IMPLEMENTATION"
+    },
+    "build/m10a2-ui-bootstrap/SCUIDEMO.SCX": {
+      "before": "d70adb59ae5372ba547e6b7f51458d91c9839a1608e3ca7762d085ab0de7ca39",
+      "after": "e8e19c000ff931acc6870d0d60c3bedfa9d2af8ce68ba61f7376607722aa6b8a",
+      "kind": "BOOTSTRAP_BUILD_OUTPUT"
+    }
+  },
+  "build_report_sha256": "9be0ddfa6a241ebecb9f345582119fd9ab18125b818f7be4ba0c55805a71cae5",
+  "source_sha256": "f4cbb64c8be577d1611da19adc0c7d16068bba3706d3ea62378a2a6b90328e16",
+  "guest_executed": false
+}

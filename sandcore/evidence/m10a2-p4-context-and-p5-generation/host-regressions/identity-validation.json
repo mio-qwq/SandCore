@@ -1,0 +1,35 @@
+{
+  "scope": "HOST_PARSER_REGRESSION_NOT_NEW_GUEST_RUN",
+  "origin_report_sha256": "115f10633b4f7593c79c53ee7888d1887918383582c75556b36947fae6e50744",
+  "checks": [
+    {
+      "name": "bare",
+      "passed": true
+    },
+    {
+      "name": "actual-prompt",
+      "passed": true
+    },
+    {
+      "name": "wrong-uid",
+      "passed": true
+    },
+    {
+      "name": "wrong-realm",
+      "passed": true
+    },
+    {
+      "name": "echo-not-output",
+      "passed": true
+    },
+    {
+      "name": "untrusted-prefix",
+      "passed": true
+    },
+    {
+      "name": "unaltered-GUI13-actual-console",
+      "passed": true
+    }
+  ],
+  "source_sha256": "51988bd68bc9ca7541b892e0409ae5ba1a3037fcdecad8584760c2da30fb4656"
+}

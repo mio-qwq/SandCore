@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """单次Windows VM以已验证G1重新编译SCUI，其余首轮证据按真实来源复用。
 
-只接受build11→新build中ui_data.c/SCUI.SCL这一修复范围；不自举、不重跑
+只接受已冻结的单ui_data或四私有源发布修复；不自举、不重跑
 aggregate/platform/text，也不安装或执行本次新生成的SCUI系统库。
 """
 import argparse
@@ -29,7 +29,59 @@ SCOPE = 'M10A2_UI_PLATFORM_FIRST_WINDOWS_GUEST_ONLY'
 CHANGED_SOURCE = 'user/scui/ui_data.c'
 EXPECTED_SOURCE_SHA256 = 'd73dc2c8ef3ffafb2bcc493aace143bc7fd59c65fb0872d9dc28e4e3b252e1bd'
 EXPECTED_SOURCE_BYTES = 110016
+OLD_MODE = 'ONE_SCUI_SOURCE_REFRESH'
+PUBLICATION_MODE = 'POST_ACTIVATE_PUBLICATION_REPAIR'
+SELECTION_MODE = 'VISIBLE_SELECTION_RANGE_REPAIR'
+QUALITY_MODE = 'DPI_OVERFLOW_WRAP_REPAIR'
+FLEX_MODE = 'FLEX_WIDTH_REFLOW_REPAIR'
+TOOLBAR_MODE = 'TOOLBAR_INPUT_STATE_REPAIR'
+CAPTURE_MODE = 'STALE_CAPTURE_NOTIFICATION_REPAIR'
+CONTEXT_MODE = 'CONTEXT_EVENT_PHASE_REPAIR'
+CONTEXT_CURRENT_BUILD_SHA = '73f1cdc5eb648111bf505872090019db45575d79a871ef3db3518aa7c7de9b8e'
+CAPTURE_CURRENT_BUILD_SHA = '7fa626266741670e8ef15c8b09c24e800d89de441e8b990abf5af89319c9eefc'
+TOOLBAR_CURRENT_BUILD_SHA = '4693a8fe0541605a02ffeae463c82700ddb3b3bca1205a58b25ffc144d60a427'
+PUBLICATION_PREVIOUS_SHA = '5535d2fdb7c6736aa7321d250bf521564055253b319199b6bf85d7f594c7e993'
+PUBLICATION_BUILD_SHA = 'a12e6e6511431a7955cae670cb296f66d7cf73257781d905d10b23b5011dfec5'
+PUBLICATION_CURRENT_BUILD_SHA = '9c8a6193f310a814b30576d37535d29095a273bef2a1f2107ebeba7fca4697ba'
+PUBLICATION_G1_SHA = 'dd7ba9d45fbd1abbafa3f5468dc2d9ee5822625aca052df2e6655945aa302138'
+SELECTION_CURRENT_BUILD_SHA = 'a05e3e76a478fda829a17b677cec4be134e0ee58d07a110cd3a4694e6266af6a'
+QUALITY_CURRENT_BUILD_SHA = '9be0ddfa6a241ebecb9f345582119fd9ab18125b818f7be4ba0c55805a71cae5'
+FLEX_CURRENT_BUILD_SHA = '787d3f986c0da3b6710408c35d64825dfa56894f419a2bcc8f34b5c8e931fbbb'
+PUBLICATION_SOURCES = {
+    'user/scui/ui_tree.c': ('500dc36bd845f2f65fd00d8a7c258e83cc80c95686af50763e91484ee55c61e7', '7d8297e6e9bbc65645e9874af8903a734bb86752fe3926fca86543794ffda226', 28107),
+    'user/scui/ui_menu.c': ('e7253c037db1f415ee25b5bac338c2bf2346c76410ff70b4a0b957ba9b9f785a', 'd1d2ab42d501c4b4f00975fb313a4bf31c9d08ed01342e9e4692008ca1a01b95', 55162),
+    'user/scui/ui_dispatch.c': ('8c88e5332bcfb0d854e21eed54f0a0088d3bc79fc7f230eb90e387e82a22af07', '40cfb74fab18cc05888684b53a41e14c303613252b80a6157fc7113c821e5e9e', 40700),
+    'user/scui/SCUIPRIVATE.H': ('fb3eb69f44f7c69b3abba3bdb8920b797e2dd0e3ce1e42b6390c40312755f4a8', '58cfa650473ebce84e6e4a40c749bc058c494755184a0c3463094bc7963ec46f', 12454),
+}
+SELECTION_SOURCES = dict(PUBLICATION_SOURCES, **{
+    'user/scui/ui_data.c': ('d73dc2c8ef3ffafb2bcc493aace143bc7fd59c65fb0872d9dc28e4e3b252e1bd', 'fdb60e57dbb086613a333075cafa6ec3919d6b1afa427b86870085914883acc6', 110452),
+    'user/scui/ui_provider.c': ('dff955162f2666427fc1e9972771021005ffa72573797ffd92284b44d7c6f302', 'acdae2b9a38fbef3513340342c564cd9f702a15a867a1eb33d074c5a11882c79', 60400),
+})
+QUALITY_SOURCES = dict(SELECTION_SOURCES, **{
+    'user/scui/SCUIPRIVATE.H': (PUBLICATION_SOURCES['user/scui/SCUIPRIVATE.H'][0], '93665c973868ae816391021febf2ee02c93d47884513cfeb5ac8fa1d5e7089ed', 12466),
+    'user/scui/ui_menu.c': (PUBLICATION_SOURCES['user/scui/ui_menu.c'][0], '6dff97d80f8d39df51d8640cd7a330e10bd12236e5da7e953d7ee5ece0248eae', 60727),
+    'user/scui/ui_controls.c': ('3ce102911565c406bfec8fd383c401ccfc940615504273590e787aad7be4cc97', '853f4555af72a086420f7d8ebc39e534dd09894da590b0b6aab222d18595d820', 56677),
+    'user/scui/ui_layout.c': ('47b6f1fd25a5cdf7c3688349780065e1a32515d840adaa18a063080cac73943e', '2719565e49b4d76a6f9ec338a06f67f2630f6852bc621209deac98fd13cc6bbc', 24348),
+    'tests/m10a2/SCUIDEMO.C': ('b2a2f81b5791b87cd751ad51126675c1a54833f1bb8d7bb1609056438ae6165c', 'dc666a7acbb373d0504ac67c1cea5c39f4eedb40902b7cf309aa3ec2dab6f259', 68940),
+})
+FLEX_SOURCES = dict(QUALITY_SOURCES, **{
+    'tests/m10a2/SCUIDEMO.C': (QUALITY_SOURCES['tests/m10a2/SCUIDEMO.C'][0], 'a3d7294b8943245b7e863a6bebd4547b2eccb914dce9bef44c9218b468ebcaba', 69026),
+    'user/scui/ui_layout.c': (QUALITY_SOURCES['user/scui/ui_layout.c'][0], '13910cb8ae1f6e07ed48045fecc9ee49944464e1cc266680d7e787691eebda93', 25721),
+})
+TOOLBAR_SOURCES = dict(FLEX_SOURCES, **{
+    'tests/m10a2/SCUIDEMO.C': (FLEX_SOURCES['tests/m10a2/SCUIDEMO.C'][0], '6c2b98e0bf8df8425f1abc1961dbc2d3b3cc9b4414841229cda27977d3c87373', 71028),
+    'user/scui/ui_controls.c': (FLEX_SOURCES['user/scui/ui_controls.c'][0], 'be9797d49790583c48f476d4a36d8af6977a82156f6cec0ea21983c0a2881ddf', 56787),
+    'user/scui/ui_menu.c': (FLEX_SOURCES['user/scui/ui_menu.c'][0], '39dbf9bcbe4a9b547e874f71737d67b395535d580c3f31be6e634b8ae7a3fdbb', 60924),
+})
+CAPTURE_SOURCES = dict(TOOLBAR_SOURCES, **{
+    'user/scui/ui_dispatch.c': (TOOLBAR_SOURCES['user/scui/ui_dispatch.c'][0], '598cdfefa757f3418c75f46520f3288224415bc28296130e0e31a30fe6d7fdec', 41404),
+})
+CONTEXT_SOURCES = dict(CAPTURE_SOURCES, **{
+    'user/scui/ui_dispatch.c': (CAPTURE_SOURCES['user/scui/ui_dispatch.c'][0], '6c89c41f0ed075860e24c72cd0f9521427e3615767c424b61828880e7cbb5388', 41971),
+    'tests/m10a2/SCUIDEMO.C': (CAPTURE_SOURCES['tests/m10a2/SCUIDEMO.C'][0], '4dc328b438967c2cf9979f184cdc42f8bb1638d694d41987b6c72ab8eaa8329a', 71224),
+})
 SCUI_CASE = 'actual-G1-library-SCUI.SCL'
+DEMO_CASE = 'actual-G1-app-SCUIDEMO'
 HELPERS = ('tools/verify_m10a2_ui_platform.py', 'tools/verify_m10a2_stdlib.py',
            'tools/verify_m10a2_scl.py', 'tools/verify_m9.py', 'tools/scserial.py',
            'tools/m10_guest_boot.py', 'tools/scl_format.py', 'tools/scd_format.py', 'tools/mkcore.py')
@@ -107,25 +159,140 @@ def changed_entries(old, new, output=False):
             or (output and old[name]['bytes'] != new[name]['bytes'])}
 
 
-def validate_build_delta(previous, old_groups, current):
+def mode_sources(mode):
+    if mode == OLD_MODE:
+        return {CHANGED_SOURCE}
+    if mode == PUBLICATION_MODE:
+        return set(PUBLICATION_SOURCES)
+    if mode == SELECTION_MODE:
+        return set(SELECTION_SOURCES)
+    if mode == CONTEXT_MODE:
+        return set(CONTEXT_SOURCES)
+    if mode == CAPTURE_MODE:
+        return set(CAPTURE_SOURCES)
+    if mode == TOOLBAR_MODE:
+        return set(TOOLBAR_SOURCES)
+    if mode == FLEX_MODE:
+        return set(FLEX_SOURCES)
+    if mode == QUALITY_MODE:
+        return set(QUALITY_SOURCES)
+    raise ValueError('未审定的SCUI刷新模式')
+
+
+def repair_sources(mode):
+    if mode == PUBLICATION_MODE:
+        return PUBLICATION_SOURCES
+    if mode == SELECTION_MODE:
+        return SELECTION_SOURCES
+    if mode == CONTEXT_MODE:
+        return CONTEXT_SOURCES
+    if mode == CAPTURE_MODE:
+        return CAPTURE_SOURCES
+    if mode == TOOLBAR_MODE:
+        return TOOLBAR_SOURCES
+    if mode == FLEX_MODE:
+        return FLEX_SOURCES
+    if mode == QUALITY_MODE:
+        return QUALITY_SOURCES
+    raise ValueError('未审定的SCUI修复来源')
+
+
+def current_repair_build(mode):
+    if mode == PUBLICATION_MODE:
+        return PUBLICATION_CURRENT_BUILD_SHA
+    if mode == SELECTION_MODE:
+        return SELECTION_CURRENT_BUILD_SHA
+    if mode == CONTEXT_MODE:
+        return CONTEXT_CURRENT_BUILD_SHA
+    if mode == CAPTURE_MODE:
+        return CAPTURE_CURRENT_BUILD_SHA
+    if mode == TOOLBAR_MODE:
+        return TOOLBAR_CURRENT_BUILD_SHA
+    if mode == FLEX_MODE:
+        return FLEX_CURRENT_BUILD_SHA
+    if mode == QUALITY_MODE:
+        if not QUALITY_CURRENT_BUILD_SHA:
+            raise ValueError('高DPI修复尚未绑定成功统一build')
+        return QUALITY_CURRENT_BUILD_SHA
+    return None
+
+
+def fresh_artifact_names(mode):
+    return {'SCUI.SCL', 'SCUIDEMO.SCX'} if mode in (QUALITY_MODE, FLEX_MODE, TOOLBAR_MODE, CAPTURE_MODE, CONTEXT_MODE) else {'SCUI.SCL'}
+
+
+def artifact_names(mode, scui=False):
+    mode_sources(mode)
+    libraries = ('SC32API.SCL', 'SCCLIB.SCL') if mode != OLD_MODE else ('SC32API.SCL',)
+    if scui:
+        libraries += ('SCUI.SCL',)
+    apps = tuple(value + '.SCX' for value in first.APPLICATIONS)
+    if mode != OLD_MODE:
+        apps += ('DEFAULTAPI.SCX', 'SWDEFAULT.SCX')
+    return ('SCCC1.SCX',) + libraries + apps
+
+
+def validate_build_delta(previous, old_groups, current, mode=OLD_MODE):
     new_groups = {kind: {item['path']: item for item in current[kind]}
                   for kind in ('inputs', 'outputs')}
     inputs = changed_entries(old_groups['inputs'], new_groups['inputs'])
     outputs = changed_entries(old_groups['outputs'], new_groups['outputs'], output=True)
     scui_output = (BUILD / 'SCUI.SCL').relative_to(ROOT).as_posix()
-    if set(inputs) != {CHANGED_SOURCE} or set(outputs) != {scui_output}:
-        raise ValueError('build input只允许ui_data.c、output只允许SCUI.SCL变化')
-    source = inputs[CHANGED_SOURCE]['after']
+    changed_outputs = {scui_output}
+    if mode in (QUALITY_MODE, FLEX_MODE, TOOLBAR_MODE, CAPTURE_MODE, CONTEXT_MODE):
+        changed_outputs.add((BUILD / 'SCUIDEMO.SCX').relative_to(ROOT).as_posix())
+    allowed = mode_sources(mode)
+    if set(inputs) != allowed or set(outputs) != changed_outputs:
+        raise ValueError('build input必须精确等于当前冻结源集合，output只允许SCUI.SCL变化')
     current_bytes = relative_path(CHANGED_SOURCE).stat().st_size
-    if source['sha256'] != EXPECTED_SOURCE_SHA256 or current_bytes != EXPECTED_SOURCE_BYTES:
-        raise ValueError('当前ui_data不是已冻结同SID/subject ACL修复')
+    if mode == OLD_MODE:
+        source = inputs[CHANGED_SOURCE]['after']
+        if source['sha256'] != EXPECTED_SOURCE_SHA256 or current_bytes != EXPECTED_SOURCE_BYTES:
+            raise ValueError('当前ui_data不是已冻结同SID/subject ACL修复')
+    else:
+        if previous.get('build_report_sha256') != PUBLICATION_BUILD_SHA or previous.get('compiler_default_repair') is not True:
+            raise ValueError('发布修复必须从完整build14/新default G1首轮开始')
+        for name, (before, after, size) in repair_sources(mode).items():
+            if (inputs[name]['before']['sha256'] != before or inputs[name]['after']['sha256'] != after
+                    or relative_path(name).stat().st_size != size):
+                raise ValueError('发布修复源不是已审定的精确新旧字节：' + name)
     if previous.get('core_sha256') != new_groups['outputs'][
             (BUILD / 'fs/SYS/CORE/CORE.SKM').relative_to(ROOT).as_posix()]['sha256']:
         raise ValueError('CORE已经改变，不能复用首轮运行')
-    return dict(allowed_input_changes=[CHANGED_SOURCE], allowed_output_changes=[scui_output],
-                actual_input_changes=inputs, actual_output_changes=outputs,
-                current_changed_source_bytes=current_bytes,
-                all_other_recorded_build_inputs_outputs_identical=True)
+    result = dict(allowed_input_changes=sorted(allowed), allowed_output_changes=sorted(changed_outputs),
+                  actual_input_changes=inputs, actual_output_changes=outputs,
+                  all_other_recorded_build_inputs_outputs_identical=True)
+    if mode == OLD_MODE:
+        result['current_changed_source_bytes'] = current_bytes
+    else:
+        result['current_changed_sources_bytes'] = {name: relative_path(name).stat().st_size for name in sorted(allowed)}
+    return result
+
+
+def preparation_changes(previous_inputs, current_inputs, delta, mode):
+    """准备树中的宿主产物只能按已经验证的 build 差异接受，不能放宽整个 build 目录。"""
+    changes = {}
+    outputs = delta['actual_output_changes']
+    for name, before in previous_inputs.items():
+        if name not in current_inputs:
+            raise ValueError('当前payload遗漏旧输入：' + name)
+        after = current_inputs[name]
+        if before == after:
+            continue
+        if name in outputs:
+            recorded = outputs[name]
+            if (before != recorded['before']['sha256']
+                    or after != recorded['after']['sha256']):
+                raise ValueError('payload产物不符合已验证build的新旧摘要：' + name)
+            kind = 'BOOTSTRAP_BUILD_OUTPUT'
+        elif name in mode_sources(mode):
+            kind = 'SCUI_IMPLEMENTATION'
+        elif name.startswith(('tools/', 'docs/')):
+            kind = 'HOST_EVIDENCE_TOOL_ONLY'
+        else:
+            raise ValueError('payload真实源/资源/产物发生额外变化：' + name)
+        changes[name] = dict(before=before, after=after, kind=kind)
+    return changes
 
 
 def include_closure(seeds, compiler_cli=False):
@@ -166,13 +333,13 @@ def include_closure(seeds, compiler_cli=False):
     return dict(sorted(seen.items()))
 
 
-def unchanged_closure(seeds, previous_inputs, current_hashes, compiler_cli=False):
+def unchanged_closure(seeds, previous_inputs, current_hashes, compiler_cli=False, mode=OLD_MODE):
     values = include_closure(seeds, compiler_cli=compiler_cli)
     for name, value in values.items():
         if previous_inputs.get(name) != value or current_hashes.get(name) != value:
             raise ValueError('复用artifact的实际include/manifest闭包改变：' + name)
-    if CHANGED_SOURCE in values:
-        raise ValueError('不能复用含ui_data.c改变的生成闭包')
+    if mode_sources(mode).intersection(values):
+        raise ValueError('不能复用含本次修复源的生成闭包')
     return dict(method='CLI_INTERFACE_EXACT_SELECTION_OTHER_LITERAL_BRANCHES_CONSERVATIVE' if compiler_cli
                 else 'CONSERVATIVE_LITERAL_INCLUDE_ALL_BRANCHES_PLUS_MANIFEST',
                 selected_SCCC_CLI=1 if compiler_cli else None,
@@ -192,7 +359,7 @@ def legacy_g1(blob):
                 old_container_not_widened=True)
 
 
-def previous_round(path, data_sha, pins):
+def previous_round(path, data_sha, pins, mode=OLD_MODE):
     path = first.inside(path, ROOT)
     report = read_json(path)
     if (report.get('status') != STATUS or report.get('scope') != SCOPE
@@ -206,6 +373,15 @@ def previous_round(path, data_sha, pins):
     if report.get('source_reuse') is not None:
         raise ValueError('previous-report必须为原guest首轮，不能是已刷新报告')
     digest = sha(path)
+    if mode != OLD_MODE:
+        if digest != PUBLICATION_PREVIOUS_SHA or report.get('compiler_default_repair') is not True:
+            raise ValueError('发布修复仅接受完整first-guest05的原真实报告')
+        if report.get('native_artifacts', {}).get('SCCC1.SCX', {}).get('sha256') != PUBLICATION_G1_SHA:
+            raise ValueError('发布修复必须使用原实际已验证的新G1')
+        if (set(report.get('native_libraries', {})) != {'SC32API.SCL', 'SCCLIB.SCL', 'SCUI.SCL'}
+                or set(report.get('native_artifacts', {})) != {'SCCC1.SCX', 'SWDEFAULT.SCX', 'DEFAULTAPI.SCX'} | {name + '.SCX' for name in first.APPLICATIONS}):
+            raise ValueError('发布修复前轮缺精确三库/新四dynamic App/legacy SWDEFAULT集合')
+    mode_sources(mode)
     pins[path] = digest
     old_path = Path(report['build_report'])
     proof, groups, ledger = recorded_build(old_path, report['build_report_sha256'])
@@ -221,6 +397,13 @@ def previous_round(path, data_sha, pins):
     for name in required:
         if cases.get(name, {}).get('exit_code') != 0 or name + '-actual-owner-page-account' not in cases:
             raise ValueError('旧首轮缺真正执行/owner账：' + name)
+    if mode != OLD_MODE:
+        machine = cases.get('actual-G1-default-switch-machine-flow-actual-mio', {})
+        account = cases.get('actual-G1-default-switch-machine-flow-actual-mio-actual-owner-page-account', {})
+        if (machine.get('status') != 'PASS' or machine.get('ordinary_exit_code') != 0
+                or machine.get('complete_owner_and_gc_observed') is not True
+                or account.get('status') != 'PASS' or account.get('complete_owner_and_gc_observed') is not True):
+            raise ValueError('发布修复缺原G1六项default机器main的实际普通退出/回收')
     aggregate = report.get('aggregate_abi', {})
     executions = aggregate.get('executions', [])
     if (len(executions) != 2 or {item.get('name') for item in executions} != set(required[-2:])
@@ -254,7 +437,7 @@ def previous_round(path, data_sha, pins):
     return report, proof, groups, cases, digest
 
 
-def obtain_artifacts(previous, previous_path, cases, hashes, pins):
+def obtain_artifacts(previous, previous_path, cases, hashes, pins, mode=OLD_MODE):
     compiler = previous['native_artifacts']['SCCC1.SCX']
     path = pin(Path(compiler['path']), previous_path.parent, compiler['sha256'], compiler['bytes'], pins)
     contract = legacy_g1(path.read_bytes())
@@ -265,8 +448,8 @@ def obtain_artifacts(previous, previous_path, cases, hashes, pins):
             or case.get('generated_bytes') != compiler['bytes']):
         raise ValueError('G1缺原真实自举/执行来源')
     blobs, contracts, closures = {'SCCC1.SCX': path.read_bytes()}, {'SCCC1.SCX': contract}, {}
-    closures['SCCC1.SCX'] = unchanged_closure(['user/sccc.c'], previous['input_sha256'], hashes, compiler_cli=True)
-    for name in ('SC32API.SCL', 'SCUI.SCL') + tuple(value + '.SCX' for value in first.APPLICATIONS):
+    closures['SCCC1.SCX'] = unchanged_closure(['user/sccc.c'], previous['input_sha256'], hashes, compiler_cli=True, mode=mode)
+    for name in artifact_names(mode, scui=True)[1:]:
         library = name.endswith('.SCL')
         item = previous['native_libraries' if library else 'native_artifacts'][name]
         actual = pin(Path(item['path']), previous_path.parent, item['sha256'], item['bytes'], pins)
@@ -276,7 +459,13 @@ def obtain_artifacts(previous, previous_path, cases, hashes, pins):
                 or case.get('compiler_sha256') != compiler['sha256']
                 or item.get('compiler_sha256') != compiler['sha256']):
             raise ValueError('artifact缺同一原真实G1成功编译记录：' + name)
-        if library:
+        if name == 'SWDEFAULT.SCX':
+            contracts[name] = legacy_g1(actual.read_bytes())
+            if (item.get('executed_this_generated_file') is not True
+                    or item.get('purpose') != 'SIX_DEFAULT_EXPLICIT_NESTED_SWITCH_MACHINE_MAIN_CHECKS'):
+                raise ValueError('SWDEFAULT原legacy生成/机器执行边界不成立')
+            seeds = ['tests/m10a2/SWDEFAULT.C']
+        elif library:
             source, manifest_name = first.LIBRARIES[name]
             declared = read_json(ROOT / 'user' / manifest_name)
             contracts[name] = stdlib.source_contract(validate(actual.read_bytes()), declared)
@@ -287,14 +476,14 @@ def obtain_artifacts(previous, previous_path, cases, hashes, pins):
             stem = name[:-4]
             declared = read_json(ROOT / 'tests/m10a2' / (stem + '.json'))
             contracts[name] = stdlib.source_contract(validate_scx(actual.read_bytes()), declared, True)
-            if item.get('executed_this_generated_file') is not (stem != 'SCUIDEMO'):
+            if item.get('executed_this_generated_file') is not (stem in ('PLATFORMPROBE', 'SCUITEXT')):
                 raise ValueError('旧app执行边界不同：' + name)
             seeds = ['tests/m10a2/' + stem + '.C', 'tests/m10a2/' + stem + '.json']
-        if item.get('format_contract') != contracts[name]:
+        if name != 'SWDEFAULT.SCX' and item.get('format_contract') != contracts[name]:
             raise ValueError('真实artifact与未变manifest不符：' + name)
         blobs[name] = actual.read_bytes()
-        if name != 'SCUI.SCL':
-            closures[name] = unchanged_closure(seeds, previous['input_sha256'], hashes)
+        if name not in fresh_artifact_names(mode):
+            closures[name] = unchanged_closure(seeds, previous['input_sha256'], hashes, mode=mode)
     return blobs, contracts, closures
 
 
@@ -345,8 +534,10 @@ def validated_refresh(path, build_report, proof_hashes):
     path = first.inside(path, ROOT)
     report = read_json(path)
     reuse = report.get('source_reuse', {})
+    mode = reuse.get('kind')
+    mode_sources(mode)
     if (report.get('status') != STATUS or report.get('scope') != SCOPE
-            or reuse.get('schema') != 1 or reuse.get('kind') != 'ONE_SCUI_SOURCE_REFRESH'
+            or reuse.get('schema') != 1
             or report.get('current_inputs_unchanged') is not True
             or report.get('source_disk_unchanged') is not True
             or report.get('changed_input_output_paths') != []
@@ -360,6 +551,8 @@ def validated_refresh(path, build_report, proof_hashes):
             or reuse.get('generated_system_libraries_installed') is not False):
         raise ValueError('refresh擅自扩大或混淆本轮执行范围')
     proof, pinned, _ = first.verified_build(build_report)
+    if current_repair_build(mode) and sha(build_report) != current_repair_build(mode):
+        raise ValueError('修复模式只接受各自冻结的成功build报告')
     if (pinned != proof_hashes or report.get('pinned_build_input_output_sha256') != pinned
             or report.get('build_report_sha256') != sha(build_report)):
         raise ValueError('refresh与当前统一build凭证不同')
@@ -368,19 +561,46 @@ def validated_refresh(path, build_report, proof_hashes):
         pin(relative_path(name), ROOT, expected)
     previous_path = first.inside(Path(reuse['previous_report']), ROOT)
     previous, _, groups, previous_cases, previous_sha = previous_round(
-        previous_path, report['source_data_sha256'], {})
+        previous_path, report['source_data_sha256'], {}, mode)
     if (previous_sha != reuse.get('previous_report_sha256')
             or reuse.get('previous_build_report_sha256') != previous['build_report_sha256']
-            or reuse.get('build_delta') != validate_build_delta(previous, groups, proof)):
+            or reuse.get('build_delta') != validate_build_delta(previous, groups, proof, mode)):
         raise ValueError('refresh旧来源SHA或唯一build差异不符')
+    if reuse.get('changed_preparation_inputs') != preparation_changes(
+            previous['input_sha256'], inputs, reuse['build_delta'], mode):
+        raise ValueError('refresh准备树变化不符合已验证build和源码闭包')
     old_snapshot = source_snapshot(previous['input_sha256'])
     if (reuse.get('previous_source_input_sha256') != old_snapshot
             or reuse.get('current_source_input_sha256') != source_snapshot(inputs)
             or report.get('source_input_snapshot') != source_snapshot(inputs)):
         raise ValueError('新准备snapshot与旧生成snapshot混淆')
-    _, previous_contracts, closures = obtain_artifacts(previous, previous_path, previous_cases, inputs, {})
+    _, previous_contracts, closures = obtain_artifacts(previous, previous_path, previous_cases, inputs, {}, mode)
     if reuse.get('unchanged_artifact_compile_closures') != closures:
         raise ValueError('reuse真实CLI/include/manifest闭包不符')
+    runtime = dict(core_sha256=previous['core_sha256'], installed_libraries=previous['installed_libraries'],
+                   scope='OLD_FIRST_VM_EXECUTION_LIBRARIES_NOT_REFRESHED_SCUI')
+    if mode != OLD_MODE:
+        if report.get('compiler_default_repair') is not True:
+            raise ValueError('发布修复丢失前轮真实default修复资格')
+        callers = report.get('caller_executions', [])
+        if len(callers) != len(previous['caller_executions']):
+            raise ValueError('发布修复改变前轮caller执行数量')
+        for old, item in zip(previous['caller_executions'], callers):
+            if (any(item.get(key) != value for key, value in old.items())
+                    or item.get('execution_class') != 'REUSED' or item.get('executed_this_vm') is not False
+                    or item.get('source_report_sha256') != previous_sha
+                    or item.get('runtime_dependencies_origin') != runtime):
+                raise ValueError('前轮caller/运行库来源被改写为本轮执行')
+        aggregate = report.get('aggregate_abi', {})
+        old_aggregate = previous['aggregate_abi']
+        if (any(aggregate.get(key) != value for key, value in old_aggregate.items() if key != 'executions')
+                or len(aggregate.get('executions', [])) != len(old_aggregate['executions'])):
+            raise ValueError('发布修复改写前轮aggregate产物或执行范围')
+        for old, item in zip(old_aggregate['executions'], aggregate['executions']):
+            if (any(item.get(key) != value for key, value in old.items())
+                    or item.get('execution_class') != 'REUSED' or item.get('executed_in_this_vm') is not False
+                    or item.get('source_report_sha256') != previous_sha):
+                raise ValueError('前轮aggregate被混记本轮执行')
     cases = {item['name']: item for item in report['cases']}
     if len(cases) != len(report['cases']):
         raise ValueError('refresh用例名重复')
@@ -389,6 +609,11 @@ def validated_refresh(path, build_report, proof_hashes):
                    'warm-existing-async-desktop-resources', 'refresh-installed-actual-G1',
                    'refresh-SCUI-compile-actual-owner-page-account'}
     fresh_names.update(SCUI_CASE + suffix for suffix in ('', '-output', '-format-contract', '-log', '-map'))
+    if mode in (QUALITY_MODE, FLEX_MODE, TOOLBAR_MODE, CAPTURE_MODE, CONTEXT_MODE):
+        fresh_names.update(DEMO_CASE + suffix for suffix in ('', '-output', '-format-contract', '-log', '-map'))
+        fresh_names.add('refresh-DEMO-compile-actual-owner-page-account')
+        if reuse.get('refreshed_DEMO_application_executed') is not False:
+            raise ValueError('新Demo生成与实际执行边界缺失')
     if {item['name'] for item in cases.values() if item.get('execution_class') == 'FRESH'} != fresh_names:
         raise ValueError('refresh真实case不等于一次SCUI编译及必要warm/get/owner账')
     for item in cases.values():
@@ -400,18 +625,30 @@ def validated_refresh(path, build_report, proof_hashes):
                     or item.get('exit_code') != original.get('exit_code')
                     or item.get('generated_sha256') != original.get('generated_sha256')):
                 raise ValueError('复用case冒充新VM或偏离原结果：' + item['name'])
+            if mode != OLD_MODE:
+                expected_name = 'reused-previous-' + original['name'] if original['name'].startswith('warm-') else original['name']
+                if (item['name'] != expected_name or item.get('runtime_dependencies_origin') != runtime
+                        or item.get('source_input_sha256') != old_snapshot
+                        or any(item.get(key) != value for key, value in original.items() if key not in ('status', 'name'))):
+                    raise ValueError('发布修复复用case的原stdout/PID/CPU/PIT/依赖字段被改写')
         elif (item.get('execution_class') != 'FRESH' or item.get('status') != 'PASS'
               or item.get('executed_in_this_vm') is not True or item.get('qemu_pid') != report.get('qemu_pid')):
             raise ValueError('refresh有未知/失败case：' + item['name'])
     libraries, apps, metadata = {}, {}, {}
-    for name in ('SCCC1.SCX', 'SC32API.SCL') + tuple(stem + '.SCX' for stem in first.APPLICATIONS):
+    if mode != OLD_MODE:
+        expected_artifacts = set(artifact_names(mode))
+        if (set(report.get('native_artifacts', {})) | set(report.get('native_libraries', {}))) != expected_artifacts | {'SCUI.SCL'}:
+            raise ValueError('发布修复未保留精确新三库/四dynamic App/legacy机器产物集合')
+    for name in artifact_names(mode):
+        if name in fresh_artifact_names(mode):
+            continue
         library = name.endswith('.SCL')
         item = report['native_libraries' if library else 'native_artifacts'][name]
         source = previous['native_libraries' if library else 'native_artifacts'][name]
         actual = pin(Path(item['path']), path.parent, source['sha256'], source['bytes'])
         origin = item.get('generation_origin', {})
         if (item.get('sha256') != source['sha256'] or item.get('bytes') != source['bytes']
-                or item.get('format_contract') != previous_contracts[name]
+                or (name != 'SWDEFAULT.SCX' and item.get('format_contract') != previous_contracts[name])
                 or item.get('compile_case') != source['compile_case']
                 or item.get('generated_this_vm') is not False or origin.get('mode') != 'REUSED'
                 or origin.get('report_sha256') != previous_sha
@@ -419,7 +656,7 @@ def validated_refresh(path, build_report, proof_hashes):
                 or origin.get('include_manifest_closure') != closures[name]
                 or item.get('current_compatibility', {}).get('include_manifest_closure') != closures[name]):
             raise ValueError('复用artifact丢原生成来源/闭包：' + name)
-        if name == 'SCCC1.SCX':
+        if name in ('SCCC1.SCX', 'SWDEFAULT.SCX'):
             legacy_g1(actual.read_bytes())
         elif library:
             libraries[name] = actual.read_bytes()
@@ -447,6 +684,25 @@ def validated_refresh(path, build_report, proof_hashes):
     libraries['SCUI.SCL'] = actual.read_bytes()
     metadata['SCUI.SCL'] = dict(item, path=str(actual), source='ACTUAL_VALIDATED_REFRESH_G1',
                                installed_this_vm=False, executed_this_vm=False, current_contract=contract)
+    if mode in (QUALITY_MODE, FLEX_MODE, TOOLBAR_MODE, CAPTURE_MODE, CONTEXT_MODE):
+        item = report['native_artifacts']['SCUIDEMO.SCX']
+        actual = pin(Path(item['path']), path.parent, item['sha256'], item['bytes'])
+        closure = include_closure(['tests/m10a2/SCUIDEMO.C', 'tests/m10a2/SCUIDEMO.json'])
+        contract = stdlib.source_contract(validate_scx(actual.read_bytes()), read_json(ROOT / 'tests/m10a2/SCUIDEMO.json'), True)
+        origin, fresh = item.get('generation_origin', {}), cases.get(DEMO_CASE, {})
+        if (reuse.get('fresh_demo_compile_closure') != closure or item.get('format_contract') != contract
+                or contract['imports'] != 133 or item.get('generated_this_vm') is not True
+                or item.get('installed_in_this_vm') is not False or item.get('executed_this_generated_file') is not False
+                or origin.get('mode') != 'FRESH' or origin.get('source_input_sha256') != source_snapshot(inputs)
+                or origin.get('include_manifest_closure') != closure or origin.get('compiler_sha256') != compiler_sha
+                or item.get('compiler_sha256') != compiler_sha or origin.get('qemu_pid') != report.get('qemu_pid')
+                or fresh.get('execution_class') != 'FRESH' or fresh.get('exit_code') != 0
+                or fresh.get('generated_sha256') != item['sha256'] or fresh.get('generated_bytes') != item['bytes']
+                or fresh.get('compiler_sha256') != compiler_sha):
+            raise ValueError('新Demo缺真实原G1编译/独立源闭包，或被冒称已执行')
+        apps['SCUIDEMO'] = actual.read_bytes()
+        metadata['SCUIDEMO.SCX'] = dict(item, path=str(actual), source='ACTUAL_VALIDATED_REFRESH_G1_FRESH_DEMO',
+            installed_this_vm=False, executed_this_vm=False, current_contract=contract)
     for folder in ('native-artifacts', 'native-libraries'):
         provenance_path = first.inside(path.parent / folder / 'provenance.json', path.parent)
         value = read_json(provenance_path)
@@ -469,9 +725,18 @@ def main():
     parser.add_argument('--out', type=Path, required=True)
     parser.add_argument('--build-report', type=Path, required=True)
     parser.add_argument('--previous-report', type=Path, required=True)
+    repair = parser.add_mutually_exclusive_group()
+    repair.add_argument('--post-activate-publication-repair', action='store_true')
+    repair.add_argument('--visible-selection-range-repair', action='store_true')
+    repair.add_argument('--dpi-overflow-wrap-repair', action='store_true')
+    repair.add_argument('--flex-width-reflow-repair', action='store_true')
+    repair.add_argument('--toolbar-input-state-repair', action='store_true')
+    repair.add_argument('--stale-capture-notification-repair', action='store_true')
+    repair.add_argument('--context-event-phase-repair', action='store_true')
     parser.add_argument('--data', type=Path, default=ROOT / 'build/m10a1/sanddata.img')
     parser.add_argument('--accel', choices=('tcg', 'whpx'), default='tcg')
     args = parser.parse_args()
+    mode = CONTEXT_MODE if args.context_event_phase_repair else CAPTURE_MODE if args.stale_capture_notification_repair else TOOLBAR_MODE if args.toolbar_input_state_repair else FLEX_MODE if args.flex_width_reflow_repair else QUALITY_MODE if args.dpi_overflow_wrap_repair else SELECTION_MODE if args.visible_selection_range_repair else PUBLICATION_MODE if args.post_activate_publication_repair else OLD_MODE
     if os.name != 'nt':
         parser.error('本工具只用Windows QEMU，不在WSL运行')
     args.out = args.out.resolve()
@@ -515,31 +780,25 @@ def main():
         args.previous_report = first.inside(args.previous_report, ROOT)
         original = sha(args.data)
         previous, old_proof, old_groups, old_cases, previous_sha = previous_round(
-            args.previous_report, original, external_pins)
+            args.previous_report, original, external_pins, mode)
         proof, proof_hashes, outputs = first.verified_build(args.build_report)
+        if current_repair_build(mode) and sha(args.build_report) != current_repair_build(mode):
+            raise ValueError('修复模式只接受各自冻结的成功build报告')
         if proof.get('source_files_modified_during_build') != []:
             raise ValueError('新build必须显式source_modified=[]')
-        delta = validate_build_delta(previous, old_groups, proof)
+        delta = validate_build_delta(previous, old_groups, proof, mode)
         prefix = '/TMP/UI-RF-' + secrets.token_hex(3)
-        extra, hashes, excluded = first.payload(prefix, proof_hashes)
+        extra, hashes, excluded = first.payload(prefix, proof_hashes, mode != OLD_MODE)
         for name in HELPERS:
             hashes[name] = sha(ROOT / name)
         hashes['tools/refresh_m10a2_ui_native.py'] = sha(Path(__file__))
         hashes['docs/UI-NATIVE-REFRESH.md'] = sha(ROOT / 'docs/UI-NATIVE-REFRESH.md')
         # previous的全准备树只是历史snapshot；只有实际生成依赖闭包须逐项不变。
-        changed_preparation = {}
-        for name, old in previous['input_sha256'].items():
-            if name not in hashes:
-                raise ValueError('当前payload遗漏旧输入：' + name)
-            if old != hashes[name]:
-                if name != CHANGED_SOURCE and not name.startswith(('tools/', 'docs/')):
-                    raise ValueError('payload真实源/资源/产物发生额外变化：' + name)
-                changed_preparation[name] = dict(before=old, after=hashes[name],
-                    kind='SCUI_IMPLEMENTATION' if name == CHANGED_SOURCE else 'HOST_EVIDENCE_TOOL_ONLY')
-        blobs, contracts, closures = obtain_artifacts(previous, args.previous_report, old_cases, hashes, external_pins)
+        changed_preparation = preparation_changes(previous['input_sha256'], hashes, delta, mode)
+        blobs, contracts, closures = obtain_artifacts(previous, args.previous_report, old_cases, hashes, external_pins, mode)
         old_source = source_snapshot(previous['input_sha256'])
         current_scui = include_closure(['user/scui/SCUI.C', 'user/scui/SCUI.json'])
-        if CHANGED_SOURCE not in current_scui:
+        if not (mode_sources(mode) - {'tests/m10a2/SCUIDEMO.C'} if mode in (QUALITY_MODE, FLEX_MODE, TOOLBAR_MODE, CAPTURE_MODE, CONTEXT_MODE) else mode_sources(mode)) <= set(current_scui):
             raise ValueError('SCUI实际编译闭包未包含修复源')
         for name, value in current_scui.items():
             if hashes.get(name) != value:
@@ -553,8 +812,9 @@ def main():
             official_corpus=copy.deepcopy(previous['official_corpus']),
             aggregate_abi=copy.deepcopy(previous['aggregate_abi']),
             generated_library_execution=previous['generated_library_execution'],
+            compiler_default_repair=mode != OLD_MODE,
             generated_library_execution_source='REUSED_PREVIOUS_AGGREGATE_ONLY_NOT_THIS_VM',
-            source_reuse=dict(schema=1, kind='ONE_SCUI_SOURCE_REFRESH', previous_report=str(args.previous_report),
+            source_reuse=dict(schema=1, kind=mode, previous_report=str(args.previous_report),
                 previous_report_sha256=previous_sha, previous_build_report=previous['build_report'],
                 previous_build_report_sha256=previous['build_report_sha256'],
                 previous_status=STATUS, previous_source_input_sha256=old_source,
@@ -564,13 +824,24 @@ def main():
                 no_rebootstrap=True, no_aggregate_rerun=True, no_platform_rerun=True, no_text_rerun=True,
                 refreshed_SCUI_library_executed=False, generated_system_libraries_installed=False,
                 current_status_meaning='MERGED_VALID_PREVIOUS_EXECUTION_AND_ONE_FRESH_SCUI_COMPILATION'))
+        if mode in (QUALITY_MODE, FLEX_MODE, TOOLBAR_MODE, CAPTURE_MODE, CONTEXT_MODE):
+            report['execution_scope'] = 'SINGLE_REFRESH_VM_OLD_ACTUAL_G1_COMPILES_CURRENT_SCUI_AND_DEMO_ONLY'
+            report['source_reuse'].update(fresh_demo_compile_closure=include_closure(
+                ['tests/m10a2/SCUIDEMO.C', 'tests/m10a2/SCUIDEMO.json']),
+                refreshed_DEMO_application_executed=False,
+                current_status_meaning='MERGED_VALID_PREVIOUS_EXECUTION_AND_FRESH_SCUI_AND_DEMO_COMPILATION')
         runtime = dict(core_sha256=previous['core_sha256'], installed_libraries=previous['installed_libraries'],
                        scope='OLD_FIRST_VM_EXECUTION_LIBRARIES_NOT_REFRESHED_SCUI')
         report['superseded_scui_cases'] = []
+        if mode in (QUALITY_MODE, FLEX_MODE, TOOLBAR_MODE, CAPTURE_MODE, CONTEXT_MODE):
+            report['superseded_demo_cases'] = []
         for item in previous['cases']:
             if item['name'].startswith(SCUI_CASE) or item['name'] == 'installed-GCC-library-preserved-SCUI.SCL':
                 report['superseded_scui_cases'].append(reused_case(
                     item, args.previous_report, previous_sha, old_source, runtime))
+                continue
+            if mode in (QUALITY_MODE, FLEX_MODE, TOOLBAR_MODE, CAPTURE_MODE, CONTEXT_MODE) and item['name'].startswith(DEMO_CASE):
+                report['superseded_demo_cases'].append(reused_case(item,args.previous_report,previous_sha,old_source,runtime))
                 continue
             value = reused_case(item, args.previous_report, previous_sha, old_source, runtime)
             if value['name'].startswith('warm-'):
@@ -585,7 +856,9 @@ def main():
                          source_report=str(args.previous_report), source_report_sha256=previous_sha,
                          runtime_dependencies_origin=runtime)
             report['caller_executions'].append(value)
-        for name in ('SCCC1.SCX', 'SC32API.SCL') + tuple(value + '.SCX' for value in first.APPLICATIONS):
+        for name in artifact_names(mode):
+            if name in fresh_artifact_names(mode):
+                continue
             library = name.endswith('.SCL')
             source = previous['native_libraries' if library else 'native_artifacts'][name]
             directory = args.out / ('native-libraries' if library else 'native-artifacts')
@@ -682,6 +955,38 @@ def main():
                         compiler_sha256=report['compiler']['sha256'], generated_sha256=first.digest(body),
                         generated_bytes=len(body), wall_seconds=time.monotonic() - begin,
                         installed=False, executed=False, source_input_sha256=current_scui)
+                    if mode in (QUALITY_MODE, FLEX_MODE, TOOLBAR_MODE, CAPTURE_MODE, CONTEXT_MODE):
+                        before, observed_before = harness.quiet()
+                        resources_before = harness.resources()
+                        local = args.out / 'native-artifacts/SCUIDEMO.SCX'
+                        manifest = read_json(ROOT / 'tests/m10a2/SCUIDEMO.json')
+                        begin = time.monotonic()
+                        body, metadata = harness.compile(DEMO_CASE, compiler, prefix + '/SCUIDEMO.C',
+                            PACKAGE + '/GENERATED/SCUIDEMO.SCX', prefix + '/SCUIDEMO.json', manifest, False, local,
+                            compiler_sha256=report['compiler']['sha256'])
+                        contract = stdlib.source_contract(validate_scx(body),manifest,True)
+                        if contract['imports'] != 133:
+                            raise ValueError('新Demo必须保持真实133imports/原manifest')
+                        report['native_artifacts']['SCUIDEMO.SCX'] = dict(metadata,path=str(local),
+                            compiler_sha256=report['compiler']['sha256'],format_contract=contract,
+                            source='FRESH_ACTUAL_PREVIOUS_G1_CURRENT_DEMO',execution_class='FRESH',
+                            generated_this_vm=True,installed_in_this_vm=False,installed_this_vm=False,
+                            executed_this_generated_file=False,executed_this_vm=False,
+                            generation_origin=dict(mode='FRESH',report=str(args.out/'ui-platform.json'),
+                                compile_case=DEMO_CASE,qemu_pid=vm.process.pid,
+                                compiler_sha256=report['compiler']['sha256'],
+                                source_input_sha256=source_snapshot(hashes),
+                                include_manifest_closure=report['source_reuse']['fresh_demo_compile_closure'],
+                                generated_this_vm=True),current_compatibility=dict(current_contract=contract))
+                        native_pins[local] = first.digest(body)
+                        after, observed_after = harness.quiet()
+                        ledger, reclaimed = harness.ledger(before,after,resources_before,harness.resources(),False)
+                        harness.append(dict(name='refresh-DEMO-compile-actual-owner-page-account',**ledger,
+                            before_observations=observed_before,after_observations=observed_after),reclaimed)
+                        report['refresh_app_generation'] = dict(compile_case=DEMO_CASE,qemu_pid=vm.process.pid,
+                            compiler_sha256=report['compiler']['sha256'],generated_sha256=first.digest(body),
+                            generated_bytes=len(body),wall_seconds=time.monotonic()-begin,installed=False,executed=False,
+                            source_input_sha256=report['source_reuse']['fresh_demo_compile_closure'])
                     harness.screen('ui-native-scui-refresh-desktop')
                     report['status'] = STATUS
                     persist()

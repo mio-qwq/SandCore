@@ -1,5 +1,7 @@
 # SCSHELL 与桌面重制设计
 
+> 2026-10-15后续：本文件下方“尚未实现/没有正式头”的表述是初始设计审计快照。现已有隔离的真实host/WM、FS lease freeze2、SCSHELL库/worker及桌面正文，见[SCSHELL-IMPLEMENTATION.md](SCSHELL-IMPLEMENTATION.md)最新段；尚未正式整合、构建或运行，原完整合同与验收门槛不变。
+
 所属版本：**SandCore M10a2 — The Application Platform Era**。2026-10-15，Phase 5 的正式设计与现状审计。完整目标来自根 `M10a2RULE.MD` 第五、六、七、八至十三节；本文件没有修改这些目标。**SCSHELL 的库、服务和新桌面尚未实现，本次没有构建或运行。** 当前 SCUI 平台的局部证据与待验范围见 [SCSHELL-IMPLEMENTATION.md](SCSHELL-IMPLEMENTATION.md)。
 
 ## 1. 用户要得到的完整工作流

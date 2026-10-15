@@ -1,0 +1,44 @@
+{
+  "status": "PATCH_SOURCE_ONLY_NOT_APPLIED_NOT_BUILT",
+  "expected_sources": {
+    "kernel/fs.c": "e53c5cc1a5b5f61681679a6a917dc36cef0b6491021691c08bef610ac8d609e2",
+    "kernel/sc32_file.c": "b81906524b9dea7c70bfa943c84417a51786fc9932a8aded6c5eb227457d9618",
+    "kernel/task.c": "4e55b56a7baca7dd52849a87bb891dbb8fd42d216f62f9128f6d97706da1f513",
+    "kernel/main.c": "8bcd35ab9cef64561088cc422983bef406897ccdaf39bcd187d91a076d565a8b",
+    "kernel/sc32_core.c": "746768af720a1029439d5335b6d0bd81032b073c295d1de5def1e201f5d6c011",
+    "Makefile": "b1e8055cf698ea5a2aa17834473f3b9dd00d037d38f0fd0c645dd59cc2aa782d",
+    "m10a2.mk": "d47ef6c774a4354278485cca6b63adb0d5f963f3530ec1052252118559ea7d26",
+    "user/sc32/SC32API.C": "a614fabaad6d553412c8655268871a1cbdaaa8524c46c7c065ba2088b8128eb8",
+    "user/SC32API.H": "f4c423c01a933922453e032c65f390347b21f1b96e39c52086a082ad7e6ae888",
+    "user/sc32/SC32API.json": "687d1bca6cff7c0cdb072f644ea779eeddc3d1cee0c122283af98defc9cffae9"
+  },
+  "changes": [
+    "kernel/fs.c",
+    "kernel/sc32_file.c",
+    "kernel/task.c",
+    "kernel/main.c",
+    "kernel/sc32_core.c",
+    "Makefile",
+    "m10a2.mk",
+    "user/sc32/SC32API.C",
+    "user/SC32API.H",
+    "user/sc32/SC32API.json"
+  ],
+  "new_files": [
+    "kernel/fs_lease.h",
+    "kernel/fs_lease.inc",
+    "kernel/fs_lease_cleanup.inc",
+    "kernel/fs_lease_commit.inc",
+    "kernel/fs_lease_index.inc",
+    "kernel/fs_lease_native.inc",
+    "kernel/fs_lease_open.inc",
+    "kernel/fs_lease_operation.inc",
+    "kernel/fs_lease_private.inc",
+    "kernel/sc32_file_lease.inc",
+    "kernel/sc32_lease.c",
+    "kernel/sc32_lease.h",
+    "user/leaseapi/leaseapi.c",
+    "user/leaseapi/SC32LEASEWIRE.H",
+    "user/SC32LEASE.H"
+  ]
+}

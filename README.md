@@ -6,7 +6,7 @@
 
 SandCore 由 [mio](https://github.com/mio-qwq/) 开发。工程包含 BIOS 引导、分页与抢占式多任务、SandFS 文件系统、多用户桌面、图形应用、音频、IPv4 网络、自有可执行格式，以及可以在系统内编译和运行程序的 C 编译器、汇编器和调试器。
 
-当前开发工作为 **SandCore M10a2 — The Application Platform Era**，2026-10-14 已开工：SCL/SCCC动态SCX、自举、SC32基础、SCCLIB/SCLIB已有真实运行证据；完整SCUI的158入口已由客体G1生成，普通会话平台、官方3013个Unicode边界与两个方向的结构体ABI通过，真实图形流程仍在修复验收；[总体设计](sandcore/docs/M10A2-DESIGN.md)、[实际状态与恢复入口](sandcore/docs/M10A2-IMPLEMENTATION.md)、[原生平台证据](sandcore/evidence/m10a2-ui-platform/README.md)。完整桌面/Shell、组件重制、SDK与整版目标持续active。可用验收基线仍为 **M10a1**，已于 **2026-10-07 验收通过**，作为 M10a 的 **GitHub Preview 预发布版**交付；统一在 `main` 开发。M9 是已验收的正式发布版本，M8a 与更早版本保留源码和运行镜像。完整 M10 尚未宣布完成，基础内核尚未冻结。
+当前开发工作为 **SandCore M10a2 — The Application Platform Era**，2026-10-14 已开工：SCL/SCCC动态SCX、自举、SC32基础、SCCLIB/SCLIB已有真实运行证据；完整SCUI的158入口已由客体G1生成，普通会话平台、官方3013个Unicode边界与两个方向的结构体ABI通过，GUI22实际91项记录通过，含两主题、100/150/200%布局、真实拖放/文件保存、隐藏停绘和最终回收；[总体设计](sandcore/docs/M10A2-DESIGN.md)、[实际状态与恢复入口](sandcore/docs/M10A2-IMPLEMENTATION.md)、[原生平台证据](sandcore/evidence/m10a2-ui-platform/README.md)。完整桌面/Shell、组件重制、SDK与整版目标持续active。可用验收基线仍为 **M10a1**，已于 **2026-10-07 验收通过**，作为 M10a 的 **GitHub Preview 预发布版**交付；统一在 `main` 开发。M9 是已验收的正式发布版本，M8a 与更早版本保留源码和运行镜像。完整 M10 尚未宣布完成，基础内核尚未冻结。
 
 > **关于 AI 参与与文档质量：** 本项目包含由 AI 生成或辅助编写的代码，部分文档也由 Agent 撰写或整理，因此可能存在表述不清、人称或代词指代错误，以及遗留的 Agent 自述等问题。欢迎通过 [Issues](https://github.com/mio-qwq/SandCore/issues) 指出问题；我也会在后续持续校对与完善。
 
@@ -452,7 +452,7 @@ env -u OS make -j4
 
 | 版本 | 状态 |
 |---|---|
-| M10a2 — The Application Platform Era | SCL与SC32基础/原生库/消息窗口已实际运行，完整四库/GUI与组件建设中，尚未验收 |
+| M10a2 — The Application Platform Era | SCL与SC32基础/原生库/消息窗口已实际运行，四库/SCUI GUI已有真实阶段证据；P5原生生成完成但启动故障修复中，组件/SDK与整版未验收 |
 | M10a1 | 2026-10-07 验收通过，GitHub Preview 预发布，含追加 curl；统一使用 main |
 | M9 | 2026-10-05 验收通过，正式发布 |
 | M8a | 批准的部分正式发布；原 M8 未完成部分继续封存 |
@@ -472,3 +472,5 @@ env -u OS make -j4
 修订：2026-10-14，合并远端许可证、英文README和原文调整，保留全部已有提交并同步双语开发状态。
 
 修订：2026-10-15，SC32公开基础与客体库、三窗口实际键鼠和精确回收通过；继续完整SCCLIB/SCLIB/GUI平台，保留验收基线。
+
+修订：2026-10-16，SCUI完整定向GUI22通过并保存证据；P5真实生成和启动故障边界分列，M10a2完整目标继续。

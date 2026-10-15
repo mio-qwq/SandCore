@@ -102,7 +102,7 @@ struct ScUiMenu {
 };
 struct UiPopup {
     UiPopup *previous,*next;ScUiContext *context;ScUiMenu *menu;ScUiNode owner,node,source;ScU32 source_item;
-    ScU32 token,hot,parent_popup,child_popup,retired,first_row,hover_timer;ScI32 caption_width,shortcut_width,row_height;
+    ScU32 token,hot,parent_popup,child_popup,retired,first_row,range_first,hover_timer;ScI32 caption_width,shortcut_width,row_height;
 };
 struct ScUiContext {
     UiObject object;ScUiContextDesc description;ScUiErrorInfo error;

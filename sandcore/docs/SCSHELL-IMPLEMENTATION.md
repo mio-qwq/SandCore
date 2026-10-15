@@ -1,5 +1,11 @@
 # SCSHELL 实施状态与源码交接
 
+> 2026-10-15后续源码状态：下面“此次仅写两份文档”是本文件最初设计审计的历史记录。现在Phase5已有隔离的实际FS lease/条件提交、host/WM角色、SCSHELL库/worker和桌面正文，正在统一收齐与静态审阅；均未接入当前kernel/user工作源，未构建、未客体运行。不能把隔离源码或P4局部证据改称Phase5完成。
+
+当前入口为 `drafts/m10a2-shell-fs`（freeze2含12个租约入口、METADATA_ONLY与条件SetMode）、`drafts/m10a2-shell-host`（可信固定发行摘要、普通会话host、两surface首帧、窗口分页/动作及必要SCUI painter公开能力）、`drafts/m10a2-shell-r3`（真正动态SCSHELL库正文，仍在收齐）、`drafts/m10a2-shell-worker`（caller-owned worker正文，仍在收齐）和 `drafts/m10a2-shell-desktop`（真正SCSHELL.SCX源码）。文件归属、未验范围与整合片段各见目录文档，不能提前注册当前cap/manifest或运行半批实现。
+
+桌面当前正文已写动态图标/空间索引、选择/框选/真实capture、候选拖动、布局CAS与冲突提示、LNK/图标、Start/上下文、带正常CLOSE请求的任务栏、8条目录与窗口候选分页、剪贴板、Drop三选与快捷方式属性、真实服务和正常撤角色清理。目录IO/消息泵和异步菜单作业的寿命已显式分开；源码中的实际权限、DPI、跨窗口拖起、缓存失效与全部完整目标仍须收尾及客体验证，不能据本段宣称交互或性能PASS。
+
 所属版本：**SandCore M10a2 — The Application Platform Era**。2026-10-15。完整设计为 [SCSHELL-DESIGN.md](SCSHELL-DESIGN.md)，目标为根 `M10a2RULE.MD` §6及相关系统库/主要应用合同。**此次仅写这两份文档，未修改实现、构建规则或当前验证输入；没有新增构建、宿主编译或QEMU。Phase5 尚未实现/验收。**
 
 ## 1. 当前真实证据及不能外推的结论

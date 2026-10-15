@@ -1,0 +1,2 @@
+printf '%s\n' '' 'printf PENDING > /HOME/M10UI/GUI-IDENTITY.TXT; exit $?' | su mio; _m9_status=$?; echo __SCUI_CMD_d6d44509c038342ddd303281:$_m9_status:__SCUI_CMD_d6d44509c038342ddd303281_END
+Password: 

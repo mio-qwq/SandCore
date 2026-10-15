@@ -1,0 +1,23 @@
+{
+  "status": "ISOLATED_WM_SOURCE_NOT_BUILT_NOT_RUN",
+  "inputs": {
+    "kernel/wm.c": "f22357f64be1b7a1c1fab492981080ef58aa2d25c329be5b18cc4590c7c72bca",
+    "kernel/wm_native.inc": "d1bcd635c3161203e1d6df88455e72c3c9b617b9094ed4907726291b37654ce7",
+    "user/SC32GUI.H": "470cb56da856c79630c3621e5f765641db798456fcb0bd643e9fa615cbc051a6"
+  },
+  "changed_paths": [
+    "kernel/wm.c",
+    "kernel/wm_native.inc",
+    "user/SC32GUI.H"
+  ],
+  "new_source": "kernel/wm_shell.inc",
+  "new_source_in_parent_integration": true,
+  "working_sources_modified": false,
+  "full_M10a2": false,
+  "candidate_sha256": {
+    "kernel/wm.c": "c5a7a7392011b0042217c117ad7ba89fa748e4440bc23481aba49ff0941d6716",
+    "kernel/wm_native.inc": "60534f5e8f6061e8178f46c8694b4139c9cb3bd4ac00e7c34b785a9a9e84d152",
+    "user/SC32GUI.H": "171dc602ec71ba77ec3d5bd043e7ce9a3d6d8cd27814d43185d51a0a12e522f2"
+  },
+  "new_source_sha256": "51c641cc27bc38b90ac20361b17931c149ceb27037a70a117cc7781afca9de85"
+}
