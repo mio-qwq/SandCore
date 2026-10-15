@@ -1,5 +1,5 @@
 /* 标准SDK真正需要的语义集中在此，不在头里伪造bool/变参栈运算。
- * 它在基础parser之后定义，共同Node仍32B，cdecl参数槽仍为4B。 */
+ * 它在基础parser之后定义，共同Node仍32B；聚合参数用连续4B槽。 */
 static int standard_integer(int type)
 {
     int kind=types[type].kind;
@@ -49,6 +49,12 @@ static int standard_value_conversion(int target,int value)
                     fatal("pointer argument has an incompatible object type");
             }
         }
+    }else if(abi_aggregate(target)){
+        abi_stack_bytes(target);
+        if(to->kind!=from->kind || aggregate_identity[target]!=aggregate_identity[source])
+            fatal("aggregate value requires the same complete aggregate type");
+        abi_stack_bytes(source);
+        return value;
     }else fatal("unsupported argument value type");
     if(target==nodes[value].type && to->kind!=TY_BOOL)return value;
     return node_new(N_CAST,target,value,0,0,0);
@@ -90,8 +96,9 @@ static int standard_conditional_type(int yes,int no)
 static int standard_default_conversion(int value)
 {
     int target=promoted(nodes[value].type);
+    if(abi_aggregate(target)){abi_stack_bytes(target);return value;}
     if(!standard_integer(target) && types[target].kind!=TY_PTR)
-        fatal("unnamed argument cannot pass void or an aggregate by value");
+        fatal("unnamed argument requires an integer, pointer or complete aggregate");
     return target==nodes[value].type?value:node_new(N_CAST,target,value,0,0,0);
 }
 static int standard_va_list(int node,int writable)
@@ -168,11 +175,12 @@ static int standard_builtin(void)
             fatal("va_start requires the rightmost named parameter");
         int symbol=find_symbol(current_token()->v,0);
         if(!symbol || symbols[symbol].kind!=S_PARAM)fatal("va_start parameter is shadowed or not a real parameter");
-        where=symbols[symbol].value+4;position++;
+        where=symbols[symbol].value+abi_stack_bytes(symbols[symbol].type);position++;
     }else if(kind==N_VA_ARG){
         need(',');type=standard_type_name();
-        if(types[type].size!=4 || (types[type].kind!=TY_INT && types[type].kind!=TY_PTR))
-            fatal("va_arg supports promoted 32-bit integers and pointers in this profile");
+        if(abi_aggregate(type))abi_stack_bytes(type);
+        else if(types[type].size!=4 || (types[type].kind!=TY_INT && types[type].kind!=TY_PTR))
+            fatal("va_arg supports promoted 32-bit scalars and complete aggregates in this profile");
     }else if(kind==N_VA_COPY){
         need(',');value=expression(2);
         if(!standard_va_list(value,0))fatal("va_copy source must have va_list type");

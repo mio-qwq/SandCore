@@ -1,0 +1,26 @@
+{
+  "version": "15.1.0",
+  "license": "Unicode-3.0",
+  "license_source": "third_party/unicode15_1/LICENSE.txt",
+  "scope": "Independent official conformance oracle, not product implementation",
+  "files": [
+    {
+      "path": "GraphemeBreakTest.txt",
+      "url": "https://www.unicode.org/Public/15.1.0/ucd/auxiliary/GraphemeBreakTest.txt",
+      "bytes": 188211,
+      "sha256": "ed9c5e92fd0911ccbeeb63c97cb19c519ea272ff1112ce843abd991582dd848f"
+    },
+    {
+      "path": "WordBreakTest.txt",
+      "url": "https://www.unicode.org/Public/15.1.0/ucd/auxiliary/WordBreakTest.txt",
+      "bytes": 298850,
+      "sha256": "69506b2253b8defb1f15b1476397376285cfda3bafd9304ee50d48bbfa0a2ab4"
+    },
+    {
+      "path": "LICENSE.txt",
+      "url": "https://www.unicode.org/license.txt",
+      "bytes": 1995,
+      "sha256": "e7a93b009565cfce55919a381437ac4db883e9da2126fa28b91d12732bc53d96"
+    }
+  ]
+}

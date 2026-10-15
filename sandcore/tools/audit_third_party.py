@@ -94,7 +94,8 @@ def audit(tree=None, catalog_path=CATALOG):
             'VONWAON.LIC': [ROOT / 'assets/licenses/VONWAON.LIC']
         }
         if catalog_path != CATALOG:
-            notices = {'THIRDPARTY.MD': [ROOT / 'docs/THIRD-PARTY.md'], 'M10.JSON': [catalog_path]}
+            notice = 'M10A2.JSON' if catalog_path.name == 'M10A2-SOURCES.json' else 'M10.JSON'
+            notices = {'THIRDPARTY.MD': [ROOT / 'docs/THIRD-PARTY.md'], notice: [catalog_path]}
         for name, originals in notices.items():
             path = tree / 'SYS/LICENSE' / name
             if not path.is_file() or path.read_bytes() != b''.join(p.read_bytes() for p in originals):

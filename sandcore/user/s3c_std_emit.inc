@@ -13,8 +13,13 @@ static void emit_standard_value(Node *node)
         move_reg(2,0);byte(0x8D);memory(0,5,node->value);std_write(0,2,0);
     }else if(node->kind==N_VA_ARG){
         /* ap地址、原cursor和新cursor各保一次；ap即使有副作用也只求一次。 */
-        move_reg(2,0);std_read(0,0,0);byte(0x8D);memory(1,0,4);
-        std_write(1,2,0);std_read(0,0,0);
+        int width=abi_stack_bytes(node->type);
+        move_reg(2,0);std_read(0,0,0);byte(0x8D);memory(1,0,width);
+        std_write(1,2,0);
+        if(abi_aggregate(node->type)){
+            int slot=aggregate_result_slot(node);
+            byte(0x8D);memory(2,5,slot);copy_aggregate(types[node->type].size);
+        }else std_read(0,0,0);
     }else if(node->kind==N_VA_COPY){
         byte(0x50);emit_expression(node->b);byte(0x5A);std_write(0,2,0);
     }else std_word(0,0,0);

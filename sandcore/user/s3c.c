@@ -10,9 +10,10 @@
  * 后端逐函数生成 x86，最后解决全局地址并封装 SCX1MIO。所有容量
  * 有明确上限，溢出在写数组之前诊断，不能输出残缺却“成功”的文件。
  *
- * 【内存为何使用固定工作区】没有 libc/malloc；大数组属于 SCX BSS，
- * 加载器映射并清零。语法树每生成完一个函数即复用，符号/类型/重定位
- * 保留到整编译单元结束；指针不会指向已经复用的函数语法树。
+ * 【工作区为什么地址固定】没有 libc/malloc；大Source/Token/Pool/Code
+ * 区在首次PP前一次从本人sc_alloc取得，之后不realloc，递归Lexer与
+ * 解析器借用指针稳定。成功的诊断/map/正文完成后释放；fatal由kernel
+ * 退出清所有本人页。语法树逐函数复用，符号/类型/重定位保留到TU结束。
  * 递归局部缓冲保持小，宏参数与 include 行缓冲放 BSS，避免 128KB
  * 用户栈被深层展开耗尽。文档：C.md、FS.md、SYSCALL.md。
  * ===================================================================== */
@@ -23,27 +24,31 @@
 #include "COMPILEUI.inc"
 #endif
 
-#define TOKEN_MAX 65536
-#define POOL_MAX 196608
-/* 原生 SCL 清单/封装与共同格式验证器成为自编译输入，真实源码总量
- * 超过旧 192KiB。只增加有依据的源码区；输出映像/栈/代码上限仍检查。 */
-#define SOURCE_MAX 262144
+#define TOKEN_MAX 262144
+#define POOL_MAX 2097152
+/* 真实SCUI已超过324KiB且controls/dialog继续增长。1MiB是完整TU
+ * 源及每文件NUL预算，不是单文件/最终SCX容量，也不边读边搬arena。 */
+#define SOURCE_MAX 1048576
 #define IDENT_MAX 4096
-#define FILE_MAX 32
+#define FILE_MAX 64
 #define LINE_MAX 1024
 #define DEPTH_MAX 16
-/* SCD1自编译曾在256项耗尽；SC32完整公开/私有八头已有340个不同
- * 宏，另需实现及预定义宏。384容纳当前真实输入，输出/栈限制不放宽。 */
-#define MACRO_MAX 384
+/* 当前Broker+Font/Popup聚合已有382项含预定义宏，SCUI近32个include。
+ * 此两表只按当时实际规模留裕量；后续symbol诊断的扩容另见下方。 */
+#define MACRO_MAX 512
 #define MACRO_BODY_MAX 8192
 #define MACRO_ARGS 8
 #define MACRO_ARG_TOKENS 128
 #define TYPE_MAX 4096
-#define SYMBOL_MAX 6144
+/* host03已解析生成真实aggregate夹具，完整SCUI在ui_edit:1531累计
+ * 符号触6144。字段/局部符号须存活至各引用完成，给完整TU留16384；
+ * Symbol和两个按ID旁表一起扩，BSS增加409600B，其它容量不动。 */
+#define SYMBOL_MAX 16384
 #define PARAM_MAX 4096
 #define NODE_MAX 8192
 #define FIX_MAX 12288
 #define CODE_MAX 262000
+#define SCL_CODE_MAX 1048576
 #define DATA_MAX 131072
 static int module_output;
 static int shared_output;
@@ -84,11 +89,11 @@ enum {
 typedef struct { int kind,type,a,b,c,value,where,next; } Node;
 typedef struct { int offset,kind,symbol,addend; } Fix;
 
-static char pool[POOL_MAX],source_arena[SOURCE_MAX];
+static char *pool,*source_arena;
 static int pool_used,source_used,identifiers[IDENT_MAX],identifier_count;
 static Source sources[FILE_MAX];
 static int source_count;
-static Tok tokens[TOKEN_MAX];
+static Tok *tokens;
 static int token_count,position,error_position;
 static Macro macros[MACRO_MAX];
 static int macro_count,macro_body_used;
@@ -115,12 +120,14 @@ static int type_count,symbol_count,param_count,node_count,fix_count;
 static int function_symbol,scope_depth,local_bytes;
 static int function_name_literal,function_name_bytes;
 static int root_adapter_symbols[2],root_adapter_used[2];
-static u8 code[CODE_MAX+36],data[DATA_MAX];
+static u8 *code,data[DATA_MAX];
+static int code_capacity;
 static int code_used,data_used,bss_used;
 static int scl_symbol_storage[SYMBOL_MAX],scl_symbol_sizes[SYMBOL_MAX];
-/* 清单/封装新增函数使真实自身符号图超过16KiB；继续保留有界检查，
- * 调整至32KiB。普通SCX/SKM的符号行及映像字节顺序均不改变。 */
-static char log_path[64],map_path[64],diagnostic[512],map_text[32768];
+/* SCUI现约495函数：函数行约26KiB，导出/导入行另加，32KiB已无
+ * 正式输入裕量。保留固定128KiB及sizeof共同检查，行格式/顺序不变。
+ * 此小区仍在BSS；四个大区移堆后自身映像仍须独立检查3d窗口。 */
+static char log_path[64],map_path[64],diagnostic[512],map_text[131072];
 static char icon_path[64];
 static int map_used;
 /* 后端会在函数语法树完成后立即消费它；前置原型保证宿主与 SCCC
@@ -177,11 +184,54 @@ static void fatal(const char *reason)
     sc_exit(1);
     for(;;) sc_yield();
 }
+static void capacity_number(char *out,u32 value)
+{
+    /* 文件尺寸来自u32元数据；不能先转int把大非法输入的need写成负数。 */
+    char reversed[10];int used=0,at=0;
+    do {reversed[used++]=(char)('0'+value%10u);value/=10u;} while(value);
+    while(used)out[at++]=reversed[--used];
+    out[at]=0;
+}
+static void capacity_fatal(const char *area,u32 used,u32 need,u32 limit)
+{
+    char message[192],number[12];
+    copy(message,area,sizeof(message));
+    append(message," capacity exceeded: used=",sizeof(message));
+    capacity_number(number,used);append(message,number,sizeof(message));
+    append(message," need=",sizeof(message));capacity_number(number,need);append(message,number,sizeof(message));
+    append(message," limit=",sizeof(message));capacity_number(number,limit);append(message,number,sizeof(message));
+    fatal(message);
+}
+static void workspace_release(void)
+{
+    /* 只有完整finish/map/log之后才走成功释放。source/file的递归Lexer、
+     * token池与字符串offset此前都有借用；不在PP/parse内部搬或释放。 */
+    if(code){sc_free(code);code=0;}
+    if(tokens){sc_free(tokens);tokens=0;}
+    if(pool){sc_free(pool);pool=0;}
+    if(source_arena){sc_free(source_arena);source_arena=0;}
+}
+static void workspace_acquire(void)
+{
+    code_capacity=shared_output?SCL_CODE_MAX:CODE_MAX;
+    source_arena=sc_alloc(SOURCE_MAX);
+    if(!source_arena)goto failed;
+    pool=sc_alloc(POOL_MAX);
+    if(!pool)goto failed;
+    tokens=sc_alloc((u32)TOKEN_MAX*(u32)sizeof(Tok));
+    if(!tokens)goto failed;
+    code=sc_alloc((u32)code_capacity+36u);
+    if(code)return;
+failed:
+    /* OOM在第一个失败处停止；既有候选先归还，不再申请后面的更大区。 */
+    workspace_release();fatal("compiler workspace allocation failed (source/token/pool/code)");
+}
 static int text_size(int at) { return *(int *)(pool+at-4); }
 static char *spelling(int at) { return pool+at; }
 static int store_text(const char *s,int n)
 {
-    if(n<0 || pool_used+12+n+1>POOL_MAX) fatal("string pool capacity exceeded");
+    if(n<0)fatal("negative string size");
+    if(pool_used>POOL_MAX-13 || n>POOL_MAX-pool_used-13)capacity_fatal("string pool",(u32)pool_used,(u32)n+13u,POOL_MAX);
     int at=pool_used+12;
     *(int *)(pool+at-12)=at;
     *(int *)(pool+at-8)=0;
@@ -199,7 +249,7 @@ static int intern(const char *s,int n)
         for(int j=0;j<n;j++) if(pool[at+j]!=s[j]) same=0;
         if(same) return at;
     }
-    if(identifier_count>=IDENT_MAX) fatal("identifier capacity exceeded");
+    if(identifier_count>=IDENT_MAX)capacity_fatal("identifiers",(u32)identifier_count,1u,IDENT_MAX);
     int at=store_text(s,n);
     identifiers[identifier_count++]=at;
     return at;
@@ -303,6 +353,9 @@ int main(void)
     if(length(icon)>63 || *token(&p))fatal("expected source, output and optional SCB2 icon");
 #endif
     copy(icon_path,icon,sizeof(icon_path));
+    /* manifest同样intern名字到pool，因此工作区取得必须早于清单；
+     * 路径/日志别名检查仍在前面，OOM不会借诊断覆盖输入正文。 */
+    workspace_acquire();
     if(shared_output){
         if(!*manifest)fatal("SCL manifest is missing");
         if(build_view_poll("Validating SCL manifest",0,0,1))fatal("compilation cancelled");
@@ -320,6 +373,7 @@ int main(void)
     compile_unit();
     if(build_view_poll(shared_output?"Linking and writing SCL":"Linking and writing SCX",1,1,1))fatal("compilation cancelled");
     finish_image(output);
+    workspace_release();
     build_view_result("Compilation complete",0);
 #ifdef SCCC_CLI
     return build_view_cancel?1:0;

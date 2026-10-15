@@ -1,0 +1,10 @@
+/HOME/M10UI/COMPILER/SCCC1.SCX /TMP/UI-dc2aea/SCUITEXT.C /HOME/M10UI/NATIVE_APPS/SCUITEXT.SCX --dynamic /TMP/UI-dc2aea/SCUITEXT.json; _m9_status=$?; printf "\n"; echo __M9_a251f6fa6fb5f9ace3f2cef5:$_m9_status
+SCCC / mio
+TMP/UI-dc2aea/SCUITEXT.C -> HOME/M10UI/NATIVE_APPS/SCUITEXT.SCX
+Validating application manifest
+SCCC: preprocess -> C -> x86
+Preprocessing source and includes
+Parsing C and generating x86
+Linking and writing SCX
+SCCC OK SCX DYNAMIC
+Compilation complete

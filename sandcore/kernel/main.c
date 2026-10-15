@@ -23,6 +23,8 @@
 #include "streams.h"
 #include "wm.h"
 #include "sc32_gui.h"
+#include "sc32_broker.h"
+#include "sc32_drop.h"
 #include "desktop.h"
 #include "module.h"
 #include "ttf.h"
@@ -325,6 +327,8 @@ void kmain(void)
 #ifdef M10_DISK_CORE
         network_poll();              /* 输入先入状态，再做有限网卡/协议批次。 */
 #endif
+        sc32_drop_poll();
+        sc32_broker_poll();
         task_cleanup_poll();          /* 先撤稳定旁表引用，再给调度器回收页与内核栈。 */
         if (wm_dirty()) {
             /* 1080p整帧拷贝/透明混合不能长时间cli，否则8042容量
@@ -341,8 +345,9 @@ void kmain(void)
          * 任务0睡掉。沿安全换栈出口交回剩余时间，恢复后continue
          * 重新检查输入，不能直接落到HALT把下一轮事件又延后一拍。
          * 旧YIELD轮询仍按当前tick节流，静止工具不会变成CPU满载。 */
-        if(task_cleanup_pending()){sti();continue;}
+        if(task_cleanup_blocks_user()){sti();continue;}
         if(task_idle_yield())continue;
+        if(task_cleanup_pending() || sc32_broker_pending() || sc32_drop_pending()){sti();continue;}
         task_idle(1);                /* IF=0设置，紧接STI/HALT，不能提前标空闲 */
         sti();
         halt();

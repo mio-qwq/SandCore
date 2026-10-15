@@ -161,7 +161,7 @@ void sc32_gui_emit(int pid,ScMessage *message)
     if(!message->sequence_lo && !message->sequence_hi)sc32_gui_stamp(pid,message);
     int device=message->id==SC32_MSG_KEYDOWN || message->id==SC32_MSG_KEYUP ||
         message->id==SC32_MSG_TEXT || message->id==SC32_MSG_MOUSEMOVE ||
-        message->id==SC32_MSG_BUTTONDOWN || message->id==SC32_MSG_BUTTONUP;
+        message->id==SC32_MSG_BUTTONDOWN || message->id==SC32_MSG_BUTTONUP || message->id==SC32_MSG_WHEEL;
     if(device && p->loss_pending){wm_sc32_input_revoked(pid,message);lost(p,2,0,0);return;}
     if(message->id==SC32_MSG_MOUSEMOVE && p->tail && p->tail->end>p->tail->begin){
         ScMessage *last=&p->tail->messages[p->tail->end-1];
@@ -201,7 +201,7 @@ static int next_message(int pid,ScMessage *result,int consume)
     while(p->head && p->head->begin<p->head->end){
         ScMessage *m=&p->head->messages[p->head->begin];
         int device=m->id==SC32_MSG_KEYDOWN || m->id==SC32_MSG_KEYUP || m->id==SC32_MSG_TEXT
-            || m->id==SC32_MSG_MOUSEMOVE || m->id==SC32_MSG_BUTTONDOWN || m->id==SC32_MSG_BUTTONUP;
+            || m->id==SC32_MSG_MOUSEMOVE || m->id==SC32_MSG_BUTTONDOWN || m->id==SC32_MSG_BUTTONUP || m->id==SC32_MSG_WHEEL;
         int revoked=device && (m->sequence_hi<p->input_barrier_hi ||
             (m->sequence_hi==p->input_barrier_hi && m->sequence_lo<p->input_barrier_lo));
         if(!revoked && wm_sc32_message_valid(pid,m))break;
@@ -333,6 +333,20 @@ int sc32_gui_call(int pid,u32 operation,u32 request,u32 output)
      * request和保留位，所有候选资源先留齐，绝不让坏out变成R3盲写。 */
     int error=0,other=0;Sc32WindowRef reference;
     switch(operation){
+    case SC32_GUI_POPUP_CREATE:{
+        error=sc32_core_output(pid,output,16);if(error)return error;
+        Sc32PopupCreate input;error=sc32_core_input(pid,request,&input,sizeof(input));if(error)return error;
+        if(!reserved_zero(input.reserved,4))return SC32_E_INVALID;
+        error=changes_begin(pid,1,&other);if(error)return error;
+        error=wm_sc32_popup_create(pid,&input,&reference);changes_end(pid,other,!error);
+        return error?error:publish(pid,output,&reference,16);
+    }
+    case SC32_GUI_CURSOR:{
+        if(output)return SC32_E_INVALID;
+        Sc32WindowAction input;error=sc32_core_input(pid,request,&input,sizeof(input));if(error)return error;
+        if(input.reserved)return SC32_E_INVALID;
+        return wm_sc32_cursor(pid,input.window,input.generation,input.action);
+    }
     case SC32_GUI_CREATE:{
         error=sc32_core_output(pid,output,16);if(error)return error;Sc32WindowCreate input;
         error=sc32_core_input(pid,request,&input,sizeof(input));if(error)return error;
@@ -433,11 +447,11 @@ int sc32_gui_call(int pid,u32 operation,u32 request,u32 output)
         error=wm_sc32_paint_begin(pid,reference.window,reference.generation,&info);
         return error?error:publish(pid,output,&info,64);
     }
-    case SC32_GUI_PAINT_END:{
+    case SC32_GUI_PAINT_END:case SC32_GUI_PAINT_CANCEL:{
         if(output)return SC32_E_INVALID;
         Sc32PaintEnd input;
         error=sc32_core_input(pid,request,&input,sizeof(input));if(error)return error;
-        return wm_sc32_paint_end(pid,&input);
+        return operation==SC32_GUI_PAINT_END?wm_sc32_paint_end(pid,&input):wm_sc32_paint_cancel(pid,&input);
     }
     case SC32_GUI_SUBMIT:{
         if(output)return SC32_E_INVALID;

@@ -1,0 +1,46 @@
+{
+  "version": 1,
+  "status": "SOURCE-REGISTERED-NOT-GUEST-VERIFIED",
+  "allowed_licenses": [
+    "Unicode-3.0"
+  ],
+  "components": [
+    {
+      "name": "Unicode15_1_Properties",
+      "upstream": "https://www.unicode.org/Public/15.1.0/ucd/",
+      "revision": "15.1.0",
+      "license": "Unicode-3.0",
+      "source": "third_party/unicode15_1",
+      "guest": "SYS/LICENSE/UNICODE15_1",
+      "purpose": "Original property data; own integer grapheme/word implementation, no upstream executable code",
+      "files": {
+        "GraphemeBreakProperty.txt": "a7e52eee647e52dc210b8719b4d7037276f4b353810293d69377fc46374cec3f",
+        "WordBreakProperty.txt": "0f5f68bdab1bac4a2bf6576530dca10a322eadbc980b386a7627c89929053dc5",
+        "emoji-data.txt": "d7aef489c8fe4c14f09ea5695200277c6b93ac82ac60845cdd2161b0d6835cc1",
+        "DerivedCoreProperties.txt": "f55d0db69123431a7317868725b1fcbf1eab6b265d756d1bd7f0f6d9f9ee108b",
+        "ReadMe.txt": "0d2da782ead4e85630d510f50808355e8c3355e670841d257dd1e6fbd40db9fa",
+        "LICENSE.txt": "e7a93b009565cfce55919a381437ac4db883e9da2126fa28b91d12732bc53d96"
+      },
+      "local_files": [
+        "PROVENANCE.json"
+      ]
+    },
+    {
+      "name": "Unicode15_1_Conformance",
+      "upstream": "https://www.unicode.org/Public/15.1.0/ucd/auxiliary/",
+      "revision": "15.1.0",
+      "license": "Unicode-3.0",
+      "source": "tests/m10a2/unicode15_1",
+      "guest": "SYS/LICENSE/UAX15_1TEST",
+      "files": {
+        "GraphemeBreakTest.txt": "ed9c5e92fd0911ccbeeb63c97cb19c519ea272ff1112ce843abd991582dd848f",
+        "WordBreakTest.txt": "69506b2253b8defb1f15b1476397376285cfda3bafd9304ee50d48bbfa0a2ab4",
+        "LICENSE.txt": "e7a93b009565cfce55919a381437ac4db883e9da2126fa28b91d12732bc53d96"
+      },
+      "local_files": [
+        "PROVENANCE.json"
+      ],
+      "purpose": "Fixed independent official boundary oracle, no executable third-party implementation"
+    }
+  ]
+}

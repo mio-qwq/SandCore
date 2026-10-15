@@ -1,0 +1,13 @@
+/* 应用只导入SCL；单TU聚合保证原生SCCC与宿主库使用同一职责正文。 */
+#include "ui_base.c"
+#include "ui_tree.c"
+#include "ui_theme.c"
+#include "ui_layout.c"
+#include "ui_paint.c"
+#include "ui_menu.c"
+#include "ui_data.c"
+#include "ui_controls.c"
+#include "ui_edit.c"
+#include "ui_dialog.c"
+#include "ui_provider.c"
+#include "ui_dispatch.c"

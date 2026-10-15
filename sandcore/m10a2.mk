@@ -125,3 +125,64 @@ $(BUILD)/utility-probe.o: tests/m10a2/UTILPROBE.C user/sclib/SCLIB.H user/SC32AP
 $(BUILD)/UTILPROBE.SCX: $(BUILD)/utility-probe.o tests/m10a2/UTILPROBE.json tools/mkdscx.py tools/scd_format.py
 	$(PY) tools/mkdscx.py $< $@ --manifest tests/m10a2/UTILPROBE.json
 m10a2-stdlib-artifacts: $(BUILD)/UTILPROBE.SCX
+
+# Phase4统一收齐后使用独立目录，保留Phase3真实产物和原M10a1盘。
+M10A2_UI_DIR ?= build/m10a2-ui-bootstrap
+.PHONY: m10a2-ui-bootstrap m10a2-ui-artifacts m10a2-ui-resources
+m10a2-ui-bootstrap:
+	$(MAKE) BUILD=$(M10A2_UI_DIR) M9_BUILD=1 M10_BUILD=1 $(M10A2_UI_DIR)/sandcore.img $(M10A2_UI_DIR)/fs/SYS/CORE/CORE.SKM $(M10A2_UI_DIR)/fs/bin/sccc.scx m10a2-ui-artifacts m10a2-ui-resources
+$(BUILD)/sc32_font.o: kernel/sc32_font.c kernel/sc32_font.h user/SC32FONT.H user/fontapi/SC32FONTWIRE.H $(STAMP)
+	$(CC) $(CFLAGS) -Werror -c $< -o $@
+$(BUILD)/sc32_broker.o: kernel/sc32_broker.c kernel/sc32_broker.h user/SC32BROKER.H user/sc32/SC32BROKERWIRE.H $(STAMP)
+	$(CC) $(CFLAGS) -Werror -c $< -o $@
+$(BUILD)/sc32_drop.o: kernel/sc32_drop.c kernel/sc32_drop.h user/SC32DROP.H user/dropapi/SC32DROPWIRE.H $(STAMP)
+	$(CC) $(CFLAGS) -Werror -c $< -o $@
+$(BUILD)/scui-library.o: user/scui/SCUI.C user/SCUI.H $(wildcard user/scui/*.c user/scui/*.H) user/SC32API.H user/SC32BROKER.H user/SC32DROP.H user/SC32FONT.H user/SC32POPUP.H $(STAMP)
+	$(CC) $(CFLAGS) $(M10A2_SCL_CFLAGS) -Werror -x c -Iuser/stdlib -Iuser/sclib -Iuser -c $< -o $@
+$(BUILD)/SCUI.SCL: $(BUILD)/scui-library.o user/scui/SCUI.json tools/mkscl.py tools/scl_format.py
+	$(PY) tools/mkscl.py $< $@ --manifest user/scui/SCUI.json
+$(BUILD)/scui-demo.o: tests/m10a2/SCUIDEMO.C user/SCUI.H $(STAMP)
+	$(CC) $(CFLAGS) $(M10A2_SCL_CFLAGS) -Werror -x c -Iuser/stdlib -Iuser/sclib -Iuser -c $< -o $@
+$(BUILD)/SCUIDEMO.SCX: $(BUILD)/scui-demo.o tests/m10a2/SCUIDEMO.json tools/mkdscx.py tools/scd_format.py
+	$(PY) tools/mkdscx.py $< $@ --manifest tests/m10a2/SCUIDEMO.json
+$(BUILD)/platform-probe.o: tests/m10a2/PLATFORMPROBE.C user/SC32API.H user/SC32BROKER.H user/SC32FONT.H $(STAMP)
+	$(CC) $(CFLAGS) $(M10A2_SCL_CFLAGS) -Werror -x c -Iuser/stdlib -Iuser/sclib -Iuser -c $< -o $@
+$(BUILD)/PLATFORMPROBE.SCX: $(BUILD)/platform-probe.o tests/m10a2/PLATFORMPROBE.json tools/mkdscx.py tools/scd_format.py
+	$(PY) tools/mkdscx.py $< $@ --manifest tests/m10a2/PLATFORMPROBE.json
+m10a2-ui-artifacts: $(BUILD)/SCLDR.SCL $(BUILD)/SC32API.SCL $(BUILD)/SCCLIB.SCL $(BUILD)/SCLIB.SCL $(BUILD)/SCUI.SCL $(BUILD)/SCUIDEMO.SCX $(BUILD)/PLATFORMPROBE.SCX
+assets/ui/UAX15_1.SCU: tools/mkui_textdata.py $(wildcard third_party/unicode15_1/*)
+	$(PY) tools/mkui_textdata.py
+$(BUILD)/fs/SYS/UI/UAX15_1.SCU: assets/ui/UAX15_1.SCU
+	mkdir -p $(dir $@)
+	cp $< $@
+$(BUILD)/m10a2-ui-resources.stamp: $(wildcard third_party/unicode15_1/* tests/m10a2/unicode15_1/*) third_party/M10A2-SOURCES.json docs/THIRD-PARTY.md tools/audit_third_party.py $(BUILD)/fs/SYS/UI/UAX15_1.SCU
+	$(PY) tools/audit_third_party.py --catalog third_party/M10A2-SOURCES.json
+	mkdir -p $(BUILD)/fs/SYS/LICENSE/UNICODE15_1
+	cp third_party/unicode15_1/* $(BUILD)/fs/SYS/LICENSE/UNICODE15_1/
+	mkdir -p $(BUILD)/fs/SYS/LICENSE/UAX15_1TEST
+	cp tests/m10a2/unicode15_1/* $(BUILD)/fs/SYS/LICENSE/UAX15_1TEST/
+	cp third_party/M10A2-SOURCES.json $(BUILD)/fs/SYS/LICENSE/M10A2.JSON
+	cp docs/THIRD-PARTY.md $(BUILD)/fs/SYS/LICENSE/THIRDPARTY.MD
+	$(PY) tools/audit_third_party.py --catalog third_party/M10A2-SOURCES.json --tree $(BUILD)/fs
+	touch $@
+m10a2-ui-resources: $(BUILD)/m10a2-ui-resources.stamp
+
+$(BUILD)/scui-text.o: tests/m10a2/SCUITEXT.C user/SCUI.H $(STAMP)
+	$(CC) $(CFLAGS) $(M10A2_SCL_CFLAGS) -Werror -x c -Iuser/stdlib -Iuser/sclib -Iuser -c $< -o $@
+$(BUILD)/SCUITEXT.SCX: $(BUILD)/scui-text.o tests/m10a2/SCUITEXT.json tools/mkdscx.py tools/scd_format.py
+	$(PY) tools/mkdscx.py $< $@ --manifest tests/m10a2/SCUITEXT.json
+m10a2-ui-artifacts: $(BUILD)/SCUITEXT.SCX
+assets/ui/tests/GRAPHEME.SCT assets/ui/tests/WORD.SCT &: tools/mkui_texttests.py tests/m10a2/unicode15_1/PROVENANCE.json tests/m10a2/unicode15_1/GraphemeBreakTest.txt tests/m10a2/unicode15_1/WordBreakTest.txt
+	$(PY) tools/mkui_texttests.py
+m10a2-ui-resources: assets/ui/tests/GRAPHEME.SCT assets/ui/tests/WORD.SCT
+
+# SCUI实际所需aggregate调用：仅两个交叉工具链回归，不扩旧系统矩阵。
+$(BUILD)/aggregate-callee.o: tests/m10a2/AGGCALLEE.C tests/m10a2/AGGABI.H $(STAMP)
+	$(CC) $(CFLAGS) $(M10A2_SCL_CFLAGS) -Werror -x c -Iuser/stdlib -Iuser -c $< -o $@
+$(BUILD)/AGGCALLEE.SCL: $(BUILD)/aggregate-callee.o tests/m10a2/AGGCALLEE.json tools/mkscl.py tools/scl_format.py
+	$(PY) tools/mkscl.py $< $@ --manifest tests/m10a2/AGGCALLEE.json
+$(BUILD)/aggregate-probe.o: tests/m10a2/AGGPROBE.C tests/m10a2/AGGABI.H $(STAMP)
+	$(CC) $(CFLAGS) $(M10A2_SCL_CFLAGS) -Werror -x c -Iuser/stdlib -Iuser -c $< -o $@
+$(BUILD)/AGGPROBE.SCX: $(BUILD)/aggregate-probe.o tests/m10a2/AGGPROBE.json tools/mkdscx.py tools/scd_format.py
+	$(PY) tools/mkdscx.py $< $@ --manifest tests/m10a2/AGGPROBE.json
+m10a2-ui-artifacts: $(BUILD)/AGGCALLEE.SCL $(BUILD)/AGGPROBE.SCX

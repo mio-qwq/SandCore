@@ -1,0 +1,20 @@
+{
+  "kind": "application",
+  "name": "AGGPROBE.SCX",
+  "dependencies": [
+    {"name": "AGGCALLEE.SCL", "abi_major": 1, "min_minor": 0, "min_version": 1},
+    {"name": "SCCLIB.SCL", "abi_major": 1, "min_minor": 0, "min_version": 1}
+  ],
+  "imports": [
+    {"name": "AggPairStep", "dependency": "AGGCALLEE.SCL", "kind": "function", "size": 1},
+    {"name": "AggRectStep", "dependency": "AGGCALLEE.SCL", "kind": "function", "size": 1},
+    {"name": "AggBlockStep", "dependency": "AGGCALLEE.SCL", "kind": "function", "size": 1},
+    {"name": "AggMixedStep", "dependency": "AGGCALLEE.SCL", "kind": "function", "size": 1},
+    {"name": "AggUnionStep", "dependency": "AGGCALLEE.SCL", "kind": "function", "size": 1},
+    {"name": "AggForward", "dependency": "AGGCALLEE.SCL", "kind": "function", "size": 1},
+    {"name": "AggVariadic", "dependency": "AGGCALLEE.SCL", "kind": "function", "size": 1},
+    {"name": "AggScalar", "dependency": "AGGCALLEE.SCL", "kind": "function", "size": 1},
+    {"name": "AggStackSample", "dependency": "AGGCALLEE.SCL", "kind": "function", "size": 1},
+    {"name": "printf", "dependency": "SCCLIB.SCL", "kind": "function", "size": 1}
+  ]
+}

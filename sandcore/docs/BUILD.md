@@ -403,3 +403,16 @@ WSL运行`make m10a2-dynamic-bootstrap`或`python3 tools/build_m10a2_dynamic.py 
 dynamic-guest-02已经实际通过；正常/回调异常退出PF8872→8872。首次未注册异常回调的故障会沿历史调试暂停语义留卡，不能等待它自动EXIT14；已保留失败与修正。无关既有矩阵复用，源码/原盘/当前盘与紧凑证据的范围见M10A2-IMPLEMENTATION。
 
 修订：2026-10-14，新增真正自动动态SCX/root/SCCC接线和真实G1执行、并发隔离及系统库保护证据，完整平台继续SC32API。
+
+
+### SCUI与平台统一目标
+
+源码/资源/规范收齐后，WSL运行 `python3 tools/build_m10a2_ui.py --tag ui-build-01`，定向目标 `m10a2-ui-bootstrap` 在独立 `build/m10a2-ui-bootstrap` 构建CORE/SCCC0、五个SCL、公开SCUIDEMO/PLATFORMPROBE/SCUITEXT和Unicode数据/完整许可归档。不走默认all/冻结游戏或覆盖P3/M10a1基盘。记录tag拒绝覆盖，输入前后摘要、真实依赖、stdout/exit及各原生产物分别保存。
+
+实际guest02在G1编译SCUI时发现当前SCCC不支持复合字面量。新批收齐、统一构建后，可先在WSL运行 `python3 tools/check_m10a2_ui_native.py --build-report build/m10a2-ui-bootstrap/ui-build-06.json --tag ui-native-host-01`，用既有真实SCCC宿主文件适配器编译完整SCUI和三个公开app，提前定位语法缺口；tag目录拒绝覆盖，固定来源/日志/输出和输入未变。该实际01预检又定位ui_data.c:1394按值结构体参数/返回缺口，报告保留；后续新构建/tag先编译两份aggregate ABI夹具，再预检上述四输入。Windows同轮只增加G1 caller→GCC callee及GCC caller→G1 callee两个方向（含反向callback、named最后aggregate的va_start、精确栈平衡），不扩旧系统矩阵。宿主预检不运行i386/G1、不代替系统内编译或GUI验收；后续按新报告/tag执行，既有06/host01拒绝覆盖。
+
+新SCCC Source/Token/Pool/Code工作区一次本人heap取得，成功写完map/log/body后才释放；Source1MiB/Token262144/Pool2MiB/SCLCode1MiB、FILE64/MACRO512/map128KiB。旧SCX/SKM最终code/load/stack/mapping限制保留，大SCL源码预算不扩旧加载容器。真正G1须本批SCCC0在客体重新生成并运行，旧G1不能编超过其旧源码预算的新版自身。
+
+当前只接线，尚未执行此目标或QEMU。后续Windows双盘独立会话复用只读基盘，准备相同资源并记录真实源码/库来源；没有因接口枚举/生成数据称UI已运行。
+
+修订：2026-10-15，新增SCUI/平台独立统一目标与数据/完整Unicode许可固定审计、自编译器容量合同，待真实构建/执行。

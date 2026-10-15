@@ -77,6 +77,7 @@ static int native_elide(char *out,const char *text,int width)
 }
 static int native_resize(win_t *w,int width,int height)
 {
+    if(window_record(w->handle)->gui.popup)return popup_resize(w,width,height);
 
     window_extra_t *e=extra_of(w->handle);
     if(width>GFX_W)width=GFX_W;
@@ -135,6 +136,7 @@ static int native_resize(win_t *w,int width,int height)
 }
 void wm_display_changed(void)
 {
+    popup_close_group(active_view,0,0);
     active_view->display_width=GFX_W;active_view->display_height=GFX_H;active_view->display_scaling=display_scale();
     menu_open=context_open=0;
     resizing=-1;
@@ -218,7 +220,7 @@ int wm_user_frame_rgb(int pid,int handle,const u32 *pixels,u32 bytes)
          * 不按每个改变像素做除法。横向保守覆盖整行，原子复制/
          * alpha统计/原字节保持，合成器只需重画这段物理客户区。 */
         int top=(int)(first/(u32)w->cw),bottom=(int)(last/(u32)w->cw)+1;
-        wm_damage_rect(w->x+1,w->y+TITLE_H+top,w->cw,bottom-top);
+        wm_damage_rect(w->x+window_client_dx(w),w->y+window_client_dy(w)+top,w->cw,bottom-top);
     }
     extra_of(handle)->opaque=(alpha&0xFF000000u)==0xFF000000u;
     return 0;
@@ -244,7 +246,7 @@ int wm_user_fill_rgb(int pid,int handle,int x,int y,int width,int height,u32 rgb
     /* 裁剪后的实际客户区已经明确，不能让一块计数卡片触发整屏
      * 壁纸/窗口合成。已有结构变更的全量请求仍由damage_full保留，
      * VGA仍沿wm_damage_rect回退全屏，不修改画布或用户返回值。 */
-    wm_damage_rect(w->x+1+x0,w->y+TITLE_H+y0,x1-x0,y1-y0);return 0;
+    wm_damage_rect(w->x+window_client_dx(w)+x0,w->y+window_client_dy(w)+y0,x1-x0,y1-y0);return 0;
 }
 int wm_user_text_rgb(int pid,int handle,int x,int y,const char *text,u32 rgb)
 {
@@ -271,7 +273,7 @@ int wm_user_text_rgb(int pid,int handle,int x,int y,const char *text,u32 rgb)
     /* 只累计确实改色的字形像素；换行/回车、负坐标和超出客户区
      * 仍走原返回语义，重复同色文本不用重合成，背景填充另外累计
      * 自己的损伤。字形/alpha/裁剪不变，不以减少画质换响应。 */
-    if(x0<x1 && y0<y1)wm_damage_rect(w->x+1+x0,w->y+TITLE_H+y0,x1-x0,y1-y0);
+    if(x0<x1 && y0<y1)wm_damage_rect(w->x+window_client_dx(w)+x0,w->y+window_client_dy(w)+y0,x1-x0,y1-y0);
     return count;
 }
 int wm_user_place(int pid,int handle,int x,int y,int width,int height)
@@ -395,6 +397,11 @@ static void native_draw_window(int index)
     if(w->x-pad>=clip[0]+clip[2] || w->y-pad>=clip[1]+clip[3]
        || w->x+w->w+pad<=clip[0] || w->y+w->h+pad<=clip[1])return;
     window_record_t *record=window_record(w->handle);
+    if(record->gui.popup){
+        if(e->opaque)gfx_opaque_blit(w->x,w->y,w->cw,w->ch,(u32 *)w->canvas,w->cw);
+        else gfx_argb_blit(w->x,w->y,w->cw,w->ch,(u32 *)w->canvas,w->cw);
+        return;
+    }
     int focus=record->gui.mode?gui_focus_any==w->handle:index==top_visible();
     int radius=theme_classic()?0:unit(theme_radius());
     if(theme_classic()){
@@ -429,7 +436,7 @@ static void native_draw_window(int index)
         }
         if(!e->opaque){
             native_round(w->x,w->y,w->w,w->h,radius,theme_color(TH_LINE));
-            native_round(w->x+1,w->y+1,w->w-2,w->h-2,radius>0?radius-1:0,theme_color(TH_FACE));
+            native_round(w->x+window_client_dx(w),w->y+1,w->w-2,w->h-2,radius>0?radius-1:0,theme_color(TH_FACE));
         }else for(int row=0;row<w->h;row++){
             if(w->y+row<clip[1] || w->y+row>=clip[1]+clip[3])continue;
             /* mio：整画布已证明不透明，客户区将完整覆盖中间。仅画
@@ -466,7 +473,7 @@ static void native_draw_window(int index)
     for(int b=0;b<controls;b++){
         u32 style=b==0?SC32_STYLE_CLOSE:b==1?SC32_STYLE_MAXIMIZE:SC32_STYLE_MINIMIZE;
         int enabled=!record->gui.mode || ((record->gui.style&style) && gui_eligible(record));
-        int bx=cx-b*box,hover=enabled && mouse_x()>=bx && mouse_x()<bx+box && mouse_y()>=w->y && mouse_y()<w->y+TITLE_H;
+        int bx=cx-b*box,hover=enabled && mouse_x()>=bx && mouse_x()<bx+box && mouse_y()>=w->y && mouse_y()<w->y+window_client_dy(w);
         if(theme_classic())native_bevel(bx+unit(3),w->y+unit(3),box-unit(6),TITLE_H-unit(6),hover&&(mouse_buttons()&1));
         else native_round(bx+unit(2),w->y+unit(2),box-unit(4),TITLE_H-unit(4),unit(6),
                           theme_color(hover?(b==0?TH_ALERT:TH_SELECT):TH_FACE_ALT));
@@ -477,7 +484,7 @@ static void native_draw_window(int index)
          * 必须按其真正占据的物理行段判断交集；以未放大的row
          * 判断会把下半客户区误跳过，留下旧帧或拖动残影。 */
         int row_scale=e->native?1:e->scale;
-        int row_top=w->y+TITLE_H+row*row_scale;
+        int row_top=w->y+window_client_dy(w)+row*row_scale;
         if(row_top+row_scale<=clip[1] || row_top>=clip[1]+clip[3])continue;
         int inset=rounded_inset(TITLE_H+row,w->h,radius);
         if(e->format==2) {
@@ -485,15 +492,15 @@ static void native_draw_window(int index)
             if(end>w->cw)end=w->cw;
             if(end>start){
                 const u32 *pixels=((u32 *)w->canvas)+row*w->cw+start;
-                if(e->opaque)gfx_opaque_blit(w->x+1+start,w->y+TITLE_H+row,end-start,1,pixels,w->cw);
-                else gfx_argb_blit(w->x+1+start,w->y+TITLE_H+row,end-start,1,pixels,w->cw);
+                if(e->opaque)gfx_opaque_blit(w->x+window_client_dx(w)+start,w->y+window_client_dy(w)+row,end-start,1,pixels,w->cw);
+                else gfx_argb_blit(w->x+window_client_dx(w)+start,w->y+window_client_dy(w)+row,end-start,1,pixels,w->cw);
             }
             continue;
         }
         int start=inset>1?inset-1:0,end=w->w-inset-1;
         if(end>w->cw)end=w->cw;
-        if(end>start)gfx_indexed_row(w->x+1+start*e->scale,
-            w->y+TITLE_H+row*e->scale,w->canvas+row*w->cw+start,end-start,e->scale);
+        if(end>start)gfx_indexed_row(w->x+window_client_dx(w)+start*e->scale,
+            w->y+window_client_dy(w)+row*e->scale,w->canvas+row*w->cw+start,end-start,e->scale);
     }
     if(!record->gui.mode || (record->gui.style&SC32_STYLE_RESIZE))
         for(int i=2;i<unit(12);i+=unit(3))gfx_line(w->x+w->w-i,w->y+w->h-2,w->x+w->w-2,w->y+w->h-i,PAL_UI_LINE);
@@ -508,32 +515,33 @@ static int taskbar_capacity(void)
 static void taskbar_reveal(int handle)
 {
     window_record_t *record=window_record(handle);if(!record)return;
+    if(record->creation_index<0)return;
     int capacity=taskbar_capacity(),slot=record->creation_index;
     if(slot<taskbar_first || slot>=taskbar_first+capacity)taskbar_first=slot/capacity*capacity;
 }
 static int task_button_width(void)
 {
     if(GFX_W==320)return 30;
-    int capacity=taskbar_capacity(),available=GFX_W-unit(250)-(nwins>capacity?unit(48):0);
-    int shown=nwins<capacity?nwins:capacity,width=shown?available/shown:unit(100);
+    int capacity=taskbar_capacity(),available=GFX_W-unit(250)-(ntasks>capacity?unit(48):0);
+    int shown=ntasks<capacity?ntasks:capacity,width=shown?available/shown:unit(100);
     if(width>unit(140))width=unit(140);
     if(width<unit(40))width=unit(40);
     return width;
 }
 static int rank_window(int slot)
 {
-    if(slot<0 || slot>=taskbar_capacity() || taskbar_first+slot>=nwins)return -1;
+    if(slot<0 || slot>=taskbar_capacity() || taskbar_first+slot>=ntasks)return -1;
     return window_record(creation_order[taskbar_first+slot])->z_index;
 }
 static int taskbar_origin(void)
-{return GFX_W==320?(nwins>taskbar_capacity()?60:44):unit(116)+(nwins>taskbar_capacity()?unit(24):0);}
+{return GFX_W==320?(ntasks>taskbar_capacity()?60:44):unit(116)+(ntasks>taskbar_capacity()?unit(24):0);}
 static int taskbar_click(int x)
 {
-    int capacity=taskbar_capacity(),overflow=nwins>capacity,origin=taskbar_origin(),bw=task_button_width();
+    int capacity=taskbar_capacity(),overflow=ntasks>capacity,origin=taskbar_origin(),bw=task_button_width();
     int left=GFX_W==320?44:unit(116),arrow=GFX_W==320?16:unit(24);
     if(overflow && x>=left && x<origin){taskbar_first-=capacity;if(taskbar_first<0)taskbar_first=0;return 1;}
     if(overflow && x>=origin+capacity*bw && x<origin+capacity*bw+arrow){
-        if(taskbar_first+capacity<nwins)taskbar_first+=capacity;return 1;}
+        if(taskbar_first+capacity<ntasks)taskbar_first+=capacity;return 1;}
     if(x<origin || x>=origin+capacity*bw)return 0;
     int i=rank_window((x-origin)/bw);if(i<0)return 0;
     win_t *w=&WINDOW(i);extra_of(w->handle)->hidden=0;visibility_changed(w);win_raise(i);return 1;
@@ -549,14 +557,14 @@ static void native_draw_taskbar(void)
     native_text_rgb(unit(18),y+unit(8),"沙核",theme_color(TH_TEXT));
     native_text_rgb(unit(56),y+unit(8),"START",theme_color(TH_ACCENT));
     int bw=task_button_width(),capacity=taskbar_capacity(),origin=taskbar_origin();
-    if(nwins>capacity){
+    if(ntasks>capacity){
         int yy=y+unit(4),hh=height-unit(8),right=origin+capacity*bw;
         native_round(unit(116),yy,unit(20),hh,unit(6),theme_color(TH_FACE_ALT));
         native_round(right,yy,unit(20),hh,unit(6),theme_color(TH_FACE_ALT));
         native_text_rgb(unit(121),y+unit(8),"<",theme_color(taskbar_first?TH_TEXT:TH_MUTED));
-        native_text_rgb(right+unit(5),y+unit(8),">",theme_color(taskbar_first+capacity<nwins?TH_TEXT:TH_MUTED));
+        native_text_rgb(right+unit(5),y+unit(8),">",theme_color(taskbar_first+capacity<ntasks?TH_TEXT:TH_MUTED));
     }
-    for(int slot=0;slot<capacity && taskbar_first+slot<nwins;slot++) {
+    for(int slot=0;slot<capacity && taskbar_first+slot<ntasks;slot++) {
 
         int i=rank_window(slot),x=origin+slot*bw;
         window_extra_t *e=extra_of(WINDOW(i).handle);
@@ -751,7 +759,7 @@ static int native_mouse(int x,int y,u8 buttons,u8 previous)
         win_t *w=&WINDOW(resizing);
         /* 同一抓取偏移贯穿预览与提交。宽高的增量恰等于鼠标
          * 从按下点移动的增量，不把抓取区内的位置误算成缩量。 */
-        resize_w=x-w->x+1+resize_ox;
+        resize_w=x-w->x+window_client_dx(w)+resize_ox;
         resize_h=y-w->y+1+resize_oy;
         if(!(buttons&1)){
             native_resize(w,resize_w,resize_h);
@@ -892,7 +900,7 @@ static int native_mouse(int x,int y,u8 buttons,u8 previous)
         i=nwins-1;
         win_t *w=&WINDOW(i);
         window_extra_t *e=extra_of(w->handle);
-        if(y<w->y+TITLE_H) {
+        if(y<w->y+window_client_dy(w)) {
 
             int box=unit(24),cx=w->x+w->w-box;
             int controls=!window_record(w->handle)->gui.mode || w->w>=unit(180);

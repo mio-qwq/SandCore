@@ -95,7 +95,19 @@ u32 wm_task_bytes(void);
 
 /* SC32消息窗口与旧窗口共享合成/画布，接口只接受可信局部请求。
  * 用户缓冲完整前检由sc32_gui执行；任何函数都不执行三环过程。 */
+/* Drop事实只供内核WM/Broker协作使用，字段均是值。 */
+typedef struct {
+    u32 window,generation,pid,pid_generation,session,geometry,visibility;
+    i32 x,y;u32 width,height,captured,buttons,input;
+} WmDropFact;
+int wm_sc32_drop_register(int pid,u32 window,u32 generation,WmDropFact *out);
+int wm_sc32_drop_window(int pid,u32 window,u32 generation,WmDropFact *out);
+int wm_sc32_drop_source(int pid,u32 window,u32 generation,int at,WmDropFact *out);
+int wm_sc32_drop_point(i32 x,i32 y,WmDropFact *out);
+int wm_sc32_drop_point_current(i32 x,i32 y);
 int wm_sc32_create(int pid,const Sc32WindowCreate *input,const char *title,Sc32WindowRef *out);
+int wm_sc32_popup_create(int pid,const Sc32PopupCreate *input,Sc32WindowRef *out);
+int wm_sc32_cursor(int pid,u32 handle,u32 generation,u32 shape);
 int wm_sc32_activate(int pid,u32 handle,u32 generation);
 int wm_sc32_destroy(int pid,u32 handle,u32 generation);
 int wm_sc32_query(int pid,u32 handle,u32 generation,ScWindowInfo *out);
@@ -108,6 +120,7 @@ int wm_sc32_input(int pid,u32 handle,u32 generation,ScInputSnapshot *out);
 int wm_sc32_invalidate(int pid,const Sc32Invalidate *input);
 int wm_sc32_paint_begin(int pid,u32 handle,u32 generation,ScPaintInfo *out);
 int wm_sc32_paint_end(int pid,const Sc32PaintEnd *input);
+int wm_sc32_paint_cancel(int pid,const Sc32PaintEnd *input);
 int wm_sc32_submit(int pid,const ScSubmitDesc *input,const ScSubmitRect *rectangles);
 int wm_sc32_cancel_close(int pid,u32 handle,u32 generation);
 int wm_sc32_owner_has_windows(int pid);

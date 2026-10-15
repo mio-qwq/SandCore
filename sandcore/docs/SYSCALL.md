@@ -657,3 +657,12 @@ INPUT等待，私有task尾部只标本次返回模式；唤醒返回新状态�
 
 修订：2026-10-15，接通SC32独立gate、原子消息等待及owner退出胶水，
 保留旧API/等待返回域；首次构建因新源误缩进-Werror拒绝，定向修正中。
+
+
+## 2026-10-15 M10a2 SCUI私有gate增量
+
+不改SCAPI.H公开功能号或任何旧忽略寄存器。新SYS300沿原selector/request/out域：GUI114 PaintCancel、115 PopupCreate、116 PointerCursor；300..30e Clip、400..40b IPC/Ready/Wait、420..426 Drop、500..509 Shared、600/601 Font。调用只接可信复制记录，不执行R3过程；公共应用使用对应cdecl SCL函数。具体字布局在SC32GUIWIRE/SC32BROKERWIRE/SC32DROPWIRE/SC32FONTWIRE，同批对应规范。
+
+WAIT40b在同一IF=0入口完整核request、真实GUI队列及对象ready，再沿旧mode0安装等待；不保存用户out/request跨睡眠，不改旧EVENTWAIT。共享VA60000000..64000000为真Shared PF标记PTE，private释放/旧debug写特例不得跨入。task退出先撤旧关联，后按预算拆broker映射，auth/session/pd/PID最后释放；初稿仍未客体验证。
+
+修订：2026-10-15，登记新私有selector与字布局/真实共享页/混合等待及退出顺序，旧SCAPI原字节保持。

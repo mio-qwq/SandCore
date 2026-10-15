@@ -1,0 +1,128 @@
+{
+  "exports": [
+    {
+      "name": "ScBrokerReady",
+      "kind": "function"
+    },
+    {
+      "name": "ScBrokerWait",
+      "kind": "function"
+    },
+    {
+      "name": "ScClipboardAbort",
+      "kind": "function"
+    },
+    {
+      "name": "ScClipboardBegin",
+      "kind": "function"
+    },
+    {
+      "name": "ScClipboardClear",
+      "kind": "function"
+    },
+    {
+      "name": "ScClipboardClose",
+      "kind": "function"
+    },
+    {
+      "name": "ScClipboardCommit",
+      "kind": "function"
+    },
+    {
+      "name": "ScClipboardFormats",
+      "kind": "function"
+    },
+    {
+      "name": "ScClipboardOffer",
+      "kind": "function"
+    },
+    {
+      "name": "ScClipboardOpen",
+      "kind": "function"
+    },
+    {
+      "name": "ScClipboardQuery",
+      "kind": "function"
+    },
+    {
+      "name": "ScClipboardRead",
+      "kind": "function"
+    },
+    {
+      "name": "ScClipboardWatch",
+      "kind": "function"
+    },
+    {
+      "name": "ScIpcAccept",
+      "kind": "function"
+    },
+    {
+      "name": "ScIpcClose",
+      "kind": "function"
+    },
+    {
+      "name": "ScIpcConnect",
+      "kind": "function"
+    },
+    {
+      "name": "ScIpcCreate",
+      "kind": "function"
+    },
+    {
+      "name": "ScIpcListen",
+      "kind": "function"
+    },
+    {
+      "name": "ScIpcPeek",
+      "kind": "function"
+    },
+    {
+      "name": "ScIpcPeer",
+      "kind": "function"
+    },
+    {
+      "name": "ScIpcQuery",
+      "kind": "function"
+    },
+    {
+      "name": "ScIpcReceive",
+      "kind": "function"
+    },
+    {
+      "name": "ScIpcSend",
+      "kind": "function"
+    },
+    {
+      "name": "ScMemoryCloseShared",
+      "kind": "function"
+    },
+    {
+      "name": "ScMemoryCreateShared",
+      "kind": "function"
+    },
+    {
+      "name": "ScMemoryGrantShared",
+      "kind": "function"
+    },
+    {
+      "name": "ScMemoryMapShared",
+      "kind": "function"
+    },
+    {
+      "name": "ScMemoryOpenShared",
+      "kind": "function"
+    },
+    {
+      "name": "ScMemoryQueryShared",
+      "kind": "function"
+    },
+    {
+      "name": "ScMemoryRevokeShared",
+      "kind": "function"
+    },
+    {
+      "name": "ScMemoryUnmapShared",
+      "kind": "function"
+    }
+  ]
+}

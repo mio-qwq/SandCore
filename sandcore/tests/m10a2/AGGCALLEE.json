@@ -1,0 +1,21 @@
+{
+  "name": "AGGCALLEE.SCL",
+  "abi_major": 1,
+  "abi_minor": 0,
+  "library_version": 1,
+  "init": null,
+  "fini": null,
+  "exports": [
+    {"name": "AggPairStep", "kind": "function"},
+    {"name": "AggRectStep", "kind": "function"},
+    {"name": "AggBlockStep", "kind": "function"},
+    {"name": "AggMixedStep", "kind": "function"},
+    {"name": "AggUnionStep", "kind": "function"},
+    {"name": "AggForward", "kind": "function"},
+    {"name": "AggVariadic", "kind": "function"},
+    {"name": "AggScalar", "kind": "function"},
+    {"name": "AggStackSample", "kind": "function"}
+  ],
+  "imports": [],
+  "dependencies": []
+}

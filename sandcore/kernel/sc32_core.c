@@ -6,6 +6,9 @@
 #include "session.h"
 #include "memory.h"
 #include "timer.h"
+#include "mouse.h"
+#include "sc32_broker.h"
+#include "sc32_drop.h"
 #include "../user/sc32/SC32WIRE.H"
 
 #define SC32_PTE_PRESENT 0x001u
@@ -98,8 +101,12 @@ static int capabilities(int pid,u32 request,u32 output)
     result.capabilities_lo=SC32_CAP_CORE_QUERY|SC32_CAP_PROCESS|SC32_CAP_PRIVATE_PAGES
         |SC32_CAP_PATH_IO|SC32_CAP_JOBS_STREAMS|SC32_CAP_SESSIONS|SC32_CAP_THEMES
         |SC32_CAP_DISPLAY|SC32_CAP_LIBRARIES|SC32_CAP_MONOTONIC|SC32_CAP_UTC_CLOCK
-        |SC32_CAP_DIRECTORIES|SC32_CAP_UPDATE_FILES|SC32_CAP_WINDOW_MESSAGES;
+        |SC32_CAP_DIRECTORIES|SC32_CAP_UPDATE_FILES|SC32_CAP_WINDOW_MESSAGES|SC32_CAP_FONT_GLYPHS
+        |SC32_CAP_POPUPS|SC32_CAP_POINTER_CURSOR;
+    if(sc32_broker_available())result.capabilities_lo|=SC32_CAP_CLIPBOARD|SC32_CAP_IPC|SC32_CAP_SHARED_MEMORY;
+    if(sc32_drop_available())result.capabilities_lo|=SC32_CAP_DROP_TARGETS;
     result.max_path_bytes=SC32_PATH_CAPACITY;result.max_arguments_bytes=1024;
+    if(mouse_wheel_available())result.capabilities_lo|=SC32_CAP_POINTER_WHEEL;
     result.page_size=PAGE_SIZE;result.pit_hz=timer_frequency_hz();
     result.heap_bytes=USER_HEAP_TOP-USER_HEAP_BASE;
     result.module_bytes=USER_MODULE_TOP-USER_MODULE_BASE;

@@ -23,6 +23,8 @@
 #define USER_HEAP_TOP  0x44000000u /* 64MB 私有图形堆，不能占用低端物理恒等别名 */
 #define USER_MODULE_BASE 0x50000000u
 #define USER_MODULE_TOP  0x54000000u /* 64MB私有SCL映像，和旧图形堆分别管理 */
+#define USER_SHARED_BASE 0x60000000u
+#define USER_SHARED_TOP  0x64000000u /* 独立共享映射窗，不覆盖256MiB内的物理恒等别名 */
 
 void paging_init(void);          /* 建内核页目录, 开启 CR0.PG */
 u32  paging_new_task_dir(void);  /* 建任务页目录: 拷共享项 + 私有用户 PT (全零) */
@@ -48,6 +50,12 @@ u32 paging_module_alloc(u32 pd,u32 bytes);
 int paging_module_protect(u32 pd,u32 base,u32 bytes,u32 access);
 int paging_module_free(u32 pd,u32 base);
 u32 paging_module_size(u32 pd,u32 base);
+/* 共享PF归broker对象；这些函数只管理本人VA/PTE，绝不释放共享PF。
+ * bind/unbind每次至多16页，private free/protect仍不接受这片VA。 */
+u32 paging_shared_reserve(u32 pd,u32 bytes);
+int paging_shared_bind(u32 pd,u32 base,u32 index,const u32 *frames,u32 count,u32 access);
+int paging_shared_unbind(u32 pd,u32 base,u32 index,u32 count);
+int paging_shared_release(u32 pd,u32 base,u32 bytes);
 /* 调试器访问另一任务时不能切 CR3 后继续使用调用者缓冲。
  * 此接口逐页取物理帧，经 supervisor 恒等别名拷贝；先检查完整范围，
  * 失败不部分写入。只允许本任务 US 页，不能把调试变成内核写原语。 */

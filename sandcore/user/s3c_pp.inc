@@ -11,7 +11,7 @@ static int macro_find(int name)
     return -1; }
 static void pp_add(Tok *out,int *used,int capacity,Tok *t)
 {
-    if(*used>=capacity) fatal("preprocessor token capacity exceeded");
+    if(*used>=capacity)capacity_fatal("preprocessor tokens",(u32)*used,1u,(u32)capacity);
     tokcopy(out+*used,t);
     (*used)++;
 }
@@ -329,8 +329,11 @@ static int load_source(const char *path)
     for(int i=0;i<source_count;i++) if(equal(path,sources[i].path)) return i;
     u32 info[2];
     if(sc_stat(path,info) || info[0]!=1) return -1;
-    if(source_count>=FILE_MAX || length(path)>63) fatal("include file capacity exceeded");
-    if(info[1]>(u32)(SOURCE_MAX-source_used-1)) fatal("source arena capacity exceeded");
+    if(length(path)>63)fatal("include path exceeds 63 bytes");
+    if(source_count>=FILE_MAX)capacity_fatal("include files",(u32)source_count,1u,FILE_MAX);
+    /* 剩余长度比较同时留NUL；不先求info[1]+1，恶意文件尺寸不能
+     * 回绕成小请求。arena在所有递归pp_file期间保持同一基址。 */
+    if(source_used>=SOURCE_MAX || info[1]>=(u32)(SOURCE_MAX-source_used))capacity_fatal("source arena",(u32)source_used,info[1],SOURCE_MAX);
     int i=source_count++;
     copy(sources[i].path,path,64);
     sources[i].source=source_used;
@@ -381,7 +384,7 @@ static void pp_define(Tok *line,int count,Lexer *lexer,int depth)
 {
     if(count<3 || line[2].k!=T_ID) fatal("define needs an identifier");
     int mi=macro_find(line[2].v);
-    if(mi<0) { if(macro_count>=MACRO_MAX) fatal("macro capacity exceeded");
+    if(mi<0) { if(macro_count>=MACRO_MAX)capacity_fatal("macros",(u32)macro_count,1u,MACRO_MAX);
         mi=macro_count++; }
     Macro *m=macros+mi;
     m->name=line[2].v;
@@ -414,7 +417,7 @@ static void pp_define(Tok *line,int count,Lexer *lexer,int depth)
     }
     m->first=macro_body_used;
     m->count=count-at;
-    if(macro_body_used+m->count>MACRO_BODY_MAX) fatal("macro body capacity exceeded");
+    if(macro_body_used+m->count>MACRO_BODY_MAX)capacity_fatal("macro body tokens",(u32)macro_body_used,(u32)m->count,MACRO_BODY_MAX);
     for(;at<count;at++) tokcopy(macro_body+macro_body_used++,line+at);
 }
 static void pp_directive(Tok *line,int count,Lexer *l,int depth,int baseline)

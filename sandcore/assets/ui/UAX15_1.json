@@ -1,0 +1,13 @@
+{
+  "version": "15.1.0",
+  "format": "SCUT15_1",
+  "bytes": 37048,
+  "records": 3082,
+  "sha256": "1f3e318ee85ec103902ce8307fa9e3262514a551acb332b8926acce45dd969c2",
+  "payload_crc32": 1284925648,
+  "original_data_unchanged": true,
+  "source_provenance_sha256": "43f7c0c85df01c15d7bd6be9eab0623f732dcf66e615a748147e13f8d14995a7",
+  "generated_by": "tools/mkui_textdata.py",
+  "guest_executed": false,
+  "copied_segmentation_implementation": false
+}

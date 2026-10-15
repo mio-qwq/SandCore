@@ -1,0 +1,41 @@
+{
+  "version": "15.1.0",
+  "sources": [
+    {
+      "path": "GraphemeBreakProperty.txt",
+      "url": "https://www.unicode.org/Public/15.1.0/ucd/auxiliary/GraphemeBreakProperty.txt",
+      "bytes": 96863,
+      "sha256": "a7e52eee647e52dc210b8719b4d7037276f4b353810293d69377fc46374cec3f"
+    },
+    {
+      "path": "WordBreakProperty.txt",
+      "url": "https://www.unicode.org/Public/15.1.0/ucd/auxiliary/WordBreakProperty.txt",
+      "bytes": 109117,
+      "sha256": "0f5f68bdab1bac4a2bf6576530dca10a322eadbc980b386a7627c89929053dc5"
+    },
+    {
+      "path": "emoji-data.txt",
+      "url": "https://www.unicode.org/Public/15.1.0/ucd/emoji/emoji-data.txt",
+      "bytes": 111505,
+      "sha256": "d7aef489c8fe4c14f09ea5695200277c6b93ac82ac60845cdd2161b0d6835cc1"
+    },
+    {
+      "path": "DerivedCoreProperties.txt",
+      "url": "https://www.unicode.org/Public/15.1.0/ucd/DerivedCoreProperties.txt",
+      "bytes": 1072686,
+      "sha256": "f55d0db69123431a7317868725b1fcbf1eab6b265d756d1bd7f0f6d9f9ee108b"
+    },
+    {
+      "path": "ReadMe.txt",
+      "url": "https://www.unicode.org/Public/15.1.0/ucd/ReadMe.txt",
+      "bytes": 631,
+      "sha256": "0d2da782ead4e85630d510f50808355e8c3355e670841d257dd1e6fbd40db9fa"
+    },
+    {
+      "path": "LICENSE.txt",
+      "url": "https://www.unicode.org/license.txt",
+      "bytes": 1995,
+      "sha256": "e7a93b009565cfce55919a381437ac4db883e9da2126fa28b91d12732bc53d96"
+    }
+  ]
+}

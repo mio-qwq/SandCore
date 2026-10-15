@@ -69,7 +69,7 @@ static int pointer_to(int base)
 }
 static int array_of(int base,int count)
 {
-    if(count<0 || (count && types[base].size>0x3D0000/count)) fatal("array size exceeds address space");
+    if(count<0 || types[base].size<0 || (count && types[base].size>0x3D0000/count)) fatal("array size exceeds address space");
     return new_type(TY_ARRAY,types[base].size*count,base,count,0,0);
 }
 static int alignment(int type)
@@ -78,6 +78,44 @@ static int alignment(int type)
     if(t->kind==TY_ARRAY) return alignment(t->base);
     if(t->kind==TY_STRUCT || t->kind==TY_UNION) return t->base?t->base:1;
     return t->size>4?4:t->size?t->size:1;
+}
+static int abi_aggregate(int type)
+{return types[type].kind==TY_STRUCT || types[type].kind==TY_UNION;}
+static int abi_stack_bytes(int type)
+{
+    /* i386参数是4B槽，聚合传的是完整对象副本而不是来源指针。
+     * 本语言成员最高4B对齐；不完整/过对齐对象不能偷偷降格传递。
+     * 与已有64KiB局部帧一致限制一次参数块，容量失败先于发射。 */
+    if(types[type].size<=0)fatal("by-value object requires a complete positive-width type");
+    if(abi_aggregate(type)){
+        int align=alignment(type),size=types[type].size;
+        if((align!=1 && align!=2 && align!=4) || size>65536)
+            fatal("aggregate argument exceeds supported alignment or 64KB stack block");
+        return (size+3)/4*4;
+    }
+    if(types[type].kind==TY_ARRAY || types[type].kind==TY_FUNC)
+        fatal("by-value array or function requires parameter decay");
+    return 4;
+}
+static int abi_function_aggregate(int type)
+{
+    while(types[type].kind==TY_PTR || types[type].kind==TY_ARRAY)type=types[type].base;
+    if(types[type].kind!=TY_FUNC)return 0;
+    if(abi_aggregate(types[type].base))return 1;
+    for(int p=types[type].fields;p;p=parameters[p].next)
+        if(abi_aggregate(parameters[p].type))return 1;
+    return 0;
+}
+static int abi_declaration_type(int previous,int type)
+{
+    /* 旧模式仍逐函数即时生成。此前按int返回发射的call不能在稍后
+     * 被同名struct-return声明改ABI；聚合相关原型必须先保持兼容。
+     * 标量旧路径不改变，完整旧原型也不能被空参数描述抹掉。 */
+    if(types[previous].kind==TY_FUNC && types[previous].count<0 && abi_function_aggregate(type))
+        fatal("aggregate function prototype must precede every call");
+    if(!sclc_type_same(previous,type,0,0))fatal("aggregate function redeclaration has an incompatible C type");
+    if(types[previous].kind==TY_FUNC && types[previous].count>=0 && types[type].count<0)return previous;
+    return type;
 }
 static int promoted(int type)
 {
@@ -151,7 +189,7 @@ static int aggregate(int kind)
         if(base<0 || storage) fatal("aggregate member needs an ordinary type");
         do {
             int member=0,mt=declarator(base,&member,0);
-            if(!member || !types[mt].size || types[mt].kind==TY_FUNC) fatal("invalid aggregate member");
+            if(!member || types[mt].size<=0 || types[mt].kind==TY_FUNC) fatal("invalid aggregate member");
             for(int f=first;f;f=symbols[f].next) if(symbols[f].name==member) fatal("duplicate aggregate member");
             int align=alignment(mt);
             if(align>max_align) max_align=align;
@@ -276,7 +314,7 @@ static int suffix(int base)
                 type=declarator(type,&name,1);
                 if(types[type].kind==TY_ARRAY) type=pointer_to(types[type].base);
                 if(types[type].kind==TY_FUNC) type=pointer_to(type);
-                if(!types[type].size || types[type].kind==TY_STRUCT || types[type].kind==TY_UNION) fatal("aggregate by-value parameters are unsupported");
+                abi_stack_bytes(type);
                 if(param_count>=PARAM_MAX) fatal("parameter capacity exceeded");
                 int p=param_count++;
                 parameters[p].name=name;
@@ -290,7 +328,8 @@ static int suffix(int base)
                 need(',');
             }
         }
-        if(types[base].kind==TY_ARRAY || types[base].kind==TY_FUNC || types[base].kind==TY_STRUCT || types[base].kind==TY_UNION) fatal("unsupported function return type");
+        if(types[base].kind==TY_ARRAY || types[base].kind==TY_FUNC) fatal("unsupported function return type");
+        if(abi_aggregate(base))abi_stack_bytes(base);
         return new_type(TY_FUNC,0,base,argc,first,variadic);
     }
     return base;
@@ -298,7 +337,13 @@ static int suffix(int base)
 static void replace_hole(int type,int hole,int replacement)
 {
     if(types[type].base==hole) { types[type].base=replacement;
-        if(types[type].kind==TY_ARRAY) types[type].size=types[replacement].size*types[type].count;
+        if(types[type].kind==TY_ARRAY){
+            /* 括号声明先以size0的hole建数组，替换真实元素后必须重做
+             * array_of同一乘法预验，不能把负溢出宽度装进按值ABI。 */
+            int count=types[type].count,size=types[replacement].size;
+            if(count<0 || size<0 || (count && size>0x3D0000/count))fatal("array size exceeds address space");
+            types[type].size=size*count;
+        }
         return;
     }
     if(types[type].kind==TY_PTR || types[type].kind==TY_ARRAY || types[type].kind==TY_FUNC) replace_hole(types[type].base,hole,replacement);
@@ -338,7 +383,8 @@ static int type_ahead(void)
     return s && symbols[s].kind==S_TYPEDEF;
 }
 static int lvalue(int n)
-{ return (nodes[n].kind==N_SYMBOL && symbols[nodes[n].value].kind!=S_FUNCTION) || nodes[n].kind==N_DEREF; }
+{ return (nodes[n].kind==N_SYMBOL && symbols[nodes[n].value].kind!=S_FUNCTION) ||
+    (nodes[n].kind==N_DEREF && !nodes[n].c); }
 static int binary(int op,int left,int right)
 {
     int a=promoted(nodes[left].type),b=promoted(nodes[right].type),type=C_INT;
@@ -394,11 +440,12 @@ static int primary(void)
 postfix_value:
     for(;;) {
         if(take('[')) {
+            int temporary_array=types[nodes[n].type].kind==TY_ARRAY && nodes[n].kind==N_DEREF && nodes[n].c;
             int subscript=expression(1);
             need(']');
             int pt=promoted(nodes[n].type);
             if(types[pt].kind!=TY_PTR) fatal("subscript needs an array or pointer");
-            n=node_new(N_DEREF,types[pt].base,binary('+',n,subscript),0,0,0);
+            n=node_new(N_DEREF,types[pt].base,binary('+',n,subscript),0,temporary_array,0);
         } else if(current_token()->k=='.' || current_token()->k==T_ARROW) {
             int arrow=current_token()->k==T_ARROW;
             position++;
@@ -410,6 +457,7 @@ postfix_value:
                 n=node_new(N_DEREF,type,n,0,0,0);
             }
             if(types[type].kind!=TY_STRUCT && types[type].kind!=TY_UNION) fatal("member access needs aggregate");
+            int temporary_member=!lvalue(n);
             if(current_token()->k!=T_ID) fatal("member access needs a name");
             int f=types[type].fields;
             while(f && symbols[f].name!=current_token()->v) f=symbols[f].next;
@@ -420,7 +468,9 @@ postfix_value:
             /* 字段偏移以字节加，不允许普通指针步长再次乘 sizeof(struct)。 */
             address=node_new(N_CAST,pointer_to(C_CHAR),address,0,0,0);
             address=binary('+',address,constant((u32)symbols[f].value,C_INT));
-            n=node_new(N_DEREF,field_type,address,0,0,0);
+            /* 返回值的成员可读取，却不是允许&或赋值的原对象lvalue。
+             * arrow先形成真正解引用，因此f().pointer->member仍可写。 */
+            n=node_new(N_DEREF,field_type,address,0,temporary_member,0);
         } else if(take('(')) {
             int type=promoted(nodes[n].type);
             if(types[type].kind!=TY_PTR || types[types[type].base].kind!=TY_FUNC) fatal("call needs a function");
@@ -431,6 +481,8 @@ postfix_value:
                 if(parameter){value=standard_value_conversion(parameters[parameter].type,value);
                     parameter=parameters[parameter].next;}
                 else value=standard_default_conversion(value);
+                if(types[type].count<0 && abi_aggregate(nodes[value].type))
+                    fatal("aggregate call requires a complete function prototype");
                 args=node_new(N_ARG,nodes[value].type,value,args,0,0);
                 argc++;
                 if(take(')')) break;
@@ -475,6 +527,8 @@ static int unary(void)
             need(')');
             int value=unary();
             if(types[type].kind==TY_BOOL)return standard_value_conversion(type,value);
+            if(abi_aggregate(type) || (abi_aggregate(nodes[value].type) && types[type].kind!=TY_VOID))
+                fatal("cast cannot convert an aggregate value");
             return node_new(N_CAST,type,value,0,0,0);
         }
         position=saved;
@@ -523,6 +577,10 @@ static int expression(int minimum)
             int assignment=p==2,right=expression(assignment?p:p+1);
             if(assignment) {
                 if(!lvalue(left) || (types[nodes[left].type].flags&Q_CONST) || types[nodes[left].type].kind==TY_ARRAY) fatal("assignment needs writable lvalue");
+                if(abi_aggregate(nodes[left].type)){
+                    if(op!='=')fatal("aggregate assignment only supports simple assignment");
+                    right=standard_value_conversion(nodes[left].type,right);
+                }else if(abi_aggregate(nodes[right].type))fatal("scalar assignment cannot use an aggregate value");
                 if(types[nodes[left].type].kind==TY_BOOL){
                     if(op=='=')standard_bool_source(right);
                     else if(types[promoted(nodes[right].type)].kind!=TY_INT)
@@ -604,7 +662,7 @@ static int initialize(int type,int symbol,int offset,int global)
             int source=nodes[value].type;
             if(types[source].kind!=t->kind || aggregate_identity[source]!=aggregate_identity[type])
                 fatal("aggregate initializer type mismatch");
-        }
+        }else if(abi_aggregate(nodes[value].type))fatal("scalar initializer cannot use an aggregate value");
         chain(&first,&last,node_new(N_INIT,type,symbol,offset,value,0));
     }
     (void)global;
@@ -630,7 +688,16 @@ static int local_declaration(void)
         if(old && symbols[old].scope==scope_depth) fatal("duplicate local name");
         if(storage&D_TYPEDEF) s=symbol_new(name,type,S_TYPEDEF,0,scope_depth);
         else if(types[type].kind==TY_FUNC || (storage&D_EXTERN)) {
-            if(old && symbols[old].scope==0) s=old;
+            if(old && symbols[old].scope==0){
+                s=old;
+                if(abi_function_aggregate(symbols[s].type) || abi_function_aggregate(type)){
+                    int checked=abi_declaration_type(symbols[s].type,type);
+                    /* 局部extern只复验已有定义，不能把其参数名字换掉，
+                     * 否则同函数中的va_start会失去真实最后named参数。 */
+                    if(types[symbols[s].type].kind==TY_FUNC && types[symbols[s].type].count<0)
+                        symbols[s].type=checked;
+                }
+            }
             else s=symbol_new(name,type,types[type].kind==TY_FUNC?S_FUNCTION:S_GLOBAL,0,0);
         } else s=symbol_new(name,type,(storage&D_STATIC)?S_GLOBAL:S_LOCAL,0,scope_depth);
         if((shared_output || dynamic_output) && (symbols[s].kind==S_GLOBAL || symbols[s].kind==S_FUNCTION))scl_declare(s,storage);
@@ -786,6 +853,8 @@ static int statement(void)
         int result=types[symbols[function_symbol].type].base;
         if((types[result].kind==TY_VOID && value) || (types[result].kind!=TY_VOID && !value)) fatal("return value disagrees with function type");
         if(value && types[result].kind==TY_BOOL)standard_bool_source(value);
+        if(value && abi_aggregate(result))value=standard_value_conversion(result,value);
+        else if(value && abi_aggregate(nodes[value].type))fatal("scalar return cannot use an aggregate value");
         return node_new(N_RETURN,result,value,0,0,0);
     }
     if(take_word("break")) { need(';');
@@ -848,6 +917,8 @@ static void compile_unit(void)
                 if(root){standard_root_declaration(s,type,root);
                     if(current_token()->k=='{')fatal("reserved root adapter cannot have a C body");}
                 if(shared_output || dynamic_output)scl_declare(s,root?D_STATIC:storage);
+                if(abi_function_aggregate(symbols[s].type) || abi_function_aggregate(type))
+                    type=abi_declaration_type(symbols[s].type,type);
                 if(shared_output || dynamic_output)type=scl_declaration_type(symbols[s].type,type);
                 symbols[s].type=type;
                 if(kind==S_FUNCTION && current_token()->k=='{') {
@@ -857,10 +928,14 @@ static void compile_unit(void)
                     scope_depth=1;
                     local_bytes=0;
                     node_count=1;
-                    int index=0;
+                    int parameter_start=8+(abi_aggregate(types[type].base)?4:0),parameter_offset=parameter_start;
+                    if(abi_aggregate(types[type].base))abi_stack_bytes(types[type].base);
                     for(int p=types[type].fields;p;p=parameters[p].next) {
                         if(!parameters[p].name) fatal("function definition parameter needs a name");
-                        symbol_new(parameters[p].name,parameters[p].type,S_PARAM,8+4*index++,1);
+                        int width=abi_stack_bytes(parameters[p].type);
+                        if(width>65536-(parameter_offset-parameter_start))fatal("function parameters exceed 64KB stack block");
+                        symbol_new(parameters[p].name,parameters[p].type,S_PARAM,parameter_offset,1);
+                        parameter_offset+=width;
                     }
                     int body=statement();
                     symbols[s].defined=1;

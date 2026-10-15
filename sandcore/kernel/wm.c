@@ -33,6 +33,7 @@
 #include "keyboard.h"
 #include "streams.h"
 #include "sc32_gui.h"
+#include "sc32_drop.h"
 
 extern void scene_paint(void);        /* main.c: 沙漠壁纸 (画进后台缓冲) */
 
@@ -79,6 +80,7 @@ typedef struct {
     u32 blocked_keys[8],blocked_buttons;
     char title[128];
     ScMessage close_message,paint_message;
+    u32 popup,popup_kind,popup_flags,popup_root,popup_previous,popup_next,popup_linked,cursor;
 } gui_window_t;
 typedef struct {
     win_t window;
@@ -92,7 +94,8 @@ typedef struct {
 typedef char window_prefix_keeps_abi[(sizeof(win_t)==80)?1:-1];
 static objpool_t window_pool;
 typedef struct {
-    int *order,*created,count,bar_first,wallpaper;
+    int *order,*created,count,task_count,bar_first,wallpaper;
+    u32 popup_first,popup_last;
     u32 order_pages,order_capacity;
     int fault_first,fault_modal;
     int dragging,resize,resize_width,resize_height,resize_offset_x,resize_offset_y;
@@ -108,6 +111,7 @@ static objpool_t view_pool;
 static desktop_view_t *active_view;
 static desktop_view_t *view_get(u32 id){return objpool_get(&view_pool,(int)id);}
 #define nwins (active_view->count)
+#define ntasks (active_view->task_count)
 #define window_order (active_view->order)
 #define creation_order (active_view->created)
 #define window_order_pages (active_view->order_pages)
@@ -135,6 +139,16 @@ static desktop_view_t *view_get(u32 id){return objpool_get(&view_pool,(int)id);}
 #define icon_first (active_view->icon_start)
 static int taskbar_capacity(void);
 static void taskbar_reveal(int handle);
+static window_record_t *window_record(int handle);
+static int popup_resize(win_t *w,int width,int height);
+static void popup_close_group(desktop_view_t *view,u32 keep_group,u32 close_group);
+static void popup_unlink(window_record_t *p);
+static void popup_raise_group(u32 group);
+static window_record_t *popup_input_target(window_record_t *p);
+static u32 popup_focus_group(int handle);
+static u32 pointer_cursor_shape(void);
+static int window_client_dx(win_t *w){window_record_t *p=window_record(w->handle);return p && p->gui.popup?0:1;}
+static int window_client_dy(win_t *w){window_record_t *p=window_record(w->handle);return p && p->gui.popup?0:TITLE_H;}
 static void visibility_changed(win_t *w);
 static int gui_can_show(window_record_t *record);
 static int gui_eligible(window_record_t *record);
@@ -159,7 +173,8 @@ static int order_reserve(desktop_view_t *view)
     if(capacity<view->order_capacity || capacity>0x0FFFFFFFu)return -1;
     u32 pages=(capacity*8+4095)/4096,address=pframe_alloc_run(pages);if(!address)return -1;
     int *order=(int *)address,*created=order+capacity;
-    for(int i=0;i<view->count;i++){order[i]=view->order[i];created[i]=view->created[i];}
+    for(int i=0;i<view->count;i++)order[i]=view->order[i];
+    for(int i=0;i<view->task_count;i++)created[i]=view->created[i];
     if(view->order)pframe_free_run((u32)view->order,view->order_pages);
     view->order=order;view->created=created;view->order_pages=pages;view->order_capacity=capacity;return 0;
 }
@@ -283,7 +298,8 @@ static void canvas_slot(win_t *w,u32 index,u8 color)
 static int top_visible(void)
 {
     if(active_view->top_known)return active_view->top_cache;
-    int result=-1;for(int i=nwins-1;i>=0;i--){window_record_t *p=window_record(WINDOW(i).handle);if(p && gui_can_show(p)){result=i;break;}}
+    int result=-1;for(int i=nwins-1;i>=0;i--){window_record_t *p=window_record(WINDOW(i).handle);
+        if(p && gui_can_show(p) && !(p->gui.popup && (p->gui.popup_flags&SC32_POPUP_NO_ACTIVATE))){result=i;break;}}
     active_view->top_cache=result;active_view->top_known=1;return result;
 }
 static int work_bottom(void){return GFX_H-(GFX_W==320?16:32*display_scale()/100);}
@@ -294,6 +310,7 @@ static int damage_full=1,damage_x0,damage_y0,damage_x1,damage_y1;
 static volatile u32 wm_partial_frames,wm_partial_pixels;
 static int cursor_dirty=1,cursor_saved;
 static int cursor_x,cursor_y,cursor_w,cursor_h;
+static u32 cursor_shape_draw;
 static u32 cursor_under[16*26]; /* 200%最大16×26；不另分配整屏快照 */
 /* 只读诊断计数以PIT的10ms刻度记录真实合成成本；不冒称GPU帧率。
  * 性能脚本同时测宿主耗时/响应，避免QEMU虚拟时间单独掩盖延迟。 */
@@ -418,7 +435,7 @@ int  wm_dirty(void)           { return dirty || cursor_dirty; }
 static int win_create(int owner, const char *title, i32 x, i32 y, i32 w, i32 h,int native)
 {
     if(!task_owned(owner) || TASK(owner).state!=1 || next_handle>0x7FFFFFFFu
-        || w<48 || h<32 || w>(native?1920:320) || h>(native?1080:184))
+        || w<(native==-3?1:48) || h<(native==-3?1:32) || w>(native?1920:320) || h>(native?1080:184))
         return -1;
     u32 id=session_task(owner);if(wm_session_prepare(id))return -1;
     desktop_view_t *view=view_get(id);
@@ -428,8 +445,8 @@ static int win_create(int owner, const char *title, i32 x, i32 y, i32 w, i32 h,i
     np->owner = owner;
     np->handle=handle;
     window_extra_t *ex=&record->extra;ex->handle=handle;ex->native=native!=0;ex->scale=1;
-    ex->format=(native==2 || native==-2)?2:1;
-    ex->hidden=native==-2;
+    ex->format=(native==2 || native==-2 || native==-3)?2:1;
+    ex->hidden=native==-2 || native==-3;record->gui.popup=native==-3;
     ex->opaque=ex->format==2;
     np->x = x; np->y = y; np->w = w; np->h = h;
     int title_bytes=0;
@@ -439,9 +456,9 @@ static int win_create(int owner, const char *title, i32 x, i32 y, i32 w, i32 h,i
         while(begin<title)np->title[title_bytes++]=*begin++;
     }
     np->title[title_bytes]=0; /* 80B旧布局保留，但UTF-8标量不被字节截开 */
-    np->cw = w - 2 * BORDER;
-    np->ch = h - (native?TITLE_H:13) - BORDER;
-    if(np->ch<16){objpool_release(&window_pool,handle);return -1;}
+    np->cw = native==-3?w:w-2*BORDER;
+    np->ch = native==-3?h:h-(native?TITLE_H:13)-BORDER;
+    if(np->ch<(native==-3?1:16)){objpool_release(&window_pool,handle);return -1;}
     /* 旧VGA索引画布也按真实尺寸借页，内容和ABI不变；不能给无限
      * 个任务只准备六块静态画布。候选失败完整释放，不消费窗口句柄。 */
     ex->pages=((u32)np->cw*(u32)np->ch*(ex->format==2?4u:1u)+4095u)/4096u;
@@ -469,9 +486,13 @@ static int win_create(int owner, const char *title, i32 x, i32 y, i32 w, i32 h,i
     np->tx = np->ty = 4;
     record->owner_generation=task_generation(owner);record->owner_next=task_record(owner)->windows;
     if(record->owner_next)window_record((int)record->owner_next)->owner_previous=(u32)handle;
-    task_record(owner)->windows=(u32)handle;record->z_index=record->creation_index=view->count;
+    task_record(owner)->windows=(u32)handle;record->z_index=view->count;
+    /* 任务栏创建序与合成z序分别计数：popup只有z位置，不制造空
+     * task按钮；rank仍直接索引，不能每个按钮扫描全部窗口。 */
+    record->creation_index=native==-3?-1:view->task_count;
+    if(native!=-3)view->created[view->task_count++]=handle;
     record->session=id;record->visibility_epoch=1;record->repaint=1;
-    view->order[view->count]=view->created[view->count]=handle;next_handle++;
+    view->order[view->count]=handle;next_handle++;
     view->count++;
     view->top_known=0;
     if(view==active_view)taskbar_reveal(handle);
@@ -490,7 +511,7 @@ static void win_close_handle(int handle)
     streams_terminal_closed(owner,handle);
     userspace_terminal_closed(owner,handle);
     record=window_record(handle);if(!record)return;int idx=record->z_index;
-    gui_focus_defer++;gui_closed(record);
+    gui_focus_defer++;popup_unlink(record);gui_closed(record);
     int drag_handle=view->dragging>=0?view->order[view->dragging]:0,resize_handle=view->resize>=0?view->order[view->resize]:0;
     if(relative_handle==handle)relative_release();
     terminal_t *term=&record->terminal;
@@ -502,8 +523,11 @@ static void win_close_handle(int handle)
     for (int i = idx; i < view->count - 1; i++) {
         view->order[i]=view->order[i+1];window_record(view->order[i])->z_index=i;
     }
-    for(int i=record->creation_index;i<view->count-1;i++){
-        view->created[i]=view->created[i+1];window_record(view->created[i])->creation_index=i;
+    if(record->creation_index>=0){
+        for(int i=record->creation_index;i<view->task_count-1;i++){
+            view->created[i]=view->created[i+1];window_record(view->created[i])->creation_index=i;
+        }
+        view->task_count--;
     }
     view->count--;
     view->top_known=0;
@@ -511,7 +535,7 @@ static void win_close_handle(int handle)
     window_record_t *drag_record=window_record(drag_handle),*resize_record=window_record(resize_handle);
     view->dragging=drag_record?drag_record->z_index:-1;view->resize=resize_record?resize_record->z_index:-1;
     if(!view->count){pframe_free_run((u32)view->order,view->order_pages);view->order=view->created=0;view->order_pages=view->order_capacity=0;}
-    if(view->bar_first>=view->count)view->bar_first=0;
+    if(view->bar_first>=view->task_count)view->bar_first=0;
     if(view==active_view)wm_request_compose();
     gui_focus_defer--;
     gui_focus_update();
@@ -533,6 +557,7 @@ static void win_raise(int idx)
     window_record_t *drag_record=window_record(drag_handle),*resize_record=window_record(resize_handle);
     drag=drag_record?drag_record->z_index:-1;resizing=resize_record?resize_record->z_index:-1;
     taskbar_reveal(handle);
+    if(!window_record(handle)->gui.popup)popup_raise_group((u32)handle);
     task_notify(window_record(handle)->window.owner,TASK_EVENT_INPUT);
     gui_focus_update();
 }
@@ -599,6 +624,7 @@ static void visibility_changed(win_t *w)
 void wm_session_repaint(u32 id)
 {
     desktop_view_t *view=view_get(id);if(!view)return;
+    popup_close_group(view,0,0);
     for(int i=0;i<view->count;i++){
         window_record_t *p=window_record(view->order[i]);p->visibility_epoch++;
         if(!p->visibility_epoch)p->visibility_epoch=1;p->repaint=1;p->terminal.theme=0;
@@ -659,7 +685,7 @@ int wm_user_frame(int pid,int handle,const u8 *pixels,u32 length)
      * VGA由wm_damage_rect原样回退整屏，旧长度/寄存器/内容不改。 */
     window_extra_t *extra=extra_of(handle);
     int scale=extra->native?1:extra->scale;
-    wm_damage_rect(w->x+1,w->y+TITLE_H,w->cw*scale,w->ch*scale);
+    wm_damage_rect(w->x+window_client_dx(w),w->y+window_client_dy(w),w->cw*scale,w->ch*scale);
     return 0;
 }
 
@@ -801,7 +827,7 @@ static void draw_window(int i)
 {
     win_t *w = &WINDOW(i);
     window_extra_t *ex=extra_of(w->handle);if(!gui_can_show(window_record(w->handle)))return;
-    if(GFX_W!=320){native_draw_window(i);return;}
+    if(GFX_W!=320 || window_record(w->handle)->gui.popup){native_draw_window(i);return;}
     int focused = window_record(w->handle)->gui.mode?gui_focus_any==w->handle:i==top_visible();
 
     gfx_fill(w->x, w->y, w->w, w->h, focused ? PAL_CON_TINT : PAL_WIN_TITLE);
@@ -817,7 +843,7 @@ static void draw_window(int i)
     /* 画布 blit: 客户区像素逐点贴到后台缓冲 */
     for (int r = 0; r < w->ch; r++)
         for (int c = 0; c < w->cw; c++)
-            if(ex->format==2) gfx_argb_pset(w->x+BORDER+c,w->y+TITLE_H+r,((u32 *)w->canvas)[r*w->cw+c]);
+            if(ex->format==2) gfx_argb_pset(w->x+BORDER+c,w->y+window_client_dy(w)+r,((u32 *)w->canvas)[r*w->cw+c]);
             else gfx_pset(w->x + BORDER + c, w->y + TITLE_H + r, w->canvas[r * w->cw + c]);
 }
 
@@ -828,10 +854,10 @@ static void draw_taskbar(void)
     gfx_text16(4, 184, "沙核", PAL_TITLE, 0);
     /* 创建序索引不随置顶改变；只画物理屏幕容得下的当前页。
      * 上一/下一页能访问所有窗口，不把固定六按钮变成任务数量门槛。 */
-    int overflow=nwins>taskbar_capacity(),origin=overflow?60:44;
+    int overflow=ntasks>taskbar_capacity(),origin=overflow?60:44;
     if(overflow){gfx_text8(46,188,"<",taskbar_first?PAL_UI_CYAN+7:PAL_UI_MUTED,1,0);
-        gfx_text8(214,188,">",taskbar_first+taskbar_capacity()<nwins?PAL_UI_CYAN+7:PAL_UI_MUTED,1,0);}
-    for(int slot=0;slot<taskbar_capacity() && taskbar_first+slot<nwins;slot++) {
+        gfx_text8(214,188,">",taskbar_first+taskbar_capacity()<ntasks?PAL_UI_CYAN+7:PAL_UI_MUTED,1,0);}
+    for(int slot=0;slot<taskbar_capacity() && taskbar_first+slot<ntasks;slot++) {
         int chosen=rank_window(slot);
         if(chosen<0) continue;
         int x=origin+slot*30; char label[4];
@@ -879,12 +905,25 @@ static const char *cursor_art[13] = {
     "#..#.#..",
     "....#...",
 };
+/* 每形8×13同一字重，#为轮廓、o为亮面；没有复制品牌光标。
+ * 相同小矩形预算让换形只恢复旧底图/画新形，不复制整屏。 */
+static const char *cursor_alternate[9][13]={
+    {".#####..","...o....","...o....","...o....","...o....","...o....","...o....","...o....","...o....","...o....","...o....","...o....",".#####.."},
+    {"........","........","........","........","..#..#..",".##..##.","########",".##..##.","..#..#..","........","........","........","........"},
+    {"...#....","..###...",".#####..","...o....","...o....","...o....","...o....","...o....","...o....","...o....",".#####..","..###...","...#...."},
+    {"####....","###.....","##o.....","#.oo....","...oo...","....oo..",".....oo.","......o#",".....o##",".....###","....####","........","........"},
+    {"....####",".....###",".....o##","....oo.#","...oo...","..oo....",".oo.....","#o......","##o.....","###.....","####....","........","........"},
+    {"..##....","..#o#...","..#o#...","..#o###.","..#o#oo#","..#oooo#","###oooo#","#oooooo#","#oooooo#",".#oooo#.",".#oooo#.","..#####.","........"},
+    {"........","..####..",".#oooo#.","#o#ooo#.","#oo#ooo#","#ooo#oo#","#oooo#o#","#ooooo##",".#oooo#.","..####..","........","........","........"},
+    {"#.......","##......","#o#.....","#oo#....","#ooo#...","#oooo#..","#ooooo#.","#ooo###.","#o#.....","#..#.##.","....#ooo",".....o#o",".....ooo"},
+    {"#.......","##......","#o#.....","#oo#....","#ooo#...","#oooo#..","#ooooo#.","#ooo###.","#o#.....","#..#.###","....#ooo",".....###","........"}
+};
 
 static void draw_cursor_at(int x,int y)
 {
     for (int r = 0; r < 13; r++)
         for (int c = 0; c < 8; c++) {
-            char a = cursor_art[r][c];
+            char a=cursor_shape_draw?cursor_alternate[cursor_shape_draw-1][r][c]:cursor_art[r][c];
             if (a == '#')
                 gfx_fill(x+unit(c),y+unit(r),unit(c+1)-unit(c),unit(r+1)-unit(r),PAL_TITLE);
             else if (a == 'o')
@@ -893,6 +932,9 @@ static void draw_cursor_at(int x,int y)
 }
 static void cursor_capture(int x,int y)
 {
+    cursor_shape_draw=pointer_cursor_shape();if(cursor_shape_draw>SC32_CURSOR_DRAG_MOVE)cursor_shape_draw=0;
+    if(cursor_shape_draw>=SC32_CURSOR_TEXT && cursor_shape_draw<=SC32_CURSOR_RESIZE_NESW){x-=unit(3);y-=unit(6);}
+    else if(cursor_shape_draw==SC32_CURSOR_HAND){x-=unit(2);y-=unit(1);}
     cursor_x=x;cursor_y=y;cursor_w=unit(8);cursor_h=unit(13);
     for(int r=0;r<cursor_h;r++)for(int c=0;c<cursor_w;c++)
         cursor_under[r*cursor_w+c]=gfx_rgb_get(x+c,y+r);
@@ -1042,7 +1084,7 @@ void wm_compose(void)
             wm_partial_pixels+=(u32)(damage_x1-damage_x0)*(u32)(damage_y1-damage_y0);
         }else gfx_swap();
     }
-    wm_cursor_x=cursor_x;wm_cursor_y=cursor_y;
+    wm_cursor_x=mouse_x();wm_cursor_y=mouse_y();
     u32 elapsed=sc_ticks-started;
     wm_frames++;wm_ticks_total+=elapsed;if(elapsed>wm_ticks_max)wm_ticks_max=elapsed;
     dirty = 0;
@@ -1054,7 +1096,8 @@ void wm_compose(void)
 static int hit_window(i32 x, i32 y)
 {
     for (int i = nwins - 1; i >= 0; i--)
-        if (gui_can_show(window_record(WINDOW(i).handle)) && x >= WINDOW(i).x && x < WINDOW(i).x + WINDOW(i).w
+        if (gui_can_show(window_record(WINDOW(i).handle)) && !(window_record(WINDOW(i).handle)->gui.popup_flags&SC32_POPUP_HIT_TRANSPARENT)
+         && x >= WINDOW(i).x && x < WINDOW(i).x + WINDOW(i).w
          && y >= WINDOW(i).y && y < WINDOW(i).y + WINDOW(i).h)
             return i;
     return -1;
@@ -1085,6 +1128,12 @@ static void wm_mouse_event(i32 x,i32 y,u8 b)
         if(e){e->pressed|=b&~pbtn;e->released|=pbtn&~b;}
         pmx=x;pmy=y;pbtn=b;return;
     }
+    int popup_index=hit_window(x,y);
+    if(popup_index>=0 && window_record(WINDOW(popup_index).handle)->gui.popup){
+        window_record_t *p=window_record(WINDOW(popup_index).handle);
+        if((b&1) && !(pbtn&1) && !(p->gui.popup_flags&SC32_POPUP_NO_ACTIVATE))win_raise(popup_index);
+        cursor_dirty=1;pmx=x;pmy=y;pbtn=b;return;
+    }
     if(terminal_mouse(x,y,b,pbtn)){cursor_dirty=1;pmx=x;pmy=y;pbtn=b;return;}
     int old_drag=drag,old_resize=resizing;
     int old_drag_x=old_drag>=0?WINDOW(old_drag).x:0,old_drag_y=old_drag>=0?WINDOW(old_drag).y:0;
@@ -1101,9 +1150,9 @@ static void wm_mouse_event(i32 x,i32 y,u8 b)
         /* native_mouse可能置顶/关闭并重排order；客户区资格必须在
          * 处理前按稳定对象取值，不能用旧数组下标判断后来的窗口。 */
         gui_client=p->gui.mode && x>w->x && x<w->x+w->w-1
-            && y>=w->y+TITLE_H && y<w->y+w->h-1;
+            && y>=w->y+window_client_dy(w) && y<w->y+w->h-1;
         int box=unit(24),left=w->x+w->w-controls*box;
-        if((!p->gui.mode || gui_eligible(p)) && y>=w->y && y<w->y+TITLE_H && x>=left && x<w->x+w->w)
+        if((!p->gui.mode || gui_eligible(p)) && y>=w->y && y<w->y+window_client_dy(w) && x>=left && x<w->x+w->w)
             new_hover=((u64)(u32)w->handle<<2)|(u32)((x-left)/box+1);
     }
     active_view->title_hover=new_hover;
@@ -1275,6 +1324,7 @@ int wm_session_prepare(u32 id)
 }
 void wm_session_switched(u32 previous,u32 current)
 {
+    popup_close_group(view_get(previous),0,0);
     relative_release();keyboard_session_switch();mouse_session_switch();
     wm_sc32_loss_epoch();gui_session_id=current;
     desktop_view_t *old=view_get(previous);if(old){old->dragging=old->resize=-1;old->menu=old->context=0;}
@@ -1343,6 +1393,7 @@ static int gui_modal_target(int handle)
 static int gui_eligible(window_record_t *p)
 {
     return p && gui_can_show(p) && p->session==session_active() && TASK(p->window.owner).state==1
+        && !(p->gui.popup_flags&SC32_POPUP_HIT_TRANSPARENT)
         && (!p->gui.mode || (!(p->gui.style&SC32_STYLE_DISABLED) && !p->gui.owner_disabled
             && gui_modal_target(p->window.handle)==p->window.handle));
 }
@@ -1389,11 +1440,16 @@ static void gui_focus_update(void)
     if(!active_view || gui_mutation || gui_focus_defer)return;
     int handle=0,top=top_visible();
     if(top>=0 && !fault_focus && !menu_open && !context_open && gui_eligible(window_record(WINDOW(top).handle)))handle=WINDOW(top).handle;
+    int popup_count_before=active_view->count;
+    popup_close_group(active_view,popup_focus_group(handle),0);
+    if(active_view->count!=popup_count_before){top=top_visible();handle=0;
+        if(top>=0 && !fault_focus && !menu_open && !context_open && gui_eligible(window_record(WINDOW(top).handle)))handle=WINDOW(top).handle;}
     if(handle==gui_focus_any)return;
     window_record_t *old=window_record(gui_focus_any),*next=window_record(handle);
     if(gui_capture_handle && gui_capture_handle!=handle)gui_capture_release(1);
     if(relative_handle && relative_handle!=handle)relative_release();
     gui_focus_any=handle;
+    if(old && old->gui.cursor){old->gui.cursor=0;cursor_dirty=1;}
     if(!sc32_gui_routing())wm_sc32_loss_epoch();
     if(old && old->gui.mode){old->gui.input++;gui_message(old,SC32_MSG_FOCUS,old->gui.input,0,(u32)handle,0,0);}
     if(next && next->gui.mode){next->gui.input++;gui_message(next,SC32_MSG_FOCUS,next->gui.input,1,old?(u32)old->window.handle:0,0,0);}
@@ -1466,7 +1522,10 @@ static void gui_commit(win_t *w)
     window_record_t *p=window_record(w->handle);
     if(!p || !p->gui.mode || gui_mutation || TASK(w->owner).state==2)return;
     gui_window_t *g=&p->gui;int visible=window_visible(w);
+    if(g->last_cw!=w->cw || g->last_ch!=w->ch || g->last_x!=w->x || g->last_y!=w->y
+        || g->last_visible!=visible)sc32_drop_window_changed((u32)w->handle);
     if(g->last_cw!=w->cw || g->last_ch!=w->ch || g->last_w!=w->w || g->last_h!=w->h){
+        if(!g->popup)popup_close_group(view_get(p->session),0,(u32)w->handle);
         g->geometry++;if(!g->geometry)g->geometry=1;g->painting=0;g->input++;
         if(!sc32_gui_routing())wm_sc32_loss_epoch();
         /* 新尺寸是全新的客户坐标域。旧大矩形不能并进缩小后的损伤，
@@ -1478,6 +1537,7 @@ static void gui_commit(win_t *w)
         (void)wm_sc32_invalidate(w->owner,&input);
     }
     if(g->last_x!=w->x || g->last_y!=w->y){
+        if(!g->popup)popup_close_group(view_get(p->session),0,(u32)w->handle);
         g->input++;gui_message(p,SC32_MSG_MOVE,g->geometry,(u32)w->x,(u32)w->y,0,0);
         g->last_x=w->x;g->last_y=w->y;if(!sc32_gui_routing())wm_sc32_loss_epoch();
     }
@@ -1495,6 +1555,7 @@ static void gui_commit(win_t *w)
 }
 static void gui_closed(window_record_t *p)
 {
+    sc32_drop_window_closed((u32)p->window.handle);
     if(!p->gui.mode)return;
     if(!sc32_gui_routing() && window_visible(&p->window))wm_sc32_loss_epoch();
     if(gui_focus_any==p->window.handle){p->gui.input++;gui_message(p,SC32_MSG_FOCUS,p->gui.input,0,0,0,0);gui_focus_any=0;}
@@ -1504,6 +1565,7 @@ static void gui_closed(window_record_t *p)
     /* 旧WINCLOSE也可能关闭新窗。剩余owned子窗解除失效owner引用，
      * 新Destroy主动按子树关闭，EXIT沿既有owner链收齐，不递归占栈。 */
     while(p->gui.first_child){window_record_t *child=window_record((int)p->gui.first_child);
+        if(child->gui.popup){u32 handle=(u32)child->window.handle;(void)wm_sc32_destroy(child->window.owner,handle,handle);continue;}
         gui_unlink_parent(child);child->gui.owner_hidden=child->gui.owner_disabled=0;
         visibility_changed(&child->window);gui_descendant_visibility(child);}
     gui_message(p,SC32_MSG_DESTROY,p->gui.input,0,0,0,0);
@@ -1524,6 +1586,7 @@ int wm_sc32_create(int pid,const Sc32WindowCreate *input,const char *title,Sc32W
         || ((input->style&SC32_STYLE_MODAL) && !input->owner_window))return SC32_E_INVALID;
     window_record_t *parent=0;int error;
     if(input->owner_window){parent=gui_record(pid,input->owner_window,input->owner_generation,&error);if(!parent)return error;
+        if(parent->gui.popup)return SC32_E_NOT_SUPPORTED;
         if((input->style&SC32_STYLE_MODAL) && parent->gui.modal_child)return SC32_E_BUSY;}
     int width=(int)input->client_width+2,height=(int)input->client_height+TITLE_H+1;
     if(width>GFX_W)width=GFX_W;
@@ -1580,7 +1643,9 @@ int wm_sc32_query(int pid,u32 handle,u32 generation,ScWindowInfo *out)
         |(p->gui.minimized?SC32_WINDOW_MINIMIZED:0)|(p->extra.maximized?SC32_WINDOW_MAXIMIZED:0)
         |((p->gui.style&SC32_STYLE_MODAL)?SC32_WINDOW_MODAL:0)|(gui_eligible(p)?SC32_WINDOW_INPUT:0)
         |(p->gui.close_pending?SC32_WINDOW_CLOSING:0)|(p->gui.paint_pending?SC32_WINDOW_PAINT:0)
-        |(p->gui.creating?SC32_WINDOW_CREATING:0)|(gui_capture_handle==(int)handle?SC32_WINDOW_CAPTURED:0);
+        |(p->gui.creating?SC32_WINDOW_CREATING:0)|(gui_capture_handle==(int)handle?SC32_WINDOW_CAPTURED:0)
+        |(p->gui.popup?SC32_WINDOW_POPUP:0)|((p->gui.popup_flags&SC32_POPUP_NO_ACTIVATE)?SC32_WINDOW_NO_ACTIVATE:0)
+        |((p->gui.popup_flags&SC32_POPUP_HIT_TRANSPARENT)?SC32_WINDOW_HIT_TRANSPARENT:0);
     out->geometry_epoch=p->gui.geometry;out->visibility_epoch=p->visibility_epoch;out->input_epoch=p->gui.input;
     out->theme_epoch=p->gui.theme;out->display_epoch=p->gui.display;return SC32_OK;
 }
@@ -1588,7 +1653,17 @@ int wm_sc32_place(int pid,const Sc32WindowPlace *input,ScWindowInfo *out)
 {
     int error;window_record_t *p=gui_record(pid,input->window,input->generation,&error);if(!p)return error;
     if(p->gui.creating)return SC32_E_BUSY;
-    if(input->width<94 || input->height<40 || input->width>1920 || input->height>1080)return SC32_E_INVALID;
+    if(input->width<(p->gui.popup?1u:94u) || input->height<(p->gui.popup?1u:40u) || input->width>1920 || input->height>1080)return SC32_E_INVALID;
+    if(p->gui.popup){
+        gui_mutation++;int changed=popup_resize(&p->window,(int)input->width,(int)input->height);gui_mutation--;
+        if(changed)return SC32_E_MEMORY;
+        int x=input->x,y=input->y;if(x<0)x=0;if(y<0)y=0;
+        if(x>GFX_W-p->window.w)x=GFX_W-p->window.w;
+        if(y>work_bottom()-p->window.h)y=work_bottom()-p->window.h;
+        wm_damage_rect(p->window.x,p->window.y,p->window.w,p->window.h);p->window.x=x;p->window.y=y;
+        wm_damage_rect(x,y,p->window.w,p->window.h);gui_commit(&p->window);gui_focus_update();
+        return wm_sc32_query(pid,input->window,input->generation,out);
+    }
     gui_mutation++;int result=wm_user_place(pid,(int)input->window,input->x,input->y,(int)input->width,(int)input->height);gui_mutation--;
     if(result)return SC32_E_MEMORY;
     gui_commit(&p->window);gui_descendant_visibility(p);gui_focus_update();
@@ -1599,6 +1674,7 @@ int wm_sc32_control(int pid,const Sc32WindowAction *input,ScWindowInfo *out)
     int error;window_record_t *p=gui_record(pid,input->window,input->generation,&error);if(!p)return error;
     if(p->gui.creating)return SC32_E_BUSY;
     if(input->action>SC32_WINDOW_FOCUS)return SC32_E_INVALID;
+    if(p->gui.popup && input->action>=SC32_WINDOW_MINIMIZE && input->action<=SC32_WINDOW_RESTORE)return SC32_E_NOT_SUPPORTED;
     if(input->action==SC32_WINDOW_FOCUS && (!gui_eligible(p) || p->session!=session_active()))return SC32_E_ACCESS;
     gui_mutation++;int result=0;
     if(input->action==SC32_WINDOW_HIDE)p->extra.hidden=1;
@@ -1616,10 +1692,12 @@ int wm_sc32_control(int pid,const Sc32WindowAction *input,ScWindowInfo *out)
 int wm_sc32_owner(int pid,const Sc32WindowOwner *input,ScWindowInfo *out)
 {
     int error;window_record_t *p=gui_record(pid,input->window,input->generation,&error);if(!p)return error;
+    if(p->gui.popup)return SC32_E_NOT_SUPPORTED;
     if(input->style&~127u || (!input->owner_window && input->owner_generation)
         || ((input->style&SC32_STYLE_MODAL) && !input->owner_window))return SC32_E_INVALID;
     window_record_t *parent=0;
     if(input->owner_window){parent=gui_record(pid,input->owner_window,input->owner_generation,&error);if(!parent)return error;
+        if(parent->gui.popup)return SC32_E_NOT_SUPPORTED;
         for(window_record_t *q=parent;q;q=window_record((int)q->gui.parent))if(q==p)return SC32_E_INVALID;
         if((input->style&SC32_STYLE_MODAL) && parent->gui.modal_child && parent->gui.modal_child!=input->window)return SC32_E_BUSY;}
     gui_focus_defer++;
@@ -1655,7 +1733,7 @@ int wm_sc32_input(int pid,u32 handle,u32 generation,ScInputSnapshot *out)
     *out=(ScInputSnapshot){0};out->size=96;out->version=1;out->window=handle;out->generation=handle;
     out->input_epoch=p->gui.input;out->visible=window_visible(&p->window);
     out->focused=gui_focus_any==(int)handle && gui_eligible(p);out->captured=gui_capture_handle==(int)handle;
-    if(out->focused){out->modifiers=keyboard_modifiers();out->x=mouse_x()-p->window.x-1;out->y=mouse_y()-p->window.y-TITLE_H;
+    if(out->focused){out->modifiers=keyboard_modifiers();out->x=mouse_x()-p->window.x-window_client_dx(&p->window);out->y=mouse_y()-p->window.y-window_client_dy(&p->window);
         out->buttons=mouse_buttons();keyboard_physical_snapshot(out->physical_down);}
     return SC32_OK;
 }
@@ -1715,6 +1793,21 @@ int wm_sc32_paint_end(int pid,const Sc32PaintEnd *input)
     }
     gui_attention(p);if(g->paint_ready)sc32_gui_notify(pid);return SC32_OK;
 }
+int wm_sc32_paint_cancel(int pid,const Sc32PaintEnd *input)
+{
+    int error;window_record_t *p=gui_record(pid,input->window,input->generation,&error);if(!p)return error;
+    gui_window_t *g=&p->gui;
+    if(!g->painting || input->paint_epoch!=g->painting || input->geometry_epoch!=g->geometry
+        || input->geometry_epoch!=g->painting_geometry)return SC32_E_STALE;
+    /* 字体/OOM/用户paint过程失败时只撤claim，不确认原损伤或其间
+     * 新损伤。待办保存在活窗口，无需额外申请队列候选，失败路径也
+     * 能恢复下一次PAINT；R3持续失败须按deadline退避而非忙重试。 */
+    g->painting=g->painting_geometry=0;
+    if(g->paint_pending && !g->paint_ready && window_visible(&p->window) && !g->creating){
+        sc32_gui_stamp(pid,&g->paint_message);g->paint_ready=1;
+    }
+    gui_attention(p);if(g->paint_ready)sc32_gui_notify(pid);return SC32_OK;
+}
 int wm_sc32_submit(int pid,const ScSubmitDesc *input,const ScSubmitRect *rectangles)
 {
     int error;window_record_t *p=gui_record(pid,input->window,input->generation,&error);if(!p)return error;
@@ -1755,7 +1848,7 @@ int wm_sc32_submit(int pid,const ScSubmitDesc *input,const ScSubmitRect *rectang
     if((opaque&0xFF000000u)!=0xFF000000u)p->extra.opaque=0;
     else if(input->rectangle_count==1 && !rectangles[0].destination_x && !rectangles[0].destination_y
         && rectangles[0].width==(u32)p->window.cw && rectangles[0].height==(u32)p->window.ch)p->extra.opaque=1;
-    if(changed)wm_damage_rect(p->window.x+1+x0,p->window.y+TITLE_H+y0,x1-x0,y1-y0);
+    if(changed)wm_damage_rect(p->window.x+window_client_dx(&p->window)+x0,p->window.y+window_client_dy(&p->window)+y0,x1-x0,y1-y0);
     return SC32_OK;
 }
 int wm_sc32_cancel_close(int pid,u32 handle,u32 generation)
@@ -1778,6 +1871,8 @@ int wm_sc32_pending(int pid,ScMessage *message,int consume)
     if(consume){if(best==&chosen->gui.close_message)chosen->gui.close_ready=0;else chosen->gui.paint_ready=0;gui_attention(chosen);}
     return 1;
 }
+#include "wm_popup.inc"
+#include "wm_drop.inc"
 int wm_sc32_message_valid(int pid,const ScMessage *message)
 {
     if(message->id==SC32_MSG_DESTROY)return 1;
@@ -1856,6 +1951,22 @@ int wm_sc32_route(const Sc32RawEvent *event)
             message.data[0]=event->text;message.data[1]=event->modifiers;gui_input_message(p,&message,event->tick);}
         return 1;
     }
+    if(event->kind==SC32_RAW_WHEEL){
+        if(!active_view || menu_open || context_open || fault_focus || drag>=0 || resizing>=0 || relative_active())return 1;
+        int index=hit_window(event->x,event->y);
+        int handle=gui_capture_handle?gui_capture_handle:index>=0?WINDOW(index).handle:0;
+        window_record_t *original=window_record(handle);
+        int popup_routed=original && original->gui.popup && (original->gui.popup_flags&SC32_POPUP_NO_ACTIVATE);
+        window_record_t *p=popup_input_target(original);if(!p || !p->gui.mode || !gui_eligible(p))return 1;
+        handle=p->window.handle;
+        int x=event->x-p->window.x-window_client_dx(&p->window),y=event->y-p->window.y-window_client_dy(&p->window);
+        if(!gui_capture_handle && !popup_routed && (x<0 || y<0 || x>=p->window.cw || y>=p->window.ch))return 1;
+        ScMessage message={0};message.id=SC32_MSG_WHEEL;message.window=(u32)handle;message.generation=(u32)handle;
+        message.epoch=p->gui.input;message.data[0]=(u32)x;message.data[1]=(u32)y;
+        message.data[2]=event->physical;message.data[3]=event->symbol;
+        message.data[4]=event->buttons;message.data[5]=event->modifiers;
+        gui_input_message(p,&message,event->tick);return 1;
+    }
     if(event->kind!=SC32_RAW_MOUSE)return 1;
     u32 previous=active_view?active_view->mouse_previous_buttons:0;
     int old_x=active_view?active_view->mouse_previous_x:event->x,old_y=active_view?active_view->mouse_previous_y:event->y;
@@ -1868,7 +1979,7 @@ int wm_sc32_route(const Sc32RawEvent *event)
      * 前的实际消费资格保留屏障，不能把系统/被阻断父窗的按钮事实
      * 再投给刚置顶或刚显现的客户区。 */
     if(original && original->gui.mode && !gui_eligible(original))chrome=1;
-    if(original && (event->x<=original->window.x || event->y<original->window.y+TITLE_H
+    if(original && !original->gui.popup && (event->x<=original->window.x || event->y<original->window.y+TITLE_H
         || event->x>=original->window.x+original->window.w-1 || event->y>=original->window.y+original->window.h-1))chrome=1;
     if(!capture)wm_mouse_event(event->x,event->y,(u8)event->buttons);
     else{cursor_dirty=1;active_view->mouse_previous_x=event->x;active_view->mouse_previous_y=event->y;active_view->mouse_previous_buttons=(u8)event->buttons;}
@@ -1876,9 +1987,12 @@ int wm_sc32_route(const Sc32RawEvent *event)
     if(!capture && (chrome || drag>=0 || resizing>=0))return 1;
     int under=gui_capture_handle?gui_capture_handle:index>=0?WINDOW(index).handle:0;
     capture=gui_capture_handle;
-    window_record_t *p=window_record(under);if(!p || !p->gui.mode || !gui_eligible(p) || menu_open || context_open || fault_focus)return 1;
-    int x=event->x-p->window.x-1,y=event->y-p->window.y-TITLE_H;
-    if(!capture && (x<0 || y<0 || x>=p->window.cw || y>=p->window.ch))return 1;
+    window_record_t *under_record=window_record(under);
+    int popup_routed=under_record && under_record->gui.popup && (under_record->gui.popup_flags&SC32_POPUP_NO_ACTIVATE);
+    window_record_t *p=popup_input_target(under_record);if(!p || !p->gui.mode || !gui_eligible(p) || menu_open || context_open || fault_focus)return 1;
+    under=p->window.handle;
+    int x=event->x-p->window.x-window_client_dx(&p->window),y=event->y-p->window.y-window_client_dy(&p->window);
+    if(!capture && !popup_routed && (x<0 || y<0 || x>=p->window.cw || y>=p->window.ch))return 1;
     if(old_x!=event->x || old_y!=event->y){ScMessage m={0};m.id=SC32_MSG_MOUSEMOVE;m.window=(u32)under;m.generation=m.window;m.epoch=p->gui.input;
         m.data[0]=(u32)x;m.data[1]=(u32)y;m.data[2]=event->buttons;m.data[4]=event->modifiers;
         if(event->flags&SC32_RAW_COALESCED)m.flags|=SC32_MSG_COALESCED;

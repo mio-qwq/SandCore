@@ -1,0 +1,82 @@
+SandShell M9
+SYSTEM /SYS [SYSTEM] # true; _m9_status=$?; printf "\n"; echo __M9_ad1f6e8031584a75e8febd54:$_m9_status
+
+__M9_ad1f6e8031584a75e8febd54:0
+SYSTEM /SYS [SYSTEM] # ls /HOME/M10UI/HOST; _m9_status=$?; printf "\n"; echo __M9_6943cdb9cb41df61f8b43d77:$_m9_status
+PLATFORMPROBE.SCX
+SCUIDEMO.SCX
+SCUITEXT.SCX
+
+__M9_6943cdb9cb41df61f8b43d77:0
+SYSTEM /SYS [SYSTEM] # echo STDLIB_BG_WARM & wait; _m9_status=$?; printf "\n"; echo __M9_e058ba8099c15b8b7432be1a:$_m9_status
+STDLIB_BG_WARM
+
+__M9_e058ba8099c15b8b7432be1a:0
+SYSTEM /SYS [SYSTEM] # printf warm > /HOME/M10UI/WARM.DAT; cat /HOME/M10UI/WARM.DAT; _m9_status=$?; printf "\n"; echo __M9_d6e38df45c03bc97af3c70e4:$_m9_status
+warm
+__M9_d6e38df45c03bc97af3c70e4:0
+SYSTEM /SYS [SYSTEM] # printf '%s\n' '' 'id; /HOME/M10UI/HOST/PLATFORMPROBE.SCX all /HOME/M10UI/HOST/PLATFORMPROBE.SCX; _ui=$?; echo __UI_LOGIN_c9857aada883c344:$_ui; exit 0' | su mio; _m9_status=$?; printf "\n"; echo __M9_94993f1c653489dd69064114:$_m9_status
+Password: 
+uid=1000 gid=1000 realm=0
+PLATFORM_ID pid=2 gen=11 uid_bits=1000 realm=0 sid=4 flags=0
+PLATFORM_ID pid=6 gen=2 uid_bits=1000 realm=0 sid=4 flags=0
+PLATFORM_CHILD_PASS
+PLATFORM_SHARED_PTE before=89 mapped=125 after=89 tables_before=4 tables_after=4 filled=4
+PLATFORM_CLIPBOARD_PASS
+PLATFORM_IPC_SHARED_PASS
+PLATFORM_FONT_PALETTE_PASS
+PLATFORM_FOUNDATION_PASS checks=87
+__UI_LOGIN_c9857aada883c344:0
+
+__M9_94993f1c653489dd69064114:0
+SYSTEM /SYS [SYSTEM] # printf '%s\n' '' 'id; /HOME/M10UI/HOST/SCUITEXT.SCX; _ui=$?; echo __UI_LOGIN_30e7c93a943b5e82:$_ui; exit 0' | su mio; _m9_status=$?; printf "\n"; echo __M9_f80fa9998083531ea88e8507:$_m9_status
+Password: 
+uid=1000 gid=1000 realm=0
+SCUI_TEXT_PASS version=15.1 cases=3013 boundaries=12948
+__UI_LOGIN_30e7c93a943b5e82:0
+
+__M9_f80fa9998083531ea88e8507:0
+SYSTEM /SYS [SYSTEM] # /TMP/UI-e148c3/SCCC0.SCX /TMP/UI-e148c3/SRC/sccc.c /HOME/M10UI/COMPILER/SCCC1.SCX; _m9_status=$?; printf "\n"; echo __M9_989c2aea40f7a4e15fae6beb:$_m9_status
+SCCC / mio
+TMP/UI-e148c3/SRC/sccc.c -> HOME/M10UI/COMPILER/SCCC1.SCX
+SCCC: preprocess -> C -> x86
+Preprocessing source and includes
+Parsing C and generating x86
+Linking and writing SCX
+SCCC OK load=242538 bss=2602680 / mio
+Compilation complete
+
+__M9_989c2aea40f7a4e15fae6beb:0
+SYSTEM /SYS [SYSTEM] # /HOME/M10UI/COMPILER/SCCC1.SCX /TMP/UI-e148c3/AGGCALLEE.C /HOME/M10UI/AGG/NATIVELIB/AGGCALLEE.SCL --scl /TMP/UI-e148c3/AGGCALLEE.json; _m9_status=$?; printf "\n"; echo __M9_5279991e4156c18f63f0bd60:$_m9_status
+SCCC / mio
+TMP/UI-e148c3/AGGCALLEE.C -> HOME/M10UI/AGG/NATIVELIB/AGGCALLEE.SCL
+Validating SCL manifest
+SCCC: preprocess -> C -> x86
+Preprocessing source and includes
+Parsing C and generating x86
+Linking and writing SCL
+SCCC OK SCL NATIVE
+Compilation complete
+
+__M9_5279991e4156c18f63f0bd60:0
+SYSTEM /SYS [SYSTEM] # /HOME/M10UI/COMPILER/SCCC1.SCX /TMP/UI-e148c3/AGGPROBE.C /HOME/M10UI/AGG/NATIVECALL/AGGPROBE.SCX --dynamic /TMP/UI-e148c3/AGGPROBE.json; _m9_status=$?; printf "\n"; echo __M9_f70e6c5659883e85df99cc9c:$_m9_status
+SCCC / mio
+TMP/UI-e148c3/AGGPROBE.C -> HOME/M10UI/AGG/NATIVECALL/AGGPROBE.SCX
+Validating application manifest
+SCCC: preprocess -> C -> x86
+Preprocessing source and includes
+Parsing C and generating x86
+Linking and writing SCX
+SCCC OK SCX DYNAMIC
+Compilation complete
+
+__M9_f70e6c5659883e85df99cc9c:0
+SYSTEM /SYS [SYSTEM] # printf '%s\n' '' 'id; /HOME/M10UI/AGG/NATIVECALL/AGGPROBE.SCX; _ui=$?; echo __UI_LOGIN_cde93b984fbfc73f:$_ui; exit 0' | su mio; _m9_status=$?; printf "\n"; echo __M9_06185c199169717a6cc46687:$_m9_status
+Password: 
+uid=1000 gid=1000 realm=0
+AGGABI FAIL exact-caller-stack-balance
+AGGABI FAIL checks=55 failures=1
+__UI_LOGIN_cde93b984fbfc73f:1
+
+__M9_06185c199169717a6cc46687:0
+SYSTEM /SYS [SYSTEM] # 

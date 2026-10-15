@@ -271,3 +271,14 @@ paging_free_task_dir回收全部US私有映像/元数据/页表，不在当前�
 
 修订：2026-10-14，登记固定SCLDR根的单块RO/RW映射、共享stage、私有
 启动尺寸/根缓存及显式释放/退出/复用寿命；本批未构建或客体运行。
+
+
+## M10a2 真实共享窗口（源码收齐，未验证）
+
+60000000..64000000是独立64MiB用户VA窗；新task目录16PDE清空，user_range照查P/US/RW。Broker对象唯一拥有并预先清零真实PF，grant绑定PID/gen/完整身份及RO/RW scope，mapping只增加引用，不复制正文。Shared PTE用800软件标签，private free/protect不接该窗，debug_patch拒绝Shared，设备BAR映射不得重叠；非PAE无NX，不宣称强制数据不可执行。
+
+reserve只留有所有权的非present PTE占位，private_trim把此占位也视为活页表，防止并发候选提前释放/覆盖。bind/unbind每gate≤16页；任务pd在所有本人mapping撤完后才释放，free_task_dir防御跳过Shared PF，页表仍归本人。最后对象引用才由全轮16页GC预算归还正文PF；合法recipient打开/map可在issuer退出后继续，Revoke只阻止后续Open，非强制撤已经映射页。
+
+修订：2026-10-15，登记共享PF/VA/reservation归属、调试/设备边界与增量回收，尚未构建运行，不据逻辑预算称性能通过。
+
+2026-10-15静态修复：分步Shared Unbind仅撤映射，保留整块SHARED/FIRST/LAST reservation；最终Release完整预验无P/精确块边界后一次清占位并trim，防止同PID交错新Map复用旧Unmap尚在拥有的前缀。实际未运行。

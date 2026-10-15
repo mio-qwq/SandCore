@@ -11,6 +11,7 @@ void mouse_isr(void);            /* IRQ12 处理 (interrupts.c 分发) */
 i32 mouse_x(void);               /* 光标位置 (已夹紧到屏幕内) */
 i32 mouse_y(void);
 u8  mouse_buttons(void);         /* bit0 左键 bit1 右键 bit2 中键 */
+int mouse_wheel_available(void); /* 真实ID3/4协商成功才为真，旧3字节设备保持。 */
 int mouse_next_event(i32 *x,i32 *y,u8 *buttons); /* IF=0主循环按包取事件 */
 int mouse_events_pending(void);
 /* mio：独立相对输入计数，原绝对坐标/旧队列不改。u32自然回绕，

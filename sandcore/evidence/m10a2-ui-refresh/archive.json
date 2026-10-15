@@ -1,0 +1,72 @@
+{
+  "schema": 1,
+  "scope": "M10A2_UI_REFRESH_PLATFORM_CHECKPOINT_GUI_NOT_PASS",
+  "files": [
+    {
+      "source": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-ui-native-refresh-01\\ui-platform.json",
+      "target": "refresh-report.json",
+      "bytes": 3299091,
+      "sha256": "cb1afc0af179d1c86c6ad0f11291156291d45ffe0a1b3dd00d26630527212f2b"
+    },
+    {
+      "source": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-ui-native-refresh-01\\native-libraries\\SCUI.SCL",
+      "target": "SCUI.SCL",
+      "bytes": 656796,
+      "sha256": "5de54249fea6cbdf65d4a083e2a254045585706193833e611b6cfe224e635950"
+    },
+    {
+      "source": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-ui-native-refresh-01\\native-libraries\\provenance.json",
+      "target": "native-library-provenance.json",
+      "bytes": 269738,
+      "sha256": "2473cf64e746757cc68d3e3dece4805ec1d0183d4ff2b0239044a48a6ae69e3d"
+    },
+    {
+      "source": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-ui-native-refresh-01\\native-artifacts\\provenance.json",
+      "target": "native-app-provenance.json",
+      "bytes": 269738,
+      "sha256": "2473cf64e746757cc68d3e3dece4805ec1d0183d4ff2b0239044a48a6ae69e3d"
+    },
+    {
+      "source": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-ui-native-refresh-01\\file-actual-G1-library-SCUI.SCL-log",
+      "target": "SCUI.log",
+      "bytes": 19,
+      "sha256": "068d8b8c3c5044c099e8134dbff66b5a4aac0543f4831a7c9f2bd496c6632b1d"
+    },
+    {
+      "source": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-ui-native-refresh-01\\file-actual-G1-library-SCUI.SCL-map",
+      "target": "SCUI.map",
+      "bytes": 45909,
+      "sha256": "48e90559099b605f9f4dc8c240045969353aad73e6174e63d6a6e2469f54bc98"
+    },
+    {
+      "source": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-ui-gui-guest-02\\ui-gui.json",
+      "target": "native-five-report-GUI-FAIL.json",
+      "bytes": 2519906,
+      "sha256": "8fcd7688107cd814687d8a1074f04bead13d08595e9efa725cb80e7af78ee9f0"
+    },
+    {
+      "source": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-ui-bootstrap\\ui-build-12.json",
+      "target": "ui-build-12.json",
+      "bytes": 62942,
+      "sha256": "a4ec1f6c19b0e77316f7a864fb8fa99aefb88f897523ef3e3d0c2506f7b37d4e"
+    },
+    {
+      "source": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-ui-bootstrap\\fs\\SYS\\CORE\\CORE.SKM",
+      "target": "CORE-build12.SKM",
+      "bytes": 507120,
+      "sha256": "fbd014ba80543deaf052faf63c861a1e46e31ca2c58771bfb1a22beb5fdbc091"
+    },
+    {
+      "source": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-ui-bootstrap\\core.elf",
+      "target": "core-build12.elf",
+      "bytes": 574484,
+      "sha256": "e0dc412efc07c747c8dbf6f1f49ee31517ad7f5f92d8c614f9c982004c71bb7f"
+    },
+    {
+      "source": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-ui-bootstrap\\core.sym",
+      "target": "core-build12.sym",
+      "bytes": 51673,
+      "sha256": "fafbac34a8eaa6bbadc62e0c908b3a9305f9fe46ae4604dfda0f7b715d099f0f"
+    }
+  ]
+}

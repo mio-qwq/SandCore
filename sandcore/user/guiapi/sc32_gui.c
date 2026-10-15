@@ -277,33 +277,41 @@ static ScStatus gui_require(sc32_gui_record **record,ScWindow window,ScU32 selec
     *record=gui_live(window);return *record?SC32_OK:gui_error(SC32_E_STALE,selector);
 }
 
-ScStatus ScWindowCreate(const ScWindowDesc *desc,ScWindow *out)
+static ScStatus gui_create_common(const ScWindowDesc *desc,ScWindow *out,const Sc32PopupCreate *popup)
 {
-    if(gui_stopping)return gui_error(SC32_E_BUSY,SC32_GUI_CREATE);
-    ScStatus checked=sc32_out(out,4);if(checked<0)return gui_error(checked,SC32_GUI_CREATE);
-    checked=sc32_record_in(desc,sizeof(ScWindowDesc));if(checked<0)return gui_error(checked,SC32_GUI_CREATE);
+    ScU32 selector=popup?SC32_GUI_POPUP_CREATE:SC32_GUI_CREATE;
+    if(gui_stopping)return gui_error(SC32_E_BUSY,selector);
+    ScStatus checked=sc32_out(out,4);if(checked<0)return gui_error(checked,selector);
+    checked=sc32_record_in(desc,sizeof(ScWindowDesc));if(checked<0)return gui_error(checked,selector);
     ScWindowDesc value=*desc;
     for(ScU32 i=0;i<4;i++){
-        if(value.reserved[i])return gui_error(SC32_E_INVALID,SC32_GUI_CREATE);
+        if(value.reserved[i])return gui_error(SC32_E_INVALID,selector);
     }
-    if(value.style&~127u)return gui_error(SC32_E_INVALID,SC32_GUI_CREATE);
-    checked=sc32_string(value.title,127,0);if(checked<0)return gui_error(checked,SC32_GUI_CREATE);
+    if(value.style&~127u)return gui_error(SC32_E_INVALID,selector);
+    checked=sc32_string(value.title,127,0);if(checked<0)return gui_error(checked,selector);
     if(value.procedure){
         checked=sc32_probe((const void *)value.procedure,1,SC32_WIRE_READ);
-        if(checked<0)return gui_error(checked,SC32_GUI_CREATE);
+        if(checked<0)return gui_error(checked,selector);
     }
     sc32_gui_record *parent=value.owner_window?gui_live(value.owner_window):0;
-    if(value.owner_window && (!parent || parent->generation!=value.owner_generation))return gui_error(SC32_E_STALE,SC32_GUI_CREATE);
-    if(!value.owner_window && value.owner_generation)return gui_error(SC32_E_INVALID,SC32_GUI_CREATE);
+    if(value.owner_window && (!parent || parent->generation!=value.owner_generation))return gui_error(SC32_E_STALE,selector);
+    if(!value.owner_window && value.owner_generation)return gui_error(SC32_E_INVALID,selector);
     sc32_gui_index_undo undo;
-    sc32_gui_record *record=gui_new_record(&undo);if(!record)return gui_error(SC32_E_MEMORY,SC32_GUI_CREATE);
+    sc32_gui_record *record=gui_new_record(&undo);if(!record)return gui_error(SC32_E_MEMORY,selector);
     gui_hold(record);
     Sc32WindowCreate request;sc32_zero(&request,sizeof(request));request.size=64;request.version=1;request.title=(ScU32)value.title;
     request.x=value.x;request.y=value.y;request.client_width=value.client_width;request.client_height=value.client_height;
     request.style=value.style;request.owner_window=value.owner_window;request.owner_generation=value.owner_generation;
-    Sc32WindowRef ref={16,1,0,0};ScI32 raw=gui_call(SC32_GUI_CREATE,&request,&ref);
-    if(raw){gui_leave(record);gui_free_record(record);gui_index_finish(&undo,0);return gui_result(raw,SC32_GUI_CREATE);}
-    if(!ref.window || !ref.generation){gui_leave(record);gui_free_record(record);gui_index_finish(&undo,0);return gui_error(SC32_E_FAILED,SC32_GUI_CREATE);}
+    Sc32WindowRef ref={16,1,0,0};ScI32 raw=gui_call(selector,popup?(const void *)popup:(const void *)&request,&ref);
+    if(raw){gui_leave(record);gui_free_record(record);gui_index_finish(&undo,0);return gui_result(raw,selector);}
+    if(!ref.window || !ref.generation){gui_leave(record);gui_free_record(record);gui_index_finish(&undo,0);return gui_error(SC32_E_FAILED,selector);}
+    if(popup && value.procedure){
+        /* 新popup先取得隐藏kernel候选和R3元数据，失败几何/OOM不会
+         * 凭空固定模块。正式pin成功才进入用户CREATE过程。已真正
+         * 执行的callback按公开固定到进程退出合同保留代码寿命。 */
+        checked=ScCallbackPin((const void *)value.procedure);
+        if(checked){(void)gui_call(SC32_GUI_DESTROY,&ref,0);gui_leave(record);gui_free_record(record);gui_index_finish(&undo,0);return checked;}
+    }
     record->window=ref.window;record->generation=ref.generation;record->state=GUI_CREATING;
     record->procedure=value.procedure;record->context=value.context;record->create_seen=1;
     gui_index(record);gui_link_owner(record,parent);
@@ -312,9 +320,10 @@ ScStatus ScWindowCreate(const ScWindowDesc *desc,ScWindow *out)
     create.tick=(ScU32)sc32_call(2,0,0,0,0,0,0);
     create.data[0]=value.client_width;create.data[1]=value.client_height;create.data[2]=value.style;
     create.data[3]=value.owner_window;create.data[4]=value.owner_generation;
+    if(popup)create.data[5]=popup->kind;
     ScStatus callback=gui_invoke(record,&create);
     ScStatus failure=callback;
-    int native_failure=0;ScU32 failure_selector=SC32_GUI_CREATE;
+    int native_failure=0;ScU32 failure_selector=selector;
     if(record->state==GUI_RETIRED)failure=SC32_E_CANCELLED;
     else if(!failure){checked=sc32_out(out,4);if(checked<0)failure=checked;}
     if(!failure){raw=gui_call(SC32_GUI_ACTIVATE,&ref,0);if(raw){failure=raw;native_failure=1;failure_selector=SC32_GUI_ACTIVATE;}}
@@ -326,10 +335,12 @@ ScStatus ScWindowCreate(const ScWindowDesc *desc,ScWindow *out)
             else{failure=raw;native_failure=1;failure_selector=SC32_GUI_DESTROY;}
         }
         gui_leave(record);gui_index_finish(&undo,0);
-        return native_failure?gui_result(failure,failure_selector):gui_error(failure,SC32_GUI_CREATE);
+        return native_failure?gui_result(failure,failure_selector):gui_error(failure,selector);
     }
     record->state=GUI_ACTIVE;*out=ref.window;gui_leave(record);gui_index_finish(&undo,1);return 0;
 }
+ScStatus ScWindowCreate(const ScWindowDesc *desc,ScWindow *out)
+{return gui_create_common(desc,out,0);}
 ScStatus ScWindowDestroy(ScWindow window)
 {
     if(gui_stopping)return gui_error(SC32_E_BUSY,SC32_GUI_DESTROY);

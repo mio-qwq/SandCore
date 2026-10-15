@@ -9,3 +9,8 @@ static void sc32_gui_finalize(void);
 #include "sc32_objects.c"
 #include "sc32_file.c"
 #include "../guiapi/sc32_gui.c"
+#include "../guiapi/sc32_popup.c"
+#include "../fontapi/sc32_font.c"
+#include "../fontapi/sc32_palette.c"
+#include "../brokerapi/sc32_broker.c"
+#include "../dropapi/sc32_drop.c"

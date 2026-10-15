@@ -1,0 +1,32 @@
+{
+  "exports": [
+    {
+      "name": "ScDropAt",
+      "kind": "function"
+    },
+    {
+      "name": "ScDropCancel",
+      "kind": "function"
+    },
+    {
+      "name": "ScDropComplete",
+      "kind": "function"
+    },
+    {
+      "name": "ScDropConnect",
+      "kind": "function"
+    },
+    {
+      "name": "ScDropRegister",
+      "kind": "function"
+    },
+    {
+      "name": "ScDropUnregister",
+      "kind": "function"
+    },
+    {
+      "name": "ScDropValidate",
+      "kind": "function"
+    }
+  ]
+}

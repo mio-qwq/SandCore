@@ -1,0 +1,4 @@
+ls /HOME/M10UI/HOST; _m9_status=$?; printf "\n"; echo __M9_62437b1e842c006fdc9d34b1:$_m9_status
+PLATFORMPROBE.SCX
+SCUIDEMO.SCX
+SCUITEXT.SCX

@@ -68,3 +68,12 @@ void sc32_raw_mouse(i32 x,i32 y,u32 buttons,u32 modifiers)
     if(buttons!=raw_mouse_buttons)event.flags=SC32_RAW_BUTTON_EDGE;
     raw_mouse_buttons=buttons;append(&event);
 }
+void sc32_raw_wheel(i32 x,i32 y,i32 vertical,i32 horizontal,u32 buttons,u32 modifiers)
+{
+    if(!vertical && !horizontal)return;
+    /* 固定64B事实中kind独立解释physical/symbol为有符号轮量；不改
+     * KEY/MOUSE字段意义。轮包本身是顺序屏障，不能被普通MOVE合并。 */
+    Sc32RawEvent event={0};event.kind=SC32_RAW_WHEEL;event.x=x;event.y=y;
+    event.physical=(u32)vertical;event.symbol=(u32)horizontal;
+    event.buttons=buttons;event.modifiers=modifiers;append(&event);
+}

@@ -1,0 +1,6 @@
+ACTUAL_MAIN_SOURCE=TMP/UICHECK/SRC/scui/SCUI.C OUTPUT=HOME/SCUI.SCL
+SCCC: preprocess -> C -> x86
+SCCC OK SCL NATIVE
+Compilation complete
+ROOTLESS_RESOLVE_CALLS=3 RESULT=0 tokens=161412 source=651097 code=555901 data=707 bss=52 fixes=4491 macros=302
+SCCC_HOST_CAPACITY types=2806 symbols=7659 params=3007 nodes=1 fixes=4491

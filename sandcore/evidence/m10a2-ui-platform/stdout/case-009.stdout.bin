@@ -1,0 +1,9 @@
+/TMP/UI-dc2aea/SCCC0.SCX /TMP/UI-dc2aea/SRC/sccc.c /HOME/M10UI/COMPILER/SCCC1.SCX; _m9_status=$?; printf "\n"; echo __M9_8f9f8cc12f9072e2eb67506f:$_m9_status
+SCCC / mio
+TMP/UI-dc2aea/SRC/sccc.c -> HOME/M10UI/COMPILER/SCCC1.SCX
+SCCC: preprocess -> C -> x86
+Preprocessing source and includes
+Parsing C and generating x86
+Linking and writing SCX
+SCCC OK load=242538 bss=2602680 / mio
+Compilation complete

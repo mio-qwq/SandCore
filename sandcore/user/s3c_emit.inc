@@ -28,7 +28,7 @@ static int label_find(int name)
 }
 static void byte(int value)
 {
-    if(code_used>=CODE_MAX) fatal("machine code capacity exceeded");
+    if(code_used>=code_capacity)capacity_fatal("machine code",(u32)code_used,1u,(u32)code_capacity);
     code[36+code_used++]=(u8)value;
 }
 static void dword(u32 value) { for(int i=0;i<4;i++) { byte((int)(value&255));
@@ -214,7 +214,32 @@ static void address(int node)
     else if(n->kind==N_STRING) { byte(0xB8);
         fixed(F_DATA,shared_output?n->value:0,shared_output?0:n->value,code_used);
         dword(0); }
+    else if(abi_aggregate(n->type))emit_expression(node);
     else fatal("code generation needs an addressable object");
+}
+static int aggregate_result_slot(Node *node)
+{
+    /* 每个实际求值的call/va_arg拥有独立栈槽；sizeof中的未求值call
+     * 不分配，也不要求全局表达式有函数帧。借用地址不随ESP的临时
+     * 压参移动，嵌套调用/成员读取/赋值/return可稳定持有这份结果。
+     * prologue的SUB立即数最后统一回填，不放大32B Node或静态BSS。 */
+    if(!node->c){
+        int width=abi_stack_bytes(node->type);
+        if(!function_symbol || width>65536-local_bytes)fatal("aggregate result exceeds 64KB local frame");
+        local_bytes+=width;node->c=-local_bytes;
+    }
+    return node->c;
+}
+static void copy_aggregate(int bytes)
+{
+    /* EAX来源/EDX目的，仅复制sizeof字节，不越过奇数字节尾端。
+     * 只为新按值ABI使用这条有界机器复制，旧store_value保持原字节。
+     * 保存ESI/EDI、返回原目的地址；内部栈完全恢复，不借libc。
+     * cdecl保证DF清；显式CLD使内联汇编后也不反向复制。 */
+    byte(0x56);byte(0x57);byte(0x52);
+    move_reg(6,0);move_reg(7,2);immediate(1,(u32)bytes);
+    byte(0xFC);byte(0xF3);byte(0xA4);
+    byte(0x58);byte(0x5F);byte(0x5E);
 }
 static int compound_operator(int op)
 {
@@ -458,19 +483,39 @@ static void emit_expression(int node)
         /* 参数树按源码顺序倒链，恰好对应 cdecl 从右往左压栈。
          * 间接目标先入栈，求参数不会破坏函数指针；CALL 后一并平衡。 */
         int direct=nodes[n->a].kind==N_SYMBOL && symbols[nodes[n->a].value].kind==S_FUNCTION;
+        int returned=abi_aggregate(n->type),argument_bytes=0;
+        if(returned)aggregate_result_slot(n);
+        for(int arg=n->b;arg;arg=nodes[arg].b){
+            int width=abi_stack_bytes(nodes[arg].type);
+            if(width>65536-argument_bytes)fatal("call arguments exceed 64KB stack block");
+            argument_bytes+=width;
+        }
         if(!direct) { emit_expression(n->a);
             byte(0x50); }
-        for(int arg=n->b;arg;arg=nodes[arg].b) { emit_expression(nodes[arg].a);
-            byte(0x50); }
+        for(int arg=n->b;arg;arg=nodes[arg].b) {
+            int type=nodes[arg].type;
+            emit_expression(nodes[arg].a);
+            if(abi_aggregate(type)){
+                int width=abi_stack_bytes(type),size=types[type].size;
+                byte(0x81);byte(0xEC);dword((u32)width);move_reg(2,4);
+                copy_aggregate(size);
+                /* ABI末槽padding不是来源对象，不读取size之外的字节。 */
+                for(int i=size;i<width;i++){byte(0xC6);memory(0,4,i);byte(0);}
+            }else byte(0x50);
+        }
+        if(returned){byte(0x8D);memory(0,5,n->c);byte(0x50);}
         if(direct) { byte(0xE8);
             fixed(F_REL,nodes[n->a].value,0,code_used);
             dword(0); }
         else { byte(0x8B);
-            memory(0,4,n->value*4);
+            memory(0,4,argument_bytes+(returned?4:0));
             byte(0xFF);
             byte(0xD0); }
-        stack_add(n->value*4+(direct?0:4));
-        if(types[n->type].kind==TY_BOOL){
+        /* SysV i386 callee用RET4只弹hidden pointer；普通参数与保存
+         * 的indirect目标由caller清理。不能再弹一次hidden而漂移ESP。 */
+        stack_add(argument_bytes+(direct?0:4));
+        if(returned){byte(0x8D);memory(0,5,n->c);}
+        else if(types[n->type].kind==TY_BOOL){
             /* i386外部bool返回只保证AL；不能拿未定义的EAX高字判断真。 */
             byte(0x0F);byte(0xB6);byte(0xC0);
         }else cast_value(n->type);
@@ -990,7 +1035,8 @@ static void emit_statement(int node)
         jump_link(continue_jumps+depth);
     } else if(kind==N_RETURN) {
         emit_expression(n->a);
-        cast_value(n->type);
+        if(abi_aggregate(n->type)){byte(0x8B);memory(2,5,8);copy_aggregate(types[n->type].size);}
+        else cast_value(n->type);
         jump_link(&return_jumps);
     } else if(kind==N_LABEL) {
         int label=label_find(n->value);
@@ -1010,7 +1056,10 @@ static void hex_text(char *out,u32 value)
 static void map_function(int symbol,int address_value,int where)
 {
     char row[160],hex[9],line[12];
-    hex_text(hex,(u32)address_value);
+    /* SCL函数行与EXPORT共用RVA域；旧SCX/SCD函数行仍为绝对VA。 */
+    u32 mapped=(u32)address_value;
+    if(shared_output)mapped-=BASE;
+    hex_text(hex,mapped);
     decimal(line,where&65535);
     copy(row,hex,sizeof(row));
     append(row," ",sizeof(row));
@@ -1022,7 +1071,7 @@ static void map_function(int symbol,int address_value,int where)
     append(row,line,sizeof(row));
     append(row,"\n",sizeof(row));
     int size=length(row);
-    if(map_used+size>=(int)sizeof(map_text)) fatal("symbol map capacity exceeded");
+    if(map_used+size>=(int)sizeof(map_text))capacity_fatal("symbol map",(u32)map_used,(u32)size,(u32)sizeof(map_text));
     for(int i=0;i<size;i++) map_text[map_used++]=row[i];
     map_text[map_used]=0;
 }
@@ -1038,7 +1087,8 @@ static void emit_function(int symbol,int body)
      * 调用其它函数不会破坏保留值：对方同样遵守此cdecl规则；
      * 普通间接函数、递归、异常恢复和系统调用继续原调用边界。
      * 后续若引入寄存器分配须同步扩使用掩码，此证明只适用于
-     * 当前仅EAX/ECX/EDX的生成器，不把“没asm”永久等同“不使用”。 */
+     * 当前常规临时寄存器为EAX/ECX/EDX；新聚合复制单独保存ESI/EDI，
+     * 不把“没asm”永久等同“不使用”。 */
     int preserve=0;
     for(int i=1;i<node_count;i++)if(nodes[i].kind==N_ASM)preserve=1;
     symbols[symbol].value=code_used;
@@ -1050,10 +1100,13 @@ static void emit_function(int symbol,int body)
     move_reg(5,4);
     byte(0x81);
     byte(0xEC);
+    int frame_size_at=code_used;
     dword((u32)local_bytes);
     if(preserve){byte(0x53);byte(0x56);byte(0x57);}
     emit_statement(body);
-    immediate(0,0);
+    int aggregate_return=abi_aggregate(types[symbols[symbol].type].base);
+    if(aggregate_return){byte(0x8B);memory(0,5,8);}
+    else immediate(0,0);
     patch_chain(return_jumps,code_used);
     for(int i=0;i<label_count;i++) {
         if(label_targets[i]<0) fatal("goto target label is undefined");
@@ -1061,7 +1114,9 @@ static void emit_function(int symbol,int body)
     }
     if(preserve){byte(0x5F);byte(0x5E);byte(0x5B);}
     byte(0xC9);
-    byte(0xC3);
+    if(aggregate_return){byte(0xC2);byte(4);byte(0);}
+    else byte(0xC3);
+    put32(code+36+frame_size_at,(u32)local_bytes);
     if(shared_output || dynamic_output)scl_symbol_sizes[symbol]=code_used-symbols[symbol].value;
 }
 static void finish_image(const char *output)
@@ -1071,6 +1126,9 @@ static void finish_image(const char *output)
     int main_symbol=find_symbol(module_output?intern("skm_main",8):intern("main",4),0);
     if(!main_symbol || symbols[main_symbol].kind!=S_FUNCTION || !symbols[main_symbol].defined) fatal("main function is missing");
     if(types[symbols[main_symbol].type].count!=(module_output?1:0)) fatal("SCX main takes no parameters; SKM skm_main takes API pointer");
+    if(abi_aggregate(types[symbols[main_symbol].type].base))fatal("SCX/SKM CRT entry cannot return an aggregate");
+    if(module_output && abi_aggregate(parameters[types[symbols[main_symbol].type].fields].type))
+        fatal("SKM CRT API parameter cannot be an aggregate value");
     int text_end=(code_used+3)&~3;
     if(data_used>CODE_MAX-text_end) fatal("SCX initialized image capacity exceeded");
     int load=text_end+data_used;
@@ -1126,7 +1184,7 @@ static void finish_image(const char *output)
         append(row,spelling(symbols[i].name),sizeof(row));
         append(row," OBJECT\n",sizeof(row));
         int n=length(row);
-        if(map_used+n>=(int)sizeof(map_text)) fatal("symbol map capacity exceeded");
+        if(map_used+n>=(int)sizeof(map_text))capacity_fatal("symbol map",(u32)map_used,(u32)n,(u32)sizeof(map_text));
         for(int j=0;j<n;j++) map_text[map_used++]=row[j];
         map_text[map_used]=0;
     }
@@ -1153,8 +1211,8 @@ static void finish_image(const char *output)
     put32(code+28,BASE);
     put32(code+32,0x004F494D);
     /* 内置图标只参与容器封装，不参与代码重定位/BSS布局；从三环文件
-     * 读取的资源也必须验证精确长度。初始化code数组仍保持旧容量，
-     * 可选较大容器放高端堆，避免自举编译器BSS逼近4MB私有映像上限。 */
+     * 读取的资源也必须验证精确长度。旧SCX的load仍受CODE_MAX约束，
+     * 可选较大容器另放高端堆；图标不占loader的262144B载荷暂存。 */
     int image_bytes=36+load;
     u8 *container=code;
     if(icon_path[0]){

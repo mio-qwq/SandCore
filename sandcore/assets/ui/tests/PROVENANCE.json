@@ -1,0 +1,27 @@
+{
+  "version": "15.1.0",
+  "inputs_unchanged": true,
+  "guest_executed": false,
+  "outputs": [
+    {
+      "path": "GRAPHEME.SCT",
+      "kind": 1,
+      "cases": 1187,
+      "bytes": 36152,
+      "sha256": "bd119034a78d1eae559d0e47ca964746f6e2c7b8c5de705c2069310495dd1eb1",
+      "original": "GraphemeBreakTest.txt",
+      "original_sha256": "ed9c5e92fd0911ccbeeb63c97cb19c519ea272ff1112ce843abd991582dd848f",
+      "expected_boundaries_source": "Official divide/multiply markers, no implementation-derived expectations"
+    },
+    {
+      "path": "WORD.SCT",
+      "kind": 2,
+      "cases": 1826,
+      "bytes": 58936,
+      "sha256": "c4e4a90ff8945bb6f4f31004881ccb7ecf885df61610a49f24c06a59cbb65ca4",
+      "original": "WordBreakTest.txt",
+      "original_sha256": "69506b2253b8defb1f15b1476397376285cfda3bafd9304ee50d48bbfa0a2ab4",
+      "expected_boundaries_source": "Official divide/multiply markers, no implementation-derived expectations"
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+make BUILD=build/m10a2-ui-bootstrap M9_BUILD=1 M10_BUILD=1 build/m10a2-ui-bootstrap/sandcore.img build/m10a2-ui-bootstrap/fs/SYS/CORE/CORE.SKM build/m10a2-ui-bootstrap/fs/bin/sccc.scx m10a2-ui-artifacts m10a2-ui-resources
+make[1]: Entering directory '/mnt/c/Users/Administrator/Desktop/projectos/sandcore'
+make[1]: 'build/m10a2-ui-bootstrap/sandcore.img' is up to date.
+python3 tools/mkcore_public_key.py --public-key "assets/trust/M10-OWNER-ED25519.PUB" --out build/m10a2-ui-bootstrap/core_public_key.h
+make[1]: 'build/m10a2-ui-bootstrap/fs/bin/sccc.scx' is up to date.
+gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -fno-exceptions -fno-leading-underscore -Ibuild/m10a2-ui-bootstrap -msoft-float -mno-sse -mno-mmx -MMD -MP -O2 -Wall -Wextra -minline-all-stringops -minline-all-stringops -DM10_DISK_CORE=1 -mincoming-stack-boundary=2 -mpreferred-stack-boundary=4 -Werror -x c -Iuser/stdlib -Iuser -c tests/m10a2/AGGPROBE.C -o build/m10a2-ui-bootstrap/aggregate-probe.o
+make[1]: Nothing to be done for 'm10a2-ui-resources'.
+python3 tools/mkdscx.py build/m10a2-ui-bootstrap/aggregate-probe.o build/m10a2-ui-bootstrap/AGGPROBE.SCX --manifest tests/m10a2/AGGPROBE.json
+HOST_BOOTSTRAP AGGPROBE.SCX: 2548 bytes, 2 dependencies, 10 imports, 20 dynamic relocations
+make[1]: Leaving directory '/mnt/c/Users/Administrator/Desktop/projectos/sandcore'

@@ -805,3 +805,39 @@ native-guest-01真实重复RESOLVE失败与代码保留，已按原ROOTLESS ABI�
 2026-10-14持续目标：用户明确设立完整目标直到完全完成M10a2，工具goal已active，无自行推断预算。动态SCX/SCD1/自动64B CRT与固定Ring3 SCLDR根已构建并由dynamic-guest-02真实通过30步骤：SCCC0/G1动态编译与执行、两并发进程隔离、init共享ctx、根代码RO/#PF回调EXIT14与暖页8872→8872、版本/缺库/CRT重定位和SYS/LIB覆盖拒绝、旧SCX和原盘保持。源/产物/1920×1080截图在evidence/m10a2-dynamic；安装根来自HOST GCC，客体生成原生根45989B只格式通过尚未执行。第一次错误等待未注册回调的故障暂停保留，修正测试私有库回调；仅失败盘清理269910016B。
 
 下一项SC32API首批公共头/私有桥/错误与typed queries，随后新消息窗口/输入/paint、真实更新file对象，再SCCLIB/SCLIB/SCUI与Desktop/Shell/Files2/Studio2/Debug2及其余应用/SDK/性能统一验收。SC32新源仍未验证。Ownership详见M10A2-IMPLEMENTATION：SC32公共/用户库由sc32_contract_audit；core/timer由dynamic_boot_kernel；file/fs增量由dynamic_scx_toolchain；主代理task分发/整合/构建/验证。全部max；会话中断后必须核对真实工作树与摘要，不能假定后台继续。不得因平台部分PASS把完整goal标complete。
+
+
+2026-10-15当前接力：P3真实标准/通用库与R1退出出口已随f632708推送main，精确失败盘清理随d8e6ed0推送。Phase4新源持续：Root内核Font/Palette/Popup/Cursor/Wheel/Broker/Shared/Drop及task/paging/session已接；SC32 ABI1.2/v3共130导出，Drop144B包括真实源PID/gen核IPC peer。SCUI157及DEMO/双进程PLATFORMPROBE尚静态收尾；Compiler容量四文件冻结，Source1M/Token3M/Pool2M/SCLCode1M/map128K真实heap，旧SCX载荷限制保留。Unicode15.1数据/完整许可和官方3013边界oracle已生成/登记，SCUITEXT实际库调用正文已写。独立ui-bootstrap目标/来源记录入口已写，整批未构建/运行；源码全冻结后统一验证。完整M10a2 goal active，Sol+max四槽，未缩减Desktop/Shell/Files2/Studio2/Debug2/全部主要组件/SDK；.zcodeignore不纳入，原盘/P3源/证据保持，M8不重启，不创建Release。
+
+
+2026-10-15更新：实际ui-build-04已exit0/source_modified=[]/45.7486秒，CORE507120B/payload506992/BSS374600；SC32API138410(130exp)、SCUI328844(157exp/137imp)、Demo36388/119imp、Platform26148/Text2724、SCCC0 load128937。Windowsui-platform-guest-01真实普通MIO父子SID4全87行为PASS，但整体FAIL仅PF9007→9008且wait_pages0→1；所有新broker/drop池已归零，原日志/输出/截图/磁盘保留。其有限wait heap是旧源码只保留1页的缓存；driver已追加真实count/capacity/heap/PFbitmap观测，严格首冷0→1/count0/cap32才记归属，不追溯guest01PASS。
+
+2026-10-15再接续：build05退出0/37.1932秒/source_modified=[]，CORE同04；SCUI330264B/158入口，Demo43332B/133imports。guest02普通平台+精确页账、官方3013边界+页账通过，首次wait空cache→allocated1页/count0/cap32已证实，unexplained=0；SCCC0→实际G1（235570B/load235534/BSS2193080）→native SC32API103863B成功，native未安装/执行。全轮FAIL为G1→SCUI ui_data.c:815复合字面量语法，原日志/JSON/截图保留，source/original皆unchanged，VM已结束。controls owner仅兼容改三片段24处并补有限隐藏计量；core owner仅追加真实VISIBILITY事件37（不改旧enum/158出口），已冻结H/dispatch/doc。Root新增真实SCCC宿主语法预检工具，待同批源全部冻结→build06→四输入host预检→新客体闭环。gui主控仍收尾；各agent均Sol+max。
+
+Phase5仅SCSHELL-DESIGN/IMPLEMENTATION两新文档已冻结，真实可信host/发现、文件lease条件事务和session-lifetime launch仍NOT_IMPLEMENTED；Files2/Studio2/Debug2及余组件、SDK与完整验收均继续，目标active。勿将平台或官方文本子结果称SCUI/整个M10a2完成，勿擅改.zcodeignore、创建Release、读私钥或重启M8。
+
+2026-10-15最新恢复点：完整目标仍active，HEAD仍main d8e6ed0（P4未提交，.zcodeignore未动）。build11当前成功；host05六输入真实emitter通过（绑定build10，非执行），SCUI symbols7659/types2806/params3007/fixes4491，SYMBOL_MAX实际6144不足后仅升16384；compiler源码最新冻结，aggregate参数/hidden-sret及SCLMAP RVA已落。Windowsplatform-guest-04完整DECLARED_PLATFORM_TEXT_G1_FIRST_ROUND_PASS/source与原盘守恒；实际G1 load242538/BSS2602680、两个方向55checks含callback/varargs/stack delta0和回收通过，G1生成SC32/SCUI/三app并运行原生平台/3013文本。guest03唯一stack断言假失败为check已压入右侧参数，Root改两次同initializer位置，保失败报告、不改compiler行为。
+
+ui-gui-guest-01五份真实native库安装并get核对，普通native-five平台和3013文本及owner账均PASS；整体FAIL为Demo Startup Editor/DropTarget -301/cause-101，尚无真正SCUI界面截图。原因已静态确定：ui_data.c endpoint ACL_SESSION未填allowed_session，被br_ipc_create拒；默认ACL已严格同SID/主体。VM已结束、失败日志/PNG/JSON保持，不宣称GUI通过。controls owner现在只解冻ui_data.c默认ACL/零handle清理/原cause保留及窄doc；compiler owner只写新refresh_m10a2_ui_native.py/UI-NATIVE-REFRESH.md，严格复用guest04不变源码闭包的G1/SC32/Apps/已验ABI，仅单VM由真实G1重新生成修复SCUI并输出可读新provenance，避免重跑已验全批；源码收齐Root再统一build/refresh/GUI。core owner只拥有evidence/m10a2-ui-platform小检查点目录，正在存guest04和必要fail/native bytes，不复制盘/VFS或P3库，不删除。所有subagent Sol+max；Root拥有现tools/构建/主控/验收。
+
+GUI helper已加强真实全文/选区/revision/本次Drag日志和身份断言，scui_workflow SHA19ecdb675ecce93a492c33b31707a39390f290387606cdca2b9520c367f98b30；大GUI脚本Root仅更新aggregate执行边界与拒读目录AUTH，仍未完整实际运行。FILES2-DESIGN及STUDIO2-DEBUG2-DESIGN只设计，无新App实现；Phase5/6/7完整范围继续，不能在此关闭目标。
+
+以下两段仅为build04时期的历史接续，已由上面的build11/GUI01真实状态取代，不能照此重启旧轮。
+
+历史下一动作：GUI必要观测缺口由controls owner只扩Demo F12真实metrics/theme/editSelection/所有live root及dialog subtree/publicname texthex、真实View100/150/200DisplayApply保mode；core owner补真正ScUiContextRootNext本context O(1)链枚举，after0首/END/失效STALE（158th API），无ID轮询/无private ptr。这两项源码尚在写，完成后Root统一ui-build-05，不能用04旧摘要冒充新Demo/UI。sc32_contract_audit同时写verify_m10a2_ui_gui.py，native5库安装来源=当前真实G1 SC32/SCUI +已执行P3原生ROOT/STD/UTIL；phase1driver本轮不启动GUI。
+
+第一轮driver新冻结SHA f162c98c998c167a92796ca0269b281ff92bb3805fdc42cc7ed9ddafd14f4c36，待05后Windows执行out build/m10a2-ui-platform-guest-02，依次真实普通platform/官方3013Corpus/SCCC0→新G1→完整2SCL/3APP→实际G1 caller；生成库未安装必须分列。Root新scui_input.py和scui_workflow.py只写真PS2/HMP/F12检查，尚未运行；GUI主控据真实日志及失败逐项修，必要两主题/DPI/dialog/拖放/隐藏/回收门槛保留。vm/session6221已失败正常结束，无QEMU后台假定；build93449已exit0。最新Git仍main d8e6ed0，所有Phase4 source/tool/docs在工作树未commit；.zcodeignore不纳入。所有live/后续subagents Sol+max，完整Goal active，不标complete/paused/blocked，不创建Release，不缩减Desktop/Shell/主要Apps/SDK。
+
+2026-10-15最新实际接续（覆盖前述历史下一动作）：ui_data.c端点默认严格SID/subject ACL与错误保存修复已freeze，SHA d73dc2c8ef3ffafb2bcc493aace143bc7fd59c65fb0872d9dc28e4e3b252e1bd；SCUI-DEMO doc c3a34333…fff8。build12退出0/39.6878秒/source_modified=[]；与build11逐项diff只有该input与HOST SCUI.SCL output变化（330816B，158/137）。其余CORE/ELF/SYM/SCCC0/库/App/AGG/Unicode全部原byte。构建session12203已exit0，当前无运行QEMU；GUI01整轮FAIL/source原盘不变已重新实核。Root仅GUI tool增加READY或实际ERROR/早退同时等待，避免90秒伪超时。
+
+单库refresh工具与doc由dynamic_scx_toolchain仍真实running开发，sc32_contract_audit只读review其origin/闭包/新snapshot分离；当前尚未冻结/运行，等待同句柄/同ownership，不重启旧guest04完整矩阵。核心GUI readerRoot独占，需按明确source_reuse.schema1承接旧证+fresh SCUI。完整第一轮小检查点已经落evidence/m10a2-ui-platform（76文件5462735B），尚未P4 commit/push。完整M10a2 active，后续P5/P6/P7仍必须实现与验收。
+
+最新接续覆盖该“仍开发”段：refresh工具已freeze58bb3cb8cfaec145accdbae86c0ea8ae4897159c2b0dc2d15fc6f23cdfd846b0，Doc a1e38c95…8ada。Root窄接GUI reader真实旧origin/闭包/REUSED_PASS与旧运行库来源，再由dynamic_boot_kernel接管GUI工具/原owned source及实际执行，Root不并发写这些。refresh01 session92915/QEMU17180已实际exit0/VM结束，只旧真G1编当前SCUI；新nativeSCUI656796B SHA5de54249fea6cbdf65d4a083e2a254045585706193833e611b6cfe224e635950，158/137及页账/源/原盘保持通过；平台/text/ABI旧证明确REUSED未重跑。
+
+GUI02整体FAIL仍保存：五native平台/text实际PASS，Demo已真实READY/SNAPSHOT，但Root新fastfail模式错误双反斜且异步READY紧接SYSTEM提示符，等待误超时。执行agent仅修该两个regex（正确换行+真实行首prompt前缀），授权窄reuse-native-checks仅取GUI02两组PASS+owner原证且精确same-byte/same-runtime来源，不把旧PID/页账当本VM，下一GUI03全真实UI行为；截图质量/裁剪/DPI仍待。Root未认为任何GUI已PASS。
+
+并行独立源码：sc32_contract_audit仅新tools/stage_m10a2_sdk.py、docs/M10A2-SDK.md、examples/m10a2-sdk（不运行、不改现输入）；dynamic_scx_toolchain仅drafts/m10a2-shell-fs隔离真实租约后端/handler/wrappers+integration.patch，现user/kernel不改。Root读完SC32LEASE.H/WIRE/ABI并核64/96/48/32/40/128/160布局，认可700..70a新SYS300 selectors，要求private header正确leaseapi层级、parent READONLY不授权写/sequence续进/真实关闭强pin与不明提交；body继续，draft不算P5完成。尚无host/desktop/SCSHELL/主要新Apps实现，完整范围不变。SDK ROOT头按RUNTIME/SCLDR.H保持原字节和../SCTYPES层级，不造扁平假include。
+
+2026-10-15恢复检查点更新：P4当前build12/refresh01/native-five平台与3013文本真实子PASS；GUI03/04纯宿主解析失败已留证，GUI05首次真正show普通SID时发现现代F12被旧wm登录入口截走，真实GUI仍FAIL。当前无live QEMU，下一步Root仅修wm.c focused-modern F12分支→统一构建→现GUI owner续真实流程。GUI三工具及SCUI-DEMO文档仍由dynamic_boot_kernel独占；Root准备提交当前平台/编译器/证据快照（不含这些活动工具、Phase5隔离草稿、SDK或.zcodeignore）。原API SHA81a73045…冻结。
+
+Phase5现在已有隔离实际源码，未集成/构建/运行：drafts/m10a2-shell-fs由dynamic_scx_toolchain完成lease/条件发布/删除后端；drafts/m10a2-shell-host由Root写session-lifetime启动、可信普通身份固定host启动/owner池/发现及gate/R3桥，WM专层由sc32_contract_audit在SDK源码收齐后接手。Release0必须最终free，成功后STALE，无tombstone/FORGET；可信角色不来自UID/文件名/IPC名。SDK所有者仍只新stager/实例/doc，不改当前UI输入。全部Sol+max，完整目标active。

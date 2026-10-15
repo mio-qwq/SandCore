@@ -60,6 +60,7 @@ u8 *task_loader_stage(u32 bytes);
 void task_stop(int pid);            /* 关窗口并置僵尸，下次调度安全回收 */
 void task_cleanup_poll(void);       /* 仅主循环IF=0：分阶段撤引用，再允许僵尸页回收。 */
 int task_cleanup_pending(void);
+int task_cleanup_blocks_user(void);
 int task_pid(void);                 /* 当前调用者；用户不能通过寄存器伪造身份 */
 u32 task_generation(int pid);       /* 内部只读代数，跨异步票据防PID复用 */
 /* mio：仅可信零环在IF=0调用。hold=1固定当前任务/CR3与共享画布

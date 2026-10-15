@@ -1,7 +1,7 @@
 /* =====================================================================
  *  SandCore PS/2 鼠标驱动 (kernel/mouse.c)
  *  ---------------------------------------------------------------------
- *  【协议】鼠标包固定 3 字节, 从 8042 控制器 (0x60) 依次读出:
+ *  【协议】默认3字节；真正协商ID3/4才改4字节，从8042依次读出:
  *    B0: bit0 左键 bit1 右键 bit2 中键 bit3 恒 1(同步位)
  *        bit4 X 负号  bit5 Y 负号  bit6/7 溢出(忽略)
  *    B1: X 位移 (8 位, 符号看 B0.4, 负值 = B1-256)
@@ -25,8 +25,10 @@
 static i32 mx, my;                /* 光标位置 */
 static u8  mbtn;                  /* 按键位图 */
 static u8 blocked_buttons;
-static u8  pkt[3];                /* 当前包积累 */
-static u8  cycle;                 /* 包内字节序号 0..2 */
+static u8  pkt[4];                /* 只有协商成功的轮设备才读第4字节 */
+static u8 packet_bytes=3,device_id;
+static int device_ready;
+static u8  cycle;                 /* 包内序号由真实device_id决定 */
 static u8  suppress;              /* init 期间丢弃一切数据 */
 typedef struct {i32 x,y;u8 buttons;} mouse_event_t;
 static mouse_event_t events[64];
@@ -82,6 +84,49 @@ static void ps2_wait_out(void)    /* 等输出缓冲有数据 (可读) */
 static void ps2_cmd(u8 c)  { ps2_wait_in(); outb(PS2_STAT, c); }
 static void ps2_put(u8 d)  { ps2_wait_in(); outb(PS2_DATA, d); }
 static u8  ps2_get(void)   { ps2_wait_out(); return inb(PS2_DATA); }
+static int mouse_reply(u8 *reply)
+{
+    for(u32 budget=100000;budget;budget--){
+        u8 status=inb(PS2_STAT);if(!(status&1u))continue;
+        /* 控制器配置已收完；现在非AUX字节是真实键盘输入。交原
+         * 解码器保存，不能为等待鼠标ACK把按键当回复或直接丢弃。 */
+        if(!(status&0x20u)){keyboard_isr();continue;}
+        *reply=inb(PS2_DATA);return 0;
+    }
+    return -1;
+}
+static int mouse_command(u8 command)
+{
+    ps2_cmd(0xD4);ps2_put(command);
+    u8 reply;return !mouse_reply(&reply) && reply==0xFA?0:-1;
+}
+static int mouse_rate(u8 rate)
+{return mouse_command(0xF3) || mouse_command(rate);}
+static int wheel_negotiate(void)
+{
+    packet_bytes=3;device_id=0;device_ready=0;
+    /* PS/2协议的200/100/80握手与F2真实ID决定包长。不是凭QEMU名字
+     * 假定设备有轮，也不把中键/按键转换成轮事实。最后恢复100Hz，
+     * 旧x/y/buttons格式及相对totals保持；不启用额外按钮的接口承诺。 */
+    if(!mouse_rate(200) && !mouse_rate(100) && !mouse_rate(80) && !mouse_command(0xF2)){
+        u8 id;
+        if(!mouse_reply(&id) && (id==0 || id==3 || id==4)){
+            device_id=id;packet_bytes=id?4:3;device_ready=1;
+        }
+    }
+    if(!device_ready){
+        /* 协商半途不能假定仍是3字节（F6不保证撤IntelliMouse模式）。
+         * 第一次FF可能只是旧参数，第二次才是真RESET；每次分别
+         * 领取ACK/BAT/ID。无法证实模式就不启上报，不错位投鼠标。 */
+        for(u32 attempt=0;attempt<2 && !device_ready;attempt++){
+            u8 bat,id;
+            if(!mouse_command(0xFF) && !mouse_reply(&bat) && bat==0xAA
+                && !mouse_reply(&id) && id==0){packet_bytes=3;device_id=0;device_ready=1;}
+        }
+    }
+    if(device_ready && mouse_rate(100))device_ready=0;
+    return device_ready?0:-1;
+}
 
 static void clamp_pos(void)
 {
@@ -114,16 +159,17 @@ void mouse_init(void)
 
     ps2_cmd(0xD4); ps2_put(0xF6); /* 对鼠标: 恢复默认值 */
     (void)ps2_get();              /* 逐条收ACK，避免未消费回复挤占下一命令 */
-    ps2_cmd(0xD4); ps2_put(0xF4); /* 对鼠标: 开始上报数据 */
-    (void)ps2_get();
+    int negotiated=wheel_negotiate();
+    if(!negotiated && mouse_command(0xF4))device_ready=0;
 
     /* 放行 IRQ12 (从片 bit4), 级联线 IRQ2 保持畅通 */
     outb(0x21, (u8)(inb(0x21) & ~0x04));
     outb(0xA1, (u8)(inb(0xA1) & ~0x10));
 
     /* 清掉 init 期间塞在缓冲里的 ACK 等杂音 */
-    for (u32 t = 0; t < 200000 && (inb(PS2_STAT) & 0x01); t++)
-        (void)inb(PS2_DATA);
+    for (u32 t = 0; t < 200000 && (inb(PS2_STAT) & 0x01); t++){
+        if(inb(PS2_STAT)&0x20u)(void)inb(PS2_DATA);else keyboard_isr();
+    }
 
     suppress = 0;
     mx = 160; my = 100;           /* 光标出生在屏幕中央 */
@@ -139,14 +185,14 @@ void mouse_isr(void)
     if (!(status & 0x01) || !(status & 0x20))
         return;                   /* 没数据 (防御性) */
     u8 d = inb(PS2_DATA);
-    if (suppress)
+    if (suppress || !device_ready)
         return;
 
     if (cycle == 0 && !(d & 0x08))
         return;                   /* 同步位不对: 字节流错位, 丢弃重对齐 */
 
     pkt[cycle++] = d;
-    if (cycle < 3)
+    if (cycle < packet_bytes)
         return;
     cycle = 0;
 
@@ -159,11 +205,23 @@ void mouse_isr(void)
     relative_x+=(u32)dx;relative_y-=(u32)dy;
     if(!relative_mode){mx+=dx;my-=dy;}
     clamp_pos();
-    u8 physical=pkt[0]&7;blocked_buttons&=physical;mbtn=physical&~blocked_buttons;
-    if(sc32_raw_active())sc32_raw_mouse(mx,my,mbtn,keyboard_modifiers());
+    u8 previous=mbtn,physical=pkt[0]&7;blocked_buttons&=physical;mbtn=physical&~blocked_buttons;
+    i32 wheel=0,horizontal=0;
+    if(device_id==3)wheel=-(i32)(signed char)pkt[3];
+    else if(device_id==4){
+        if(pkt[3]&0x40u){i32 value=pkt[3]&63u;if(value&32)value-=64;horizontal=-value;}
+        else{ i32 value=pkt[3]&15u;if(value&8)value-=16;wheel=-value; }
+    }
+    if(sc32_raw_active()){
+        /* 同一包先发布真实移动/按钮，再发布轮量。纯轮包不额外造一
+         * 次相同位置MOVE，避免无意义唤醒与潜在整客户重绘。 */
+        if((!wheel && !horizontal) || dx || dy || previous!=mbtn)sc32_raw_mouse(mx,my,mbtn,keyboard_modifiers());
+        if(wheel || horizontal)sc32_raw_wheel(mx,my,wheel,horizontal,mbtn,keyboard_modifiers());
+    }
     else event_push();
 }
 
 i32 mouse_x(void)       { clamp_pos();return mx; }
 i32 mouse_y(void)       { clamp_pos();return my; }
 u8  mouse_buttons(void) { return mbtn; }
+int mouse_wheel_available(void){return device_ready && (device_id==3 || device_id==4);}

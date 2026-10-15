@@ -6,6 +6,7 @@
  * task0在IF=0消费；数量仅是不可分配的中断突发预算，不是任务上限。 */
 #define SC32_RAW_KEY 1u
 #define SC32_RAW_MOUSE 2u
+#define SC32_RAW_WHEEL 3u
 #define SC32_RAW_COALESCED 1u
 #define SC32_RAW_PULSE 2u
 #define SC32_RAW_BUTTON_EDGE 4u
@@ -20,4 +21,5 @@ void sc32_raw_pop(void);
 void sc32_raw_loss(u32 out[2]);
 void sc32_raw_key(u32 physical,u32 symbol,u32 text,u32 modifiers,u32 down,u32 repeat,u32 legacy);
 void sc32_raw_mouse(i32 x,i32 y,u32 buttons,u32 modifiers);
+void sc32_raw_wheel(i32 x,i32 y,i32 vertical,i32 horizontal,u32 buttons,u32 modifiers);
 #endif

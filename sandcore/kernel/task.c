@@ -19,6 +19,12 @@
 #include "sc32_core.h"
 #include "sc32_file.h"
 #include "sc32_gui.h"
+#include "sc32_font.h"
+#include "sc32_broker.h"
+#include "sc32_drop.h"
+#include "../user/dropapi/SC32DROPWIRE.H"
+#include "../user/fontapi/SC32FONTWIRE.H"
+#include "../user/sc32/SC32BROKERWIRE.H"
 #ifdef M10_DISK_CORE
 #include "network.h"
 #endif
@@ -92,6 +98,7 @@ static u32 ready_tick;
 static u64 deferred_epoch;
 static volatile int kernel_pending;
 static int cleanup_head=-1,cleanup_tail=-1;
+static u32 cleanup_revoke_pending;
 static int *wait_heap;
 static u32 wait_count,wait_capacity,wait_pages,wait_tick;
 static u64 wait_clock;
@@ -248,6 +255,24 @@ static int task_gui_wait(u32 *frame)
     if(events<0)return events==-4?SC32_E_MEMORY:SC32_E_INVALID;
     return sc32_gui_wait_result(current,(u32)events);
 }
+static int task_broker_wait(u32 *frame)
+{
+    u32 timeout,mask,events;
+    int result=sc32_broker_wait_check(current,frame[10],frame[9],&timeout,&mask,&events);
+    if(result!=SC32_PENDING){
+        if(!result){
+            /* ready路径也消费本次已返回的事实位，沿旧EVENTWAIT语义。
+             * 否则历史INPUT/STREAM常驻会让已空的GUI/IPC混合泵忙转。 */
+            task_record(current)->events&=~(events&255u);
+            return (int)events;
+        }
+        return result;
+    }
+    task_record_t *p=task_record(current);p->wait_result_mode=0;
+    int waited=task_wait_install(frame,mask,timeout);
+    if(p->waiting)return 0;
+    return waited<0?(waited==-4?SC32_E_MEMORY:SC32_E_INVALID):waited;
+}
 void task_kernel_wake(void){kernel_pending=1;}
 int task_pid(void) { return current; }
 u32 task_generation(int pid){return pid>=0 && (u32)pid<NTASK?task_record(pid)->generation:0;}
@@ -378,12 +403,13 @@ void task_init(void)
     task_record(0)->generation=1;task_record(0)->last_yield=sc_ticks-1;kernel_idle=0;
     ready_head=ready_tail=deferred_head=deferred_tail=zombie_head=-1;
     wake_head=wake_tail=-1;wake_dispatches=0;
-    cleanup_head=cleanup_tail=-1;
+    cleanup_head=cleanup_tail=-1;cleanup_revoke_pending=0;
     ready_tick=sc_ticks;deferred_epoch=1;kernel_pending=0;
     wait_clock=0;wait_tick=sc_ticks;wait_count=wait_capacity=wait_pages=0;wait_heap=0;task_record(0)->wait_heap=-1;
     process_reset(0);
     simd_init();                          /* 对象先存在，任务0才能保存扩展现场。 */
     streams_init();
+    if(sc32_broker_init() || sc32_drop_init())panic("BROKER MEMORY",0);
     cpu_ready=1;
     tss_set_esp0(0x90000);
     if(flags&0x200u)sti();
@@ -482,7 +508,7 @@ u32 sched_pick(u32 cur_esp)
      * 三环主动让出/硬件IRQ均先回主循环；主循环完成工作即取队首。
      * 用户队列只在真正得到CPU时轮转，稳定轮询者不会压过其它用户。 */
     int next=0;
-    if(!current && !kernel_pending && cleanup_head<0 && (ready_head>=0 || wake_head>=0)){
+    if(!current && !kernel_pending && !cleanup_revoke_pending && (ready_head>=0 || wake_head>=0)){
         if(wake_head>=0 && (ready_head<0 || wake_dispatches<2)){
             next=wake_head;if(wake_dispatches<2)wake_dispatches++;
         }else {next=ready_head;wake_dispatches=0;}
@@ -553,52 +579,65 @@ void task_stop(int pid)
      * 同一接口供 SYS_EXIT 和窗口红叉使用，避免两条退出路径语义漂移。 */
     if (pid <= 0 || pid >= NTASK || TASK(pid).state == 0 || TASK(pid).state == 2) return;
     task_state_set(pid,2);          /* 先改变状态，避免关闭调试子进程时重复进入 */
+    cleanup_revoke_pending++;
     task_record(pid)->cleanup_next=-1;
     if(cleanup_tail>=0)task_record(cleanup_tail)->cleanup_next=pid;else cleanup_head=pid;
     cleanup_tail=pid;
     task_kernel_wake();
 }
 int task_cleanup_pending(void){return cleanup_head>=0;}
+int task_cleanup_blocks_user(void){return cleanup_revoke_pending!=0;}
 void task_cleanup_poll(void)
 {
-    /* 动态树/窗口/作业不能一次递归扫完。每轮64个资源阶段、每任务轮转，
-     * 主循环其余输入/设备每轮照常服务；关联授权全撤销前暂不恢复三环，
-     * 防止父进程关闭后，尚在清理队列末尾的孩子继续使用继承能力。
-     * 只有最后阶段才入真正的僵尸回收链，旁表/订阅游标/当前栈仍有效。
-     * 这是清理操作数预算，不宣称一次磁盘事务或窗口重排有固定耗时。 */
+    /* 先完成旧关联授权撤销，再增量拆共享映射；不能把大型共享对象
+     * 的页数变成整个三环的停机时间。每轮至多64个真实拥有者、每拥有者
+     * 仅一个阶段；队尾水印防止单个映射在一轮被重排并拆64次。
+     * broker每步最多16页，所有旧授权已撤后其它READY任务继续调度。
+     * 最后才进入僵尸链；PID/gen、凭据、pd和内核栈在此之前均不复用。 */
     if(current || render_hold)return;
-    u32 budget=64;
+    u32 budget=64;int stop_at=cleanup_tail;
     while(cleanup_head>=0 && budget--){
         int owner=cleanup_head;task_record_t *p=task_record(owner);cleanup_head=p->cleanup_next;
         if(cleanup_head<0)cleanup_tail=-1;p->cleanup_next=-1;int advance=1;
         switch(p->cleanup_phase){
         case 0:image_service_owner_stopped(owner);userspace_stop(owner,process_status(owner));audio_stop_owner(owner);break;
         case 1:advance=sc32_file_stop_step(owner);break;
-        case 2:advance=sc32_gui_stop_step(owner);break;
+        case 2:advance=sc32_drop_stop_step(owner) && sc32_gui_stop_step(owner);break;
         case 3:advance=streams_stop_step(owner,process_status(owner));break;
         case 4:advance=process_detach_owner_step(owner);break;
         case 5:advance=wm_close_owner_step(owner);break;
         case 6:advance=wm_capture_stop_step(owner);break;
 #ifdef M10_DISK_CORE
         case 7:advance=network_stop_owner_step(owner);break;
-        case 8:auth_stop(owner);break;
+        case 8:advance=sc32_broker_stop_step(owner);break;
+        case 9:auth_stop(owner);break;
 #else
-        case 7:auth_stop(owner);break;
+        case 7:advance=sc32_broker_stop_step(owner);break;
+        case 8:auth_stop(owner);break;
 #endif
         default:break;
         }
-        if(advance)p->cleanup_phase++;
+        if(advance){p->cleanup_phase++;
+            if(p->cleanup_phase==
+#ifdef M10_DISK_CORE
+                8
+#else
+                7
+#endif
+            )cleanup_revoke_pending--;
+        }
         if(p->cleanup_phase>=
 #ifdef M10_DISK_CORE
-            9
+            10
 #else
-            8
+            9
 #endif
         ){p->queue=QUEUE_ZOMBIE;p->zombie_next=zombie_head;zombie_head=owner;}
         else{
             if(cleanup_tail>=0)task_record(cleanup_tail)->cleanup_next=owner;else cleanup_head=owner;
             cleanup_tail=owner;
         }
+        if(owner==stop_at)break;
     }
     if(cleanup_head>=0)task_kernel_wake();
 }
@@ -669,6 +708,13 @@ void syscall_c_common(u32 vec, u32 *frame)
             frame[11]=(u32)sc32_gui_call(current,frame[8],frame[10],frame[9]);
         else if(frame[8]>=SC32_WIRE_FILE_FIRST && frame[8]<SC32_WIRE_CLIPBOARD_FIRST)
             frame[11]=(u32)sc32_file_call(current,frame[8],frame[10],frame[9]);
+        else if(frame[8]>=SC32_D_REGISTER && frame[8]<=SC32_D_CANCEL)
+            frame[11]=(u32)sc32_drop_call(current,frame[8],frame[10],frame[9]);
+        else if(frame[8]==SC32_B_WAIT)frame[11]=(u32)task_broker_wait(frame);
+        else if(frame[8]>=SC32_WIRE_CLIPBOARD_FIRST && frame[8]<0x600u)
+            frame[11]=(u32)sc32_broker_call(current,frame[8],frame[10],frame[9]);
+        else if(frame[8]==SC32_FONT_QUERY || frame[8]==SC32_FONT_GLYPH)
+            frame[11]=(u32)sc32_font_call(current,frame[8],frame[10],frame[9]);
         else frame[11]=(u32)sc32_core_call(current,frame[8],frame[10],frame[9]);
         break;
     case SYS_STATUS:

@@ -1,0 +1,3 @@
+ACTUAL_MAIN_SOURCE=TMP/UICHECK/SRC/scui/SCUI.C OUTPUT=HOME/SCUI.SCL
+SCCC: preprocess -> C -> x86
+SCCC ERROR TMP/UICHECK/SRC/scui/ui_edit.c:1531: symbol capacity exceeded

@@ -2,6 +2,7 @@
 #define SANDCORE_SC32GUIWIRE_H
 #include "SC32WIRE.H"
 #include "../SC32GUI.H"
+#include "../SC32POPUP.H"
 
 /* 与公共cdecl分离的私有gate selector。所有输入固定size/version1，
  * 有输出的调用先验完整声明RW再effects；CREATE不含用户回调指针。 */
@@ -25,8 +26,15 @@
 #define SC32_GUI_SUBMIT 0x111u
 #define SC32_GUI_CLOSE_CANCEL 0x112u
 #define SC32_GUI_QUEUE 0x113u
+#define SC32_GUI_PAINT_CANCEL 0x114u
+#define SC32_GUI_POPUP_CREATE 0x115u
+#define SC32_GUI_CURSOR 0x116u
 #define SC32_GUI_RECT_LIMIT 64u
 typedef struct {ScU32 size,version,window,generation;} Sc32WindowRef;
+typedef struct {
+    ScU32 size,version,owner_window,owner_generation;ScI32 anchor_x,anchor_y;
+    ScU32 anchor_width,anchor_height,preferred_width,preferred_height,kind,flags,reserved[4];
+} Sc32PopupCreate;
 typedef struct {
     ScU32 size,version,title;ScI32 x,y;
     ScU32 client_width,client_height,style,owner_window,owner_generation,reserved[6];

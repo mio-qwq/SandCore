@@ -1,0 +1,10 @@
+/HOME/M10UI/COMPILER/SCCC1.SCX /TMP/UI-dc2aea/AGGCALLEE.C /HOME/M10UI/AGG/NATIVELIB/AGGCALLEE.SCL --scl /TMP/UI-dc2aea/AGGCALLEE.json; _m9_status=$?; printf "\n"; echo __M9_189ee1d9eab8fbea57794cb9:$_m9_status
+SCCC / mio
+TMP/UI-dc2aea/AGGCALLEE.C -> HOME/M10UI/AGG/NATIVELIB/AGGCALLEE.SCL
+Validating SCL manifest
+SCCC: preprocess -> C -> x86
+Preprocessing source and includes
+Parsing C and generating x86
+Linking and writing SCL
+SCCC OK SCL NATIVE
+Compilation complete

@@ -161,3 +161,12 @@ NETINFO仍原96字布局，其租约使用字段保持秒含义。私有dhcp.c
 2026-10-07 DHCP私有派生更新：短租约三策略双来源22项实际通过；长租约省略T2的真实边界发现上游先32位乘7溢出。tools/prepare_lwip_dhcp.py严格核对固定原件SHAf89cf1aacbd9a04dcb47a03c81a1a231331f4edb323d2e0cf26e640ca78c3453，仅替换一次默认T2表达式为t-ceil(t/8)，完整版权/BSD条文逐字节保留。原件third_party/lwip/src/core/ipv4/dhcp.c及固定摘要不变，构建派生dhcp_upstream.inc与DHCPPREP.PY进SYS/NETSRC/PORT，所有上游源码继续SYS/LICENSE/LWIP。私有dhcp.c继续处理无限租约旧计数。新候选尚未构建/运行，不借旧22或308项结果宣称通过。
 
 修订：2026-10-07，登记真实默认T2溢出、一处受固定摘要保护的BSD派生及完整实际源码归档待验。
+
+
+## M10a2 Unicode 15.1 数据
+
+SCUI 字素/词边界使用 Unicode 15.1.0 官方原始属性数据，固定原件在 `third_party/unicode15_1`；版本、原始 URL、字节数与 SHA256 见 `PROVENANCE.json` 及独立 `M10A2-SOURCES.json`。不修改 M9/M10 固定来源清单。四份属性文件、ReadMe、Unicode V3 完整许可和来源表七文件原样归档 `/SYS/LICENSE/UNICODE15_1`；许可保留版权、许可、免责声明与不背书条款，不只是作者名。该数据许可允许本项目所需使用与派生，未引入第三方可执行实现。
+
+自写 `tools/mkui_textdata.py` 校验原始摘要，生成连续覆盖 0..10FFFF 的组合属性区间，产物 `/SYS/UI/UAX15_1.SCU` 保留版本、完整区间与 CRC。SCUI 整数边界算法及格式校验源码随 SDK；不同资源版本不能静默复用旧缓存。完整原件仍独立保留，二进制压缩资源不替代许可或原始数据。固定来源/客体副本审计接入本批资源目标；尚未运行该目标或客体 UI，数据已生成不等于编辑行为通过。
+
+修订：2026-10-15，登记 Unicode 15.1 官方数据、Unicode V3 原文及完整客体归档、自写派生资源与独立来源审计；本批 SCUI 源码未构建运行。

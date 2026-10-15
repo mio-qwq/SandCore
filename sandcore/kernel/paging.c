@@ -23,6 +23,7 @@
 #define PTE_US 0x004
 #define PTE_BLOCK_FIRST 0x200u
 #define PTE_BLOCK_LAST  0x400u
+#define PTE_SHARED 0x800u
 /* x86 的9..11位供操作系统使用。块首/块尾记录在私有PTE中，而不是
  * 用户可改写的堆头；因此用户不能伪造长度去释放邻块或内核物理帧。 */
 
@@ -76,7 +77,8 @@ int paging_map_device(u32 base,u32 bytes)
     if(!paging_on || !bytes || (base&4095u) || (bytes&4095u) || bytes>0xFFFFFFFFu-base)return -1;
     u32 end=base+bytes;
     if(base<0x10000000u || (base<USER_HEAP_TOP && end>USER_HEAP_BASE)
-        || (base<USER_MODULE_TOP && end>USER_MODULE_BASE))return -1;
+        || (base<USER_MODULE_TOP && end>USER_MODULE_BASE)
+        || (base<USER_SHARED_TOP && end>USER_SHARED_BASE))return -1;
     for(u32 i=0;i<e820_count();i++){
         e820_entry_t *entry=e820_entry(i);if(entry->type_lo!=E820_TYPE_USABLE || entry->type_hi)continue;
         u64 lo=((u64)entry->base_hi<<32)|entry->base_lo;
@@ -106,6 +108,7 @@ u32 paging_new_task_dir(void)
      * 在调用者CR3中变成另一段用户页，内核拷帧就会写错物理内存。 */
     for(u32 i=USER_HEAP_BASE>>22;i<USER_HEAP_TOP>>22;i++) d[i]=0;
     for(u32 i=USER_MODULE_BASE>>22;i<USER_MODULE_TOP>>22;i++) d[i]=0;
+    for(u32 i=USER_SHARED_BASE>>22;i<USER_SHARED_TOP>>22;i++) d[i]=0;
     return pd;
 }
 
@@ -128,6 +131,7 @@ static int user_range(u32 pd,u32 ptr,u32 size,int write)
     if(ptr>=USER_BASE && ptr<USER_TOP) top=USER_TOP;
     else if(ptr>=USER_HEAP_BASE && ptr<USER_HEAP_TOP) top=USER_HEAP_TOP;
     else if(ptr>=USER_MODULE_BASE && ptr<USER_MODULE_TOP) top=USER_MODULE_TOP;
+    else if(ptr>=USER_SHARED_BASE && ptr<USER_SHARED_TOP) top=USER_SHARED_TOP;
     else return 0;
     if(size>top-ptr || !pd || pd==(u32)kernel_pd) return 0;
     if (!size) return 1;
@@ -163,7 +167,9 @@ void paging_free_task_dir(u32 pd)
     for(u32 index=0;index<1024;index++) {
         if((d[index]&(PTE_P|PTE_US))!=(PTE_P|PTE_US)) continue;
         u32 *pt=(u32 *)(d[index]&~0xFFFu);
-        for(u32 i=0;i<1024;i++) if(pt[i]&PTE_P) pframe_free(pt[i]&~0xFFFu);
+        /* Broker必须先撤映射。防御性跳过Shared标签，不能把仍由
+         * 其它recipient使用的PF按私有页doublefree；PT本身仍归本人。 */
+        for(u32 i=0;i<1024;i++)if((pt[i]&PTE_P) && !(pt[i]&PTE_SHARED))pframe_free(pt[i]&~0xFFFu);
         pframe_free((u32)pt);
     }
     pframe_free(pd);
@@ -192,6 +198,7 @@ int paging_debug_patch(u32 pd,u32 address,u8 value)
 {
     if(!paging_user_range(pd,address,1))return -1;
     u32 *pt=(u32 *)(((u32 *)pd)[address>>22]&~0xFFFu);
+    if(pt[(address>>12)&1023]&PTE_SHARED)return -1;
     u8 *physical=(u8 *)((pt[(address>>12)&1023]&~0xFFFu)+(address&0xFFFu));
     *physical=value;return 0;
 }
@@ -223,7 +230,9 @@ static void private_trim(u32 pd,u32 first,u32 top)
     for(u32 index=first>>22;index<top>>22;index++) {
         if((d[index]&(PTE_P|PTE_US))!=(PTE_P|PTE_US)) continue;
         u32 *pt=(u32 *)(d[index]&~0xFFFu); int used=0;
-        for(u32 i=0;i<1024;i++) if(pt[i]&PTE_P) { used=1; break; }
+        /* 非present的Shared占位也是活reservation。只看P会把另一
+         * 尚在分批bind的mapping页表提前释放，导致候选虚址相互覆盖。 */
+        for(u32 i=0;i<1024;i++)if(pt[i]&(PTE_P|PTE_SHARED)){used=1;break;}
         if(!used) { d[index]=0; pframe_free((u32)pt); }
     }
     private_flush(pd);
@@ -282,6 +291,8 @@ static int private_free(u32 pd,u32 base,u32 first_address,u32 top)
     }
     private_trim(pd,first_address,top); return 0;
 }
+#include "paging_shared.inc"
+
 u32 paging_user_alloc(u32 pd,u32 bytes)
 {return private_alloc(pd,bytes,USER_HEAP_BASE,USER_HEAP_TOP);}
 int paging_user_free(u32 pd,u32 base)

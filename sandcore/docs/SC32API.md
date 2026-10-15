@@ -155,3 +155,14 @@ GUI100..1ff、FILE200..2ff、clipboard300、IPC400、shared500分别为私有ope
 
 
 修订：2026-10-15，统一stdlib-build-06及guest02/04/05实际SCCLIB/SCLIB/R1/C1..C5、九模式/当前G1/253项通用工作流与精确回收通过；保留三项验证失败、未变输入复用与证据边界，见evidence/m10a2-stdlib，完整目标继续。
+
+
+## M10a2 SCUI平台增量（本批未验证）
+
+库保留已发布86入口，ABI1.2/version3共130实际导出：Font2、Palette1、Popup/PaintCancel/Cursor3、Broker31、Drop7。公共FONT/POPUP/PALETTE头可由SC32API包含，BROKER/DROP显式包含以避免类型循环；详细参数/错误/记录见对应规范。旧SCAPI.H SHA256仍81a730450fcb3d310ed841ad3e5c70a3fed32aa7fbd10acac8b888ac7da9ffc1。
+
+新增功能均有真实R3桥、内核服务、owner/session回收与构建规则，非声明占位。Font、弹出窗和鼠标状态来自已有真正系统资源；Clip/IPC/Shared/Drop是独立动态对象及权限合同，不把原流/malloc/窗口列表改名。新WHEEL21来自PS/2真协商包，INPUT|STREAM组合泵靠原子BrokerWait；没有预留而未生产的Broker GUI消息。
+
+本批尚未构建/运行。后续只测改动实际影响的新平台和SCUI、必要原ABI兼容/退出；P3未受影响的原source与证据保留，不重跑无关旧网络/游戏矩阵。
+
+修订：2026-10-15，保留86/增44正式函数和真实平台接线、版本及未验证边界。

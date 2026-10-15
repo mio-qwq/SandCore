@@ -9,6 +9,8 @@
 #include "userspace.h"
 #include "interrupts.h"
 #include "fs.h"
+#include "sc32_broker.h"
+#include "sc32_drop.h"
 
 static objpool_t sessions;
 static u32 serial,visible,system_id,locked_id;
@@ -50,7 +52,7 @@ int session_bind(int pid,u32 id)
 }
 static void release(session_t *s)
 {
-    u32 id=s->id;wm_session_destroy(id);desktop_session_destroy(id);theme_session_destroy(id);userspace_session_destroy(id);
+    u32 id=s->id;sc32_drop_session_discard(id);sc32_broker_session_discard(id);wm_session_destroy(id);desktop_session_destroy(id);theme_session_destroy(id);userspace_session_destroy(id);
     objpool_release(&sessions,(int)id);
 }
 void session_unbind(int pid)
@@ -90,7 +92,7 @@ int session_control(int pid,u32 id,u32 action)
     if(id==visible && session_switch_trusted(locked_id))return -4;
     /* 只沿本会话成员链停止；每个任务先撤运行/授权，退出解除成员。
      * 不用UID扫描杀掉同账户在另一个登录会话的后台任务。 */
-    s->closing=1;
+    s->closing=1;sc32_drop_session_discard(id);sc32_broker_session_discard(id);
     for(int pid=s->task_head;pid>=0;){int following=task_record(pid)->session_next;task_stop(pid);pid=following;}
     s=session_get(id);if(s && !s->references)release(s);
     if(visible==locked_id)(void)session_show_login();return 0;

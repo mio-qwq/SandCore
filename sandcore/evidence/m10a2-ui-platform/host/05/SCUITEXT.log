@@ -1,0 +1,6 @@
+ACTUAL_MAIN_SOURCE=TMP/UICHECK/SCUITEXT.C OUTPUT=HOME/SCUITEXT.SCX
+SCCC: preprocess -> C -> x86
+SCCC OK SCX DYNAMIC
+Compilation complete
+ROOTLESS_RESOLVE_CALLS=3 RESULT=0 tokens=14148 source=82123 code=4041 data=385 bss=8 fixes=56 macros=261
+SCCC_HOST_CAPACITY types=1170 symbols=2447 params=1333 nodes=1 fixes=56
