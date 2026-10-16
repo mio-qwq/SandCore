@@ -1,0 +1,64 @@
+{
+  "schema": 1,
+  "status": "SOURCE_ONLY_FIXED_INPUTS_NOT_REFRESHED",
+  "files": {
+    "build/m10a2-p6-target-refresh-03/p6-generation.json": {
+      "bytes": 14897961,
+      "sha256": "fbc1c4519c9f432a67772eb9b7989b166edb7ce29a20a65cc88c5bae63774f2f"
+    },
+    "build/m10a2-p6-refresh-vm-03/refresh-vm.json": {
+      "bytes": 966507,
+      "sha256": "f03755bcb535ee872661f7061bf57b12e8fcc4ea973a9475229ce1ff10bd0a33"
+    },
+    "build/m10a2-p6-guest-generation-run-03/p6-generation.json": {
+      "bytes": 15284667,
+      "sha256": "f5538ba547f2ae38e00f35d35b57e2c0a55ef8282955aefbf221042122c57ddc"
+    },
+    "build/m10a2-p6-gui-coherent-layout-01/layout-proof.json": {
+      "bytes": 2202,
+      "sha256": "95d1108d29e095223dca4f912e4ed3af57821d3ccbc0c7fdac3b699280ad79bd"
+    },
+    "drafts/m10a2-p6-final-02-receipt/core-build-receipt.json": {
+      "bytes": 89661,
+      "sha256": "4f75f8d83d8dcb3af9f41291f51245c3ce18a54853e9e008aefa5be22bbb49cd"
+    },
+    "drafts/m10a2-p6-final-02-receipt/core-build-inputs.json": {
+      "bytes": 54512,
+      "sha256": "dc5eb8c468a6f1ee3f953ca0a9d14522ae3edbd9fab4782213cbb4a97d25eb54"
+    },
+    "build/m10a2-p6-final-02/sdk/MANIFEST.json": {
+      "bytes": 1389362,
+      "sha256": "82a839cf68c32c7cae18427a7a949e74e80005359f312e76040a29b9072cf439"
+    },
+    "build/m10a2-p6-final-02/codec-proof.json": {
+      "bytes": 3101,
+      "sha256": "4299f1c9f1ef60abf2db10c86605621acb2ae34208832ff5247fcf529da9e020"
+    },
+    "build/m10a2-main-studio-01/p6-unified-host-07.json": {
+      "bytes": 363039,
+      "sha256": "22b85409627ff02b46bc47093a4f2c9482e0229efb23b403d469892997a0e39c"
+    },
+    "drafts/m10a2-p6-refresh-runner/driver.py": {
+      "bytes": 9020,
+      "sha256": "c97648a400926f7cd1ee3227a2e8dc530b496eb3bea74f06d5e9e537fe1269d6"
+    },
+    "drafts/m10a2-p6-target-refresh/refresh.py": {
+      "bytes": 21239,
+      "sha256": "e2e4e24ecfa7bf051bbfd2c91b3480beb3d8d981cc98847dc682268bf744307d"
+    },
+    "drafts/m10a2-gui-owner-review/owner_snapshot.py": {
+      "bytes": 22143,
+      "sha256": "25d87a8f1b5cbac487ed740416a65031a1c456a9cbaf48505ba739c651f859dc"
+    },
+    "drafts/m10a2-p6-guest-generation/model.py": {
+      "bytes": 33027,
+      "sha256": "3087b2c093dd99350e4049214478bf188a23edb585a4766f529dbc16e50f5bb2"
+    }
+  },
+  "previous_exact": "fbc1c4519c9f432a67772eb9b7989b166edb7ce29a20a65cc88c5bae63774f2f",
+  "host08_not_yet_provided": true,
+  "previous_report_modified": false,
+  "old_layout_sha_replaced": false,
+  "build_started": false,
+  "vm_started": false
+}

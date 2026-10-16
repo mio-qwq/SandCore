@@ -1,0 +1,305 @@
+{
+  "schema": 1,
+  "status": "PASS_SCOPED_EXISTING_GUI02_ALPHA_RUNTIME_PIXELS",
+  "scope": "ONE_EXISTING_FILES_ICON_GEOMETRY_NO_NEW_VM_BUILD_OR_ASSET_EDIT",
+  "observed_utc": "2026-10-16T08:24:40.350822+00:00",
+  "screenshots": {
+    "gui01": {
+      "path": "build/m10a2-p6-gui-run-01/p6-native-desktop-initial.png",
+      "bytes": 1356144,
+      "sha256": "3d6ebce153def126d38457b44eb6df58149d64d313a871745da22922fb8e3584"
+    },
+    "gui02": {
+      "path": "build/m10a2-p6-gui-run-02/p6-new-native-desktop.png",
+      "bytes": 1364340,
+      "sha256": "9a57a7504873b058462558c4fe17fb41740cdfc3f9f8eeb30bfee1e0cad9455e"
+    }
+  },
+  "resources": {
+    "SYS/ICONS/AURORA/FILES.SCB": {
+      "bytes": 65568,
+      "sha256": "2a6a31f0732886fadaf457b1afba18cb8e6beb4ab37282cd86e6a55772286ea1",
+      "identical_original_gui01_gui02": true
+    },
+    "SYS/ICONS/AURORA/NOTE.SCB": {
+      "bytes": 65568,
+      "sha256": "ba97f38493903b6f6259f79ee1b770fe220070fdf3e42fb132305e0ecd5fd46b",
+      "identical_original_gui01_gui02": true
+    },
+    "SYS/ICONS/AURORA/STUDIO.SCB": {
+      "bytes": 65568,
+      "sha256": "acef695ee9699f5a31441fb9c7b39b99ef516640be41804902238678b38993d9",
+      "identical_original_gui01_gui02": true
+    },
+    "SYS/ICONS/AURORA/CALC.SCB": {
+      "bytes": 65568,
+      "sha256": "6d44370a8d54ecda14ac2492516fe340143e8c42a2aec7b39163af6a046c3c5c",
+      "identical_original_gui01_gui02": true
+    },
+    "SYS/ICONS/AURORA/SHELL.SCB": {
+      "bytes": 65568,
+      "sha256": "5475fe9e772415c12ece489a4f26a0a8bdd45902a4792a4c9988dd44abe07c2e",
+      "identical_original_gui01_gui02": true
+    },
+    "SYS/ICONS/AURORA/LENS.SCB": {
+      "bytes": 65568,
+      "sha256": "b131868d4d4d1364edc0a6f43b81242bdbf52deee0acbdb1f8256be079015f3f",
+      "identical_original_gui01_gui02": true
+    },
+    "SYS/ICONS/AURORA/SOUND.SCB": {
+      "bytes": 65568,
+      "sha256": "8684677311a2b7eb2a5c2b8488bba17199895fb5842badf10224bd43ca676056",
+      "identical_original_gui01_gui02": true
+    },
+    "SYS/ICONS/AURORA/PALETTE.SCB": {
+      "bytes": 65568,
+      "sha256": "13812cfeaa4b5bde079fc88459dca95faa5f2db6213bd7e045380de71d0afff5",
+      "identical_original_gui01_gui02": true
+    }
+  },
+  "wallpaper": {
+    "path": "SYS/WALL/AURORA.SCB",
+    "bytes": 6293440,
+    "sha256": "4fa69fd47a82b8752fb425bf3ae5613d0eeb8e7e0aca799c21f600ad835e1922",
+    "identical_original_gui01_gui02": true,
+    "width": 1672,
+    "height": 941,
+    "all_source_pixels_opaque": true,
+    "cover_crop": [
+      0,
+      0,
+      1672,
+      940
+    ],
+    "screen_dimensions": [
+      1920,
+      1080
+    ]
+  },
+  "geometry": {
+    "screen": [
+      96,
+      48,
+      72,
+      72
+    ],
+    "source": [
+      128,
+      128
+    ],
+    "sampling": "source_x=floor(x*128/72),source_y=floor(y*128/72)",
+    "shortcut_exclusion_screen": [
+      96,
+      107,
+      13,
+      13
+    ],
+    "mouse_exclusion_screen": [
+      160,
+      100,
+      16,
+      20
+    ],
+    "excluded": {
+      "mouse_box_intersection": 160,
+      "shortcut_badge": 169
+    }
+  },
+  "expected_formula_per_rgb_channel": "(source*source_alpha+wallpaper*(255-source_alpha)+127)//255",
+  "results": {
+    "gui01": {
+      "transparent": 2522,
+      "transparent_exact_straight_over_wallpaper": 2522,
+      "partial": 693,
+      "partial_exact_straight_over_wallpaper": 0,
+      "partial_exact_wrong_black": 693,
+      "opaque": 1640,
+      "opaque_exact_straight_over_wallpaper": 1640
+    },
+    "gui02": {
+      "transparent": 2522,
+      "transparent_exact_straight_over_wallpaper": 2522,
+      "partial": 693,
+      "partial_exact_straight_over_wallpaper": 693,
+      "partial_exact_wrong_black": 0,
+      "opaque": 1640,
+      "opaque_exact_straight_over_wallpaper": 1640
+    }
+  },
+  "examples": [
+    {
+      "screen": [
+        105,
+        66
+      ],
+      "source": [
+        16,
+        32
+      ],
+      "source_argb": "01000000",
+      "wallpaper_rgb": [
+        192,
+        227,
+        251
+      ],
+      "expected_straight_over_rgb": [
+        191,
+        226,
+        250
+      ],
+      "gui01_rgb": [
+        0,
+        0,
+        0
+      ],
+      "gui02_rgb": [
+        191,
+        226,
+        250
+      ]
+    },
+    {
+      "screen": [
+        125,
+        66
+      ],
+      "source": [
+        51,
+        32
+      ],
+      "source_argb": "03555555",
+      "wallpaper_rgb": [
+        192,
+        227,
+        252
+      ],
+      "expected_straight_over_rgb": [
+        191,
+        225,
+        250
+      ],
+      "gui01_rgb": [
+        1,
+        1,
+        1
+      ],
+      "gui02_rgb": [
+        191,
+        225,
+        250
+      ]
+    },
+    {
+      "screen": [
+        107,
+        67
+      ],
+      "source": [
+        19,
+        33
+      ],
+      "source_argb": "13bba15d",
+      "wallpaper_rgb": [
+        192,
+        227,
+        251
+      ],
+      "expected_straight_over_rgb": [
+        192,
+        222,
+        239
+      ],
+      "gui01_rgb": [
+        14,
+        12,
+        7
+      ],
+      "gui02_rgb": [
+        192,
+        222,
+        239
+      ]
+    }
+  ],
+  "gui02_mismatches": [],
+  "runtime_binding": {
+    "report_path": "build/m10a2-p6-gui-run-02/p6-gui.json",
+    "report_read_time_sha256": "cbfbe4428f8fd7ec55c8406889fab5ec4c3f105459bdf5eb84aadf498ebf80df",
+    "report_is_live_not_claimed_unchanged": true,
+    "baseline_field": "baseline.coherent_snapshot.debug_modules[6]",
+    "loaded_scui_module": {
+      "id": 7,
+      "owner": 1,
+      "generation": 1,
+      "metadata_pages": 27,
+      "file_pages": 0,
+      "source_object": 0,
+      "phase": 2,
+      "kind": 2,
+      "image_bytes": 638976,
+      "flags": 5,
+      "source_bytes": 733256,
+      "image_sha256": "7059348b04925a4ba5f29702abd0c419a570b05008ad854908f70dae66d640b7"
+    },
+    "baseline_module_owner": {
+      "pid": 1,
+      "generation": 1,
+      "session": 1,
+      "name": "SCSHELL.SCX"
+    },
+    "baseline_is_session1_not_ordinary_session4": true,
+    "ordinary_screenshot_fields": [
+      "p6_gui_runtime.actions.initial-ordinary-bind.result",
+      "p6_gui_runtime.actions.desktop-start.result"
+    ],
+    "ordinary_binding": {
+      "uid": 1000,
+      "realm": 0,
+      "session": 4,
+      "evidence_case": "p6-bind-initial-ordinary-bind",
+      "session_row": {
+        "id": 4,
+        "uid": 1000,
+        "gid": 1000,
+        "type": "user",
+        "active": true,
+        "tasks": 1,
+        "name": "mio"
+      }
+    },
+    "screen_record": {
+      "path": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-p6-gui-run-02\\p6-new-native-desktop.png",
+      "width": 1920,
+      "height": 1080,
+      "sha256": "9a57a7504873b058462558c4fe17fb41740cdfc3f9f8eeb30bfee1e0cad9455e",
+      "counts_as_gui_pass": false
+    },
+    "native_report": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-p6-target-refresh-03\\p6-generation.json",
+    "native_report_sha256": "fbc1c4519c9f432a67772eb9b7989b166edb7ce29a20a65cc88c5bae63774f2f"
+  },
+  "source_sha256": {
+    "user/scui/ui_paint.c": "167c9ba2d0eeb3662c8951d6ed276ed0c521962c842b87b6b45f4ed4e501458f",
+    "user/scui/ui_argb.c": "9e8134166b15fc59a7210a166f9dc55514de01e6ad0bdc7702025c69e38c6121",
+    "user/scui/SCUIPRIVATE.H": "62a62bf304bb05812b7db0f33c2a9ec1640770f33c8e4c9eb38905695737f7bc",
+    "user/scshell/desktop/desktop_view.inc": "375fd8b4981941255b71a6718b93c33409d2a1d39ccebf1f850def04bcf64fcb",
+    "kernel/desktop.c": "cd6ebda391aa8baba8248f8a43701ac1cff8f6277120fd9e5b984a420fd4ad90",
+    "kernel/gfx.c": "5f7ddba8233a8b999685dbb9bb24358c9ecc3cb845132f70697b1ce0727e8dd9"
+  },
+  "reused_checker": {
+    "path": "drafts/m10a2-desktop-icon-alpha/inspect_pixels.py",
+    "bytes": 5560,
+    "sha256": "7d19a58a2f61fe4c9e9af79fdbc6bd0e81fe9fbad4626bd38ef861e664826f07"
+  },
+  "limitations": [
+    "Only this existing 128-to-72 Files icon is numerically accepted.",
+    "No scaling-quality or performance conclusion.",
+    "Coherent module observation is baseline session1; ordinary screenshot has separate UID1000 SID4 action binding.",
+    "This inspection did not start, pause, resume, or send input to any VM."
+  ],
+  "asset_edited": false,
+  "image_generated": false,
+  "main_source_edited": false,
+  "build_started": false,
+  "vm_called": false,
+  "input_sent": false
+}

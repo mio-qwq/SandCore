@@ -1,0 +1,80 @@
+{
+  "status": "SOURCE_PATCH_ONLY_NOT_BUILT_NOT_GUEST_VERIFIED",
+  "applications": {
+    "FILES2": {
+      "entry": "user/files2/FILES2.C",
+      "before_sha256": "98dabeb0aae454f13e9a9b3215997e1a6d4cddea2633c2b78b3921d1cfeab0bf",
+      "result_sha256": "98dabeb0aae454f13e9a9b3215997e1a6d4cddea2633c2b78b3921d1cfeab0bf",
+      "modified": false,
+      "consumer": "user/files2/files2_view.inc",
+      "consumer_before_sha256": "c7de9698e27275ff8e57d08dc94389598f60b3758d86968ccfd7c435092e84a7",
+      "consumer_result_sha256": "c7de9698e27275ff8e57d08dc94389598f60b3758d86968ccfd7c435092e84a7",
+      "decision": "UNCHANGED_ALREADY_DECODES_SINGLE_START_PATH"
+    },
+    "NOTES2": {
+      "entry": "user/notes2/NOTES2.C",
+      "before_sha256": "b9e03693a4be610f22f8c49418fb5f25c9fec5bf120e63913bf90334512ef8e0",
+      "result_sha256": "5894444773d92c6104a06bfa293a84b728bf0cd6b0c1a1c77a9f3f556b51571e",
+      "modified": true,
+      "consumer": "user/notes2/NOTES2.C",
+      "consumer_before_sha256": "b9e03693a4be610f22f8c49418fb5f25c9fec5bf120e63913bf90334512ef8e0",
+      "consumer_result_sha256": "5894444773d92c6104a06bfa293a84b728bf0cd6b0c1a1c77a9f3f556b51571e",
+      "decision": "PATCH_RAW_SINGLE_DOCUMENT_CONSUMER"
+    },
+    "LENS2": {
+      "entry": "user/imageapps/LENS2.C",
+      "before_sha256": "3fd01cdb689a075a71a582c89998a098c8633e09cea14edc51b8cdd171c4f535",
+      "result_sha256": "3fd01cdb689a075a71a582c89998a098c8633e09cea14edc51b8cdd171c4f535",
+      "modified": false,
+      "consumer": "user/imageapps/lifecycle.c",
+      "consumer_before_sha256": "0afd7f895ef38005126e5fde970162bf6f55a0df13d51a8e09872eba106d007f",
+      "consumer_result_sha256": "0afd7f895ef38005126e5fde970162bf6f55a0df13d51a8e09872eba106d007f",
+      "decision": "UNCHANGED_ALREADY_HANDLES_OUTER_PAIR_AND_OPTIONAL_OPEN"
+    },
+    "SOUND2": {
+      "entry": "user/sound2/SOUND2.C",
+      "before_sha256": "481f5fb9a5b516a7757c3971dcf06d43145359f0391fc6432ca76019008ac0e6",
+      "result_sha256": "481f5fb9a5b516a7757c3971dcf06d43145359f0391fc6432ca76019008ac0e6",
+      "modified": false,
+      "consumer": "user/sound2/SOUND2.C",
+      "consumer_before_sha256": "481f5fb9a5b516a7757c3971dcf06d43145359f0391fc6432ca76019008ac0e6",
+      "consumer_result_sha256": "481f5fb9a5b516a7757c3971dcf06d43145359f0391fc6432ca76019008ac0e6",
+      "decision": "UNCHANGED_ALREADY_STRICT_SINGLE_DOCUMENT_PARSER"
+    },
+    "CANVAS2": {
+      "entry": "user/imageapps/CANVAS2.C",
+      "before_sha256": "8145b1299ca3ce1b64d267dde5c0696fea2c58fe489929eb4c2c84108aa2aae5",
+      "result_sha256": "8145b1299ca3ce1b64d267dde5c0696fea2c58fe489929eb4c2c84108aa2aae5",
+      "modified": false,
+      "consumer": "user/imageapps/lifecycle.c",
+      "consumer_before_sha256": "0afd7f895ef38005126e5fde970162bf6f55a0df13d51a8e09872eba106d007f",
+      "consumer_result_sha256": "0afd7f895ef38005126e5fde970162bf6f55a0df13d51a8e09872eba106d007f",
+      "decision": "UNCHANGED_ALREADY_HANDLES_OUTER_PAIR_AND_OPTIONAL_OPEN"
+    }
+  },
+  "changed_paths": [
+    "user/notes2/NOTES2.C"
+  ],
+  "refresh_labels": [
+    "NOTES2"
+  ],
+  "patch_sha256": "6a50398b942fe81d37ce5be5b16f83bcdd71fe35e8c6bc964fce645f9182c863",
+  "no_new_imports": true,
+  "manifests_not_modified": true,
+  "no_new_shared_argument_API": true,
+  "SCLIB_header": {
+    "path": "user/sclib/SCLIB.H",
+    "sha256": "a6c3cc3946fb690e1384b4462aa710d3e872697fa390e6c3be2123423434243d",
+    "public_argument_parser_declared": false
+  },
+  "actual_GUI02_source_pins_match": true,
+  "native_report": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-p6-target-refresh-03\\p6-generation.json",
+  "native_report_sha256": "fbc1c4519c9f432a67772eb9b7989b166edb7ce29a20a65cc88c5bae63774f2f",
+  "screenshot": {
+    "path": "/mnt/c/Users/Administrator/Desktop/projectos/sandcore/build/m10a2-p6-gui-run-02/p6-notes-associated-status.png",
+    "sha256": "9bf78c925e2c809848b291f30a2b0d49eb18c11212b485cb94109f36ce41ea48",
+    "visually_inspected": true
+  },
+  "original_main_unchanged": true,
+  "scope": "Only Notes2 raw single-path startup consumer; Shell/SCAPI/ABI and other four consumers unchanged"
+}

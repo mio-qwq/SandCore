@@ -1,0 +1,25 @@
+{
+  "status": "SOURCE_PATCH_ONLY_NOT_BUILT_NOT_GUEST_VERIFIED",
+  "files": {
+    "PINS.json": {
+      "sha256": "4c970f5b1d31b7d51208a0f40057630d3b2f1319c54731a1fe827dd817789097",
+      "bytes": 4144
+    },
+    "README.md": {
+      "sha256": "ca879b81ec898127e054c38578f76435dfc8826dfaf310bcf9c94c0a1b77165a",
+      "bytes": 3277
+    },
+    "notes-single-path.patch": {
+      "sha256": "6a50398b942fe81d37ce5be5b16f83bcdd71fe35e8c6bc964fce645f9182c863",
+      "bytes": 2295
+    },
+    "overlay/user/notes2/NOTES2.C": {
+      "sha256": "5894444773d92c6104a06bfa293a84b728bf0cd6b0c1a1c77a9f3f556b51571e",
+      "bytes": 2676
+    },
+    "prepare.py": {
+      "sha256": "c57652b2bcde02494dca155e21bf7178dc1fd2cb7032f562bbf608d610331623",
+      "bytes": 7373
+    }
+  }
+}

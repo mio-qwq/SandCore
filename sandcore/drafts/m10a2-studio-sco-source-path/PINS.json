@@ -1,0 +1,213 @@
+{
+  "status": "SOURCE_PATCH_ONLY_NOT_BUILT_NOT_GUEST_VERIFIED",
+  "modified": {
+    "user/studio2/studio_build.c": {
+      "before_sha256": "0a2c2d65ae2634a7d3a04868d4e9df72282f73c200ee1df1ffcfa40b7ee2d789",
+      "result_sha256": "549289e059f9ba70f9bc9b6b429dc4a512b8f0f24f0cf22d0496b7fdc1be6081",
+      "before_bytes": 29425,
+      "result_bytes": 29704
+    }
+  },
+  "patch_sha256": "7a55202df4adcada2674bc71f6e052ff45667b10888962fab88d2bfa0ee58d05",
+  "refresh_labels": [
+    "STUDIO2"
+  ],
+  "dependencies": {
+    "user/s3c.c": "ac22a6289cc98df5e289cce3ac777cfe4fae3db4f4d9d5e502f12a16106a3ced",
+    "user/s3c_pp.inc": "7aa081fc201b73c96932097c41da5296be9312219b953ddb25839097f6d96697",
+    "user/sccc_include.inc": "6517fd33c36e7ebc86ddb36d22c9440669b867cfbc0a6afa80760b94d53627bb",
+    "user/s3c_sco.inc": "5dc18556c92202fa421894b9615a2221e86449bcb1a1d6cf812615f5104e5919",
+    "user/SCOFMT.H": "63a29cc6a881c744d0b3493ba603ac241edd58b673e948e588a1fe47e43017da",
+    "user/studio2/studio_io.c": "004ef5f65693f6f380d599267482910f9dc8b01250a2eb4e8bdf30e10079eca2",
+    "docs/SC32API.md": "a68deb557b3d02b73086609fc8a264c3ae4e4708aece5f87dddc6c9dfaf64380",
+    "docs/SCO-AND-LINKER.md": "046ca89da7040974401b444fe1fdb599becfb5fd105582a5cb780a6777278894"
+  },
+  "actual_GUI02_source_pin_match": true,
+  "actual_existing_sco": {
+    "path": "/mnt/c/Users/Administrator/Desktop/projectos/sandcore/build/m10a2-p6-target-refresh-03/objects/STUDIO2.SCO",
+    "sha256": "fe003f071ae17b88909698af3dd5563a217e2e7ca6845339377fad14cfaea6bc",
+    "source_count": 32,
+    "source_files": [
+      {
+        "path": "SYS/SRC/studio2/STUDIO2.C",
+        "source_bytes": 2279,
+        "source_FNV1a32": 3141603745
+      },
+      {
+        "path": "SYS/SRC/studio2/STUDIO2.H",
+        "source_bytes": 6142,
+        "source_FNV1a32": 4005030181
+      },
+      {
+        "path": "SYS/INC/SCUI.H",
+        "source_bytes": 24386,
+        "source_FNV1a32": 2919855502
+      },
+      {
+        "path": "SYS/INC/SC32API.H",
+        "source_bytes": 13011,
+        "source_FNV1a32": 4276039697
+      },
+      {
+        "path": "SYS/INC/SCTYPES.H",
+        "source_bytes": 275,
+        "source_FNV1a32": 4042493986
+      },
+      {
+        "path": "SYS/INC/SC32GUI.H",
+        "source_bytes": 5137,
+        "source_FNV1a32": 3176900923
+      },
+      {
+        "path": "SYS/INC/SC32FONT.H",
+        "source_bytes": 1696,
+        "source_FNV1a32": 270126820
+      },
+      {
+        "path": "SYS/INC/SC32PALETTE.H",
+        "source_bytes": 315,
+        "source_FNV1a32": 3506380852
+      },
+      {
+        "path": "SYS/INC/SC32POPUP.H",
+        "source_bytes": 1637,
+        "source_FNV1a32": 993176395
+      },
+      {
+        "path": "SYS/INC/SC32BROKER.H",
+        "source_bytes": 7474,
+        "source_FNV1a32": 3407677534
+      },
+      {
+        "path": "SYS/INC/SC32DROP.H",
+        "source_bytes": 2663,
+        "source_FNV1a32": 3529905449
+      },
+      {
+        "path": "SYS/INC/SCLIB.H",
+        "source_bytes": 16467,
+        "source_FNV1a32": 3505040990
+      },
+      {
+        "path": "SYS/INC/stdarg.h",
+        "source_bytes": 518,
+        "source_FNV1a32": 66478691
+      },
+      {
+        "path": "SYS/INC/stdio.h",
+        "source_bytes": 2175,
+        "source_FNV1a32": 713256709
+      },
+      {
+        "path": "SYS/INC/stddef.h",
+        "source_bytes": 611,
+        "source_FNV1a32": 3372591503
+      },
+      {
+        "path": "SYS/INC/SCUITABS.H",
+        "source_bytes": 472,
+        "source_FNV1a32": 3557538386
+      },
+      {
+        "path": "SYS/INC/SCSHELL.H",
+        "source_bytes": 17316,
+        "source_FNV1a32": 1491378059
+      },
+      {
+        "path": "SYS/INC/SC32HOST.H",
+        "source_bytes": 3902,
+        "source_FNV1a32": 1260047610
+      },
+      {
+        "path": "SYS/INC/SC32PATH.H",
+        "source_bytes": 532,
+        "source_FNV1a32": 4175168519
+      },
+      {
+        "path": "SYS/INC/SC32LEASE.H",
+        "source_bytes": 6950,
+        "source_FNV1a32": 1843257504
+      },
+      {
+        "path": "SYS/INC/SCSHELLABSENT.H",
+        "source_bytes": 305,
+        "source_FNV1a32": 1567317021
+      },
+      {
+        "path": "SYS/INC/SC32CAPTURE.H",
+        "source_bytes": 592,
+        "source_FNV1a32": 2812152766
+      },
+      {
+        "path": "SYS/INC/SC32REPLACE.H",
+        "source_bytes": 637,
+        "source_FNV1a32": 2285265917
+      },
+      {
+        "path": "SYS/INC/SCOFMT.H",
+        "source_bytes": 731,
+        "source_FNV1a32": 2815292490
+      },
+      {
+        "path": "SYS/INC/stdlib.h",
+        "source_bytes": 882,
+        "source_FNV1a32": 2244133219
+      },
+      {
+        "path": "SYS/INC/string.h",
+        "source_bytes": 1187,
+        "source_FNV1a32": 162984818
+      },
+      {
+        "path": "SYS/SRC/studio2/studio_io.c",
+        "source_bytes": 14787,
+        "source_FNV1a32": 122421506
+      },
+      {
+        "path": "SYS/SRC/studio2/studio_project.c",
+        "source_bytes": 10340,
+        "source_FNV1a32": 2629296519
+      },
+      {
+        "path": "SYS/SRC/studio2/studio_syntax.c",
+        "source_bytes": 7312,
+        "source_FNV1a32": 1479791175
+      },
+      {
+        "path": "SYS/SRC/studio2/studio_build.c",
+        "source_bytes": 29425,
+        "source_FNV1a32": 678838762
+      },
+      {
+        "path": "SYS/SRC/studio2/studio_ui.c",
+        "source_bytes": 18016,
+        "source_FNV1a32": 1437393849
+      },
+      {
+        "path": "SYS/SRC/studio2/studio_actions.c",
+        "source_bytes": 25923,
+        "source_FNV1a32": 3734924400
+      }
+    ],
+    "all_rootless": true,
+    "all_source_names_at_most_63_bytes": true
+  },
+  "failed_RDSTATS_sco_recovered": false,
+  "screenshot": {
+    "path": "/mnt/c/Users/Administrator/Desktop/projectos/sandcore/build/m10a2-p6-gui-run-02/p6-studio-scw-build-progress.png",
+    "sha256": "9234121f0c94a51f2090ed8275e8793cd06e93d7b537cfc25b9073ade630720a",
+    "visually_inspected": true,
+    "observed": "Actual SCCC OK SCO / Compilation complete, then Studio project-external-source refusal -108; no link success"
+  },
+  "validation_preserved": [
+    "path UTF8 and forbidden bytes",
+    "full canonical member comparison",
+    "normalized SYS/INC namespace only",
+    "system dependency ScPathQuery revisions",
+    "inputs_current revisions and alias checks"
+  ],
+  "no_new_imports": true,
+  "manifests_not_modified": true,
+  "compiler_and_SCO_format_not_modified": true,
+  "original_main_unchanged": true
+}

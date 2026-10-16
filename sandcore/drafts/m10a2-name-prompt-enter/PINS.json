@@ -1,0 +1,10 @@
+{
+  "path": "user/scshell/shell_name_prompt.inc",
+  "status": "SOURCE_ONLY_NOT_BUILT_NOT_GUEST_VERIFIED",
+  "before_sha256": "f90d957791cd84c8be69197aab27306fa9111c5a33118cfe124b5d40d8651a43",
+  "result_sha256": "0faae116c75c788540db8ea9f6df51768ae6647160027cbceb88544043471e58",
+  "patch_sha256": "039095ac6245538690edb75ed93dbc7dc371df7d07384296d94d88889cf3fd51",
+  "before_bytes": 7084,
+  "result_bytes": 7717,
+  "local_hunks": 2
+}

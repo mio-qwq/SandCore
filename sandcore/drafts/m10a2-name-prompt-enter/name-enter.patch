@@ -1,0 +1,29 @@
+--- a/user/scshell/shell_name_prompt.inc
++++ b/user/scshell/shell_name_prompt.inc
+@@ -16,7 +16,16 @@
+     ScStatus s=0;
+     if(!sh_valid(m,SH_MENU)||sh_quiet)return 0;
+     sh_enter(&m->base);
+-    if(event->type==SC_UI_EVENT_DESTROY&&event->node==m->prompt) {
++    if(event->phase==SC_UI_CAPTURE_PHASE) {
++        /* context的Enter快捷键先于default_button；只在本名称框拦截，不能改宿主其它控件的按键语义。 */
++        if(event->root==m->prompt&&event->node==m->prompt_name&&event->type==SC_UI_EVENT_KEY_DOWN&&
++            !(event->modifiers&(SC32_MOD_SHIFT|SC32_MOD_CONTROL|SC32_MOD_ALT))&&
++            (event->key=='\n'||event->key==27)) {
++            ScU32 intent=event->key==27?SC_UI_DIALOG_CANCEL:SC_UI_DIALOG_OK;
++            if(!m->prompt_intent||intent==SC_UI_DIALOG_CANCEL)m->prompt_intent=intent;
++            handled=1;
++        }
++    } else if(event->type==SC_UI_EVENT_DESTROY&&event->node==m->prompt) {
+         m->prompt=m->prompt_name=m->prompt_status=0;
+         m->prompt_listener=m->prompt_intent=m->prompt_kind=0;
+     } else if(event->type==SC_UI_EVENT_CLOSE_REQUEST ||
+@@ -98,7 +107,7 @@
+     if(s>=0)s=sh_menu_name_layout(m,cancel,SC_UI_ABSOLUTE,88,30,0);
+     if(s>=0)s=ScUiButtonSetDefault(m->desc.ui,m->prompt,accept);
+     memset(&listener,0,sizeof(listener));listener.size=sizeof(listener);listener.version=1;
+-    listener.phases=SC_UI_TARGET_PHASE|SC_UI_BUBBLE_PHASE;
++    listener.phases=SC_UI_CAPTURE_PHASE|SC_UI_TARGET_PHASE|SC_UI_BUBBLE_PHASE;
+     listener.procedure=sh_menu_name_event;listener.context=m;
+     if(s>=0)s=ScUiListen(m->desc.ui,m->prompt,&listener,&m->prompt_listener);
+     if(s>=0)s=ScUiLayout(m->desc.ui,m->prompt);

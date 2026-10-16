@@ -1,0 +1,10 @@
+{
+  "user/scui/ui_dispatch.c": "b3c683401c14d397989f3187dcaa0d47c4b159eecbfab8c03264dbe4da5069e9",
+  "user/scui/ui_menu.c": "b84afc54e8192bb5a71823f2da39a59d4836b2c5223fc7f237d6b39082f242b9",
+  "user/scui/ui_controls.c": "21ee664714d1ee6efe81defe817641665be801427c08624c45d389358ce7d763",
+  "user/scui/ui_edit.c": "ae9d836f57ac2728c1a60234194262ffed3e9739b34dd5b211d10d1f9d8eec9c",
+  "user/files2/files2_view.inc": "c7de9698e27275ff8e57d08dc94389598f60b3758d86968ccfd7c435092e84a7",
+  "user/scshell/shell_menu.c": "d4e6259054098fdb4ce269e873fab070d6764b54428b571ed57c2883e85df7b7",
+  "user/scshell/SCSHELL.json": "ca71470830687c867e1fd149983c7daf46630952c424c3229caca541cfd159f5",
+  "user/SCUI.H": "72d54bfea02c732201ce6b2ecad495c933c30353ab49240c74a5831f0010f72a"
+}

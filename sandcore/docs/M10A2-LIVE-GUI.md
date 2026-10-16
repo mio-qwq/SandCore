@@ -2,6 +2,35 @@
 
 2026-10-16。完整持续目标仍 active。先读本页、P6 实施状态及根 M10a2RULE.MD。本文区分生成、安装和实际运行，不是最终完成声明。
 
+## 当前 GUI02 正在运行
+
+最新实际进展：Notes/Studio/Terminal已正常关闭，仅Files2在 `/HOME/P6GUI/CLIP/RETURN/DROPBACK`，Canvas正从桌面启动。普通SID4仍active，VM/exec仍2364/22125。最后动作 `canvas-desktop-open`、`canvas-first-view`，后续先看真实画面，不重放启动。
+
+Files实际完成文件COPY和CUT/MOVE：20B源/目标正文精确相等，E-6.REC/E-9.REC的头/连续三frame/CRC均正确，分别stage3/stage4、DURABLE=1；MOVE源目录只有RETURN、原NOTE不再存在。审计为VM目录的copy-journal-audit.json/move-journal-audit.json。真实Files→Desktop Copy到 `/DESK/NOTE.TXT`，再Desktop→Files Move到 `/HOME/P6GUI/CLIP/RETURN/DROPBACK/NOTE.TXT`；两份REC取回并按同样合同核验。第三次Files→Desktop拖放选取消，源20B/SHA/代数1564未变，/DESK前后均原16项。
+
+跨窗操作本身持久成功，但Desktop在源移动删除后仍显示NOTE图标130秒以上；人工点击桌面空白+F5后才消失，图片p6-desktop-after-move-refresh.png与p6-desktop-manual-refresh.png保留前后。drop-journal-audit.json明确source_view_stale，不能称整个Drop闭环PASS。`drafts/m10a2-drop-source-refresh`正审阅传输ACK早于文件job持久终态、实际MOVE选择同步和发送端刷新出口，尚未合main；不能用过早一次refresh或目录轮询掩盖。
+
+三处确定局部修复都已冻结但尚未合入：m10a2-name-prompt-enter（仅SCSHELL）、m10a2-app-path-arguments（仅NOTES2）、m10a2-studio-sco-source-path（仅STUDIO2，SCO根内名补明确根/后沿原严格资格检查）。后续接线m10a2-p6-followup-refresh已冻结，只读85副文件witness及当前布局/CORE闭包通过；目前该wrapper精确要求三个label，若Drop根因需要其它label，须先按实际设计调整明确范围，不能硬维持三个目标而不修。HOST08尚未构建。
+
+操作注意：真实控件焦点有语义。地址TextBox内CtrlV属于文本粘贴；进入目录要等真实加载/新建job结束，随后点表格空白再CtrlV才是文件粘贴。此前过早切目录的一次操作落到旧目录、出现Result unknown，已正常关闭，未把它算成功；随后正确目录+表格焦点的单次COPY取得真实DURABLE ACK。业务动作不因超时盲重放。
+
+exec session **22125**，Windows QEMU PID **2364**，原 SID1、普通 UID/GID1000/realm0 的测试 SID4。入口为 `drafts/m10a2-p6-gui-coherent/driver.py`，输入接口仍是 JSONL；报告为 `build/m10a2-p6-gui-run-02/p6-gui.json`，RUNNING。恢复必须先核进程，不能重启此输出目录或重放动作 ID。
+
+本次输入使用 target-refresh-03、HOST07、final-02/core、final-02/sdk、原 M10a1 数据盘、`build/m10a2-p6-gui-coherent-layout-01/layout-proof.json`。实际新 i386 layout proof SHA 为95d1108d29e095223dca4f912e4ed3af57821d3ccbc0c7fdac3b699280ad79bd。CORE SHA为aed45e2f613e556cc4687582c5b79a39a55393c394ed0be9b57c58035dbd4102，SDK485项/17389865B。发行与构建凭证见 `drafts/m10a2-p6-final-02-receipt`，三个实际步骤exit0、1325限定源前后不变。主源及本次helpers/SDK/CORE均冻结，不在VM运行时修改。
+
+基点已取得真实一致 PF13922/13922、host ready、等待和 GC 收束，完整暂停1.657秒并确认恢复；原可信host PID1/代数1 实际登记的新SCUI完整摘要为7059348b04925a4ba5f29702abd0c419a570b05008ad854908f70dae66d640b7。最终账尚未执行；不把GUI01的205页免除。
+
+Root已实际查看并完成：
+
+- 新桌面图标黑边消失。`p6-new-native-desktop.png` 已查看；像素凭证 `drafts/m10a2-desktop-alpha-runtime` 核1640不透明点原RGB保持、693半透明点全部精确匹配真实壁纸合成、2522透明点精确透出背景，原8图标及壁纸未变。baseline SID1与实际截图SID4的来源分开记录。
+- Files2真正启动，CtrlL进入/HOME，CtrlShiftN紧凑新建名称框，输入P6GUI后点击新建成功，目录本人1000:1000并可进入。文本框裸Enter没有提交，按钮路径成功；修复草稿在 `drafts/m10a2-name-prompt-enter`，尚未合入。具体原因是同context Files OPEN快捷键优先于默认按钮，局部CAPTURE修复只作用于本名称框。
+- Notes2读取旧159B notes.txt；CtrlN新文档输入20B，标准Save As保存 `/HOME/P6GUI/NOTE.TXT`。`p6-notes-durable-saved.png`实际显示“已持久保存”、标题无星号。只读取回 `notes-saved.txt` 精确为 `P6 native GUI note.\n`，SHA7def50866c7959c3579cf642bea6e2473349576f26c2c9dbba874db8ec921ec69。旧文本未改。
+- Notes正常关闭后，Files刷新显示NOTE.TXT/20B/1000:1000；选中Enter走真实默认关联，但Notes对带外双引号路径返回-103。截图 `p6-notes-associated-status.png`保留失败。不是保存失败。最小启动解析草稿 `drafts/m10a2-app-path-arguments` 只修改Notes，另外四个关联入口已有相应处理；尚未合入。
+- Terminal2从系统菜单启动，普通提示符mio/HOME。实际 `mkdir -p /HOME/RDESK /HOME/RDWORK /HOME/RDPLUGIN` 无错误并回提示符，三个目录也在共享对话框中真实列出。Shell已exit、Terminal正常点X关闭。
+- Studio2从开发菜单启动。实际工程菜单“打开工作区…”/标题“.SCW”，SDK目录筛选仅列RDESK.SCW和RDSTATS.SCW。已打开RDSTATS.SCW，真实树含JSON/C/H；F5执行实际SCCC --object并输出SCCC OK SCO。随后依赖检查误报工程外头文件(-108)，未执行链接/发布。`p6-studio-scw-build-progress.png`保留实际编译命令和失败。正在针对SCO根相对路径与ScPathResolve当前目录语义准备局部修复；不重复F5。临时对象已被正常cleanup清除，Root只读get返回-1记录保留。
+
+较早时点曾开Files2、空文档Notes2、Studio2及其错误提示，现均已按上方最新进展收束。继续其它代表GUI或收束本VM；最后切回SID1、注销SID4，再finish核一致owner账。新补丁只在新draft，等本VM结束后再合入、只刷新SCSHELL/NOTES2/STUDIO2；SCUI和CORE无须无故重编。main最新提交6bd6c93；当前新增凭证待保存，远端上次未确认。
+
 ## 当前实现与构建
 
 - SCW（SandCore Workspace）是工程工作区，Studio 入口、打开/保存筛选和 SDK 示例统一使用 `.SCW`。先构建 `RDSTATS.SCW` 的独立 SCL，再构建 `RDESK.SCW` 的四 TU 应用。F5 构建、F6 运行、F7 调试。

@@ -1,0 +1,32 @@
+--- a/user/studio2/studio_build.c
++++ b/user/studio2/studio_build.c
+@@ -377,8 +377,8 @@
+     if(memcmp(head,"SCO1MIO\0",8)||read32(head+8)!=1u||read32(head+24)!=q.bytes)return SC32_E_INVALID;
+     U files=read32(head+52),count=read32(head+56),strings=read32(head+68),stringbytes=read32(head+72);
+     if(files>q.bytes||count>(q.bytes-files)/16u||strings>q.bytes||stringbytes>q.bytes-strings)return SC32_E_INVALID;
+-    /* 编译器本来最多64份source；这里只读取它真正记录的依赖身份，
+-     * 项目外非系统头必须显式加为header后重新构建，不能悄悄漏跟踪。 */
++    /* 按实际source-file表枚举依赖身份；项目外非系统头必须显式
++     * 加为header后重新构建，不能悄悄漏跟踪。 */
+     for(U i=0;i<count;i++){
+         unsigned char row[16];
+         n=0;
+@@ -386,12 +386,15 @@
+         if(s<0||n!=16u)return SC32_E_IO;
+         U offset=read32(row);
+         if(offset>=stringbytes)return SC32_E_INVALID;
+-        char name[68];
++        /* SCCC把旧RESOLVE的根内名原样写入SCO，不能把它再当cwd相对名。
++         * 先补显式根，再沿原path正规化；后面的工程/namespace/revision检查不变。
++         * name+1仍有67B，读取上限同时给根斜杠和字符串终止留足空间。 */
++        char name[68];name[0]='/';
+         U take=stringbytes-offset;
+         if(take>67u)take=67u;
+         n=0;
+-        s=ScPathRead(in->object,strings+offset,name,take,&n);
+-        if(s<0||!memchr(name,0,n))return SC32_E_INVALID;
++        s=ScPathRead(in->object,strings+offset,name+1,take,&n);
++        if(s<0||!memchr(name+1,0,n)||!name[1])return SC32_E_INVALID;
+         char absolute[68];
+         s=path(name,absolute);
+         if(s<0)return s;

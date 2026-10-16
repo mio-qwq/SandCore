@@ -1,0 +1,25 @@
+{
+  "status": "SOURCE_PATCH_ONLY_NOT_BUILT_NOT_GUEST_VERIFIED",
+  "files": {
+    "PINS.json": {
+      "sha256": "03aaed762f0eab91ca1eb84ab55306512c537a5c659a511a58739363c38d2b47",
+      "bytes": 6459
+    },
+    "README.md": {
+      "sha256": "456e13b02ec525789d4a7fb215eb7de33f7ee69ff61b9379a1c438985f066235",
+      "bytes": 2908
+    },
+    "overlay/user/studio2/studio_build.c": {
+      "sha256": "549289e059f9ba70f9bc9b6b429dc4a512b8f0f24f0cf22d0496b7fdc1be6081",
+      "bytes": 29704
+    },
+    "prepare.py": {
+      "sha256": "40767640834b0906b06efe26c31582bd22d3d5e174dcf6075f1b3d0214571fa2",
+      "bytes": 6595
+    },
+    "studio-sco-source-root.patch": {
+      "sha256": "7a55202df4adcada2674bc71f6e052ff45667b10888962fab88d2bfa0ee58d05",
+      "bytes": 1760
+    }
+  }
+}

@@ -1,0 +1,83 @@
+{
+  "schema": 1,
+  "status": "FROZEN_ACTUAL_CORE_AND_STRICT_SDK_READY_FOR_ROOT_NEXT_GUI",
+  "date": "2026-10-16",
+  "owned_output": "build/m10a2-p6-final-02",
+  "native_report": {
+    "path": "build/m10a2-p6-target-refresh-03/p6-generation.json",
+    "bytes": 14897961,
+    "sha256": "fbc1c4519c9f432a67772eb9b7989b166edb7ce29a20a65cc88c5bae63774f2f"
+  },
+  "host_report": {
+    "path": "build/m10a2-main-studio-01/p6-unified-host-07.json",
+    "bytes": 363039,
+    "sha256": "22b85409627ff02b46bc47093a4f2c9482e0229efb23b403d469892997a0e39c"
+  },
+  "steps": [
+    {
+      "name": "codec-proof",
+      "exit_code": 0,
+      "wall_seconds": 0.11000000000058208,
+      "log": "build/m10a2-p6-final-02/codec-proof-01.log",
+      "log_sha256": "5dd9db5791c7fc6e791596b28fa4e744320b08c989813e92cc593269773234c4"
+    },
+    {
+      "name": "sdk-stage",
+      "exit_code": 0,
+      "wall_seconds": 11.43699999999808,
+      "log": "build/m10a2-p6-final-02/sdk-stage-01.log",
+      "log_sha256": "a24407dcab1001aafac0e8910171f37f875c58b3beff3eea92c2167d6eba48ee"
+    },
+    {
+      "name": "core-build",
+      "exit_code": 0,
+      "wall_seconds": 22.531000000002678,
+      "log": "build/m10a2-p6-final-02/core-build-01.log",
+      "log_sha256": "76ebcaa4dcf37d87dfaa73a4a6761e1b6b891d8e5bf111e81944cda3598fc16a"
+    }
+  ],
+  "files": {
+    "core-build-inputs.json": {
+      "bytes": 54512,
+      "sha256": "dc5eb8c468a6f1ee3f953ca0a9d14522ae3edbd9fab4782213cbb4a97d25eb54"
+    },
+    "core-build-receipt.json": {
+      "bytes": 89661,
+      "sha256": "4f75f8d83d8dcb3af9f41291f51245c3ce18a54853e9e008aefa5be22bbb49cd"
+    },
+    "finalize.py": {
+      "bytes": 10522,
+      "sha256": "6e9880662f8bc5d57fea97e8dce1811086c0b36bf3313d461b363405bf1faa46"
+    },
+    "inspect_final.py": {
+      "bytes": 8989,
+      "sha256": "8e12c7bc261f69ad342b746d541149eee7bfd2f1f926aeba94b751dce90ee8fb"
+    },
+    "PLAN.json": {
+      "bytes": 3940,
+      "sha256": "f5b91e7c4a7e6fc0f666aee69a8cec5b99cfb4e4cb64cc55505434641b072dd1"
+    },
+    "README.md": {
+      "bytes": 4817,
+      "sha256": "1056e9eb409286854bdbdad6c9ce3fd75727c7d90ea4c1046c399b3e2826b448"
+    },
+    "sdk-staging-receipt.json": {
+      "bytes": 82277,
+      "sha256": "4d88c5cad6418a94c33b81ea99cac97aadf15e6e10ff3e0a3f641ef07d6a69e6"
+    }
+  },
+  "execution_receipt": {
+    "path": "build/m10a2-p6-final-02/finalization.json",
+    "sha256": "13c1939d2e698ee18338fd6b328535e41482cae8e4dcf92af925e366748daed6"
+  },
+  "core_sha256": "aed45e2f613e556cc4687582c5b79a39a55393c394ed0be9b57c58035dbd4102",
+  "sdk_manifest_sha256": "82a839cf68c32c7cae18427a7a949e74e80005359f312e76040a29b9072cf439",
+  "sdk_payload_files": 485,
+  "sdk_payload_bytes": 17389865,
+  "main_modified": false,
+  "vm_started": false,
+  "data_disk_copied": false,
+  "guest_booted": false,
+  "guest_runtime_verified": false,
+  "full_M10a2": false
+}

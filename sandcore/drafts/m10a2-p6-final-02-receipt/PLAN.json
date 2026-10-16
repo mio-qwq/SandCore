@@ -1,0 +1,91 @@
+{
+  "schema": 1,
+  "status": "PREPARED_WAITING_FOR_ROOT_EXPLICIT_NATIVE_PASS_NO_EXECUTION",
+  "native_report": "build/m10a2-p6-target-refresh-03/p6-generation.json",
+  "host_report": {
+    "path": "build/m10a2-main-studio-01/p6-unified-host-07.json",
+    "bytes": 363039,
+    "sha256": "22b85409627ff02b46bc47093a4f2c9482e0229efb23b403d469892997a0e39c"
+  },
+  "out": "build/m10a2-p6-final-02",
+  "steps": [
+    {
+      "name": "codec-proof",
+      "args": [
+        "C:\\Users\\Administrator\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+        "-B",
+        "tools/make_m10a2_codec_proof.py",
+        "--build-report",
+        "build/m10a2-main-studio-01/p6-unified-host-07.json",
+        "--out",
+        "build/m10a2-p6-final-02/codec-proof.json"
+      ]
+    },
+    {
+      "name": "sdk-stage",
+      "args": [
+        "C:\\Users\\Administrator\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+        "-B",
+        "tools/stage_m10a2_sdk.py",
+        "--profile",
+        "native-preview",
+        "--out",
+        "build/m10a2-p6-final-02/sdk",
+        "--build-report",
+        "build/m10a2-main-studio-01/p6-unified-host-07.json",
+        "--compiler-provenance",
+        "build/m10a2-p6-target-refresh-03/native-artifacts/provenance.json",
+        "--linker-provenance",
+        "build/m10a2-p6-target-refresh-03/native-artifacts/provenance.json",
+        "--host-codec-proof",
+        "build/m10a2-p6-final-02/codec-proof.json",
+        "--native-library",
+        "SCLDR.SCL=build/m10a2-p6-target-refresh-03/native-libraries/provenance.json",
+        "--native-library",
+        "SC32API.SCL=build/m10a2-p6-target-refresh-03/native-libraries/provenance.json",
+        "--native-library",
+        "SCCLIB.SCL=build/m10a2-p6-target-refresh-03/native-libraries/provenance.json",
+        "--native-library",
+        "SCLIB.SCL=build/m10a2-p6-target-refresh-03/native-libraries/provenance.json",
+        "--native-library",
+        "SCUI.SCL=build/m10a2-p6-target-refresh-03/native-libraries/provenance.json",
+        "--native-library",
+        "SCSHELL.SCL=build/m10a2-p6-target-refresh-03/native-libraries/provenance.json",
+        "--native-library",
+        "SCGFX.SCL=build/m10a2-p6-target-refresh-03/native-libraries/provenance.json",
+        "--native-library",
+        "SCTERM.SCL=build/m10a2-p6-target-refresh-03/native-libraries/provenance.json"
+      ]
+    },
+    {
+      "name": "core-build",
+      "args": [
+        "wsl.exe",
+        "sh",
+        "-lc",
+        "cd /mnt/c/Users/Administrator/Desktop/projectos/sandcore && PYTHONDONTWRITEBYTECODE=1 make -j4 BUILD=build/m10a2-p6-final-02/core M9_BUILD=1 M10_BUILD=1 SHELL_HOST_IMAGE=build/m10a2-p6-target-refresh-03/native-artifacts/SCSHELL.SCX LOGIN2_ISSUE_IMAGE=build/m10a2-p6-target-refresh-03/native-artifacts/LOGIN2.SCX LOGIN2_ISSUE_LIBRARIES=build/m10a2-p6-target-refresh-03/native-libraries M10_PUBLIC_KEY=assets/trust/M10-OWNER-ED25519.PUB build/m10a2-p6-final-02/core/sandcore.img build/m10a2-p6-final-02/core/fs/SYS/CORE/CORE.SKM"
+      ],
+      "make_args": [
+        "make",
+        "-j4",
+        "BUILD=build/m10a2-p6-final-02/core",
+        "M9_BUILD=1",
+        "M10_BUILD=1",
+        "SHELL_HOST_IMAGE=build/m10a2-p6-target-refresh-03/native-artifacts/SCSHELL.SCX",
+        "LOGIN2_ISSUE_IMAGE=build/m10a2-p6-target-refresh-03/native-artifacts/LOGIN2.SCX",
+        "LOGIN2_ISSUE_LIBRARIES=build/m10a2-p6-target-refresh-03/native-libraries",
+        "M10_PUBLIC_KEY=assets/trust/M10-OWNER-ED25519.PUB",
+        "build/m10a2-p6-final-02/core/sandcore.img",
+        "build/m10a2-p6-final-02/core/fs/SYS/CORE/CORE.SKM"
+      ]
+    }
+  ],
+  "scopes": {
+    "main_write": false,
+    "vm_start": false,
+    "disk_copy": false,
+    "core_targets_only": 2,
+    "ordinary_native_libraries": 8,
+    "host_codec_exception": "SCSOUND.SCL_ONLY"
+  }
+}

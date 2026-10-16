@@ -1,0 +1,48 @@
+{
+  "schema": 1,
+  "status": "SOURCE_WIRING_FROZEN_NOT_THREE_TARGET_REFRESHED",
+  "read_only_check": {
+    "command": "python -B sandcore/drafts/m10a2-p6-followup-refresh/driver.py --frozen-audit",
+    "exit_code": 0,
+    "status": "READ_ONLY_FROZEN_BASIS_AUDIT_PASS_NOT_REFRESHED",
+    "actual_get_direct": 9,
+    "actual_get_inherited_alias": 76,
+    "fixed_sidecars": 85,
+    "fixed_top_level_reports_helpers": 13
+  },
+  "source_checks": {
+    "ast_parse": "PASS_TWO_FILES",
+    "frozen_legacy_imports": "PASS",
+    "all_previous_source_names_in_HOST07_schema": true,
+    "all_27_formal_native_manifest_names_in_HOST07_schema": true
+  },
+  "execution_boundaries": {
+    "HOST08_provided": false,
+    "three_patch_preflight_executed": false,
+    "build_started": false,
+    "VM_started_or_connected": false,
+    "VM_input_sent": false,
+    "main_or_old_helpers_edited": false,
+    "disk_copied": false,
+    "new_native_outputs_created": false,
+    "old_task_layout_replaced": false
+  },
+  "files": {
+    "followup.py": {
+      "bytes": 13279,
+      "sha256": "9f6e7497d11a0edc5d5b3485c68e873191c13b22941ada3e1723443bed956e60"
+    },
+    "driver.py": {
+      "bytes": 11130,
+      "sha256": "0c3517e8717f09e15306842d2dc2d87f877aea289adad09fd5fda86c9dab0cf2"
+    },
+    "PINS.json": {
+      "bytes": 2609,
+      "sha256": "41fa8f71fc1ce4040dea231c2fc5efa25cc60e92422cf835636aa31e89565f8a"
+    },
+    "README.md": {
+      "bytes": 5308,
+      "sha256": "954d6c527e9c346b803893a40ccf528ce0621ae80f97e2f066d0dc46eb45e638"
+    }
+  }
+}

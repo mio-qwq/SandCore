@@ -1,0 +1,16 @@
+{
+  "status": "SOURCE_ONLY_NOT_BUILT_NOT_GUEST_VERIFIED",
+  "static_checks": [
+    "python_ast",
+    "source_before_unchanged",
+    "two_local_hunks"
+  ],
+  "files": {
+    "name-enter.patch": "039095ac6245538690edb75ed93dbc7dc371df7d07384296d94d88889cf3fd51",
+    "PINS.json": "f0d862d1cdb73ba6c68fa9465de03524ab518aacacc0360433f440d64dab2897",
+    "prepare.py": "11e99b1f045f4f01d7c45f6516219d9a6b46704dfbe6feb951121ad3aa6df9a6",
+    "README.md": "89e306b373c21ce43ad3a9fba4b22b3aab5288f4817aa1a88008ea54ed20e76f",
+    "result/shell_name_prompt.inc": "0faae116c75c788540db8ea9f6df51768ae6647160027cbceb88544043471e58",
+    "SOURCE-PINS.json": "a83d35380e8d7f6700e705d2fb16191be2237728a9d37fbefef08f7742399dc5"
+  }
+}
