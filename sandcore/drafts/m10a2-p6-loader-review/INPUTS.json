@@ -1,0 +1,270 @@
+{
+  "schema": 1,
+  "scope": "READ_ONLY_RUN02_LOADER_CAUSE_AND_SOURCE_FIX_REVIEW",
+  "date": "2026-10-16",
+  "status": "FROZEN_CAUSE_CONFIRMED_ROOT_FIXED_RUNTIME_PENDING",
+  "missing_imports_or_dependencies": [],
+  "actual_seed_imports": [
+    {
+      "name": "ScPathResolve",
+      "dep_index": 0,
+      "dependency": "SC32API.SCL",
+      "kind": 1,
+      "size": 1
+    },
+    {
+      "name": "ScProcessArguments",
+      "dep_index": 0,
+      "dependency": "SC32API.SCL",
+      "kind": 1,
+      "size": 1
+    },
+    {
+      "name": "__scc_standard",
+      "dep_index": 1,
+      "dependency": "SCCLIB.SCL",
+      "kind": 1,
+      "size": 1
+    },
+    {
+      "name": "calloc",
+      "dep_index": 1,
+      "dependency": "SCCLIB.SCL",
+      "kind": 1,
+      "size": 1
+    },
+    {
+      "name": "exit",
+      "dep_index": 1,
+      "dependency": "SCCLIB.SCL",
+      "kind": 1,
+      "size": 1
+    },
+    {
+      "name": "fclose",
+      "dep_index": 1,
+      "dependency": "SCCLIB.SCL",
+      "kind": 1,
+      "size": 1
+    },
+    {
+      "name": "fopen",
+      "dep_index": 1,
+      "dependency": "SCCLIB.SCL",
+      "kind": 1,
+      "size": 1
+    },
+    {
+      "name": "fprintf",
+      "dep_index": 1,
+      "dependency": "SCCLIB.SCL",
+      "kind": 1,
+      "size": 1
+    },
+    {
+      "name": "fread",
+      "dep_index": 1,
+      "dependency": "SCCLIB.SCL",
+      "kind": 1,
+      "size": 1
+    },
+    {
+      "name": "free",
+      "dep_index": 1,
+      "dependency": "SCCLIB.SCL",
+      "kind": 1,
+      "size": 1
+    },
+    {
+      "name": "fseek",
+      "dep_index": 1,
+      "dependency": "SCCLIB.SCL",
+      "kind": 1,
+      "size": 1
+    },
+    {
+      "name": "ftell",
+      "dep_index": 1,
+      "dependency": "SCCLIB.SCL",
+      "kind": 1,
+      "size": 1
+    },
+    {
+      "name": "fwrite",
+      "dep_index": 1,
+      "dependency": "SCCLIB.SCL",
+      "kind": 1,
+      "size": 1
+    },
+    {
+      "name": "memcmp",
+      "dep_index": 1,
+      "dependency": "SCCLIB.SCL",
+      "kind": 1,
+      "size": 1
+    },
+    {
+      "name": "memcpy",
+      "dep_index": 1,
+      "dependency": "SCCLIB.SCL",
+      "kind": 1,
+      "size": 1
+    },
+    {
+      "name": "memset",
+      "dep_index": 1,
+      "dependency": "SCCLIB.SCL",
+      "kind": 1,
+      "size": 1
+    },
+    {
+      "name": "printf",
+      "dep_index": 1,
+      "dependency": "SCCLIB.SCL",
+      "kind": 1,
+      "size": 1
+    },
+    {
+      "name": "qsort",
+      "dep_index": 1,
+      "dependency": "SCCLIB.SCL",
+      "kind": 1,
+      "size": 1
+    },
+    {
+      "name": "realloc",
+      "dep_index": 1,
+      "dependency": "SCCLIB.SCL",
+      "kind": 1,
+      "size": 1
+    },
+    {
+      "name": "snprintf",
+      "dep_index": 1,
+      "dependency": "SCCLIB.SCL",
+      "kind": 1,
+      "size": 1
+    },
+    {
+      "name": "strcmp",
+      "dep_index": 1,
+      "dependency": "SCCLIB.SCL",
+      "kind": 1,
+      "size": 1
+    },
+    {
+      "name": "strlen",
+      "dep_index": 1,
+      "dependency": "SCCLIB.SCL",
+      "kind": 1,
+      "size": 1
+    }
+  ],
+  "actual_seed_dependencies": [
+    {
+      "name": "SC32API.SCL",
+      "abi_major": 1,
+      "min_minor": 3,
+      "min_version": 5,
+      "flags": 0
+    },
+    {
+      "name": "SCCLIB.SCL",
+      "abi_major": 1,
+      "min_minor": 0,
+      "min_version": 1,
+      "flags": 0
+    }
+  ],
+  "inputs": {
+    "kernel/sc32_debug_modules.inc": {
+      "sha256": "f602dec85f1e67ec8dfab79ec6a737c0cd64d364deffb70df1ff780cefb34647",
+      "host02_sha256": "e6def8b5cca663c68612c4297e93b6fd59de92c57b2eaf4198eb499b0f3edbae"
+    },
+    "kernel/fs.c": {
+      "sha256": "e0e916990807587df741ee023a3d36741bce85f4c15fb5c0523f52351bc2fb52",
+      "host02_sha256": "e0e916990807587df741ee023a3d36741bce85f4c15fb5c0523f52351bc2fb52"
+    },
+    "kernel/fs_lease_native.inc": {
+      "sha256": "912ec0de00abb51d9bfbc9a785046084cfb5cd0bbb539db0c94a75b00818107a",
+      "host02_sha256": "912ec0de00abb51d9bfbc9a785046084cfb5cd0bbb539db0c94a75b00818107a"
+    },
+    "kernel/sc32_file.c": {
+      "sha256": "2792ef65e0f2d53db41a08ac9fcf62d9e70963eba643debe2111f6c566df5fed",
+      "host02_sha256": "2792ef65e0f2d53db41a08ac9fcf62d9e70963eba643debe2111f6c566df5fed"
+    },
+    "user/runtime/scl_application.c": {
+      "sha256": "412a933b833f87a48b2b48a45bf352a51edfa50047b608e45c8474c4306d0dd7",
+      "host02_sha256": "412a933b833f87a48b2b48a45bf352a51edfa50047b608e45c8474c4306d0dd7"
+    },
+    "user/runtime/scl_debug_registry.c": {
+      "sha256": "e1df89189c090b1ac5bf20796ef1210c4dfa1e22ce83fdd18cd97c8000d5ed94",
+      "host02_sha256": "e1df89189c090b1ac5bf20796ef1210c4dfa1e22ce83fdd18cd97c8000d5ed94"
+    },
+    "user/runtime/scldr.c": {
+      "sha256": "d575beaabe72991b81a9c74d649ece726938ebe37063e665819aa560923296a5",
+      "host02_sha256": "d575beaabe72991b81a9c74d649ece726938ebe37063e665819aa560923296a5"
+    },
+    "user/runtime/scl_platform.c": {
+      "sha256": "a69dace410b4b67dc306711b51a8348a858f7ca24aee89f9db7a9da665437259",
+      "host02_sha256": "a69dace410b4b67dc306711b51a8348a858f7ca24aee89f9db7a9da665437259"
+    },
+    "user/runtime/SCLDR.H": {
+      "sha256": "0f9dd692e7a5b47a4299e17d4fe13295de2911cb0ceeb8b35e7187659805b9cb",
+      "host02_sha256": "0f9dd692e7a5b47a4299e17d4fe13295de2911cb0ceeb8b35e7187659805b9cb"
+    },
+    "user/SCLD.json": {
+      "sha256": "caee7d89213891333e7e407df5b0b801f40a86b198a20a48dc376c17e669ccb0",
+      "host02_sha256": "caee7d89213891333e7e407df5b0b801f40a86b198a20a48dc376c17e669ccb0"
+    },
+    "user/SCLD.NATIVE.JSON": {
+      "sha256": "b00843b63f8996fd99cd841d00ddfdf5ce25b6f527e0ee34827a74dea7d9f042",
+      "host02_sha256": "b00843b63f8996fd99cd841d00ddfdf5ce25b6f527e0ee34827a74dea7d9f042"
+    },
+    "disk:SYS/LIB/SCLDR.SCL": {
+      "bytes": 20529,
+      "sha256": "d38a01577be615a9cf756b789b1d30f71a862b31fcd30aba8da4fe16fc1ec613",
+      "abi_major": 1,
+      "abi_minor": 2,
+      "library_version": 3,
+      "exports": 12
+    },
+    "disk:SYS/LIB/SC32API.SCL": {
+      "bytes": 154939,
+      "sha256": "c4d810c78240a7021e2ffc68c9570034675876aa668cf159e11370ef328b847d",
+      "abi_major": 1,
+      "abi_minor": 4,
+      "library_version": 6,
+      "exports": 193
+    },
+    "disk:SYS/LIB/SCCLIB.SCL": {
+      "bytes": 39256,
+      "sha256": "181d4b647e466d58bc0d0966a1b1253d36612d989ced5bf5c406204fe7c5619b",
+      "abi_major": 1,
+      "abi_minor": 0,
+      "library_version": 1,
+      "exports": 94
+    },
+    "build\\m10a2-p6-guest-generation-run-02\\p6-generation.json": {
+      "bytes": 1125135,
+      "sha256": "62f9b402ed3b8f3e09313fe5d97d60156a4db3dc8eec9426ece8ed73d2667898"
+    },
+    "build\\m10a2-p6-guest-generation-run-02\\native-artifacts\\SCLD0.SCX": {
+      "bytes": 73228,
+      "sha256": "570167927a4828760d637a98676cd728e9ada9cd6fa1d0018daa2f4f9c3ac4f9"
+    },
+    "build\\m10a2-p6-guest-generation-run-02\\sanddata.img": {
+      "bytes": 268435456,
+      "sha256": "30d19983be2e4f3035af1a6e591c15eb3eb9cf9df2371c1c6b59af81affb1bc9"
+    },
+    "build\\m10a2-main-studio-01\\p6-unified-host-02.json": {
+      "bytes": 362751,
+      "sha256": "55472b7cd477cf545a66ca1d106daff27c15ac53e336a262dfe9f2b7ebc5ddd6",
+      "preflight_sha256": "55472b7cd477cf545a66ca1d106daff27c15ac53e336a262dfe9f2b7ebc5ddd6"
+    }
+  },
+  "report_sha256": "19cdce4ce91f0baa7b91556ecf075ea79cc8c6a8ee82dc106a9579acf40888df",
+  "main_modified_by_reviewer": false,
+  "qemu_started_by_reviewer": false,
+  "build_or_tests_started_by_reviewer": false
+}

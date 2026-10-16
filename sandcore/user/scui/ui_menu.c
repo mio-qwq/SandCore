@@ -1544,6 +1544,8 @@ ScStatus ScUiCommand(ScUiContext *c,ScUiNode source,ScU32 command)
     if(!n || c->object.closing){s=SC_UI_E_CANCELLED;
         goto done;
         }
+    s=ui_secret_submit_command(c,n);if(s<0)goto done;
+    n=ui_node(c,source);if(!n || c->object.closing){s=SC_UI_E_CANCELLED;goto done;}
     ui_event_record(&event,n,SC_UI_EVENT_COMMAND);
     event.command=command;
     event.flags=SC_UI_EVENT_PROGRAMMATIC;

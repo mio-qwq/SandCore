@@ -1,8 +1,8 @@
 {
   "name": "SCUI.SCL",
   "abi_major": 1,
-  "abi_minor": 1,
-  "library_version": 2,
+  "abi_minor": 3,
+  "library_version": 4,
   "init": null,
   "fini": "ScUiFinalize",
   "exports": [
@@ -439,6 +439,10 @@
       "kind": "function"
     },
     {
+      "name": "ScUiPainterArgb",
+      "kind": "function"
+    },
+    {
       "name": "ScUiPainterBounds",
       "kind": "function"
     },
@@ -515,6 +519,26 @@
       "kind": "function"
     },
     {
+      "name": "ScUiSecretBindSubmit",
+      "kind": "function"
+    },
+    {
+      "name": "ScUiSecretClear",
+      "kind": "function"
+    },
+    {
+      "name": "ScUiSecretConsume",
+      "kind": "function"
+    },
+    {
+      "name": "ScUiSecretCreate",
+      "kind": "function"
+    },
+    {
+      "name": "ScUiSecretQuery",
+      "kind": "function"
+    },
+    {
       "name": "ScUiSelectionClear",
       "kind": "function"
     },
@@ -563,7 +587,15 @@
       "kind": "function"
     },
     {
+      "name": "ScUiTabRemove",
+      "kind": "function"
+    },
+    {
       "name": "ScUiTabSelect",
+      "kind": "function"
+    },
+    {
+      "name": "ScUiTabSetText",
       "kind": "function"
     },
     {
@@ -1104,6 +1136,18 @@
       "name": "ScIpcSend",
       "kind": "function",
       "dependency": "SC32API.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScMemoryAllocatePages",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScMemoryFreePages",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
       "size": 1
     },
     {

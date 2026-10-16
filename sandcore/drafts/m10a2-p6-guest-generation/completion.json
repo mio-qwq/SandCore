@@ -1,0 +1,84 @@
+{
+  "status": "FOREGROUND_DRIVER_FIX_IMPLEMENTED_PENDING_ROOT_RERUN",
+  "qemu_started": false,
+  "guest_generation_run": false,
+  "final_runtime_preflight_run": false,
+  "scope": "THIS_AGENT_FIX_ONLY_NO_QEMU_RUN",
+  "producer_identity": "NOT_OBSERVED",
+  "previous_run": {
+    "report": "build/m10a2-p6-guest-generation-run-01/p6-generation.json",
+    "sha256": "a21d1d7a6a8a099ba69f31ff3a5acbfecfffb312e10df0bfaf2086ba800dbe1c",
+    "qemu_pid": 14668,
+    "reached": "ACTUAL_STARTUP_AND_WARM",
+    "failure": "OPTIONAL_IDENTITY_OBSERVER_REJECTED_SH_SCX_BACKGROUND_WRAPPER_NOT_COMPILER_OS_FAILURE",
+    "old_driver_sha256": "d13353e6ef1127f3db94c9d0a961424c00f6fd7084217bf6e6508fd3e06cdb20",
+    "archive": "history/run-01/archive.json"
+  },
+  "new_ordinary_libraries": 8,
+  "targets": 27,
+  "source_only_and_parser_report": "build/m10a2-p6-guest-generation-agent-check-02/report.json",
+  "report_sha256": "3e9b84f66fd2f0ab3c20f9c1251b1250ecbba0dfc26d5b38807721cb84bbdb0f",
+  "checks": [
+    {
+      "name": "actual-source-closure-and-SDK-whitelist",
+      "status": "PASS",
+      "cases": 27,
+      "sources": 322,
+      "public_headers": 47,
+      "max_prepared_path_bytes": 44
+    },
+    {
+      "name": "existing-i386-layout-extractor-current-headers",
+      "status": "PASS",
+      "layout_sha256": "6db2b6749f24d6c3e15f471b39e62de12fd7f4b60596ef3840f73b48a02c76a5",
+      "fields": {
+        "record_size": 320,
+        "record_generation": 168,
+        "record_name": 28,
+        "record_name_bytes": 12,
+        "record_state": 20,
+        "pool_stride": 1088
+      }
+    },
+    {
+      "name": "existing-real-SCO-SCLD-SCDB-source-and-layout-parser",
+      "status": "PASS",
+      "scope": "HOST_IO_EXISTING_ARTIFACTS_ONLY_NOT_GUEST",
+      "origin_report": "/mnt/c/Users/Administrator/Desktop/projectos/sandcore/build/m10a2-p6-sco-04/report.json",
+      "origin_sha256": "896ce4f829a011f4809f8598bdb6157f34dacc7fac5ce60658430139798a0c91",
+      "case": "SOUND2",
+      "object_sha256": "41c2ec7d1b8a82cdb8f177dbf68cd9a4da2bff8d54ce3e8368eefbc900a9f677",
+      "image_sha256": "9e8dad90f1cb84f1c05a78c339b6ecd6e48e608dce8e9a53eeea850109183792",
+      "debug": {
+        "format": "SCDB1MIO",
+        "image_sha256": "9e8dad90f1cb84f1c05a78c339b6ecd6e48e608dce8e9a53eeea850109183792",
+        "bytes": 16458,
+        "sha256": "eb158d8a49eadf666bb87624ed30343c4816466523b153fa2a0eb11dd0b13f29",
+        "symbols": 48,
+        "files": 33,
+        "lines": 828,
+        "object_count": 1,
+        "source_and_address_contract_exact": true
+      }
+    }
+  ],
+  "final_python_syntax": "PASS",
+  "source_scope": "OWN_DRAFT_AND_BUILD_ONLY_MAIN_NOT_EDITED",
+  "runtime_inputs_needed": "Root updates actual Native07/current source config and reruns existing Windows workflow",
+  "limits": [
+    "Foreground producer fix not run in QEMU by this agent",
+    "Producer PID/generation explicitly NOT_OBSERVED and not a gate",
+    "P3 standard-library behavior matrix reused externally, not rerun",
+    "Native LOGIN2/five-libraries issuer/CORE must be rebuilt for following execution VM"
+  ],
+  "files": {
+    "DESIGN.md": "bb0ecd6fc645e291cc3a5478b21470515aa98282359f890b095f459ac4a4c196",
+    "README.md": "5a35b6a03c25054c712ed3edff7a750ee47fb06eca8d96d02fb6d663186fa221",
+    "archive_run01.py": "29b389452de313535ea3674e1493817b50aa0eff73266396ae18c2964929fc03",
+    "check.py": "ef833367f27a1646233a9950df7cbdeaca57e8fdbd892f432ae4d6e3edbad4e9",
+    "driver.py": "f27af00c8fa65cfe8506ec188f557dbb7e56f996a8eb7d166392564b72030409",
+    "finalize.py": "a43dfcea98f58c646888903c21f25115f38064c21b986b8950ee41f81dc701ae",
+    "layout.py": "8acba30234480a3fd55f15c2c374a7af1ace451eb4d59713838ab798bb695911",
+    "model.py": "3087b2c093dd99350e4049214478bf188a23edb585a4766f529dbc16e50f5bb2"
+  }
+}

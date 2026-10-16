@@ -330,14 +330,15 @@ static int load_source(const char *path)
     u32 info[2];
     if(sc_stat(path,info) || info[0]!=1) return -1;
     if(length(path)>63)fatal("include path exceeds 63 bytes");
-    if(source_count>=FILE_MAX)capacity_fatal("include files",(u32)source_count,1u,FILE_MAX);
     /* 剩余长度比较同时留NUL；不先求info[1]+1，恶意文件尺寸不能
      * 回绕成小请求。arena在所有递归pp_file期间保持同一基址。 */
     if(source_used>=SOURCE_MAX || info[1]>=(u32)(SOURCE_MAX-source_used))capacity_fatal("source arena",(u32)source_used,info[1],SOURCE_MAX);
+    source_reserve();
     int i=source_count++;
     copy(sources[i].path,path,64);
     sources[i].source=source_used;
     sources[i].size=(int)info[1];
+    sources[i].once=0;
     int n=sc_read(path,source_arena+source_used,(int)info[1]);
     if(n!=(int)info[1]) fatal("source read failed");
     for(int k=0;k<n;k++) if(!source_arena[source_used+k]) fatal("NUL inside source file");
@@ -351,6 +352,7 @@ static void pp_flush(void)
     raw_used=0;
 }
 static void pp_file(const char *path,int depth);
+#include "sccc_include.inc"
 static void pp_include(Tok *line,int count,const char *current,int depth)
 {
     int n=0;
@@ -374,6 +376,7 @@ static void pp_include(Tok *line,int count,const char *current,int depth)
         if(load_source(candidate)>=0) { pp_file(candidate,depth+1);
             return; }
     }
+    if(project_include_find(name,candidate)){pp_file(candidate,depth+1);return;}
     copy(candidate,"SYS/INC/",sizeof(candidate));
     if(length(candidate)+length(name)>63) fatal("include path too long");
     append(candidate,name,sizeof(candidate));
@@ -462,7 +465,7 @@ static void pp_directive(Tok *line,int count,Lexer *l,int depth,int baseline)
         int i=macro_find(line[2].v);
         if(i>=0) macros[i].active=0;
     } else if(word(line+1,"include")) pp_include(line+2,count-2,sources[l->file].path,depth);
-    else if(word(line+1,"pragma") && count==3 && word(line+2,"once")) source_once[l->file]=1;
+    else if(word(line+1,"pragma") && count==3 && word(line+2,"once")) sources[l->file].once=1;
     else if(word(line+1,"error")) fatal("active #error directive");
     else fatal("unsupported preprocessing directive");
 }
@@ -484,7 +487,7 @@ static void pp_file(const char *path,int depth)
     if(depth>=DEPTH_MAX) fatal("include depth exceeded");
     int file=load_source(path);
     if(file<0) fatal("source file not found");
-    if(source_once[file]) return;
+    if(sources[file].once) return;
     Lexer l;
     l.source=source_arena+sources[file].source;
     l.offset=0;
@@ -518,6 +521,7 @@ static void pp_file(const char *path,int depth)
 }
 static void preprocess(const char *path)
 {
+    project_include_init();
     /* 架构与编译器身份是本工具真实提供的宏，用户可用它选择 API 内联
      * 汇编兼容分支。不是冒充宿主 GCC，也不伪造不提供的标准库能力。 */
     /* mio：能力宏只宣告当前汇编器真实支持的REP字符串子集。

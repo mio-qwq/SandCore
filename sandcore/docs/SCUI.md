@@ -28,6 +28,22 @@ surface只分配当前客户尺寸，尺寸候选完成才替换旧区；不会�
 
 ABS/HBOX/VBOX/Dock/等分Grid与跨度/Flow/Overlay/Scroll布局measure/arrange全候选后发布，重入修改代数则保旧布局。Grid行数只扫描一次，比例用双字整数乘除。Tab top26、GroupBox的8/22/8/8逻辑像素是固有保留区，用户padding额外叠加而不覆盖它；child clip与客户区一致。LayoutDesc长度以96基准逻辑像素计，NodeInfo/measure/arrange/Painter为实际物理坐标。临时cell editor使用私有viewport placement，避免长表内容坐标与DPI取整破坏屏幕内编辑位置。
 
+### FLOW 与普通滚动布局的具体语义
+
+FLOW 的自然宽度为可见内容项的单行外宽总和（包括各自margin及项间gap）；AUTO高度按实际安排后的内宽换行，累计每行最大外高与行间gap。测量和安排共用同一分行规则，第二次测量把高度向上传给VBox/Dock等祖先。显式height/min/max仍有效，主动限制高度可以裁剪内容。超宽单项保留尺寸并独占一行，不能暗缩；隐藏项不占行，零宽项仍按实际行归属处理。横向位置由行打包决定，纵向CENTER/END/STRETCH相对当前行，不将所有项分别居中整个父框。逻辑长度逐项通过实际scale转换后计算，不把150%逐项取整假设为最后统一乘1.5。
+
+普通SCROLL_LAYOUT是竖向内容布局，使用现有ScUiScrollQuery/To/EnsureVisible，没有新增公开入口或记录。内容范围由未减offset的真实孩子及允许溢出的后代形成；clip、内嵌滚动容器边界阻止隐藏正文扩大外层范围。范围包括内容项末尾margin，不包括父padding、固定滚动条与私有viewport placement孩子。内容至少覆盖viewport，空内容offset为0；横向超出真实范围可滚动，负向越界部分裁剪，不发明负offset。通用坐标/范围溢出明确RANGE；专用Edit/Table等双字内容范围不转换成32位。
+
+需要固定滚动条时，在普通SCROLL_LAYOUT下创建SC_UI_SCROLL孩子并显式设置LayoutDesc.dock为TOP/BOTTOM/LEFT/RIGHT。可见条按兄弟顺序从内框预留固定条带，不随正文offset移动，不计算入正文；未停靠SCROLL孩子保留普通内容布局行为，不隐式生成或改造任何控件。用户padding与Tab/GroupBox固有保留区先扣除。滚动Query、夹紧、EnsureVisible、条比例及拖动共用同一实际viewport；两轴line_step为16/20逻辑像素换算后的物理值。滑块拖动使用track减thumb的实际行程，短条没有可拖动行程时不除零或跳到末尾。
+
+布局先准备几何候选，以普通scroll offset0计算范围，自底向上传播必要的未裁剪后代外界，夹紧候选offset，最后一次线性安排应用最终位置/clip。没有普通SCROLL_LAYOUT的上下文仍用既有两遍测量/安排；有普通scroll时才增加范围和最终安排遍历。自定义arrange仍只调用一次。所有矩形/content/offset候选成功后统一发布，失败、OOM、算术溢出或回调重入改变代数保旧布局。内容缩短、孩子隐藏/移除、viewport变化在同次发布夹紧；普通pane隐藏保留上次范围/位置，重新可见时据实际内容重建。布局触发的自动offset变化增加value revision，并在全部发布后发VALUE_CHANGED；通知失败沿原规则记录，不撤销已发布布局。
+
+ScUiScrollQuery/公共HitTest仍读取已提交布局，不为查询私下调用应用measure。实际原生输入遇到dirty布局时先准备几何再命中，连续未改变的mousemove不触发布局；布局失败保旧帧，并记录notification_error、继续使用旧提交布局输入。普通wheel仅在原目标/祖先/上下文均未消费时向最近仍可滚动的普通祖先处理，到边界可交外层；Edit/Table/Menu/Tab等已有专用输入先处理，未被接管。普通滚动祖先中的焦点准备会调用EnsureVisible。
+
+EnsureVisible使用实际viewport并处理嵌套祖先；比viewport大的目标对齐起边，普通目标最小滚动到可见。先保存祖先ID路径，回调后重新查ID，节点失效或额外布局修改明确STALE/BUSY。其逐个ScrollTo已提交的外部回调副作用不承诺回滚。ROOT/自定义节点生命周期、SCAPI字节、公开SCUI记录与ABI保持，私有扩展只在一次布局候选数组中存在。
+
+修订：2026-10-16 补FLOW换行高度、普通SCROLL_LAYOUT内容范围/夹紧/裁剪/输入语义；宿主共享算法检查通过，真实客体待Root针对性回归，不代表全部SCUI或M10a2验收。
+
 ## 数据、菜单与输入
 
 Tree用连续siblings范围分段，collapsed十万根项不创建十万控件或数组行；EnsureItem以完整候选展开祖先。flat表只查询viewport行，水平列有display索引与双字位置，也只遍历可见列。UPDATE保留树段索引并损伤实际变更行，结构通知才重建。cell缓存按item/field/revision/format失效；借用provider Icon在下一query前Retain，绘制后Release。

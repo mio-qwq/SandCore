@@ -1,5 +1,14 @@
 # SandCore M10a2 — The Application Platform Era：持续目标
 
+> 当前执行检查点：HOST02已通过（41产物/1320输入/源码变化0），codec证明为codec-host-proof-02；八应用菜单快捷键接线及native宿主后端07通过。Windows真实run02已完成旧G1→新版SCCC（load257350）→动态SCLD及SCLDR.SCO，启动SCLD时ROOT返回-11（实际I/O），正在定位，尚未链接出八普通库和19工具/应用。完整stdout、失败截图、源码和原盘守恒事实已保存。下一步修复该具体故障并继续原生生成，再发行native CORE和进行普通用户GUI/SDK验收；不得停在HOST或工具检查点。详细以M10A2-P6-IMPLEMENTATION.md“当前客体生成检查点”为准。
+
+> 当前最高检查点：全批主源、默认升级和最终SDK/四TU示例已接齐。SC32 193导出、SCUI1.3/v4 170导出；27个SCCC/SCO/SCLD宿主后端目标通过。统一HOST报告 `build/m10a2-main-studio-01/p6-unified-host-01.json`：exit0、41产物、source变化0，含CORE/九库/十五GUI入口/worker/工具/SH/nano。SCSOUND是明确HOST codec例外，其证明已写入 `build/m10a2-session-sound-integration-01/codec-host-proof.json`。下一项真实Windows客体生成8普通库/新SCCC/SCLD及组件；随后按native LOGIN2/五库重新签发CORE、普通用户GUI/SDK与最终验收。没有新客体结论，不停在HOST检查点。下方旧数字和“尚在草稿”属于沿革，以此段和P6文档首节为准。main最新本地提交仍f101dff；本批新增待保存，远端上次push失败未确认。
+
+> 当前最高检查点：完整目标仍active。主源已收齐十二个重制应用并完成合并HOST构建，SC32现189导出、SCUI165导出及共享FLOW/普通Scroll修复。Studio/Capture/Tab、Settings/CORE007、Image/SCGFX/IMAGE服务、Terminal/SCTERM/PTY已合入；Notes/Studio/SCGFX/CAT/LNK覆盖已有文件采用Preserving保元数据。详细实际状态以M10A2-P6-IMPLEMENTATION.md首节为准，下方历史检查点不代表当前仍未整合。Sound2 GUI/候选worker已写、封面模块接续；Session2/Login2和最终SDK/复杂第三方示例仍在独立草稿。最后新批次只有HOST/宿主后端证据，尚未进行新的客体矩阵。本地f101dff后修改待保存新提交，远端上次push失败未确认；原用户盘和.zcodeignore继续保留。
+
+
+> 更晚检查点：本地main `f101dff`已保存上一批六应用/证据，WSL两次push因网络连接失败，尚未确认远端更新。此后Studio2、Capture20B、SCCC_INCLUDE、共享Tab生命周期与Shell EXPECT_ABSENT已按冻结原像合入，Notes/Studio旧目标保存已迁移Preserving，七应用定向HOST通过；SCUI1.2/v3/164、SCSHELL1.1/v2/96、SC32v6当前追加Audio/Simd/Preserving/Config共179导出。CORE007配置和更新ROOT HOST通过。新SCSOUND五函数/19导入库已实际写齐并HOST构建，Sound2 UI/worker/封面仍在接续；见SCSOUND.md。其余三个代理分别在image-tools、settings-installer、terminal2专属草稿，未冻结全目录勿覆盖/整体暂存。SCUI普通FLOW测量与通用SCROLL内容范围有真实缺口待Root补，不能把原P4覆盖当已通过该边界。完整目标active。
+
 > 最新恢复补充：`M10A2-P6-IMPLEMENTATION.md`记录已整合六应用、SCO/SCLD与调试/壁纸底座。`evidence/m10a2-p5-desktop-resources`保存新视觉/连续会话/布局与零增量回收；冷图标45→46PIT未证明提速。Studio2最后交付中，Canvas/Lens/Settings继续；Installer临时名不是既有GUI，按原CLI文件安装功能收敛，不自设软件包管理目标。完整目标active，不停在本检查点。
 
 2026-10-16。用户要求主代理接手最新工作区，继续到根 `M10a2RULE.MD` 全部完成。此页是可恢复的执行清单，不缩减原合同，也不是版本完成声明。当前统一 main；已有代理落盘成果保留，由主代理整合。旧接力稿为历史快照，当前证据按本页及原始报告判断。

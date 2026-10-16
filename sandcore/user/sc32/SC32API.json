@@ -7,6 +7,50 @@
   "fini": "Sc32Finalize",
   "exports": [
     {
+      "name": "ScAudioControl",
+      "kind": "function"
+    },
+    {
+      "name": "ScAudioDeviceQuery",
+      "kind": "function"
+    },
+    {
+      "name": "ScAudioEffect",
+      "kind": "function"
+    },
+    {
+      "name": "ScAudioMasterVolume",
+      "kind": "function"
+    },
+    {
+      "name": "ScAudioOpen",
+      "kind": "function"
+    },
+    {
+      "name": "ScAudioQuery",
+      "kind": "function"
+    },
+    {
+      "name": "ScAudioSubmit",
+      "kind": "function"
+    },
+    {
+      "name": "ScAuthLoginActivate",
+      "kind": "function"
+    },
+    {
+      "name": "ScAuthLoginBegin",
+      "kind": "function"
+    },
+    {
+      "name": "ScAuthLoginCancel",
+      "kind": "function"
+    },
+    {
+      "name": "ScAuthLoginQuery",
+      "kind": "function"
+    },
+    {
       "name": "ScBrokerReady",
       "kind": "function"
     },
@@ -63,6 +107,14 @@
       "kind": "function"
     },
     {
+      "name": "ScConfigurationApply",
+      "kind": "function"
+    },
+    {
+      "name": "ScConfigurationCheck",
+      "kind": "function"
+    },
+    {
       "name": "ScDebugBreakpointAdd",
       "kind": "function"
     },
@@ -104,6 +156,10 @@
     },
     {
       "name": "ScDefaultWindowProc",
+      "kind": "function"
+    },
+    {
+      "name": "ScDesktopReload",
       "kind": "function"
     },
     {
@@ -211,6 +267,10 @@
       "kind": "function"
     },
     {
+      "name": "ScFileLeasePublishPreserving",
+      "kind": "function"
+    },
+    {
       "name": "ScFileLeaseQuery",
       "kind": "function"
     },
@@ -280,6 +340,30 @@
     },
     {
       "name": "ScIdentityQuery",
+      "kind": "function"
+    },
+    {
+      "name": "ScImageDecodeBegin",
+      "kind": "function"
+    },
+    {
+      "name": "ScImageDecodeCancel",
+      "kind": "function"
+    },
+    {
+      "name": "ScImageDecodeCopy",
+      "kind": "function"
+    },
+    {
+      "name": "ScImageDecodeMemoryBegin",
+      "kind": "function"
+    },
+    {
+      "name": "ScImageDecodeQuery",
+      "kind": "function"
+    },
+    {
+      "name": "ScImageDecodeStep",
       "kind": "function"
     },
     {
@@ -519,6 +603,14 @@
       "kind": "function"
     },
     {
+      "name": "ScProcessSpawnCapture",
+      "kind": "function"
+    },
+    {
+      "name": "ScProcessSpawnInteractive",
+      "kind": "function"
+    },
+    {
       "name": "ScProcessTerminate",
       "kind": "function"
     },
@@ -583,6 +675,10 @@
       "kind": "function"
     },
     {
+      "name": "ScSimdQuery",
+      "kind": "function"
+    },
+    {
       "name": "ScSystemCapabilities",
       "kind": "function"
     },
@@ -608,6 +704,18 @@
     },
     {
       "name": "ScSystemWait",
+      "kind": "function"
+    },
+    {
+      "name": "ScTerminalControl",
+      "kind": "function"
+    },
+    {
+      "name": "ScTerminalQuery",
+      "kind": "function"
+    },
+    {
+      "name": "ScTerminalResize",
       "kind": "function"
     },
     {

@@ -16,12 +16,14 @@
 #include "timer.h"
 #include "fs.h"
 #include "wm.h"
+#include "../user/SC32API.H"
 
 typedef struct {
     u32 ticket,generation,worker_generation,started;
     int state,worker,claimed,error,owner,previous,next,queued;
     int worker_owner;
     u32 worker_owner_generation,worker_ticket;
+    u32 source_kind,input_pages,input_bytes,input_received;u8 *input;
     char path[64];
     image_surface_t image;
 } image_job_t;
@@ -34,12 +36,14 @@ static u32 serial;
 static int active_worker;
 static u32 active_generation;
 static int pending_head=-1,pending_tail=-1;
+static int upload_head=-1,upload_tail=-1;
 
 static void pending_remove(image_job_t *job)
 {
     if(!job->queued)return;
-    if(job->previous>=0)IMAGE_JOB(job->previous).next=job->next;else pending_head=job->next;
-    if(job->next>=0)IMAGE_JOB(job->next).previous=job->previous;else pending_tail=job->previous;
+    int *head=job->queued==2?&upload_head:&pending_head,*tail=job->queued==2?&upload_tail:&pending_tail;
+    if(job->previous>=0)IMAGE_JOB(job->previous).next=job->next;else *head=job->next;
+    if(job->next>=0)IMAGE_JOB(job->next).previous=job->previous;else *tail=job->previous;
     job->previous=job->next=-1;job->queued=0;
 }
 static void worker_detach(image_job_t *job)
@@ -70,18 +74,20 @@ static image_job_t *working(int worker,u32 ticket)
     return job && job->generation==link->worker_owner_generation && job->state==2
         && job->worker==worker && job->worker_generation==task_generation(worker)?job:0;
 }
+#include "image_memory.inc"
+
 static void discard(image_job_t *job)
 {
     /* 先撤销身份，再杀服务：task_stop会回到本模块，不能在递归清理
      * 时误把同一缓存释放两次，也不能把worker自己的新作业混进来。 */
     int worker=job->worker;u32 generation=job->worker_generation;
-    pending_remove(job);worker_detach(job);job->state=0;job->worker=0;image_release(&job->image);
+    pending_remove(job);worker_detach(job);job->state=0;job->worker=0;image_release(&job->image);input_release(job);
     if(worker>0 && task_generation(worker)==generation)task_stop(worker);
 }
 static void fail(image_job_t *job,int error)
 {
     int worker=job->worker;u32 generation=job->worker_generation;
-    pending_remove(job);worker_detach(job);job->state=4;job->error=error;job->worker=0;image_release(&job->image);
+    pending_remove(job);worker_detach(job);job->state=4;job->error=error;job->worker=0;image_release(&job->image);input_release(job);
     changed(job);
     if(worker>0 && task_generation(worker)==generation)task_stop(worker);
 }
@@ -104,8 +110,10 @@ int image_service_request(int owner,const char *path)
     image_job_t *job=&IMAGE_JOB(owner);
     /* 票据不回绕重用，耗尽明确失败；无需为每次请求扫描所有活任务。
      * 待办链只含尚未启动的请求，按实际创建时间FIFO负责启动与超时。 */
-    if(serial==0x7FFFFFFFu)return -4;serial++;
+    if(serial==0x7FFFFFFFu)return -4;
+    serial++;
     int i=0;do{job->path[i]=normalized[i];}while(normalized[i++]);
+    job->source_kind=1;
     job->ticket=serial;job->generation=task_generation(owner);job->started=sc_ticks;
     job->worker=job->claimed=job->error=0;job->state=1;
     job->owner=owner;job->previous=pending_tail;job->next=-1;job->queued=1;
@@ -136,7 +144,7 @@ int image_service_result(int owner,u32 ticket,u32 *info,void *pixels,u32 capacit
 int image_service_claim(int worker,u32 ticket,char *path,u32 capacity)
 {
     image_job_t *job=working(worker,ticket);
-    if(!job || job->claimed || !path || !capacity || capacity>64)return -1;
+    if(!job || job->source_kind!=1 || job->claimed || !path || !capacity || capacity>64)return -1;
     u32 n=0;while(job->path[n])n++;
     if(capacity<=n)return -1;
     for(u32 i=0;i<=n;i++)path[i]=job->path[i];
@@ -147,11 +155,13 @@ int image_service_submit(int worker,u32 ticket,u32 width,u32 height,u32 address,
     image_job_t *job=working(worker,ticket);if(!job || !job->claimed)return -1;
     if(status){
         if(status<-6 || status>-2)return -1;
-        job->state=4;job->error=status;changed(job);return 0;
+        input_release(job);job->state=4;job->error=status;changed(job);return 0;
     }
     if(!width || !height || width>1920 || height>1080)return -1;
     u32 bytes=width*height*4;
     if(!paging_user_range(TASK(worker).pd,address,bytes))return -1;
+    /* 服务已经提交完整解码；先释放封存输入，降低16MiB来源与8MiB结果重叠。 */
+    input_release(job);
     image_surface_t candidate={0};candidate.width=width;candidate.height=height;
     candidate.pages=(bytes+4095)/4096;
     candidate.pixels=(u32 *)pframe_alloc_run(candidate.pages);
@@ -199,12 +209,20 @@ void image_service_poll(void)
              * APPLICATION PAUSED卡片，由用户关叉才杀暂停任务。将
              * worker从作业脱离，客户端自动取消错误票据时不能把诊断
              * 卡一并悄悄消掉；新请求可用另一空槽继续工作。 */
-            worker_detach(job);job->state=4;job->error=-6;job->worker=0;changed(job);
+            worker_detach(job);input_release(job);job->state=4;job->error=-6;job->worker=0;changed(job);
         }
         else if(job && (TASK(worker).state!=1 || (u32)(sc_ticks-job->started)>=3000))fail(job,-6);
         if(!task_owned(worker) || task_generation(worker)!=active_generation || TASK(worker).state!=1)active_worker=0;
     }
     u32 budget=64;
+    while(upload_head>=0 && budget--){
+        image_job_t *job=&IMAGE_JOB(upload_head);
+        if(job->generation!=task_generation(job->owner)){discard(job);continue;}
+        if((u32)(sc_ticks-job->started)<3000)break;
+        fail(job,-6);
+    }
+    if(upload_head>=0 && (u32)(sc_ticks-IMAGE_JOB(upload_head).started)>=3000)task_kernel_wake();
+    budget=64;
     while(pending_head>=0 && budget--){
         image_job_t *job=&IMAGE_JOB(pending_head);
         if(job->generation!=task_generation(job->owner)){discard(job);continue;}
@@ -220,7 +238,8 @@ void image_service_poll(void)
         u32 stat[2];if(fs_stat("SYS/CORE/IMAGE.SCX",stat) || stat[0]!=1){fail(&IMAGE_JOB(i),-3);return;}
         char command[48]="SYS/CORE/IMAGE.SCX ",reverse[11];int n=0,at=19;
         u32 ticket=IMAGE_JOB(i).ticket;do{reverse[n++]=(char)('0'+ticket%10);ticket/=10;}while(ticket);
-        while(n)command[at++]=reverse[--n];command[at]=0;
+        while(n)command[at++]=reverse[--n];
+        command[at]=0;
         /* 启动文件IO也可能超过一tick：保持任务0与共享装载中转区，
          * 只开硬件IRQ，不让另一EXEC抢占并覆盖scx_stage。 */
         task_render_hold(1);sti();int worker=auth_service_exec(command,i);cli();task_render_hold(0);

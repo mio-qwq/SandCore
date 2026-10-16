@@ -794,7 +794,7 @@ int main(void)
         int c=take_input();if(c==-1){sc_yield();continue;}if(c<0)break;
         if(c==3 || c==27){used=source_used=0;cli_text(1,"^C\n");prompt();continue;}
         if(c==4 && !used)break;
-        if(c==8 || c==127){if(used){used--;cli_text(1,"\b \b");}continue;}
+        if(c==8 || c==127){if(used){used--;while(used && ((u8)line[used]&0xC0)==0x80)used--;cli_text(1,"\b \b");}continue;}
         if(c=='\r')continue;
         if(c=='\n'){
             line[used]=0;cli_text(1,"\n");if(source_used+used+2>=(int)sizeof(interactive_source)){

@@ -1,0 +1,652 @@
+{
+  "name": "SCGFX.SCL",
+  "dependencies": [
+    {
+      "name": "SC32API.SCL",
+      "abi_major": 1,
+      "min_minor": 4,
+      "min_version": 6
+    },
+    {
+      "name": "SCCLIB.SCL",
+      "abi_major": 1,
+      "min_minor": 0,
+      "min_version": 1
+    },
+    {
+      "name": "SCLIB.SCL",
+      "abi_major": 1,
+      "min_minor": 0,
+      "min_version": 1
+    },
+    {
+      "name": "SCUI.SCL",
+      "abi_major": 1,
+      "min_minor": 2,
+      "min_version": 3
+    }
+  ],
+  "imports": [
+    {
+      "name": "ScCallbackPin",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScClipboardAbort",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScClipboardBegin",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScClipboardClose",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScClipboardCommit",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScClipboardFormats",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScClipboardOffer",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScClipboardOpen",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScClipboardRead",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScDisplayPalette",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScFileClose",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScFileFlush",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScFileLeaseAdvance",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScFileLeaseCancel",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScFileLeaseCreatePinned",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScFileLeaseOpenPinned",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScFileLeasePublish",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScFileLeaseQuery",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScFileLeaseRelease",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScFileRead",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScFileSeek",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScFileWrite",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScImageDecodeBegin",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScImageDecodeCancel",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScImageDecodeCopy",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScImageDecodeMemoryBegin",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScImageDecodeQuery",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScImageDecodeStep",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScPathQuery",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScPathResolve",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScProcessSelf",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScProcessYield",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScSystemMonotonic",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUiCapture",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUiClassRegister",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUiClassUnregister",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUiContextRelease",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUiContextRetain",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUiDisconnect",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUiInvalidate",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUiListen",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUiNodeDestroy",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUiPainterArgb",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUiPainterBounds",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUiPainterFill",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUiPainterLine",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUiPainterText",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUiTimerCancel",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUiTimerChange",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUiTimerSet",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUiWidgetCreate",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUiWindowNative",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUtf8Validate",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "calloc",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "free",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "malloc",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "memcmp",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "memcpy",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "memmove",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "memset",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "realloc",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "snprintf",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "strcmp",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "strlen",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScFileLeasePublishPreserving",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    }
+  ],
+  "abi_major": 1,
+  "abi_minor": 0,
+  "library_version": 1,
+  "init": null,
+  "fini": null,
+  "exports": [
+    {
+      "name": "ScGfxArgbErase",
+      "kind": "function"
+    },
+    {
+      "name": "ScGfxArgbOver",
+      "kind": "function"
+    },
+    {
+      "name": "ScGfxCanvasCancel",
+      "kind": "function"
+    },
+    {
+      "name": "ScGfxCanvasCenter",
+      "kind": "function"
+    },
+    {
+      "name": "ScGfxCanvasCreate",
+      "kind": "function"
+    },
+    {
+      "name": "ScGfxCanvasInvalidate",
+      "kind": "function"
+    },
+    {
+      "name": "ScGfxCanvasPan",
+      "kind": "function"
+    },
+    {
+      "name": "ScGfxCanvasQuery",
+      "kind": "function"
+    },
+    {
+      "name": "ScGfxCanvasRelease",
+      "kind": "function"
+    },
+    {
+      "name": "ScGfxCanvasRetain",
+      "kind": "function"
+    },
+    {
+      "name": "ScGfxCanvasSetBrush",
+      "kind": "function"
+    },
+    {
+      "name": "ScGfxCanvasSetMode",
+      "kind": "function"
+    },
+    {
+      "name": "ScGfxCanvasSetSelection",
+      "kind": "function"
+    },
+    {
+      "name": "ScGfxCanvasSetSurface",
+      "kind": "function"
+    },
+    {
+      "name": "ScGfxCanvasSetTool",
+      "kind": "function"
+    },
+    {
+      "name": "ScGfxClearBegin",
+      "kind": "function"
+    },
+    {
+      "name": "ScGfxClearRectBegin",
+      "kind": "function"
+    },
+    {
+      "name": "ScGfxClipboardCopyBegin",
+      "kind": "function"
+    },
+    {
+      "name": "ScGfxClipboardPasteBegin",
+      "kind": "function"
+    },
+    {
+      "name": "ScGfxDrawPathBegin",
+      "kind": "function"
+    },
+    {
+      "name": "ScGfxEditAbort",
+      "kind": "function"
+    },
+    {
+      "name": "ScGfxEditBegin",
+      "kind": "function"
+    },
+    {
+      "name": "ScGfxEditCommit",
+      "kind": "function"
+    },
+    {
+      "name": "ScGfxEditPixel",
+      "kind": "function"
+    },
+    {
+      "name": "ScGfxEditQuery",
+      "kind": "function"
+    },
+    {
+      "name": "ScGfxFillBegin",
+      "kind": "function"
+    },
+    {
+      "name": "ScGfxHistoryBegin",
+      "kind": "function"
+    },
+    {
+      "name": "ScGfxHistoryLabel",
+      "kind": "function"
+    },
+    {
+      "name": "ScGfxLoadBegin",
+      "kind": "function"
+    },
+    {
+      "name": "ScGfxLoadMemoryBegin",
+      "kind": "function"
+    },
+    {
+      "name": "ScGfxOperationCancel",
+      "kind": "function"
+    },
+    {
+      "name": "ScGfxOperationClose",
+      "kind": "function"
+    },
+    {
+      "name": "ScGfxOperationQuery",
+      "kind": "function"
+    },
+    {
+      "name": "ScGfxOperationStep",
+      "kind": "function"
+    },
+    {
+      "name": "ScGfxOperationSurface",
+      "kind": "function"
+    },
+    {
+      "name": "ScGfxPathClear",
+      "kind": "function"
+    },
+    {
+      "name": "ScGfxPathClose",
+      "kind": "function"
+    },
+    {
+      "name": "ScGfxPathCreate",
+      "kind": "function"
+    },
+    {
+      "name": "ScGfxPathCubicTo",
+      "kind": "function"
+    },
+    {
+      "name": "ScGfxPathLineTo",
+      "kind": "function"
+    },
+    {
+      "name": "ScGfxPathMoveTo",
+      "kind": "function"
+    },
+    {
+      "name": "ScGfxPathQuadraticTo",
+      "kind": "function"
+    },
+    {
+      "name": "ScGfxPathQuery",
+      "kind": "function"
+    },
+    {
+      "name": "ScGfxPathRelease",
+      "kind": "function"
+    },
+    {
+      "name": "ScGfxPathRetain",
+      "kind": "function"
+    },
+    {
+      "name": "ScGfxSample",
+      "kind": "function"
+    },
+    {
+      "name": "ScGfxSaveBegin",
+      "kind": "function"
+    },
+    {
+      "name": "ScGfxSurfaceCreate",
+      "kind": "function"
+    },
+    {
+      "name": "ScGfxSurfaceHistoryBudget",
+      "kind": "function"
+    },
+    {
+      "name": "ScGfxSurfaceMarkSaved",
+      "kind": "function"
+    },
+    {
+      "name": "ScGfxSurfacePixel",
+      "kind": "function"
+    },
+    {
+      "name": "ScGfxSurfacePixels",
+      "kind": "function"
+    },
+    {
+      "name": "ScGfxSurfaceQuery",
+      "kind": "function"
+    },
+    {
+      "name": "ScGfxSurfaceRelease",
+      "kind": "function"
+    },
+    {
+      "name": "ScGfxSurfaceRetain",
+      "kind": "function"
+    },
+    {
+      "name": "ScGfxTransformBegin",
+      "kind": "function"
+    }
+  ]
+}

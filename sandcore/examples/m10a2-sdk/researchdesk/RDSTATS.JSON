@@ -1,0 +1,24 @@
+{
+  "name": "RDSTATS.SCL",
+  "dependencies": [],
+  "imports": [],
+  "abi_major": 1,
+  "abi_minor": 0,
+  "library_version": 1,
+  "init": null,
+  "fini": null,
+  "exports": [
+    {
+      "name": "RdStatsBegin",
+      "kind": "function"
+    },
+    {
+      "name": "RdStatsFinish",
+      "kind": "function"
+    },
+    {
+      "name": "RdStatsPush",
+      "kind": "function"
+    }
+  ]
+}

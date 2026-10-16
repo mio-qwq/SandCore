@@ -5,8 +5,8 @@
     {
       "name": "SC32API.SCL",
       "abi_major": 1,
-      "min_minor": 3,
-      "min_version": 5
+      "min_minor": 4,
+      "min_version": 6
     },
     {
       "name": "SCCLIB.SCL",
@@ -96,6 +96,12 @@
     },
     {
       "name": "ScFileLeasePublish",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScFileLeasePublishPreserving",
       "dependency": "SC32API.SCL",
       "kind": "function",
       "size": 1

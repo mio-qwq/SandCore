@@ -1421,8 +1421,9 @@ ScStatus ScUiScrollQuery(ScUiContext *context,ScUiNode id,ScUiScrollInfo *out)
     value.y=node->scroll_y;
     value.content_width=node->content_width;
     value.content_height=node->content_height;
-    value.viewport_width=node->rectangle.width>0?(ScU32)node->rectangle.width:0;
-    value.viewport_height=node->rectangle.height>0?(ScU32)node->rectangle.height:0;
+    ScUiRect viewport;s=ui_scroll_viewport(node,&viewport);if(s<0)return s;
+    value.viewport_width=viewport.width>0?(ScU32)viewport.width:0;
+    value.viewport_height=viewport.height>0?(ScU32)viewport.height:0;
     value.line_step_x=node->scroll_step_x;
     value.line_step_y=node->scroll_step_y;
     memcpy(out,&value,sizeof(value));
@@ -1434,8 +1435,9 @@ ScStatus ScUiScrollTo(ScUiContext *context,ScUiNode id,const ScWideCounter *x,co
     ScWideCounter next_x,next_y,max_x,max_y;
     if(!node)return SC_UI_E_STALE;
     if(!x || !y)return SC_UI_E_INVALID;
-    max_x=ui_scroll_limit(node->content_width,node->rectangle.width>0?(ScU32)node->rectangle.width:0);
-    max_y=ui_scroll_limit(node->content_height,node->rectangle.height>0?(ScU32)node->rectangle.height:0);
+    ScUiRect viewport;ScStatus checked=ui_scroll_viewport(node,&viewport);if(checked<0)return checked;
+    max_x=ui_scroll_limit(node->content_width,viewport.width>0?(ScU32)viewport.width:0);
+    max_y=ui_scroll_limit(node->content_height,viewport.height>0?(ScU32)viewport.height:0);
     next_x=ui_wide_compare(x,&max_x)>0?max_x:*x;
     next_y=ui_wide_compare(y,&max_y)>0?max_y:*y;
     if(ui_wide_compare(&next_x,&node->scroll_x)==0 && ui_wide_compare(&next_y,&node->scroll_y)==0)return SC_UI_OK;
@@ -1501,7 +1503,7 @@ ScStatus ScUiAccessibleQuery(ScUiContext *context,ScUiNode id,ScUiAccessibleInfo
     value.version=1;
     value.node=id;
     value.parent=node->parent?node->parent->id:0;
-    value.role=node->kind;
+    value.role=node->kind==SC_UI_SECRET?SC_UI_TEXTBOX:node->kind;
     value.state=node->effective;
     value.revision=node->value_revision;
     value.rectangle=node->rectangle;

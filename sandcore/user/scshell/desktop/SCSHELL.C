@@ -129,43 +129,10 @@ static ScStatus desk_file_revision(const char *path,ScU32 *revision)
     if(closed<0)return closed;
     *revision=info.revision;return 0;
 }
+#include "desktop_defaults.inc"
 static ScStatus desk_seeds(void)
 {
-    static const char *ids[]={"files","studio","debug","settings","notes","canvas","lens","monitor","calculator","terminal","palette","sound","session"};
-    static const char *labels[]={"文件","开发工作室","调试器","设置","笔记","画板","图片","系统监视器","计算器","终端","调色板","音频","登录与会话"};
-    static const char *paths[]={"/APPS/FILES.SCX","/APPS/IDE.SCX","/APPS/DEBUGGER.SCX","/APPS/SETTINGS.SCX","/APPS/NOTE.SCX","/APPS/CANVAS.SCX","/APPS/LENS.SCX","/APPS/MONITOR.SCX","/APPS/CALC.SCX","/BIN/SH.SCX","/APPS/PALETTE.SCX","/APPS/SOUND.SCX","/APPS/SESSION.SCX"};
-    static const char *icons[]={"@FILES","@STUDIO","@DEBUG","@SETTINGS","@NOTE","@CANVAS","@LENS","@MONITOR","@CALC","@SHELL","@PALETTE","@SOUND","@SESSION"};
-    for(ScU32 i=0;i<sizeof(ids)/sizeof(ids[0]);i++){
-        ScU32 revision=0;
-        ScStatus s=desk_file_revision(paths[i],&revision);if(s==SC32_E_NOT_FOUND)continue;if(s<0)return s;
-        ScShellCatalogInfo info;memset(&info,0,sizeof(info));info.size=sizeof(info);info.version=1;
-        s=ScShellCatalogQuery(desk.catalog,&info);if(s<0)return s;
-        char id[48];snprintf(id,sizeof(id),"sandcore.%s",ids[i]);
-        ScShellVerbDesc verb;memset(&verb,0,sizeof(verb));verb.size=sizeof(verb);verb.version=1;
-        verb.verb="open";verb.label="打开";verb.flags=SC_SHELL_VERB_DEFAULT;
-        verb.executable=paths[i];verb.arguments="";verb.types=i==0?"directory":"";verb.icon=icons[i];
-        verb.profile=SC_SHELL_PROFILE_LEGACY;
-        ScShellApplicationDesc app;memset(&app,0,sizeof(app));app.size=sizeof(app);app.version=1;
-        app.layer=SC_SHELL_LAYER_SYSTEM;app.id=id;app.label=labels[i];app.executable=paths[i];
-        app.arguments="";app.icon=icons[i];app.category=i==1 || i==2?"开发":"系统";
-        app.profile=SC_SHELL_PROFILE_LEGACY;app.verbs=&verb;app.verb_count=1;ScU32 token;
-        s=ScShellCatalogRegister(desk.catalog,&app,info.epoch,&token);if(s<0)return s;
-        /* 保现Files已经使用的类型分派。这里只登记路由，不冒充本轮已
-         * 验证旧Lens每种解码器；未知二进制不自动交文本编辑器保存。 */
-        const char *types[8];ScU32 type_count=0;
-        if(i==0)types[type_count++]="directory";
-        if(i==1){types[type_count++]="c";types[type_count++]="h";types[type_count++]="inc";
-            types[type_count++]="asm";types[type_count++]="txt";types[type_count++]="cfg";types[type_count++]="log";}
-        if(i==6){types[type_count++]="scb";types[type_count++]="bmp";types[type_count++]="png";
-            types[type_count++]="jpg";types[type_count++]="jpeg";types[type_count++]="webp";}
-        for(ScU32 t=0;t<type_count;t++){
-            s=ScShellCatalogQuery(desk.catalog,&info);if(s<0)return s;
-            ScShellAssociationDesc assoc;memset(&assoc,0,sizeof(assoc));assoc.size=sizeof(assoc);assoc.version=1;
-            assoc.layer=SC_SHELL_LAYER_SYSTEM;assoc.type=types[t];assoc.application=id;assoc.verb="open";
-            s=ScShellCatalogSetAssociation(desk.catalog,&assoc,info.epoch);if(s<0)return s;
-        }
-    }
-    return 0;
+    return def_seed(desk.catalog);
 }
 static ScStatus desk_directory(const char *path)
 {
@@ -206,14 +173,33 @@ static ScStatus desk_paths(void)
     else if(s<0)return s;
     ScShellCatalogInfo cat;memset(&cat,0,sizeof(cat));cat.size=sizeof(cat);cat.version=1;
     s=ScShellCatalogQuery(desk.catalog,&cat);if(s<0)return s;
+    ScU32 project=0;
     if(desk.store_revision){
         s=ScShellCatalogLoad(desk.catalog,desk.store_path,cat.epoch);
-        /* 坏候选不覆盖已验证SYSTEM种子；明确记录，继续可用桌面。 */
+        /* SYSTEM记录仍沿原Load拒绝；不为默认迁移放宽文件信任层。 */
         if(s<0)fprintf(stderr,"SCSHELL configuration rejected=%d path=%s\n",s,desk.store_path);
+        else project=1;
     }else{
+        ScLeaseInfo pin;ScU32 eligible=0;ScStatus held=def_menu_hold(menu,&pin,&eligible);
+        if(held<0)fprintf(stderr,"SCSHELL default menu check=%d path=%s\n",held,menu);
         s=ScShellCatalogImportLegacyMenu(desk.catalog,menu,cat.epoch);
+        ScStatus released=def_menu_finish(&pin,&eligible);
+        if(released<0)fprintf(stderr,"SCSHELL default menu release=%d path=%s\n",released,menu);
         if(s<0 && s!=SC32_E_NOT_FOUND && s!=SC_SHELL_E_NOT_FOUND)
             fprintf(stderr,"SCSHELL legacy menu rejected=%d path=%s\n",s,menu);
+        if(s==0 && held==0 && released==0 && eligible)project=1;
+    }
+    if(project){ScU32 changed=0;s=def_project(desk.catalog,&changed);
+        if(s<0)fprintf(stderr,"SCSHELL defaults projection=%d durable=0\n",s);
+        else if(changed){
+            /* 直接保存同一catalog/layout快照，不调用重排/布局重建。
+             * 正常Store拥有exact revision与Preserving；只有后续ACK才持久。 */
+            desk.layout_unsaved=desk.clock_dirty=1;
+            s=ScShellCatalogStoreRevision(desk.catalog,&desk.store_revision);
+            if(s==0)s=ScShellStoreBegin(desk.catalog,desk.store_path,desk.store_revision,&desk.store);
+            if(s==0)desk.store_serial=desk.layout_serial;
+            fprintf(stderr,"SCSHELL defaults projected=%u store=%d durable=0\n",changed,s);
+        }
     }
     return 0;
 }

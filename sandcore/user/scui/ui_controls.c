@@ -113,7 +113,7 @@ static ScStatus ui_controls_init(UiNode *n)
     UiControl *p;
     ScStatus s=0;
     if(n->custom)return 0;
-    if(n->kind<SC_UI_WINDOW || n->kind>SC_UI_PROPERTY_PAGE)return SC_UI_E_INVALID;
+    if(n->kind<SC_UI_WINDOW || (n->kind>SC_UI_PROPERTY_PAGE && n->kind!=SC_UI_SECRET))return SC_UI_E_INVALID;
     p=(UiControl *)calloc(1,sizeof(*p));
     if(!p)return SC_UI_E_MEMORY;
     n->control=p;
@@ -134,7 +134,8 @@ static ScStatus ui_controls_init(UiNode *n)
     if(n->kind==SC_UI_SPLITTER){n->layout.width=4;
         n->layout.min_width=4;
     }
-    if(ui_control_editor(n))s=ui_edit_init(n);
+    if(n->kind==SC_UI_SECRET)s=ui_secret_init(n);
+    else if(ui_control_editor(n))s=ui_edit_init(n);
     if(s==0 && n->kind==SC_UI_SPINBOX)ui_control_spin_initial(n);
     return s;
 }
@@ -142,6 +143,7 @@ static void ui_controls_destroy(UiNode *n,int quiet)
 {
     UiControl *p=ui_control(n);
     if(!p)return;
+    if(n->kind==SC_UI_SECRET)ui_secret_destroy(n,quiet);
     if(p->edit)ui_edit_destroy(n);
     if(!quiet)ui_control_popup_close(n);
     else{if(p->popup_previous)p->popup_previous->popup_next=p->popup_next;
@@ -246,6 +248,7 @@ static ScStatus ui_controls_measure(UiNode *n,const ScUiSize *constraint,ScUiSiz
     out->width=out->height=0;
     ui_font_line(n->owner,n->font_role,&line,&baseline);
     (void)baseline;
+    if(n->kind==SC_UI_SECRET)return ui_secret_measure(n,constraint,out);
     if(ui_control_editor(n))return ui_edit_measure(n,constraint,out);
     if(n->kind==SC_UI_TREE || n->kind==SC_UI_LIST || n->kind==SC_UI_TABLE){out->width=ui_scale(n->owner,180);
         out->height=(ScI32)line*6+pad;
@@ -328,7 +331,7 @@ static void ui_control_focus(ScUiPainter *p,const ScUiRect *area)
     }
 }
 static int ui_control_rounded(UiNode *n)
-{return n->kind==SC_UI_BUTTON || n->kind==SC_UI_TEXTBOX || n->kind==SC_UI_EDIT || n->kind==SC_UI_SPINBOX || n->kind==SC_UI_COMBOBOX || n->kind==SC_UI_PROGRESS || n->kind==SC_UI_TOOLTIP;
+{return n->kind==SC_UI_SECRET || n->kind==SC_UI_BUTTON || n->kind==SC_UI_TEXTBOX || n->kind==SC_UI_EDIT || n->kind==SC_UI_SPINBOX || n->kind==SC_UI_COMBOBOX || n->kind==SC_UI_PROGRESS || n->kind==SC_UI_TOOLTIP;
 }
 static ScI32 ui_control_radius(UiNode *n,const ScUiRect *r)
 {
@@ -411,6 +414,7 @@ static ScStatus ui_controls_paint(UiNode *n,ScUiPainter *p)
     UiControl *c=ui_control(n);
     ScUiRect r={0,0,n->rectangle.width,n->rectangle.height},text=r;
     ScI32 pad=ui_scale(n->owner,4);
+    if(n->kind==SC_UI_SECRET)return ui_secret_paint(n,p);
     if(ui_control_editor(n))return ui_edit_paint(n,p);
     if(n->kind==SC_UI_TREE || n->kind==SC_UI_LIST || n->kind==SC_UI_TABLE)return ui_view_paint(n,p);
     if(n->kind==SC_UI_BUTTON){
@@ -574,7 +578,8 @@ static ScStatus ui_controls_paint(UiNode *n,ScUiPainter *p)
         ui_control_arrow(p,first.x+side/2-3,first.y+side/2-3,4,vertical?1:2,SC32_COLOR_TEXT);
         ui_control_arrow(p,last.x+side/2-3,last.y+side/2-3,4,vertical?0:3,SC32_COLOR_TEXT);
         UiNode *target=n->parent;
-        if(target){ScU32 content=vertical?target->content_height.lo:target->content_width.lo,viewport=vertical?(ScU32)target->rectangle.height:(ScU32)target->rectangle.width;
+        if(target){ScUiRect view;ScStatus measured=ui_scroll_viewport(target,&view);if(measured<0)return measured;
+            ScU32 content=vertical?target->content_height.lo:target->content_width.lo,viewport=vertical?(ScU32)view.height:(ScU32)view.width;
             ScI32 track=(vertical?r.height:r.width)-side*2;
             if(track<0)track=0;
             ScI32 thumb=content>viewport && content?((ScI32)ui_control_fraction(viewport,(ScU32)track,content)):track;
@@ -1122,7 +1127,8 @@ static ScStatus ui_control_scroll_event(UiNode *n,const ScUiEvent *e)
     ScI32 coordinate=vertical?e->y:e->x,length=vertical?n->rectangle.height:n->rectangle.width;
     ScWideCounter x=target->scroll_x,y=target->scroll_y,*offset=vertical?&y:&x;
     ScU32 step=vertical?target->scroll_step_y:target->scroll_step_x,content=vertical?target->content_height.lo:target->content_width.lo;
-    ScU32 viewport=vertical?(ScU32)target->rectangle.height:(ScU32)target->rectangle.width,max=content>viewport?content-viewport:0;
+    ScUiRect view;ScStatus measured=ui_scroll_viewport(target,&view);if(measured<0)return measured;
+    ScU32 viewport=vertical?(ScU32)view.height:(ScU32)view.width,max=content>viewport?content-viewport:0;
     if(e->type==SC_UI_EVENT_POINTER_DOWN && ui_control_left_edge(e) && (e->buttons&1)){
         if(coordinate<side){if(!offset->hi && offset->lo<step)offset->lo=0;
             else{ScU32 old=offset->lo;
@@ -1141,8 +1147,10 @@ static ScStatus ui_control_scroll_event(UiNode *n,const ScUiEvent *e)
     }
     if(e->type==SC_UI_EVENT_POINTER_MOVE && c->pressed_part){
         ScI32 track=length-side*2;
+        if(ui_scroll_layout_node(target))track=ui_scroll_bar_travel(length,side,content,viewport);
         ScI32 delta=coordinate-c->drag_origin;
-        ScU32 change=ui_control_fraction((ScU32)(delta<0?-delta:delta),max,(ScU32)(track>0?track:1));
+        ScU32 magnitude=delta<0?0u-(ScU32)delta:(ScU32)delta;
+        ScU32 change=ui_scroll_layout_node(target) && track<=0?0:ui_control_fraction(magnitude,max,(ScU32)(track>0?track:1));
         ScU32 old=(ScU32)c->drag_value;
         if(delta<0)offset->lo=change>old?0:old-change;
         else offset->lo=change>max-old?max:old+change;
@@ -1183,6 +1191,7 @@ static ScStatus ui_controls_event(UiNode *n,const ScUiEvent *e)
             return s<0?s:SC_UI_HANDLED;
         }
     }
+    if(n->kind==SC_UI_SECRET)return ui_secret_event(n,e);
     if(ui_control_editor(n))return ui_edit_event(n,e);
     if(n->kind==SC_UI_COMBOBOX){
         if(e->type==SC_UI_EVENT_POINTER_DOWN && ui_control_left_edge(e) && (e->buttons&1)){s=ScUiComboOpen(n->owner,n->id,c->popup?0:1);
@@ -1347,3 +1356,5 @@ static ScStatus ui_controls_popup_event(UiNode *root,const ScUiEvent *event)
     }
     return 0;
 }
+
+#include "scui_tabs.inc"

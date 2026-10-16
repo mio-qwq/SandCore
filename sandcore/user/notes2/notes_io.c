@@ -131,13 +131,13 @@ static ScStatus n_publish(NotesIo *io)
     desc.expected_source_object=io->source.info.object_id;desc.expected_source_revision=io->source.info.revision;
     desc.target_path=io->path;desc.flags=SC32_LEASE_EXPECT_ABSENT|SC32_LEASE_SET_MODE;desc.final_mode=23;
     if(io->target.valid){
-        desc.flags=SC32_LEASE_EXPECT_EXACT|SC32_LEASE_SET_MODE;
+        desc.flags=SC32_LEASE_EXPECT_EXACT;desc.final_mode=0;
         desc.target_lease=io->target.info.lease;desc.target_generation=io->target.info.generation;
         desc.expected_target_object=io->target.info.object_id;desc.expected_target_revision=io->target.info.revision;
-        ScPathInfo prior;n_record(&prior,sizeof(prior));status=ScPathQuery(io->path,&prior);if(status<0)return status;
-        desc.final_mode=prior.rw;
     }
-    status=ScFileLeasePublish(&desc,&current);
+    /* 编辑旧文件只替换正文，不把共享作品的owner偷偷改为保存者。
+     * 身份/权限与metadata在提交阶段由固定目标核验并原样继承。 */
+    status=io->target.valid?ScFileLeasePublishPreserving(&desc,&current):ScFileLeasePublish(&desc,&current);
     if(current.lease==io->source.info.lease)io->source.info=current;
     return status;
 }

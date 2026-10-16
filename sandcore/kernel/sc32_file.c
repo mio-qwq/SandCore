@@ -1,4 +1,6 @@
 #include "sc32_file.h"
+#include "../user/sc32/SC32TERMINALWIRE.H"
+#include "../user/sc32/SC32CAPTUREWIRE.H"
 #include "sc32_core.h"
 #include "fs.h"
 #include "fs_lease.h"
@@ -18,7 +20,7 @@ typedef struct {
     Sc32FileReply completed_reply;
     char path[64];
 } file_handle_t;
-typedef struct {u32 refs,head,object,position,flags,create_mode,ready;int standard;} file_description_t;
+typedef struct {u32 refs,head,object,position,flags,create_mode,ready,native_endpoint;int standard;} file_description_t;
 typedef struct {u32 generation,head,pending_open,standard[3];} file_owner_t;
 static objpool_t handles,descriptions,owners;
 static u32 handle_counter;
@@ -151,8 +153,8 @@ static void file_reply(int pid,file_handle_t *h,file_description_t *d,Sc32FileRe
     clear(r,sizeof(*r));r->size=sizeof(*r);r->version=1;r->handle=h?h->id:0;r->raw=raw;r->transferred=transferred;
     if(!d)return;
     r->position=d->position;r->flags=d->flags;r->object=d->object;
-    if(d->standard>=0){
-        r->flags|=SC32_FILE_STANDARD;u32 info[8];
+    if(d->native_endpoint){
+        r->flags|=d->standard>=0?SC32_FILE_STANDARD:SC32_FILE_NATIVE_ENDPOINT;u32 info[8];
         if(!streams_native_query(pid,h->native_reference,info)){
             r->position=info[2];r->length=info[3];r->revision=info[4];r->endpoint_kind=info[1];r->endpoint_capabilities=info[6];
         }
@@ -210,7 +212,7 @@ static int duplicate_file(int pid,file_handle_t *original,u32 output)
     if(d->refs==0xffffffffu)return SC32_E_RANGE;
     file_handle_t *h=new_handle(pid,FILE_HANDLE);if(!h)return SC32_E_MEMORY;
     int raw=0;
-    if(d->standard>=0){raw=streams_native_duplicate(pid,original->native_reference,&h->native_reference);
+    if(d->native_endpoint){raw=streams_native_duplicate(pid,original->native_reference,&h->native_reference);
         if(raw){drop(h);return stream_status(raw);}}
     attach_description(h,original->description);Sc32FileReply r;file_reply(pid,h,d,&r,0,0);return publish(pid,output,&r,sizeof(r));
 }
@@ -221,7 +223,7 @@ static int standard_file(int pid,u32 index,u32 output)
     if(d && d->head){file_handle_t *existing=handle(pid,d->head,FILE_HANDLE);if(existing)return duplicate_file(pid,existing,output);}
     file_handle_t *h=new_handle(pid,FILE_HANDLE);if(!h)return SC32_E_MEMORY;
     int slot=objpool_alloc(&descriptions);if(slot<0){drop(h);return SC32_E_MEMORY;}
-    d=objpool_get(&descriptions,slot);d->standard=(int)index;d->ready=1;
+    d=objpool_get(&descriptions,slot);d->standard=(int)index;d->ready=1;d->native_endpoint=1;
     attach_description(h,(u32)slot+1);
     int raw=streams_native_take(pid,(int)index,&h->native_reference);
     if(raw){drop(h);return raw==-1?SC32_E_NOT_FOUND:stream_status(raw);}
@@ -268,8 +270,12 @@ static int directory(int pid,u32 operation,const u32 *q,u32 output)
     h->cursor=cursor;r.cursor=cursor;r.flags=cursor==0xffffffffu?SC32_DIRECTORY_END:0;
     return publish(pid,output,&r,sizeof(r));
 }
+#include "sc32_capture_kernel.inc"
+#include "sc32_terminal_kernel.inc"
 int sc32_file_call(int pid,u32 operation,u32 request,u32 output)
 {
+    if(operation>=SC32_T_SPAWN && operation<=SC32_T_CONTROL)return terminal_call(pid,operation,request,output);
+    if(operation==SC32_F_CAPTURE)return capture_spawn(pid,request,output);
     if(operation==SC32_P_QUERY)return path_query(pid,request,output);
     if(operation!=SC32_F_OPEN && operation!=SC32_F_READ && operation!=SC32_F_WRITE && operation!=SC32_F_SEEK
        && operation!=SC32_F_TELL && operation!=SC32_F_FLUSH && operation!=SC32_F_CLOSE && operation!=SC32_F_QUERY
@@ -297,7 +303,7 @@ int sc32_file_call(int pid,u32 operation,u32 request,u32 output)
             if(cached<0)return SC32_E_BUSY;
             int copied=publish(pid,output,&r,sizeof(r));return copied?copied:native_status(r.raw);
         }
-        if(d->standard>=0){
+        if(d->native_endpoint){
             raw=operation==SC32_F_READ?streams_native_read(pid,h->native_reference,(void *)q[3],q[4])
                 :streams_native_write(pid,h->native_reference,(const void *)q[3],q[4]);
             if(raw>=0)transferred=(u32)raw;
@@ -313,21 +319,21 @@ int sc32_file_call(int pid,u32 operation,u32 request,u32 output)
             int cached=completed(h,FS_NATIVE_WRITE_OPERATION,q[4],&r);if(cached<0)return SC32_E_BUSY;
             int copied=publish(pid,output,&r,sizeof(r));return copied?copied:native_status(r.raw);
         }
-        file_reply(pid,h,d,&r,raw>=0 && d->standard>=0?0:raw,transferred);
+        file_reply(pid,h,d,&r,raw>=0 && d->native_endpoint?0:raw,transferred);
         {int copied=publish(pid,output,&r,sizeof(r));if(copied)return copied;}
         return status;
     }
     if(operation==SC32_F_SEEK){
         if(!reserved(q,5) || q[3]>SC32_SEEK_END)return SC32_E_INVALID;
         if(h->closing)return SC32_E_BUSY;
-        if(d->standard>=0){u32 info[8];raw=streams_native_query(pid,h->native_reference,info);
+        if(d->native_endpoint){u32 info[8];raw=streams_native_query(pid,h->native_reference,info);
             if(!raw && !(info[6]&1u))raw=-12;
             if(raw){file_reply(pid,h,d,&r,raw,0);int copied=publish(pid,output,&r,sizeof(r));return copied?copied:stream_status(raw);}}
         file_reply(pid,h,d,&r,0,0);u32 base=q[3]==SC32_SEEK_SET?0:q[3]==SC32_SEEK_CUR?r.position:r.length;
         ScI32 offset=(ScI32)q[4];u32 position;
         if(offset<0){u32 subtract=0u-(u32)offset;if(subtract>base)return SC32_E_RANGE;position=base-subtract;}
         else{if((u32)offset>0xffffffffu-base)return SC32_E_RANGE;position=base+(u32)offset;}
-        if(d->standard>=0){raw=streams_native_seek(pid,h->native_reference,position);status=stream_status(raw);}
+        if(d->native_endpoint){raw=streams_native_seek(pid,h->native_reference,position);status=stream_status(raw);}
         else{fs_native_info_t info;raw=fs_native_info(pid,d->object,d->flags&3u,&info);status=native_status(raw);
             if(!status){fs_native_cancel(d->object,h->id);h->completed_kind=0;d->position=position;}}
         if(status){file_reply(pid,h,d,&r,raw,0);int copied=publish(pid,output,&r,sizeof(r));return copied?copied:status;}
@@ -345,7 +351,7 @@ int sc32_file_call(int pid,u32 operation,u32 request,u32 output)
         if(complete){file_reply(pid,h,d,&r,0,0);drop(h);r.handle=0;return publish(pid,output,&r,sizeof(r));}
     }
     if(operation==SC32_F_QUERY || operation==SC32_F_TELL){
-        if(d->standard>=0){u32 info[8];raw=streams_native_query(pid,h->native_reference,info);
+        if(d->native_endpoint){u32 info[8];raw=streams_native_query(pid,h->native_reference,info);
             if(!raw && operation==SC32_F_TELL && !(info[6]&2u))raw=-12;
             status=stream_status(raw);}
         else{fs_native_info_t info;raw=fs_native_info(pid,d->object,0,&info);status=native_status(raw);}
@@ -361,14 +367,14 @@ int sc32_file_call(int pid,u32 operation,u32 request,u32 output)
         int copied=publish(pid,output,&r,sizeof(r));return copied?copied:status;
     }
     if(operation==SC32_F_TRUNCATE){
-        if(d->standard>=0)return SC32_E_NOT_SUPPORTED;
+        if(d->native_endpoint)return SC32_E_NOT_SUPPORTED;
         if(!(d->flags&FS_NATIVE_WRITE))return SC32_E_ACCESS;
         raw=fs_native_truncate(pid,d->object,h->id,q[3]);status=native_status(raw);
     }else{
         if(operation==SC32_F_CLOSE && !h->closing){
             h->closing=1;if(d->object)fs_native_cancel(d->object,h->id);
         }
-        if(d->standard>=0){raw=streams_native_flush(pid,h->native_reference);status=stream_status(raw);}
+        if(d->native_endpoint){raw=streams_native_flush(pid,h->native_reference);status=stream_status(raw);}
         else if(d->flags&FS_NATIVE_WRITE){raw=fs_native_flush(pid,d->object,h->id);status=native_status(raw);}
         else{fs_native_info_t info;raw=fs_native_info(pid,d->object,FS_NATIVE_READ,&info);status=native_status(raw);}
     }

@@ -513,6 +513,12 @@
       "dependency": "SCCLIB.SCL",
       "kind": "function",
       "size": 1
+    },
+    {
+      "name": "ScUiCommandSet",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
     }
   ]
 }

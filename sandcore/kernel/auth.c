@@ -13,7 +13,7 @@
 #define USER_PASSWORD 2u
 #define AUTH_DB "SYS/AUTH/USERS.DAT"
 typedef struct {char name[32],home[64];i32 uid,gid;u8 salt[16],hash[32];u32 flags,reserved;} user_t;
-typedef struct {i32 uid,gid,subject_uid,subject_gid;u32 realm,session,generation;} credential_t;
+typedef struct {i32 uid,gid,subject_uid,subject_gid;u32 realm,session,generation,login_role;} credential_t;
 typedef struct {
     u32 ticket,generation,created,state,action,database_generation;
     i32 target;pbkdf256_t derive;u8 salt[16];
@@ -35,6 +35,7 @@ static login_t *logins_at(int pid)
 u32 auth_login_bytes(void){return sizeof(login_t);}
 static u32 launch_set,launch_desktop,serial_session,serial_counter,poll_tick;
 static int login_head=-1,login_tail=-1;
+static int login_launch;
 static i32 active_uid=AUTH_DEFAULT,active_gid=AUTH_DEFAULT;
 static u32 next_attempt[AUTH_USER_MAX+1];
 
@@ -142,6 +143,8 @@ static credential_t *credential(int pid)
         || CREDENTIAL(pid).generation!=task_generation(pid))return 0;
     return &CREDENTIAL(pid);
 }
+#include "login_role.inc"
+
 void auth_spawn(int pid,int parent)
 {
     login_clear(pid);
@@ -153,6 +156,7 @@ void auth_spawn(int pid,int parent)
         CREDENTIAL(pid).uid=CREDENTIAL(pid).subject_uid=s?s->uid:-2;
         CREDENTIAL(pid).gid=CREDENTIAL(pid).subject_gid=s?s->gid:-2;
     }
+    CREDENTIAL(pid).login_role=launch_set && login_launch;
     CREDENTIAL(pid).generation=task_generation(pid);
     (void)session_bind(pid,launch_set?launch_desktop:parent>0?session_task(parent):session_active());
 }
@@ -294,7 +298,10 @@ int auth_login_screen_exec(u32 desktop)
     session_t *s=session_get(desktop);if(!s || s->kind!=SESSION_LOCKED)return -1;
     /* 仅此固定登录程序显示在锁屏会话。服务UID不带串口授权；文件
      * 主体为无权限哨兵，不能借登录窗读写其它用户文档或执行任意程序。 */
-    return execute("SYS/CORE/LOGIN.SCX",AUTH_SYSTEM,AUTH_SYSTEM,AUTH_SERVICE,0,-2,-2,desktop);
+    if(!login_resources_ready())return -5;
+    login_launch=1;
+    int child=execute("SYS/CORE/LOGIN2.SCX",AUTH_SYSTEM,AUTH_SYSTEM,AUTH_SERVICE,0,-2,-2,desktop);
+    login_launch=0;return child;
 }
 int auth_launch_access(const char *path,u32 access)
 {

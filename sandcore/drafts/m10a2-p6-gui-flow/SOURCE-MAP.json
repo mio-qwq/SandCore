@@ -1,0 +1,231 @@
+{
+  "status": "STATIC_PREPARATION_ONLY_NO_VM",
+  "input_reference_sha256": {
+    "tools/verify_m10a2_ui_gui.py": "42df9dce1013a86136398f8cd3d78d6347b833521c838b3ce82b8c9843c0280f",
+    "tools/verify_m10a2_shell_runtime.py": "f950079caaaeed276f81746faf04d56361760570f1097c9327189a03c4ecbc52",
+    "tools/m10a2_shell_desktop_flow.py": "cbd9f258838d7af494d313ce5ad3658c50133a777e4ba8baa07021285426ce75",
+    "tools/scui_input.py": "7f0cd2aa1fff2ac6704369450067ee3fd143d2aee1c8e4a63af4acf7ece38e50",
+    "tools/scui_workflow.py": "dae175cdb3fcdcbe4f9a53974af7527fd197241690e16204fe366ec358d82565",
+    "tools/m10a2_shell_inspect.py": "a2edd8ca08d4d0481049a3b2c910aacf7e94eef79cebd20b94610bc60dd158ff",
+    "tools/verify_m10a2_ui_platform.py": "4f9ec7435e98cfc4205961c86c90ef305d018096550bb3ad1c60f0fe1d0a364a",
+    "tools/audit_m10a2_file_job_results.py": "eb7777e5d9e9b609b11fe700fa9cd328135ddfb66c2c415e56588f5604164a62",
+    "tools/keys.py": "04003b20234f565f1df6df66f11182fc2c8b9469b199122b206bfbaddb83ec75",
+    "tools/mouse.py": "08dd1814b4a9dd32eeb231083aae85f50fc1fdcfd6484df5c0b58577bbb07372",
+    "user/files2/FILES2.H": "b97695d2e396086a83a40237ec78476763ff8f3f518ff6cd9e2dffd2017f51e8",
+    "user/files2/files2_view.inc": "c7de9698e27275ff8e57d08dc94389598f60b3758d86968ccfd7c435092e84a7",
+    "user/files2/files2_actions.inc": "d54cf70c0196d074ee7ca65d448cbd2a5cfa45f65971de48e13158d37bb1686e",
+    "user/files2/files2_storage.inc": "7e7832fed70f498a742967122f9a6884c96fe055dabb8e67a20067946cf9ef8f",
+    "user/scshell/desktop/desktop_view.inc": "375fd8b4981941255b71a6718b93c33409d2a1d39ccebf1f850def04bcf64fcb",
+    "user/scshell/desktop/desktop_actions.inc": "233c499c258f86b0b64f4e692771fad30f3ef04a2b97c418a8d255e6ee0a9443",
+    "user/notes2/NOTES2.H": "9260d2122bd7dc7a65932d73a42b104fa7ac9305907e119dc14cf5baf6bb2fc4",
+    "user/notes2/notes_ui.c": "c61332e512e524d803e895fef04cdad522646ce4a49b42a43967bfc0365fe6bd",
+    "user/notes2/notes_io.c": "de06866d2d19c23d0d5c33c54ca8068bdf1663cf2410c16a9c6ebebef1664b2c",
+    "user/studio2/STUDIO2.H": "78610cae78419b785e265ad73365bbd8bc597341d344d95a7c7cf368ea73183b",
+    "user/studio2/studio_ui.c": "56d73096c75dcc77ad3ae6420a0d482eb262479e1c642da92b22d7c1af9009ff",
+    "user/studio2/studio_actions.c": "84186422a0be22bd36def7078cf692b53e606ddefb809c1a4e2332321b5f0201",
+    "user/studio2/studio_build.c": "69249a23196d36ac5420e336bc605b37025d279d4721a2b75471fbf81dbfd4a0",
+    "user/debug2/D2APP.H": "7544910a379afc5057f536c26ab2391f417a416059cbdd861ea0142d9d8b87d5",
+    "user/debug2/ui.c": "55d6cbc7ba2ed2edf6d86d150f27c585b03b1c4f2debaf0e69b078c6f22b96a2",
+    "user/debug2/model.c": "a805f211262d840e263072055ab9677ad3e9ee5f65c4cef6cf02a22afaa44305",
+    "user/debug2/sidecar.c": "158df952776dda20153b799ed5923fc7eb4f42201ee7aad1d896d273eb84e124",
+    "user/debug2/DEBUG2.C": "d0a540d0260afb6c2c2db710894224d0874f282b8973de23f78f5cbb07d33e39",
+    "user/imageapps/IMAGEAPP.H": "0294c610be70b08cd9e801a55d84aded1e743b4b0c121da3fe880bc998cece0a",
+    "user/imageapps/ui.c": "3fad7408ea5b400ee004e3abe97401aa9d39fc74ed4fcf51a14f18f976db8340",
+    "user/imageapps/actions.c": "6f5c308c3e28f202abbe1ca0775bed5c22303601911b45a48a9bd2500d7964a7",
+    "user/settings2/SETTINGS2.H": "7fc1c1c10c9c40a7cef5771e87c048020d1b61253f8ecbd935a73db9b22eb45c",
+    "user/settings2/settings_view.inc": "451467943eaf712b0bf23b5bd7e0a23eca87391fb6feaf2b10611a21f77c449b",
+    "user/settings2/app_ui.inc": "b770078fba1a896a3c6df39e452cfd5f036eb93c4081aecf4fdabbc7666eb683",
+    "user/systemtools/tools_ui.inc": "8ac3d66668684d0f4eff64c6c6055412517d668db2f8b1675852c442676e82ff",
+    "user/systemtools/calc_view.inc": "97aa49ceb3064902f280d8f79184419683f1f215f3708b7669da451e42f15c9d",
+    "user/systemtools/palette_view.inc": "45ec34df45de17f087494b611f6be0d87df24239746c0591054aa74671967523",
+    "user/systemtools/monitor_view.inc": "cab7f59979f5285b9f3755b335efea7e727f05bed1db64e950ef192c6611dced",
+    "user/terminal2/TERMINAL2.H": "242a01d63e18ca4e990e1d2c9e633fe9f388de39aa150d7b0c67f6b4bdc999a8",
+    "user/terminal2/TERMINAL2.C": "a89ff0fd9c29bd99f75baf320af64f9db809b0ce0549b3af72f2b7fe2ca8d022",
+    "user/terminal2/terminal_ui.c": "e810d3d6f2a4877e3cbecde7207ccf0222fafe940937b58f41070ded1a623c59",
+    "user/scterm/term_widget.c": "273acd2c5ea674fb936ee7ab7790d4c1f8e453877c8f6fe9cf06086ef44b5fa2",
+    "user/sound2/SOUND2.H": "ec6cceef1f7335641d6f4394d528528f8b84c8c7b340366d422c5b0aea231e07",
+    "user/sound2/sound_ui.c": "a4802d52f1bf9593c520efa0a99d7befd7d23903b84bff65268b4fc34ee822b5",
+    "user/session2/S2APP.H": "72cb98b04ca63ddd7696a5e2ca1a3488af4e112b8a20a1ba5a310acffe228706",
+    "user/session2/ui.c": "b838db5dfee0a0ea7f50082425db1cb99309683b53af6f3d93eb60c43246bc21",
+    "user/session2/actions.c": "ac2f87cbf0e319325530312fbf3bc8c2d07974bdd0928a35c6900a50e4e61bad",
+    "user/scui/ui_menu.c": "b84afc54e8192bb5a71823f2da39a59d4836b2c5223fc7f237d6b39082f242b9",
+    "user/scui/ui_dispatch.c": "b3c683401c14d397989f3187dcaa0d47c4b159eecbfab8c03264dbe4da5069e9",
+    "user/scui/ui_dialog.c": "3edbc873669548cefa6495e191c2b3a88544d9d994e7134d7002da9b2607ac4d",
+    "examples/m10a2-sdk/researchdesk/RDESK.SCP": "5b82c28c150313559546d6cef535a6db95e5210d3e90892b8f5b642a4e01b1a1",
+    "examples/m10a2-sdk/researchdesk/RDSTATS.SCP": "956e4f9602464762bdf0438358232b317f17ddfe78ab5a90113612a36f106854",
+    "examples/m10a2-sdk/researchdesk/MAIN.C": "4046bc096b5c6b6b5b4e126f3b54e2ace6bf3b0e673c1f03b9b9f12ffcc78b09",
+    "examples/m10a2-sdk/researchdesk/MODEL.C": "fcc39f50fad62e82c7fb1929f2d7402484178a29ef10e225ddb7f69ed8922584",
+    "examples/m10a2-sdk/researchdesk/BUILD.SH": "80a967f089597b78afbf576b057ef547acd663c4e7eee357d6e00300a3da4133"
+  },
+  "commands": {
+    "user/files2/FILES2.H": {
+      "F2_ADDRESS": {
+        "decimal": 33045,
+        "hex": "0x8115"
+      },
+      "F2_DROP_COPY": {
+        "decimal": 33046,
+        "hex": "0x8116"
+      },
+      "F2_DROP_MOVE": {
+        "decimal": 33047,
+        "hex": "0x8117"
+      },
+      "F2_EDIT": {
+        "decimal": 33034,
+        "hex": "0x810a"
+      },
+      "F2_DEBUG": {
+        "decimal": 33035,
+        "hex": "0x810b"
+      }
+    },
+    "user/notes2/NOTES2.H": {
+      "N_SAVE": {
+        "decimal": 33026,
+        "hex": "0x8102"
+      },
+      "N_SAVE_AS": {
+        "decimal": 33027,
+        "hex": "0x8103"
+      },
+      "N_COPY": {
+        "decimal": 33033,
+        "hex": "0x8109"
+      },
+      "N_PASTE": {
+        "decimal": 33034,
+        "hex": "0x810a"
+      }
+    },
+    "user/studio2/STUDIO2.H": {
+      "S_PROJECT_OPEN": {
+        "decimal": 34311,
+        "hex": "0x8607"
+      },
+      "S_BUILD": {
+        "decimal": 34328,
+        "hex": "0x8618"
+      },
+      "S_CANCEL": {
+        "decimal": 34329,
+        "hex": "0x8619"
+      },
+      "S_RUN": {
+        "decimal": 34330,
+        "hex": "0x861a"
+      },
+      "S_DEBUG": {
+        "decimal": 34331,
+        "hex": "0x861b"
+      }
+    },
+    "user/debug2/D2APP.H": {
+      "D2_LAUNCH": {
+        "decimal": 100,
+        "hex": "0x64"
+      },
+      "D2_CONTINUE": {
+        "decimal": 200,
+        "hex": "0xc8"
+      },
+      "D2_PAUSE": {
+        "decimal": 201,
+        "hex": "0xc9"
+      },
+      "D2_STEP": {
+        "decimal": 202,
+        "hex": "0xca"
+      },
+      "D2_BREAK_ADD": {
+        "decimal": 302,
+        "hex": "0x12e"
+      },
+      "D2_BREAK_REMOVE": {
+        "decimal": 303,
+        "hex": "0x12f"
+      }
+    },
+    "user/imageapps/IMAGEAPP.H": {
+      "I_NEW": {
+        "decimal": 100,
+        "hex": "0x64"
+      },
+      "I_SAVE_AS": {
+        "decimal": 103,
+        "hex": "0x67"
+      },
+      "I_UNDO": {
+        "decimal": 106,
+        "hex": "0x6a"
+      },
+      "I_REDO": {
+        "decimal": 107,
+        "hex": "0x6b"
+      },
+      "I_TOOL_FIRST": {
+        "decimal": 200,
+        "hex": "0xc8"
+      }
+    },
+    "user/settings2/SETTINGS2.H": {
+      "S2_PREVIEW": {
+        "decimal": 20992,
+        "hex": "0x5200"
+      },
+      "S2_KEEP": {
+        "decimal": 20993,
+        "hex": "0x5201"
+      },
+      "S2_REVERT": {
+        "decimal": 20994,
+        "hex": "0x5202"
+      }
+    },
+    "user/sound2/SOUND2.H": {
+      "S2_OPEN": {
+        "decimal": 26880,
+        "hex": "0x6900"
+      },
+      "S2_FORWARD": {
+        "decimal": 26885,
+        "hex": "0x6905"
+      },
+      "S2_SEEK": {
+        "decimal": 26886,
+        "hex": "0x6906"
+      },
+      "S2_CANCEL": {
+        "decimal": 26890,
+        "hex": "0x690a"
+      }
+    },
+    "user/session2/S2APP.H": {
+      "S_SIGNIN": {
+        "decimal": 100,
+        "hex": "0x64"
+      },
+      "S_REQUEST_SIGNIN": {
+        "decimal": 101,
+        "hex": "0x65"
+      },
+      "S_CANCEL": {
+        "decimal": 102,
+        "hex": "0x66"
+      },
+      "S_LOCK": {
+        "decimal": 108,
+        "hex": "0x6c"
+      }
+    }
+  },
+  "helpers_executed": false,
+  "guest": false,
+  "build": false,
+  "packaging": false,
+  "observed_gaps": [
+    "SESSION_LOGIN_PANEL_IS_NOT_ASSERTED_SAME_SID_UNLOCK",
+    "SCUIDEMO_F12_SNAPSHOT_IS_NOT_FORMAL_APPLICATION_API"
+  ],
+  "shortcut_wiring": "ROOT_FIXED_FOUR_HELPERS_PUBLIC_COMMANDSET_GUEST_KEYS_UNVERIFIED"
+}

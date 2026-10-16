@@ -221,7 +221,7 @@ static ScStatus sw_parse_plan(const unsigned char *body,ScU32 bytes)
     for(ScU32 i=0;!status && i<begin->count;i++){
         const ScShellWireJobItem *input=(const ScShellWireJobItem *)(body+begin->items_offset+i*sizeof(*input));
         if(input->size!=sizeof(*input) || input->version!=1 || !input->item_id || (input->kind!=1 && input->kind!=2)
-           || (input->flags&~3u) || ((input->flags&SHW_ITEM_EXPECT_SOURCE)?!input->expected_source_revision:input->expected_source_revision!=0)
+           || (input->flags&~7u) || ((input->flags&SHW_ITEM_EXPECT_ABSENT) && (input->flags&SHW_ITEM_EXPECT_DESTINATION)) || ((input->flags&SHW_ITEM_EXPECT_SOURCE)?!input->expected_source_revision:input->expected_source_revision!=0)
            || ((input->flags&SHW_ITEM_EXPECT_DESTINATION)?(!input->expected_destination_revision || (input->expected_destination_kind!=1 && input->expected_destination_kind!=2)):
                 (input->expected_destination_revision || input->expected_destination_kind))) {status=SC32_E_INVALID;
             break;

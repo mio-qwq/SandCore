@@ -1,0 +1,72 @@
+{
+  "status": "DRIVER_IMPLEMENTED_PENDING_ROOT_FINAL_PINS_AND_GUEST_GENERATION",
+  "qemu_started": false,
+  "guest_generation_run": false,
+  "final_runtime_preflight_run": false,
+  "new_ordinary_libraries": 8,
+  "targets": 27,
+  "source_only_and_parser_report": "build/m10a2-p6-guest-generation-agent-check-02/report.json",
+  "report_sha256": "3e9b84f66fd2f0ab3c20f9c1251b1250ecbba0dfc26d5b38807721cb84bbdb0f",
+  "checks": [
+    {
+      "name": "actual-source-closure-and-SDK-whitelist",
+      "status": "PASS",
+      "cases": 27,
+      "sources": 322,
+      "public_headers": 47,
+      "max_prepared_path_bytes": 44
+    },
+    {
+      "name": "existing-i386-layout-extractor-current-headers",
+      "status": "PASS",
+      "layout_sha256": "6db2b6749f24d6c3e15f471b39e62de12fd7f4b60596ef3840f73b48a02c76a5",
+      "fields": {
+        "record_size": 320,
+        "record_generation": 168,
+        "record_name": 28,
+        "record_name_bytes": 12,
+        "record_state": 20,
+        "pool_stride": 1088
+      }
+    },
+    {
+      "name": "existing-real-SCO-SCLD-SCDB-source-and-layout-parser",
+      "status": "PASS",
+      "scope": "HOST_IO_EXISTING_ARTIFACTS_ONLY_NOT_GUEST",
+      "origin_report": "/mnt/c/Users/Administrator/Desktop/projectos/sandcore/build/m10a2-p6-sco-04/report.json",
+      "origin_sha256": "896ce4f829a011f4809f8598bdb6157f34dacc7fac5ce60658430139798a0c91",
+      "case": "SOUND2",
+      "object_sha256": "41c2ec7d1b8a82cdb8f177dbf68cd9a4da2bff8d54ce3e8368eefbc900a9f677",
+      "image_sha256": "9e8dad90f1cb84f1c05a78c339b6ecd6e48e608dce8e9a53eeea850109183792",
+      "debug": {
+        "format": "SCDB1MIO",
+        "image_sha256": "9e8dad90f1cb84f1c05a78c339b6ecd6e48e608dce8e9a53eeea850109183792",
+        "bytes": 16458,
+        "sha256": "eb158d8a49eadf666bb87624ed30343c4816466523b153fa2a0eb11dd0b13f29",
+        "symbols": 48,
+        "files": 33,
+        "lines": 828,
+        "object_count": 1,
+        "source_and_address_contract_exact": true
+      }
+    }
+  ],
+  "final_python_syntax": "PASS",
+  "source_scope": "OWN_DRAFT_AND_BUILD_ONLY_MAIN_NOT_EDITED",
+  "runtime_inputs_needed": "README schema=1 final HOST build/report, actual per-case NATIVE.JSON reports, original data pin, bootstrap HOST/issuer/resources, current layout",
+  "limits": [
+    "Windows QEMU/serial/PID barrier/owner ledger not executed this task",
+    "Final HOST build/input pins not yet supplied",
+    "P3 standard-library behavior matrix reused externally, not rerun",
+    "Native LOGIN2/five-libraries issuer/CORE must be rebuilt for following execution VM"
+  ],
+  "files": {
+    "DESIGN.md": "56888daf265fcc816d3a81234d2d59987eaf226a3871a21fa7b85e4efee338a3",
+    "README.md": "562858575711ae100e7223b6b9aae1d6c51762895c647ee9139fce1cfcf8c3f9",
+    "check.py": "ef833367f27a1646233a9950df7cbdeaca57e8fdbd892f432ae4d6e3edbad4e9",
+    "driver.py": "d13353e6ef1127f3db94c9d0a961424c00f6fd7084217bf6e6508fd3e06cdb20",
+    "finalize.py": "b9ebf5501f8f09fee229a38091075e47a8fabb403e3a0a327b6e310d72cd4412",
+    "layout.py": "8acba30234480a3fd55f15c2c374a7af1ace451eb4d59713838ab798bb695911",
+    "model.py": "3087b2c093dd99350e4049214478bf188a23edb585a4766f529dbc16e50f5bb2"
+  }
+}

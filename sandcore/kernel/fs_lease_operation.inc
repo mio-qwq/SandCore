@@ -108,6 +108,8 @@ static int lease_destination_condition(lease_record_t *r)
        || target->object!=r->expected_target_object || dirents[index].generation!=r->expected_target_revision)return SC32_E_STALE;
     int status=lease_binding_check(target,1);if(status)return status;
     if(!lease_parent_access(target,pid,1) || !fs_access(pid,target->name,FS_ACCESS_META))return SC32_E_ACCESS;
+    /* 保留metadata仍须拥有当前正文W；每个提交阶段都会重验。 */
+    if((r->condition&SC32_LEASE_PRESERVE_TARGET_METADATA) && !fs_access(pid,target->name,FS_ACCESS_WRITE))return SC32_E_ACCESS;
     if(target->handle_kind!=r->handle_kind)return SC32_E_INVALID;
     if(target->handle_kind==2){
         if(!fs_access(pid,target->name,FS_ACCESS_META))return SC32_E_ACCESS;
@@ -167,7 +169,8 @@ static int lease_accept(lease_record_t *r,ScLeaseInfo *out)
 int fs_lease_begin(int pid,const Sc32LeasePublishRequest *q,const char *target_name,int rename,ScLeaseInfo *out)
 {
     for(u32 i=0;i<8;i++)if(q->reserved[i])return SC32_E_INVALID;
-    if(!target_name[0] || !q->expected_source_revision || ((q->flags&3u)!=1 && (q->flags&3u)!=2) || (q->flags&~7u)
+    if(!target_name[0] || !q->expected_source_revision || ((q->flags&3u)!=1 && (q->flags&3u)!=2) || (q->flags&~15u)
+       || ((q->flags&SC32_LEASE_PRESERVE_TARGET_METADATA) && (rename || (q->flags&3u)!=SC32_LEASE_EXPECT_EXACT || (q->flags&SC32_LEASE_SET_MODE)))
        || (rename && ((q->flags&SC32_LEASE_SET_MODE) || q->final_mode))
        || (!(q->flags&SC32_LEASE_SET_MODE) && q->final_mode) || q->final_mode>63)return SC32_E_INVALID;
     lease_record_t *r=lease_owned(pid,q->source_lease,q->source_generation);

@@ -1,5 +1,6 @@
 #include "SC32PRIVATE.H"
 #include "SC32FILEWIRE.H"
+#include "SC32CAPTUREWIRE.H"
 
 #define SC32_REPLY_UNWRITTEN ((ScI32)0x80000000u)
 static void sc32_file_reply(Sc32FileReply *reply)
@@ -25,7 +26,7 @@ static ScStatus sc32_file_status(ScI32 status,const Sc32FileReply *reply,ScU32 s
     ScU32 operation=SC32_OP_FILE_BASE+selector-SC32_F_OPEN;
     if(!status){if(sc32_file_reply_valid(reply))return 0;return sc32_fail(SC32_E_FAILED,SC32_DOMAIN_KERNEL,status,operation);}
     ScI32 code=status<=SC32_E_INVALID && status>=SC32_E_FAILED?status:SC32_E_FAILED;
-    ScU32 domain=sc32_file_reply_valid(reply) && (reply->flags&SC32_FILE_STANDARD)?SC32_DOMAIN_LEGACY:SC32_DOMAIN_KERNEL;
+    ScU32 domain=sc32_file_reply_valid(reply) && (reply->flags&(SC32_FILE_STANDARD|SC32_FILE_NATIVE_ENDPOINT))?SC32_DOMAIN_LEGACY:SC32_DOMAIN_KERNEL;
     return sc32_fail(code,domain,sc32_file_reply_valid(reply)?reply->raw:status,operation);
 }
 static void sc32_file_information(ScFileInfo *out,const Sc32FileReply *reply)

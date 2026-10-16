@@ -1,4 +1,6 @@
 #include "sc32_core.h"
+#include "userspace.h"
+#include "../user/configapi/SC32CONFIGWIRE.H"
 #include "../user/SC32DEBUG.H"
 #include "task.h"
 #include "task_store.h"
@@ -217,11 +219,13 @@ static int monotonic_query(int pid,u32 request,u32 output)
 }
 
 #include "sc32_wall_query.inc"
+#include "sc32_config_apply.inc"
 int sc32_core_call(int pid,u32 operation,u32 request,u32 output)
 {
     int error=caller_valid(pid);if(error)return error;
     switch(operation){
     case SC32_W_QUERY:return wall_mode_query(pid,request,output);
+    case SC32_C_CONFIG_APPLY:return settings_config_apply(pid,request,output);
     case SC32_WIRE_PROBE:return probe(pid,request,output);
     case SC32_WIRE_CAPABILITIES:return capabilities(pid,request,output);
     case SC32_WIRE_PROCESS:return process_query(pid,request,output);

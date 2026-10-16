@@ -57,4 +57,9 @@ int streams_native_seek(int pid,u32 reference,u32 offset);
 int streams_native_query(int pid,u32 reference,u32 out[8]);
 int streams_native_flush(int pid,u32 reference);
 int streams_native_close(int pid,u32 reference);
+int streams_native_capture(int pid,const char *command,u32 readers[2]);
+int streams_native_interactive(int pid,const char *command,u32 columns,u32 rows,u32 *master);
+int streams_native_terminal_query(int pid,u32 reference,u32 out[16]);
+int streams_native_terminal_resize(int pid,u32 reference,u32 columns,u32 rows);
+int streams_native_terminal_control(int pid,u32 reference,u32 action);
 #endif

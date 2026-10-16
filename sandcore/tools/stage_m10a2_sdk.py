@@ -8,16 +8,19 @@ from pathlib import Path, PurePosixPath
 import re
 import struct
 import traceback
+import sys
+import m10a2_sdk_final as final_sdk
 
 from scl_format import validate, FUNCTION, DATA, NO_ENTRY
 
 ROOT = Path(__file__).resolve().parents[1]
 LIBRARIES = {
     'SCLDR.SCL': ('user/runtime/SCLROOT.json', ('user/runtime/',)),
-    'SC32API.SCL': ('user/sc32/SC32API.json', ('user/sc32/', 'user/guiapi/', 'user/fontapi/', 'user/brokerapi/', 'user/dropapi/', 'user/debugapi/', 'user/pathapi/', 'user/leaseapi/', 'user/hostapi/', 'user/wallapi/')),
+    'SC32API.SCL': ('user/sc32/SC32API.json', ('user/sc32/', 'user/guiapi/', 'user/fontapi/', 'user/brokerapi/', 'user/dropapi/', 'user/debugapi/', 'user/pathapi/', 'user/leaseapi/', 'user/hostapi/', 'user/wallapi/', 'user/imageapi/', 'user/authapi/')),
     'SCCLIB.SCL': ('user/stdlib/SCCLIB.json', ('user/stdlib/',)),
     'SCLIB.SCL': ('user/sclib/SCLIB.json', ('user/sclib/',)),
     'SCUI.SCL': ('user/scui/SCUI.json', ('user/scui/',)),
+    'SCGFX.SCL': ('user/scgfx/SCGFX.json', ('user/scgfx/',)),
 }
 SHARED_HEADERS = ('user/SCTYPES.H', 'user/SC32GUI.H')
 HEADERS = {
@@ -28,7 +31,11 @@ HEADERS = {
     'SC32DEBUG.H': 'user/SC32DEBUG.H', 'SCDBGFILE.H': 'user/SCDBGFILE.H',
     'SC32PATH.H':'user/SC32PATH.H', 'SC32LEASE.H':'user/SC32LEASE.H',
     'SC32HOST.H':'user/SC32HOST.H', 'SC32WALL.H':'user/SC32WALL.H',
+    'SC32AUDIO.H':'user/SC32AUDIO.H', 'SC32SIMD.H':'user/SC32SIMD.H',
     'SCSHELL.H':'user/SCSHELL.H', 'SCOFMT.H':'user/SCOFMT.H',
+    'SC32IMAGE.H':'user/SC32IMAGE.H', 'SCUIARGB.H':'user/SCUIARGB.H',
+    'SCGFX.H':'user/SCGFX.H', 'SCGFXDRAW.H':'user/SCGFXDRAW.H', 'SCUICANVAS.H':'user/SCUICANVAS.H',
+    'SC32AUTH.H':'user/SC32AUTH.H', 'SCUISECRET.H':'user/SCUISECRET.H',
     'SCUI.H': 'user/SCUI.H', 'SCLIB.H': 'user/sclib/SCLIB.H',
     # 保持官方头原字节；其../SCTYPES.H必须在INC内正确解析。
     'RUNTIME/SCLDR.H': 'user/runtime/SCLDR.H',
@@ -39,7 +46,9 @@ FORBIDDEN = ('PRIVATE','WIRE','NUI','SCAPI','SCIO','SCMEM','KERNEL','SCLFMT','SC
 DOCS = ('M10A2-SDK.md','SCL.md','SC32API.md','SC32-GUI-USER.md','SC32-BROKER.md',
         'SC32-DROP.md','SC32-FONT.md','SCUI.md','SCUI-TEXT.md','SCLIB.md','SCCLIB.md',
         'SCCC-SCL.md','SCCC-AGGREGATE-ABI.md','THIRD-PARTY.md','SC32-DEBUG.md',
-        'SCO-AND-LINKER.md','SC32-FILE.md','SCSHELL-DESIGN.md','SCSHELL-IMPLEMENTATION.md','SC32-WALL.md')
+        'SCO-AND-LINKER.md','SC32-FILE.md','SCSHELL-DESIGN.md','SCSHELL-IMPLEMENTATION.md','SC32-WALL.md','SCGFX.md','SC32-IMAGE.md','SC32-AUTH.md','SCUI-SECRET.md','SESSION2.md')
+
+DOCS = final_sdk.configure(ROOT, LIBRARIES, HEADERS, DOCS)
 
 
 def digest(body: bytes) -> str:
@@ -233,10 +242,9 @@ def actual_native(name: str, provenance_path: Path, manifest: dict, inputs: Inpu
         # 小型归档保留完整原报告，其stdout绝对路径仍指向原验证目录。
         # 不猜另一份同名日志；只读取报告给出的精确路径及SHA，且不离开仓库。
         inputs.read(Path(cases[0]['stdout_path']), cases[0]['stdout_sha256'], cases[0]['stdout_bytes'])
-    required = set(public_headers) | set(SHARED_HEADERS)
+    required = final_sdk.implementation_headers(ROOT,roots,set(public_headers) | set(SHARED_HEADERS))
     for folder in roots:
-        files = [p for p in (ROOT / folder).rglob('*') if p.is_file() and p.suffix.lower() in ('.c','.h','.inc','.asm','.json')
-                 and 'draft' not in p.name.lower()]
+        files = final_sdk.native_sources(ROOT,folder)
         for file in files:
             key = file.relative_to(ROOT).as_posix()
             required.add(key)
@@ -365,6 +373,10 @@ def public_include_graph(plan):
 
 
 def library_headers(name):
+    extra = final_sdk.extra_headers(name)
+    if extra is not None:return extra
+    if name == 'SCGFX.SCL':
+        return ('user/SCGFX.H','user/SCGFXDRAW.H','user/SCUICANVAS.H','user/SCUIARGB.H','user/SC32IMAGE.H','user/SCUI.H','user/SC32API.H','user/SC32BROKER.H','user/sclib/SCLIB.H')
     if name == 'SC32API.SCL':
         return tuple(source for source in HEADERS.values()
                      if source.startswith('user/SC32') or source == 'user/runtime/SCLDR.H')
@@ -401,6 +413,8 @@ def main():
     parser.add_argument('--profile',choices=('native-preview','host-preview'),default='native-preview')
     parser.add_argument('--native-library',action='append',default=[],metavar='NAME=PROVENANCE_JSON')
     parser.add_argument('--compiler-provenance',type=Path)
+    parser.add_argument('--linker-provenance',type=Path)
+    parser.add_argument('--host-codec-proof',type=Path)
     parser.add_argument('--plugin-manifest',type=Path,action='append',default=[])
     args=parser.parse_args();args.out=args.out.resolve()
     if args.out.exists():raise FileExistsError('SDK staging目录必须全新，拒绝覆盖')
@@ -414,6 +428,8 @@ def main():
         plan[target]=dict(body=body,source=source,bytes=len(body),sha256=digest(body))
     try:
         inputs.read(Path(__file__).resolve())
+        inputs.read(Path(final_sdk.__file__).resolve())
+        inputs.read(relative('tools/scd_format.py'))
         inputs.read(relative('tools/scl_format.py'))
         proof,recorded,outputs=verified_build(args.build_report.resolve(strict=True),inputs)
         build=args.build_report.resolve().parent
@@ -435,26 +451,33 @@ def main():
             if name in LIBRARIES or any(v[0]==name for v in plugin_specs):raise ValueError('plugin库重复核心/扩展名字')
             if name in providers:raise ValueError('plugin来源已由其manifest提供，不能重复native-library')
             providers[name]=relative(spec['native_provenance']);plugin_specs.append((name,spec,declared))
-        if args.profile=='native-preview' and set(providers)!=set(LIBRARIES)|{v[0] for v in plugin_specs}:
-            raise ValueError('native-preview必须逐名显式提供完整核心五库/所有plugin真实来源')
-        if args.profile=='host-preview' and (providers or args.compiler_provenance):
+        if args.profile=='native-preview' and set(providers)!=(set(LIBRARIES)-{final_sdk.CODEC})|{v[0] for v in plugin_specs}:
+            raise ValueError('native-preview必须逐名提供全部普通库/插件真实guest来源，codec只走固定白名单')
+        if args.profile=='host-preview' and (providers or args.compiler_provenance or args.linker_provenance or args.host_codec_proof):
             raise ValueError('HOST profile不混入未标记native source；选择native-preview')
-        specs=[(name,manifest,roots,None,library_headers(name)) for name,(manifest,roots) in LIBRARIES.items()]
+        specs=[(name,final_sdk.select_manifest(ROOT,name,manifest,args.profile),roots,None,library_headers(name)) for name,(manifest,roots) in LIBRARIES.items()]
         specs += [(name,spec['library_manifest'],plugin_roots(spec['source_roots']),declared,spec['public_headers']) for name,spec,declared in plugin_specs]
         for name,manifest_name,roots,declared,public_headers in specs:
-            if manifest_name not in recorded:
+            if manifest_name not in recorded and (args.profile!='native-preview' or not manifest_name.endswith('.NATIVE.JSON')):
                 raise ValueError('library manifest不在当前build：' + manifest_name)
-            manifest_path=relative(manifest_name);manifest_body=inputs.read(manifest_path,recorded[manifest_name])
+            manifest_path=relative(manifest_name);manifest_body=inputs.read(manifest_path,recorded.get(manifest_name))
             declared=declared or json_bytes(manifest_body)
-            if args.profile=='native-preview':body,table,origin=actual_native(name,providers[name],declared,inputs,roots,public_headers)
+            if args.profile=='native-preview' and name==final_sdk.CODEC:
+                if not args.host_codec_proof:raise ValueError('SCSOUND必须显式host-codec-proof，不能伪称native')
+                body,table,origin=final_sdk.host_codec(sys.modules[__name__],args.host_codec_proof.resolve(strict=True),declared,inputs)
+            elif args.profile=='native-preview':body,table,origin=actual_native(name,providers[name],declared,inputs,roots,public_headers)
             else:
                 file=inside(build/name,build)
                 if file not in outputs:raise ValueError('HOST库未在指定build输出：'+name)
                 body=inputs.read(file,outputs[file]['sha256'],outputs[file]['bytes']);table=contract(body,declared)
                 origin=dict(source='HOST_GCC_BUILD_ONLY_NOT_NATIVE',bytes=len(body),sha256=digest(body),staging_is_execution_evidence=False)
+            origin['selected_manifest']=dict(path=manifest_name,sha256=digest(manifest_body),verified_against_actual_dynamic_table=True,host_build_member=manifest_name in recorded)
             libraries[name]=dict(table=table,origin=origin)
             add('SYS/LIB/'+name,body,origin)
             add('SYS/SDK/LINK/'+name[:-4]+'.JSON',manifest_body,str(manifest_path))
+            if name in LIBRARIES:
+                host_manifest=LIBRARIES[name][0]
+                add('SYS/SDK/HOSTLINK/'+name[:-4]+'.JSON',inputs.read(relative(host_manifest),recorded.get(host_manifest)),dict(source=host_manifest,scope='HOST_BOOTSTRAP_MANIFEST_NOT_NATIVE'))
         order=closure(libraries)
         if args.profile=='native-preview':
             if not args.compiler_provenance:raise ValueError('native-preview需实际G1 compiler provenance')
@@ -465,6 +488,19 @@ def main():
             compiler_body=inputs.read(file,outputs[file]['sha256'],outputs[file]['bytes'])
             compiler_origin=dict(source='HOST_GCC_SCCC0_NOT_NATIVE',bytes=len(compiler_body),sha256=digest(compiler_body))
         add('SYS/BIN/SCCC.SCX',compiler_body,compiler_origin)
+        if args.profile=='native-preview':
+            if not args.linker_provenance:raise ValueError('native-preview缺实际SCLD generation来源')
+            linker_body,linker_origin,linker_table=final_sdk.native_linker(sys.modules[__name__],args.linker_provenance.resolve(strict=True),inputs,recorded)
+        else:
+            linker_file=inside(build/'fs/bin/scld.scx',build)
+            if linker_file not in outputs:raise ValueError('HOST SCLD不在指定build输出')
+            linker_body=inputs.read(linker_file,outputs[linker_file]['sha256'],outputs[linker_file]['bytes'])
+            from scd_format import validate_scx
+            linker_table=validate_scx(linker_body)
+            linker_origin=dict(source='HOST_GCC_SCLD_NOT_GUEST_NATIVE',bytes=len(linker_body),sha256=digest(linker_body))
+        add('SYS/BIN/SCLD.SCX',linker_body,linker_origin)
+        # 链接工具也是实际动态程序，必须由本SDK provider闭包满足。
+        closure(dict(libraries, **{'SCLD.SCX':dict(table=linker_table,origin=linker_origin)}))
         for target,name in HEADERS.items():
             file=relative(name);header_allowed(file,'SYS/INC/'+target)
             if name not in recorded:raise ValueError('public header未被当前build固定：'+name)
@@ -473,7 +509,7 @@ def main():
             source='user/stdlib/'+name;file=relative(source);header_allowed(file,'SYS/INC/'+name)
             if source not in recorded:raise ValueError('standard header未被当前build固定：'+source)
             add('SYS/INC/'+name,inputs.read(file,recorded[source]),source)
-        license_names=['third_party/M10A2-SOURCES.json','third_party/M10-SOURCES.json']
+        license_names=['third_party/M10A2-SOURCES.json','third_party/M10-SOURCES.json','third_party/M9-SOURCES.json']
         for name,spec,_ in plugin_specs:
             for source in spec['public_headers']:
                 file=relative(source);header_allowed(file,'SYS/INC/'+file.name)
@@ -492,6 +528,7 @@ def main():
             index=inputs.json(relative(license_name),recorded.get(license_name))
             selected=index['components']
             if license_name=='third_party/M10-SOURCES.json':selected=[v for v in selected if v['source']=='third_party/vonwaon']
+            if license_name=='third_party/M9-SOURCES.json':selected=[v for v in selected if v['name'] in final_sdk.CODEC_LICENSES]
             for component in selected:
                 if not component['guest'].startswith('SYS/LICENSE/'):
                     raise ValueError('license component只能进入SYS/LICENSE：'+component['name'])
@@ -522,27 +559,30 @@ def main():
         for file in sorted(examples.iterdir()):
             if not file.is_file() or file.suffix not in ('.C','.json','.md'):continue
             add('SYS/SDK/EXAMPLES/'+file.name.upper(),inputs.read(file),str(file))
+        final_sdk.install_sources(sys.modules[__name__],inputs,recorded,add)
+        final_sdk.install_researchdesk(sys.modules[__name__],inputs,add)
         for name in DOCS:
             file=relative('docs/'+name)
             add('SYS/SDK/DOC/'+name.upper(),inputs.read(file),str(file))
         commands=['/SYS/BIN/SCCC.SCX /SYS/SDK/EXAMPLES/EDIT2.C /HOME/EDIT2.SCX --dynamic /SYS/SDK/EXAMPLES/EDIT2.JSON',
                   '/SYS/BIN/SCCC.SCX /SYS/SDK/EXAMPLES/UTILITY.C /HOME/UTILITY.SCX --dynamic /SYS/SDK/EXAMPLES/UTILITY.JSON']
+        commands.append('/BIN/SH.SCX /SYS/SDK/EXAMPLES/RDESK/BUILD.SH')
         source_map={str(path):value for path,value in inputs.pins.items()}
         provenance_body=(json.dumps(dict(schema=1,scope='SDK_COPY_SOURCE_AND_GENERATION_ORIGINS_ONLY',
             profile=args.profile,build_report=str(args.build_report.resolve()),
             build_report_sha256=inputs.pins[args.build_report.resolve()],
-            compiler=compiler_origin,libraries={name:value['origin'] for name,value in libraries.items()},
+            compiler=compiler_origin,linker=linker_origin,libraries={name:value['origin'] for name,value in libraries.items()},
             license_components=license_components,original_input_sha256=source_map,
             staging_is_execution_evidence=False,full_M10a2=False),ensure_ascii=False,indent=2)+'\n').encode('utf-8')
         add('PROVENANCE.json',provenance_body,'GENERATED_FROM_PINNED_INPUTS')
         add('GUEST-COMMANDS.txt',('\n'.join(commands)+'\n').encode('ascii'),'GENERATED_COMMANDS_NOT_EXECUTED')
         manifest=dict(schema=1,status='PREVIEW_STAGING_ONLY_NOT_RELEASE_OR_RUNTIME_ACCEPTANCE',profile=args.profile,
             build_report=str(args.build_report.resolve()),build_report_sha256=sha(args.build_report),
-            compiler=compiler_origin,libraries={name:dict(origin=value['origin'],abi_major=value['table']['abi_major'],
+            compiler=compiler_origin,linker=linker_origin,libraries={name:dict(origin=value['origin'],abi_major=value['table']['abi_major'],
                 abi_minor=value['table']['abi_minor'],library_version=value['table']['library_version'],
                 imports=value['table']['imports'],exports=value['table']['exports'],dependencies=value['table']['dependencies']) for name,value in libraries.items()},
             dependency_initialization_order=order,guest_compile_commands=commands,license_components=license_components,
-            examples_status='SOURCE_WRITTEN_NOT_COMPILED_OR_RUN',full_M10a2=False,Phase7_complete=False,
+            examples_status='SOURCE_AND_HOST_BACKEND_EVIDENCE_GUEST_PENDING',full_M10a2=False,Phase7_complete=False,
             installed_into_live_SYS=False,ZIP_created=False,SDK_runtime_verified=False,
             files={name:{k:v for k,v in row.items() if k!='body'} for name,row in plan.items()})
         changed=inputs.unchanged()

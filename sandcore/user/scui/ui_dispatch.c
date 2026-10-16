@@ -119,7 +119,9 @@ static ScStatus ui_emit(ScUiContext *c,UiNode *target,ScUiEvent *event)
     if(!s){e.x=x;e.y=y;
         s=ui_deliver(c,0,&e,SC_UI_BUBBLE_PHASE,watermark);
         }
+    if(!s && e.type==SC_UI_EVENT_WHEEL)s=ui_scroll_layout_wheel(target,&e);
 release:
+    ui_secret_event_finished(c,target,&e);
     memset(&info,0,sizeof(info));
     info.size=sizeof(info);
     info.version=1;
@@ -253,6 +255,11 @@ ScStatus ScUiFocus(ScUiContext *c,ScUiNode id)
             if(!(info.state&SC32_WINDOW_FOCUSED)){s=SC_UI_E_BUSY;
                 goto done;
                 }}}
+    for(UiNode *parent=n->parent;parent;parent=parent->parent)if(ui_scroll_layout_node(parent)){
+        if(root->private_flags&UI_NODE_LAYOUT_DIRTY){s=ui_layout_root(root);if(s<0)goto done;}
+        s=ScUiEnsureVisible(c,id,0);if(s<0)goto done;n=ui_node(c,id);root=ui_root(c,id);
+        if(!n || !root || !root->window){s=SC_UI_E_STALE;goto done;}break;
+    }
     old=ui_node(c,root->window->focus);
     if(old==n){
         if(!(n->effective&SC_UI_FOCUSED)){ui_node_hold(n);
@@ -267,6 +274,7 @@ ScStatus ScUiFocus(ScUiContext *c,ScUiNode id)
         }
     ui_node_hold(n);
     root->window->focus=id;
+    ui_secret_focus_changed(c,root,id);
     if(old){old->state&=~SC_UI_FOCUSED;
         old->effective&=~SC_UI_FOCUSED;
         ui_node_damage(old);
@@ -393,7 +401,7 @@ static void ui_cursor_target(UiNode *root,UiNode *target,ScI32 x,ScI32 y)
     ScU32 shape=SC32_CURSOR_ARROW;
     if(!native || !native->window || native->window->capture)return;
     if(target && (target->effective&(SC_UI_VISIBLE|SC_UI_ENABLED))==(SC_UI_VISIBLE|SC_UI_ENABLED)){
-        if(target->kind==SC_UI_EDIT || target->kind==SC_UI_TEXTBOX || (target->kind==SC_UI_LABEL && (target->flags&SC_UI_LABEL_SELECTABLE)))shape=SC32_CURSOR_TEXT;
+        if(target->kind==SC_UI_SECRET || target->kind==SC_UI_EDIT || target->kind==SC_UI_TEXTBOX || (target->kind==SC_UI_LABEL && (target->flags&SC_UI_LABEL_SELECTABLE)))shape=SC32_CURSOR_TEXT;
         else if(target->kind==SC_UI_SPINBOX && x<target->rectangle.width-ui_scale(target->owner,18))shape=SC32_CURSOR_TEXT;
         else if(target->kind==SC_UI_SPLITTER)shape=target->parent && target->parent->layout.mode==SC_UI_HBOX?SC32_CURSOR_RESIZE_H:SC32_CURSOR_RESIZE_V;
         else if(target->kind==SC_UI_TABLE && target->view && y>=0 && (ScU32)y<ui_view_row_height(target)){ScU32 first,past,i;
@@ -503,7 +511,8 @@ static ScStatus ui_native_proc(ScWindow window,const ScMessage *m,void *context)
         else w->information.state&=~SC32_WINDOW_VISIBLE;
         ui_timers_visibility(c,root->id,w->visible);
         ui_drag_state(root);
-        if(!w->visible){ui_menu_close_owner(c,root->id);
+        if(!w->visible){ui_secret_root_clear(root);
+            ui_menu_close_owner(c,root->id);
             ui_input_cancel(root,SC_UI_EVENT_CAPTURE_LOST);
             }
         else{w->paint_pending=1;
@@ -557,6 +566,7 @@ static ScStatus ui_native_proc(ScWindow window,const ScMessage *m,void *context)
     if(m->id==SC32_MSG_FOCUS){
         if(!m->data[0]){w->cursor=UINT_MAX;
             w->information.state&=~SC32_WINDOW_FOCUSED;
+            ui_secret_root_clear(root);
             ui_input_cancel(root,SC_UI_EVENT_FOCUS_OUT);
             ui_menu_close_owner(c,root->id);
             }
@@ -577,6 +587,10 @@ static ScStatus ui_native_proc(ScWindow window,const ScMessage *m,void *context)
         else ScWindowRejectClose(window);
         goto done;
         }
+    {ScStatus prepared=ui_layout_prepare_input(root,m);
+        if(prepared<0)c->notification_error=prepared;
+        if(root->private_flags&UI_NODE_RETIRED){s=SC_UI_E_STALE;goto done;}
+    }
     ui_event_record(&e,root,0);
     e.message=m;
     e.tick=m->tick;
@@ -596,6 +610,7 @@ static ScStatus ui_native_proc(ScWindow window,const ScMessage *m,void *context)
         e.modifiers=m->id==SC32_MSG_TEXT?m->data[1]:m->data[3];
         e.node=target->id;
         e.root=target->root;
+        if(target->kind==SC_UI_SECRET){s=ui_secret_dispatch(target,&e);if(s!=0)goto done;}
         if(e.type==SC_UI_EVENT_KEY_DOWN && e.key==27){s=ui_drag_event(target,&e);
             if(s!=0)goto done;
             }
@@ -1043,6 +1058,7 @@ ScStatus ScUiContextStep(ScUiContext *c,ScU32 timeout)
         s=ScMessageGet(&message,0);
         if(s!=0)break;
         s=ScUiContextDispatch(c,&message);
+        ui_secret_wipe(&message,sizeof(message));
         if(s<0 && s!=SC_UI_E_CANCELLED && s!=SC_UI_E_STALE && s!=SC32_E_STALE){c->notification_error=s;
             if(c->description.error_procedure){ScUiEvent error;
                 ui_event_record(&error,0,SC_UI_EVENT_ERROR);

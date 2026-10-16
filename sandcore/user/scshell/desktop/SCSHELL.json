@@ -41,6 +41,18 @@
       "size": 1
     },
     {
+      "name": "ScBufferRelease",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScBufferView",
+      "dependency": "SCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
       "name": "ScClipboardQuery",
       "dependency": "SC32API.SCL",
       "kind": "function",
@@ -101,6 +113,24 @@
       "size": 1
     },
     {
+      "name": "ScFileLeaseAdvance",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScFileLeaseOpenPinned",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScFileLeaseRelease",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
       "name": "ScFileOpen",
       "dependency": "SC32API.SCL",
       "kind": "function",
@@ -109,6 +139,18 @@
     {
       "name": "ScFileQuery",
       "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScFileRead",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScHashBytes",
+      "dependency": "SCLIB.SCL",
       "kind": "function",
       "size": 1
     },
@@ -179,6 +221,12 @@
       "size": 1
     },
     {
+      "name": "ScPathResolve",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
       "name": "ScProcessSelf",
       "dependency": "SC32API.SCL",
       "kind": "function",
@@ -209,6 +257,18 @@
       "size": 1
     },
     {
+      "name": "ScShellApplicationDescribe",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellApplicationQuery",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
       "name": "ScShellApplicationRelease",
       "dependency": "SCSHELL.SCL",
       "kind": "function",
@@ -227,7 +287,19 @@
       "size": 1
     },
     {
+      "name": "ScShellCatalogExport",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
       "name": "ScShellCatalogFind",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellCatalogImport",
       "dependency": "SCSHELL.SCL",
       "kind": "function",
       "size": 1

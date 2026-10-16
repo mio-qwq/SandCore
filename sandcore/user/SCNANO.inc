@@ -18,7 +18,7 @@ typedef struct {u32 at,old_size,new_size,before,after;u8 *old_text,*new_text;} n
 typedef struct {
     u8 *data;u32 capacity,lo,hi,*starts,lines,line_capacity;
     u32 top,left,columns,rows,kind,goal,revision,next_revision,clean_revision;
-    int terminal,readonly,goal_valid,failure;
+    int terminal,readonly,goal_valid,failure,size_exit;
     char name[64],notice[128],search[256];
     u8 *cut;u32 cut_size;
     nano_edit history[NANO_HISTORY];u32 edits,applied,history_bytes;
@@ -137,7 +137,8 @@ static void nano_dimensions(nano_state *n)
 {
     u32 info[8];if(sc_terminal_info2(n->terminal,info)<0){n->failure=1;return;}
     n->kind=info[1];n->columns=info[2];n->rows=info[3];
-    if(n->columns<16 || n->rows<5){n->failure=1;return;}if(n->columns>200)n->columns=200;if(n->rows>80)n->rows=80;
+    if(n->kind==9)n->failure=0;
+    if(n->columns<16 || n->rows<5){n->failure=n->kind==9?2:1;return;}if(n->columns>200)n->columns=200;if(n->rows>80)n->rows=80;
     /* 历史窗口TTY只保留16KiB文本，不能让整屏UTF-8帧被悄悄滚掉。
      * 在这个已有协议上限定一次完整页的行数，原始文件始终完整保留。 */
     if(n->kind==5){u32 rows=15360/(n->columns*4+32);if(n->rows>rows)n->rows=rows;if(n->rows<5)n->failure=1;}
@@ -167,7 +168,13 @@ static void nano_content(nano_state *n,u32 row)
 }
 static int nano_draw(nano_state *n,const char *prompt,const char *answer)
 {
-    nano_dimensions(n);if(n->failure)return -1;u32 needed=(n->columns*4+32)*n->rows+1024;
+    nano_dimensions(n);
+    if(n->failure==2){
+        /* PTY真实网格可以小于编辑页；暂停保留gap/Undo，不伪报尺寸或退出。 */
+        for(;;){int r=sc_terminal_clear(n->terminal);if(r!=-6){if(r<0)return r;break;}sc_yield();}
+        return cli_text(n->terminal,n->notice[0]?n->notice:n->size_exit?"Unsaved: Y save / N discard / Esc cancel":"Terminal too small; resize (^X exits)");
+    }
+    if(n->failure)return -1;u32 needed=(n->columns*4+32)*n->rows+1024;
     if(needed>n->frame_capacity){char *frame=sc_alloc(needed);if(!frame)return -4;if(n->frame)sc_free(n->frame);n->frame=frame;n->frame_capacity=needed;}
     n->frame_size=0;u32 row=nano_line(n,n->lo),body=n->rows-4,col=nano_column(n,n->lo);
     if(row<n->top)n->top=row;if(row>=n->top+body)n->top=row-body+1;
@@ -184,6 +191,7 @@ static int nano_draw(nano_state *n,const char *prompt,const char *answer)
     for(;;){int r=sc_terminal_clear(n->terminal);if(r!=-6){if(r<0)return r;break;}sc_yield();}
     return cli_write(n->terminal,n->frame,n->frame_size)<0?-1:0;
 }
+#include "nano_pty_small.inc"
 static int nano_raw(nano_state *n,int timeout)
 {
     u32 start=(u32)sc_tick();for(;;){u8 c;int r=sc_stream_read(n->terminal,&c,1);if(r==1)return c;if(!r)return -2;if(r!=-6)return -1;
@@ -209,7 +217,7 @@ static int nano_prompt(nano_state *n,const char *label,char *out,u32 capacity)
 {
     u32 used=(u32)length(out);if(used>=capacity)return -1;
     if(nano_draw(n,label,out)<0)return -1;
-    for(;;){int c=nano_key(n);if(c==-3)continue;if(c==NK_RESIZE){if(nano_draw(n,label,out)<0)return -1;continue;}
+    for(;;){int c=nano_key(n);if(c==-3)continue;if(n->failure==2 && c>=0 && c!=NK_RESIZE && c!=27)continue;if(c==NK_RESIZE){if(nano_draw(n,label,out)<0)return -1;continue;}
         if(c<0 || c==27)return -1;if(c=='\r'||c=='\n')return (int)used;
         if(c==21){used=0;out[0]=0;}
         else if(c==8 || c==127){if(used)out[--used]=0;}
@@ -257,6 +265,8 @@ static int nano_main(void)
     int result=0,redraw=1;
     for(;;){if(redraw){if(nano_draw(&n,0,0)<0){result=1;break;}redraw=0;}
         int key=nano_key(&n);if(key==-3)continue;if(key<0){result=n.revision!=n.clean_revision?1:0;break;}redraw=1;n.notice[0]=0;
+        if(n.failure==2){if(nano_small_key(&n,key))break;continue;}
+        n.size_exit=0;
         if(key==NK_RESIZE || key==12)continue;
         if(key==24){if(n.revision==n.clean_revision)break;char choice[8]="";
             if(nano_prompt(&n,"Save changes? y/n (Esc cancel)",choice,8)<0)continue;

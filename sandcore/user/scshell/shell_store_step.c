@@ -197,12 +197,15 @@ ScStatus ScShellStoreStep(ScShellStore *s,ScU32 timeout) {
             publish.final_mode=3;
             publish.flags=SC32_LEASE_SET_MODE|(s->info.expected_revision?SC32_LEASE_EXPECT_EXACT:SC32_LEASE_EXPECT_ABSENT);
             if(s->info.expected_revision) {
+                /* CAT/LNK 的条件替换只改变内容，保留原文件的权限和身份。 */
+                publish.flags=SC32_LEASE_EXPECT_EXACT;
+                publish.final_mode=0;
                 publish.target_lease=s->target.lease;
                 publish.target_generation=s->target.generation;
                 publish.expected_target_object=s->target.object_id;
                 publish.expected_target_revision=s->target.revision;
             }
-            status=ScFileLeasePublish(&publish,&s->candidate);
+            status=s->info.expected_revision?ScFileLeasePublishPreserving(&publish,&s->candidate):ScFileLeasePublish(&publish,&s->candidate);
         }
         status=sh_store_result(s,status);
         sh_leave(&s->base);

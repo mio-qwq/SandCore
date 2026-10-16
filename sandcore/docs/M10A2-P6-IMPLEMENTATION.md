@@ -1,5 +1,49 @@
 # M10a2 主要应用与工具链实施状态
 
+## 当前客体生成检查点
+
+2026-10-16，当前统一HOST凭证为 `build/m10a2-main-studio-01/p6-unified-host-02.json`：exit0、41产物、1320输入、构建期间源码变化0；`codec-host-proof-02.json`绑定该批SCSOUND。Files、Calculator、Palette、Monitor、Sound、Settings、安装GUI和Terminal的菜单快捷键已通过既有ScUiCommandSet接线，八目标SCCC/SCO/SCLD宿主后端预检07通过。HOST01与旧codec证明保留为历史，不作为这八个新字节的凭证。
+
+实际Windows QEMU `m10a2-p6-guest-generation-run-02` 已用旧真实G1生成新版SCCC（load257350B），再由该SCCC生成动态BOOT/SCLD.SCX及SCLDR.SCO。执行BOOT/SCLD时停止于ROOT通用提示 `dependency or symbol (-11)`；-11实际是SC_SCL_IO，尚未确定发生于读取、映像保护或调试模块登记，不能称为缺符号或原生链接通过。失败日志、完整stdout、产物及桌面截图保留，源码/原盘守恒检查通过。此前run01止于主控错误地把后台Shell包装进程当编译器身份，已改为现有前台command，旧源码和报告另存history/run-01。
+
+当前出口：修复这一个实际装载故障，继续同批27目标原生生成；随后以真实native LOGIN2/五库/桌面字节重新生成发行摘要和CORE，并完成普通用户GUI/SDK真实流程。完整M10a2仍active，不能用本段的工具编译成功替代应用运行或最终验收。
+
+修订：2026-10-16，保存HOST02、八应用快捷键预检及真实客体原生生成的I/O失败边界。
+
+## 统一生成前的当前状态
+
+2026-10-16，本批实现、资源接线和正式原生清单已接齐。统一HOST构建 `build/m10a2-main-studio-01/p6-unified-host-01.json` 返回0，41个产物齐全，构建前后源码变化0。包含实际CORE/引导、九库、十五个界面入口、文件/音频worker、SCLD/SCCC与PTY所需SH/nano；没有构建封存游戏，也没有生成或修改数据盘。CORE映像597520B/BSS384840B只是本次宿主链接事实，还没有新客体启动结论。
+
+SC32当前193导出，SCUI1.3/v4当前170导出。新增Session2/Login2、typed Auth与专页Secret控件；固定LOGIN2角色只允许发行摘要绑定的五库/UAX读取和本人必要调用，不能取得普通Broker对象或硬件SYSTEM。正式native库/LOGIN2出来以后必须重新生成发行头再构建CORE，不能拿HOST摘要配另一组字节。
+
+Sound2完整GUI、普通音频worker和封面提取现已接齐。HOST GUI23716B/83导入，worker17540B/39导入，SCSOUND122536B/五导出。实际SCCC→SCO→SCLD宿主适配也通过。切歌QUIT ACK后结束当前接收批次、双方按Broker flags识别EOF；旧STOP交接已提交以后不再允许取消新候选。封面保ID3/FLAC/Base64和旁置回退，内存分块传输，正常播放不建临时图片。证据仍不等于客体音频/交互验收。
+
+原生预检中发现并解决了两个实质缺口：新组件的C99复合字面量/柔性尾数组改为当前SCCC可表达的等价代码，图像tile的24B头/4120B最大记录与历史预算不变；Source/once表从固定64项改为真实动态分配，保15bit位置格式、路径、行号和稳定正文arena。新编译器实际后端自编译load257350B，没有扩大旧262108B加载上限。P6对象检查03/04/05/06按改变闭包共覆盖27个目标，全部真实后端/严格链接通过；这些是HOST IO适配结果，正式NATIVE.JSON已逐项固定到主源。
+
+最终SDK和ResearchDesk四独立TU/独立RDSTATS.SCL已整合。SDK严格区分HOSTLINK与NATIVE.JSON，普通八库和G1/SCLD必须有真实客体来源；仅固定SCSOUND接受既有用户授权的宿主codec例外。`codec-host-proof.json`已从本次实际构建提取，未把它称为native。SCCLIB/SCLIB此次依赖的公开SC32头确有变化，将在同一VM各重生成一次，原P3功能/性能证据继续复用。
+
+默认入口升级也已接入：十四个新版应用注册及关联；仅全文和UID/GID/mode完全等同发布基线的MENU/LNK作候选转换，用户自定义内容保留；保存CAT只投影完全等同原默认的ACCOUNT Imported项，SYSTEM记录继续按旧Load合同拒绝。原盘只读，旧SCX保留。新目标缺失明确回退旧默认，安装GUI缺失则跳过，不拿CLI代替GUI。
+
+下一步为一次Windows QEMU实际系统内生成、按新native字节重签发发行摘要，再做同批普通用户GUI/SDK/权限/回收与截图验收；不扩无关矩阵。完整P5/P6/P7和M10a2目标仍active。
+
+修订：2026-10-16，完整主源整合、27目标原生后端宿主预检、41产物统一HOST守恒构建与最终生成前状态。
+
+## 最新主源检查点（覆盖下方较早状态）
+
+2026-10-16，十二个应用已经接入主源：Files2、Notes2、Debug2、Calculator2、Palette2、Monitor2、Studio2、Canvas2、Lens2、Settings2、文件安装GUI、Terminal2。`build/m10a2-main-components-02/host-build.json` 固定本批十八个HOST产物、日志及构建后输入摘要；这些应用尚未取得本轮真实客体流程/视觉验收，不把HOST和原生后端宿主适配混称系统内执行。
+
+- Studio2保留真正逐TU的SCO/SCLD工程流程，Capture20B、SCCC_INCLUDE和共享Tab的关闭/重命名已合入。旧目标保存使用Preserving，旧Publish语义不变。
+- SCGFX为独立Ring3库，Canvas2/Lens2复用共享Canvas。SC32图像内存输入已接真实IMAGE.SCX服务，不能只换SCGFX库而继续使用旧服务。Canvas/Lens覆盖已有图像保留原所有者/权限。
+- Settings2包含六页设置、预览回退、配置草稿和条件激活。安装GUI只提供原install的文件/目录/UID/GID/rw功能；没有包格式、包数据库或新包管理目标，旧CLI保留。
+- SCTERM为独立Ring3终端库，Terminal2通过真正双向PTY持续运行同一个SH。新增20C..20F及kind8/9，旧串口/TTY保持。nano既有compound literal仍不在SCCC支持范围；新nano候选仅有GCC对象证明，不伪称系统内编译成功。
+- SC32API维持1.4/v6并保留前166项，Capture、Audio/Simd、Preserving、Config、Image和Terminal累计189导出；当前HOST149402B。SCUI1.2/v3共165导出，FLOW实际换行测量及普通滚动范围/命中/EnsureVisible已合入并HOST重建354076B。SCSHELL1.1/v2共96导出；CAT/LNK旧目标保存同样保留原元数据。
+- SCSOUND五函数/19导入库HOST构建通过。主代理已写Sound2 GUI/受管候选worker状态机；当前GUI真实SCCC→SCO→SCLD宿主适配46160B/85导入，属于宿主IO证据。封面元数据与最终清单正在接齐，没有客体音频或画面结论。
+
+Session2/Login2和专用Secret控件、完整SDK与多TU独立第三方示例仍在隔离草稿实施。随后生成实际客体产物，再对本批改变的行为作一次合并流程；复用未受影响的P3/P4/P5证据。下文166导出/六应用等数字属于较早检查点，保留作沿革。
+
+修订：2026-10-16，图像、设置、终端和共享布局整合；保存HOST证据边界及音乐/会话/SDK未完成项。
+
+
 2026-10-16。完整目标继续 active。下列是实际主源整合与证据边界；没有宣告完整 Phase6、Phase5、SDK 或 M10a2 验收完成。
 
 ## 已接入主源
@@ -36,7 +80,7 @@ SC32API ABI1.4/version6：原154入口保留，追加10个调试函数和2个壁
 
 Studio2主功能已收齐：真实逐TU SCO/SCLD、工程输入资格、现代stdout/stderr捕获、取消/回收、多文档、着色、停靠、调试和条件发布，最后定向检查/冻结交付中。仅在其专属draft，尚未整合主树。
 
-Canvas2/Lens2由图像工具草稿负责真正R3 SCGFX及共享Canvas控件，保原尺寸/图片格式/透明/异步解码和旧画笔；Settings2/Installer2保六页配置/预览回退/权限及真实包预检/收据/失败恢复。图片API唯一由图像代理维护，避免两份互不兼容封装。用户指定代理均为GPT-6.1 Sol/max，文件所有权分离。
+Canvas2/Lens2由图像工具草稿负责真正R3 SCGFX及共享Canvas控件，保原尺寸/图片格式/透明/异步解码和旧画笔；Settings保六页配置/预览回退/权限。用户已确认安装入口仅围绕原install的文件源/目标/目录/UID/GID/mode功能，不创建软件包格式/数据库。图片API唯一由图像代理维护。用户指定代理均为GPT-6.1 Sol/max，文件所有权分离。
 
 终端还需要真实双向交互端点/PTY模型，不能用Capture的stdin EOF冒充交互终端；音频需保MP3/WAV/FLAC、封面/跳转/音量/迷你模式及许可证；登录/会话、完整SDK与复杂第三方原生示例、P5实际跨Files拖放/关联/窗口操作/会话回归及最终交付继续。没有删减完整合同。
 

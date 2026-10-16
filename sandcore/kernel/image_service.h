@@ -21,4 +21,9 @@ void image_service_poll(void);
 void image_service_owner_stopped(int owner);
 /* M10a1：仅内核任务存储器使用，资源按真实任务申请。 */
 u32 image_service_task_bytes(void);
+int image_service_memory_begin(int owner,u32 bytes);
+int image_service_memory_write(int owner,u32 ticket,u32 offset,u32 address,u32 bytes);
+int image_service_memory_seal(int owner,u32 ticket);
+int image_service_source_claim(int worker,u32 ticket,u32 *kind,u32 *bytes,char path[64]);
+int image_service_memory_read(int worker,u32 ticket,u32 offset,u32 address,u32 bytes);
 #endif

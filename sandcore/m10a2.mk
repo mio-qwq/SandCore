@@ -284,3 +284,20 @@ include m10a2-apps.mk
 $(BUILD)/sc32-library.o: user/SC32WALL.H $(wildcard user/wallapi/*.c user/wallapi/*.H)
 $(BUILD)/sc32_core.o: kernel/sc32_wall_query.inc user/SC32WALL.H user/wallapi/SC32WALLWIRE.H
 $(BUILD)/wm.o: kernel/wm_wall_snapshot.inc user/SC32WALL.H
+$(BUILD)/sc32-library.o: user/SC32AUDIO.H user/SC32SIMD.H $(wildcard user/audioapi/*.c)
+$(BUILD)/sc32-library.o: user/SC32CAPTURE.H user/sc32/SC32CAPTUREWIRE.H user/sc32/sc32_capture_api.c
+$(BUILD)/sc32_file.o: kernel/sc32_capture_kernel.inc user/SC32CAPTURE.H user/sc32/SC32CAPTUREWIRE.H
+$(BUILD)/streams.o: kernel/streams_capture.inc
+$(BUILD)/scui-library.o: user/SCUITABS.H user/scui/scui_tabs.inc
+$(BUILD)/scshell-library.o: user/SCSHELLABSENT.H
+$(BUILD)/sc32-library.o: user/SC32REPLACE.H user/configapi/SC32REPLACEWIRE.H user/configapi/sc32_replace.c
+$(BUILD)/fs.o: user/configapi/SC32REPLACEWIRE.H
+include m10a2-sound.mk
+$(BUILD)/sc32_core.o: kernel/sc32_config_apply.inc user/SC32CONFIG.H user/configapi/SC32CONFIGWIRE.H
+$(BUILD)/sc32-library.o: user/SC32CONFIG.H user/configapi/SC32CONFIGWIRE.H user/configapi/sc32_config.c
+
+include m10a2-image.mk
+include m10a2-settings.mk
+include m10a2-terminal.mk
+
+include m10a2-session.mk

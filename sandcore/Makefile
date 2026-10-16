@@ -122,7 +122,7 @@ $(BUILD)/font8_data.h: assets/font/phoenix-ascii.json tools/mkfont8.py | $(BUILD
 # ---------------- 产物规则 ----------------
 # 内核参与链接的全部目标文件。entry.o 必须排第一 (链接脚本里 _start 在前)。
 OBJS := entry.o main.o boot_scene.o idt.o interrupts.o timer.o keyboard.o mouse.o \
-        memory.o heap.o objpool.o task_store.o session.o core_boot.o paging.o gfx.o ttf.o display.o theme.o image.o image_service.o userspace.o desktop.o wm.o task.o process.o module.o ata.o fs.o serial.o auth.o crypto.o random.o crc.o streams.o management.o simd.o ringdebug.o audio.o rtc.o scl_boot.o scl_validate.o scd_validate.o sc32_core.o sc32_file.o sc32_gui.o sc32_raw.o sc32_font.o sc32_broker.o sc32_drop.o sc32_host.o sc32_lease.o sc32_debug.o
+        memory.o heap.o objpool.o task_store.o session.o core_boot.o paging.o gfx.o ttf.o display.o theme.o image.o image_service.o userspace.o desktop.o wm.o task.o process.o module.o ata.o fs.o serial.o auth.o crypto.o random.o crc.o streams.o management.o simd.o ringdebug.o audio.o rtc.o scl_boot.o scl_validate.o scd_validate.o sc32_core.o sc32_file.o sc32_gui.o sc32_raw.o sc32_font.o sc32_broker.o sc32_drop.o sc32_host.o sc32_lease.o sc32_debug.o sc32_image.o
 
 # mio：全部普通三环C源与私有include一并上盘，让Notes/计算器/
 # 游戏和通用客户端也能在系统内编辑编译。第三方解码服务单独由
@@ -424,8 +424,8 @@ WEBP_SOURCES := $(addprefix third_party/libwebp/src/dec/,$(addsuffix .c,$(WEBP_D
                 $(addprefix third_party/libwebp/src/dsp/,$(addsuffix .c,$(WEBP_DSP))) \
                 $(addprefix third_party/libwebp/src/utils/,$(addsuffix .c,$(WEBP_UTIL)))
 CODEC_OBJS := $(patsubst third_party/libwebp/%.c,$(BUILD)/codec/webp/%.o,$(WEBP_SOURCES)) \
-              $(addprefix $(BUILD)/codec/,$(addsuffix .o,service runtime decode))
-CODEC_HEADERS := user/SCAPI.H $(wildcard user/codec/include/*.h user/codec/*.H third_party/libwebp/src/dec/*.h \
+              $(addprefix $(BUILD)/codec/,$(addsuffix .o,service runtime decode image_worker_bridge))
+CODEC_HEADERS := user/SC32API.H user/SCTYPES.H user/SC32IMAGE.H user/imageapi/SC32IMAGEWIRE.H user/SCAPI.H $(wildcard user/codec/include/*.h user/codec/*.H third_party/libwebp/src/dec/*.h \
                  third_party/libwebp/src/dsp/*.h third_party/libwebp/src/utils/*.h third_party/libwebp/src/webp/*.h)
 CODEC_CFLAGS := $(CFLAGS) -Os -DWEBP_REDUCE_SIZE -ffunction-sections -fdata-sections -Iuser/codec/include -Iuser/codec \
                 -Iuser -Ithird_party/stb -Ithird_party/libwebp

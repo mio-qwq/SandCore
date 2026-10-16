@@ -138,7 +138,10 @@ static int d2_module_begin(int pid,d2_state_t *state,const Sc32DebugRegistration
     u32 allocation=paging_module_size(TASK(pid).pd,r->base);
     if(!allocation)return SC32_E_RANGE;
     u32 source=0;
-    int error=fs_native_open(pid,0,canonical,FS_NATIVE_READ,0,&source);
+    /* native接口即使只读也要求非零调用身份；任务代数在本次核验
+     * 期间稳定。这里只打开既有只读源，不创建写事务；释放仍传0，
+     * 因而不会因数值碰撞取消同一文件上其它句柄的真实pending。 */
+    int error=fs_native_open(pid,task_generation(pid),canonical,FS_NATIVE_READ,0,&source);
     if(error)return error==FS_N_ACCESS?SC32_E_ACCESS:error==FS_N_NOT_FOUND?SC32_E_NOT_FOUND:SC32_E_IO;
     fs_native_info_t fi;
     error=fs_native_info(pid,source,FS_ACCESS_READ,&fi);

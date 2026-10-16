@@ -41,6 +41,10 @@ static int lease_copy_batch(lease_record_t *r)
         if(n && !current)return SC32_E_STALE;
         entry_t e=n?*current:r->draft;
         lease_zero(e.name,sizeof(e.name));copy(e.name,r->target);
+        if(r->condition&SC32_LEASE_PRESERVE_TARGET_METADATA){
+            if(!r->removed_valid || r->removed.generation!=r->expected_target_revision)return SC32_E_STALE;
+            e.uid=r->removed.uid;e.gid=r->removed.gid;e.mode=r->removed.mode;e.flags=r->removed.flags;
+        }
         if(r->condition&SC32_LEASE_SET_MODE)e.mode=r->final_mode;
         e.generation=new_generation();if(!e.generation)return SC32_E_RANGE;
         r->candidate[r->candidate_count++]=e;

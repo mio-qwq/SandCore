@@ -108,6 +108,11 @@ static ScStatus tool_menu_item(ScUiMenu *menu,const ToolMenuEntry *entry,ScU32 f
     item.shortcut.version=1;
     item.shortcut.key=entry->key;
     item.shortcut.modifiers=entry->modifiers;
+    if(item.command && item.shortcut.key){
+        ScUiCommandDesc binding;memset(&binding,0,sizeof(binding));binding.size=sizeof(binding);binding.version=1;
+        binding.command=item.command;binding.flags=flags&~SC_UI_MENU_SEPARATOR;binding.label=item.label;binding.shortcut=item.shortcut;
+        ScStatus status=ScUiCommandSet(tool.ui,&binding);if(status<0)return status;
+    }
     ScU32 token;
     return ScUiMenuInsert(menu,0,&item,&token);
 }

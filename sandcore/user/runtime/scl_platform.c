@@ -46,7 +46,8 @@ static int system_library(const char *name)
     return same(name, "SC32API.SCL") || same(name, "SCCLIB.SCL") ||
         same(name, "SCLIB.SCL") || same(name, "SCUI.SCL") ||
         same(name, "SCSHELL.SCL") || same(name, "SCGFX.SCL") ||
-        same(name, "SCRES.SCL") || same(name, "SCLDR.SCL");
+        same(name, "SCRES.SCL") || same(name, "SCLDR.SCL") ||
+        same(name, "SCSOUND.SCL") || same(name, "SCTERM.SCL");
 }
 static int read_file(void *context, const char *name, void **bytes, ScU32 *size)
 {

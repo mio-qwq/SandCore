@@ -1,3 +1,4 @@
+#include "SCUILAYOUTPRIVATE.H"
 static ScStatus ui_layout_valid(ScUiContext *c,const ScUiLayoutDesc *d)
 {
     ScU32 i;
@@ -61,7 +62,7 @@ ScStatus ScUiNodeGetLayout(ScUiContext *c,ScUiNode id,ScUiLayoutDesc *out)
     memcpy(out,&n->layout,sizeof(*out));
     return SC_UI_OK;
     }
-static ScStatus ui_plan_get(ScArray *plan,ScHash *map,ScU32 id,UiPlacement *out,ScU32 *index)
+static ScStatus ui_plan_get(ScArray *plan,ScHash *map,ScU32 id,UiLayoutPlacement *out,ScU32 *index)
 {
     ScHashEntry e;
     memset(&e,0,sizeof(e));
@@ -87,6 +88,7 @@ static void ui_intrinsic_padding(UiNode *n,ScI32 *padding)
         padding[1]=ui_scale(n->owner,22);
         }
 }
+#include "scui_layout_helpers.inc"
 static ScStatus ui_measure_node(UiNode *n,ScArray *plan,ScHash *map,ScUiSize *out,int wrapped_width)
 {
     ScUiContext *c=n->owner;
@@ -97,12 +99,13 @@ static ScStatus ui_measure_node(UiNode *n,ScArray *plan,ScHash *map,ScUiSize *ou
     ScU32 children=0;
     constraint.width=(ScI32)ui_root(c,n->id)->window->information.client_width;
     constraint.height=(ScI32)ui_root(c,n->id)->window->information.client_height;
-    if(wrapped_width && (n->kind==SC_UI_LABEL || n->kind==SC_UI_TOOLTIP)){UiPlacement candidate;
+    if(wrapped_width && (n->kind==SC_UI_LABEL || n->kind==SC_UI_TOOLTIP || n->layout.mode==SC_UI_FLOW)){UiLayoutPlacement candidate;
         ScU32 index;
         s=ui_plan_get(plan,map,n->id,&candidate,&index);
         if(s<0)return s;
         constraint.width=candidate.rectangle.width;
     }
+    if(!wrapped_width && n->layout.mode==SC_UI_FLOW && n->layout.width>=0)constraint.width=ui_clamp_size(c,ui_scale(c,n->layout.width),n->layout.min_width,n->layout.max_width);
     preferred.width=0;
     preferred.height=0;
     if(n->custom && n->custom->description.measure){n->custom->depth++;
@@ -113,7 +116,8 @@ static ScStatus ui_measure_node(UiNode *n,ScArray *plan,ScHash *map,ScUiSize *ou
     else s=ui_controls_measure(n,&constraint,&preferred);
     if(s!=0)return s;
     if(preferred.width<0 || preferred.height<0)return SC_UI_E_RANGE;
-    for(child=n->first_child;child;child=child->next)if(child->effective&SC_UI_VISIBLE){UiPlacement p;
+    for(child=n->first_child;child;child=child->next)if((child->effective&SC_UI_VISIBLE)
+        && ((n->layout.mode!=SC_UI_FLOW && !ui_scroll_layout_node(n)) || ui_layout_content_item(n,child))){UiLayoutPlacement p;
         ScU32 index;
         ScI32 w,h;
         s=ui_plan_get(plan,map,child->id,&p,&index);
@@ -121,7 +125,7 @@ static ScStatus ui_measure_node(UiNode *n,ScArray *plan,ScHash *map,ScUiSize *ou
         if(!ui_signed_add(p.preferred.width,ui_scale(c,child->layout.margin[0]),&w) || !ui_signed_add(w,ui_scale(c,child->layout.margin[2]),&w)
             || !ui_signed_add(p.preferred.height,ui_scale(c,child->layout.margin[1]),&h) || !ui_signed_add(h,ui_scale(c,child->layout.margin[3]),&h))return SC_UI_E_RANGE;
         if(w<0 || h<0)return SC_UI_E_RANGE;
-        if(n->layout.mode==SC_UI_HBOX){if(total>INT_MAX-w)return SC_UI_E_RANGE;
+        if(n->layout.mode==SC_UI_HBOX || n->layout.mode==SC_UI_FLOW){if(total>INT_MAX-w)return SC_UI_E_RANGE;
             total+=w;
             if(h>cross)cross=h;
             }
@@ -137,13 +141,27 @@ static ScStatus ui_measure_node(UiNode *n,ScArray *plan,ScHash *map,ScUiSize *ou
     if(children>1 && gap>0){if(children-1>(ScU32)INT_MAX/(ScU32)gap || total>INT_MAX-(ScI32)(children-1)*gap)return SC_UI_E_RANGE;
         total+=(ScI32)(children-1)*gap;
         }
-    if(n->layout.mode==SC_UI_HBOX){if(total>preferred.width)preferred.width=total;
-        if(cross>preferred.height)preferred.height=cross;
+    if(n->layout.mode==SC_UI_HBOX || n->layout.mode==SC_UI_FLOW){if(total>preferred.width)preferred.width=total;
+        if(n->layout.mode==SC_UI_HBOX && cross>preferred.height)preferred.height=cross;
         }
     if(n->layout.mode==SC_UI_VBOX || n->layout.mode==SC_UI_SCROLL_LAYOUT){if(total>preferred.height)preferred.height=total;
         if(cross>preferred.width)preferred.width=cross;
         }
-    {ScI32 intrinsic[4],px=ui_scale(c,n->layout.padding[0])+ui_scale(c,n->layout.padding[2]),py=ui_scale(c,n->layout.padding[1])+ui_scale(c,n->layout.padding[3]);
+    if(n->layout.mode==SC_UI_FLOW){
+        ScUiRect bounds={0,0,constraint.width,0},inner;ScI32 height;
+        s=ui_layout_inner(n,&bounds,&inner);if(s<0)return s;
+        s=ui_flow_measure(n,plan,map,inner.width,&height);if(s<0)return s;
+        if(height>preferred.height)preferred.height=height;
+    }
+    if(ui_scroll_layout_node(n))for(child=n->first_child;child;child=child->next)if((child->effective&SC_UI_VISIBLE) && ui_scroll_layout_bar(n,child)){
+        UiLayoutPlacement p;ScU32 index;ScI32 w,h;s=ui_plan_get(plan,map,child->id,&p,&index);if(s<0)return s;
+        s=ui_layout_outer(child,&p.preferred,&w,&h);if(s<0)return s;
+        if(child->layout.dock==SC_UI_DOCK_LEFT || child->layout.dock==SC_UI_DOCK_RIGHT){if(!ui_signed_add(preferred.width,w,&preferred.width))return SC_UI_E_RANGE;}
+        else if(!ui_signed_add(preferred.height,h,&preferred.height))return SC_UI_E_RANGE;
+    }
+    {ScI32 intrinsic[4],px,py;
+        if(!ui_signed_add(ui_scale(c,n->layout.padding[0]),ui_scale(c,n->layout.padding[2]),&px)
+            || !ui_signed_add(ui_scale(c,n->layout.padding[1]),ui_scale(c,n->layout.padding[3]),&py))return SC_UI_E_RANGE;
         ui_intrinsic_padding(n,intrinsic);
         if(!ui_signed_add(px,intrinsic[0]+intrinsic[2],&px) || !ui_signed_add(py,intrinsic[1]+intrinsic[3],&py))return SC_UI_E_RANGE;
         if(preferred.width>INT_MAX-px || preferred.height>INT_MAX-py)return SC_UI_E_RANGE;
@@ -158,15 +176,15 @@ static ScStatus ui_measure_node(UiNode *n,ScArray *plan,ScHash *map,ScUiSize *ou
     *out=preferred;
     return SC_UI_OK;
 }
-static ScStatus ui_arrange_children(UiNode *n,ScArray *plan,ScHash *map)
+static ScStatus ui_arrange_children(UiNode *n,ScArray *plan,ScHash *map,int scroll_final)
 {
     ScUiContext *c=n->owner;
-    UiPlacement parent;
+    UiLayoutPlacement parent;
     ScU32 pi,children=0,total_weight=0;
     UiNode *child;
     ScUiRect inner,remaining;
     ScI32 shrink_space=0,shrink_total=0;
-    ScI32 main_total=0,free_space=0,cursor_x=0,cursor_y=0,line_height=0,gap=ui_scale(c,(ScI32)n->layout.gap),padding[4],intrinsic[4],padding_x,padding_y;
+    ScI32 main_total=0,free_space=0,cursor_x=0,cursor_y=0,gap=ui_scale(c,(ScI32)n->layout.gap),padding[4],intrinsic[4],padding_x,padding_y;
     ScStatus s;
     ScU32 grid_rows=1,i;
     s=ui_plan_get(plan,map,n->id,&parent,&pi);
@@ -180,14 +198,18 @@ static ScStatus ui_arrange_children(UiNode *n,ScArray *plan,ScHash *map)
     inner.height-=padding_y;
     if(inner.width<0)inner.width=0;
     if(inner.height<0)inner.height=0;
+    ScUiRect child_area=inner,bar_remaining=inner;
+    int generic_scroll=ui_scroll_layout_node(n);
+    if(generic_scroll){s=ui_scroll_layout_area(n,&parent.rectangle,plan,map,&inner);if(s<0)return s;}
     remaining=inner;
-    if((n->layout.flags&UI_LAYOUT_CLIP) || n->kind==SC_UI_TAB || n->kind==SC_UI_GROUPBOX){ui_rect_intersection(&inner,&parent.child_clip,&parent.child_clip);
+    if((n->layout.flags&UI_LAYOUT_CLIP) || n->kind==SC_UI_TAB || n->kind==SC_UI_GROUPBOX || generic_scroll){ui_rect_intersection(generic_scroll?&child_area:&inner,&parent.child_clip,&parent.child_clip);
         s=ScArraySet(plan,pi,&parent);
         if(s<0)return s;
         }
+    if(n->layout.mode==SC_UI_FLOW)return ui_arrange_flow(n,&parent,&inner,plan,map);
     if(n->layout.mode==SC_UI_GRID_LAYOUT)for(child=n->first_child;child;child=child->next)if((child->effective&SC_UI_VISIBLE) && child->layout.row+child->layout.row_span>grid_rows)grid_rows=child->layout.row+child->layout.row_span;
     if(n->layout.mode==SC_UI_HBOX || n->layout.mode==SC_UI_VBOX){
-        for(child=n->first_child;child;child=child->next)if(child->effective&SC_UI_VISIBLE){UiPlacement p;
+        for(child=n->first_child;child;child=child->next)if(child->effective&SC_UI_VISIBLE){UiLayoutPlacement p;
             ScU32 ci;
             ScI32 size;
             s=ui_plan_get(plan,map,child->id,&p,&ci);
@@ -222,7 +244,7 @@ static ScStatus ui_arrange_children(UiNode *n,ScArray *plan,ScHash *map)
     }
     cursor_x=inner.x;
     cursor_y=inner.y;
-    for(child=n->first_child;child;child=child->next){UiPlacement p;
+    for(child=n->first_child;child;child=child->next){UiLayoutPlacement p;
         ScU32 ci;
         ScUiRect r;
         ScI32 ml,mt,mr,mb;
@@ -232,6 +254,10 @@ static ScStatus ui_arrange_children(UiNode *n,ScArray *plan,ScHash *map)
         mt=ui_scale(c,child->layout.margin[1]);
         mr=ui_scale(c,child->layout.margin[2]);
         mb=ui_scale(c,child->layout.margin[3]);
+        int fixed_bar=0;
+        if((child->effective&SC_UI_VISIBLE) && ui_scroll_layout_bar(n,child)){
+            s=ui_scroll_take_bar(child,&p.preferred,&bar_remaining,&r);if(s<0)return s;fixed_bar=1;goto placed;
+        }
         if(child->private_flags&UI_NODE_VIEWPORT_CHILD){r=child->viewport_rectangle;
             if(!ui_signed_add(r.x,parent.rectangle.x,&r.x) || !ui_signed_add(r.y,parent.rectangle.y,&r.y))return SC_UI_E_RANGE;
             goto placed;
@@ -239,7 +265,7 @@ static ScStatus ui_arrange_children(UiNode *n,ScArray *plan,ScHash *map)
         if(!ui_signed_add(inner.x,ml,&r.x) || !ui_signed_add(inner.y,mt,&r.y))return SC_UI_E_RANGE;
         r.width=p.preferred.width;
         r.height=p.preferred.height;
-        if(!(child->effective&SC_UI_VISIBLE)){r.width=r.height=0;
+        if(!(child->effective&SC_UI_VISIBLE)){r.width=r.height=0;goto placed;
             }
         else if(n->layout.mode==SC_UI_HBOX || n->layout.mode==SC_UI_VBOX || n->layout.mode==SC_UI_SCROLL_LAYOUT){
             ScI32 extra=0;
@@ -307,17 +333,6 @@ static ScStatus ui_arrange_children(UiNode *n,ScArray *plan,ScHash *map)
             r.height=r.height>mt+mb?r.height-mt-mb:0;
             r.height=r.height>gap?r.height-gap:0;
         }
-        else if(n->layout.mode==SC_UI_FLOW){
-            ScI32 advance,cross;
-            ScU32 used=(ScU32)cursor_x-(ScU32)inner.x,total;
-            if(!ui_signed_add(r.width,ml+mr,&advance) || !ui_signed_add(r.height,mt+mb,&cross))return SC_UI_E_RANGE;
-            if(cursor_x>inner.x && (!ui_add(used,(ScU32)advance,&total) || total>(ScU32)inner.width)){cursor_x=inner.x;
-                if(!ui_signed_add(line_height,gap,&line_height) || !ui_signed_add(cursor_y,line_height,&cursor_y))return SC_UI_E_RANGE;
-                line_height=0;
-                }
-            if(!ui_signed_add(cursor_x,ml,&r.x) || !ui_signed_add(cursor_y,mt,&r.y) || !ui_signed_add(advance,gap,&advance) || !ui_signed_add(cursor_x,advance,&cursor_x))return SC_UI_E_RANGE;
-            if(cross>line_height)line_height=cross;
-        }
         else if(n->layout.mode==SC_UI_OVERLAY){
             if(child->layout.width==SC_UI_AUTO || child->layout.align_h==SC_UI_STRETCH)r.width=inner.width-ml-mr;
             if(child->layout.height==SC_UI_AUTO || child->layout.align_v==SC_UI_STRETCH)r.height=inner.height-mt-mb;
@@ -338,16 +353,25 @@ static ScStatus ui_arrange_children(UiNode *n,ScArray *plan,ScHash *map)
                 }
         }
         if(!(child->private_flags&UI_NODE_VIEWPORT_CHILD)){
-            if(n->scroll_x.hi || n->scroll_x.lo>(ScU32)INT_MAX || !ui_signed_add(r.x,-(ScI32)n->scroll_x.lo,&r.x))r.x=-INT_MAX;
-            if(n->scroll_y.hi || n->scroll_y.lo>(ScU32)INT_MAX || !ui_signed_add(r.y,-(ScI32)n->scroll_y.lo,&r.y))r.y=-INT_MAX;
+            ScWideCounter zero,x,y;
+            zero.lo=0;zero.hi=0;
+            x=n->scroll_x;y=n->scroll_y;
+            if(generic_scroll){x=zero;y=zero;
+                if(scroll_final){x=parent.scroll_x;y=parent.scroll_y;}
+            }
+            if(x.hi || x.lo>(ScU32)INT_MAX || !ui_signed_add(r.x,-(ScI32)x.lo,&r.x))r.x=-INT_MAX;
+            if(y.hi || y.lo>(ScU32)INT_MAX || !ui_signed_add(r.y,-(ScI32)y.lo,&r.y))r.y=-INT_MAX;
             }
         {ScI32 edge;
             if(!ui_signed_add(r.x,r.width,&edge) || !ui_signed_add(r.y,r.height,&edge))return SC_UI_E_RANGE;
             }
 placed:
         p.rectangle=r;
-        ui_rect_intersection(&r,&parent.child_clip,&p.clip);
-        p.child_clip=(child->layout.flags&UI_LAYOUT_CLIP)?p.clip:parent.child_clip;
+        ScUiRect base_clip=parent.child_clip;
+        p.range_needed=ui_layout_child_range(n,&parent,child);
+        if(generic_scroll && !fixed_bar && !(child->private_flags&UI_NODE_VIEWPORT_CHILD))ui_rect_intersection(&inner,&base_clip,&base_clip);
+        ui_rect_intersection(&r,&base_clip,&p.clip);
+        p.child_clip=(child->layout.flags&UI_LAYOUT_CLIP)?p.clip:base_clip;
         s=ScArraySet(plan,ci,&p);
         if(s<0)return s;
     }
@@ -359,18 +383,19 @@ static ScStatus ui_layout_root(UiNode *root)
     ScArray *plan=0;
     ScHash *map=0;
     UiNode *n;
-    ScU32 count=0,i,pass,revision=c->revision;
+    ScU32 count=0,i,pass,generic_count=0,revision=c->revision;
     ScStatus s;
     if(!root->window || (root->private_flags&UI_NODE_RETIRED))return SC_UI_E_STALE;
     if(c->layout_depth)return SC_UI_E_BUSY;
     c->layout_depth++;
     ui_node_hold(root);
     c->walking++;
-    s=ui_array_new(sizeof(UiPlacement),&plan);
+    s=ui_array_new(sizeof(UiLayoutPlacement),&plan);
     if(s==0)s=ui_hash_new(sizeof(ScU32),&map);
     if(s<0)goto done;
     n=root;
-    while(n){UiPlacement p;
+    while(n){UiLayoutPlacement p;
+        if(ui_scroll_layout_node(n))generic_count++;
         memset(&p,0,sizeof(p));
         p.node=n->id;
         p.revision=n->value_revision;
@@ -389,7 +414,7 @@ static ScStatus ui_layout_root(UiNode *root)
      * 将Label换行高度自底向上传回VBox，再算flex余量和兄弟位置。
      * 两遍共用候选，不发布中间帧，应用arrange只在最终一遍调用。 */
     for(pass=0;pass<2;pass++){
-        for(i=count;i;i--){UiPlacement p;
+        for(i=count;i;i--){UiLayoutPlacement p;
             ScArrayGet(plan,i-1,&p);
             n=ui_node(c,p.node);
             if(!n){s=SC_UI_E_CANCELLED;
@@ -404,7 +429,7 @@ static ScStatus ui_layout_root(UiNode *root)
             s=ScArraySet(plan,i-1,&p);
             if(s<0)goto done;
             }
-        {UiPlacement p;
+        {UiLayoutPlacement p;
             ScArrayGet(plan,0,&p);
             p.rectangle.x=p.rectangle.y=0;
             p.rectangle.width=(ScI32)root->window->information.client_width;
@@ -413,15 +438,15 @@ static ScStatus ui_layout_root(UiNode *root)
             p.child_clip=p.clip;
             ScArraySet(plan,0,&p);
             }
-        for(i=0;i<count;i++){UiPlacement p;
+        for(i=0;i<count;i++){UiLayoutPlacement p;
             ScArrayGet(plan,i,&p);
             n=ui_node(c,p.node);
             if(!n){s=SC_UI_E_CANCELLED;
                 goto done;
                 }
-            s=ui_arrange_children(n,plan,map);
+            s=ui_arrange_children(n,plan,map,0);
             if(s<0)goto done;
-            if(pass && n->custom && n->custom->description.arrange){ui_node_hold(n);
+            if(pass && !generic_count && n->custom && n->custom->description.arrange){ui_node_hold(n);
                 n->custom->depth++;
                 s=n->custom->description.arrange(c,n->id,&p.rectangle,n->custom->description.context);
                 n->custom->depth--;
@@ -431,11 +456,25 @@ static ScStatus ui_layout_root(UiNode *root)
                 goto done;
                 }}
     }
+    if(generic_count){
+    s=ui_layout_scroll_ranges(c,plan,map,count);if(s<0)goto done;
+    /* 范围和offset候选先确定，最后一次线性安排只应用夹紧的坐标。
+     * 不再次measure/分配，避免删短后旧offset让内容永久落在视口外。 */
+    for(i=0;i<count;i++){
+        UiLayoutPlacement p;ScArrayGet(plan,i,&p);n=ui_node(c,p.node);
+        if(!n){s=SC_UI_E_CANCELLED;goto done;}
+        s=ui_arrange_children(n,plan,map,1);if(s<0)goto done;
+        if(n->custom && n->custom->description.arrange){ui_node_hold(n);n->custom->depth++;
+            s=n->custom->description.arrange(c,n->id,&p.rectangle,n->custom->description.context);
+            n->custom->depth--;ui_node_leave(n);}
+        if(s!=0 || revision!=c->revision){if(s>=0)s=SC_UI_E_BUSY;goto done;}
+    }
+    }
     if(c->revision==UINT_MAX){s=SC_UI_E_RANGE;
         goto done;
         }
     /* 候选全完成才发布，measure/arrange失败从不留下半棵新布局。 */
-    for(i=0;i<count;i++){UiPlacement p;
+    for(i=0;i<count;i++){UiLayoutPlacement p;
         ScArrayGet(plan,i,&p);
         n=ui_node(c,p.node);
         if(!n){s=SC_UI_E_CANCELLED;
@@ -445,14 +484,21 @@ static ScStatus ui_layout_root(UiNode *root)
         n->clip=p.clip;
         n->child_clip=p.child_clip;
         n->preferred=p.preferred;
+        if(ui_scroll_layout_node(n)){
+            n->content_width=p.content_width;n->content_height=p.content_height;
+            n->scroll_x=p.scroll_x;n->scroll_y=p.scroll_y;
+            n->scroll_step_x=(ScU32)ui_scale(c,16);n->scroll_step_y=(ScU32)ui_scale(c,20);
+            if(p.scroll_changed)n->value_revision++;
+        }
         n->layout_revision=c->revision+1;
         n->private_flags&=~UI_NODE_LAYOUT_DIRTY;
         }
     c->revision++;
-    for(i=0;i<count;i++){UiPlacement p;
+    for(i=0;i<count;i++){UiLayoutPlacement p;
         ScArrayGet(plan,i,&p);
         n=ui_node(c,p.node);
         if(n)ui_controls_layout(n);
+        if(n && p.scroll_changed){ScStatus notice=ui_event(n,SC_UI_EVENT_VALUE_CHANGED,0,0);if(notice<0)c->notification_error=notice;}
         }
     ui_node_damage(root);
     s=ui_event(root,SC_UI_EVENT_LAYOUT,0,0);
@@ -487,26 +533,13 @@ ScStatus ScUiBatchEnd(ScUiContext *c)
     c->batch--;
     return SC_UI_OK;
     }
-ScStatus ScUiEnsureVisible(ScUiContext *c,ScUiNode id,const ScUiRect *local)
+static ScStatus ui_layout_prepare_input(UiNode *root,const ScMessage *message)
 {
-    UiNode *n=ui_node(c,id),*parent;
-    ScUiRect r;
-    if(!n)return SC_UI_E_STALE;
-    r=n->rectangle;
-    if(local){r=*local;
-        r.x+=n->rectangle.x;
-        r.y+=n->rectangle.y;
-        }
-    for(parent=n->parent;parent;parent=parent->parent)if(parent->kind==SC_UI_SCROLL || parent->layout.mode==SC_UI_SCROLL_LAYOUT){ScWideCounter x=parent->scroll_x,y=parent->scroll_y;
-        if(r.x<parent->rectangle.x){ScU32 delta=(ScU32)(parent->rectangle.x-r.x);
-            x.lo=x.lo>delta?x.lo-delta:0;
-            }
-        else if(ui_rect_right(&r)>ui_rect_right(&parent->rectangle))ui_wide_add(&x,(ScU32)(ui_rect_right(&r)-ui_rect_right(&parent->rectangle)));
-        if(r.y<parent->rectangle.y){ScU32 delta=(ScU32)(parent->rectangle.y-r.y);
-            y.lo=y.lo>delta?y.lo-delta:0;
-            }
-        else if(ui_rect_bottom(&r)>ui_rect_bottom(&parent->rectangle))ui_wide_add(&y,(ScU32)(ui_rect_bottom(&r)-ui_rect_bottom(&parent->rectangle)));
-        return ScUiScrollTo(c,parent->id,&x,&y);
-        }
-    return SC_UI_OK;
+    ScU32 kind=message->id;
+    if(kind!=SC32_MSG_KEYDOWN && kind!=SC32_MSG_KEYUP && kind!=SC32_MSG_TEXT
+       && kind!=SC32_MSG_MOUSEMOVE && kind!=SC32_MSG_BUTTONDOWN && kind!=SC32_MSG_BUTTONUP && kind!=SC32_MSG_WHEEL)return 0;
+    /* 未改变的mousemove不测量；前一条滚动/尺寸/内容事件留下dirty时，
+     * 命中必须使用即将显示的矩形。失败仍保旧布局，分发器继续按旧帧输入。 */
+    return root->private_flags&UI_NODE_LAYOUT_DIRTY?ui_layout_root(root):0;
 }
+#include "scui_ensure_visible.inc"

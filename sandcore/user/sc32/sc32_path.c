@@ -89,6 +89,8 @@ ScStatus ScPathReplace(const char *path,const void *data,ScU32 bytes,ScU32 *tran
  * 此缓存按库实例归属，不用逐次分配64KiB，也不借另一个进程的缓冲。 */
 void Sc32Finalize(void)
 {
+    sc32_image_finalize();
+    sc32_auth_finalize();
     sc32_gui_finalize();
     if(sc32_path_scratch){sc32_call(0x101,(ScI32)sc32_path_scratch,0,0,0,0,0);sc32_path_scratch=0;}
 }

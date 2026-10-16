@@ -1,0 +1,516 @@
+{
+  "name": "SCCLIB.SCL",
+  "abi_major": 1,
+  "abi_minor": 0,
+  "library_version": 1,
+  "init": "SccLibraryInit",
+  "fini": "SccLibraryFini",
+  "exports": [
+    {
+      "name": "_Exit",
+      "kind": "function"
+    },
+    {
+      "name": "__scc_assert_fail",
+      "kind": "function"
+    },
+    {
+      "name": "__scc_errno_location",
+      "kind": "function"
+    },
+    {
+      "name": "__scc_standard",
+      "kind": "function"
+    },
+    {
+      "name": "abort",
+      "kind": "function"
+    },
+    {
+      "name": "abs",
+      "kind": "function"
+    },
+    {
+      "name": "atexit",
+      "kind": "function"
+    },
+    {
+      "name": "atoi",
+      "kind": "function"
+    },
+    {
+      "name": "atol",
+      "kind": "function"
+    },
+    {
+      "name": "bsearch",
+      "kind": "function"
+    },
+    {
+      "name": "calloc",
+      "kind": "function"
+    },
+    {
+      "name": "clearerr",
+      "kind": "function"
+    },
+    {
+      "name": "exit",
+      "kind": "function"
+    },
+    {
+      "name": "fclose",
+      "kind": "function"
+    },
+    {
+      "name": "feof",
+      "kind": "function"
+    },
+    {
+      "name": "ferror",
+      "kind": "function"
+    },
+    {
+      "name": "fflush",
+      "kind": "function"
+    },
+    {
+      "name": "fgetc",
+      "kind": "function"
+    },
+    {
+      "name": "fgetpos",
+      "kind": "function"
+    },
+    {
+      "name": "fgets",
+      "kind": "function"
+    },
+    {
+      "name": "fopen",
+      "kind": "function"
+    },
+    {
+      "name": "fprintf",
+      "kind": "function"
+    },
+    {
+      "name": "fputc",
+      "kind": "function"
+    },
+    {
+      "name": "fputs",
+      "kind": "function"
+    },
+    {
+      "name": "fread",
+      "kind": "function"
+    },
+    {
+      "name": "free",
+      "kind": "function"
+    },
+    {
+      "name": "fseek",
+      "kind": "function"
+    },
+    {
+      "name": "fsetpos",
+      "kind": "function"
+    },
+    {
+      "name": "ftell",
+      "kind": "function"
+    },
+    {
+      "name": "fwrite",
+      "kind": "function"
+    },
+    {
+      "name": "getc",
+      "kind": "function"
+    },
+    {
+      "name": "getchar",
+      "kind": "function"
+    },
+    {
+      "name": "getenv",
+      "kind": "function"
+    },
+    {
+      "name": "isalnum",
+      "kind": "function"
+    },
+    {
+      "name": "isalpha",
+      "kind": "function"
+    },
+    {
+      "name": "isblank",
+      "kind": "function"
+    },
+    {
+      "name": "iscntrl",
+      "kind": "function"
+    },
+    {
+      "name": "isdigit",
+      "kind": "function"
+    },
+    {
+      "name": "isgraph",
+      "kind": "function"
+    },
+    {
+      "name": "islower",
+      "kind": "function"
+    },
+    {
+      "name": "isprint",
+      "kind": "function"
+    },
+    {
+      "name": "ispunct",
+      "kind": "function"
+    },
+    {
+      "name": "isspace",
+      "kind": "function"
+    },
+    {
+      "name": "isupper",
+      "kind": "function"
+    },
+    {
+      "name": "isxdigit",
+      "kind": "function"
+    },
+    {
+      "name": "labs",
+      "kind": "function"
+    },
+    {
+      "name": "malloc",
+      "kind": "function"
+    },
+    {
+      "name": "memchr",
+      "kind": "function"
+    },
+    {
+      "name": "memcmp",
+      "kind": "function"
+    },
+    {
+      "name": "memcpy",
+      "kind": "function"
+    },
+    {
+      "name": "memmove",
+      "kind": "function"
+    },
+    {
+      "name": "memset",
+      "kind": "function"
+    },
+    {
+      "name": "perror",
+      "kind": "function"
+    },
+    {
+      "name": "printf",
+      "kind": "function"
+    },
+    {
+      "name": "putc",
+      "kind": "function"
+    },
+    {
+      "name": "putchar",
+      "kind": "function"
+    },
+    {
+      "name": "puts",
+      "kind": "function"
+    },
+    {
+      "name": "qsort",
+      "kind": "function"
+    },
+    {
+      "name": "rand",
+      "kind": "function"
+    },
+    {
+      "name": "realloc",
+      "kind": "function"
+    },
+    {
+      "name": "remove",
+      "kind": "function"
+    },
+    {
+      "name": "rename",
+      "kind": "function"
+    },
+    {
+      "name": "rewind",
+      "kind": "function"
+    },
+    {
+      "name": "setbuf",
+      "kind": "function"
+    },
+    {
+      "name": "setvbuf",
+      "kind": "function"
+    },
+    {
+      "name": "snprintf",
+      "kind": "function"
+    },
+    {
+      "name": "sprintf",
+      "kind": "function"
+    },
+    {
+      "name": "srand",
+      "kind": "function"
+    },
+    {
+      "name": "strcat",
+      "kind": "function"
+    },
+    {
+      "name": "strchr",
+      "kind": "function"
+    },
+    {
+      "name": "strcmp",
+      "kind": "function"
+    },
+    {
+      "name": "strcoll",
+      "kind": "function"
+    },
+    {
+      "name": "strcpy",
+      "kind": "function"
+    },
+    {
+      "name": "strcspn",
+      "kind": "function"
+    },
+    {
+      "name": "strerror",
+      "kind": "function"
+    },
+    {
+      "name": "strlen",
+      "kind": "function"
+    },
+    {
+      "name": "strncat",
+      "kind": "function"
+    },
+    {
+      "name": "strncmp",
+      "kind": "function"
+    },
+    {
+      "name": "strncpy",
+      "kind": "function"
+    },
+    {
+      "name": "strpbrk",
+      "kind": "function"
+    },
+    {
+      "name": "strrchr",
+      "kind": "function"
+    },
+    {
+      "name": "strspn",
+      "kind": "function"
+    },
+    {
+      "name": "strstr",
+      "kind": "function"
+    },
+    {
+      "name": "strtok",
+      "kind": "function"
+    },
+    {
+      "name": "strtol",
+      "kind": "function"
+    },
+    {
+      "name": "strtoul",
+      "kind": "function"
+    },
+    {
+      "name": "strxfrm",
+      "kind": "function"
+    },
+    {
+      "name": "tolower",
+      "kind": "function"
+    },
+    {
+      "name": "toupper",
+      "kind": "function"
+    },
+    {
+      "name": "ungetc",
+      "kind": "function"
+    },
+    {
+      "name": "vfprintf",
+      "kind": "function"
+    },
+    {
+      "name": "vprintf",
+      "kind": "function"
+    },
+    {
+      "name": "vsnprintf",
+      "kind": "function"
+    },
+    {
+      "name": "vsprintf",
+      "kind": "function"
+    }
+  ],
+  "imports": [
+    {
+      "name": "ScSystemWait",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScProcessExit",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScProcessYield",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScProcessEnvironment",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScPathRemove",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScPathRename",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScMemoryAllocatePages",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScMemoryFreePages",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScFileOpen",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScFileRead",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScFileWrite",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScFileSeek",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScFileFlush",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScFileClose",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScFileQuery",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScFileGetStandard",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScApplicationRegisterPrepare",
+      "dependency": "SCLDR.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScApplicationPinCallback",
+      "dependency": "SCLDR.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScApplicationExit",
+      "dependency": "SCLDR.SCL",
+      "kind": "function",
+      "size": 1
+    }
+  ],
+  "dependencies": [
+    {
+      "name": "SC32API.SCL",
+      "abi_major": 1,
+      "min_minor": 4,
+      "min_version": 6
+    },
+    {
+      "name": "SCLDR.SCL",
+      "abi_major": 1,
+      "min_minor": 2,
+      "min_version": 3
+    }
+  ]
+}

@@ -1,0 +1,828 @@
+{
+  "name": "SC32API.SCL",
+  "abi_major": 1,
+  "abi_minor": 4,
+  "library_version": 6,
+  "init": null,
+  "fini": "Sc32Finalize",
+  "exports": [
+    {
+      "name": "ScAudioControl",
+      "kind": "function"
+    },
+    {
+      "name": "ScAudioDeviceQuery",
+      "kind": "function"
+    },
+    {
+      "name": "ScAudioEffect",
+      "kind": "function"
+    },
+    {
+      "name": "ScAudioMasterVolume",
+      "kind": "function"
+    },
+    {
+      "name": "ScAudioOpen",
+      "kind": "function"
+    },
+    {
+      "name": "ScAudioQuery",
+      "kind": "function"
+    },
+    {
+      "name": "ScAudioSubmit",
+      "kind": "function"
+    },
+    {
+      "name": "ScAuthLoginActivate",
+      "kind": "function"
+    },
+    {
+      "name": "ScAuthLoginBegin",
+      "kind": "function"
+    },
+    {
+      "name": "ScAuthLoginCancel",
+      "kind": "function"
+    },
+    {
+      "name": "ScAuthLoginQuery",
+      "kind": "function"
+    },
+    {
+      "name": "ScBrokerReady",
+      "kind": "function"
+    },
+    {
+      "name": "ScBrokerWait",
+      "kind": "function"
+    },
+    {
+      "name": "ScCallbackPin",
+      "kind": "function"
+    },
+    {
+      "name": "ScClipboardAbort",
+      "kind": "function"
+    },
+    {
+      "name": "ScClipboardBegin",
+      "kind": "function"
+    },
+    {
+      "name": "ScClipboardClear",
+      "kind": "function"
+    },
+    {
+      "name": "ScClipboardClose",
+      "kind": "function"
+    },
+    {
+      "name": "ScClipboardCommit",
+      "kind": "function"
+    },
+    {
+      "name": "ScClipboardFormats",
+      "kind": "function"
+    },
+    {
+      "name": "ScClipboardOffer",
+      "kind": "function"
+    },
+    {
+      "name": "ScClipboardOpen",
+      "kind": "function"
+    },
+    {
+      "name": "ScClipboardQuery",
+      "kind": "function"
+    },
+    {
+      "name": "ScClipboardRead",
+      "kind": "function"
+    },
+    {
+      "name": "ScClipboardWatch",
+      "kind": "function"
+    },
+    {
+      "name": "ScConfigurationApply",
+      "kind": "function"
+    },
+    {
+      "name": "ScConfigurationCheck",
+      "kind": "function"
+    },
+    {
+      "name": "ScDebugBreakpointAdd",
+      "kind": "function"
+    },
+    {
+      "name": "ScDebugBreakpointRemove",
+      "kind": "function"
+    },
+    {
+      "name": "ScDebugBreakpoints",
+      "kind": "function"
+    },
+    {
+      "name": "ScDebugControl",
+      "kind": "function"
+    },
+    {
+      "name": "ScDebugLaunch",
+      "kind": "function"
+    },
+    {
+      "name": "ScDebugModules",
+      "kind": "function"
+    },
+    {
+      "name": "ScDebugQuery",
+      "kind": "function"
+    },
+    {
+      "name": "ScDebugRead",
+      "kind": "function"
+    },
+    {
+      "name": "ScDebugSegments",
+      "kind": "function"
+    },
+    {
+      "name": "ScDebugSymbols",
+      "kind": "function"
+    },
+    {
+      "name": "ScDefaultWindowProc",
+      "kind": "function"
+    },
+    {
+      "name": "ScDesktopReload",
+      "kind": "function"
+    },
+    {
+      "name": "ScDirectoryClose",
+      "kind": "function"
+    },
+    {
+      "name": "ScDirectoryNext",
+      "kind": "function"
+    },
+    {
+      "name": "ScDirectoryOpen",
+      "kind": "function"
+    },
+    {
+      "name": "ScDisplayApply",
+      "kind": "function"
+    },
+    {
+      "name": "ScDisplayPalette",
+      "kind": "function"
+    },
+    {
+      "name": "ScDisplayQuery",
+      "kind": "function"
+    },
+    {
+      "name": "ScDropAt",
+      "kind": "function"
+    },
+    {
+      "name": "ScDropCancel",
+      "kind": "function"
+    },
+    {
+      "name": "ScDropComplete",
+      "kind": "function"
+    },
+    {
+      "name": "ScDropConnect",
+      "kind": "function"
+    },
+    {
+      "name": "ScDropRegister",
+      "kind": "function"
+    },
+    {
+      "name": "ScDropUnregister",
+      "kind": "function"
+    },
+    {
+      "name": "ScDropValidate",
+      "kind": "function"
+    },
+    {
+      "name": "ScErrorFormat",
+      "kind": "function"
+    },
+    {
+      "name": "ScErrorName",
+      "kind": "function"
+    },
+    {
+      "name": "ScErrorQuery",
+      "kind": "function"
+    },
+    {
+      "name": "ScFileClose",
+      "kind": "function"
+    },
+    {
+      "name": "ScFileDuplicate",
+      "kind": "function"
+    },
+    {
+      "name": "ScFileFlush",
+      "kind": "function"
+    },
+    {
+      "name": "ScFileGetStandard",
+      "kind": "function"
+    },
+    {
+      "name": "ScFileLeaseAcquire",
+      "kind": "function"
+    },
+    {
+      "name": "ScFileLeaseAdvance",
+      "kind": "function"
+    },
+    {
+      "name": "ScFileLeaseCancel",
+      "kind": "function"
+    },
+    {
+      "name": "ScFileLeaseCreatePinned",
+      "kind": "function"
+    },
+    {
+      "name": "ScFileLeaseOpenPinned",
+      "kind": "function"
+    },
+    {
+      "name": "ScFileLeasePublish",
+      "kind": "function"
+    },
+    {
+      "name": "ScFileLeasePublishPreserving",
+      "kind": "function"
+    },
+    {
+      "name": "ScFileLeaseQuery",
+      "kind": "function"
+    },
+    {
+      "name": "ScFileLeaseRelease",
+      "kind": "function"
+    },
+    {
+      "name": "ScFileLeaseRemove",
+      "kind": "function"
+    },
+    {
+      "name": "ScFileLeaseRename",
+      "kind": "function"
+    },
+    {
+      "name": "ScFileLeaseSetMode",
+      "kind": "function"
+    },
+    {
+      "name": "ScFileLeaseSnapshot",
+      "kind": "function"
+    },
+    {
+      "name": "ScFileOpen",
+      "kind": "function"
+    },
+    {
+      "name": "ScFileQuery",
+      "kind": "function"
+    },
+    {
+      "name": "ScFileRead",
+      "kind": "function"
+    },
+    {
+      "name": "ScFileSeek",
+      "kind": "function"
+    },
+    {
+      "name": "ScFileTell",
+      "kind": "function"
+    },
+    {
+      "name": "ScFileTruncate",
+      "kind": "function"
+    },
+    {
+      "name": "ScFileWrite",
+      "kind": "function"
+    },
+    {
+      "name": "ScFontGetGlyph",
+      "kind": "function"
+    },
+    {
+      "name": "ScFontQuery",
+      "kind": "function"
+    },
+    {
+      "name": "ScFreeLibrary",
+      "kind": "function"
+    },
+    {
+      "name": "ScGetSymbol",
+      "kind": "function"
+    },
+    {
+      "name": "ScIdentityQuery",
+      "kind": "function"
+    },
+    {
+      "name": "ScImageDecodeBegin",
+      "kind": "function"
+    },
+    {
+      "name": "ScImageDecodeCancel",
+      "kind": "function"
+    },
+    {
+      "name": "ScImageDecodeCopy",
+      "kind": "function"
+    },
+    {
+      "name": "ScImageDecodeMemoryBegin",
+      "kind": "function"
+    },
+    {
+      "name": "ScImageDecodeQuery",
+      "kind": "function"
+    },
+    {
+      "name": "ScImageDecodeStep",
+      "kind": "function"
+    },
+    {
+      "name": "ScInputQuery",
+      "kind": "function"
+    },
+    {
+      "name": "ScIpcAccept",
+      "kind": "function"
+    },
+    {
+      "name": "ScIpcClose",
+      "kind": "function"
+    },
+    {
+      "name": "ScIpcConnect",
+      "kind": "function"
+    },
+    {
+      "name": "ScIpcCreate",
+      "kind": "function"
+    },
+    {
+      "name": "ScIpcListen",
+      "kind": "function"
+    },
+    {
+      "name": "ScIpcPeek",
+      "kind": "function"
+    },
+    {
+      "name": "ScIpcPeer",
+      "kind": "function"
+    },
+    {
+      "name": "ScIpcQuery",
+      "kind": "function"
+    },
+    {
+      "name": "ScIpcReceive",
+      "kind": "function"
+    },
+    {
+      "name": "ScIpcSend",
+      "kind": "function"
+    },
+    {
+      "name": "ScJobCancel",
+      "kind": "function"
+    },
+    {
+      "name": "ScJobClose",
+      "kind": "function"
+    },
+    {
+      "name": "ScJobQuery",
+      "kind": "function"
+    },
+    {
+      "name": "ScJobWait",
+      "kind": "function"
+    },
+    {
+      "name": "ScLibraryQuery",
+      "kind": "function"
+    },
+    {
+      "name": "ScLoadLibrary",
+      "kind": "function"
+    },
+    {
+      "name": "ScMemoryAllocatePages",
+      "kind": "function"
+    },
+    {
+      "name": "ScMemoryCloseShared",
+      "kind": "function"
+    },
+    {
+      "name": "ScMemoryCreateShared",
+      "kind": "function"
+    },
+    {
+      "name": "ScMemoryFreePages",
+      "kind": "function"
+    },
+    {
+      "name": "ScMemoryGrantShared",
+      "kind": "function"
+    },
+    {
+      "name": "ScMemoryMapShared",
+      "kind": "function"
+    },
+    {
+      "name": "ScMemoryOpenShared",
+      "kind": "function"
+    },
+    {
+      "name": "ScMemoryQueryShared",
+      "kind": "function"
+    },
+    {
+      "name": "ScMemoryRevokeShared",
+      "kind": "function"
+    },
+    {
+      "name": "ScMemoryUnmapShared",
+      "kind": "function"
+    },
+    {
+      "name": "ScMessageDispatch",
+      "kind": "function"
+    },
+    {
+      "name": "ScMessageGet",
+      "kind": "function"
+    },
+    {
+      "name": "ScMessagePeek",
+      "kind": "function"
+    },
+    {
+      "name": "ScMessagePost",
+      "kind": "function"
+    },
+    {
+      "name": "ScMessageQueueQuery",
+      "kind": "function"
+    },
+    {
+      "name": "ScPaintBegin",
+      "kind": "function"
+    },
+    {
+      "name": "ScPaintCancel",
+      "kind": "function"
+    },
+    {
+      "name": "ScPaintEnd",
+      "kind": "function"
+    },
+    {
+      "name": "ScPathCreate",
+      "kind": "function"
+    },
+    {
+      "name": "ScPathMetadata",
+      "kind": "function"
+    },
+    {
+      "name": "ScPathPermissions",
+      "kind": "function"
+    },
+    {
+      "name": "ScPathQuery",
+      "kind": "function"
+    },
+    {
+      "name": "ScPathRead",
+      "kind": "function"
+    },
+    {
+      "name": "ScPathRemove",
+      "kind": "function"
+    },
+    {
+      "name": "ScPathRename",
+      "kind": "function"
+    },
+    {
+      "name": "ScPathReplace",
+      "kind": "function"
+    },
+    {
+      "name": "ScPathResolve",
+      "kind": "function"
+    },
+    {
+      "name": "ScPathStat",
+      "kind": "function"
+    },
+    {
+      "name": "ScPointerCapture",
+      "kind": "function"
+    },
+    {
+      "name": "ScPointerSetCursor",
+      "kind": "function"
+    },
+    {
+      "name": "ScPopupCreate",
+      "kind": "function"
+    },
+    {
+      "name": "ScProcessArguments",
+      "kind": "function"
+    },
+    {
+      "name": "ScProcessEnumerate",
+      "kind": "function"
+    },
+    {
+      "name": "ScProcessEnvironment",
+      "kind": "function"
+    },
+    {
+      "name": "ScProcessExit",
+      "kind": "function"
+    },
+    {
+      "name": "ScProcessLaunch",
+      "kind": "function"
+    },
+    {
+      "name": "ScProcessQuery",
+      "kind": "function"
+    },
+    {
+      "name": "ScProcessSelf",
+      "kind": "function"
+    },
+    {
+      "name": "ScProcessSetEnvironment",
+      "kind": "function"
+    },
+    {
+      "name": "ScProcessSetWorkingDirectory",
+      "kind": "function"
+    },
+    {
+      "name": "ScProcessSleep",
+      "kind": "function"
+    },
+    {
+      "name": "ScProcessSpawn",
+      "kind": "function"
+    },
+    {
+      "name": "ScProcessSpawnCapture",
+      "kind": "function"
+    },
+    {
+      "name": "ScProcessSpawnInteractive",
+      "kind": "function"
+    },
+    {
+      "name": "ScProcessTerminate",
+      "kind": "function"
+    },
+    {
+      "name": "ScProcessWorkingDirectory",
+      "kind": "function"
+    },
+    {
+      "name": "ScProcessYield",
+      "kind": "function"
+    },
+    {
+      "name": "ScSessionControl",
+      "kind": "function"
+    },
+    {
+      "name": "ScSessionEnumerate",
+      "kind": "function"
+    },
+    {
+      "name": "ScSessionPath",
+      "kind": "function"
+    },
+    {
+      "name": "ScShellHostActivate",
+      "kind": "function"
+    },
+    {
+      "name": "ScShellHostConnect",
+      "kind": "function"
+    },
+    {
+      "name": "ScShellHostDeactivate",
+      "kind": "function"
+    },
+    {
+      "name": "ScShellHostPrepare",
+      "kind": "function"
+    },
+    {
+      "name": "ScShellHostQuery",
+      "kind": "function"
+    },
+    {
+      "name": "ScShellHostRestart",
+      "kind": "function"
+    },
+    {
+      "name": "ScShellHostWindowAction",
+      "kind": "function"
+    },
+    {
+      "name": "ScShellHostWindowAt",
+      "kind": "function"
+    },
+    {
+      "name": "ScShellHostWindows",
+      "kind": "function"
+    },
+    {
+      "name": "ScShellHostWorkspace",
+      "kind": "function"
+    },
+    {
+      "name": "ScSimdQuery",
+      "kind": "function"
+    },
+    {
+      "name": "ScSystemCapabilities",
+      "kind": "function"
+    },
+    {
+      "name": "ScSystemClock",
+      "kind": "function"
+    },
+    {
+      "name": "ScSystemCpu",
+      "kind": "function"
+    },
+    {
+      "name": "ScSystemMemory",
+      "kind": "function"
+    },
+    {
+      "name": "ScSystemMonotonic",
+      "kind": "function"
+    },
+    {
+      "name": "ScSystemStorage",
+      "kind": "function"
+    },
+    {
+      "name": "ScSystemWait",
+      "kind": "function"
+    },
+    {
+      "name": "ScTerminalControl",
+      "kind": "function"
+    },
+    {
+      "name": "ScTerminalQuery",
+      "kind": "function"
+    },
+    {
+      "name": "ScTerminalResize",
+      "kind": "function"
+    },
+    {
+      "name": "ScThemeApply",
+      "kind": "function"
+    },
+    {
+      "name": "ScThemePath",
+      "kind": "function"
+    },
+    {
+      "name": "ScThemeQuery",
+      "kind": "function"
+    },
+    {
+      "name": "ScWallpaperQuery",
+      "kind": "function"
+    },
+    {
+      "name": "ScWallpaperSet",
+      "kind": "function"
+    },
+    {
+      "name": "ScWindowControl",
+      "kind": "function"
+    },
+    {
+      "name": "ScWindowCreate",
+      "kind": "function"
+    },
+    {
+      "name": "ScWindowDestroy",
+      "kind": "function"
+    },
+    {
+      "name": "ScWindowInvalidate",
+      "kind": "function"
+    },
+    {
+      "name": "ScWindowPlace",
+      "kind": "function"
+    },
+    {
+      "name": "ScWindowQuery",
+      "kind": "function"
+    },
+    {
+      "name": "ScWindowRejectClose",
+      "kind": "function"
+    },
+    {
+      "name": "ScWindowSetOwner",
+      "kind": "function"
+    },
+    {
+      "name": "ScWindowSetTitle",
+      "kind": "function"
+    },
+    {
+      "name": "ScWindowSubmit",
+      "kind": "function"
+    }
+  ],
+  "imports": [
+    {
+      "name": "ScRuntimeOpen",
+      "dependency": "SCLDR.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScRuntimeClose",
+      "dependency": "SCLDR.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScRuntimeResolve",
+      "dependency": "SCLDR.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScApplicationRuntime",
+      "dependency": "SCLDR.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScApplicationPinCallback",
+      "dependency": "SCLDR.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScRuntimeQuery",
+      "dependency": "SCLDR.SCL",
+      "kind": "function",
+      "size": 1
+    }
+  ],
+  "dependencies": [
+    {
+      "name": "SCLDR.SCL",
+      "abi_major": 1,
+      "min_minor": 2,
+      "min_version": 3
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "scope": "EXACT_RUN01_DRIVER_BEFORE_FOREGROUND_FIX",
+  "driver_sha256": "d13353e6ef1127f3db94c9d0a961424c00f6fd7084217bf6e6508fd3e06cdb20",
+  "original_report": "build/m10a2-p6-guest-generation-run-01/p6-generation.json",
+  "report_sha256": "a21d1d7a6a8a099ba69f31ff3a5acbfecfffb312e10df0bfaf2086ba800dbe1c",
+  "qemu_pid": 14668,
+  "current_inputs_unchanged": true,
+  "changed_input_output_paths": [],
+  "source_disk_unchanged": true,
+  "failure": "OPTIONAL_IDENTITY_OBSERVER_REJECTED_SH_SCX_BACKGROUND_WRAPPER_NOT_COMPILER_OS_FAILURE",
+  "actual_producer_pid_generation": "NOT_OBSERVED",
+  "shell_wrapper_pid": 1,
+  "active_case": "old-G1-current-source-SCCC",
+  "stdout_sha256": "c4e2d49376dc0bf1fd2c72f8bb42dc27e3cd16ccf0838595418e64256402c433",
+  "stdout_bytes": 225,
+  "files": {
+    "DESIGN.md": "56888daf265fcc816d3a81234d2d59987eaf226a3871a21fa7b85e4efee338a3",
+    "README.md": "562858575711ae100e7223b6b9aae1d6c51762895c647ee9139fce1cfcf8c3f9",
+    "completion.json": "dfaab2e6c9088ba8fd7da257cddd56109522795d674941e6ddda21ee0aa7cbef",
+    "driver.py": "d13353e6ef1127f3db94c9d0a961424c00f6fd7084217bf6e6508fd3e06cdb20",
+    "finalize.py": "b9ebf5501f8f09fee229a38091075e47a8fabb403e3a0a327b6e310d72cd4412",
+    "producer.stdout.bin": "c4e2d49376dc0bf1fd2c72f8bb42dc27e3cd16ccf0838595418e64256402c433"
+  }
+}

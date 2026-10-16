@@ -49,4 +49,8 @@ int auth_network_exec(int pid,const char *command,const i32 descriptors[3]);
 /* M10a1：仅内核任务存储器使用，资源按真实任务申请。 */
 u32 auth_task_bytes(void);
 u32 auth_login_bytes(void);
+int auth_login_screen_role(int pid);
+int auth_launch_issued_login(void);
+int auth_login_resource_access(int pid,const char *path,u32 access);
+int auth_login_syscall_allowed(int pid,const u32 *frame);
 #endif

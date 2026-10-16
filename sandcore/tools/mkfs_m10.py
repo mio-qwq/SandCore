@@ -13,6 +13,7 @@ import struct
 import zlib
 from mkfs_m9 import Record, read_image, normalize, fold, defaults, ENTRY, MAGIC
 from core_signature import verify
+from upgrade_m10a2_defaults import upgrade_records
 
 MAX_BYTES = 256 * 1024 * 1024
 
@@ -213,6 +214,8 @@ def main():
             if key.startswith('SYS/CORE/') and key.endswith('.SKM'):
                 raise ValueError('签名扩展只从独立signed-dir引入，不把普通构建树当信任输入')
             publish(name, path.read_bytes())
+        # 仅全文和身份匹配的发行默认；用户MENU/LNK原样，旧文本沿原索引归档。
+        report['m10a2_defaults'] = upgrade_records(records, generation, archive_record)
         publish('SYS/CORE/CORE.SKM', main_blob, force=True, system=True)
         publish('LEGACY/SKM/WALL-V1.SKM', legacy)
         recovery = records.get('SYS/RECOVERY/CORE.SKM')

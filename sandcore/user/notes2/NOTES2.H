@@ -2,6 +2,7 @@
 #define SANDCORE_NOTES2_PRIVATE_H
 #include <SCUI.H>
 #include <SC32LEASE.H>
+#include <SC32REPLACE.H>
 #include <SC32PATH.H>
 #include <stdio.h>
 #include <stdlib.h>

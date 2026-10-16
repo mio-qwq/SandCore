@@ -1,0 +1,19 @@
+{
+  "scope": "PROJECT_DECODER_ADAPTED_TO_SC32_AND_SHARED_SCCLIB_WITH_OWNED_SCRATCH",
+  "files": [
+    {
+      "source": "sandcore/user/audio/decoder.c",
+      "source_sha256": "0802d67c6dad380fb2d8009bcae3c64d4c8d881f9717de2bbee872b0c2a0e459",
+      "target": "sandcore/user/scsound/sound_decoder.c",
+      "adapted_sha256": "e2499c0db7dfb4a98e91e75cf641cdee39f6304cb321f980129fb4a1c39dbca4",
+      "legacy_source_unchanged": true
+    },
+    {
+      "source": "sandcore/user/audio/flac.c",
+      "source_sha256": "ebd8eb96e338b9be56c474e053f92975733d49923e5245f28eed360a71b9104c",
+      "target": "sandcore/user/scsound/sound_flac.c",
+      "adapted_sha256": "ffa4860b3ba832d1ab0f399028496868e452736b4be9aba30962e091b44a4cb9",
+      "legacy_source_unchanged": true
+    }
+  ]
+}

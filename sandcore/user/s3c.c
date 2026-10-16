@@ -10,10 +10,11 @@
  * 后端逐函数生成 x86，最后解决全局地址并封装 SCX1MIO。所有容量
  * 有明确上限，溢出在写数组之前诊断，不能输出残缺却“成功”的文件。
  *
- * 【工作区为什么地址固定】没有 libc/malloc；大Source/Token/Pool/Code
- * 区在首次PP前一次从本人sc_alloc取得，之后不realloc，递归Lexer与
- * 解析器借用指针稳定。成功的诊断/map/正文完成后释放；fatal由kernel
- * 退出清所有本人页。语法树逐函数复用，符号/类型/重定位保留到TU结束。
+ * 【工作区为什么地址固定】没有 libc/malloc；源码正文/Token/Pool/Code
+ * 在首次PP前从本人sc_alloc取得且不搬，递归Lexer与解析器借用稳定。
+ * Source元数据和once状态按需倍增，引用只保存索引；诊断/map/正文
+ * 最后借用后，成功和fatal统一释放本人工作区。语法树逐函数复用，
+ * 符号/类型/重定位保留到TU结束；其它临时页仍由kernel退出统一回收。
  * 递归局部缓冲保持小，宏参数与 include 行缓冲放 BSS，避免 128KB
  * 用户栈被深层展开耗尽。文档：C.md、FS.md、SYSCALL.md。
  * ===================================================================== */
@@ -30,7 +31,8 @@
  * 源及每文件NUL预算，不是单文件/最终SCX容量，也不边读边搬arena。 */
 #define SOURCE_MAX 1048576
 #define IDENT_MAX 4096
-#define FILE_MAX 64
+/* where最高位标记语句，剩余15位文件索引；不是固定工程文件配额。 */
+#define SOURCE_INDEX_LIMIT 32768
 #define LINE_MAX 1024
 #define DEPTH_MAX 16
 /* 当前Broker+Font/Popup聚合已有382项含预定义宏，SCUI近32个include。
@@ -60,7 +62,7 @@ static void finish_sco(const char *output);
 
 /* 单字节运算符直接保存 ASCII，多字节运算符才分配扩展编号。
  * 标记 v 是整数值或字符串池偏移；字符串池前四字节保存字节数，
- * 所以 "A\0B" 不会被普通 strlen 截断。位置为 文件索引:16/行号:16。 */
+ * 所以 "A\0B" 不会被普通 strlen 截断。位置为 语句:1/文件索引:15/行号:16。 */
 enum {
     T_ID=256,T_NUM,T_UNUM,T_STR,T_NL,T_EQ,T_NE,T_LE,T_GE,T_SHL,T_SHR,
     T_AND,T_OR,T_INC,T_DEC,T_ARROW,T_ADDSET,T_SUBSET,T_MULSET,T_DIVSET,
@@ -70,7 +72,7 @@ typedef struct { int k,v,where; } Tok;
 typedef struct { char *source;
     int offset,line,file,comment; } Lexer;
 typedef struct { char path[64];
-    int source,size; } Source;
+    int source,size,once; } Source;
 typedef struct { int name,first,count,argc,active,variadic;
     int params[MACRO_ARGS]; } Macro;
 typedef struct { int parent,active,taken,otherwise; } Conditional;
@@ -94,8 +96,8 @@ typedef struct { int offset,kind,symbol,addend; } Fix;
 
 static char *pool,*source_arena;
 static int pool_used,source_used,identifiers[IDENT_MAX],identifier_count;
-static Source sources[FILE_MAX];
-static int source_count;
+static Source *sources;
+static int source_count,source_capacity;
 static Tok *tokens;
 static int token_count,position,error_position;
 static Macro macros[MACRO_MAX];
@@ -106,7 +108,7 @@ static Tok macro_arguments[DEPTH_MAX][MACRO_ARGS][MACRO_ARG_TOKENS];
 static int macro_arg_lengths[DEPTH_MAX][MACRO_ARGS];
 static Conditional conditions[128];
 static int condition_count;
-static int line_ends[DEPTH_MAX][LINE_MAX],source_once[FILE_MAX],macro_busy[MACRO_MAX];
+static int line_ends[DEPTH_MAX][LINE_MAX],macro_busy[MACRO_MAX];
 static Tok replacements[DEPTH_MAX][LINE_MAX],condition_tokens[LINE_MAX];
 static Tok raw_chunk[16384];
 static int raw_used;
@@ -164,6 +166,8 @@ static int scl_path_same(const char *a,const char *b);
 static void finish_scl(const char *output);
 static void finish_dynamic(const char *output);
 
+static void workspace_release(void);
+
 static void fatal(const char *reason)
 {
     /* 报错后立即 EXIT，任何阶段都不会再提交输出文件；旧的成功文件
@@ -184,6 +188,8 @@ static void fatal(const char *reason)
     sc_puts(diagnostic);
 #endif
     build_view_result(diagnostic,1);
+    /* 路径和字符串借用直到诊断结束才失效；OOM同样归还旧拥有表。 */
+    workspace_release();
     sc_exit(1);
     for(;;) sc_yield();
 }
@@ -207,8 +213,10 @@ static void capacity_fatal(const char *area,u32 used,u32 need,u32 limit)
 }
 static void workspace_release(void)
 {
-    /* 只有完整finish/map/log之后才走成功释放。source/file的递归Lexer、
-     * token池与字符串offset此前都有借用；不在PP/parse内部搬或释放。 */
+    /* 成功在finish/map/log之后，fatal在诊断最后借用之后；可重复清理，
+     * 不搬仍被递归Lexer或字符串offset借用的正文工作区。 */
+    if(sources){sc_free(sources);sources=0;}
+    source_count=0;source_capacity=0;
     if(code){sc_free(code);code=0;}
     if(tokens){sc_free(tokens);tokens=0;}
     if(pool){sc_free(pool);pool=0;}
@@ -228,6 +236,21 @@ static void workspace_acquire(void)
 failed:
     /* OOM在第一个失败处停止；既有候选先归还，不再申请后面的更大区。 */
     workspace_release();fatal("compiler workspace allocation failed (source/token/pool/code)");
+}
+static void source_reserve(void)
+{
+    if(source_count<source_capacity)return;
+    if(source_count>=SOURCE_INDEX_LIMIT)capacity_fatal("source index",(u32)source_count,1u,SOURCE_INDEX_LIMIT);
+    int capacity=source_capacity?source_capacity*2:16;
+    if(capacity>SOURCE_INDEX_LIMIT)capacity=SOURCE_INDEX_LIMIT;
+    if((u32)capacity>0x7FFFFFFFu/(u32)sizeof(Source))fatal("source metadata byte size overflow");
+    Source *memory=sc_alloc((u32)capacity*(u32)sizeof(Source));
+    if(!memory)fatal("source metadata allocation failed");
+    /* 先取得候选才替换拥有者。仅搬元数据，Lexer仍借稳定arena和索引；
+     * pp_include已在load_source前复制当前路径，__FILE__另存字符串池。 */
+    for(int i=0;i<source_count;i++)memory[i]=sources[i];
+    if(sources)sc_free(sources);
+    sources=memory;source_capacity=capacity;
 }
 static int text_size(int at) { return *(int *)(pool+at-4); }
 static char *spelling(int at) { return pool+at; }

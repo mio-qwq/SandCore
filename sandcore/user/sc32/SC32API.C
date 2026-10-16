@@ -1,15 +1,21 @@
 /* 每个函数正文仅在运行期独立SC32API.SCL中出现，不复制进应用SCX。
  * 单翻译单元满足当前SCCC工具链；各片段仍按系统对象职责分开。 */
 static void sc32_gui_finalize(void);
+static void sc32_auth_finalize(void);
+static void sc32_image_finalize(void);
 #include "sc32_bridge.c"
 #include "sc32_support.c"
 #include "sc32_system.c"
 #include "sc32_process.c"
 #include "sc32_path.c"
 #include "sc32_objects.c"
+#include "../authapi/sc32_auth.c"
 #include "sc32_file.c"
 #include "../pathapi/path_query.c"
 #include "../wallapi/sc32_wall.c"
+#include "../audioapi/sc32_audio.c"
+#include "../imageapi/sc32_image.c"
+#include "sc32_capture_api.c"
 #include "../guiapi/sc32_gui.c"
 #include "../guiapi/sc32_popup.c"
 #include "../fontapi/sc32_font.c"
@@ -19,4 +25,8 @@ static void sc32_gui_finalize(void);
 #include "../hostapi/sc32_launch.c"
 
 #include "../leaseapi/leaseapi.c"
+#include "../configapi/sc32_replace.c"
+#include "../configapi/sc32_config.c"
 #include "../debugapi/sc32_debug.c"
+
+#include "sc32_terminal_api.c"

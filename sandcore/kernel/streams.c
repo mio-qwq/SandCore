@@ -13,7 +13,7 @@
 #include "ata.h"
 #define FD_MAX 16
 #define PIPE_SIZE 4096u
-enum { END_FILE=1,END_REPLACE,END_PIPE,END_SERIAL,END_TTY,END_NULL,END_MEMORY };
+enum { END_FILE=1,END_REPLACE,END_PIPE,END_SERIAL,END_TTY,END_NULL,END_MEMORY,END_PTY_MASTER,END_PTY_SLAVE };
 typedef struct descriptor descriptor_t;
 typedef struct {
     u32 refs,type,position,generation,token,controls,event,eof,key_head,key_tail;
@@ -35,7 +35,7 @@ static objpool_t endpoint_pool,pipe_pool,job_pool,native_pool;
 #define ENDPOINT(index) (*(endpoint_t *)objpool_get(&endpoint_pool,index))
 #define PIPE(index) (*(pipe_t *)objpool_get(&pipe_pool,index))
 typedef struct {descriptor_t fds[FD_MAX];char arguments[1024];int jobs_head,owned_job,terminal_head,stop_phase,native_head;
-    u32 standard_refs[3];} stream_task_t;
+    u32 standard_refs[3];descriptor_t control_terminal;} stream_task_t;
 #define STREAM_CONTEXT(pid) (*(stream_task_t *)task_data(pid,TASK_DATA_STREAMS))
 u32 streams_task_bytes(void){return sizeof(stream_task_t);}
 
@@ -74,6 +74,7 @@ void streams_init(void)
         || objpool_init(&job_pool,sizeof(job_t),0) || objpool_init(&native_pool,sizeof(native_reference_t),0))panic("STREAM MEMORY",0);
     for(int pid=task_next(-1);pid>=0;pid=task_next(pid)){
         STREAM_CONTEXT(pid).jobs_head=-1;STREAM_CONTEXT(pid).owned_job=-1;
+        STREAM_CONTEXT(pid).control_terminal=(descriptor_t){-1,0};
         STREAM_CONTEXT(pid).terminal_head=STREAM_CONTEXT(pid).native_head=-1;
         for(int fd=0;fd<FD_MAX;fd++)STREAM_CONTEXT(pid).fds[fd].endpoint=-1;
     }
@@ -104,6 +105,7 @@ static void terminal_unlink(endpoint_t *e)
     }
     e->generation=0;e->owner_previous=e->owner_next=-1;
 }
+#include "streams_pty_core.inc"
 static void reference(descriptor_t *d,int add)
 {
     if(d->endpoint<0)return;
@@ -127,10 +129,11 @@ static void reference(descriptor_t *d,int add)
         if(d->direction&STREAM_READ){if(add)p->readers++;else p->readers--;}
         if(d->direction&STREAM_WRITE){if(add)p->writers++;else p->writers--;}
     }
+    pty_reference(e,d,add);
     if(!e->refs && e->type==END_REPLACE && e->token)fs_stream_abort(e->owner,e->token);
     if(!e->refs && e->type==END_MEMORY && e->pages){pframe_free_run(e->memory,e->pages);e->memory=e->bytes=e->pages=0;}
     if(!e->refs){
-        events_remove(e);terminal_unlink(e);if(serial_endpoint==e->index)serial_endpoint=-1;
+        events_remove(e);terminal_unlink(e);pty_endpoint_release(e);if(serial_endpoint==e->index)serial_endpoint=-1;
         if(e->type==END_PIPE)objpool_release(&pipe_pool,e->pipe);objpool_release(&endpoint_pool,d->endpoint);
     }else events_changed(e);
 }
@@ -145,6 +148,7 @@ void streams_spawn(int pid,int parent)
 {
     for(int fd=0;fd<FD_MAX;fd++)STREAM_CONTEXT(pid).fds[fd]=(descriptor_t){-1,0};
     STREAM_CONTEXT(pid).arguments[0]=0;
+    STREAM_CONTEXT(pid).control_terminal=(descriptor_t){-1,0};
     STREAM_CONTEXT(pid).jobs_head=STREAM_CONTEXT(pid).owned_job=-1;
     STREAM_CONTEXT(pid).terminal_head=STREAM_CONTEXT(pid).native_head=-1;
     for(int i=0;i<3;i++)STREAM_CONTEXT(pid).standard_refs[i]=0;
@@ -152,6 +156,9 @@ void streams_spawn(int pid,int parent)
         for(int fd=0;fd<3;fd++)if(endpoint(parent,fd)){
             descriptor_t d=STREAM_CONTEXT(parent).fds[fd];attach(pid,fd,d.endpoint,d.direction);
         }
+    if(parent>0 && task_owned(parent) && auth_uid(pid)==auth_uid(parent)
+        && session_task(pid)==session_task(parent) && STREAM_CONTEXT(parent).control_terminal.endpoint>=0)
+        pty_task_attach(pid,STREAM_CONTEXT(parent).control_terminal.endpoint);
 }
 static job_t *owned_job(int parent,u32 token)
 {
@@ -178,6 +185,7 @@ void streams_stop(int pid,int code)
         native_reference_t *r=objpool_get(&native_pool,STREAM_CONTEXT(pid).native_head);
         if(!r)break;streams_native_close(pid,r->token);
     }
+    pty_task_close(pid);
     while(STREAM_CONTEXT(pid).terminal_head>=0){
         endpoint_t *e=&ENDPOINT(STREAM_CONTEXT(pid).terminal_head);terminal_unlink(e);events_changed(e);
     }
@@ -201,6 +209,7 @@ int streams_stop_step(int pid,int code)
     if(!c->stop_phase){
         if(c->native_head>=0){native_reference_t *r=objpool_get(&native_pool,c->native_head);
             if(r)streams_native_close(pid,r->token);else c->native_head=-1;return 0;}
+        if(c->control_terminal.endpoint>=0){pty_task_close(pid);return 0;}
         if(c->terminal_head>=0){endpoint_t *e=&ENDPOINT(c->terminal_head);terminal_unlink(e);events_changed(e);return 0;}
         for(int fd=0;fd<FD_MAX;fd++)streams_close(pid,fd,0);
         c->stop_phase=1;return 0;
@@ -225,7 +234,9 @@ int streams_open(int pid,const char *path,u32 mode,u32 capacity)
 {
     if((mode!=STREAM_READ && mode!=STREAM_WRITE && mode!=STREAM_NULL && mode!=STREAM_TERMINAL) || !path)return -1;
     if(mode==STREAM_TERMINAL){int fd=vacant(pid,3);if(fd<0)return fd;
-        for(int source=0;source<3;source++){endpoint_t *e=endpoint(pid,source);if(e && (e->type==END_TTY || e->type==END_SERIAL)){
+        int control=STREAM_CONTEXT(pid).control_terminal.endpoint;endpoint_t *ce=objpool_get(&endpoint_pool,control);
+        if(ce && ce->type==END_PTY_SLAVE && pty_access(pid,pty_of(ce))){attach(pid,fd,control,STREAM_READ|STREAM_WRITE);return fd;}
+        for(int source=0;source<3;source++){endpoint_t *e=endpoint(pid,source);if(e && (e->type==END_TTY || e->type==END_SERIAL || (e->type==END_PTY_SLAVE && pty_access(pid,pty_of(e))))){
                 descriptor_t d=STREAM_CONTEXT(pid).fds[source];attach(pid,fd,d.endpoint,STREAM_READ|STREAM_WRITE);return fd;}}return -1;}
     int fd=vacant(pid,3);if(fd<0)return fd;int index=allocate_endpoint();if(index<0)return index;
     endpoint_t *e=&ENDPOINT(index);e->owner=pid;
@@ -291,7 +302,8 @@ static void tty_poll(endpoint_t *e)
 }
 int streams_event(int pid,int fd,u32 action)
 {
-    endpoint_t *e=endpoint(pid,fd);if(!e || (e->type!=END_TTY && e->type!=END_SERIAL) || action>2)return -1;
+    endpoint_t *e=endpoint(pid,fd);if(!e || (e->type!=END_TTY && e->type!=END_SERIAL && e->type!=END_PTY_SLAVE) || action>2)return -1;
+    if(e->type==END_PTY_SLAVE && !pty_access(pid,pty_of(e)))return -5;
     descriptor_t *d=&STREAM_CONTEXT(pid).fds[fd];
     if(action==1){if(d->controls==65535)return -4;d->controls++;e->controls++;}
     else if(action==2){if(!d->controls)return -1;d->controls--;e->controls--;}
@@ -301,6 +313,7 @@ static int endpoint_read(int pid,endpoint_t *e,u32 direction,void *data,u32 leng
 {
     if(!e || !(direction&STREAM_READ) || length>65536)return -1;
     if(!length)return 0;u8 *out=(u8 *)data;
+    if(pty_of(e))return pty_read(pid,e,data,length);
     if(e->type==END_NULL)return 0;
     if(e->type==END_MEMORY){if(e->position>=e->bytes)return 0;u32 count=e->bytes-e->position;if(count>length)count=length;
         for(u32 i=0;i<count;i++)out[i]=((const u8 *)e->memory)[e->position+i];e->position+=count;return (int)count;}
@@ -335,6 +348,7 @@ static int endpoint_write(int pid,endpoint_t *e,u32 direction,const void *data,u
 {
     if(!e || !(direction&STREAM_WRITE) || length>65536)return -1;
     const u8 *in=(const u8 *)data;if(!length)return 0;
+    if(pty_of(e))return pty_write(pid,e,data,length);
     if(e->type==END_NULL)return (int)length;
     if(e->type==END_REPLACE){
         /* 父Shell保留输出事务，子任务只能顺序写正文；commit仍只认
@@ -406,6 +420,7 @@ int streams_tty(int pid,int window)
 int streams_terminal_info(int pid,int fd,u32 out[8])
 {
     endpoint_t *e=endpoint(pid,fd);if(!e)return -1;clear(out,32);out[0]=1;out[1]=e->type;
+    if(pty_of(e))return pty_old_info(pid,e,out);
     if(e->type==END_SERIAL){if(e->generation!=serial_session)return -5;out[2]=80;out[3]=24;out[4]=3;}
     else if(e->type==END_TTY){int columns,rows;if(e->generation!=task_generation(e->owner) || wm_terminal_size(e->owner,e->window,&columns,&rows)<0)return -8;
         out[2]=(u32)columns;out[3]=(u32)rows;out[4]=3;out[5]=(u32)e->window;}
@@ -414,6 +429,7 @@ int streams_terminal_info(int pid,int fd,u32 out[8])
 int streams_terminal_clear(int pid,int fd)
 {
     endpoint_t *e=endpoint(pid,fd);if(!e || !(STREAM_CONTEXT(pid).fds[fd].direction&STREAM_WRITE))return -1;e->utf8_used=0;
+    if(pty_of(e))return pty_clear(pid,e);
     if(e->type==END_SERIAL){if(e->generation!=serial_session)return -5;int result=management_console_write_atomic("\033[2J\033[H",7);return result==7?0:result;}
     if(e->type!=END_TTY || e->generation!=task_generation(e->owner))return -1;return wm_terminal_control(e->owner,e->window,1);
 }
@@ -438,9 +454,12 @@ void streams_login_terminal(int parent,int child)
      * 写入事务。SERIAL终端是连接能力；SYSTEM权限仍由独立realm核对。 */
     for(int fd=0;fd<3;fd++){
         endpoint_t *e=endpoint(parent,fd);if(!e)continue;
-        if(e->type!=END_SERIAL && e->type!=END_TTY && e->type!=END_PIPE && e->type!=END_NULL)continue;
+        if(e->type!=END_SERIAL && e->type!=END_TTY && e->type!=END_PIPE && e->type!=END_NULL && e->type!=END_PTY_SLAVE)continue;
+        if(e->type==END_PTY_SLAVE && !pty_access(child,pty_of(e)))continue;
         descriptor_t d=STREAM_CONTEXT(parent).fds[fd];attach(child,fd,d.endpoint,d.direction);
     }
+    if(session_task(parent)==session_task(child) && STREAM_CONTEXT(parent).control_terminal.endpoint>=0)
+        pty_task_attach(child,STREAM_CONTEXT(parent).control_terminal.endpoint);
 }
 int streams_serial_input(const void *data,u32 length)
 {
@@ -495,6 +514,7 @@ int streams_ready(int pid,int fd,u32 out[8])
     u32 readable=0,writable=0;int error=0;u32 eof=0;
     if(e->type==END_PIPE){pipe_t *p=&PIPE(e->pipe);readable=p->head-p->tail;writable=PIPE_SIZE-readable;
         eof=!p->writers;if(!p->readers)error=-7;}
+    else if(pty_of(e))pty_ready(pid,e,&readable,&writable,&eof,&error);
     else if(e->type==END_TTY){
         if(!e->generation || e->generation!=task_generation(e->owner) || !wm_terminal_owned(e->owner,e->window))error=-8;
         else{tty_poll(e);readable=e->key_head-e->key_tail;writable=256;eof=e->eof!=0;}
@@ -528,11 +548,10 @@ int streams_pipe_descriptors(int parent,const i32 fds[3])
         if(!e || e->type!=END_PIPE || !(STREAM_CONTEXT(parent).fds[fds[i]].direction&(i?STREAM_WRITE:STREAM_READ)))return 0;
     }return 1;
 }
-int streams_exec(int parent,const char *command,const i32 fds[3],u32 flags)
+static int streams_execute(int parent,const char *command,const descriptor_t targets[3],u32 flags)
 {
     if(flags&~1u)return -1; /* bit0=脱离终端，默认建立可等待作业 */
     if(!task_owned(parent) || job_counter==0x7FFFFFFFu)return -6;
-    for(int i=0;i<3;i++)if(fds[i]>=0 && !endpoint(parent,fds[i]))return -1;
     char file[64],resolved[64];u32 n=0;while(*command==' ')command++;
     while(command[n] && command[n]!=' '){if(n==63)return -1;file[n]=command[n];n++;}file[n]=0;
     const char *args=command+n;while(*args==' ')args++;if(size(args)>1023)return -1;
@@ -563,11 +582,19 @@ int streams_exec(int parent,const char *command,const i32 fds[3],u32 flags)
     streams_set_arguments(child,args);
     for(int i=0;i<3;i++){
         streams_close(child,i,0);
-        if(!(flags&1) && fds[i]>=0){descriptor_t d=STREAM_CONTEXT(parent).fds[fds[i]];attach(child,i,d.endpoint,d.direction);}
+        if(!(flags&1) && targets[i].endpoint>=0)attach(child,i,targets[i].endpoint,targets[i].direction);
     }
     *job=(job_t){(u32)token,task_generation(parent),task_generation(child),parent,child,0,child,-1,STREAM_CONTEXT(parent).jobs_head};
     if(job->parent_next>=0)((job_t *)objpool_get(&job_pool,job->parent_next))->parent_prev=token;
     STREAM_CONTEXT(parent).jobs_head=token;STREAM_CONTEXT(child).owned_job=token;return token;
+}
+int streams_exec(int parent,const char *command,const i32 fds[3],u32 flags)
+{
+    if(flags&~1u || !task_owned(parent))return -1;
+    descriptor_t targets[3];clear(targets,sizeof(targets));
+    for(int i=0;i<3;i++){targets[i].endpoint=-1;
+        if(fds[i]>=0){if(!endpoint(parent,fds[i]))return -1;targets[i]=STREAM_CONTEXT(parent).fds[fds[i]];}}
+    return streams_execute(parent,command,targets,flags);
 }
 #include "streams_launch.inc"
 
@@ -712,6 +739,7 @@ int streams_native_query(int pid,u32 token,u32 out[8])
         u32 info[4];int error=fs_stream_snapshot(e->owner,e->token,info);if(error)return error;
         out[2]=out[3]=info[0];out[4]=info[2];out[6]=2|8;out[7]=info[3]?(u32)-1:0;
     }
+    else if(pty_of(e)){if(!pty_access(pid,pty_of(e)))return -5;}
     else if(e->type==END_TTY){if(e->generation!=task_generation(e->owner) || !wm_terminal_owned(e->owner,e->window))return -8;}
     else if(e->type==END_SERIAL){if(e->generation!=serial_session)return -5;}
     out[6]|=4;
@@ -737,3 +765,7 @@ int streams_native_flush(int pid,u32 token)
     if(e->type==END_FILE)return ata_flush()?-1:0;
     return 0;
 }
+
+#include "streams_capture.inc"
+
+#include "streams_pty_native.inc"

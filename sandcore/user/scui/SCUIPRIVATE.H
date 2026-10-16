@@ -1,6 +1,7 @@
 #ifndef SANDCORE_SCUIPRIVATE_H
 #define SANDCORE_SCUIPRIVATE_H
 #include "../SCUI.H"
+#include "../SCUISECRET.H"
 #include "../SC32FONT.H"
 #include "../SC32BROKER.H"
 #include "../SC32POPUP.H"
@@ -79,7 +80,7 @@ struct UiNode {
     ScUiRect rectangle,clip,child_clip,viewport_rectangle;ScUiSize preferred;ScUiLayoutDesc layout;
     ScString *text,*accessible_name,*tooltip;UiValue value;ScUiIcon *icon;ScUiMenu *menu;ScU32 menu_hot,menu_pressed;
     void *context;ScDropProc context_drop;UiClassDef *custom;
-    UiRoot *window;UiView *view;void *control;UiTimer *timers;
+    UiRoot *window;UiView *view;void *control,*secret;UiTimer *timers;
     ScWideCounter scroll_x,scroll_y,content_width,content_height;
     ScU32 scroll_step_x,scroll_step_y;ScUiNode label_target;
 };
@@ -126,6 +127,21 @@ typedef struct {ScString *text;ScU32 stamp;} UiCell;
 
 static int ui_stopping,ui_quiet,ui_finalizing;
 static UiObject *ui_objects;
+
+static int ui_subtree_contains(UiNode *,UiNode *);
+static ScStatus ui_secret_init(UiNode *);
+static void ui_secret_destroy(UiNode *,int);
+static ScStatus ui_secret_measure(UiNode *,const ScUiSize *,ScUiSize *);
+static ScStatus ui_secret_paint(UiNode *,ScUiPainter *);
+static ScStatus ui_secret_event(UiNode *,const ScUiEvent *);
+static ScStatus ui_secret_dispatch(UiNode *,ScUiEvent *);
+static void ui_secret_root_clear(UiNode *);
+static void ui_secret_subtree_clear(UiNode *);
+static void ui_secret_focus_changed(ScUiContext *,UiNode *,ScUiNode);
+static void ui_secret_event_finished(ScUiContext *,UiNode *,const ScUiEvent *);
+static ScStatus ui_secret_submit_command(ScUiContext *,UiNode *);
+static void ui_secret_wipe(void *,ScU32);
+
 static ScStatus ui_input(const void *,ScU32);
 static ScStatus ui_output(void *,ScU32);
 static ScStatus ui_object_new(ScU32,ScU32,void (*)(UiObject *,int),void **);
@@ -154,6 +170,7 @@ static ScStatus ui_node_new(ScUiContext *,ScU32,UiNode *,UiNode **);
 static void ui_node_hold(UiNode *);
 static void ui_node_leave(UiNode *);
 static void ui_node_retire(UiNode *);
+static int ui_tab_forget(UiNode *,ScUiNode);
 static void ui_nodes_collect(ScUiContext *);
 static ScStatus ui_node_text(UiNode *,const ScUiText *);
 static void ui_node_damage(UiNode *);

@@ -2,6 +2,7 @@
 #define SANDCORE_SCSHELLPRIVATE_H
 #include "SCSHELL.H"
 #include "SCSHELLWIRE.H"
+#include "SC32REPLACE.H"
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>

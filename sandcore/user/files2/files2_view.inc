@@ -36,6 +36,12 @@ static ScStatus f2_menu_add(ScUiMenu *menu,const char *label,ScU32 command,ScUiM
     ScUiMenuItem item;memset(&item,0,sizeof(item));item.size=sizeof(item);item.version=1;
     item.command=command;item.label=f2_text(label);item.submenu=submenu;item.flags=flags;
     item.shortcut.size=sizeof(item.shortcut);item.shortcut.version=1;item.shortcut.key=key;item.shortcut.modifiers=modifiers;
+    if(command && key){
+        /* 菜单中的键帽是描述，键盘分派还须登记同一公开Command。 */
+        ScUiCommandDesc binding;memset(&binding,0,sizeof(binding));binding.size=sizeof(binding);binding.version=1;
+        binding.command=command;binding.flags=flags&~SC_UI_MENU_SEPARATOR;binding.label=item.label;binding.shortcut=item.shortcut;
+        ScStatus status=ScUiCommandSet(f2.ui,&binding);if(status<0)return status;
+    }
     ScU32 id;return ScUiMenuInsert(menu,0,&item,&id);
 }
 static ScStatus f2_places_refresh(void)

@@ -189,6 +189,9 @@ static ScStatus sw_target(SwItem *item)
     ScStatus status=ScPathQuery(item->destination,&info);
     if(status!=0 && status!=SC32_E_NOT_FOUND)return status;
     int exists=!status;
+    /* caller明确观察缺名，不能让默认REPLACE把后来出现的对象覆盖。
+     * 自己已经持久发布的root可沿原恢复路径收尾，不把它当外来目标。 */
+    if(item==item->root->root_item && !item->published && (item->root->flags&SHW_ITEM_EXPECT_ABSENT) && exists)return SC32_E_STALE;
     if(item->decision_check && (exists?info.generation:0)!=item->decision_expected_destination)return SC32_E_STALE;
     if(item==item->root->root_item && !item->retry && item->root->expected_destination_revision
        && (!exists || info.generation!=item->root->expected_destination_revision || info.kind!=item->root->expected_destination_kind))return SC32_E_STALE;

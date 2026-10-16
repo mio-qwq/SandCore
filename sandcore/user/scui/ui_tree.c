@@ -153,7 +153,7 @@ static ScStatus ui_node_new(ScUiContext *c,ScU32 kind,UiNode *parent,UiNode **ou
         custom=*(UiClassDef * const *)e.value;
         if(custom->retired)return SC_UI_E_STALE;
     }
-    else if(!kind || kind>UI_KIND_POPUP)return SC_UI_E_INVALID;
+    else if(!kind || (kind>UI_KIND_POPUP && kind!=SC_UI_SECRET))return SC_UI_E_INVALID;
     n=(UiNode *)calloc(1,sizeof(*n));
     if(!n)return SC_UI_E_MEMORY;
     n->owner=c;
@@ -277,6 +277,7 @@ mark_next:
     while(work){UiNode *next=work->destroy_next;
         work->destroy_next=0;
         ui_node_destroy_notice(work);
+        ui_tab_forget(work->parent,work->id);
         ui_detach_node(work);
         if(!work->depth && (work->private_flags&UI_NODE_DESTROY_SENT))ui_node_clear(work);
         work=next;
@@ -293,6 +294,7 @@ static ScStatus ui_node_text(UiNode *n,const ScUiText *text)
     ScUiEvent e;
     ScUiText candidate;
     ScU32 revision=n->value_revision;
+    if(n->kind==SC_UI_SECRET)return SC_UI_E_NOT_SUPPORTED;
     if(n->value_revision==UINT_MAX || n->owner->revision==UINT_MAX)return SC_UI_E_RANGE;
     s=ui_text_copy(text,&next);
     if(s<0)return ui_cause(n->owner,s,UI_OP_NODE,n->id);
@@ -331,6 +333,7 @@ ScStatus ScUiWidgetCreate(ScUiContext *c,const ScUiWidgetDesc *description,ScUiN
     if(s<0 || !out)return s<0?s:SC_UI_E_INVALID;
     for(i=0;i<4;i++)if(description->reserved[i])return SC_UI_E_INVALID;
     if(description->kind==SC_UI_WINDOW || description->kind==UI_KIND_POPUP)return SC_UI_E_INVALID;
+    if(description->kind==SC_UI_SECRET && description->text.bytes)return SC_UI_E_NOT_SUPPORTED;
     s=ui_object_enter((UiObject *)c,UI_CONTEXT);
     if(s<0)return s;
     parent=ui_node(c,description->parent);
@@ -539,6 +542,7 @@ ScStatus ScUiWindowShow(ScUiContext *c,ScUiNode id,ScU32 action)
         s=ScWindowControl(r->window->window,action,&info);
         if(s==0){r->window->information=info;
             r->window->visible=(info.state&SC32_WINDOW_VISIBLE)!=0;
+            if(!r->window->visible || (info.state&SC32_WINDOW_MINIMIZED))ui_secret_root_clear(r);
             ui_timers_visibility(c,r->id,r->window->visible);
             ui_drag_state(r);
             }
@@ -593,6 +597,8 @@ ScStatus ScUiNodeMove(ScUiContext *c,ScUiNode id,ScUiNode parent_id,ScUiNode bef
                 }
             ui_detach_node(n);
             ui_append_node(parent,n,before);
+            if(old_parent!=parent && ui_tab_forget(old_parent,n->id))n->state|=SC_UI_VISIBLE;
+            if((n->private_flags|parent->private_flags)&UI_NODE_RETIRED){s=SC_UI_E_CANCELLED;goto move_done;}
             if(old_id!=parent->root){UiNode *current=n;
                 while(current){current->root=parent->root;
                     if(current->first_child){current=current->first_child;
@@ -636,7 +642,8 @@ ScStatus ScUiNodeSetState(ScUiContext *c,ScUiNode id,ScU32 mask,ScU32 value)
             ui_node_layout_dirty(n);
             }
         r=ui_root(c,id);
-        if((n->effective&(SC_UI_VISIBLE|SC_UI_ENABLED))!=(SC_UI_VISIBLE|SC_UI_ENABLED)){ui_input_subtree(n);
+        if((n->effective&(SC_UI_VISIBLE|SC_UI_ENABLED))!=(SC_UI_VISIBLE|SC_UI_ENABLED)){ui_secret_subtree_clear(n);
+            ui_input_subtree(n);
             if(r && r->window && !(r->private_flags&UI_NODE_RETIRED) && !r->window->focus)ScUiFocusNext(c,r->id,1);
             }
         s=(n->private_flags&UI_NODE_RETIRED)?SC_UI_E_CANCELLED:SC_UI_OK;
@@ -667,6 +674,7 @@ ScStatus ScUiNodeCopyText(ScUiContext *c,ScUiNode id,ScString **out)
     ScUiText text;
     ScStatus s;
     if(!n || !out)return n?SC_UI_E_INVALID:SC_UI_E_STALE;
+    if(n->kind==SC_UI_SECRET)return SC_UI_E_NOT_SUPPORTED;
     if(n->kind==SC_UI_EDIT || n->kind==SC_UI_TEXTBOX || n->kind==SC_UI_SPINBOX || (n->kind==SC_UI_LABEL && (n->flags&SC_UI_LABEL_SELECTABLE)))return ui_cause(c,ui_controls_copy_text(n,out),UI_OP_NODE,id);
     ui_text_view(n->text,&text);
     s=ScStringCreate(text.data,text.bytes,out);
@@ -688,6 +696,7 @@ ScStatus ScUiNodeSetValue(ScUiContext *c,ScUiNode id,const ScValue *value)
     if(n->value_revision==UINT_MAX || c->revision==UINT_MAX){s=SC_UI_E_RANGE;
         goto done;
         }
+    if(n->kind==SC_UI_SECRET){s=SC_UI_E_NOT_SUPPORTED;goto done;}
     s=ui_value_copy(value,&next);
     if(s<0)goto done;
     revision=n->value_revision;
@@ -727,6 +736,7 @@ ScStatus ScUiNodeGetValue(ScUiContext *c,ScUiNode id,ScValue *out)
     if(s<0)return s;
     n=ui_node(c,id);
     if(!n)return SC_UI_E_STALE;
+    if(n->kind==SC_UI_SECRET)return SC_UI_E_NOT_SUPPORTED;
     memcpy(out,&n->value.value,sizeof(*out));
     return SC_UI_OK;
     }

@@ -17,6 +17,7 @@
 #include "task_store.h"
 #include "scl_boot.h"
 #include "sc32_core.h"
+#include "sc32_image.h"
 #include "sc32_debug.h"
 #include "sc32_host.h"
 #include "sc32_file.h"
@@ -650,6 +651,7 @@ void syscall_c_common(u32 vec, u32 *frame)
 {
     (void)vec;
     u32 call=frame[11];int defer=0;
+    if(!auth_login_syscall_allowed(current,frame)){frame[11]=(u32)(call==SYS_SC32?SC32_E_ACCESS:-5);return;}
     if(current>0 && !task_record(current)->visibility_aware){
         /* 先排除坏用户指针；旧接口的非法输入仍立即给出原错误。
          * 句柄/格式不属于本人时不等，随后原分发器保留旧拒绝语义。 */
@@ -727,6 +729,8 @@ void syscall_c_common(u32 vec, u32 *frame)
             frame[11]=(u32)sc32_host_call(current,frame[8],frame[10],frame[9]);
         else if(frame[8]>=0x900u && frame[8]<0x920u)
             frame[11]=(u32)sc32_debug_call(current,frame[8],frame[10],frame[9]);
+        else if(frame[8]>=0xa00u && frame[8]<=0xa04u)
+            frame[11]=(u32)sc32_image_call(current,frame[8],frame[10],frame[9]);
         else frame[11]=(u32)sc32_core_call(current,frame[8],frame[10],frame[9]);
         break;
     case SYS_STATUS:
@@ -1316,6 +1320,7 @@ u8 *task_loader_stage(u32 bytes)
 }
 
 #include "shell_issue.inc"
+#include "login_issue.inc"
 
 int task_exec_scx(const char *path)
 {
@@ -1360,6 +1365,7 @@ int task_exec_scx_parts(const char *filename,const char *arguments)
      * 载荷，既保留旧装载上限，也支持“最大载荷+独立图标”大文件。 */
     if(fs_read_at(filename,scx_stage+36,load_size,36)!=(int)load_size)return -1;
     if(auth_launch_issued_shell() && (icon_length || shell_issue_verify(scx_stage,36u+load_size)))return -5;
+    if(auth_launch_issued_login() && (icon_length || login_issue_verify(scx_stage,36u+load_size)))return -5;
 
     u32 pd = paging_new_task_dir();
     if (!pd) return -4;

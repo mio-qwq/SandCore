@@ -19,6 +19,7 @@
 #include "io.h"
 #include "ata.h"
 #include "fs.h"
+#include "../user/configapi/SC32REPLACEWIRE.H"
 #include "memory.h"
 #include "auth.h"
 #include "task.h"
@@ -164,7 +165,8 @@ static int protected(const char *name)
     /* 系统SCL是用户态代码，但启动来源必须稳定。root绕过普通rw
      * 不等于可替换系统库；宿主发行包与可信零环更新沿原内部接口。 */
     || same(name,"SYS/LIB") || child(name,"SYS/LIB")
-    || same(name,"SYS/SHELL") || child(name,"SYS/SHELL"); }
+    || same(name,"SYS/SHELL") || child(name,"SYS/SHELL")
+    || same(name,"SYS/UI/UAX15_1.SCU"); }
 static int module_path(const char *name)
 {return same(name,"SYS/MOD") || child(name,"SYS/MOD");}
 int fs_user_mutable(const char *path,int descendants)
@@ -654,7 +656,8 @@ int fs_access_identity(const char *path,int uid,int gid,u32 access)
     return permission(uid,gid,dirents[index].uid,dirents[index].gid,dirents[index].mode,access&3);
 }
 int fs_access(int pid,const char *path,u32 access)
-{return fs_access_identity(path,auth_subject_uid(pid),auth_subject_gid(pid),access);}
+{if(auth_login_resource_access(pid,path,access))return 1;
+ return fs_access_identity(path,auth_subject_uid(pid),auth_subject_gid(pid),access);}
 int fs_access_parent(int pid,const char *path)
 {
     char name[64];int n=fs_normalize(path,name);if(n<=0 || version<5)return 0;

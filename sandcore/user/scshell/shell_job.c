@@ -25,7 +25,7 @@ static ScStatus sh_file_items(const ScShellFileItem *items,ScU32 count,ScShellFi
     for(i=0;i<count;++i) {
         s=sh_record(items+i,sizeof(*items));
         if(s<0)goto fail;
-        if(!items[i].item||(items[i].kind!=SC32_PATH_FILE&&items[i].kind!=SC32_PATH_DIRECTORY)||items[i].flags&~3u||items[i].reserved[0]||items[i].reserved[1]|| ((items[i].flags&SC_SHELL_ITEM_EXPECT_SOURCE)?!items[i].expected_source_revision:items[i].expected_source_revision!=0)|| ((items[i].flags&SC_SHELL_ITEM_EXPECT_DESTINATION)?(!items[i].expected_destination_revision||(items[i].expected_destination_kind!=1&&items[i].expected_destination_kind!=2)):(items[i].expected_destination_revision||items[i].expected_destination_kind))) {
+        if(!items[i].item||(items[i].kind!=SC32_PATH_FILE&&items[i].kind!=SC32_PATH_DIRECTORY)||items[i].flags&~7u|| ((items[i].flags&4u) && (items[i].flags&SC_SHELL_ITEM_EXPECT_DESTINATION))||items[i].reserved[0]||items[i].reserved[1]|| ((items[i].flags&SC_SHELL_ITEM_EXPECT_SOURCE)?!items[i].expected_source_revision:items[i].expected_source_revision!=0)|| ((items[i].flags&SC_SHELL_ITEM_EXPECT_DESTINATION)?(!items[i].expected_destination_revision||(items[i].expected_destination_kind!=1&&items[i].expected_destination_kind!=2)):(items[i].expected_destination_revision||items[i].expected_destination_kind))) {
             s=SC_SHELL_E_INVALID;
             goto fail;
         }

@@ -1,0 +1,30 @@
+{
+  "status": "FROZEN_PREPARATION_ONLY_NOT_EXECUTED",
+  "files": [
+    {
+      "path": "flow_input.py",
+      "bytes": 2492,
+      "sha256": "2705cab6a8eb872a0dbb240ad2676dc04bfa0b72ed47b2bf86b3ae6bd00e52ae"
+    },
+    {
+      "path": "freeze.py",
+      "bytes": 5129,
+      "sha256": "7f03e02dcc6091b33dcd04c77b43487028eadbbc3cea88e1e309ecbab6683ea9"
+    },
+    {
+      "path": "GUI-FLOW.md",
+      "bytes": 13193,
+      "sha256": "f4ee921f73101da1468bb522cb6a90b09136835793ff106515a6c613224c8be0"
+    },
+    {
+      "path": "SOURCE-MAP.json",
+      "bytes": 9401,
+      "sha256": "2fe37ec473f2939f2272529ab3d4b22736f1d30fe4538be4ac9b8eab88958b54"
+    }
+  ],
+  "guest": false,
+  "build": false,
+  "main_modified": false,
+  "git_used": false,
+  "disk_copied": false
+}

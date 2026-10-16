@@ -1,0 +1,308 @@
+{
+  "version": 1,
+  "source": "build/m10a1/sanddata.img",
+  "source_sha256": "3db2e3cd9262343204e8c19af02847e98244732c5b5ad4397dd334be84fe7e64",
+  "apps": [
+    {
+      "id": "sandcore.files",
+      "label": "文件",
+      "modern": "/APPS/FILES2.SCX",
+      "legacy": "/APPS/FILES.SCX",
+      "icon": "@FILES",
+      "category": "系统",
+      "types": "directory"
+    },
+    {
+      "id": "sandcore.studio",
+      "label": "开发工作室",
+      "modern": "/APPS/STUDIO2.SCX",
+      "legacy": "/APPS/IDE.SCX",
+      "icon": "@STUDIO",
+      "category": "开发",
+      "types": "c h inc asm"
+    },
+    {
+      "id": "sandcore.debug",
+      "label": "调试器",
+      "modern": "/APPS/DEBUG2.SCX",
+      "legacy": "/APPS/DEBUGGER.SCX",
+      "icon": "@DEBUG",
+      "category": "开发",
+      "types": ""
+    },
+    {
+      "id": "sandcore.settings",
+      "label": "设置",
+      "modern": "/APPS/SETTINGS2.SCX",
+      "legacy": "/APPS/SETTINGS.SCX",
+      "icon": "@SETTINGS",
+      "category": "系统",
+      "types": ""
+    },
+    {
+      "id": "sandcore.notes",
+      "label": "笔记",
+      "modern": "/APPS/NOTES2.SCX",
+      "legacy": "/APPS/NOTE.SCX",
+      "icon": "@NOTE",
+      "category": "系统",
+      "types": "txt cfg log"
+    },
+    {
+      "id": "sandcore.canvas",
+      "label": "画板",
+      "modern": "/APPS/CANVAS2.SCX",
+      "legacy": "/APPS/CANVAS.SCX",
+      "icon": "@CANVAS",
+      "category": "系统",
+      "types": ""
+    },
+    {
+      "id": "sandcore.lens",
+      "label": "图片",
+      "modern": "/APPS/LENS2.SCX",
+      "legacy": "/APPS/LENS.SCX",
+      "icon": "@LENS",
+      "category": "系统",
+      "types": "scb bmp png jpg jpeg webp"
+    },
+    {
+      "id": "sandcore.monitor",
+      "label": "系统监视器",
+      "modern": "/APPS/MONITOR2.SCX",
+      "legacy": "/APPS/MONITOR.SCX",
+      "icon": "@MONITOR",
+      "category": "系统",
+      "types": ""
+    },
+    {
+      "id": "sandcore.calculator",
+      "label": "计算器",
+      "modern": "/APPS/CALC2.SCX",
+      "legacy": "/APPS/CALC.SCX",
+      "icon": "@CALC",
+      "category": "系统",
+      "types": ""
+    },
+    {
+      "id": "sandcore.terminal",
+      "label": "终端",
+      "modern": "/APPS/TERMINAL2.SCX",
+      "legacy": "/BIN/SH.SCX",
+      "icon": "@SHELL",
+      "category": "系统",
+      "types": ""
+    },
+    {
+      "id": "sandcore.palette",
+      "label": "调色板",
+      "modern": "/APPS/PALETTE2.SCX",
+      "legacy": "/APPS/PALETTE.SCX",
+      "icon": "@PALETTE",
+      "category": "系统",
+      "types": ""
+    },
+    {
+      "id": "sandcore.sound",
+      "label": "音频",
+      "modern": "/APPS/SOUND2.SCX",
+      "legacy": "/APPS/SOUND.SCX",
+      "icon": "@SOUND",
+      "category": "系统",
+      "types": "mp3 wav flac"
+    },
+    {
+      "id": "sandcore.session",
+      "label": "登录与会话",
+      "modern": "/APPS/SESSION2.SCX",
+      "legacy": "/APPS/SESSION.SCX",
+      "icon": "@SESSION",
+      "category": "系统",
+      "types": ""
+    },
+    {
+      "id": "sandcore.installer",
+      "label": "文件安装",
+      "modern": "/APPS/INSTALLER2.SCX",
+      "legacy": "",
+      "icon": "@FILES",
+      "category": "系统",
+      "types": ""
+    }
+  ],
+  "aliases": {
+    "/BIN/SHELL.SCX": 9
+  },
+  "files": [
+    {
+      "path": "desk/files.lnk",
+      "uid": 1000,
+      "gid": 1000,
+      "mode": 23,
+      "generation": 1,
+      "bytes": 28,
+      "sha256": "94fda020647551e733ae11b8449f84fd8ace3e9a4168268e5f0b722c32f8d7d3",
+      "data_base64": "RmlsZXMKYXBwcy9maWxlcy5zY3gKQEZJTEVTCg=="
+    },
+    {
+      "path": "desk/notes.lnk",
+      "uid": 1000,
+      "gid": 1000,
+      "mode": 23,
+      "generation": 1,
+      "bytes": 26,
+      "sha256": "99aa38412ed9460619bf50fd23c594b5c8a889eca0277e1fbcf38ee9f755a89d",
+      "data_base64": "Tm90ZXMKYXBwcy9ub3RlLnNjeApATk9URQo="
+    },
+    {
+      "path": "desk/palette.lnk",
+      "uid": 1000,
+      "gid": 1000,
+      "mode": 23,
+      "generation": 1,
+      "bytes": 34,
+      "sha256": "cb73d49455105b0eb6b152671d657f8774f1b77b88d7b71e15a1678863235b4e",
+      "data_base64": "UGFsZXR0ZQphcHBzL3BhbGV0dGUuc2N4CkBQQUxFVFRFCg=="
+    },
+    {
+      "path": "desk/shell.lnk",
+      "uid": 1000,
+      "gid": 1000,
+      "mode": 23,
+      "generation": 9,
+      "bytes": 24,
+      "sha256": "9277deeecacf89f29e32b0451665d02a7e1c6607f74158207d81e9dd57f679fc",
+      "data_base64": "U2hlbGwKYmluL3NoLnNjeApAU0hFTEwK"
+    },
+    {
+      "path": "desk/sound.lnk",
+      "uid": 1000,
+      "gid": 1000,
+      "mode": 23,
+      "generation": 8,
+      "bytes": 28,
+      "sha256": "c5bd3090bcf4bafacc523d18462a21985074314dd541f125c216bb7afa064362",
+      "data_base64": "U291bmQKYXBwcy9zb3VuZC5zY3gKQFNPVU5ECg=="
+    },
+    {
+      "path": "desk/Z-CALCULATOR.LNK",
+      "uid": 1000,
+      "gid": 1000,
+      "mode": 23,
+      "generation": 1,
+      "bytes": 31,
+      "sha256": "c4948c86f8e0838f3a68abaae73a683b84b6d0ae76181ac7503604445bea1d0c",
+      "data_base64": "Q2FsY3VsYXRvcgphcHBzL2NhbGMuc2N4CkBDQUxDCg=="
+    },
+    {
+      "path": "desk/Z-CANVAS.LNK",
+      "uid": 1000,
+      "gid": 1000,
+      "mode": 23,
+      "generation": 1,
+      "bytes": 31,
+      "sha256": "932dbbf815c3e171d1caf90e65f9178c284966c8fdbcae4615fe103e87a8e2f1",
+      "data_base64": "Q2FudmFzCmFwcHMvY2FudmFzLnNjeApAQ0FOVkFTCg=="
+    },
+    {
+      "path": "desk/Z-DEBUG.LNK",
+      "uid": 1000,
+      "gid": 1000,
+      "mode": 23,
+      "generation": 1,
+      "bytes": 31,
+      "sha256": "4c8a7987604aecce24111ac7ca9f953d17c9f6aa7ee262db312922241df56b10",
+      "data_base64": "RGVidWcKYXBwcy9kZWJ1Z2dlci5zY3gKQERFQlVHCg=="
+    },
+    {
+      "path": "desk/Z-LENS.LNK",
+      "uid": 1000,
+      "gid": 1000,
+      "mode": 23,
+      "generation": 1,
+      "bytes": 25,
+      "sha256": "25a2ae1d6fa3b923e95c5b9b46c7998bda21e89a4a740c2095ea46fbc8ea229e",
+      "data_base64": "TGVucwphcHBzL2xlbnMuc2N4CkBMRU5TCg=="
+    },
+    {
+      "path": "desk/Z-LUMEN.LNK",
+      "uid": 1000,
+      "gid": 1000,
+      "mode": 23,
+      "generation": 1,
+      "bytes": 28,
+      "sha256": "b1a8a56878696da2bdb8a75896ee1b62e585ea8a4bbe217bed9d5d9039aebf84",
+      "data_base64": "THVtZW4KYXBwcy9sdW1lbi5zY3gKQExVTUVOCg=="
+    },
+    {
+      "path": "desk/Z-MINES.LNK",
+      "uid": 1000,
+      "gid": 1000,
+      "mode": 23,
+      "generation": 1,
+      "bytes": 28,
+      "sha256": "c2789c10c0e3c9e01abaac3d3b1054d27d7e788c85af0fa43e5a9239d513545b",
+      "data_base64": "TWluZXMKYXBwcy9taW5lcy5zY3gKQE1JTkVTCg=="
+    },
+    {
+      "path": "desk/Z-MONITOR.LNK",
+      "uid": 1000,
+      "gid": 1000,
+      "mode": 23,
+      "generation": 1,
+      "bytes": 34,
+      "sha256": "15c94f3594af13bba25b95b43c1be22d9ad4647d7809a23644ec01d4e86bab21",
+      "data_base64": "TW9uaXRvcgphcHBzL21vbml0b3Iuc2N4CkBNT05JVE9SCg=="
+    },
+    {
+      "path": "desk/Z-RACE.LNK",
+      "uid": 1000,
+      "gid": 1000,
+      "mode": 23,
+      "generation": 1,
+      "bytes": 25,
+      "sha256": "94bb0afe12e61f1d891843605c289eacc08ea6171c5c9f7203da11a44d65556a",
+      "data_base64": "UmFjZQphcHBzL3JhY2Uuc2N4CkBSQUNFCg=="
+    },
+    {
+      "path": "desk/Z-SETTINGS.LNK",
+      "uid": 1000,
+      "gid": 1000,
+      "mode": 23,
+      "generation": 1,
+      "bytes": 37,
+      "sha256": "61267bb82054b93604bbc202e6ff278e12adac95ca9db9e1ef4f5971fdddf7bb",
+      "data_base64": "U2V0dGluZ3MKYXBwcy9zZXR0aW5ncy5zY3gKQFNFVFRJTkdTCg=="
+    },
+    {
+      "path": "desk/Z-STUDIO.LNK",
+      "uid": 1000,
+      "gid": 1000,
+      "mode": 23,
+      "generation": 1,
+      "bytes": 28,
+      "sha256": "4e5afafc87e381a88f2b18dfa5e2386fd123437137f401a4866e755f62b11db8",
+      "data_base64": "U3R1ZGlvCmFwcHMvaWRlLnNjeApAU1RVRElPCg=="
+    },
+    {
+      "path": "desk/Z-WORLD.LNK",
+      "uid": 1000,
+      "gid": 1000,
+      "mode": 23,
+      "generation": 1,
+      "bytes": 28,
+      "sha256": "836263ade719a63552161357f4246637b942a6765945739388c42f7db80c1bfc",
+      "data_base64": "V29ybGQKYXBwcy93b3JsZC5zY3gKQFdPUkxECg=="
+    },
+    {
+      "path": "sys/MENU.CFG",
+      "uid": 1000,
+      "gid": 1000,
+      "mode": 23,
+      "generation": 1,
+      "bytes": 493,
+      "sha256": "eba610126decde4595aab50655be99b060bb331244dacef5368c578460de5fb7",
+      "data_base64": "U01FTlUxTUlPCkZpbGVzfGFwcHMvZmlsZXMuc2N4fEBGSUxFUwpTdHVkaW98YXBwcy9pZGUuc2N4fEBTVFVESU8KRGVidWd8YXBwcy9kZWJ1Z2dlci5zY3h8QERFQlVHClNldHRpbmdzfGFwcHMvc2V0dGluZ3Muc2N4fEBTRVRUSU5HUwpMZW5zfGFwcHMvbGVucy5zY3h8QExFTlMKQ2FudmFzfGFwcHMvY2FudmFzLnNjeHxAQ0FOVkFTCk1vbml0b3J8YXBwcy9tb25pdG9yLnNjeHxATU9OSVRPUgpTaGVsbHxiaW4vc2hlbGwuc2N4fEBTSEVMTApMdW1lbnxhcHBzL2x1bWVuLnNjeHxATFVNRU4KUmFjZXxhcHBzL3JhY2Uuc2N4fEBSQUNFCldvcmxkfGFwcHMvd29ybGQuc2N4fEBXT1JMRApOb3Rlc3xhcHBzL25vdGUuc2N4fEBOT1RFClBhbGV0dGV8YXBwcy9wYWxldHRlLnNjeHxAUEFMRVRURQpDYWxjdWxhdG9yfGFwcHMvY2FsYy5zY3h8QENBTEMKTWluZXN8YXBwcy9taW5lcy5zY3h8QE1JTkVTCkxlZ2FjeSB0b29sc3xhcHBzL2ZpbGVzLnNjeCBMRUdBQ1l8QEZJTEVTCg=="
+    }
+  ]
+}

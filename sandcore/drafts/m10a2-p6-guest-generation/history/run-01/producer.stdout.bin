@@ -1,0 +1,2 @@
+/HOME/M10P6/TOOLS/ACTUALG1.SCX /SYS/SRC/sccc.c /HOME/M10P6/TOOLS/SCCC1.SCX & _p6_pid=$!; echo __P6_PID_5bdecb771f4d1904:$_p6_pid; read _p6_ack; wait $_p6_pid; echo __M9_1f4f40ca5c0e14243176edf5:$?
+__P6_PID_5bdecb771f4d1904:1

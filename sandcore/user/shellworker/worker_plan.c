@@ -128,6 +128,12 @@ static ScStatus sw_plan_root(SwRoot *root)
 {
     if(root->planned)return 0;
     if(!root->root_item){
+        if((root->flags&SHW_ITEM_EXPECT_ABSENT) && root->destination[0]){
+            ScPathInfo destination;sw_record(&destination,sizeof(destination));
+            ScStatus observed=ScPathQuery(root->destination,&destination);
+            if(!observed)return SC32_E_STALE;
+            if(observed!=SC32_E_NOT_FOUND)return observed;
+        }
         ScLeaseEntry row;
         sw_record(&row,sizeof(row));
         row.kind=root->kind;
