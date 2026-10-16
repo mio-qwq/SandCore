@@ -79,7 +79,7 @@ typedef struct {
 }
 StIo;
 typedef struct {
-    U phase,generation,epoch,next,input_count,linking,cancel,publishing;
+    U phase,generation,epoch,next,input_count,linking,cancel,publishing,publication_serial;
     ScStatus error;
     StInput *inputs;
     StDependency *dependencies;

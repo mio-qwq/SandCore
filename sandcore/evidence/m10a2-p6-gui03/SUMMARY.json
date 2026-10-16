@@ -1,0 +1,93 @@
+{
+  "status": "PARTIAL_GUI_WORKFLOW_EVIDENCE_WITH_TRANSPORT_FAILURE",
+  "report_status": "FAIL_OR_INTERRUPTED",
+  "original_report_sha256": "2f68625d66a8b4205360855972e63686e0c8745b8e63c4aac6ef75b2521e724d",
+  "root_viewed_representative_pngs": true,
+  "actual_passed": [
+    "Notes save and association",
+    "Deferred file copy and move with durable journals",
+    "Automatic source desktop refresh",
+    "Drop cancellation preserves source",
+    "Calculator text paste after source exit",
+    "Monitor process properties window"
+  ],
+  "partial": [
+    "Studio SCO compilation and SCL link; publication failed -401",
+    "Settings startup and 100 percent preview; timeout state text stale"
+  ],
+  "failed": [
+    "Default Lens PNG launch -112",
+    "Management heartbeat timeout"
+  ],
+  "final_resource_account": "NOT_OBTAINED",
+  "full_M10a2": false,
+  "stderr_observed": {
+    "exit_code": 1,
+    "cause": "TimeoutError: 管理请求 10 无有效回复",
+    "call": "verify_m9.Guest.connect.heartbeat -> ManagementClient.checked(10) -> request",
+    "final_error": "RuntimeError: 串口会话错误",
+    "evidence": "Actual exec session 5218 termination output; no failure fields reset"
+  },
+  "files": {
+    "p6-gui.json": {
+      "bytes": 1551633,
+      "sha256": "2f68625d66a8b4205360855972e63686e0c8745b8e63c4aac6ef75b2521e724d"
+    },
+    "gui3-drop-audit.json": {
+      "bytes": 5152,
+      "sha256": "efee0cbb1e090e63c6c4a666f0dc9e8a326a6f5c5e8e235668fb29a3376dc3a2"
+    },
+    "gui3-desktop-copy.rec": {
+      "bytes": 832,
+      "sha256": "4f0ba97c7fbba83713e5f2a948ac08e2a92537fd14dcf53ffd2f68732cf36cbc"
+    },
+    "gui3-desktop-move.rec": {
+      "bytes": 832,
+      "sha256": "b1d9f2ef928bfe63b73a0d89b77292b256eb7b546040ef9120a7cb7beeee188a"
+    },
+    "gui3-note-saved.txt": {
+      "bytes": 20,
+      "sha256": "7def5086c7959c3579cf642bea6e2473349576f26c2c9dbba874db8ec921ec69"
+    },
+    "gui3-after-cancel-note.txt": {
+      "bytes": 20,
+      "sha256": "7def5086c7959c3579cf642bea6e2473349576f26c2c9dbba874db8ec921ec69"
+    },
+    "p6-gui3-note-default-opened.png": {
+      "bytes": 695458,
+      "sha256": "7c2267996d6fb82ecb3ea90f63dc3bc85195960218ba73b9ca834241294f8bf5"
+    },
+    "p6-gui3-move-auto-refresh.png": {
+      "bytes": 862480,
+      "sha256": "14292f9434d7e2f27a8a45ecedcce6054bf2b72d6b2129ef8b88c545ac7c39f8"
+    },
+    "p6-gui3-drop-cancelled-source-retained.png": {
+      "bytes": 864033,
+      "sha256": "4dea493ab00ca401130041aa982b02e466b5fff72df27ee584cb916e2d082b94"
+    },
+    "p6-gui3-calculator-to-notes-text.png": {
+      "bytes": 691652,
+      "sha256": "a8bb771601be90498bfee302d1ed3821aa00f3fc7d95d9035f001ecc71c6f25a"
+    },
+    "p6-gui3-studio-rdstats-link-diagnostic.png": {
+      "bytes": 644074,
+      "sha256": "42a8514fa3240aeb653be9cf8d76d26d944677efbb6b17b37002b02d8ee3b592"
+    },
+    "p6-gui3-settings-preview.png": {
+      "bytes": 1052911,
+      "sha256": "a5ab95032011ab3d7b285dde4b96783d0573fc9cc456629f0fb0f2c057dd098a"
+    },
+    "p6-gui3-settings-timeout-revert.png": {
+      "bytes": 1055770,
+      "sha256": "44b77db3559c4db0d4fe0d1915eb65bb7d2e22c1b7866bd8d16441e555b0b783"
+    },
+    "p6-gui3-monitor-self-properties.png": {
+      "bytes": 835273,
+      "sha256": "8e20cee23fd44b6bf2bc8073281a00fcb633260e9ac684fc7450770ac7e37203"
+    },
+    "p6-gui3-notes-default.png": {
+      "bytes": 792977,
+      "sha256": "7d91a38799ed7c966e8d36a41d08c19a33230b0da2ca056d0620fce395ef1cbd"
+    }
+  }
+}

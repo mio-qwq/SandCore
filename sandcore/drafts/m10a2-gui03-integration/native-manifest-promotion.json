@@ -1,0 +1,27 @@
+{
+  "status": "REAL_SCCC_HOST_IO_MANIFESTS_PROMOTED_NOT_GUEST_GENERATED",
+  "report_sha256": "ff269ab0873766dd6a44a970de20766e1940a1d6b52b0aba3dd94e1c7a6ced6d",
+  "modified": [
+    {
+      "label": "SCUI",
+      "path": "user/scui/SCUI.NATIVE.JSON",
+      "before_sha256": "81fc4c2ed02f3de183c52996ad264cd0bd62f3dccd7b438235a713952335ce39",
+      "after_sha256": "81fc4c2ed02f3de183c52996ad264cd0bd62f3dccd7b438235a713952335ce39",
+      "object_sha256": "ce8e07c160dbe91817da14f89440a35bac0314a36af265d05fe18c3838e60776"
+    },
+    {
+      "label": "STUDIO2",
+      "path": "user/studio2/STUDIO2.NATIVE.JSON",
+      "before_sha256": "0ced288d8164e307e3d5af43c8329d815a374419d5c67ed2d9686a76bdce6b8c",
+      "after_sha256": "99a43c651ac0539625cb63418b243ed55bbbae834f2c63e934258151d39e5168",
+      "object_sha256": "3fb36b0651140ea7af87909de55c721bfb01873b3662e5926524b14990884e79"
+    },
+    {
+      "label": "SETTINGS2",
+      "path": "user/settings2/SETTINGS2.NATIVE.JSON",
+      "before_sha256": "30adf726309f6cd35bc628529d4935266f405a790db3220231761c5becbc5238",
+      "after_sha256": "30adf726309f6cd35bc628529d4935266f405a790db3220231761c5becbc5238",
+      "object_sha256": "7fdce5b629cdfe16225e47746caf66012d48df291cc091f2aaf030a040884bfe"
+    }
+  ]
+}

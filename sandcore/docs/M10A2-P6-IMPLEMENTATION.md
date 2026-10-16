@@ -1,5 +1,13 @@
 # M10a2 主要应用与工具链实施状态
 
+> GUI03最新：HOST10/native04/final04已实际运行。文本剪贴板在源Calculator退出后仍可粘贴到Notes；延迟Drop真实COPY/MOVE/DURABLE与自动源刷新、取消保源通过。Monitor进程属性窗口已实际显示。Studio真实SCCC生成SCO、SCLD完成RDSTATS.SCL，但发布参数-401导致整个构建未取得资格；Settings真实缩放预览生效，超时状态文字存在终态竞态。GUI03结束为FAIL_OR_INTERRUPTED，心跳原始cause是TimeoutError（请求10），最终资源账未取得，输入和原盘保持不变。
+
+2026-10-16局部修复已合主源：IMAGE worker按装载器IF0合同启动并在关联发布后恢复原IF；共享Dialog按钮栏FLOW自动换行；Studio为每次发布创建独立REC路径，冲突策略保留字段仍为0，逐项决定只接受本次worker epoch和提交时相同的源/目标修订，外部变更取消；Settings拥有的预览读到0秒时先结清取消再查询真实模式，随后才停止定时器。公开ABI/SCAPI.H均不变。`drafts/m10a2-gui03-integration/integration.json`保存真实前后摘要。
+
+三个变化目标SCUI/STUDIO2/SETTINGS2的真实SCCC宿主IO后端/SCLD检查12已退出0；正式NATIVE清单从实际SCO导入表提升。HOST11已退出0，41产物/源码变化0。Root随后真实执行原生刷新05：三个目标完整生成、27对象/8库/21产物严格集合保留，最终physical_delta0/unexpected=[]，输入和原盘保持。新final05的三个实际构建步骤与只读核验均0，CORE SHA5da64fc176cb273803fddd328b02d5123b726440673689cf20aa5e48a3464eff，SDK494项/17482860B。GUI04已启动普通SID4，修后业务尚待验证，不能把构建/原生生成写成GUI通过。SCO11因误从Windows启动ELF适配器未运行，失败目录保留，不覆盖。
+
+修订：2026-10-16，GUI03业务成功、IDE发布和显示倒计时实测缺陷、串口真实失败及三目标局部修复，完整目标继续active。
+
 > 最高检查点：12标签native refresh04已完整PASS（inner SHA1ac7e951434d5465a665844019a731609a08c35c4a22a5f42bb6c43fac2b5191），整体physical/unexplained0、输入/原盘保持。SCUI ABI1.4/v5、SCSHELL1.2/v3及十应用已真实系统内生成，其它来源按完整闭包复用。GUI02已正常关闭/注销，PF13922→13922；既有实际成功与失败分别留证。随后HOST10仅改稳定读兼容三内核文件，exit0/41/source0，所有用户态产物不变；新的运行CORE/SDK接续，修后GUI/IDE完整出口未验，不能称M10a2完成。详见M10A2-LIVE-GUI.md。
 
 > 最新执行检查点：GUI02已正常关闭所有应用和worker、恢复SID1并注销SID4；一致owner账PF13922→13922、全部资源池差额0、unexplained0，输入和原盘均不变。Notes保存/Files复制移动/Canvas撤销重做保存/Lens原生显示/Calculator数学与历史/Palette真实色值/Monitor历史冻结继续/Sound首次真实PCM已有证据；跨应用文本剪贴板、源拖放自动刷新、Studio链接后流程、Settings/Installer启动及若干应用生命周期问题正在修复。9个局部文件已合入、尚未HOST08或新客体验证；Drop/TEXT1/共享对话框与Sound窄补丁接续。完整目标active，实际边界和下一步以M10A2-LIVE-GUI.md为准。

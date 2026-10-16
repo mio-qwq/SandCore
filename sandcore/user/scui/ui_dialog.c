@@ -231,8 +231,11 @@ static ScStatus ui_dialog_buttons(ScUiDialog *d,const ScUiMenuItem *buttons,ScU3
     ScUiNode bar,button;
     ScStatus s=ui_dialog_widget(d,d->root,SC_UI_PANEL,0,0,&bar);
     if(s<0)return s;
-    ui_dialog_layout(d,bar,SC_UI_HBOX,SC_UI_AUTO,30,0,0);
+    /* 固定单行会裁掉较长的后续按钮。AUTO将真实换行高度传回VBox，
+     * 单行仍留原30逻辑像素，不靠缩字号或压缩按钮掩盖宽度不足。 */
+    ui_dialog_layout(d,bar,SC_UI_FLOW,SC_UI_AUTO,SC_UI_AUTO,0,0);
     UiNode *host=ui_node(d->context,bar);
+    host->layout.min_height=30;
     host->layout.align_h=SC_UI_END_ALIGN;
     ScUiMenuItem fallback[2];
     if(!count){memset(fallback,0,sizeof(fallback));

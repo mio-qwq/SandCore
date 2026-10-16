@@ -292,3 +292,5 @@ Classic与Aurora共享SCUI行为/metrics，命名颜色沿GFX/THEME，原Phoenix
 修订：2026-10-15，完整审阅现Studio/Debugger及现代SC32/SCLDR，建立多文件原生工程/共享编辑/诊断/owned Debug/模块符号/SDK与分工；仅设计，记录CPUINFO越界、typed能力/多TU缺项及本批aggregate/SCLMAP收齐未验边界，未实现或运行新应用。
 
 修订：2026-10-16，SCW工作区入口、schema1与标准文件对话框合同。
+
+2026-10-16实施增量：GUI03真实RDSTATS.SCW经SCCC/SCO及SCLD链接成功，但发布作业-401，不取得当前产物资格。publication现按SCSHELL既有合同保持conflict_policy=0，使用当前独占构建目录内递增Pxxxxxxxx.REC，计数溢出拒绝。存在目标时只对提交时捕获且worker本次仍相等的源/目标修订发显式REPLACE决定，绑定item和conflict_epoch；新建/外部变更目标、路径或类型不符取消而不覆盖。三个产物仍走真实COPY作业，逐项DONE/DURABLE与最终输入/输出资格检查保持，最终SCX/SCL正文最后提交；失败不假称跨文件原子回滚。公开SCSHELL ABI不变。本批宿主SCCC/SCLD通过，修后系统内编译/发布/运行/调试未验。

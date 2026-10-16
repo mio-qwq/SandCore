@@ -1,0 +1,20 @@
+{
+  "status": "CURRENT_FINAL05_WIRING_PREPARED_NOT_EXECUTED",
+  "original_helpers": {
+    "drafts\\m10a2-p6-final-03-receipt\\bindings.py": "115f65eaca137ed0766cfbf5484e9dcd1349a00b98283f8e679c0a2f637f0299",
+    "drafts\\m10a2-p6-final-04-receipt\\bindings.py": "b13e52b202d75e5327a03ce64be6915858303cdefdc33ee06c10a319409b49dd",
+    "drafts\\m10a2-p6-final-04-receipt\\finalize.py": "97a41a41ac0f8fd9f4a6a0c37f0872850d378dc6ba10abeaf242ddc095ae5a7c",
+    "drafts\\m10a2-p6-final-04-receipt\\inspect_final.py": "b3255eb212c33aae7f7fe677c0d40f01f2b061fcdbe9f6e472018b81fa5a294b"
+  },
+  "new_helpers": {
+    "bindings.py": "cd71105c6bd59c837341a1dbf4ed940e7972f9a6e35936e79d0b5295b82ac858",
+    "finalize.py": "1fbbb4b87dffdbedc189228a034a408463f48e73cb878de4ecd0a3fe7d3410e4",
+    "inspect_final.py": "691af14240f73c3c0740ba8a8bdbe1de6e6460dc6e8f37a06e456d40e63d3e49"
+  },
+  "native_sha256": "9a21978c82563b1d9c31ce36d0384482c1f44dee56cb0ffcda33937e9a26257e",
+  "refresh_sha256": "80a8a2fa91ee170272a1ac02d6bfc218c7297da0bd1c3460f8c597d6baffafbf",
+  "historical_layout_kept": true,
+  "layout_recompiled": false,
+  "core_built": false,
+  "sdk_staged": false
+}

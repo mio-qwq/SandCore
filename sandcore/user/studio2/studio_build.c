@@ -476,12 +476,19 @@ static ScStatus publication(U exporting,const char *directory)
         item->expected_destination_kind=s>=0?dst.kind:0;
         item->flags=SC_SHELL_ITEM_EXPECT_SOURCE|(s>=0?SC_SHELL_ITEM_EXPECT_DESTINATION:SC_SHELL_ITEM_EXPECT_ABSENT);
     }
+    /* 每次发布保留独立REC；重复导出不能覆盖上次作业的持久记录。
+     * build目录由本进程代数/构建代数独占，计数耗尽明确拒绝。 */
+    if(b->publication_serial==0xffffffffu)return SC32_E_RANGE;
+    char recovery[68],journal[24];
+    snprintf(journal,sizeof(journal),"P%08X.REC",++b->publication_serial);
+    ScStatus recovery_status=join(recovery,b->directory,journal);
+    if(recovery_status<0)return recovery_status;
     ScShellFileJobDesc d;
     rec(&d,sizeof(d));
     d.operation=SC_SHELL_COPY;
     d.items=b->items;
     d.count=3;
-    d.conflict_policy=SC_SHELL_REPLACE;
+    d.recovery_path=recovery;
     d.final_mode=23;
     ScStatus s=ScShellFileOperationBegin(&d,&b->filejob);
     if(s>=0){
@@ -509,6 +516,33 @@ static void publication_step(void)
     ScStatus s=ScShellFileOperationQuery(b->filejob,&q);
     if(s<0){
         build_fail(s);
+        return;
+    }
+    if(q.state==SC_SHELL_JOB_CONFLICT){
+        ScShellFileResult conflict;
+        rec(&conflict,sizeof(conflict));
+        s=ScShellFileOperationConflict(b->filejob,&conflict);
+        if(s<0){ScShellFileOperationCancel(b->filejob);build_fail(s);return;}
+        ScShellFileItem *item=conflict.item&&conflict.item<=3u?b->items+conflict.item-1u:0;
+        /* Build只替换提交时已知的同一目标修订；后来创建/修改的用户文件
+         * 不获得预设覆盖授权。决定绑定worker本次epoch与源/目标修订。 */
+        if(!item || !(item->flags&SC_SHELL_ITEM_EXPECT_DESTINATION)
+            || item->expected_destination_kind!=SC32_PATH_FILE
+            || item->expected_source_revision!=conflict.source_revision
+            || item->expected_destination_revision!=conflict.destination_revision
+            || !same_name(item->source,conflict.source)
+            || !same_name(item->destination,conflict.destination)){
+            ScShellFileOperationCancel(b->filejob);build_fail(SC32_E_STALE);return;
+        }
+        ScShellConflictDecision decision;
+        rec(&decision,sizeof(decision));
+        decision.item=conflict.item;
+        decision.conflict_epoch=conflict.conflict_epoch;
+        decision.decision=SC_SHELL_REPLACE;
+        decision.expected_source_revision=conflict.source_revision;
+        decision.expected_destination_revision=conflict.destination_revision;
+        s=ScShellFileOperationResolveConflict(b->filejob,&decision);
+        if(s<0 && s!=SC_SHELL_E_BUSY){ScShellFileOperationCancel(b->filejob);build_fail(s);}
         return;
     }
     if(q.state<SC_SHELL_JOB_FINISHED)return;

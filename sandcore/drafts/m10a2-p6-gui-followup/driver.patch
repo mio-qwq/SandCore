@@ -1,0 +1,38 @@
+--- frozen_gui_driver.py
++++ new_gui_driver.py
+@@ -10,7 +10,8 @@
+ HERE = Path(__file__).resolve().parent
+ ROOT = HERE.parents[1]
+ for directory in (ROOT/'tools', HERE.parent/'m10a2-p6-gui-flow',
+-                  HERE.parent/'m10a2-p6-gui-runtime', HERE.parent/'m10a2-p6-final-flow'):
++                  HERE.parent/'m10a2-p6-gui-runtime', HERE.parent/'m10a2-p6-final-flow',
++                  HERE.parent/'m10a2-p6-gui-coherent'):
+     sys.path.insert(0, str(directory))
+ 
+ from prepare_candidate import Candidate
+@@ -23,6 +24,7 @@
+ from flow_input import FlowInput
+ from runtime import serve
+ from coherent_runtime import CoherentRuntime, ObserverPlan
++from heartbeat_guest import FollowupGuest
+ 
+ 
+ def main():
+@@ -52,7 +54,7 @@
+         pins[path] = sha(path)
+     for directory in (HERE, HERE.parent/'m10a2-p6-gui-flow',
+                       HERE.parent/'m10a2-p6-gui-runtime', HERE.parent/'m10a2-p6-final-flow',
+-                      HERE.parent/'m10a2-gui-owner-review'):
++                      HERE.parent/'m10a2-gui-owner-review', HERE.parent/'m10a2-p6-gui-coherent'):
+         for path in directory.glob('*.py'):pins[path.resolve()] = sha(path)
+     if not args.execute:
+         print(json.dumps(dict(status='P6_GUI_PREFLIGHT_ONLY', payload_files=len(candidate.payload),
+@@ -74,7 +76,7 @@
+                          audio=True, memory=256, data_prepare=candidate.install) as vm:
+             report['qemu_pid'] = vm.process.pid
+             persist()
+-            guest = GuiGuest(vm)
++            guest = FollowupGuest(vm)
+             harness = None
+             try:
+                 symbols = unique_symbols(candidate.core/'core.sym')

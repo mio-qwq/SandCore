@@ -933,6 +933,18 @@
       "dependency": "SCCLIB.SCL",
       "kind": "function",
       "size": 1
+    },
+    {
+      "name": "ScShellFileOperationConflict",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellFileOperationResolveConflict",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
     }
   ]
 }

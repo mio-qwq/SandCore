@@ -1,0 +1,10 @@
+{
+  "status": "NEW_GUI_DRIVER_PREPARED_NOT_EXECUTED",
+  "frozen_driver_sha256": "8651195db270371007dc92f821516760a366054efd30e4e9f75acff5b423bc55",
+  "driver_sha256": "5a1dcf10fae6c958e58253f2981cd704eab5557272b95dbe828e60a159fcac7b",
+  "heartbeat_sha256": "f2fcd33b91255a529cc32a1243c52bd86c552427210cb16049a6d111ec254879",
+  "old_helpers_modified": false,
+  "guest_memory_writes": false,
+  "forced_finish": false,
+  "diagnostic_only_of_host_transport": true
+}

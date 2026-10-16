@@ -1,0 +1,49 @@
+{
+  "status": "FOCUSED_GUI03_FIXES_INTEGRATED_NOT_BUILT",
+  "gui_report_sha256": "2f68625d66a8b4205360855972e63686e0c8745b8e63c4aac6ef75b2521e724d",
+  "gui03_exit_code": 1,
+  "gui03_final_resource_account": "NOT_OBTAINED",
+  "heartbeat_original_exception": "TimeoutError: 管理请求 10 无有效回复",
+  "modified": {
+    "kernel/image_service.c": {
+      "before_sha256": "6538a1f5bf84f353a88490bcca5b5d9cb40f6c7981cd235597c2be95d1bab09f",
+      "after_sha256": "8dfb226f68dcdf91cd9bb3717a78e8ebcee158baa9e54846b4e2471c0b38d4f5"
+    },
+    "docs/SC32-IMAGE.md": {
+      "before_sha256": "68501d67492fbf0f4cdfc901b068428d2352f0bf6cb8fddc435826fe04070265",
+      "after_sha256": "cbc8474f5ac4435baf03eff74d69d0edf1d63f336c737ab99a006aa9c22a1e45"
+    },
+    "user/scui/ui_dialog.c": {
+      "before_sha256": "3b5d8ac16af4f1aa942a7e1895a7532d899b530b874c1f23d0ac2fdd7b31edfb",
+      "after_sha256": "67dc3cb0b62696b7c5e94278c7442da658d83e2aa3b339e2824c7ad530583b86"
+    },
+    "docs/SCUI.md": {
+      "before_sha256": "ff2bca9e465fde1a403185215ecd7de289f6142993379e2bd10088cc4438a403",
+      "after_sha256": "9190e41ede621227b05610305fb7c91efcfe87f0467b4f2a45c78e9d88e2f3cc"
+    },
+    "user/studio2/STUDIO2.H": {
+      "before_sha256": "78610cae78419b785e265ad73365bbd8bc597341d344d95a7c7cf368ea73183b",
+      "after_sha256": "269a3a2a61f7eff0446954ea727ee61ab381aadb5003d839db32fb097aeea2a6"
+    },
+    "user/studio2/studio_build.c": {
+      "before_sha256": "549289e059f9ba70f9bc9b6b429dc4a512b8f0f24f0cf22d0496b7fdc1be6081",
+      "after_sha256": "95b303d9e0a272fab81bd40c5cb760c16ce8199c84c4492650664c5d8e1d65d1"
+    },
+    "user/studio2/STUDIO2.JSON": {
+      "before_sha256": "4079aa733f0576c4e2c822c780755af8e9861ce7a8b4ccd7098df18e9bebf53b",
+      "after_sha256": "b4d13a8cdff17fd2744a44672a9b24f56aa55b6abb6d90597ae24bdea2df7c9f"
+    },
+    "user/settings2/settings_view.inc": {
+      "before_sha256": "c80f2cff71f6e243fff67a67eb0622c647ea8798ac058307d599f5705f7aec50",
+      "after_sha256": "63dadc132c0a72330fe380e0cf0b4b97342d9bd8ce6be9429340e55882c056ae"
+    }
+  },
+  "expected_native_refresh_labels": [
+    "SCUI",
+    "STUDIO2",
+    "SETTINGS2"
+  ],
+  "public_ABI_changed": false,
+  "build_started": false,
+  "guest_fix_verification": false
+}

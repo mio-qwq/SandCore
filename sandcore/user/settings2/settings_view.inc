@@ -20,6 +20,15 @@ static ScStatus display_refresh(void)
     INIT(d);
     ScStatus s=ScDisplayQuery(&d);
     if(s<0)return s;
+    /* deadline刚到时查询可先于内核display_poll：剩余秒已为0，模式
+     * 尚未回退。由预览拥有者结清这一终态并重读，不能停表后留旧比例。 */
+    if(settings.owns_preview && !d.preview_seconds){
+        s=ScDisplayApply(0,0,0,SC32_DISPLAY_CANCEL);
+        if(s<0)return s;
+        INIT(d);
+        s=ScDisplayQuery(&d);
+        if(s<0)return s;
+    }
     settings.preview=d.preview_seconds;
     if(!settings.preview)settings.owns_preview=0;
     char line[192];

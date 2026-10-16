@@ -240,14 +240,24 @@ void image_service_poll(void)
         u32 ticket=IMAGE_JOB(i).ticket;do{reverse[n++]=(char)('0'+ticket%10);ticket/=10;}while(ticket);
         while(n)command[at++]=reverse[--n];
         command[at]=0;
-        /* 启动文件IO也可能超过一tick：保持任务0与共享装载中转区，
-         * 只开硬件IRQ，不让另一EXEC抢占并覆盖scx_stage。 */
-        task_render_hold(1);sti();int worker=auth_service_exec(command,i);cli();task_render_hold(0);
-        if(worker<0){fail(&IMAGE_JOB(i),-3);return;}
-        IMAGE_JOB(i).worker=active_worker=worker;
-        IMAGE_JOB(i).worker_generation=active_generation=task_generation(worker);
-        IMAGE_JOB(i).claimed=0;IMAGE_JOB(i).state=2;pending_remove(&IMAGE_JOB(i));
-        IMAGE_JOB(worker).worker_owner=i;IMAGE_JOB(worker).worker_owner_generation=task_generation(i);
-        IMAGE_JOB(worker).worker_ticket=IMAGE_JOB(i).ticket;return;
+        /* SCX装载器只在IF=0使用共享stage；render_hold只阻止换任务，
+         * 不能让IF=1通过该合同。保存原IF，装载和票据关联发布完成后再还原，
+         * 否则刚生成的worker可能在owner/generation尚未登记时运行。 */
+        u32 irq_flags;
+        __asm__ __volatile__("pushfl;popl %0;cli":"=r"(irq_flags)::"memory");
+        task_render_hold(1);
+        int worker=auth_service_exec(command,i);
+        task_render_hold(0);
+        if(worker<0)fail(&IMAGE_JOB(i),-3);
+        else{
+            IMAGE_JOB(i).worker=active_worker=worker;
+            IMAGE_JOB(i).worker_generation=active_generation=task_generation(worker);
+            IMAGE_JOB(i).claimed=0;IMAGE_JOB(i).state=2;pending_remove(&IMAGE_JOB(i));
+            IMAGE_JOB(worker).worker_owner=i;IMAGE_JOB(worker).worker_owner_generation=task_generation(i);
+            IMAGE_JOB(worker).worker_ticket=IMAGE_JOB(i).ticket;
+        }
+        /* memory屏障使关联写入不能被编译器移到重新允许IRQ之后。 */
+        if(irq_flags&0x200u)__asm__ __volatile__("sti":::"memory");
+        return;
     }
 }

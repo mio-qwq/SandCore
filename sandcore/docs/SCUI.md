@@ -97,3 +97,7 @@ Copy/Cut/Paste使用真实session clipboard事务及immutable snapshot，源退�
 2026-10-16修订：Phase5主源ABI1.1/v2保留158入口，新增ScUiPainterClear/TextColor/Bounds/ContextWaitTimeout共162。透明桌面只清本人clip，图标传ENABLED，命名角色阴影与内核单一路径壁纸共同合成；Context混合泵按真实下一期限等待。隐藏Window不持首帧资格，实际选中后PREPARING才允许有限完整Submit/End，随后Activate；后台Shell服务不等待绘制。当前仅Runtime11阶段切片通过，不代表全部组件已重制。
 
 2026-10-16：SCUI ABI1.4/library5在独立SCUIDROP.H追加Defer/Query/Reply/Release，ScUiDragDesc显式flag才选v2，旧SCUI.H和flags0即时回调/ACK保持。新FILE拖放先HOLD/READY消费短传输票，再确认/真实job/最终结果；等待不强制1tick。详见SCUI-DROP-DEFERRED，隔离源码尚未构建或客体验证。
+
+2026-10-16：共享Dialog按钮栏使用现有FLOW与AUTO高度，保留30逻辑像素单行下限；自然宽度、28高按钮、gap6、command/default/cancel、字体和事件不变。宽度足够的2/3按钮仍同排，后续按钮不足宽时自然换行，真实行高在两遍候选布局中传回父VBox，原flex正文让出相应空间；不缩字号或修改应用标签。MessageBox420×170的本次四按钮场景可由原父尺寸容纳。本组隔离源码未构建、未客体验证。
+
+2026-10-16执行记录：延迟Drop已由GUI03真实COPY/MOVE/取消及源桌面自动刷新留证；按钮FLOW修复随后合主源，经SCO12、HOST11和真实客体native05生成。final05 CORE/SDK已核验并启动GUI04，四按钮修后画面仍待验证，不把原生生成称为交互通过。

@@ -2,7 +2,21 @@
 
 2026-10-16。完整持续目标仍 active。先读本页、P6实施状态及根 M10a2RULE.MD；生成、安装和运行分别记载。
 
-## GUI03当前正在运行
+## 最新：native05与final05已实际完成，GUI04启动中
+
+2026-10-16。GUI03 exec5218/QEMU18952已退出1，无活动旧VM。原报告FAIL_OR_INTERRUPTED、源码和原盘保持；真实stderr首cause为心跳TimeoutError“管理请求10无有效回复”。代表业务截图/原始报告/REC保存在 `evidence/m10a2-p6-gui03`，包含Notes关联、延迟Drop及自动源刷新、跨应用文本、Monitor真实进程属性。Studio的SCO/SCLD成功但publication失败、Settings倒计时状态文字、默认PNG失败均分别记录，最终owner未取得，不能称本轮PASS。下方GUI03原记录只作为历史快照，不继续操作已关闭的exec。
+
+主源已按 `drafts/m10a2-gui03-integration/integration.json` 合入IMAGE装载IF、共享按钮FLOW、Studio独立REC/逐项修订绑定冲突决定、Settings预览到期结清后再查询。SCO12三个目标真实宿主后端/严格SCLD通过；SCO11误从Windows运行ELF适配器失败目录保留。HOST11实际exit0/41/source0，SHA15ae392845d5307dd3617778ee461ba53f2e87bc7533b31d29857db40b2b3785。
+
+Root已实际运行v4：exec84549正常退出0，native05 inner SHA9a21978c82563b1d9c31ce36d0384482c1f44dee56cb0ffcda33937e9a26257e；outer05 SHA80a8a2fa91ee170272a1ac02d6bfc218c7297da0bd1c3460f8c597d6baffafbf。SCUI/STUDIO2/SETTINGS2三项真实系统内编译、SCLD、SCO/map/SCDB取回完成，完整集合27对象/8库/21产物；最终physical_delta0/unexpected=[]，输入与原盘保持，其余来源按明确继承链复用。
+
+Root已实际执行 `drafts/m10a2-p6-final-05-receipt/finalize.py` 三步骤及inspect_final，均0。CORE SHA5da64fc176cb273803fddd328b02d5123b726440673689cf20aa5e48a3464eff，ELF f19582d31a60963601214732329bfa9db2f5eb29d9eee023720814985b0ae5ff；严格SDK494项/17482860B。生成和运行同HOST11；实际旧layout02原件及五结构头相同，明确复用其HOST09/native04编译事实，不改历史proof。该构建核验状态不是修后GUI通过。
+
+GUI04新入口为 `drafts/m10a2-p6-gui-followup/driver.py`，851 payload/26404040B，预检已实际退出0，完整预检日志在integration/gui04-preflight.log。执行命令已启动，新的exec句柄在Root工具回执中；普通SID/READY须等真实启动结果，不能沿用旧SID绑定。输出 `build/m10a2-p6-gui-run-04`，输入native05/HOST11/final05、原M10a1盘、实际layout02。新driver只将幂等PING的有限单次等待改15秒、仍3次，逐次原始耗时/结果/error写heartbeat.jsonl；真正负ACK/超时仍失败，不清failure、不重连旧会话、不伪造finish。原工具和driver未改，所有新helper及来源也被pin。当前全部主源/现有tools/SDK/CORE/活helper冻结。
+
+本轮优先真实Terminal创建RDESK/RDWORK/RDPLUGIN，Studio打开SDK RDSTATS.SCW构建SCL，再RDESK.SCW四TU构建/运行/Debug2；接续默认PNG、设置超时状态、四按钮换行、Installer和Sound重播/seek。GUI03已过业务不重复。本地已保存到a0fe116的旧代码及接力，其后本批待保存，远端之前连接失败未确认。
+
+## GUI03历史运行快照（已关闭）
 
 ### 最新覆盖记录：本节优先于下方早期快照
 
