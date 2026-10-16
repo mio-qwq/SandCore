@@ -1,5 +1,7 @@
 # SandCore M10a2 — The Application Platform Era：持续目标
 
+> 最高检查点：main已存0384676。GUI02正常退出后PF13922→13922、资源池/未归属差0；本批12目标原生refresh04全部实际编译/链接/取回和严格读取通过，整体physical/unexplained0、源码/原盘守恒。HOST10随后仅加入三内核文件的稳定读共享修复，exit0/41/source0；用户态产物字节与HOST09相同，native04无需重编。正在按生成HOST09与运行HOST10分层签发final04 CORE/SDK；实际新layout02已生成。修后GUI03、Studio SCL/四TU运行调试及SDK完整出口尚待验，完整目标active。实时入口M10A2-LIVE-GUI.md，下方为保留的较早检查点。
+
 > 最新执行检查点：GUI02已正常关闭所有应用和worker、恢复SID1并注销SID4；一致owner账PF13922→13922、全部资源池差额0、unexplained0，输入和原盘均不变。Notes保存/Files复制移动/Canvas撤销重做保存/Lens原生显示/Calculator数学与历史/Palette真实色值/Monitor历史冻结继续/Sound首次真实PCM已有证据；跨应用文本剪贴板、源拖放自动刷新、Studio链接后流程、Settings/Installer启动及若干应用生命周期问题正在修复。9个局部文件已合入、尚未HOST08或新客体验证；Drop/TEXT1/共享对话框与Sound窄补丁接续。完整目标active，实际边界和下一步以M10A2-LIVE-GUI.md为准。
 
 

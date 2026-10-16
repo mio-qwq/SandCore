@@ -1,5 +1,7 @@
 # M10a2 主要应用与工具链实施状态
 
+> 最高检查点：12标签native refresh04已完整PASS（inner SHA1ac7e951434d5465a665844019a731609a08c35c4a22a5f42bb6c43fac2b5191），整体physical/unexplained0、输入/原盘保持。SCUI ABI1.4/v5、SCSHELL1.2/v3及十应用已真实系统内生成，其它来源按完整闭包复用。GUI02已正常关闭/注销，PF13922→13922；既有实际成功与失败分别留证。随后HOST10仅改稳定读兼容三内核文件，exit0/41/source0，所有用户态产物不变；新的运行CORE/SDK接续，修后GUI/IDE完整出口未验，不能称M10a2完成。详见M10A2-LIVE-GUI.md。
+
 > 最新执行检查点：GUI02已正常关闭所有应用和worker、恢复SID1并注销SID4；一致owner账PF13922→13922、全部资源池差额0、unexplained0，输入和原盘均不变。Notes保存/Files复制移动/Canvas撤销重做保存/Lens原生显示/Calculator数学与历史/Palette真实色值/Monitor历史冻结继续/Sound首次真实PCM已有证据；跨应用文本剪贴板、源拖放自动刷新、Studio链接后流程、Settings/Installer启动及若干应用生命周期问题正在修复。9个局部文件已合入、尚未HOST08或新客体验证；Drop/TEXT1/共享对话框与Sound窄补丁接续。完整目标active，实际边界和下一步以M10A2-LIVE-GUI.md为准。
 
 

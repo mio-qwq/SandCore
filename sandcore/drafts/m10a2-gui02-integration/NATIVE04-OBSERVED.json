@@ -1,0 +1,25 @@
+{
+  "status": "ROOT_OBSERVED_NATIVE04_AND_ACTUAL_LAYOUT02_PASS_NOT_GUI",
+  "reports": [
+    {
+      "path": "build\\m10a2-p6-target-refresh-04\\p6-generation.json",
+      "sha256": "1ac7e951434d5465a665844019a731609a08c35c4a22a5f42bb6c43fac2b5191",
+      "status": "DECLARED_P6_NATIVE_GENERATION_PASS"
+    },
+    {
+      "path": "build\\m10a2-p6-refresh-vm-04\\refresh-vm.json",
+      "sha256": "226d9d99ae250c247744430b0247f7c7f30cc315ca1687e2a8e6b604f7317175",
+      "status": "EXPLICIT_LABEL_REFRESH_GENERATED"
+    },
+    {
+      "path": "build\\m10a2-p6-gui-coherent-layout-02\\layout-proof.json",
+      "sha256": "6b828bbab032c4bb8ceb00ee6a94f7b55cdf0671ec18d2cb807d73240260e80a",
+      "status": "ACTUAL_CURRENT_I386_LAYOUT_GENERATED_NO_GUEST"
+    }
+  ],
+  "physical_delta": 0,
+  "unexplained_delta": 0,
+  "unexpected": [],
+  "source_disk_unchanged": true,
+  "current_inputs_unchanged": true
+}

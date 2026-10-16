@@ -117,6 +117,12 @@ static int lease_node_blocked(u32 node,const char *name,u32 operation,u32 a,u32 
         int covers=descendants || same(name,held)
             || ((slot?r->handle_kind==2:r->kind==SC32_LEASE_NAMESPACE) && child(name,held));
         if(covers && !lease_allowed(r,a,b,ns)){
+            /* kind不会随Rename/Remove/SetMode改变；只放过真正空闲的读。
+             * slot1是提交目标保留，PENDING/清理也不能被新读者插入。 */
+            if(operation==FS_LEASE_STABLE_OPEN && !slot && r->kind==SC32_LEASE_READ_STABLE
+               && r->handle_kind==1 && (r->state==SC32_LEASE_READY || r->state==SC32_LEASE_COMMITTED)
+               && !r->cancel && !r->release && !r->queued && !r->stage
+               && !(r->flags&(SC32_LEASE_FLAG_CANDIDATE|SC32_LEASE_FLAG_REVOKED|SC32_LEASE_FLAG_UNCERTAIN))){token=next;continue;}
             if(operation==FS_LEASE_READ_OPEN && !slot
                && (r->kind!=SC32_LEASE_NAMESPACE || r->read_only)){token=next;continue;}
             return 1;

@@ -117,3 +117,13 @@ v5显式父目录直接扫描后续记录，只有直属条目进入结果，不
 worker诊断可由调用者本人设置SCSHELL_TRACE为普通可写路径，默认关闭；错误先冻结再写日志，日志IO失败不改变原始提交结果。不使用SYSTEM串口，不绕FS权限，不把日志当durable ACK。
 
 2026-10-16实际结果：FILEJOB04通过普通UID1000的精确路径查询、131079B COPY/MOVE、持久ACK、客体逐字节和宿主取回内容对照；两份832B恢复日志的头/frame CRC与START/提交/FINISH独立审计通过。退出/注销13830→13830 PF，各池/历史/字体/未归因增量0，输入/原盘保持。证据入口evidence/m10a2-p5-file-jobs/README.md。完整P5、主要组件和SDK仍未完成，持续目标active。
+
+## 稳定读共享打开
+
+READ_STABLE保证来源正文/名称稳定，不要求稳定读者之间独占。内核私有STABLE_OPEN仅供FILE稳定读Acquire/OpenPinned，允许空闲且有效的slot0 READ_STABLE共存；write lease、namespace、slot1目标保留和PENDING/取消/清理/异常记录仍冲突。普通READ_OPEN原语义不变，不能用于取得稳定性，因为它也允许普通读取写租约对象。
+
+各读者分别持本人FILE/游标、owner PID/gen、精确object/revision和lease强引用。原R或METADATA_ONLY的META权限、精确版本、native pending、别名与ref溢出检查保持；写Acquire/OpenPinned与typed rename/remove/set-mode的唯一绑定不放宽。已有普通WRITE描述符的后续Write/Truncate/Flush仍由lease_native_guard检查读租约，不能绕过。没有新增公共调用、header布局、磁盘格式或权限。
+
+旧fs_permissions仍按真正owner/管理者和原保护gate改权限，后续IO重验当前权限；READ_STABLE不屏蔽旧权限撤回。typed lease SetMode在存在其它稳定读时仍因unique/TREE冲突失败，不能把两者混称“所有chmod都被锁住”。本组仅隔离源码方案，尚未构建或客体验证。
+
+修订记录：2026-10-16，稳定读共享打开与原权限/alias/writer边界合同；旧ABI及普通读取行为保持，待统一整合验证。

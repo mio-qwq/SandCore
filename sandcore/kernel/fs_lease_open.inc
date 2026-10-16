@@ -68,7 +68,8 @@ int fs_lease_acquire(int pid,const Sc32LeaseAcquireRequest *q,ScLeaseInfo *out)
     lease_record_t *parent=0;status=lease_parent_check(pid,q->namespace_lease,q->namespace_generation,b.path,writing,&parent);
     if(status)return status;
     if(lease_meta_owner || native_meta_owner)return SC32_E_BUSY;
-    if(lease_conflict(b.path,directory?FS_LEASE_TREE:FS_LEASE_CONTENT,0,0,parent?parent->id:0)
+    u32 conflict_operation=directory?FS_LEASE_TREE:q->kind==SC32_LEASE_READ_STABLE?FS_LEASE_STABLE_OPEN:FS_LEASE_CONTENT;
+    if(lease_conflict(b.path,conflict_operation,0,0,parent?parent->id:0)
        || transaction_busy(b.path))return SC32_E_BUSY;
     u32 kind,revision;status=lease_exact_entry(b.path,q->expected_revision,&kind,&revision);if(status)return status;
     if(kind!=(directory?2u:1u))return SC32_E_INVALID;
@@ -139,7 +140,8 @@ int fs_lease_open(int pid,const Sc32LeaseOpenRequest *q,const char *name,int cre
     if(lease_meta_owner || native_meta_owner)return SC32_E_BUSY;
     lease_record_t *parent=0;int status=lease_parent_check(pid,q->namespace_lease,q->namespace_generation,name,writing,&parent);
     if(status)return status;
-    if(lease_conflict(name,directory?FS_LEASE_TREE:FS_LEASE_CONTENT,0,0,parent?parent->id:0)
+    u32 conflict_operation=directory?FS_LEASE_TREE:q->lease_kind==SC32_LEASE_READ_STABLE?FS_LEASE_STABLE_OPEN:FS_LEASE_CONTENT;
+    if(lease_conflict(name,conflict_operation,0,0,parent?parent->id:0)
        || transaction_busy(name))return SC32_E_BUSY;
     int index=find(name);
     if(create && index>=0)return SC32_E_EXISTS;

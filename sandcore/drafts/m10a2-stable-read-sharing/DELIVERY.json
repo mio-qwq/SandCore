@@ -1,0 +1,45 @@
+{
+  "status": "SOURCE_ONLY_NOT_BUILT_NOT_GUEST_VERIFIED",
+  "files": {
+    "CONTRACT.md": {
+      "sha256": "73d7c29300b109fbca71faa4e297527c825838ddd89d1c5808d3fdb17a8fb46d",
+      "bytes": 3976
+    },
+    "make_patch.py": {
+      "sha256": "884d00b1f082e7ee9737a48542b6b0ea18006b16c1bb52a0fba81a00455bd5e8",
+      "bytes": 6671
+    },
+    "overlay/docs/SC32-FILE.md": {
+      "sha256": "27d300ac12add6842437e17984e4c6d23bdf87c6c40388e9283090113121275c",
+      "bytes": 18529
+    },
+    "overlay/kernel/fs_lease.h": {
+      "sha256": "723435a27195819d78c43f97a6adda4e725c669f689e0ad4b8844f43146e0bb6",
+      "bytes": 2687
+    },
+    "overlay/kernel/fs_lease_index.inc": {
+      "sha256": "46f33de6c5ac044ff612f34824ee74727193499178e59f3faa096199dff11bd6",
+      "bytes": 13962
+    },
+    "overlay/kernel/fs_lease_open.inc": {
+      "sha256": "6517091f810073a908704cb6489b2b5776a0b34ed70cd428888f19dbbb62b86a",
+      "bytes": 11431
+    },
+    "PINS.json": {
+      "sha256": "038541f8300c0eee4720189002609a781d472a9304bb4f676a7bfdaad471b3f9",
+      "bytes": 1270
+    },
+    "README.md": {
+      "sha256": "38549cec002bb7cfd53a280d3a12fd69ac7952be228d763c9e36ce0fd10860b0",
+      "bytes": 1416
+    },
+    "SOURCE-PINS.json": {
+      "sha256": "9704431af9c60f3902660b22f4505f2b18f5bd029f0db16ea428ac33e59bfee3",
+      "bytes": 1942
+    },
+    "stable-read-sharing.patch": {
+      "sha256": "6ae7e5ad93f75e9dc660ff5f1a0a1c451a934f51232e6bc21793c0ebeb0451ab",
+      "bytes": 5129
+    }
+  }
+}

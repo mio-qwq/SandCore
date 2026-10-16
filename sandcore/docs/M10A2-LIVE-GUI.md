@@ -2,6 +2,14 @@
 
 2026-10-16。完整持续目标仍 active。先读本页、P6实施状态及根 M10a2RULE.MD；生成、安装和运行分别记载。
 
+## 原生刷新04已完成，当前构建稳定读修复
+
+主源已保存main@0384676；此后仅稳定读三内核文件和规范增量待保存。HOST09真实成功；v3确认实际变化恰好12标签，完整源码/正式NATIVE/HOST摘要及85项旧副文件来源保持。`drafts/m10a2-p6-followup-refresh-v3/driver.py` 已退出0，exec37714/QEMU9016关闭。outer `build/m10a2-p6-refresh-vm-04/refresh-vm.json` 为EXPLICIT_LABEL_REFRESH_GENERATED，SHA226d9d99ae250c247744430b0247f7c7f30cc315ca1687e2a8e6b604f7317175；inner `build/m10a2-p6-target-refresh-04/p6-generation.json` 为DECLARED_P6_NATIVE_GENERATION_PASS，SHA1ac7e951434d5465a665844019a731609a08c35c4a22a5f42bb6c43fac2b5191。12项全部真实编译/链接/映像/map/SCDB取回通过，27对象/8普通库/21记录完整，最终physical/unexplained0、unexpected=[]，源及原盘不变。
+
+该刷新运行底座是旧final02 CORE/SDK及原native SCCC1/SCLD，新库未在刷新VM安装执行。新SCUI752812B/SHA159963852994f46afc7deb71cede4b8b56ae39be35b65c602db678be1837bdf6；新SCSHELL320068B/SHA723b572f533d6af9e37fd5da23484671c36371b2ad906b827d4e95a2a6187fc5。新i386布局已实际编译为 `build/m10a2-p6-gui-coherent-layout-02/layout-proof.json`，SHA6b828bbab032c4bb8ceb00ee6a94f7b55cdf0671ec18d2cb807d73240260e80a，desk_size1332/context_size672/node_size456/root_size184。旧95 proof不改。final03只执行了新layout，没有生成CORE/SDK。
+
+同文件重播/seek的确定源码矛盾为旧READ_STABLE仍持有时新稳定读被CONTENT冲突拒绝。`drafts/m10a2-stable-read-sharing`已按原像合入三内核文件和SC32-FILE规范：仅新稳定读Acquire/Open兼容健康idle的slot0 READ_STABLE，其它write/namespace/目标预留/取消/提交中记录仍阻挡；旧权限撤回语义不改。凭证 `drafts/m10a2-gui02-integration/stable-read-integration.json`。当前HOST10构建exec11106，源码继续冻结；并非再次生成12用户态目标。final04新接线分开记录native04的原生成HOST09与新运行CORE/HOST10，五个结构头若逐字节相同则复用实际新layout02，不改旧proof字段。普通GUI03尚未启动，不能称修后行为已通过。
+
 ## GUI02 已正常收束
 
 `build/m10a2-p6-gui-run-02/p6-gui.json` 为 `P6_GUI_INPUT_SESSION_FINISHED_REVIEW_PENDING`。exec22125/QEMU2364均已退出。所有应用、Shell文件worker和音频worker正常关闭，恢复原SID1，注销普通UID/GID1000、realm0的测试SID4；不重放本轮动作。

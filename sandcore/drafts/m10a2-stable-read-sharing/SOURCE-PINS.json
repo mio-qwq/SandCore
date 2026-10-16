@@ -1,0 +1,58 @@
+{
+  "user/SCAPI.H": {
+    "sha256": "81a730450fcb3d310ed841ad3e5c70a3fed32aa7fbd10acac8b888ac7da9ffc1",
+    "unchanged": true
+  },
+  "user/SC32LEASE.H": {
+    "sha256": "e724f522bdc883df656d4851e7dbe45d1cb40282de05c7fee66ad09c7665f943",
+    "unchanged": true
+  },
+  "user/leaseapi/SC32LEASEWIRE.H": {
+    "sha256": "60adac3541e003cdd10c6d40e0b1e0f17d1b5d2e188afc5737ea6ca2ec2cdc4c",
+    "unchanged": true
+  },
+  "kernel/sc32_lease.c": {
+    "sha256": "6b9e2a39b135894dcb372716e1c2957a369d113e0ffdc68175eec0e18eb4a85b",
+    "unchanged": true
+  },
+  "kernel/sc32_file_lease.inc": {
+    "sha256": "15be029e594fc4d19e095d10d87b23bd49c5b9b82c0158bd12199664ed41223a",
+    "unchanged": true
+  },
+  "kernel/fs.c": {
+    "sha256": "e0e916990807587df741ee023a3d36741bce85f4c15fb5c0523f52351bc2fb52",
+    "unchanged": true
+  },
+  "kernel/fs_lease_native.inc": {
+    "sha256": "912ec0de00abb51d9bfbc9a785046084cfb5cd0bbb539db0c94a75b00818107a",
+    "unchanged": true
+  },
+  "kernel/fs_lease_operation.inc": {
+    "sha256": "58a47ef6d2a25a3a290479ad9f236a2ebdc17c6de350d18d38758095b844829f",
+    "unchanged": true
+  },
+  "kernel/fs_lease_commit.inc": {
+    "sha256": "7e382a96f9515b7367263d7100019db43c3d98857a4af6da3d769ad1ed4c7752",
+    "unchanged": true
+  },
+  "kernel/fs_lease_cleanup.inc": {
+    "sha256": "e88f41075d63d381b1a4ef124b4b922d02d936ad653ea55e2e2ba1f94a656666",
+    "unchanged": true
+  },
+  "kernel/interrupts.c": {
+    "sha256": "9550e1b4cd6680be529fdb5f216d6a139e6ed0b7828d83390c57f3512ab1295b",
+    "unchanged": true
+  },
+  "user/scsound/sound_api.c": {
+    "sha256": "2f26db87a31066375e72982781bf01f09569de6a440457fe2a0ad9560f88597a",
+    "unchanged": true
+  },
+  "docs/SCSHELL-DESIGN.md": {
+    "sha256": "5b53ba77d787f84aadb88f353a81132f034add30f9ae1553606686a16d50d009",
+    "unchanged": true
+  },
+  "docs/SCSOUND.md": {
+    "sha256": "7db4afee720dd75eb0fe60401dc52896587f518fd540d24ab77f354381ff382f",
+    "unchanged": true
+  }
+}

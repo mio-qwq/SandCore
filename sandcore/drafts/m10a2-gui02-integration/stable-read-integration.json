@@ -1,0 +1,33 @@
+{
+  "status": "STABLE_READ_SOURCE_INTEGRATED_NOT_BUILT",
+  "modified": [
+    {
+      "path": "kernel/fs_lease.h",
+      "before_sha256": "d6d0715c2d9ee0f66b2c279f380a1af3e0e4dea28830d046b69ed99724684a14",
+      "carrier_sha256": "723435a27195819d78c43f97a6adda4e725c669f689e0ad4b8844f43146e0bb6",
+      "after_sha256": "723435a27195819d78c43f97a6adda4e725c669f689e0ad4b8844f43146e0bb6"
+    },
+    {
+      "path": "kernel/fs_lease_index.inc",
+      "before_sha256": "f1c40a0ac70450725f636e31e4d736b60b638f56d13d1db23d127d749b567744",
+      "carrier_sha256": "46f33de6c5ac044ff612f34824ee74727193499178e59f3faa096199dff11bd6",
+      "after_sha256": "46f33de6c5ac044ff612f34824ee74727193499178e59f3faa096199dff11bd6"
+    },
+    {
+      "path": "kernel/fs_lease_open.inc",
+      "before_sha256": "85d401113e2ce8d1f16b4941a41c5c354ca7f7269c1c1287d7385f368c17ca55",
+      "carrier_sha256": "6517091f810073a908704cb6489b2b5776a0b34ed70cd428888f19dbbb62b86a",
+      "after_sha256": "6517091f810073a908704cb6489b2b5776a0b34ed70cd428888f19dbbb62b86a"
+    },
+    {
+      "path": "docs/SC32-FILE.md",
+      "before_sha256": "0ed799f3ebc13b25cbf207f8d1c471c4d26a295e7d80fbb8db3030cba02674ae",
+      "carrier_sha256": "27d300ac12add6842437e17984e4c6d23bdf87c6c40388e9283090113121275c",
+      "after_sha256": "53e30db300106931bc778704ccbfb98c93e0e7859181da21c9f78427b6635eb5"
+    }
+  ],
+  "native04_recompile_required": false,
+  "reason": "KERNEL_PRIVATE_CONFLICT_OPERATION_ONLY_NO_USER_SOURCE_OR_LAYOUT_CHANGE",
+  "public_ABI_changed": false,
+  "guest_runtime_verified": false
+}

@@ -30,6 +30,9 @@ void fs_lease_poll(void);
 #define FS_LEASE_CONTENT 1u
 #define FS_LEASE_TREE 2u
 #define FS_LEASE_READ_OPEN 3u
+/* 只用于取得新稳定读：可与空闲READ_STABLE共存，绝不能借普通READ_OPEN
+ * 同时放过写租约；不是公开selector或用户flags。 */
+#define FS_LEASE_STABLE_OPEN 4u
 int fs_lease_path_blocked(const char *name,u32 operation);
 int fs_lease_volume_locked(void);
 int fs_lease_available(void);

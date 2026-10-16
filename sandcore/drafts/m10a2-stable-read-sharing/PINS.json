@@ -1,0 +1,30 @@
+{
+  "status": "SOURCE_ONLY_NOT_BUILT_NOT_GUEST_VERIFIED",
+  "modified": {
+    "kernel/fs_lease.h": {
+      "before_sha256": "d6d0715c2d9ee0f66b2c279f380a1af3e0e4dea28830d046b69ed99724684a14",
+      "result_sha256": "723435a27195819d78c43f97a6adda4e725c669f689e0ad4b8844f43146e0bb6",
+      "before_bytes": 2494,
+      "result_bytes": 2687
+    },
+    "kernel/fs_lease_index.inc": {
+      "before_sha256": "f1c40a0ac70450725f636e31e4d736b60b638f56d13d1db23d127d749b567744",
+      "result_sha256": "46f33de6c5ac044ff612f34824ee74727193499178e59f3faa096199dff11bd6",
+      "before_bytes": 13386,
+      "result_bytes": 13962
+    },
+    "kernel/fs_lease_open.inc": {
+      "before_sha256": "85d401113e2ce8d1f16b4941a41c5c354ca7f7269c1c1287d7385f368c17ca55",
+      "result_sha256": "6517091f810073a908704cb6489b2b5776a0b34ed70cd428888f19dbbb62b86a",
+      "before_bytes": 11225,
+      "result_bytes": 11431
+    },
+    "docs/SC32-FILE.md": {
+      "before_sha256": "0ed799f3ebc13b25cbf207f8d1c471c4d26a295e7d80fbb8db3030cba02674ae",
+      "result_sha256": "27d300ac12add6842437e17984e4c6d23bdf87c6c40388e9283090113121275c",
+      "before_bytes": 17186,
+      "result_bytes": 18529
+    }
+  },
+  "patch_sha256": "6ae7e5ad93f75e9dc660ff5f1a0a1c451a934f51232e6bc21793c0ebeb0451ab"
+}
