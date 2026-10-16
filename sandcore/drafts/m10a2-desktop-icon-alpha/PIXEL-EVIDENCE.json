@@ -1,0 +1,335 @@
+{
+  "schema": 1,
+  "scope": "READ_ONLY_EXISTING_SCREENSHOT_AND_ORIGINAL_SCB_PIXEL_FORENSICS",
+  "resources": {
+    "SYS/ICONS/AURORA/FILES.SCB": {
+      "bytes": 65568,
+      "sha256": "2a6a31f0732886fadaf457b1afba18cb8e6beb4ab37282cd86e6a55772286ea1",
+      "width": 128,
+      "height": 128,
+      "format": "STRAIGHT_ARGB_SCB2_FLAGS_ZERO",
+      "same_bytes_as_original_m10a1": true,
+      "alpha_zero": 8805,
+      "alpha_partial": 2292,
+      "alpha_opaque": 5287,
+      "distinct_alpha": 136,
+      "opaque_white": 81,
+      "opaque_black": 0
+    },
+    "SYS/ICONS/AURORA/NOTE.SCB": {
+      "bytes": 65568,
+      "sha256": "ba97f38493903b6f6259f79ee1b770fe220070fdf3e42fb132305e0ecd5fd46b",
+      "width": 128,
+      "height": 128,
+      "format": "STRAIGHT_ARGB_SCB2_FLAGS_ZERO",
+      "same_bytes_as_original_m10a1": true,
+      "alpha_zero": 8111,
+      "alpha_partial": 2362,
+      "alpha_opaque": 5911,
+      "distinct_alpha": 68,
+      "opaque_white": 631,
+      "opaque_black": 0
+    },
+    "SYS/ICONS/AURORA/STUDIO.SCB": {
+      "bytes": 65568,
+      "sha256": "acef695ee9699f5a31441fb9c7b39b99ef516640be41804902238678b38993d9",
+      "width": 128,
+      "height": 128,
+      "format": "STRAIGHT_ARGB_SCB2_FLAGS_ZERO",
+      "same_bytes_as_original_m10a1": true,
+      "alpha_zero": 7670,
+      "alpha_partial": 2529,
+      "alpha_opaque": 6185,
+      "distinct_alpha": 143,
+      "opaque_white": 583,
+      "opaque_black": 0
+    },
+    "SYS/ICONS/AURORA/CALC.SCB": {
+      "bytes": 65568,
+      "sha256": "6d44370a8d54ecda14ac2492516fe340143e8c42a2aec7b39163af6a046c3c5c",
+      "width": 128,
+      "height": 128,
+      "format": "STRAIGHT_ARGB_SCB2_FLAGS_ZERO",
+      "same_bytes_as_original_m10a1": true,
+      "alpha_zero": 8111,
+      "alpha_partial": 2362,
+      "alpha_opaque": 5911,
+      "distinct_alpha": 68,
+      "opaque_white": 631,
+      "opaque_black": 0
+    },
+    "SYS/ICONS/AURORA/SHELL.SCB": {
+      "bytes": 65568,
+      "sha256": "5475fe9e772415c12ece489a4f26a0a8bdd45902a4792a4c9988dd44abe07c2e",
+      "width": 128,
+      "height": 128,
+      "format": "STRAIGHT_ARGB_SCB2_FLAGS_ZERO",
+      "same_bytes_as_original_m10a1": true,
+      "alpha_zero": 7271,
+      "alpha_partial": 2548,
+      "alpha_opaque": 6565,
+      "distinct_alpha": 109,
+      "opaque_white": 44,
+      "opaque_black": 0
+    },
+    "SYS/ICONS/AURORA/LENS.SCB": {
+      "bytes": 65568,
+      "sha256": "b131868d4d4d1364edc0a6f43b81242bdbf52deee0acbdb1f8256be079015f3f",
+      "width": 128,
+      "height": 128,
+      "format": "STRAIGHT_ARGB_SCB2_FLAGS_ZERO",
+      "same_bytes_as_original_m10a1": true,
+      "alpha_zero": 6885,
+      "alpha_partial": 2527,
+      "alpha_opaque": 6972,
+      "distinct_alpha": 81,
+      "opaque_white": 581,
+      "opaque_black": 0
+    },
+    "SYS/ICONS/AURORA/SOUND.SCB": {
+      "bytes": 65568,
+      "sha256": "8684677311a2b7eb2a5c2b8488bba17199895fb5842badf10224bd43ca676056",
+      "width": 128,
+      "height": 128,
+      "format": "STRAIGHT_ARGB_SCB2_FLAGS_ZERO",
+      "same_bytes_as_original_m10a1": true,
+      "alpha_zero": 11260,
+      "alpha_partial": 2495,
+      "alpha_opaque": 2629,
+      "distinct_alpha": 203,
+      "opaque_white": 19,
+      "opaque_black": 0
+    },
+    "SYS/ICONS/AURORA/PALETTE.SCB": {
+      "bytes": 65568,
+      "sha256": "13812cfeaa4b5bde079fc88459dca95faa5f2db6213bd7e045380de71d0afff5",
+      "width": 128,
+      "height": 128,
+      "format": "STRAIGHT_ARGB_SCB2_FLAGS_ZERO",
+      "same_bytes_as_original_m10a1": true,
+      "alpha_zero": 8030,
+      "alpha_partial": 2326,
+      "alpha_opaque": 6028,
+      "distinct_alpha": 190,
+      "opaque_white": 34,
+      "opaque_black": 0
+    }
+  },
+  "screenshots": {
+    "build/m10a2-p6-gui-run-01/p6-native-desktop-initial.png": {
+      "bytes": 1356144,
+      "sha256": "3d6ebce153def126d38457b44eb6df58149d64d313a871745da22922fb8e3584"
+    },
+    "build/m10a2-p6-gui-run-01/p6-native-system-menu-settled.png": {
+      "bytes": 1246472,
+      "sha256": "e93c8ffca9009b42dd907f9b401de88fbea4e5889708e68a87f191d04cdde485"
+    }
+  },
+  "files_nearest_geometry": {
+    "x": 96,
+    "y": 48,
+    "width": 72,
+    "height": 72,
+    "opaque_samples": 1640,
+    "opaque_rgb_exact": 1640,
+    "partial_samples_excluding_shortcut_badge": 699,
+    "partial_exact_wrong_black_composite": 693,
+    "remaining_samples": [
+      {
+        "screen": [
+          160,
+          100
+        ],
+        "source_argb": "0200007f",
+        "expected_wrong_black": [
+          0,
+          0,
+          1
+        ],
+        "actual": [
+          235,
+          232,
+          220
+        ]
+      },
+      {
+        "screen": [
+          160,
+          101
+        ],
+        "source_argb": "0200007f",
+        "expected_wrong_black": [
+          0,
+          0,
+          1
+        ],
+        "actual": [
+          235,
+          232,
+          220
+        ]
+      },
+      {
+        "screen": [
+          160,
+          102
+        ],
+        "source_argb": "0200007f",
+        "expected_wrong_black": [
+          0,
+          0,
+          1
+        ],
+        "actual": [
+          235,
+          232,
+          220
+        ]
+      },
+      {
+        "screen": [
+          160,
+          103
+        ],
+        "source_argb": "0200007f",
+        "expected_wrong_black": [
+          0,
+          0,
+          1
+        ],
+        "actual": [
+          235,
+          232,
+          220
+        ]
+      },
+      {
+        "screen": [
+          160,
+          104
+        ],
+        "source_argb": "01000000",
+        "expected_wrong_black": [
+          0,
+          0,
+          0
+        ],
+        "actual": [
+          235,
+          232,
+          220
+        ]
+      },
+      {
+        "screen": [
+          160,
+          105
+        ],
+        "source_argb": "01000000",
+        "expected_wrong_black": [
+          0,
+          0,
+          0
+        ],
+        "actual": [
+          235,
+          232,
+          220
+        ]
+      }
+    ]
+  },
+  "note_opaque_white_samples": 177,
+  "note_opaque_white_exact": 177,
+  "examples": [
+    {
+      "screen": [
+        105,
+        66
+      ],
+      "source": [
+        16,
+        32
+      ],
+      "source_argb": "01000000",
+      "actual_rgb": [
+        0,
+        0,
+        0
+      ],
+      "wrong_opaque_black_composite": [
+        0,
+        0,
+        0
+      ],
+      "correct_clear_destination_argb": "01000000"
+    },
+    {
+      "screen": [
+        107,
+        67
+      ],
+      "source": [
+        19,
+        33
+      ],
+      "source_argb": "13bba15d",
+      "actual_rgb": [
+        14,
+        12,
+        7
+      ],
+      "wrong_opaque_black_composite": [
+        14,
+        12,
+        7
+      ],
+      "correct_clear_destination_argb": "13bba15d"
+    },
+    {
+      "screen": [
+        125,
+        66
+      ],
+      "source": [
+        51,
+        32
+      ],
+      "source_argb": "03555555",
+      "actual_rgb": [
+        1,
+        1,
+        1
+      ],
+      "wrong_opaque_black_composite": [
+        1,
+        1,
+        1
+      ],
+      "correct_clear_destination_argb": "03555555"
+    }
+  ],
+  "source_sha256": {
+    "user/scui/ui_paint.c": "e17e1f9d31e1f10cd485aca88c68009f5feed99ca6edf5ca70e704767b33cecb",
+    "user/scui/ui_argb.c": "0e2f5b6a71abeda13cdeda2d71635511d57f32e724950891d58a4ac3f807ddd6",
+    "user/scui/ui_data.c": "fbff908e57cf962d0698316a6b53b86f0382d588fa4b8a7fdc236393d27eb2ca",
+    "user/scui/SCUIPRIVATE.H": "374c2c98c7da78cd7b8956764ec1b9143d1fec20b3361444634b2fd8658ca3a0",
+    "user/scui/ui_shell_paint.inc": "d41fc58d9d75c2a9bac48e77a071f2bc84ff875bfbd9fde9eca6eda9d3cf6ba4",
+    "user/scui/ui_menu.c": "b84afc54e8192bb5a71823f2da39a59d4836b2c5223fc7f237d6b39082f242b9",
+    "user/scshell/shell_shortcut.c": "06ed545850d1fdd65d8320811041610b1cdae9056e740a6f9ca9051ff0ec516d",
+    "user/scshell/desktop/desktop_view.inc": "375fd8b4981941255b71a6718b93c33409d2a1d39ccebf1f850def04bcf64fcb",
+    "user/SCUIARGB.H": "3eb74405879b65697823881ed78a056c1aef0d1b3a320ac6b47fa9526b31dc64",
+    "docs/IMAGE.md": "f2fa579bfe3d20c57c5c502cc54e3b252e950545c494097a3e8edd9ccd33d605",
+    "docs/GFX.md": "04c5ae945e6a34a8213770250132785e727bdfd2cc19c1462ab73a47ea7bba2b"
+  },
+  "native_ui": {
+    "path": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-p6-guest-generation-run-03\\native-libraries\\SCUI.SCL",
+    "bytes": 732380,
+    "sha256": "975e4dcb1ec4336486a8d8a8ee550183ab1895a0e7b6736c1f62cfa9a5d9c991",
+    "object_compile_case": "SCUI-actual-SCCC-object"
+  },
+  "asset_edited": false,
+  "image_generated": false,
+  "vm_started": false,
+  "fix_runtime_verified": false
+}

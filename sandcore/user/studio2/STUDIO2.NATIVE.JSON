@@ -119,6 +119,24 @@
       "size": 1
     },
     {
+      "name": "ScDirectoryOpen",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScDirectoryNext",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScDirectoryClose",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
       "name": "__scc_standard",
       "dependency": "SCCLIB.SCL",
       "kind": "function",
@@ -690,6 +708,12 @@
     },
     {
       "name": "ScPathQuery",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScFileLeaseAcquire",
       "dependency": "SC32API.SCL",
       "kind": "function",
       "size": 1

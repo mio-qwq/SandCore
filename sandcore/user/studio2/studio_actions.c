@@ -251,7 +251,7 @@ static ScStatus dialog_done(ScUiContext *ui,const ScUiEvent *e,void *opaque)
     if(s<0){
         st.pending_action=0;
         st.save_all=0;
-        error(s,"操作未完成；原文档与工程保留");
+        error(s,kind==S_DIALOG_PROJECT_SAVE?"工作区未保存；请使用 .SCW。自动补全只创建新目标；覆盖时显式选择完整文件名。":"操作未完成；原文档与工程保留");
     }
     refresh();
     return 0;
@@ -260,12 +260,21 @@ static ScStatus file_dialog(U kind)
 {
     if(st.dialog||st.io)return SC32_E_BUSY;
     ScUiFileDialogDesc d;
+    ScUiMenuItem filter;
     rec(&d,sizeof(d));
     d.owner=st.root;
     d.directory="/HOME";
-    d.title=text(kind==S_DIALOG_SAVE?"另存文档":kind==S_DIALOG_NEW?"新建文件":kind==S_DIALOG_PROJECT_OPEN?"打开工程":kind==S_DIALOG_PROJECT_SAVE?"保存工程":kind==S_DIALOG_PUBLISH?"发布到目录":"选择文件");
+    d.title=text(kind==S_DIALOG_SAVE?"另存文档":kind==S_DIALOG_NEW?"新建文件":kind==S_DIALOG_PROJECT_OPEN?"打开工作区（.SCW）":kind==S_DIALOG_PROJECT_SAVE?"保存工作区（默认 .SCW）":kind==S_DIALOG_PUBLISH?"发布到目录":"选择文件");
     d.flags=kind==S_DIALOG_SAVE||kind==S_DIALOG_PROJECT_SAVE?SC_UI_FILE_SAVE|SC_UI_FILE_OVERWRITE:kind==S_DIALOG_NEW?SC_UI_FILE_SAVE:kind==S_DIALOG_PUBLISH?SC_UI_FILE_DIRECTORY:SC_UI_FILE_OPEN;
     if(kind==S_DIALOG_ADD)d.flags|=SC_UI_FILE_MULTI;
+    if(kind==S_DIALOG_PROJECT_OPEN||kind==S_DIALOG_PROJECT_SAVE){
+        rec(&filter,sizeof(filter));
+        filter.item=1;filter.command=1;
+        filter.label=text("SCW 工作区（*.SCW）");
+        /* 公共glob按字节匹配；列齐3个ASCII字母的大小写，不假定FS返回大写。 */
+        filter.help=text("*.SCW;*.scw;*.Scw;*.sCW;*.SCw;*.ScW;*.sCw;*.scW");
+        d.filters=&filter;d.filter_count=1;d.selected_filter=1;
+    }
     d.completion=dialog_done;
     ScStatus s=ScShellFileDialog(st.ui,&d,&st.dialog);
     if(s>=0){
@@ -280,7 +289,7 @@ static ScStatus config_dialog(void)
     ScUiPropertySheetDesc d;
     rec(&d,sizeof(d));
     d.owner=st.root;
-    d.title=text("工程配置");
+    d.title=text("工作区配置");
     d.initial=st.config;
     d.completion=dialog_done;
     const char *keys[]={

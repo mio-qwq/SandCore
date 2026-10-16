@@ -1,0 +1,309 @@
+{
+  "status": "OFFLINE_SOURCE_REVIEW_NOT_NEW_RUNTIME_PASS",
+  "original_report": "/mnt/c/Users/Administrator/Desktop/projectos/sandcore/build/m10a2-p6-gui-run-01/p6-gui.json",
+  "original_report_sha256": "16f81616b66b172f51e669c86e9d22b5f7ac6f0f3ea699e23a929ac73c6c6111",
+  "original_status": "FAIL_OR_INTERRUPTED",
+  "original_ledger": {
+    "name": "p6-gui-single-final-owner-account",
+    "before_physical_pages": 13713,
+    "after_physical_pages": 13918,
+    "physical_delta": 205,
+    "actual_pool_deltas": {
+      "records@008a6fc0": {
+        "pages": 0,
+        "objects": 0,
+        "flags": 1
+      },
+      "view_pool@008cc520": {
+        "pages": 0,
+        "objects": 0,
+        "flags": 0
+      },
+      "window_pool@008cc980": {
+        "pages": 0,
+        "objects": 0,
+        "flags": 0
+      },
+      "capture_pool@008ccde0": {
+        "pages": 0,
+        "objects": 0,
+        "flags": 0
+      },
+      "native_pool@008ce4a0": {
+        "pages": -6,
+        "objects": -1,
+        "flags": 0
+      },
+      "transaction_pool@008ce900": {
+        "pages": 0,
+        "objects": 0,
+        "flags": 0
+      },
+      "native_pool@008d7420": {
+        "pages": 0,
+        "objects": 0,
+        "flags": 0
+      },
+      "job_pool@008d7880": {
+        "pages": 0,
+        "objects": 0,
+        "flags": 0
+      },
+      "pipe_pool@008d7ce0": {
+        "pages": 0,
+        "objects": 0,
+        "flags": 0
+      },
+      "endpoint_pool@008d8140": {
+        "pages": 0,
+        "objects": 0,
+        "flags": 0
+      },
+      "owners@008dd960": {
+        "pages": 0,
+        "objects": 0,
+        "flags": 0
+      },
+      "descriptions@008dddc0": {
+        "pages": 0,
+        "objects": 0,
+        "flags": 0
+      },
+      "handles@008de220": {
+        "pages": 0,
+        "objects": 0,
+        "flags": 0
+      },
+      "owners@008de6a0": {
+        "pages": 0,
+        "objects": 0,
+        "flags": 0
+      },
+      "br_offers@008e2b40": {
+        "pages": 0,
+        "objects": 0,
+        "flags": 0
+      },
+      "br_shared_objects@008e2fa0": {
+        "pages": 0,
+        "objects": 0,
+        "flags": 0
+      },
+      "br_messages@008e3400": {
+        "pages": 0,
+        "objects": 0,
+        "flags": 0
+      },
+      "br_connections@008e3860": {
+        "pages": 0,
+        "objects": 0,
+        "flags": 0
+      },
+      "br_endpoints@008e3cc0": {
+        "pages": 0,
+        "objects": 0,
+        "flags": 0
+      },
+      "br_formats@008e4120": {
+        "pages": 0,
+        "objects": 0,
+        "flags": 0
+      },
+      "br_clips@008e4580": {
+        "pages": 0,
+        "objects": 0,
+        "flags": 0
+      },
+      "br_blobs@008e49e0": {
+        "pages": 0,
+        "objects": 0,
+        "flags": 0
+      },
+      "br_handles@008e4e40": {
+        "pages": 0,
+        "objects": 0,
+        "flags": 0
+      },
+      "br_sessions@008e52a0": {
+        "pages": 0,
+        "objects": 0,
+        "flags": 0
+      },
+      "br_owners@008e5700": {
+        "pages": 0,
+        "objects": 0,
+        "flags": 0
+      },
+      "drop_tickets@008e5ba0": {
+        "pages": 0,
+        "objects": 0,
+        "flags": 0
+      },
+      "drop_targets@008e6000": {
+        "pages": 0,
+        "objects": 0,
+        "flags": 0
+      },
+      "drop_sessions@008e6460": {
+        "pages": 0,
+        "objects": 0,
+        "flags": 0
+      },
+      "drop_owners@008e68c0": {
+        "pages": 0,
+        "objects": 0,
+        "flags": 0
+      },
+      "drop_windows@008e6d20": {
+        "pages": 0,
+        "objects": 0,
+        "flags": 0
+      },
+      "owners@008ec240": {
+        "pages": 0,
+        "objects": 0,
+        "flags": 0
+      }
+    },
+    "actual_history_page_delta": 0,
+    "actual_font_page_delta": 0,
+    "first_font_context": true,
+    "actual_first_finite_wait_cache_delta": 0,
+    "finite_wait_heap_before": {
+      "count": 1,
+      "capacity": 32,
+      "heap": 40910848,
+      "pages": 1,
+      "heap_aligned_managed": true,
+      "heap_page_allocated": true
+    },
+    "finite_wait_heap_after": {
+      "count": 1,
+      "capacity": 32,
+      "heap": 40910848,
+      "pages": 1,
+      "heap_aligned_managed": true,
+      "heap_page_allocated": true
+    },
+    "finite_wait_cache_source": "kernel/task.c::wait_reserve initial32 and wait_remove retains empty pages==1",
+    "actual_desktop_page_delta": 0,
+    "attributed_physical_delta": 0,
+    "unexplained_delta": 205,
+    "unexpected": [
+      "live objects: native_pool@008ce4a0",
+      "non-history pool pages: native_pool@008ce4a0",
+      "persistent scalar changed: wait_pages"
+    ],
+    "complete_owner_and_gc_observed": true,
+    "before_observations": [
+      {
+        "pages": 13713,
+        "samples": [
+          13713,
+          13713,
+          13713,
+          13713,
+          13713
+        ],
+        "pending": {
+          "br_garbage_first": 0,
+          "br_notify_first": 0,
+          "gc_first": 0,
+          "session_first": 0,
+          "cleanup_head": 4294967295,
+          "zombie_head": 4294967295,
+          "cleanup_revoke_pending": 0
+        }
+      }
+    ],
+    "after_observations": [
+      {
+        "pages": 13918,
+        "samples": [
+          13918,
+          13918,
+          13918,
+          13918,
+          13918
+        ],
+        "pending": {
+          "br_garbage_first": 0,
+          "br_notify_first": 0,
+          "gc_first": 0,
+          "session_first": 0,
+          "cleanup_head": 4294967295,
+          "zombie_head": 4294967295,
+          "cleanup_revoke_pending": 0
+        }
+      }
+    ],
+    "execution_class": "FRESH",
+    "executed_in_this_vm": true,
+    "qemu_pid": 15152,
+    "status": "FAIL"
+  },
+  "current_inputs_unchanged": true,
+  "source_disk_unchanged": true,
+  "core_elf_sha256": "7300fc668e335dfa33c69d17c7c5760f72f87d47d17fd937b05fbde79300caf0",
+  "scoped_wait": {
+    "task.c::wait_pages": {
+      "address": 9228884,
+      "bytes": 4
+    }
+  },
+  "native_pools": {
+    "fs.c::native_pool": {
+      "address": 9233568,
+      "bytes": 1112
+    },
+    "streams.c::native_pool": {
+      "address": 9270304,
+      "bytes": 1112
+    }
+  },
+  "baseline_scalar_wait_pages": 0,
+  "baseline_finite_wait_heap": {
+    "count": 1,
+    "capacity": 32,
+    "heap": 40910848,
+    "pages": 1,
+    "heap_aligned_managed": true,
+    "heap_page_allocated": true
+  },
+  "scalar_and_finite_wait_disagree_in_baseline": true,
+  "physical_delta": 205,
+  "known_fs_pool_delta": -6,
+  "remainder_after_known_fs_decrease": 211,
+  "cache_attribution": "NOT_OBSERVED_NOT_EXEMPTED",
+  "final_full_resources_saved": false,
+  "baseline_owner_page_tables_saved": false,
+  "scdb_binding": {
+    "image_sha256": "7053cd7c96b512e41955fea13ecb01e1677f433668b04d4186fe3697f327eab4",
+    "debug_sha256": "1d8cbc36cb8f66b78b464b3dd656924dfc71284ba41c37e6b5251e21310603fe",
+    "image_bytes": 139680,
+    "debug_format": "SCDB1MIO_V1_SCX_ABSOLUTE_VA",
+    "desk": 4333948,
+    "desk_size": 1248,
+    "object_index": 0
+  },
+  "map_binding": {
+    "image_sha256": "7053cd7c96b512e41955fea13ecb01e1677f433668b04d4186fe3697f327eab4",
+    "debug_sha256": "3920681c87fc6e7f09535a714d8b85fbd11fc49ad3505e42348641949ec7f9ad",
+    "image_bytes": 139680,
+    "debug_format": "SCDBMAP1MIO_VA_SIZE_NAME_OBJECT_BINDING",
+    "desk": 4333948,
+    "desk_size": 1248,
+    "object_index": 0
+  },
+  "source_pins": {
+    "kernel/fs.c": "e0e916990807587df741ee023a3d36741bce85f4c15fb5c0523f52351bc2fb52",
+    "kernel/objpool.c": "4f94afcb2723a4f90a71c049a2be1314abc827dfab42c5eb0101318f5710ea2d",
+    "kernel/paging.c": "e8ad73ac5ae3a84f69b7dfae7c3ad74b4f7da9d404cc50e480a9189e0e2a6d36",
+    "kernel/sc32_debug.c": "c714171345e4b41bced4f9d4c17c73200256fc713126c4d853267e86344e2f7e",
+    "kernel/task.c": "40495fad1e36bdc1e83e2787e6e18a4da710eea1553959a8ba3ca6f543ece2ef",
+    "user/SC32DEBUG.H": "61edbdf3fb76e422032bb68669656b4950807601e2edadf9e7b558c5ecda2a68"
+  },
+  "helper_vm_path_executed": false,
+  "new_build": false,
+  "new_vm": false
+}

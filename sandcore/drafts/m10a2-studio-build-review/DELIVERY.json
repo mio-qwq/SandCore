@@ -1,0 +1,37 @@
+{
+  "status": "SOURCE_PATCH_ONLY_NOT_BUILT_NOT_GUEST_VERIFIED",
+  "files": {
+    "PINS.json": {
+      "sha256": "0ecfc752ca2b94a0889f2f9411d5e4d0a88c2ffa7d8a8ad0452cfc3d3870c4e9",
+      "bytes": 1787
+    },
+    "README.md": {
+      "sha256": "3ef96a6b449c16f0056820163276e34f8386f4d353beaf74e785883ed68abbf5",
+      "bytes": 3958
+    },
+    "REVIEW.json": {
+      "sha256": "ed221da502ec3aab0d75e1dc1640e64628c6c291232150c91aaf066d5ce267a3",
+      "bytes": 5229
+    },
+    "make_patch.py": {
+      "sha256": "1be31d96959ea2c7b81e059dab2f4deb714c487acfd8d01cde7d0d6492d85930",
+      "bytes": 13251
+    },
+    "overlay/user/studio2/STUDIO2.JSON": {
+      "sha256": "4079aa733f0576c4e2c822c780755af8e9861ce7a8b4ccd7098df18e9bebf53b",
+      "bytes": 19671
+    },
+    "overlay/user/studio2/studio_build.c": {
+      "sha256": "0a2c2d65ae2634a7d3a04868d4e9df72282f73c200ee1df1ffcfa40b7ee2d789",
+      "bytes": 29425
+    },
+    "overlay/user/studio2/studio_io.c": {
+      "sha256": "d823b27581d404e537bb7a6c85dbee04bd8be53e4ef6ee920b9348d246f5e5cf",
+      "bytes": 13784
+    },
+    "studio-namespace.patch": {
+      "sha256": "a646eaf5a4bef585a7084e70c010f02ab2abef16d357c756784cd01986147987",
+      "bytes": 4618
+    }
+  }
+}

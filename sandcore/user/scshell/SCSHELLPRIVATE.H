@@ -72,7 +72,8 @@ struct ShProvider {
 struct ScShellMenu {
     ShObject base;ScShellMenuDesc desc;ScShellFileItem *items;char *directory;
     ScUiMenu *menu;ShProvider **providers;ScU32 provider_count;
-    ScArray *commands;ScShellFileJob *job;ScShellDialog *dialog;ScUiDialog *prompt;
+    ScArray *commands;ScShellFileJob *job;ScShellDialog *dialog;ScUiNode prompt,prompt_name,prompt_status;
+    ScU32 prompt_listener,prompt_intent;
     char *recovery;ScU32 pending_command,prompt_kind,catalog_epoch;
     ScUiDialog *conflict_prompt;ScShellFileResult conflict_snapshot;
 };

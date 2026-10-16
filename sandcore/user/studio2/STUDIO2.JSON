@@ -95,6 +95,24 @@
       "size": 1
     },
     {
+      "name": "ScDirectoryClose",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScDirectoryNext",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScDirectoryOpen",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
       "name": "ScFileClose",
       "dependency": "SC32API.SCL",
       "kind": "function",
@@ -102,6 +120,12 @@
     },
     {
       "name": "ScFileFlush",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScFileLeaseAcquire",
       "dependency": "SC32API.SCL",
       "kind": "function",
       "size": 1

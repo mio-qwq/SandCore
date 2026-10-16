@@ -1,0 +1,66 @@
+{
+  "schema": 1,
+  "status": "FROZEN_PINNED_PATCH_PREPARED_NOT_APPLIED_NOT_COMPILED",
+  "date": "2026-10-16",
+  "source_targets": {
+    "user/scui/ui_dialog.c": {
+      "before_bytes": 50166,
+      "after_bytes": 50507,
+      "before_sha256": "3edbc873669548cefa6495e191c2b3a88544d9d994e7134d7002da9b2607ac4d",
+      "after_sha256": "3b5d8ac16af4f1aa942a7e1895a7532d899b530b874c1f23d0ac2fdd7b31edfb"
+    },
+    "user/scui/SCUI.json": {
+      "before_bytes": 30884,
+      "after_bytes": 30881,
+      "before_sha256": "d5f76e378f1e1de18499604185dab1cbb00310b9de410721bda50a880c88f553",
+      "after_sha256": "119bac0b8e51e5abfa3dc1cbf1b7800e2d59f0af851ac24303420590046cdbf0"
+    },
+    "user/scui/SCUI.NATIVE.JSON": {
+      "before_bytes": 29338,
+      "after_bytes": 29335,
+      "before_sha256": "f7ba0ca60219804635c91ae538059d706c61d1d3c07e444554eb35d042e59fbc",
+      "after_sha256": "fec15b982b500eb2d884a77c9d7d720d79d983ed1205e1e71505ddc41474932c"
+    }
+  },
+  "supporting_source_sha256": {
+    "user/SCUI.H": "72d54bfea02c732201ce6b2ecad495c933c30353ab49240c74a5831f0010f72a",
+    "user/SC32PATH.H": "f0bc29ab842043c7d63791ee8c7ff83760e9c84d5b6aa80e74544a9c4851d037",
+    "user/scui/ui_data.c": "fbff908e57cf962d0698316a6b53b86f0382d588fa4b8a7fdc236393d27eb2ca",
+    "user/SC32API.H": "0e77851eb66437d2b2afeadf7312b8bf0704d5f61347c5f84f57189819617dda"
+  },
+  "existing_screenshot_sha256": {
+    "build/m10a2-p6-gui-run-01/p6-native-studio-open-project.png": "39c7b99fc2d0a0b6730b817caa7161c0baf8aee98d76cfb6f5e75fc88c17bc4c",
+    "build/m10a2-p6-gui-run-01/p6-native-notes-saved.png": "17ce34cb9a95376bdf5f64f9f6881dfcc3aaeccffa610e18343ad307fdbaa598"
+  },
+  "files": {
+    "file-dialog.patch": {
+      "bytes": 2242,
+      "sha256": "a4d2f789e0b4c3a8741aedacf3645751edf0c3ae711cbba1078a42c756876c4b"
+    },
+    "pins.json": {
+      "bytes": 296,
+      "sha256": "71af971f69124d5d50eb2e41543e28b0ce989762d640e56ad8195dde4c54e87c"
+    },
+    "PREPARATION.json": {
+      "bytes": 1130,
+      "sha256": "fb37fa906b2e97fa81c056b38ed5c505948c35a399ad3cda307c8deb9fec7cc6"
+    },
+    "prepare_patch.py": {
+      "bytes": 5279,
+      "sha256": "f2d3dcd458f8648ba87b69fce0ea046de44903b708fe06c6053ce444276cde5d"
+    },
+    "README.md": {
+      "bytes": 2651,
+      "sha256": "6aba9449f582fc9e20353ddb2452d81b6cadb1c12e5084028d0f904d5dc931d1"
+    },
+    "result-pins.json": {
+      "bytes": 296,
+      "sha256": "06df32db30787da5d7dc8c36e9edd5055418a296238374f48f8b1ec089086ed6"
+    }
+  },
+  "main_modified": false,
+  "patch_applied": false,
+  "build_executed": false,
+  "qemu_started": false,
+  "guest_fix_verified": false
+}

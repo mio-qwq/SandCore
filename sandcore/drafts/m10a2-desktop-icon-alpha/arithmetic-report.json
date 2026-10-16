@@ -1,0 +1,35 @@
+{
+  "scope": "HOST_I386_INTEGER_ARITHMETIC_ONLY_NOT_SCUI_OR_GUEST",
+  "guest": false,
+  "full_ui_compiled": false,
+  "status": "PASS",
+  "commands": [
+    {
+      "args": [
+        "gcc",
+        "-m32",
+        "-O2",
+        "-std=c99",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "/mnt/c/Users/Administrator/Desktop/projectos/sandcore/drafts/m10a2-desktop-icon-alpha/host-arithmetic.c",
+        "-o",
+        "/mnt/c/Users/Administrator/Desktop/projectos/sandcore/drafts/m10a2-desktop-icon-alpha/host-arithmetic"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "/mnt/c/Users/Administrator/Desktop/projectos/sandcore/drafts/m10a2-desktop-icon-alpha/host-arithmetic"
+      ],
+      "exit_code": 0,
+      "stdout": "STRAIGHT_ARGB_U32_ARITHMETIC_PASS cases=1168 known_regressions=4 opaque_old_exact=true\n",
+      "stderr": ""
+    }
+  ],
+  "source_sha256": "456a7dfa767e5e4980682cff139ce9050619c809a4b5b6d2aeb24de8882f1862",
+  "helper_sha256": "f36e8ae9c3b211053a7072bd0aba8c1f4bfa77d4751faa46e8aa875a97ca3024"
+}

@@ -1253,7 +1253,7 @@
       "size": 1
     },
     {
-      "name": "ScPathMetadata",
+      "name": "ScPathQuery",
       "kind": "function",
       "dependency": "SC32API.SCL",
       "size": 1

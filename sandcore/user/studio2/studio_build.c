@@ -240,20 +240,38 @@ static ScStatus spawn(StChild *c,const char *command,U compiler)
 }
 static ScStatus namespace_pin(StPin *p)
 {
-    ScPathInfo info;
-    rec(&info,sizeof(info));
-    ScStatus s=ScPathQuery("/SYS/INC",&info);
+    if(p->live)return SC32_E_BUSY;
+    ScPathInfo path_info;
+    rec(&path_info,sizeof(path_info));
+    ScStatus s=ScPathQuery("/SYS/INC",&path_info);
     if(s<0)return s;
-    ScLeaseOpenDesc d;
-    rec(&d,sizeof(d));
-    d.path="/SYS/INC";
-    d.object_kind=SC32_PATH_DIRECTORY;
-    d.lease_kind=SC32_LEASE_NAMESPACE;
-    d.expected_revision=info.generation;
-    d.flags=SC32_LEASE_READ_ONLY_NAMESPACE|SC32_LEASE_METADATA_ONLY;
+    if(path_info.kind!=SC32_PATH_DIRECTORY)return SC32_E_INVALID;
+    ScDirectory directory=0;
+    s=ScDirectoryOpen("/SYS/INC",&directory);
+    if(s<0)return s;
+    /* 先交给构建清理状态机持有。后续失败不能丢掉还未关闭的目录，
+     * 尤其不能把一次返回BUSY的Close当成已回收。 */
     rec(&p->info,sizeof(p->info));
-    s=ScFileLeaseOpenPinned(&d,&p->info);
-    if(s>=0)p->live=1;
+    p->info.directory=directory;
+    p->live=1;
+    ScDirectoryEntry row;
+    ScDirectoryPage page;
+    rec(&page,sizeof(page));
+    s=ScDirectoryNext(directory,&row,1,&page);
+    if(s<0)return s;
+    /* revision与全局目录epoch是两种身份。只读Acquire固定实际子树，
+     * 仍允许编译器独立读头文件；META的OpenPinned不能代替这份合同。 */
+    ScLeaseAcquireDesc d;
+    ScLeaseInfo acquired;
+    rec(&d,sizeof(d));
+    rec(&acquired,sizeof(acquired));
+    d.kind=SC32_LEASE_NAMESPACE;
+    d.directory=directory;
+    d.expected_revision=path_info.generation;
+    d.expected_epoch=page.generation;
+    d.flags=SC32_LEASE_READ_ONLY_NAMESPACE;
+    s=ScFileLeaseAcquire(&d,&acquired);
+    if(s>=0)p->info=acquired;
     return s;
 }
 static ScStatus inputs_current(void)
@@ -777,16 +795,18 @@ static void build_step(void)
         return;
     }
     if(b->phase==S_BUILD_CLEAN){
+        /* 只有已确认关闭才推进。失败仍保留pin，下个安全点重试，
+         * 不让下一次构建memset吞掉尚活的目录或lease引用。 */
         if(b->next<b->input_count){
             ScStatus s=pin_close(&b->inputs[b->next].pin);
-            if(s==SC32_PENDING)return;
+            if(s){if(s<0&&!b->error)b->error=s;return;}
             b->next++;
             return;
         }
         ScStatus s=pin_close(&b->manifest);
-        if(s==SC32_PENDING)return;
+        if(s){if(s<0&&!b->error)b->error=s;return;}
         s=pin_close(&b->system_headers);
-        if(s==SC32_PENDING)return;
+        if(s){if(s<0&&!b->error)b->error=s;return;}
         b->phase=0;
         b->cancel=0;
         if(b->error){

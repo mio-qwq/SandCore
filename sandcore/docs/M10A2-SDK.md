@@ -14,7 +14,7 @@ SandCore M10a2 — The Application Platform Era。最终 SDK staging 增量已�
 | SYS/SDK/HOSTLINK | 原 `.json` 宿主 manifest，明确不作为原生编译清单 |
 | SYS/BIN | 实际 guest G1 SCCC.SCX、独立实际 guest SCLD.SCX；host-preview 全程另标宿主来源 |
 | SYS/SDK/SRC | 对应实现、公共/私有布局、工具链、现代应用及 codec 的固定源码摘要；私有内容只作源码归档 |
-| SYS/SDK/EXAMPLES | EDIT2、UTILITY 和 RDESK 的独立 TU、插件、SCP、manifest、响应文件、普通用户 BUILD.SH 与说明 |
+| SYS/SDK/EXAMPLES | EDIT2、UTILITY 和 RDESK 的独立 TU、插件、SCW工作区、manifest、响应文件、普通用户 BUILD.SH 与说明 |
 | SYS/SDK/DOC | 同批公开规范、SDK 和示例使用说明 |
 | SYS/UI、SYS/FONT | 真实 Unicode 数据/oracle 与原始凤凰 12/16px TTF |
 | SYS/LICENSE | 所纳入第三方的固定完整源码、嵌套实现、完整许可/版权/来源与项目许可 |
@@ -56,7 +56,7 @@ scld PLUGIN.SCL --scl PLUGIN.JSON @PLUGIN.RSP
 
 SCO v1 保留各 TU 的段、section-relative 定义/重定位、未决函数/数据、private/static 身份、对齐/BSS 和真实源行。链接器按对象解析 duplicate/missing、落实各对象记录的对齐，最终输出 SCX/SCL、map 与 SCDB1MIO v1 `.sdbg`。副文件绑定完整映像 SHA，不冒充内核验证的实际装载身份。响应文件只有对象路径，不能包含源码、嵌套 @ 或隐式 include；具体限制见 SCO-AND-LINKER。
 
-ResearchDesk 的 MAIN/MODEL/VIEW/IO 四独立 TU 与 RDSTATS 独立插件展示公开的多文档、共享 UndoRedo、树/表 provider revision、排序与源行、可调布局/主题、图表、文件对话框、剪贴板、未知长度读取和条件保存。数据/结果绑定正文 revision 与工作代数，失败候选不破坏原数据。已有目标使用 Preserving 精确发布；只有 durable COMMITTED 且正文修订相同才清 dirty。详细命令与普通用户结束条件见 SDK-RESEARCHDESK 和示例 README。
+ResearchDesk 的 MAIN/MODEL/VIEW/IO 四独立 TU 与 RDSTATS 独立插件展示公开的多文档、共享 UndoRedo、树/表 provider revision、排序与源行、可调布局/主题、图表、文件对话框、剪贴板、未知长度读取和条件保存。数据/结果绑定正文 revision 与工作代数，失败候选不破坏原数据。已有目标使用 Preserving 精确发布；只有 durable COMMITTED 且正文修订相同才清 dirty。RDSTATS.SCW和RDESK.SCW分别描述插件与四TU应用，SCW即SandCore Workspace（工程工作区）。详细合同见SCW-WORKSPACE；命令与普通用户结束条件见 SDK-RESEARCHDESK 和示例 README。
 
 ```text
 /BIN/SH.SCX /SYS/SDK/EXAMPLES/RDESK/BUILD.SH
@@ -84,3 +84,5 @@ EDIT2 和 UTILITY 原例及历史证据保留。它们原先的直接 FILE 保�
 | 2026-10-15 | SDK 五库 preview 与双示例宿主后端检查；客体执行待验，原证据保留。 |
 | 2026-10-16 | 完整公共头/八普通原生库及固定 codec 白名单、独立 SCLD、SRC/许可/来源、NATIVE/HOSTLINK 和 ResearchDesk 多源开发合同；本批整套客体 staging/运行待主代理统一验证。 |
 | 2026-10-16 | 原生来源核真实聚合include闭包；未接线历史草稿仍完整归档、按HOST固定，不伪称guest编译。 |
+
+2026-10-16：公开SCW工作区合同、示例路径和SDK归档接线。

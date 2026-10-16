@@ -1,0 +1,41 @@
+{
+  "status": "SOURCE_PATCH_ONLY_NOT_BUILT_NOT_GUEST_VERIFIED",
+  "modified": {
+    "user/studio2/studio_build.c": {
+      "before_sha256": "69249a23196d36ac5420e336bc605b37025d279d4721a2b75471fbf81dbfd4a0",
+      "after_sha256": "0a2c2d65ae2634a7d3a04868d4e9df72282f73c200ee1df1ffcfa40b7ee2d789",
+      "before_bytes": 28397,
+      "after_bytes": 29425
+    },
+    "user/studio2/studio_io.c": {
+      "before_sha256": "df36f817150447f5b48e609a575aa8d99597e96bf3c71e1550897faa9fb5d587",
+      "after_sha256": "d823b27581d404e537bb7a6c85dbee04bd8be53e4ef6ee920b9348d246f5e5cf",
+      "before_bytes": 13220,
+      "after_bytes": 13784
+    },
+    "user/studio2/STUDIO2.JSON": {
+      "before_sha256": "eed94567f1d2e7db7434cf4e6e6161be57ac9b65229b7b85cdd1f0b3fa615bbb",
+      "after_sha256": "4079aa733f0576c4e2c822c780755af8e9861ce7a8b4ccd7098df18e9bebf53b",
+      "before_bytes": 19151,
+      "after_bytes": 19671
+    }
+  },
+  "patch_sha256": "a646eaf5a4bef585a7084e70c010f02ab2abef16d357c756784cd01986147987",
+  "added_host_imports": [
+    "ScDirectoryClose",
+    "ScDirectoryNext",
+    "ScDirectoryOpen",
+    "ScFileLeaseAcquire"
+  ],
+  "native_manifest": "ROOT_REGENERATE_FROM_ACTUAL_SCO_NOT_EDITED",
+  "scw": {
+    "pins_sha256": "08c17dc8498dd2b725ca6fc0b203b2edfffa552bb5f85d923711c97bbc0adfb7",
+    "renames_sha256": "3417df687676612472a0749e26d416eb34b2e2ec4c17998ccd0b160cd7489124",
+    "io_before_sha256": "df36f817150447f5b48e609a575aa8d99597e96bf3c71e1550897faa9fb5d587",
+    "io_after_scw_sha256": "2026dc09cc6a0d57586d685ad0c7cd844ecd4eb3b3fc3d1e4ed32765c1f94553",
+    "io_after_both_sha256": "004ef5f65693f6f380d599267482910f9dc8b01250a2eb4e8bdf30e10079eca2",
+    "close_hunk_unique_after_scw": true,
+    "studio_build_not_modified_by_scw": true,
+    "renames_read": 2
+  }
+}

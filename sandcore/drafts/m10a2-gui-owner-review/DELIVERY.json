@@ -1,0 +1,21 @@
+{
+  "status": "OFFLINE_SOURCE_REVIEW_NOT_NEW_RUNTIME_PASS",
+  "files": {
+    "README.md": {
+      "sha256": "a4a0cfee6f7df8fa94c1b097da44e9256b649fbc3e1bebf86d3a2c2fd536fb1e",
+      "bytes": 6610
+    },
+    "REVIEW.json": {
+      "sha256": "602c439012515314cd65fbb1ca9074a2599ec28eba8c1a025b82fe79cfdcf696",
+      "bytes": 7949
+    },
+    "audit.py": {
+      "sha256": "2386749aa9b9c3561b0ceee222d0377e07362d98bccc3605c518446fe4db7618",
+      "bytes": 4329
+    },
+    "owner_snapshot.py": {
+      "sha256": "25d87a8f1b5cbac487ed740416a65031a1c456a9cbaf48505ba739c651f859dc",
+      "bytes": 22143
+    }
+  }
+}

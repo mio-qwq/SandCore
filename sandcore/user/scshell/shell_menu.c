@@ -58,7 +58,8 @@ static void sh_menu_dispose(ShObject *base) {
     if(m->dialog)ScShellDialogClose(m->dialog);
     if(m->job)sh_release(&m->job->base);
     if(!sh_quiet) {
-        if(m->prompt)ScUiDialogRelease(m->prompt);
+        if(m->prompt_listener)ScUiDisconnect(m->desc.ui,m->prompt_listener);
+        if(m->prompt)ScUiNodeDestroy(m->desc.ui,m->prompt);
         if(m->conflict_prompt)ScUiDialogRelease(m->conflict_prompt);
         ScUiMenuRelease(m->menu);
         if(m->desc.ui)ScUiContextRelease(m->desc.ui);
@@ -421,67 +422,24 @@ static ScStatus sh_menu_job_start(ScShellMenu *m,ScU32 operation,const ScShellFi
     }
     return s;
 }
-static ScStatus sh_menu_name_prompt(ScShellMenu *m,ScU32 command) {
-    ScConfig *initial=0;
-    ScValue v;
-    ScUiFieldDesc field;
-    ScUiPropertySheetDesc d;
-    ScStatus s;
-    const char *name="New directory";
-    if(command==SC_SHELL_COMMAND_RENAME) {
-        name=strrchr(m->items[0].source,'/');
-        name=name?name+1:m->items[0].source;
-    } else if(command==0x7300) {
-        name=strrchr(m->conflict_snapshot.destination,'/');
-        name=name?name+1:m->conflict_snapshot.destination;
-    }
-    s=ScConfigCreate(&initial);
-    memset(&v,0,sizeof(v));
-    v.size=sizeof(v);
-    v.version=1;
-    v.type=SC_VALUE_UTF8;
-    v.data=name;
-    v.bytes=(ScU32)strlen(name);
-    if(s>=0)s=ScConfigSet(initial,"operation","name",&v);
-    if(s<0)goto done;
-    memset(&field,0,sizeof(field));
-    field.size=sizeof(field);
-    field.version=1;
-    field.field=1;
-    field.kind=SC_UI_TEXTBOX;
-    field.flags=SC_UI_FIELD_REQUIRED;
-    field.page=1;
-    field.section="operation";
-    field.key="name";
-    sh_ui_text("Name",&field.label);
-    memset(&d,0,sizeof(d));
-    d.size=sizeof(d);
-    d.version=1;
-    d.owner=m->dialog&&m->dialog->root?m->dialog->root:m->desc.owner;
-    d.initial=initial;
-    sh_ui_text(command==SC_SHELL_COMMAND_RENAME||command==0x7300?"Rename":"New directory",&d.title);
-    s=ScUiPropertySheet(m->desc.ui,&d,&field,1,&m->prompt);
-    if(s>=0)m->prompt_kind=command;
-    done:ScConfigRelease(initial);
-    return sh_cause(s,106,0);
-}
+#include "shell_name_prompt.inc"
 static ScStatus sh_menu_name_commit(ScShellMenu *m) {
-    ScConfig *values=0;
-    ScValue v;
+    ScString *input=0;
+    ScView v;
     ScString *joined=0;
     const char *text;
     char *name=0,*base=0;
     ScShellFileItem item;
-    ScU32 i;
+    ScU32 i,kind=m->prompt_kind;
     ScStatus s;
-    s=ScUiDialogCopyValues(m->prompt,&values);
+    s=ScUiNodeCopyText(m->desc.ui,m->prompt_name,&input);
     if(s<0)goto done;
     memset(&v,0,sizeof(v));
     v.size=sizeof(v);
     v.version=1;
-    s=ScConfigGet(values,"operation","name",&v);
+    s=ScStringView(input,&v);
     if(s<0)goto done;
-    if(v.type!=SC_VALUE_UTF8||!v.bytes||v.bytes>63||memchr(v.data,0,v.bytes)) {
+    if(!v.bytes||v.bytes>63||memchr(v.data,0,v.bytes)) {
         s=SC_SHELL_E_INVALID;
         goto done;
     }
@@ -504,9 +462,9 @@ static ScStatus sh_menu_name_commit(ScShellMenu *m) {
     item.size=sizeof(item);
     item.version=1;
     item.item=1;
-    if(m->prompt_kind==SC_SHELL_COMMAND_RENAME||m->prompt_kind==0x7300) {
+    if(kind==SC_SHELL_COMMAND_RENAME||kind==0x7300) {
         char *slash;
-        s=sh_copy_text(m->prompt_kind==0x7300?m->conflict_snapshot.destination:m->items[0].source,64,0,&base);
+        s=sh_copy_text(kind==0x7300?m->conflict_snapshot.destination:m->items[0].source,64,0,&base);
         if(s<0)goto done;
         slash=strrchr(base,'/');
         if(!slash) {
@@ -514,7 +472,7 @@ static ScStatus sh_menu_name_commit(ScShellMenu *m) {
             goto done;
         }
         slash[1]=0;
-        if(m->prompt_kind!=0x7300)item=m->items[0];
+        if(kind!=0x7300)item=m->items[0];
     } else {
         if(!m->directory) {
             s=SC_SHELL_E_INVALID;
@@ -528,7 +486,10 @@ static ScStatus sh_menu_name_commit(ScShellMenu *m) {
     if(s>=0)s=ScStringCStr(joined,&text);
     if(s<0)goto done;
     item.destination=text;
-    if(m->prompt_kind==0x7300) {
+    /* 同owner只准一个modal child；校验成功才让出名称窗，再建原进度窗。 */
+    s=sh_menu_name_close(m);
+    if(s<0)goto done;
+    if(kind==0x7300) {
         ScShellConflictDecision decision;
         memset(&decision,0,sizeof(decision));
         decision.size=sizeof(decision);
@@ -540,11 +501,15 @@ static ScStatus sh_menu_name_commit(ScShellMenu *m) {
         decision.expected_destination_revision=m->conflict_snapshot.destination_revision;
         decision.new_path=text;
         s=ScShellFileOperationResolveConflict(m->job,&decision);
-    } else s=sh_menu_job_start(m,m->prompt_kind==SC_SHELL_COMMAND_RENAME?SC_SHELL_RENAME:SC_SHELL_MKDIR,&item,1,0);
+    } else s=sh_menu_job_start(m,kind==SC_SHELL_COMMAND_RENAME?SC_SHELL_RENAME:SC_SHELL_MKDIR,&item,1,0);
+    if(s<0&&!m->base.closing&&(!m->job||(kind==0x7300&&m->job->conflict_valid))) {
+        /* Begin/Resolve没有成功，保留原输入供修正；真正成功仍只由原任务ACK决定。 */
+        sh_menu_name_open(m,kind,name);
+    }
     done:free(name);
     free(base);
     ScStringRelease(joined);
-    ScConfigRelease(values);
+    ScStringRelease(input);
     return sh_cause(s,107,0);
 }
 ScStatus ScShellMenuExecute(ScShellMenu *m,ScU32 command) {
@@ -747,17 +712,13 @@ ScStatus ScShellMenuStep(ScShellMenu *m,ScU32 timeout) {
     if(!sh_valid(m,SH_MENU))return SC_SHELL_E_STALE;
     if(m->base.depth)return SC_SHELL_E_BUSY;
     sh_enter(&m->base);
-    if(m->prompt) {
-        ScUiDialogInfo info;
-        memset(&info,0,sizeof(info));
-        info.size=sizeof(info);
-        info.version=1;
-        s=ScUiDialogQuery(m->prompt,&info);
-        if(s>=0&&(info.stage==SC_UI_DIALOG_DONE||info.stage==SC_UI_DIALOG_CANCELLED)) {
-            if(info.stage==SC_UI_DIALOG_DONE&&info.command==SC_UI_DIALOG_OK)s=sh_menu_name_commit(m);
-            ScUiDialogRelease(m->prompt);
-            m->prompt=0;
-            m->prompt_kind=0;
+    if(m->prompt&&m->prompt_intent) {
+        ScU32 intent=m->prompt_intent;
+        m->prompt_intent=0;
+        if(intent==SC_UI_DIALOG_CANCEL)s=sh_menu_name_close(m);
+        else {
+            s=sh_menu_name_commit(m);
+            if(s<0&&m->prompt)sh_menu_name_error(m,s);
         }
     }
     if(s>=0&&m->dialog) {

@@ -731,6 +731,12 @@
       "size": 1
     },
     {
+      "name": "ScFileLeasePublishPreserving",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
       "name": "ScFileLeaseQuery",
       "kind": "function",
       "dependency": "SC32API.SCL",
@@ -905,15 +911,15 @@
       "size": 1
     },
     {
-      "name": "ScPathQuery",
-      "kind": "function",
-      "dependency": "SC32API.SCL",
-      "size": 1
-    },
-    {
       "name": "ScPathNormalize",
       "kind": "function",
       "dependency": "SCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScPathQuery",
+      "kind": "function",
+      "dependency": "SC32API.SCL",
       "size": 1
     },
     {
@@ -1061,12 +1067,6 @@
       "size": 1
     },
     {
-      "name": "ScUiDialogCopyValues",
-      "kind": "function",
-      "dependency": "SCUI.SCL",
-      "size": 1
-    },
-    {
       "name": "ScUiDialogQuery",
       "kind": "function",
       "dependency": "SCUI.SCL",
@@ -1121,7 +1121,19 @@
       "size": 1
     },
     {
+      "name": "ScUiEditSelectAll",
+      "kind": "function",
+      "dependency": "SCUI.SCL",
+      "size": 1
+    },
+    {
       "name": "ScUiFileDialog",
+      "kind": "function",
+      "dependency": "SCUI.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScUiFocus",
       "kind": "function",
       "dependency": "SCUI.SCL",
       "size": 1
@@ -1163,6 +1175,12 @@
       "size": 1
     },
     {
+      "name": "ScUiLayout",
+      "kind": "function",
+      "dependency": "SCUI.SCL",
+      "size": 1
+    },
+    {
       "name": "ScUiListen",
       "kind": "function",
       "dependency": "SCUI.SCL",
@@ -1194,6 +1212,12 @@
     },
     {
       "name": "ScUiMessageBox",
+      "kind": "function",
+      "dependency": "SCUI.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScUiMetricsQuery",
       "kind": "function",
       "dependency": "SCUI.SCL",
       "size": 1
@@ -1236,12 +1260,6 @@
     },
     {
       "name": "ScUiProgressSet",
-      "kind": "function",
-      "dependency": "SCUI.SCL",
-      "size": 1
-    },
-    {
-      "name": "ScUiPropertySheet",
       "kind": "function",
       "dependency": "SCUI.SCL",
       "size": 1
@@ -1400,12 +1418,6 @@
       "name": "toupper",
       "kind": "function",
       "dependency": "SCCLIB.SCL",
-      "size": 1
-    },
-    {
-      "name": "ScFileLeasePublishPreserving",
-      "dependency": "SC32API.SCL",
-      "kind": "function",
       "size": 1
     }
   ]

@@ -1,0 +1,133 @@
+{
+  "status": "DETERMINISTIC_SOURCE_BLOCKER_IDENTIFIED_PATCH_NOT_EXECUTED",
+  "original_native_report": "/mnt/c/Users/Administrator/Desktop/projectos/sandcore/build/m10a2-p6-guest-generation-run-03/p6-generation.json",
+  "native_report_sha256": "f5538ba547f2ae38e00f35d35b57e2c0a55ef8282955aefbf221042122c57ddc",
+  "original_native_artifact": {
+    "path": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-p6-guest-generation-run-03\\native-artifacts\\STUDIO2.SCX",
+    "sha256": "25a791461fff3eea2de3c4a7673556e33f08db8bc6f49d18698f8129545dd3e4",
+    "bytes": 126344,
+    "compile_case": "STUDIO2-actual-native-SCLD-link",
+    "object_compile_case": "STUDIO2-actual-SCCC-object",
+    "guest_target": "/HOME/M10P6/OUT/STUDIO2.SCX",
+    "guest_sccc_compiled": true,
+    "generated_by_actual_scld": true,
+    "compiler_sha256": "ac7b219535aea51b502d8b7ef609874a4fe7920b8788706349d8585a3ce51a9e",
+    "linker_sha256": "570167927a4828760d637a98676cd728e9ada9cd6fa1d0018daa2f4f9c3ac4f9",
+    "manifest_sha256": "4f9beddaf93fc48afe9f51f9fda42c390f8921e25acd29e3c878210f3516dd21",
+    "map_sha256": "9d07defb57ef0f5db0b49b3d24fec5cc99aecd5d92a2bf82ff5fb8626374e19b",
+    "debug": {
+      "format": "SCDB1MIO",
+      "image_sha256": "25a791461fff3eea2de3c4a7673556e33f08db8bc6f49d18698f8129545dd3e4",
+      "bytes": 49336,
+      "sha256": "bc63fcb3d60c2df983346811d5cc3023c8d657c0a76d39b6283ccb4e797bf943",
+      "symbols": 82,
+      "files": 32,
+      "lines": 2820,
+      "object_count": 1,
+      "source_and_address_contract_exact": true
+    },
+    "generated_this_vm": true,
+    "installed_this_vm": false,
+    "executed_this_generated_file": false,
+    "format_contract": {
+      "format": "SCD1MIO",
+      "imports": 146,
+      "dependencies": 5,
+      "exports": 0,
+      "contract_exact": true
+    }
+  },
+  "screenshot": {
+    "path": "/mnt/c/Users/Administrator/Desktop/projectos/sandcore/build/m10a2-p6-gui-run-01/p6-native-studio-plugin-build-result.png",
+    "sha256": "c1931ada877e1ff598eb2ae72f1a8cc7754b3767792934211068d651dc39d344",
+    "inspected": true,
+    "width": 1920,
+    "height": 1080
+  },
+  "source_review": {
+    "user/studio2/studio_build.c": {
+      "sha256": "69249a23196d36ac5420e336bc605b37025d279d4721a2b75471fbf81dbfd4a0",
+      "gui_pin_match": true
+    },
+    "user/studio2/studio_io.c": {
+      "sha256": "df36f817150447f5b48e609a575aa8d99597e96bf3c71e1550897faa9fb5d587",
+      "gui_pin_match": true
+    },
+    "user/studio2/STUDIO2.JSON": {
+      "sha256": "eed94567f1d2e7db7434cf4e6e6161be57ac9b65229b7b85cdd1f0b3fa615bbb",
+      "gui_pin_match": true
+    },
+    "user/studio2/STUDIO2.H": {
+      "sha256": "78610cae78419b785e265ad73365bbd8bc597341d344d95a7c7cf368ea73183b",
+      "gui_pin_match": true
+    },
+    "user/studio2/STUDIO2.NATIVE.JSON": {
+      "sha256": "4f9beddaf93fc48afe9f51f9fda42c390f8921e25acd29e3c878210f3516dd21",
+      "gui_pin_match": true
+    },
+    "user/SC32LEASE.H": {
+      "sha256": "e724f522bdc883df656d4851e7dbe45d1cb40282de05c7fee66ad09c7665f943",
+      "gui_pin_match": true
+    },
+    "user/sc32/sc32_file.c": {
+      "sha256": "64a44597edef30033154ea6a47aa51989f9968df2705fa80396874b8ec0a45ab",
+      "gui_pin_match": true
+    },
+    "user/sc32/sc32_path.c": {
+      "sha256": "1eda869b2a1845aa8fe253f505eca9939c8d307c8f01206be15f8a4eb6b6b6dc",
+      "gui_pin_match": true
+    },
+    "user/sc32/sc32_support.c": {
+      "sha256": "faa7b3df51e0b0dd4ae7334a416dc30769aa09a5f9e2c0ac2b175dab533bdd18",
+      "gui_pin_match": true
+    },
+    "kernel/fs_lease_open.inc": {
+      "sha256": "85d401113e2ce8d1f16b4941a41c5c354ca7f7269c1c1287d7385f368c17ca55",
+      "gui_pin_match": true
+    },
+    "kernel/fs_lease_index.inc": {
+      "sha256": "f1c40a0ac70450725f636e31e4d736b60b638f56d13d1db23d127d749b567744",
+      "gui_pin_match": true
+    },
+    "kernel/fs_lease_cleanup.inc": {
+      "sha256": "e88f41075d63d381b1a4ef124b4b922d02d936ad653ea55e2e2ba1f94a656666",
+      "gui_pin_match": true
+    },
+    "kernel/sc32_file.c": {
+      "sha256": "2792ef65e0f2d53db41a08ac9fcf62d9e70963eba643debe2111f6c566df5fed",
+      "gui_pin_match": true
+    },
+    "kernel/sc32_file_lease.inc": {
+      "sha256": "15be029e594fc4d19e095d10d87b23bd49c5b9b82c0158bd12199664ed41223a",
+      "gui_pin_match": true
+    },
+    "kernel/fs.c": {
+      "sha256": "e0e916990807587df741ee023a3d36741bce85f4c15fb5c0523f52351bc2fb52",
+      "gui_pin_match": true
+    },
+    "examples/m10a2-sdk/researchdesk/RDSTATS.SCP": {
+      "sha256": "956e4f9602464762bdf0438358232b317f17ddfe78ab5a90113612a36f106854",
+      "gui_pin_match": true
+    }
+  },
+  "invalid_request": {
+    "path": "/SYS/INC",
+    "object_kind": 2,
+    "lease_kind": 3,
+    "open_flags": 0,
+    "requested_flags": 3,
+    "open_pinned_allowed_flags": 2,
+    "status": -101,
+    "stage": "S_BUILD_SAVE_before_first_command"
+  },
+  "replacement": {
+    "namespace_kind": 3,
+    "flags": 1,
+    "next_capacity": 1,
+    "expected_revision": "ScPathInfo.generation",
+    "expected_epoch": "ScDirectoryPage.generation"
+  },
+  "actual_new_compile_or_vm": false,
+  "exact_runtime_call_pc_observed": false,
+  "read_only_scope": "Existing reports, sources and screenshot only; no guest input or process inspection"
+}

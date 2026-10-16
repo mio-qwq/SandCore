@@ -233,3 +233,5 @@ Classic为真正矩形凸凹边、选中/焦点/disabled、固定像素图标；
 2026-10-16实施修订：主题高度是逻辑像素，host角色工作区和原生窗口是物理像素；桌面初建及主题/DPI变化使用同一换算，初始隐藏任务栏窗先满足普通40px最小高度，再由Prepare设置角色精确高度。默认账户继续使用旧SYS菜单和DESK，新catalog/恢复目录使用/HOME/.DESKTOP，避免向uid0的SYS父目录创建文件；其它账户沿SessionPath，先建本人私有父目录。所有新增SCUI布局显式span=1，Shell说明标签换行。未改变旧SessionPath/SCAPI语义；本批已统一构建并实际生成，P5运行验收继续。
 
 2026-10-16合同澄清：PREPARED表示可信PID/gen已绑定两surface与监听endpoint，可连接并以HELLO确定后台服务；ACTIVE仍要求两张真正首帧并控制窗口动作。隐藏会话不画首帧、不计显示激活超时，服务继续泵IPC/文件任务；显示切换后才取得Window PREPARING资格并Activate。HostInfo的PREPARING表示仍缺首帧，WindowInfo的PREPARING仅表示当前可绘资格，二者不能混为普通可见性。
+
+2026-10-16名称提示修订：ScShellMenu的新建目录/重命名/冲突改名使用公开SCUI模态Window和标准Label/Textbox/Button，320×170逻辑客户区、中文标题及新建/重命名/取消动作，无PropertySheet页签或Apply。焦点全选，Enter确认、Esc/关闭取消；非法输入保留原文。校验后先销提示窗口让出同owner模态槽，再进入原受管文件事务，只有原持久ACK可确认文件结果。Properties及其完整元数据/权限页不变，公开ABI/导出不变。本修复为隔离源码草稿，尚未构建或客体验证。

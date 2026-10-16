@@ -1,0 +1,328 @@
+--- a/user/studio2/STUDIO2.C
++++ b/user/studio2/STUDIO2.C
+@@ -19,8 +19,14 @@
+     s=ScProcessArguments(args,sizeof(args),&n);
+     if(s>=0 && n){
+         while(n && (args[n-1]==' '||args[n-1]=='\t'))args[--n]=0;
+-        const char *ext=strrchr(args,'.');
+-        io_open(args,ext && (!strcmp(ext,".SCP")||!strcmp(ext,".scp"))?S_IO_PROJECT_OPEN:S_IO_OPEN,0);
++        U first=0;
++        while(first<n&&(args[first]==' '||args[first]=='\t'))first++;
++        /* MODERN Shell为单个document加外引号；只剥成对引号，路径本身仍完整验证。 */
++        if(first<n&&args[first]=='"'&&n>first+1&&args[n-1]=='"'){first++;args[--n]=0;}
++        if(first<n){
++            s=strchr(args+first,'"')?SC32_E_INVALID:io_open(args+first,workspace_suffix(args+first)?S_IO_PROJECT_OPEN:S_IO_OPEN,0);
++            if(s<0)error(s,"无法打开指定文件");
++        }
+     }
+     while(!st.stopping){
+         io_step();
+--- a/user/studio2/studio_io.c
++++ b/user/studio2/studio_io.c
+@@ -25,6 +25,26 @@
+     if(!n||n>64||out[0]!='/')return SC32_E_RANGE;
+     for(U i=0;i<n;i++)if((unsigned char)out[i]<=32u||out[i]==';'||out[i]=='\\'||out[i]==':')return SC32_E_INVALID;
+     return ScUtf8Validate(out,n,0)<0?SC32_E_INVALID:0;
++}
++static U workspace_suffix(const char *name)
++{
++    const char *base=strrchr(name,'/');
++    const char *suffix=strrchr(base?base+1:name,'.');
++    return suffix&&same_name(suffix,".SCW");
++}
++static ScStatus workspace_save_name(const char *name,char out[68],U *implicit)
++{
++    ScStatus s=path(name,out);
++    if(s<0)return s;
++    const char *base=strrchr(out,'/');
++    const char *suffix=strrchr(base?base+1:out,'.');
++    *implicit=0;
++    if(suffix)return workspace_suffix(out)?0:SC32_E_INVALID;
++    U n=(U)strlen(out);
++    if(n>60u)return SC32_E_RANGE;
++    memcpy(out+n,".SCW",5);
++    *implicit=1;
++    return 0;
+ }
+ static void pin_control(StPin *p,ScLeaseControl *c){
+     rec(c,sizeof(*c));
+@@ -77,6 +97,7 @@
+     char absolute[68];
+     ScStatus s=path(name,absolute);
+     if(s<0)return s;
++    if(kind==S_IO_PROJECT_OPEN&&!workspace_suffix(absolute))return SC32_E_INVALID;
+     if(kind==S_IO_OPEN){
+         StDoc *old=document_path(absolute);
+         if(old){
+@@ -110,7 +131,7 @@
+     status("读取候选文件…");
+     return 0;
+ }
+-static ScStatus io_write_start(ScString *snapshot,const char *name,U expected,U kind,U owner,U revision)
++static ScStatus io_write_start(ScString *snapshot,const char *name,U expected,U kind,U owner,U revision,U absent)
+ {
+     if(st.io)return SC32_E_BUSY;
+     char absolute[68];
+@@ -121,6 +142,8 @@
+     s=ScPathQuery(absolute,&info);
+     if(s<0&&s!=SC32_E_NOT_FOUND)return s;
+     U exists=s==0;
++    /* 自动扩展名没有对最终目标取得覆盖确认；这里只允许ABSENT，发布时继续原ABSENT条件。 */
++    if(absent&&exists)return SC32_E_EXISTS;
+     if(exists&&info.kind!=SC32_PATH_FILE)return SC32_E_INVALID;
+     if(expected&&(!exists||info.generation!=expected))return SC32_E_STALE;
+     StIo *io=calloc(1,sizeof(*io));
+@@ -164,15 +187,19 @@
+     ScStatus s=ScUiDocumentQuery(d->text,&info);
+     ScString *snapshot=0;
+     if(s>=0)s=ScUiDocumentCopy(d->text,0,info.bytes,&snapshot);
+-    if(s>=0)s=io_write_start(snapshot,name,!strcmp(name,d->path)?d->disk_revision:0,S_IO_SAVE,d->id,info.revision);
++    if(s>=0)s=io_write_start(snapshot,name,!strcmp(name,d->path)?d->disk_revision:0,S_IO_SAVE,d->id,info.revision,0);
+     ScStringRelease(snapshot);
+     return s;
+ }
+ static ScStatus io_project_save(const char *name)
+ {
++    char absolute[68];
++    U implicit=0;
++    ScStatus s=workspace_save_name(name,absolute,&implicit);
++    if(s<0)return s;
+     ScString *snapshot=0;
+-    ScStatus s=project_encode(&snapshot);
+-    if(s>=0)s=io_write_start(snapshot,name,!strcmp(name,st.project_path)?st.project_disk_revision:0,S_IO_PROJECT_SAVE,0,st.project_revision);
++    s=project_encode(&snapshot);
++    if(s>=0)s=io_write_start(snapshot,absolute,!strcmp(absolute,st.project_path)?st.project_disk_revision:0,S_IO_PROJECT_SAVE,0,st.project_revision,implicit);
+     ScStringRelease(snapshot);
+     return s;
+ }
+--- a/user/studio2/studio_actions.c
++++ b/user/studio2/studio_actions.c
+@@ -251,7 +251,7 @@
+     if(s<0){
+         st.pending_action=0;
+         st.save_all=0;
+-        error(s,"操作未完成；原文档与工程保留");
++        error(s,kind==S_DIALOG_PROJECT_SAVE?"工作区未保存；请使用 .SCW。自动补全只创建新目标；覆盖时显式选择完整文件名。":"操作未完成；原文档与工程保留");
+     }
+     refresh();
+     return 0;
+@@ -260,12 +260,21 @@
+ {
+     if(st.dialog||st.io)return SC32_E_BUSY;
+     ScUiFileDialogDesc d;
++    ScUiMenuItem filter;
+     rec(&d,sizeof(d));
+     d.owner=st.root;
+     d.directory="/HOME";
+-    d.title=text(kind==S_DIALOG_SAVE?"另存文档":kind==S_DIALOG_NEW?"新建文件":kind==S_DIALOG_PROJECT_OPEN?"打开工程":kind==S_DIALOG_PROJECT_SAVE?"保存工程":kind==S_DIALOG_PUBLISH?"发布到目录":"选择文件");
++    d.title=text(kind==S_DIALOG_SAVE?"另存文档":kind==S_DIALOG_NEW?"新建文件":kind==S_DIALOG_PROJECT_OPEN?"打开工作区（.SCW）":kind==S_DIALOG_PROJECT_SAVE?"保存工作区（默认 .SCW）":kind==S_DIALOG_PUBLISH?"发布到目录":"选择文件");
+     d.flags=kind==S_DIALOG_SAVE||kind==S_DIALOG_PROJECT_SAVE?SC_UI_FILE_SAVE|SC_UI_FILE_OVERWRITE:kind==S_DIALOG_NEW?SC_UI_FILE_SAVE:kind==S_DIALOG_PUBLISH?SC_UI_FILE_DIRECTORY:SC_UI_FILE_OPEN;
+     if(kind==S_DIALOG_ADD)d.flags|=SC_UI_FILE_MULTI;
++    if(kind==S_DIALOG_PROJECT_OPEN||kind==S_DIALOG_PROJECT_SAVE){
++        rec(&filter,sizeof(filter));
++        filter.item=1;filter.command=1;
++        filter.label=text("SCW 工作区（*.SCW）");
++        /* 公共glob按字节匹配；列齐3个ASCII字母的大小写，不假定FS返回大写。 */
++        filter.help=text("*.SCW;*.scw;*.Scw;*.sCW;*.SCw;*.ScW;*.sCw;*.scW");
++        d.filters=&filter;d.filter_count=1;d.selected_filter=1;
++    }
+     d.completion=dialog_done;
+     ScStatus s=ScShellFileDialog(st.ui,&d,&st.dialog);
+     if(s>=0){
+@@ -280,7 +289,7 @@
+     ScUiPropertySheetDesc d;
+     rec(&d,sizeof(d));
+     d.owner=st.root;
+-    d.title=text("工程配置");
++    d.title=text("工作区配置");
+     d.initial=st.config;
+     d.completion=dialog_done;
+     const char *keys[]={
+--- a/user/studio2/studio_ui.c
++++ b/user/studio2/studio_ui.c
+@@ -18,11 +18,11 @@
+         "关闭文档",'w',SC32_MOD_CONTROL
+     },
+     {
+-        "新建工程",0,0
+-    },{
+-        "打开工程…",0,0
+-    },{
+-        "保存工程",0,0
++        "新建工作区",0,0
++    },{
++        "打开工作区…",0,0
++    },{
++        "保存工作区",0,0
+     },{
+         "添加文件…",0,0
+     },{
+--- a/tools/build_m10a2_p6.py
++++ b/tools/build_m10a2_p6.py
+@@ -4,7 +4,7 @@
+ import argparse,hashlib,json,subprocess,time
+ import stage_m10a2_sdk as sdk
+ ROOT=Path(__file__).resolve().parents[1]
+-SUFFIX={'.c','.h','.inc','.asm','.json','.ld','.py','.mk','.scp','.rsp','.rdt','.sh'}
++SUFFIX={'.c','.h','.inc','.asm','.json','.ld','.py','.mk','.scw','.rsp','.rdt','.sh'}
+ OUTPUTS=('sandcore.img','fs/SYS/CORE/CORE.SKM','core.sym','core.elf','core.bin',
+  'fs/bin/sccc.scx','fs/bin/sh.scx','fs/bin/nano.scx','fs/SYS/CORE/IMAGE.SCX',
+  'fs/SYS/UI/UAX15_1.SCU','SCLD.SCX','SCSHELL.SCX','SCFILEWORK.SCX',
+--- a/tools/m10a2_sdk_final.py
++++ b/tools/m10a2_sdk_final.py
+@@ -34,7 +34,7 @@
+     for name in OPTIONAL_AUTH:
+         if (root/'user'/name).is_file():headers[name]='user/'+name
+     # 新正式文档只在主代理同批整合后加入，不把缺失文档伪造为空文件。
+-    additions=('SC32-AUDIO.md','SCSOUND.md','SC32-CONFIG.md','SC32-TERMINAL.md','SCTERM.md','SDK-RESEARCHDESK.md')
++    additions=('SC32-AUDIO.md','SCSOUND.md','SC32-CONFIG.md','SC32-TERMINAL.md','SCTERM.md','SDK-RESEARCHDESK.md','SCW-WORKSPACE.md')
+     return tuple(dict.fromkeys(docs+tuple(name for name in additions if (root/'docs'/name).is_file())))
+ 
+ def required_sources(root,roots,extra=()):
+@@ -191,6 +191,6 @@
+ def install_researchdesk(stage,inputs,add):
+     base=stage.ROOT/'examples/m10a2-sdk/researchdesk'
+     if not base.is_dir():raise ValueError('缺独立多TU ResearchDesk源码目录')
+-    allowed={'.c','.h','.json','.scp','.rsp','.sh','.md','.rdt'}
++    allowed={'.c','.h','.json','.scw','.rsp','.sh','.md','.rdt'}
+     for file in sorted(base.iterdir()):
+         if file.is_file() and file.suffix.lower() in allowed:add('SYS/SDK/EXAMPLES/RDESK/'+file.name.upper(),inputs.read(file),str(file))
+--- a/examples/m10a2-sdk/researchdesk/BUILD.SH
++++ b/examples/m10a2-sdk/researchdesk/BUILD.SH
+@@ -1,3 +1,4 @@
++# ResearchDesk SCW workspaces: RDSTATS.SCW (plugin), RDESK.SCW (application).
+ # Build as an ordinary signed-in user. No /SYS output is written.
+ mkdir -p /HOME/RDESK /HOME/RDWORK /HOME/RDPLUGIN || exit 10
+ /SYS/BIN/SCCC.SCX /SYS/SDK/EXAMPLES/RDESK/RDSTATS.C /HOME/RDPLUGIN/RDSTATS.SCO --object || exit 11
+--- a/examples/m10a2-sdk/researchdesk/README.md
++++ b/examples/m10a2-sdk/researchdesk/README.md
+@@ -17,7 +17,7 @@
+ 
+ BUILD.SH 每一步检查退出值，只写 /HOME 的三个目录。APP.RSP 的四行仅是对象路径。SCLD 输出真实 SCX/SCL、`.map` 和 `.sdbg` 副文件；副文件绑定完整映像 SHA256。脚本最后的 BUILD_OK 只证明构建命令成功，不能代表 GUI、客体执行或整个 SDK 已验收。
+ 
+-Studio2 可分别打开 RDSTATS.SCP、RDESK.SCP，先构建插件，再构建和运行应用。SDK 工程本身只读；需要改源码或工程配置时先复制到普通用户目录，并修改源码、manifest、include_dirs、workspace 路径。Studio 自动建立独立构建目录和对象响应文件，不使用本示例固定 APP.RSP。SCL 工程不能单独 Run，RDESK 是实际宿主。
++SCW（SandCore Workspace）是 Studio 2 的工程工作区。通过“工程 → 打开工作区…”分别打开 RDSTATS.SCW、RDESK.SCW，先构建插件，再构建和运行应用。SDK 工程本身只读；需要改源码或工程配置时先复制到普通用户目录，并修改源码、manifest、include_dirs、workspace 路径。Studio 自动建立独立构建目录和对象响应文件，不使用本示例固定 APP.RSP。SCL 工程不能单独 Run，RDESK 是实际宿主。
+ 
+ ## 数据与保存
+ 
+@@ -36,3 +36,5 @@
+ 5. 先退出程序，将插件移到其它用户目录，再启动，窗口/文档仍可用并明确插件失败；恢复插件并“连接统计插件”后统计恢复。此动作只针对自建 /HOME 产物，不修改系统库。最后退出，受管任务与本任务句柄/页回收恢复。
+ 
+ 这些是主代理待执行的客体结束条件。本目录的宿主真实后端与模型报告分列，不把它们冒充上述结果。
++
++修订记录：2026-10-16，SCW工作区路径、公开Studio入口和ResearchDesk构建合同。
+--- a/docs/SDK-RESEARCHDESK.md
++++ b/docs/SDK-RESEARCHDESK.md
+@@ -17,7 +17,7 @@
+ 
+ BUILD.SH 每一步检查退出值，只写 /HOME 的三个目录。APP.RSP 的四行仅是对象路径。SCLD 输出真实 SCX/SCL、`.map` 和 `.sdbg` 副文件；副文件绑定完整映像 SHA256。脚本最后的 BUILD_OK 只证明构建命令成功，不能代表 GUI、客体执行或整个 SDK 已验收。
+ 
+-Studio2 可分别打开 RDSTATS.SCP、RDESK.SCP，先构建插件，再构建和运行应用。SDK 工程本身只读；需要改源码或工程配置时先复制到普通用户目录，并修改源码、manifest、include_dirs、workspace 路径。Studio 自动建立独立构建目录和对象响应文件，不使用本示例固定 APP.RSP。SCL 工程不能单独 Run，RDESK 是实际宿主。
++SCW（SandCore Workspace）是 Studio 2 的工程工作区。通过“工程 → 打开工作区…”分别打开 RDSTATS.SCW、RDESK.SCW，先构建插件，再构建和运行应用。SDK 工程本身只读；需要改源码或工程配置时先复制到普通用户目录，并修改源码、manifest、include_dirs、workspace 路径。Studio 自动建立独立构建目录和对象响应文件，不使用本示例固定 APP.RSP。SCL 工程不能单独 Run，RDESK 是实际宿主。
+ 
+ ## 数据与保存
+ 
+@@ -36,3 +36,5 @@
+ 5. 先退出程序，将插件移到其它用户目录，再启动，窗口/文档仍可用并明确插件失败；恢复插件并“连接统计插件”后统计恢复。此动作只针对自建 /HOME 产物，不修改系统库。最后退出，受管任务与本任务句柄/页回收恢复。
+ 
+ 这些是主代理待执行的客体结束条件。本目录的宿主真实后端与模型报告分列，不把它们冒充上述结果。
++
++修订记录：2026-10-16，SCW工作区路径、公开Studio入口和ResearchDesk构建合同。
+--- a/docs/M10A2-SDK.md
++++ b/docs/M10A2-SDK.md
+@@ -14,7 +14,7 @@
+ | SYS/SDK/HOSTLINK | 原 `.json` 宿主 manifest，明确不作为原生编译清单 |
+ | SYS/BIN | 实际 guest G1 SCCC.SCX、独立实际 guest SCLD.SCX；host-preview 全程另标宿主来源 |
+ | SYS/SDK/SRC | 对应实现、公共/私有布局、工具链、现代应用及 codec 的固定源码摘要；私有内容只作源码归档 |
+-| SYS/SDK/EXAMPLES | EDIT2、UTILITY 和 RDESK 的独立 TU、插件、SCP、manifest、响应文件、普通用户 BUILD.SH 与说明 |
++| SYS/SDK/EXAMPLES | EDIT2、UTILITY 和 RDESK 的独立 TU、插件、SCW工作区、manifest、响应文件、普通用户 BUILD.SH 与说明 |
+ | SYS/SDK/DOC | 同批公开规范、SDK 和示例使用说明 |
+ | SYS/UI、SYS/FONT | 真实 Unicode 数据/oracle 与原始凤凰 12/16px TTF |
+ | SYS/LICENSE | 所纳入第三方的固定完整源码、嵌套实现、完整许可/版权/来源与项目许可 |
+@@ -56,7 +56,7 @@
+ 
+ SCO v1 保留各 TU 的段、section-relative 定义/重定位、未决函数/数据、private/static 身份、对齐/BSS 和真实源行。链接器按对象解析 duplicate/missing、落实各对象记录的对齐，最终输出 SCX/SCL、map 与 SCDB1MIO v1 `.sdbg`。副文件绑定完整映像 SHA，不冒充内核验证的实际装载身份。响应文件只有对象路径，不能包含源码、嵌套 @ 或隐式 include；具体限制见 SCO-AND-LINKER。
+ 
+-ResearchDesk 的 MAIN/MODEL/VIEW/IO 四独立 TU 与 RDSTATS 独立插件展示公开的多文档、共享 UndoRedo、树/表 provider revision、排序与源行、可调布局/主题、图表、文件对话框、剪贴板、未知长度读取和条件保存。数据/结果绑定正文 revision 与工作代数，失败候选不破坏原数据。已有目标使用 Preserving 精确发布；只有 durable COMMITTED 且正文修订相同才清 dirty。详细命令与普通用户结束条件见 SDK-RESEARCHDESK 和示例 README。
++ResearchDesk 的 MAIN/MODEL/VIEW/IO 四独立 TU 与 RDSTATS 独立插件展示公开的多文档、共享 UndoRedo、树/表 provider revision、排序与源行、可调布局/主题、图表、文件对话框、剪贴板、未知长度读取和条件保存。数据/结果绑定正文 revision 与工作代数，失败候选不破坏原数据。已有目标使用 Preserving 精确发布；只有 durable COMMITTED 且正文修订相同才清 dirty。RDSTATS.SCW和RDESK.SCW分别描述插件与四TU应用，SCW即SandCore Workspace（工程工作区）。详细合同见SCW-WORKSPACE；命令与普通用户结束条件见 SDK-RESEARCHDESK 和示例 README。
+ 
+ ```text
+ /BIN/SH.SCX /SYS/SDK/EXAMPLES/RDESK/BUILD.SH
+@@ -84,3 +84,5 @@
+ | 2026-10-15 | SDK 五库 preview 与双示例宿主后端检查；客体执行待验，原证据保留。 |
+ | 2026-10-16 | 完整公共头/八普通原生库及固定 codec 白名单、独立 SCLD、SRC/许可/来源、NATIVE/HOSTLINK 和 ResearchDesk 多源开发合同；本批整套客体 staging/运行待主代理统一验证。 |
+ | 2026-10-16 | 原生来源核真实聚合include闭包；未接线历史草稿仍完整归档、按HOST固定，不伪称guest编译。 |
++
++2026-10-16：公开SCW工作区合同、示例路径和SDK归档接线。
+--- a/docs/M10A2-LIVE-GUI.md
++++ b/docs/M10A2-LIVE-GUI.md
+@@ -34,9 +34,9 @@
+ 5. CtrlShiftS打开共享FileDialog；上方目录填/HOME/P6GUI后Enter，下方填NOTE.TXT并点确定，实际出现“操作未完成，请检查错误”，文件不存在。该步失败，不能称保存成功。Esc取消后20B文本仍完整留在未命名脏文档，截图`p6-native-notes-unsaved-retained.png`已看。
+ 6. 最后已点击Start并发送`down,right,ret`，意图启动开发组首项Studio2；当前尚未读下一张截图确认，下一步先观察，不重放此动作。动作ID为start-for-studio、start-launch-studio。
+ 
+-文件关联、clipboard/drop、Studio工程/F5/F6/F7、Debug真实SCL、其它组件代表动作、两主题、资源最终账仍待。正式SDK使用SCW工程工作区：RDSTATS.SCW先构建独立SCL，再RDESK.SCW四TU。工程打开没有CtrlShiftO，F7本身已启动Debug2，不再CtrlF5重启。
++文件关联、clipboard/drop、Studio工程/F5/F6/F7、Debug真实SCL、其它组件代表动作、两主题、资源最终账仍待。正式SDK使用SCW工程工作区：RDSTATS.SCW先构建独立SCL，再RDESK.SCW四TU。工作区入口为“工程 → 打开工作区…”，没有CtrlShiftO，F7本身已启动Debug2，不再CtrlF5重启。
+ 
+-最新界面要求：SCW作为正式工作区格式，入口、样例、筛选与文档自然使用该名称，不写后缀更名过程。已有同名游戏存档格式保持；本次不扩内容嗅探或泛关联。桌面图标按实际透明度/背景键色和轮廓复核，保原前景颜色与资源，不能靠粗暴色键挖掉内部内容。两项仍在独占草稿准备，不改本活跃VM的冻结源码。
++SCW（SandCore Workspace）为工程工作区格式，入口、样例、筛选与文档使用 .SCW。已有同名游戏存档格式保持；本次不扩内容嗅探或泛关联。桌面图标按实际透明度/背景键色和轮廓复核，保原前景颜色与资源，不能靠粗暴色键挖掉内部内容。两项仍在独占草稿准备，不改本活跃VM的冻结源码。
+ 
+ ## 两处已定位、尚未改当前冻结代码的问题
+ 
+--- a/docs/M10A2-CURRENT-GOAL.md
++++ b/docs/M10A2-CURRENT-GOAL.md
+@@ -109,3 +109,5 @@
+ ROOT已按四份精确原SHA应用SCO编译器补丁（build/m10a2-object-integration-01/compiler-application.json），新增user/s3c_sco.inc、SCOFMT.H、SCDBGFILE.H、scld.c、SCLD.json，m10a2.mk已接独立object工具目标/正式头安装；旧default-label/sret修复保留，不扩大262108旧限。这是主源实施整合，尚未对新增工具启动客体流程；P5隔离stage故意仍保旧编译器冻结源，原生图标性能前后caller和资源不混淆。
+ 
+ Visual02新标签居中/128×112网格、原壁纸与全部实际icon引用和提交就绪已通过并由主代理查看原尺寸图；P5真实drag/owner仍通过。ICONPROFILE actualG1 caller SHA ccd18a49eb673a5987a84348f189a231c762ea00296d852ec44f5bd5f19511c6，16×128px=1048576B，75 PIT@100Hz，默认512KiB资源cache16 misses/0hits/7entries；只是无窗口资源分项，不是整桌面时间。优化SCB2直接复制/ASCII同名key已在主源；桌面显式2MiB cache只增加 lookup持有预算，不预分配或降尺寸，避免16张可见强持图重复创建。GEN17只更新SCSHELL/desktop原生通过，CORE18正绑定；下一同源caller视觉02→优化后对照，达到本项结束条件即停止该性能矩阵。
++
++2026-10-16 SCW工作区：Studio 2 的工作区入口及SDK示例使用.SCW（SandCore Workspace）。普通用户先打开/SYS/SDK/EXAMPLES/RDESK/RDSTATS.SCW构建独立SCL，再打开RDESK.SCW构建四TU应用；F5构建、F6运行、F7调试。此段为当前入口合同，实际执行证据另列。
+--- a/docs/STUDIO2-DEBUG2-DESIGN.md
++++ b/docs/STUDIO2-DEBUG2-DESIGN.md
+@@ -82,7 +82,7 @@
+ 
+ ### 5.1 项目模型
+ 
+-工程descriptor采用版本化、严格解析的普通用户配置文件，先完整候选再提交。包含project ID/name、绝对project/work/package root、源/头/资源/SDK文档项、targets、依赖DAG、toolchain profile、run/debug配置及布局。稳定item ID与显示排序分开，动态容器/索引，只受真实资源预算限制，无固定文件/目标/面板数量。
++工程工作区使用.SCW（SandCore Workspace），其descriptor采用版本化、严格解析的普通用户配置文件，先完整候选再提交。包含project ID/name、绝对project/work/package root、源/头/资源/SDK文档项、targets、依赖DAG、toolchain profile、run/debug配置及布局。稳定item ID与显示排序分开，动态容器/索引，只受真实资源预算限制，无固定文件/目标/面板数量。
+ 
+ 目标类型至少为旧SCX兼容、自动动态SCX、SCL、独立ASM；可选SKM保留现开发能力但Run SKM继续原真实外部授权链，Studio本身不取得Ring0。SCX+SCL的name/ABI/export/import/dependency/init/fini是严格manifest模型，参数个数/签名/引用要求由真实工具链校验。项目依赖环、重复输出、输入与副产物别名、无权路径先拒绝，不在首次失败后留下半个项目注册。
+ 
+@@ -290,3 +290,5 @@
+ 只有这些完整实际出口及保留清单成立后才称重制完成。现源码审计、设计稿、build08/09或平台87功能子结果都不能充当Studio2/Debug2验收；M10a2完整目标继续。
+ 
+ 修订：2026-10-15，完整审阅现Studio/Debugger及现代SC32/SCLDR，建立多文件原生工程/共享编辑/诊断/owned Debug/模块符号/SDK与分工；仅设计，记录CPUINFO越界、typed能力/多TU缺项及本批aggregate/SCLMAP收齐未验边界，未实现或运行新应用。
++
++修订：2026-10-16，SCW工作区入口、schema1与标准文件对话框合同。
+--- /dev/null
++++ b/docs/SCW-WORKSPACE.md
+@@ -0,0 +1,30 @@
++# SCW 工程工作区
++
++SCW 表示 **SandCore Workspace**（工程工作区），正式扩展名为 **.SCW**。Studio 2 用工作区描述组织源文件、公开 SDK、构建工具、输出和布局；源代码与构建产物仍是各自独立的文件。
++
++## 打开与保存
++
++在 Studio 2 选择“工程 → 打开工作区…”，或在 Shell 的显式 Open with 中选择 Studio。工作区对话框筛选 .SCW，程序参数也可传入一个完整工作区路径。普通文本的打开和编辑入口保持独立。
++
++“新建工作区”在内存建立默认配置。第一次保存由用户选择目录和名称；无扩展名时使用 .SCW。自动补全后的目标必须不存在；如该名称已存在，请显式选择完整 .SCW 文件名，由标准覆盖确认和精确发布处理。完整绝对路径仍受当前64字节、无空白的文件系统边界约束。
++
++读取先取得 READ_STABLE 文件身份，完整解析后再发布候选配置；无效正文或 schema 不改变当前工作区。保存使用现有候选、flush和条件发布；只有真实 durable COMMITTED 才更新磁盘修订和已保存状态。已有目标继承其原 uid/gid/mode/flags，取消、权限失败或冲突保留当前配置。
++
++## 文本合同
++
++正文为公开 ScConfig 的UTF8文本，当前 [project] 的 schema=1u。file_count 是 [file.N] 记录数；每项 path 是绝对文件路径，source=1u 表示独立编译的源TU，source=0u 表示头等成员。不会把所有 .C include 到一个聚合文件冒充独立编译。
++
++project 节保留 kind（SCX或SCL）、compiler、linker、manifest、output、include_dirs、workspace、arguments、debug_host、publish_dir。include_dirs 以分号分隔；workspace 是可写构建目录。UI布局由同一配置序列化。源、manifest、输出和副文件别名检查、只读SDK和普通用户权限边界继续有效。
++
++## ResearchDesk
++
++公开示例目录为 /SYS/SDK/EXAMPLES/RDESK。
++
++- **RDSTATS.SCW**：RDSTATS.C 为1个独立TU，链接到 /HOME/RDESK/RDSTATS.SCL；RDSTATS.H 是头成员。
++- **RDESK.SCW**：MAIN.C、MODEL.C、VIEW.C、IO.C 分别编译为4个SCO，再链接到 /HOME/RDESK/RDESK.SCX；两个头是普通成员。
++
++先构建 RDSTATS.SCW，再构建 RDESK.SCW。SCL工作区不独立Run；RDESK.SCX实际加载同目录插件。F5构建、F6运行、F7调试，构建成功与真实运行分别留证。普通用户也可执行 /BIN/SH.SCX /SYS/SDK/EXAMPLES/RDESK/BUILD.SH；该脚本直接逐条调用公开 SCCC/SCLD，不解析工作区描述。
++
++SDK中的工作区与源文件是只读示例；编辑时先复制到本人目录并相应调整成员、manifest、include_dirs及workspace路径。
++
++修订记录：2026-10-16，SCW工作区入口、schema1、条件保存和ResearchDesk双目标合同；本合同对应源码接线，实际新字节编译与运行证据另列。

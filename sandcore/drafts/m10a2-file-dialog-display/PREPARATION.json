@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "status": "FIXED_SOURCE_PATCH_PREPARED_NOT_APPLIED_NOT_COMPILED",
+  "targets": {
+    "user/scui/ui_dialog.c": {
+      "before_bytes": 50166,
+      "after_bytes": 50507,
+      "before_sha256": "3edbc873669548cefa6495e191c2b3a88544d9d994e7134d7002da9b2607ac4d",
+      "after_sha256": "3b5d8ac16af4f1aa942a7e1895a7532d899b530b874c1f23d0ac2fdd7b31edfb"
+    },
+    "user/scui/SCUI.json": {
+      "before_bytes": 30884,
+      "after_bytes": 30881,
+      "before_sha256": "d5f76e378f1e1de18499604185dab1cbb00310b9de410721bda50a880c88f553",
+      "after_sha256": "119bac0b8e51e5abfa3dc1cbf1b7800e2d59f0af851ac24303420590046cdbf0"
+    },
+    "user/scui/SCUI.NATIVE.JSON": {
+      "before_bytes": 29338,
+      "after_bytes": 29335,
+      "before_sha256": "f7ba0ca60219804635c91ae538059d706c61d1d3c07e444554eb35d042e59fbc",
+      "after_sha256": "fec15b982b500eb2d884a77c9d7d720d79d983ed1205e1e71505ddc41474932c"
+    }
+  },
+  "memory_only_pinned_patch_replay": true,
+  "source_unchanged_during_preparation": true,
+  "main_modified": false,
+  "build_executed": false,
+  "qemu_started": false
+}

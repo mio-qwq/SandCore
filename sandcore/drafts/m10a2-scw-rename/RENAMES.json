@@ -1,0 +1,18 @@
+[
+  {
+    "source": "examples/m10a2-sdk/researchdesk/RDESK.SCP",
+    "target": "examples/m10a2-sdk/researchdesk/RDESK.SCW",
+    "before_sha256": "5b82c28c150313559546d6cef535a6db95e5210d3e90892b8f5b642a4e01b1a1",
+    "after_sha256": "5b82c28c150313559546d6cef535a6db95e5210d3e90892b8f5b642a4e01b1a1",
+    "bytes": 646,
+    "operation": "EXACT_SMALL_FILE_MOVE_AT_ROOT_INTEGRATION"
+  },
+  {
+    "source": "examples/m10a2-sdk/researchdesk/RDSTATS.SCP",
+    "target": "examples/m10a2-sdk/researchdesk/RDSTATS.SCW",
+    "before_sha256": "956e4f9602464762bdf0438358232b317f17ddfe78ab5a90113612a36f106854",
+    "after_sha256": "956e4f9602464762bdf0438358232b317f17ddfe78ab5a90113612a36f106854",
+    "bytes": 423,
+    "operation": "EXACT_SMALL_FILE_MOVE_AT_ROOT_INTEGRATION"
+  }
+]

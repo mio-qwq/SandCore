@@ -1,0 +1,106 @@
+{
+  "status": "READ_ONLY_FLOW_PREPARATION_NOT_EXECUTED",
+  "source_files": {
+    "user/imageapps/ui.c": {
+      "sha256": "3fad7408ea5b400ee004e3abe97401aa9d39fc74ed4fcf51a14f18f976db8340",
+      "bytes": 16833
+    },
+    "user/imageapps/actions.c": {
+      "sha256": "6f5c308c3e28f202abbe1ca0775bed5c22303601911b45a48a9bd2500d7964a7",
+      "bytes": 17393
+    },
+    "user/imageapps/lifecycle.c": {
+      "sha256": "0afd7f895ef38005126e5fde970162bf6f55a0df13d51a8e09872eba106d007f",
+      "bytes": 10498
+    },
+    "user/imageapps/IMAGEAPP.H": {
+      "sha256": "0294c610be70b08cd9e801a55d84aded1e743b4b0c121da3fe880bc998cece0a",
+      "bytes": 2537
+    },
+    "user/settings2/settings_view.inc": {
+      "sha256": "451467943eaf712b0bf23b5bd7e0a23eca87391fb6feaf2b10611a21f77c449b",
+      "bytes": 17754
+    },
+    "user/settings2/install_view.inc": {
+      "sha256": "d935140ff2a70847d571eb599b5ddc6499367dd0412412db34cddd3ef7b04e34",
+      "bytes": 10511
+    },
+    "user/settings2/install_model.inc": {
+      "sha256": "d1a2672aafa3331c2cf98d7527ea4dcc3647557a5f308e7e7a0a4dca53349709",
+      "bytes": 8295
+    },
+    "user/settings2/install_job.inc": {
+      "sha256": "218ed4a73b447de50c10c2e09ad365e4b98e2290060a3c2d18e2c1304d4394cb",
+      "bytes": 8135
+    },
+    "user/systemtools/calc_view.inc": {
+      "sha256": "97aa49ceb3064902f280d8f79184419683f1f215f3708b7669da451e42f15c9d",
+      "bytes": 16108
+    },
+    "user/systemtools/calc_engine.inc": {
+      "sha256": "cc7b908d0a975b9bf9eca42b49826bd68d572fb9c09235a545fe70a9ba5f0a07",
+      "bytes": 5218
+    },
+    "user/systemtools/palette_view.inc": {
+      "sha256": "45ec34df45de17f087494b611f6be0d87df24239746c0591054aa74671967523",
+      "bytes": 16770
+    },
+    "user/systemtools/monitor_view.inc": {
+      "sha256": "cab7f59979f5285b9f3755b335efea7e727f05bed1db64e950ef192c6611dced",
+      "bytes": 23049
+    },
+    "user/systemtools/tools_ui.inc": {
+      "sha256": "8ac3d66668684d0f4eff64c6c6055412517d668db2f8b1675852c442676e82ff",
+      "bytes": 10098
+    },
+    "user/sound2/sound_ui.c": {
+      "sha256": "a4802d52f1bf9593c520efa0a99d7befd7d23903b84bff65268b4fc34ee822b5",
+      "bytes": 15509
+    },
+    "user/sound2/sound_jobs.c": {
+      "sha256": "b1cf434a244f5985e999ccefab326eff250c797220a5c9a8dcfee4817808ec7b",
+      "bytes": 10226
+    },
+    "user/session2/ui.c": {
+      "sha256": "b838db5dfee0a0ea7f50082425db1cb99309683b53af6f3d93eb60c43246bc21",
+      "bytes": 14767
+    },
+    "user/session2/actions.c": {
+      "sha256": "ac2f87cbf0e319325530312fbf3bc8c2d07974bdd0928a35c6900a50e4e61bad",
+      "bytes": 9154
+    },
+    "user/session2/model.c": {
+      "sha256": "2d7d4f2b41bd7033f3f7cf1b79a9ef6dccffaaba3866eb9a67c2d0a7af6a44c6",
+      "bytes": 9089
+    },
+    "kernel/audio.c": {
+      "sha256": "4f2a30f8d71b0bb8c6e2b22230cb9f6bd4f908bc019aac4cd5dfa654ece44aee",
+      "bytes": 13199
+    }
+  },
+  "commands": {
+    "canvas_new": 100,
+    "image_open": 101,
+    "image_save_as": 103,
+    "image_exit": 105,
+    "image_undo": 106,
+    "image_redo": 107,
+    "image_fit": 114,
+    "image_native": 115,
+    "settings_preview": "0x5200",
+    "settings_revert": "0x5202",
+    "monitor_freeze": "0x6500",
+    "palette_raw": "0x6400",
+    "palette_theme": "0x6401",
+    "calc_evaluate": "0x6200",
+    "sound_open": "0x6900",
+    "sound_seek": "0x6906",
+    "sound_cancel": "0x690a",
+    "session_lock": 108,
+    "session_close": 104,
+    "installer_add": "0x5300",
+    "installer_preflight": "0x5304",
+    "installer_start": "0x5305",
+    "installer_close": "0x530b"
+  }
+}

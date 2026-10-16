@@ -1,3 +1,4 @@
+# ResearchDesk SCW workspaces: RDSTATS.SCW (plugin), RDESK.SCW (application).
 # Build as an ordinary signed-in user. No /SYS output is written.
 mkdir -p /HOME/RDESK /HOME/RDWORK /HOME/RDPLUGIN || exit 10
 /SYS/BIN/SCCC.SCX /SYS/SDK/EXAMPLES/RDESK/RDSTATS.C /HOME/RDPLUGIN/RDSTATS.SCO --object || exit 11

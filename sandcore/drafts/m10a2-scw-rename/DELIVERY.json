@@ -1,0 +1,37 @@
+{
+  "status": "SOURCE_ONLY_NOT_BUILT_NOT_GUEST_VERIFIED",
+  "checks": [
+    "python_ast",
+    "pins_unchanged",
+    "small_workspace_text_identity",
+    "build_script_command_identity",
+    "active_rg_coverage"
+  ],
+  "files": {
+    "DESIGN.md": "6d7dc14c42c434302f9ce088b987d44481faf88f0768e15f5cbd212e82ed1ba9",
+    "freeze.py": "f9d208054095634e465bdee0409e6a28292e281328bbe9e48906c9c5073379d8",
+    "make_patch.py": "a32d280e434cea6c3fbfa8ae608ab43de4f3c9203470db3da4e393f9e5c92ecf",
+    "overlay/docs/M10A2-CURRENT-GOAL.md": "30ae8ef15213ecab6c62f8898cd8f551aed8220e81ee867f5720c683dca127d7",
+    "overlay/docs/M10A2-LIVE-GUI.md": "8bbd57622b192da63c92a2a78127db1444f499905cb156f1652a1ab19042f62b",
+    "overlay/docs/M10A2-SDK.md": "11299bc0a0db0c7a81fa806ac89234308d9ee8ea5ec42d256baec848ebd426b9",
+    "overlay/docs/SCW-WORKSPACE.md": "37621718dd051fea097a39bedf3b1bf5d3bcfec0bf5c091ad58c068e30560d16",
+    "overlay/docs/SDK-RESEARCHDESK.md": "e976a5e1861226ed89104168dc28d2586cfd0d4d83df38c9eb66439bffccb54b",
+    "overlay/docs/STUDIO2-DEBUG2-DESIGN.md": "79dcc56c05337be315a13e190cc8c658ab978bc974c90a81b5c470e689efdd04",
+    "overlay/examples/m10a2-sdk/researchdesk/BUILD.SH": "294ec6ba6dfe15fa07401c86e907b35848caa6e9ea7cca5671ebec7167d90f8d",
+    "overlay/examples/m10a2-sdk/researchdesk/RDESK.SCW": "5b82c28c150313559546d6cef535a6db95e5210d3e90892b8f5b642a4e01b1a1",
+    "overlay/examples/m10a2-sdk/researchdesk/RDSTATS.SCW": "956e4f9602464762bdf0438358232b317f17ddfe78ab5a90113612a36f106854",
+    "overlay/examples/m10a2-sdk/researchdesk/README.md": "e976a5e1861226ed89104168dc28d2586cfd0d4d83df38c9eb66439bffccb54b",
+    "overlay/tools/build_m10a2_p6.py": "f62f75990046493345d981f8de5010441eb5ea61993fe42eff8425a52c4b79be",
+    "overlay/tools/m10a2_sdk_final.py": "a2b6218a135491e3d5bcdc64ead05744c806dbd31ae32d07fbcaf04677e157ba",
+    "overlay/user/studio2/STUDIO2.C": "87b711bd1187e26a425efc3f797b14084cd00366f7f77c7301f67b90e34aad0a",
+    "overlay/user/studio2/studio_actions.c": "4836835ac3f89f1b43fd75070d9767a8d8c8a600b95513d94b494b967caa648c",
+    "overlay/user/studio2/studio_io.c": "2026dc09cc6a0d57586d685ad0c7cd844ecd4eb3b3fc3d1e4ed32765c1f94553",
+    "overlay/user/studio2/studio_ui.c": "172b0c7f86c4c442b81a0d176195109053e960424656400e0185ec13677603d7",
+    "PINS.json": "08c17dc8498dd2b725ca6fc0b203b2edfffa552bb5f85d923711c97bbc0adfb7",
+    "README.md": "a4bb5b9de913d4dc5685f1bf3d46100f059d39f9e18877dc70bd2be4f6bbf780",
+    "RENAMES.json": "3417df687676612472a0749e26d416eb34b2e2ec4c17998ccd0b160cd7489124",
+    "SCAN.json": "9d498c36638a262f63570d37d9a72816fa8a9d932d4370d6ee3f5d52678b004a",
+    "SCW-WORKSPACE.md": "37621718dd051fea097a39bedf3b1bf5d3bcfec0bf5c091ad58c068e30560d16",
+    "scw-workspace.patch": "27acb9c24452ebfc7a9a05d5ceb682949463e451e641072f904ffb27bc27223b"
+  }
+}

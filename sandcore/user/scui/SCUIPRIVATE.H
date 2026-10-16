@@ -204,6 +204,7 @@ static void ui_glyph_release(ScUiContext *,ScU32);
 static ScStatus ui_text_measure(ScUiContext *,ScU32,const ScUiText *,ScI32,ScU32,ScUiTextMetrics *);
 static void ui_fill(ScUiPainter *,const ScUiRect *,ScU32);
 static void ui_border(ScUiPainter *,const ScUiRect *,int);
+static ScU32 ui_argb_over_partial(ScU32,ScU32);
 static ScStatus ui_paint_text(ScUiPainter *,const ScUiRect *,const ScUiText *,ScU32,ScU32);
 static ScStatus ui_menu_paint(UiNode *,ScUiPainter *);
 static ScStatus ui_menu_event(UiNode *,const ScUiEvent *);

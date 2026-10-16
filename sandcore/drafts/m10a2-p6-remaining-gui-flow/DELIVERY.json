@@ -1,0 +1,12 @@
+{
+  "status": "READ_ONLY_FLOW_PREPARATION_NOT_EXECUTED",
+  "static_checks": [
+    "nine_application_rows",
+    "current_source_sha_unchanged",
+    "calculator_format_exact"
+  ],
+  "files": {
+    "REMAINING-GUI.md": "57e6927cc9401e797e1226a47454d1f4afef623e615b2a813cf12ddbc5b25b2e",
+    "SOURCE-PINS.json": "ad5804ca10fef39c22b683709f39b8f05de7046b3a62c59413c33ac635247239"
+  }
+}

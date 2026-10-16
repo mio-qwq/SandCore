@@ -1,5 +1,13 @@
 # M10a2 主要应用与工具链实施状态
 
+## 当前最高检查点
+
+2026-10-16：完整 run03 已实际生成 8 普通库、21 工具/应用记录及27 SCO，整体 physical_delta=0、源码/原盘不变。已生成旧 native-bound CORE 和九库 SDK，GUI01 实际普通身份运行了 Files/Notes/Studio/Terminal 的部分流程，但保存和构建暴露共享层缺陷，最终 +205 页未归属，原报告 FAIL 保留。
+
+SCW 工作区、Save As 精确查询、类型列、图标透明合成、紧凑名称框、Studio namespace lease 已合主源。HOST07 exit0/41产物/源变化0，SCO08 三变化目标后端检查通过；refresh-vm-03 已实际刷新 SCUI/SCSHELL/STUDIO2，其他原生来源严格复用；六次编译/链接、取回与严格审计通过，PF14036→14036，源/原盘守恒。新 CORE/SDK 正在接续，修复后的 GUI 尚未宣布通过。实时状态、命令和恢复边界以 [M10A2-LIVE-GUI.md](M10A2-LIVE-GUI.md) 为准，下方记录保留原检查点时态。
+
+修订：2026-10-16，同步完整原生来源、SCW 与共享层修复、GUI01 失败边界和三目标刷新状态。
+
 ## 当前客体生成检查点
 
 2026-10-16，当前统一HOST凭证为 `build/m10a2-main-studio-01/p6-unified-host-02.json`：exit0、41产物、1320输入、构建期间源码变化0；`codec-host-proof-02.json`绑定该批SCSOUND。Files、Calculator、Palette、Monitor、Sound、Settings、安装GUI和Terminal的菜单快捷键已通过既有ScUiCommandSet接线，八目标SCCC/SCO/SCLD宿主后端预检07通过。HOST01与旧codec证明保留为历史，不作为这八个新字节的凭证。

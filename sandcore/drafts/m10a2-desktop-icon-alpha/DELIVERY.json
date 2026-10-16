@@ -1,0 +1,73 @@
+{
+  "schema": 1,
+  "status": "FROZEN_PINNED_R3_ALPHA_PATCH_HOST_ARITHMETIC_CHECKED_NOT_APPLIED",
+  "date": "2026-10-16",
+  "targets": {
+    "user/scui/ui_paint.c": "e17e1f9d31e1f10cd485aca88c68009f5feed99ca6edf5ca70e704767b33cecb",
+    "user/scui/ui_argb.c": "0e2f5b6a71abeda13cdeda2d71635511d57f32e724950891d58a4ac3f807ddd6",
+    "user/scui/SCUIPRIVATE.H": "374c2c98c7da78cd7b8956764ec1b9143d1fec20b3361444634b2fd8658ca3a0"
+  },
+  "result_sha256": {
+    "user/scui/ui_paint.c": "167c9ba2d0eeb3662c8951d6ed276ed0c521962c842b87b6b45f4ed4e501458f",
+    "user/scui/ui_argb.c": "9e8134166b15fc59a7210a166f9dc55514de01e6ad0bdc7702025c69e38c6121",
+    "user/scui/SCUIPRIVATE.H": "62a62bf304bb05812b7db0f33c2a9ec1640770f33c8e4c9eb38905695737f7bc"
+  },
+  "files": {
+    "arithmetic-harness-initial-warning.json": {
+      "bytes": 2314,
+      "sha256": "3b15ca578c8c44384d3188fb37be740927b3ca2a38dc1bae212bbbcbbc3e34cf"
+    },
+    "arithmetic-report.json": {
+      "bytes": 1090,
+      "sha256": "6496ba75d0b913dff5db48ec8e01de90ac00833b0e20f13fdd8bb63e152f1227"
+    },
+    "check_arithmetic.py": {
+      "bytes": 3135,
+      "sha256": "9fd764da9dbc5f4c107f2ccb92e3db0a7663534dc1d4a53916a296b578126b37"
+    },
+    "host-arithmetic": {
+      "bytes": 15196,
+      "sha256": "539930b0a4d8ba3c7c2e8e837caf7e9e4fd8914b8b4c17789c884b25eaba4b27"
+    },
+    "host-arithmetic.c": {
+      "bytes": 2689,
+      "sha256": "456a7dfa767e5e4980682cff139ce9050619c809a4b5b6d2aeb24de8882f1862"
+    },
+    "inspect_pixels.py": {
+      "bytes": 5560,
+      "sha256": "7d19a58a2f61fe4c9e9af79fdbc6bd0e81fe9fbad4626bd38ef861e664826f07"
+    },
+    "pins.json": {
+      "bytes": 292,
+      "sha256": "6ed61cb91126fea6c7f4a017c7fd0a5f49d1372baffc1c7f2a3bd05989702c28"
+    },
+    "PIXEL-EVIDENCE.json": {
+      "bytes": 8939,
+      "sha256": "56eed09e40b71d888317ce8e4226fa46147a72cab724883249414639976c348a"
+    },
+    "prepare_patch.py": {
+      "bytes": 4628,
+      "sha256": "fb75486e490d084f74491ff157fa7228185621a95e7983a9d372e44098a5389e"
+    },
+    "README.md": {
+      "bytes": 4503,
+      "sha256": "ce1451368e047348af5e8bc7a025e9dea7f3f064327ba11a7dc2afb529d1048d"
+    },
+    "result-pins.json": {
+      "bytes": 292,
+      "sha256": "721c53bc90ee2b701a0b93f7a8c968b1f5239605b5560025792db40ff9a3368a"
+    },
+    "straight-alpha.patch": {
+      "bytes": 3832,
+      "sha256": "f0c05b32fc33d3604d8be2fc55ad97d736d06801a158b3c89cd6cebbab4e1800"
+    }
+  },
+  "no_overlap_with_file_dialog_patch": true,
+  "main_modified": false,
+  "assets_edited": false,
+  "image_generated": false,
+  "full_ui_built": false,
+  "guest_built": false,
+  "qemu_started": false,
+  "fix_guest_verified": false
+}

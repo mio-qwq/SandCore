@@ -1,0 +1,28 @@
+{
+  "scope": "HOST_I386_INTEGER_ARITHMETIC_ONLY_NOT_SCUI_OR_GUEST",
+  "guest": false,
+  "full_ui_compiled": false,
+  "status": "FAIL",
+  "error": "/mnt/c/Users/Administrator/Desktop/projectos/sandcore/drafts/m10a2-desktop-icon-alpha/host-arithmetic.c: In function ‘main’:\n/mnt/c/Users/Administrator/Desktop/projectos/sandcore/drafts/m10a2-desktop-icon-alpha/host-arithmetic.c:47:9: error: this ‘if’ clause does not guard... [-Werror=misleading-indentation]\n   47 |         if(over(s,d)!=old)return 3;cases++;\n      |         ^~\n/mnt/c/Users/Administrator/Desktop/projectos/sandcore/drafts/m10a2-desktop-icon-alpha/host-arithmetic.c:47:36: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’\n   47 |         if(over(s,d)!=old)return 3;cases++;\n      |                                    ^~~~~\ncc1: all warnings being treated as errors\n",
+  "commands": [
+    {
+      "args": [
+        "gcc",
+        "-m32",
+        "-O2",
+        "-std=c99",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "/mnt/c/Users/Administrator/Desktop/projectos/sandcore/drafts/m10a2-desktop-icon-alpha/host-arithmetic.c",
+        "-o",
+        "/mnt/c/Users/Administrator/Desktop/projectos/sandcore/drafts/m10a2-desktop-icon-alpha/host-arithmetic"
+      ],
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "/mnt/c/Users/Administrator/Desktop/projectos/sandcore/drafts/m10a2-desktop-icon-alpha/host-arithmetic.c: In function ‘main’:\n/mnt/c/Users/Administrator/Desktop/projectos/sandcore/drafts/m10a2-desktop-icon-alpha/host-arithmetic.c:47:9: error: this ‘if’ clause does not guard... [-Werror=misleading-indentation]\n   47 |         if(over(s,d)!=old)return 3;cases++;\n      |         ^~\n/mnt/c/Users/Administrator/Desktop/projectos/sandcore/drafts/m10a2-desktop-icon-alpha/host-arithmetic.c:47:36: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’\n   47 |         if(over(s,d)!=old)return 3;cases++;\n      |                                    ^~~~~\ncc1: all warnings being treated as errors\n"
+    }
+  ],
+  "source_sha256": "5999183e41737f901b80154034115ef19df6b40d2e74fd9f005dd473635896bc",
+  "helper_sha256": "f36e8ae9c3b211053a7072bd0aba8c1f4bfa77d4751faa46e8aa875a97ca3024"
+}

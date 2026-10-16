@@ -1,6 +1,6 @@
 # SandCore M10a2 — The Application Platform Era：持续目标
 
-> 当前执行检查点：run03完整真实原生生成PASS，8库/21工具应用记录/27SCO，整轮physical_delta=0且源码/原盘守恒。HOST05固定最后SDK/metadata工具，41产物/输入变化0；native-bound CORE及九库SDK已生成。GUI01正运行UID1000/SID4，已实际菜单启动Files2/Notes2、创建本人目录和编辑新文档；新文件Save As被共享SCUI旧元数据查询阻断，另有SCSHELL单字段名称提示误用大属性页，均已定位、尚未合入修复。当前完整M10a2仍active，GUI/ResearchDesk/最终交付未完成；实时恢复入口M10A2-LIVE-GUI.md。main已存cfdcd16/5a53cc9，WSL push退出1、远端未确认。
+> 当前执行检查点：完整目标仍 active。SCW、共享 Save As/文件类型列、整数透明合成、紧凑名称提示、Studio 只读命名空间租约修复已合主源。HOST07 exit0/41产物/源变化0；SCO08三个变化目标宿主后端通过。refresh-vm-03 仅真实生成 SCUI/SCSHELL/STUDIO2，其他产物显式复用完整 run03 来源；整轮真实生成/严格审计 PASS，PF14036→14036，源码/原盘守恒。GUI01 已正常关闭应用/注销测试SID，原最终 +205 页未归属，FAIL保留；Terminal 普通身份/管道等真实成功旁证继续保留。新 native CORE/SDK 和下一次一致采样普通GUI接续中，实时恢复入口 M10A2-LIVE-GUI.md。main 已存 f6cd28d，当前修复待保存，远端推送未确认。
 
 > 当前最高检查点：全批主源、默认升级和最终SDK/四TU示例已接齐。SC32 193导出、SCUI1.3/v4 170导出；27个SCCC/SCO/SCLD宿主后端目标通过。统一HOST报告 `build/m10a2-main-studio-01/p6-unified-host-01.json`：exit0、41产物、source变化0，含CORE/九库/十五GUI入口/worker/工具/SH/nano。SCSOUND是明确HOST codec例外，其证明已写入 `build/m10a2-session-sound-integration-01/codec-host-proof.json`。下一项真实Windows客体生成8普通库/新SCCC/SCLD及组件；随后按native LOGIN2/五库重新签发CORE、普通用户GUI/SDK与最终验收。没有新客体结论，不停在HOST检查点。下方旧数字和“尚在草稿”属于沿革，以此段和P6文档首节为准。main最新本地提交仍f101dff；本批新增待保存，远端上次push失败未确认。
 
@@ -109,3 +109,5 @@ Desktop-layout01实际单拖/框选/组拖/磁盘CAT通过，全部16图标资�
 ROOT已按四份精确原SHA应用SCO编译器补丁（build/m10a2-object-integration-01/compiler-application.json），新增user/s3c_sco.inc、SCOFMT.H、SCDBGFILE.H、scld.c、SCLD.json，m10a2.mk已接独立object工具目标/正式头安装；旧default-label/sret修复保留，不扩大262108旧限。这是主源实施整合，尚未对新增工具启动客体流程；P5隔离stage故意仍保旧编译器冻结源，原生图标性能前后caller和资源不混淆。
 
 Visual02新标签居中/128×112网格、原壁纸与全部实际icon引用和提交就绪已通过并由主代理查看原尺寸图；P5真实drag/owner仍通过。ICONPROFILE actualG1 caller SHA ccd18a49eb673a5987a84348f189a231c762ea00296d852ec44f5bd5f19511c6，16×128px=1048576B，75 PIT@100Hz，默认512KiB资源cache16 misses/0hits/7entries；只是无窗口资源分项，不是整桌面时间。优化SCB2直接复制/ASCII同名key已在主源；桌面显式2MiB cache只增加 lookup持有预算，不预分配或降尺寸，避免16张可见强持图重复创建。GEN17只更新SCSHELL/desktop原生通过，CORE18正绑定；下一同源caller视觉02→优化后对照，达到本项结束条件即停止该性能矩阵。
+
+2026-10-16 SCW工作区：Studio 2 的工作区入口及SDK示例使用.SCW（SandCore Workspace）。普通用户先打开/SYS/SDK/EXAMPLES/RDESK/RDSTATS.SCW构建独立SCL，再打开RDESK.SCW构建四TU应用；F5构建、F6运行、F7调试。此段为当前入口合同，实际执行证据另列。

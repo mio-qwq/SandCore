@@ -19,8 +19,14 @@ int main(void)
     s=ScProcessArguments(args,sizeof(args),&n);
     if(s>=0 && n){
         while(n && (args[n-1]==' '||args[n-1]=='\t'))args[--n]=0;
-        const char *ext=strrchr(args,'.');
-        io_open(args,ext && (!strcmp(ext,".SCP")||!strcmp(ext,".scp"))?S_IO_PROJECT_OPEN:S_IO_OPEN,0);
+        U first=0;
+        while(first<n&&(args[first]==' '||args[first]=='\t'))first++;
+        /* MODERN Shell为单个document加外引号；只剥成对引号，路径本身仍完整验证。 */
+        if(first<n&&args[first]=='"'&&n>first+1&&args[n-1]=='"'){first++;args[--n]=0;}
+        if(first<n){
+            s=strchr(args+first,'"')?SC32_E_INVALID:io_open(args+first,workspace_suffix(args+first)?S_IO_PROJECT_OPEN:S_IO_OPEN,0);
+            if(s<0)error(s,"无法打开指定文件");
+        }
     }
     while(!st.stopping){
         io_step();

@@ -24,9 +24,13 @@ ScStatus ScUiPainterArgb(ScUiPainter *p,const ScUiArgbBlit *d)
         ScU32 *target=p->root->pixels+((ScU32)clipped.y+(ScU32)y)*p->root->width+(ScU32)clipped.x;
         for(ScI32 x=0;x<clipped.width;x++){ScU32 color=source[x],alpha=color>>24;
             if(d->flags==SC_UI_ARGB_COPY || alpha==255u)target[x]=color;
-            else if(alpha){ScU32 old=target[x],value=0xff000000u;
-                for(ScU32 shift=0;shift<24;shift+=8)value|=(((((color>>shift)&255u)*alpha+((old>>shift)&255u)*(255u-alpha)+127u)/255u)<<shift);
-                target[x]=value;
+            else if(alpha){ScU32 old=target[x],target_alpha=old>>24;
+                if(!target_alpha)target[x]=color;
+                else if(target_alpha==255u){ScU32 value=0xff000000u;
+                    for(ScU32 shift=0;shift<24;shift+=8)value|=(((((color>>shift)&255u)*alpha+((old>>shift)&255u)*(255u-alpha)+127u)/255u)<<shift);
+                    target[x]=value;
+                }
+                else target[x]=ui_argb_over_partial(color,old);
             }
         }
     }

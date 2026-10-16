@@ -17,7 +17,7 @@ RDSTATS.SCL 通过 ScLoadLibrary 和 ScGetSymbol 实际装入，版本化状态/
 
 BUILD.SH 每一步检查退出值，只写 /HOME 的三个目录。APP.RSP 的四行仅是对象路径。SCLD 输出真实 SCX/SCL、`.map` 和 `.sdbg` 副文件；副文件绑定完整映像 SHA256。脚本最后的 BUILD_OK 只证明构建命令成功，不能代表 GUI、客体执行或整个 SDK 已验收。
 
-Studio2 可分别打开 RDSTATS.SCP、RDESK.SCP，先构建插件，再构建和运行应用。SDK 工程本身只读；需要改源码或工程配置时先复制到普通用户目录，并修改源码、manifest、include_dirs、workspace 路径。Studio 自动建立独立构建目录和对象响应文件，不使用本示例固定 APP.RSP。SCL 工程不能单独 Run，RDESK 是实际宿主。
+SCW（SandCore Workspace）是 Studio 2 的工程工作区。通过“工程 → 打开工作区…”分别打开 RDSTATS.SCW、RDESK.SCW，先构建插件，再构建和运行应用。SDK 工程本身只读；需要改源码或工程配置时先复制到普通用户目录，并修改源码、manifest、include_dirs、workspace 路径。Studio 自动建立独立构建目录和对象响应文件，不使用本示例固定 APP.RSP。SCL 工程不能单独 Run，RDESK 是实际宿主。
 
 ## 数据与保存
 
@@ -36,3 +36,5 @@ Studio2 可分别打开 RDSTATS.SCP、RDESK.SCP，先构建插件，再构建和
 5. 先退出程序，将插件移到其它用户目录，再启动，窗口/文档仍可用并明确插件失败；恢复插件并“连接统计插件”后统计恢复。此动作只针对自建 /HOME 产物，不修改系统库。最后退出，受管任务与本任务句柄/页回收恢复。
 
 这些是主代理待执行的客体结束条件。本目录的宿主真实后端与模型报告分列，不把它们冒充上述结果。
+
+修订记录：2026-10-16，SCW工作区路径、公开Studio入口和ResearchDesk构建合同。

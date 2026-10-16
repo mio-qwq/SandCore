@@ -1115,6 +1115,18 @@
       "size": 1
     },
     {
+      "name": "ScUiLayout",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUiFocus",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
       "name": "ScUiListen",
       "dependency": "SCUI.SCL",
       "kind": "function",
@@ -1122,6 +1134,12 @@
     },
     {
       "name": "ScUiDisconnect",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUiMetricsQuery",
       "dependency": "SCUI.SCL",
       "kind": "function",
       "size": 1
@@ -1235,6 +1253,12 @@
       "size": 1
     },
     {
+      "name": "ScUiEditSelectAll",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
       "name": "ScUiMessageBox",
       "dependency": "SCUI.SCL",
       "kind": "function",
@@ -1247,12 +1271,6 @@
       "size": 1
     },
     {
-      "name": "ScUiPropertySheet",
-      "dependency": "SCUI.SCL",
-      "kind": "function",
-      "size": 1
-    },
-    {
       "name": "ScUiDialogRelease",
       "dependency": "SCUI.SCL",
       "kind": "function",
@@ -1260,12 +1278,6 @@
     },
     {
       "name": "ScUiDialogQuery",
-      "dependency": "SCUI.SCL",
-      "kind": "function",
-      "size": 1
-    },
-    {
-      "name": "ScUiDialogCopyValues",
       "dependency": "SCUI.SCL",
       "kind": "function",
       "size": 1

@@ -1,0 +1,64 @@
+--- a/sandcore/user/scui/ui_dialog.c
++++ b/sandcore/user/scui/ui_dialog.c
+@@ -1,4 +1,5 @@
+ #include "SCUIPRIVATE.H"
++#include "../SC32PATH.H"
+ 
+ typedef struct {
+     ScUiFieldDesc description;
+@@ -481,8 +482,12 @@
+     if(request->field==1){reply->value.type=SC_VALUE_U32;
+         reply->value.lo=row->length;
+     }
+-    else if(request->field==2){reply->value.type=SC_VALUE_U32;
+-        reply->value.lo=row->kind;
++    else if(request->field==2){
++        /* 类型列只翻译呈现；目录kind仍供原排序、导航和权限检查。 */
++        const char *kind=row->kind==SC32_PATH_DIRECTORY?"文件夹":"文件";
++        reply->value.type=SC_VALUE_UTF8;
++        reply->value.data=kind;
++        reply->value.bytes=(ScU32)strlen(kind);
+     }
+     else{reply->value.type=SC_VALUE_UTF8;
+         reply->value.data=row->name;
+@@ -667,7 +672,7 @@
+         columns[1].title=ui_dialog_text("大小");
+         columns[1].format=SC_UI_FORMAT_BYTES;
+         columns[2].title=ui_dialog_text("类型");
+-        columns[2].format=SC_UI_FORMAT_U32;
++        columns[2].format=SC_UI_FORMAT_TEXT;
+         if(s==0)s=ScUiTableSetColumns(context,d->list,columns,3);
+     }
+     if(s==0){text=ui_dialog_text("");
+@@ -809,7 +814,8 @@
+         memset(&metadata,0,sizeof(metadata));
+         metadata.size=sizeof(metadata);
+         metadata.version=1;
+-        s=ScPathMetadata(full,&metadata);
++        /* 旧Metadata把缺失折成粗错误；保存新名字必须用精确Query。 */
++        s=ScPathQuery(full,&metadata);
+         if(s==SC32_E_NOT_FOUND)s=0;
+         else if(s==0 && metadata.kind!=SC32_PATH_FILE)s=SC_UI_E_INVALID;
+         else if(s==0 && !(d->flags&SC_UI_FILE_OVERWRITE)){
+--- a/sandcore/user/scui/SCUI.json
++++ b/sandcore/user/scui/SCUI.json
+@@ -1253,7 +1253,7 @@
+       "size": 1
+     },
+     {
+-      "name": "ScPathMetadata",
++      "name": "ScPathQuery",
+       "kind": "function",
+       "dependency": "SC32API.SCL",
+       "size": 1
+--- a/sandcore/user/scui/SCUI.NATIVE.JSON
++++ b/sandcore/user/scui/SCUI.NATIVE.JSON
+@@ -719,7 +719,7 @@
+       "size": 1
+     },
+     {
+-      "name": "ScPathMetadata",
++      "name": "ScPathQuery",
+       "dependency": "SC32API.SCL",
+       "kind": "function",
+       "size": 1

@@ -82,7 +82,7 @@ Studio集成debug时，controller与DebugSession在Studio同进程，直接复�
 
 ### 5.1 项目模型
 
-工程descriptor采用版本化、严格解析的普通用户配置文件，先完整候选再提交。包含project ID/name、绝对project/work/package root、源/头/资源/SDK文档项、targets、依赖DAG、toolchain profile、run/debug配置及布局。稳定item ID与显示排序分开，动态容器/索引，只受真实资源预算限制，无固定文件/目标/面板数量。
+工程工作区使用.SCW（SandCore Workspace），其descriptor采用版本化、严格解析的普通用户配置文件，先完整候选再提交。包含project ID/name、绝对project/work/package root、源/头/资源/SDK文档项、targets、依赖DAG、toolchain profile、run/debug配置及布局。稳定item ID与显示排序分开，动态容器/索引，只受真实资源预算限制，无固定文件/目标/面板数量。
 
 目标类型至少为旧SCX兼容、自动动态SCX、SCL、独立ASM；可选SKM保留现开发能力但Run SKM继续原真实外部授权链，Studio本身不取得Ring0。SCX+SCL的name/ABI/export/import/dependency/init/fini是严格manifest模型，参数个数/签名/引用要求由真实工具链校验。项目依赖环、重复输出、输入与副产物别名、无权路径先拒绝，不在首次失败后留下半个项目注册。
 
@@ -290,3 +290,5 @@ Classic与Aurora共享SCUI行为/metrics，命名颜色沿GFX/THEME，原Phoenix
 只有这些完整实际出口及保留清单成立后才称重制完成。现源码审计、设计稿、build08/09或平台87功能子结果都不能充当Studio2/Debug2验收；M10a2完整目标继续。
 
 修订：2026-10-15，完整审阅现Studio/Debugger及现代SC32/SCLDR，建立多文件原生工程/共享编辑/诊断/owned Debug/模块符号/SDK与分工；仅设计，记录CPUINFO越界、typed能力/多TU缺项及本批aggregate/SCLMAP收齐未验边界，未实现或运行新应用。
+
+修订：2026-10-16，SCW工作区入口、schema1与标准文件对话框合同。

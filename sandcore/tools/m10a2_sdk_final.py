@@ -34,7 +34,7 @@ def configure(root,libraries,headers,docs):
     for name in OPTIONAL_AUTH:
         if (root/'user'/name).is_file():headers[name]='user/'+name
     # 新正式文档只在主代理同批整合后加入，不把缺失文档伪造为空文件。
-    additions=('SC32-AUDIO.md','SCSOUND.md','SC32-CONFIG.md','SC32-TERMINAL.md','SCTERM.md','SDK-RESEARCHDESK.md')
+    additions=('SC32-AUDIO.md','SCSOUND.md','SC32-CONFIG.md','SC32-TERMINAL.md','SCTERM.md','SDK-RESEARCHDESK.md','SCW-WORKSPACE.md')
     return tuple(dict.fromkeys(docs+tuple(name for name in additions if (root/'docs'/name).is_file())))
 
 def required_sources(root,roots,extra=()):
@@ -191,6 +191,6 @@ def install_sources(stage,inputs,recorded,add):
 def install_researchdesk(stage,inputs,add):
     base=stage.ROOT/'examples/m10a2-sdk/researchdesk'
     if not base.is_dir():raise ValueError('缺独立多TU ResearchDesk源码目录')
-    allowed={'.c','.h','.json','.scp','.rsp','.sh','.md','.rdt'}
+    allowed={'.c','.h','.json','.scw','.rsp','.sh','.md','.rdt'}
     for file in sorted(base.iterdir()):
         if file.is_file() and file.suffix.lower() in allowed:add('SYS/SDK/EXAMPLES/RDESK/'+file.name.upper(),inputs.read(file),str(file))

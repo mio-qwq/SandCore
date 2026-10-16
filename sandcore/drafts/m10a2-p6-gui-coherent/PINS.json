@@ -1,0 +1,10 @@
+{
+  "status": "SOURCE_ONLY_NOT_BUILT_NOT_VM_EXECUTED",
+  "base": "/mnt/c/Users/Administrator/Desktop/projectos/sandcore/drafts/m10a2-p6-acceptance/driver.py",
+  "base_sha256": "e2ed3b1ff27ae0162121e9162d642700ed8d20fe8fa8209482e7842009759878",
+  "new_driver_sha256": "8651195db270371007dc92f821516760a366054efd30e4e9f75acff5b423bc55",
+  "patch_sha256": "b8946d5375ff0ac2636ed1c91118b02a04e642939385a12643381fc99488ef75",
+  "original_files_modified": false,
+  "runtime_base_sha256": "20651143189d331c6adb1e66f0d4a7ac5ccf9bc5f9bf2359e604a8298110325a",
+  "owner_helper_sha256": "25d87a8f1b5cbac487ed740416a65031a1c456a9cbaf48505ba739c651f859dc"
+}

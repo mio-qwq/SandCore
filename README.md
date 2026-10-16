@@ -6,7 +6,7 @@
 
 SandCore 由 [mio](https://github.com/mio-qwq/) 开发。工程包含 BIOS 引导、分页与抢占式多任务、SandFS 文件系统、多用户桌面、图形应用、音频、IPv4 网络、自有可执行格式，以及可以在系统内编译和运行程序的 C 编译器、汇编器和调试器。
 
-当前开发工作为 **SandCore M10a2 — The Application Platform Era**，2026-10-14 已开工：SCL/SCCC动态SCX、自举、SC32基础、SCCLIB/SCLIB已有真实运行证据；完整SCUI的158入口已由客体G1生成，普通会话平台、官方3013个Unicode边界与两个方向的结构体ABI通过，GUI22实际91项记录通过，含两主题、100/150/200%布局、真实拖放/文件保存、隐藏停绘和最终回收；[总体设计](sandcore/docs/M10A2-DESIGN.md)、[实际状态与恢复入口](sandcore/docs/M10A2-IMPLEMENTATION.md)、[原生平台证据](sandcore/evidence/m10a2-ui-platform/README.md)。完整桌面/Shell、组件重制、SDK与整版目标持续active。可用验收基线仍为 **M10a1**，已于 **2026-10-07 验收通过**，作为 M10a 的 **GitHub Preview 预发布版**交付；统一在 `main` 开发。M9 是已验收的正式发布版本，M8a 与更早版本保留源码和运行镜像。完整 M10 尚未宣布完成，基础内核尚未冻结。
+当前开发工作为 **SandCore M10a2 — The Application Platform Era**：真正 Ring3 动态链接、四大系统库、SCUI 与桌面已有分项客体证据；八个普通库和重制应用工具链已实际系统内生成，完整 SDK 和 SCW 工程工作区已接入。普通用户 GUI 与独立开发示例仍在收束，实际失败与修复分列于[当前客体接力](sandcore/docs/M10A2-LIVE-GUI.md)，完整目标持续 active。可用验收基线仍为 **M10a1**，已于 **2026-10-07 验收通过**并交付 [GitHub Preview](https://github.com/mio-qwq/SandCore/releases/tag/M10a1)。统一在 `main` 开发；M9、M8a 及更早历史产物保留。完整 M10 尚未宣布完成，基础内核尚未冻结。
 
 > **关于 AI 参与与文档质量：** 本项目包含由 AI 生成或辅助编写的代码，部分文档也由 Agent 撰写或整理，因此可能存在表述不清、人称或代词指代错误，以及遗留的 Agent 自述等问题。欢迎通过 [Issues](https://github.com/mio-qwq/SandCore/issues) 指出问题；我也会在后续持续校对与完善。
 
@@ -452,7 +452,7 @@ env -u OS make -j4
 
 | 版本 | 状态 |
 |---|---|
-| M10a2 — The Application Platform Era | SCL与SC32基础/原生库/消息窗口已实际运行，四库/SCUI GUI已有真实阶段证据；P5原生host稳定切换及普通用户COPY/MOVE/精确元数据通过，跨进程文件剪贴板、图标拖动/布局冷恢复与连续会话切片通过；六重制组件已HOST构建，Files跨窗及组件/SDK整版未验收 |
+| M10a2 — The Application Platform Era | Ring3 SCL/四库/SCUI、桌面和文件事务等已有实际分项证据；八个普通库、重制组件与原生SCCC/SCLD已在系统内生成。SCW/SDK接齐，当前只刷新三个变化目标；普通GUI、复杂示例和整版验收继续 |
 | M10a1 | 2026-10-07 验收通过，GitHub Preview 预发布，含追加 curl；统一使用 main |
 | M9 | 2026-10-05 验收通过，正式发布 |
 | M8a | 批准的部分正式发布；原 M8 未完成部分继续封存 |
@@ -479,3 +479,5 @@ env -u OS make -j4
 
 
 修订：2026-10-16，保存Ring3桌面资源/连续会话证据与六个重制组件HOST整合；新应用客体/Files跨窗/完整SDK继续。
+
+修订：2026-10-16，同步完整原生生成、SCW/SDK和普通GUI实际边界；整版目标继续。

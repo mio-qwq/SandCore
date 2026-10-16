@@ -1,0 +1,67 @@
+--- a/drafts/m10a2-p6-acceptance/driver.py
++++ b/drafts/m10a2-p6-gui-coherent/driver.py
+@@ -21,13 +21,15 @@
+ import refresh_m10a2_ui_native as refresh
+ from scui_input import ScuiInput
+ from flow_input import FlowInput
+-from runtime import GuiRuntime, serve
++from runtime import serve
++from coherent_runtime import CoherentRuntime, ObserverPlan
+ 
+ 
+ def main():
+     parser = argparse.ArgumentParser(description=__doc__)
+     for name in ('native-report', 'host-report', 'sdk-directory', 'core-build', 'source-image', 'out'):
+         parser.add_argument('--'+name, type=Path, required=True)
++    parser.add_argument('--layout-report', type=Path, required=True)
+     parser.add_argument('--execute', action='store_true')
+     parser.add_argument('--accel', choices=('tcg', 'whpx'), default='tcg')
+     args = parser.parse_args()
+@@ -36,7 +38,9 @@
+         raise ValueError('必须使用build内新的m10a2-p6-gui-输出目录')
+     candidate = Candidate(args.native_report, args.host_report, args.sdk_directory,
+                           args.core_build, args.source_image)
++    owner_plan = ObserverPlan(candidate, args.layout_report)
+     pins = dict(candidate.input_pins.pins)
++    pins.update(owner_plan.pins)
+     pins[candidate.native_path] = sha(candidate.native_path)
+     pins[candidate.source] = candidate.source_sha
+     for directory in (candidate.sdk,):
+@@ -47,12 +51,13 @@
+         path = candidate.core/name
+         pins[path] = sha(path)
+     for directory in (HERE, HERE.parent/'m10a2-p6-gui-flow',
+-                      HERE.parent/'m10a2-p6-gui-runtime', HERE.parent/'m10a2-p6-final-flow'):
++                      HERE.parent/'m10a2-p6-gui-runtime', HERE.parent/'m10a2-p6-final-flow',
++                      HERE.parent/'m10a2-gui-owner-review'):
+         for path in directory.glob('*.py'):pins[path.resolve()] = sha(path)
+     if not args.execute:
+         print(json.dumps(dict(status='P6_GUI_PREFLIGHT_ONLY', payload_files=len(candidate.payload),
+             payload_bytes=sum(map(len, candidate.payload.values())), core_binding=candidate.core_binding,
+-            qemu_started=False), ensure_ascii=False))
++            qemu_started=False, coherent_owner_source_binding=owner_plan.metadata), ensure_ascii=False))
+         return
+     if os.name != 'nt':parser.error('只使用Windows QEMU')
+     report = dict(status='RUNNING', scope='P6_ORDINARY_GUI_AND_SDK_WORKFLOW', cases=[], screenshots=[],
+@@ -89,16 +94,16 @@
+                 flow = FlowInput(ScuiInput(vm, guest, symbols, report['physical_input'].append), harness)
+                 # 本轮首次使用各应用字形；只沿已验证ledger逐页计入真实
+                 # TTF owned_pages及首次wait堆，不把未知页差额当作缓存。
+-                runtime = GuiRuntime(flow, harness, session_parser=sessions, cold_font=True)
++                runtime = CoherentRuntime(flow, harness, owner_plan=owner_plan, session_parser=sessions, cold_font=True)
+                 # AC97保持；只结束启动段录音，防止后续长GUI流程写满静音。
+                 capture = runtime.request(dict(id='startup-audio-stop', op='audio_stop'))
+                 if 'error' in capture:raise ValueError('启动段录音未精确停止：'+str(capture['error']))
+-                before, observed = harness.quiet()
+-                runtime.baseline = (before, observed, harness.resources())
+-                report['baseline'] = dict(pages=before, observations=observed, resources=runtime.baseline[2])
+                 original = sessions(harness.run('sessions-before-gui', 'sessionctl list')['output'].encode())
+                 report['original_sessions'] = original
+-                report['original_active_session'] = next(row['id'] for row in original if row['active'])
++                active = [row for row in original if row['active']]
++                if len(active) != 1:raise ValueError('缺唯一真实原SID')
++                report['original_active_session'] = active[0]['id']
++                runtime.establish_baseline(active[0])
+                 harness.login_cooldown()
+                 login = harness.run('ordinary-gui-login',
+                     "printf '%s\\n' '' 'id; exit' | su mio", forbidden=(b'[AUTH] login failed',), timeout=120)

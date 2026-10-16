@@ -1,0 +1,32 @@
+{
+  "status": "STATIC_SOURCE_WIRING_ONLY_NOT_BUILT_NOT_VM_EXECUTED",
+  "parsed_files": [
+    "check.py",
+    "coherent_runtime.py",
+    "driver.py",
+    "layout_current.py",
+    "prepare.py"
+  ],
+  "frozen_originals_unchanged": true,
+  "actual_new_layout_generated_by_this_agent": false,
+  "actual_Root_layout_read_only_verified": true,
+  "Root_layout_report": "/mnt/c/Users/Administrator/Desktop/projectos/sandcore/build/m10a2-p6-gui-coherent-layout-01/layout-proof.json",
+  "Root_layout_report_sha256": "95d1108d29e095223dca4f912e4ed3af57821d3ccbc0c7fdac3b699280ad79bd",
+  "Root_layout_sizes": {
+    "desk": 1248,
+    "context": 672,
+    "root": 184
+  },
+  "Candidate_preflight_executed": false,
+  "qemu_started": false,
+  "original_GUI01_failure_exempted": false,
+  "header_delta": {
+    "old_actual_archive": "/mnt/c/Users/Administrator/Desktop/projectos/sandcore/build/m10a2-p6-final-01/sdk/SYS/SDK/SRC/user/scui/SCUIPRIVATE.H",
+    "old_sha256": "374c2c98c7da78cd7b8956764ec1b9143d1fec20b3361444634b2fd8658ca3a0",
+    "current_path": "/mnt/c/Users/Administrator/Desktop/projectos/sandcore/user/scui/SCUIPRIVATE.H",
+    "current_sha256": "62a62bf304bb05812b7db0f33c2a9ec1640770f33c8e4c9eb38905695737f7bc",
+    "only_added_function_declaration": "static ScU32 ui_argb_over_partial(ScU32,ScU32);",
+    "all_other_header_text_identical": true,
+    "diff": "--- /mnt/c/Users/Administrator/Desktop/projectos/sandcore/build/m10a2-p6-final-01/sdk/SYS/SDK/SRC/user/scui/SCUIPRIVATE.H\n+++ /mnt/c/Users/Administrator/Desktop/projectos/sandcore/user/scui/SCUIPRIVATE.H\n@@ -204,6 +204,7 @@\n static ScStatus ui_text_measure(ScUiContext *,ScU32,const ScUiText *,ScI32,ScU32,ScUiTextMetrics *);\n static void ui_fill(ScUiPainter *,const ScUiRect *,ScU32);\n static void ui_border(ScUiPainter *,const ScUiRect *,int);\n+static ScU32 ui_argb_over_partial(ScU32,ScU32);\n static ScStatus ui_paint_text(ScUiPainter *,const ScUiRect *,const ScUiText *,ScU32,ScU32);\n static ScStatus ui_menu_paint(UiNode *,ScUiPainter *);\n static ScStatus ui_menu_event(UiNode *,const ScUiEvent *);\n"
+  }
+}

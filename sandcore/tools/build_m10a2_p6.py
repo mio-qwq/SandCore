@@ -4,7 +4,7 @@ from pathlib import Path
 import argparse,hashlib,json,subprocess,time
 import stage_m10a2_sdk as sdk
 ROOT=Path(__file__).resolve().parents[1]
-SUFFIX={'.c','.h','.inc','.asm','.json','.ld','.py','.mk','.scp','.rsp','.rdt','.sh'}
+SUFFIX={'.c','.h','.inc','.asm','.json','.ld','.py','.mk','.scw','.rsp','.rdt','.sh'}
 OUTPUTS=('sandcore.img','fs/SYS/CORE/CORE.SKM','core.sym','core.elf','core.bin',
  'fs/bin/sccc.scx','fs/bin/sh.scx','fs/bin/nano.scx','fs/SYS/CORE/IMAGE.SCX',
  'fs/SYS/UI/UAX15_1.SCU','SCLD.SCX','SCSHELL.SCX','SCFILEWORK.SCX',

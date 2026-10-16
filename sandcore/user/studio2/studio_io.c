@@ -26,6 +26,26 @@ static ScStatus path(const char *input,char out[68])
     for(U i=0;i<n;i++)if((unsigned char)out[i]<=32u||out[i]==';'||out[i]=='\\'||out[i]==':')return SC32_E_INVALID;
     return ScUtf8Validate(out,n,0)<0?SC32_E_INVALID:0;
 }
+static U workspace_suffix(const char *name)
+{
+    const char *base=strrchr(name,'/');
+    const char *suffix=strrchr(base?base+1:name,'.');
+    return suffix&&same_name(suffix,".SCW");
+}
+static ScStatus workspace_save_name(const char *name,char out[68],U *implicit)
+{
+    ScStatus s=path(name,out);
+    if(s<0)return s;
+    const char *base=strrchr(out,'/');
+    const char *suffix=strrchr(base?base+1:out,'.');
+    *implicit=0;
+    if(suffix)return workspace_suffix(out)?0:SC32_E_INVALID;
+    U n=(U)strlen(out);
+    if(n>60u)return SC32_E_RANGE;
+    memcpy(out+n,".SCW",5);
+    *implicit=1;
+    return 0;
+}
 static void pin_control(StPin *p,ScLeaseControl *c){
     rec(c,sizeof(*c));
     c->lease=p->info.lease;
@@ -52,8 +72,21 @@ static ScStatus pin_close(StPin *p)
     if(!p->live)return 0;
     if(p->info.file){
         ScStatus s=ScFileClose(p->info.file);
-        if(s==SC32_E_BUSY||s==SC32_E_AGAIN)return SC32_PENDING;
+        if(s==SC32_PENDING||s==SC32_E_BUSY||s==SC32_E_AGAIN)return SC32_PENDING;
+        if(s<0&&s!=SC32_E_STALE)return s;
         p->info.file=0;
+    }
+    if(p->info.directory){
+        ScStatus s=ScDirectoryClose(p->info.directory);
+        if(s==SC32_PENDING||s==SC32_E_BUSY||s==SC32_E_AGAIN)return SC32_PENDING;
+        if(s<0&&s!=SC32_E_STALE)return s;
+        p->info.directory=0;
+    }
+    /* Acquire失败时也持有待关目录，但没有lease；Close成功才可清空。
+     * 正常目录的Release仅解除绑定，不会替应用关闭既有目录句柄。 */
+    if(!p->info.lease){
+        memset(p,0,sizeof(*p));
+        return 0;
     }
     ScLeaseControl c;
     ScLeaseInfo info;
@@ -77,6 +110,7 @@ static ScStatus io_open(const char *name,U kind,U owner)
     char absolute[68];
     ScStatus s=path(name,absolute);
     if(s<0)return s;
+    if(kind==S_IO_PROJECT_OPEN&&!workspace_suffix(absolute))return SC32_E_INVALID;
     if(kind==S_IO_OPEN){
         StDoc *old=document_path(absolute);
         if(old){
@@ -110,7 +144,7 @@ static ScStatus io_open(const char *name,U kind,U owner)
     status("读取候选文件…");
     return 0;
 }
-static ScStatus io_write_start(ScString *snapshot,const char *name,U expected,U kind,U owner,U revision)
+static ScStatus io_write_start(ScString *snapshot,const char *name,U expected,U kind,U owner,U revision,U absent)
 {
     if(st.io)return SC32_E_BUSY;
     char absolute[68];
@@ -121,6 +155,8 @@ static ScStatus io_write_start(ScString *snapshot,const char *name,U expected,U 
     s=ScPathQuery(absolute,&info);
     if(s<0&&s!=SC32_E_NOT_FOUND)return s;
     U exists=s==0;
+    /* 自动扩展名没有对最终目标取得覆盖确认；这里只允许ABSENT，发布时继续原ABSENT条件。 */
+    if(absent&&exists)return SC32_E_EXISTS;
     if(exists&&info.kind!=SC32_PATH_FILE)return SC32_E_INVALID;
     if(expected&&(!exists||info.generation!=expected))return SC32_E_STALE;
     StIo *io=calloc(1,sizeof(*io));
@@ -164,15 +200,19 @@ static ScStatus io_save(StDoc *d,const char *name)
     ScStatus s=ScUiDocumentQuery(d->text,&info);
     ScString *snapshot=0;
     if(s>=0)s=ScUiDocumentCopy(d->text,0,info.bytes,&snapshot);
-    if(s>=0)s=io_write_start(snapshot,name,!strcmp(name,d->path)?d->disk_revision:0,S_IO_SAVE,d->id,info.revision);
+    if(s>=0)s=io_write_start(snapshot,name,!strcmp(name,d->path)?d->disk_revision:0,S_IO_SAVE,d->id,info.revision,0);
     ScStringRelease(snapshot);
     return s;
 }
 static ScStatus io_project_save(const char *name)
 {
+    char absolute[68];
+    U implicit=0;
+    ScStatus s=workspace_save_name(name,absolute,&implicit);
+    if(s<0)return s;
     ScString *snapshot=0;
-    ScStatus s=project_encode(&snapshot);
-    if(s>=0)s=io_write_start(snapshot,name,!strcmp(name,st.project_path)?st.project_disk_revision:0,S_IO_PROJECT_SAVE,0,st.project_revision);
+    s=project_encode(&snapshot);
+    if(s>=0)s=io_write_start(snapshot,absolute,!strcmp(absolute,st.project_path)?st.project_disk_revision:0,S_IO_PROJECT_SAVE,0,st.project_revision,implicit);
     ScStringRelease(snapshot);
     return s;
 }

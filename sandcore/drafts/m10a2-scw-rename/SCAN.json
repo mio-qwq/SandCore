@@ -1,0 +1,49 @@
+{
+  "active_refs": [
+    "examples\\m10a2-sdk\\researchdesk\\README.md:20:Studio2 可分别打开 RDSTATS.SCP、RDESK.SCP，先构建插件，再构建和运行应用。SDK 工程本身只读；需要改源码或工程配置时先复制到普通用户目录，并修改源码、manifest、include_dirs、workspace 路径。Studio 自动建立独立构建目录和对象响应文件，不使用本示例固定 APP.RSP。SCL 工程不能单独 Run，RDESK 是实际宿主。",
+    "docs\\M10A2-SDK.md:17:| SYS/SDK/EXAMPLES | EDIT2、UTILITY 和 RDESK 的独立 TU、插件、SCP、manifest、响应文件、普通用户 BUILD.SH 与说明 |",
+    "tools\\build_m10a2_p6.py:7:SUFFIX={'.c','.h','.inc','.asm','.json','.ld','.py','.mk','.scp','.rsp','.rdt','.sh'}",
+    "tools\\m10a2_sdk_final.py:194:    allowed={'.c','.h','.json','.scp','.rsp','.sh','.md','.rdt'}",
+    "docs\\SDK-RESEARCHDESK.md:20:Studio2 可分别打开 RDSTATS.SCP、RDESK.SCP，先构建插件，再构建和运行应用。SDK 工程本身只读；需要改源码或工程配置时先复制到普通用户目录，并修改源码、manifest、include_dirs、workspace 路径。Studio 自动建立独立构建目录和对象响应文件，不使用本示例固定 APP.RSP。SCL 工程不能单独 Run，RDESK 是实际宿主。",
+    "user\\studio2\\STUDIO2.C:23:        io_open(args,ext && (!strcmp(ext,\".SCP\")||!strcmp(ext,\".scp\"))?S_IO_PROJECT_OPEN:S_IO_OPEN,0);"
+  ],
+  "exact_small_moves": [
+    "examples\\m10a2-sdk\\researchdesk\\RDSTATS.SCP",
+    "examples\\m10a2-sdk\\researchdesk\\RDESK.SCP"
+  ],
+  "preserved_game_references": [
+    "user/world.c:77:    if(sc_write(\"HOME/WORLD/CHUNK.SCW\",save_bytes,bytes)==(int)bytes) {",
+    "user/world.c:87:    if(sc_stat(\"HOME/WORLD/CHUNK.SCW\",info)||info[1]!=bytes) return 0;",
+    "user/world.c:88:    if(sc_read(\"HOME/WORLD/CHUNK.SCW\",save_bytes,bytes)!=(int)bytes) return 0;",
+    "legacy/M7/user/world.c:4: * 转向、跳跃、破坏/放置草/土/石/玻璃；存档写 HOME/WORLD/CHUNK.SCW。",
+    "legacy/M7/user/world.c:68:    if(sc_write(\"HOME/WORLD/CHUNK.SCW\",save_bytes,sizeof(save_bytes))==(int)sizeof(save_bytes)) {",
+    "legacy/M7/user/world.c:76:    if(sc_stat(\"HOME/WORLD/CHUNK.SCW\",info)||info[1]!=sizeof(save_bytes)) return 0;",
+    "legacy/M7/user/world.c:77:    if(sc_read(\"HOME/WORLD/CHUNK.SCW\",save_bytes,sizeof(save_bytes))!=(int)sizeof(save_bytes)) return 0;",
+    "docs/GAMES.md:60:HOME/WORLD/CHUNK.SCW 长度 6944 字节。磁盘平铺路径通过斜杠推导目录。",
+    "user/world_game.inc:10: * 远征/创造分别写EXPEDITION.SCW与CREATIVE.SCW，legacy才读旧CHUNK。",
+    "user/world_game.inc:19:{return world_mode==2?\"HOME/WORLD/CREATIVE.SCW\":\"HOME/WORLD/EXPEDITION.SCW\";}"
+  ],
+  "preserved_history": [
+    "drafts/",
+    "build/",
+    "evidence/",
+    "Git history"
+  ],
+  "source_pins": {
+    "tools/stage_m10a2_sdk.py": "76b9d70bc6d85e4e51f8c1e32553dcc105c89f6d6ddfc301eef25deb327fb988",
+    "user/studio2/STUDIO2.JSON": "eed94567f1d2e7db7434cf4e6e6161be57ac9b65229b7b85cdd1f0b3fa615bbb",
+    "user/studio2/STUDIO2.H": "78610cae78419b785e265ad73365bbd8bc597341d344d95a7c7cf368ea73183b",
+    "user/studio2/studio_project.c": "31b82a1400e0fc2bacbc3984d6db0f880cda26b6cf63a6f85a63a806f29db420",
+    "user/scui/ui_dialog.c": "3edbc873669548cefa6495e191c2b3a88544d9d994e7134d7002da9b2607ac4d",
+    "user/SCUI.H": "72d54bfea02c732201ce6b2ecad495c933c30353ab49240c74a5831f0010f72a",
+    "user/scshell/shell_launch.c": "8cee6602516baefad41baa73c390190721670412fe50309959ae13f2a89f2dc3",
+    "user/scshell/shell_catalog.c": "cd557db9556d2bbb129a534bc7c827675c0e3d05f7e08d7982e4efaa1a2a02e3",
+    "user/scshell/desktop/DESKDEFAULTS.H": "92d88b5daeada8666edc6df79463fcc64bad9a2b72b81b6d62d47fff108f74f0",
+    "user/world.c": "8a5c8674441241a239bf44c40ade6a808c123333ac5885ae4fcb093a79e61789",
+    "user/world_game.inc": "188ffb88ac4fb26183f8ec8bdbfc6fe3dd23ea2c28a144de86ca68b5b9cadd5e",
+    "legacy/M7/user/world.c": "94d8109415ced1f6c6ed458a3c83175fbedb2176bdc0b5f02460978b1a9ef7af"
+  },
+  "build_script_commands_identical": true,
+  "schema_text_identical": true,
+  "no_generic_scw_association_added": true
+}
