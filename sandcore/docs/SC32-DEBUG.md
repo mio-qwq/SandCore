@@ -32,6 +32,8 @@ Breakpoints/Modules/Segments/Symbols 按最多64条一页枚举，批大小不�
 
 其余默认 SCLDR 库在重定位与保护完成、init 之前登记。内核另行打开来源文件并按64KiB步骤读取、hash、验证 SCL 文件与 loader 提交的元数据；核对真实 MODULE 分配、段范围与当前 RW 页。接着按64KiB步骤逐段比较原始正文/BSS及所有ABS32/PC32重定位，导入反查已经登记的真实同进程依赖。合法 INT3 用其原始字节参与核验。登记期间 MODULEPROTECT 改变 mapping_epoch 会使候选失败。来源文件变化、坏映射、坏 relocation、OOM 均撤销候选；PENDING 期间 ROOT 真实让出 CPU。
 
+来源只读打开也遵守native文件层非零调用身份合同，使用当前任务代数，不放宽文件层校验；无CREATE/TRUNCATE/APPEND，不进入写事务。释放只读引用仍传writer=0，避免取消其它句柄的真实pending。权限、lease冲突、真实映射和来源核验均保持。首次客体执行发现的旧writer=0会先返回FS_N_INVALID，再被总括为ROOT的SC_SCL_IO=-11；其修复不涉及缺失导入或ABI放宽。
+
 内核独立保存已验证元数据和来源摘要；模块视图来自该快照，不扫描 SCLDR 用户堆。init 前显示 INITIALIZING，成功后 READY。源 SHA 是装载时文件身份，不代表可写 data/BSS 永远不变。每次 Segment 查询从真实页表取 R/RW；MIXED 明示混合权限，X 仅是 SCL 的逻辑段声明。当前非 PAE 没有 NX，不宣称完整 W^X。
 
 ROOT 不为自定义 ScRuntimePlatform 伪造来源登记；没有经过默认来源/映射核验的模块不会出现在受验证清单。普通应用即使直接调用私有 gate，也只能登记自己映像，必须通过相同文件/映射/重定位核验，不获得跨进程或内核权限。正常释放前撤登记和对应断点，MODULEFREE、任务异常/退出与槽回收亦撤销。登记不是授予符号地址的读写权限。
@@ -49,3 +51,5 @@ SCL exports 来自内核保存的正式元数据。补充 `.sdbg` 使用原生�
 隐藏时绘图 timer 暂停，无目标时不保留采样 timer。运行目标5 ticks查询状态，暂停25 ticks查询，候选按1 tick有限步骤推进；关闭回收使用后台1 tick。目标后台工作不因 GUI 隐藏暂停。模块 epoch 不变时复用 immutable 模块/符号/sidecar，单步不反复读盘。以上结构不是整机性能结论，实测仍待客体。
 
 修订：2026-10-16，新增typed调试、真实模块核验登记、SCDB1MIO消费及SCUI Debug2合同；旧调试入口及SYSTEM边界保留，当前仅有宿主定向证据。
+
+修订：2026-10-16，修正来源只读打开的非零调用身份；真实原生SCLD已执行并生成ROOT/SC32API/SCCLIB/SCLIB/SCUI，Debug2交互仍待统一GUI验收。

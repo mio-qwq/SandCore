@@ -1,6 +1,6 @@
 # SandCore M10a2 — The Application Platform Era：持续目标
 
-> 当前执行检查点：HOST02已通过（41产物/1320输入/源码变化0），codec证明为codec-host-proof-02；八应用菜单快捷键接线及native宿主后端07通过。Windows真实run02已完成旧G1→新版SCCC（load257350）→动态SCLD及SCLDR.SCO，启动SCLD时ROOT返回-11（实际I/O），正在定位，尚未链接出八普通库和19工具/应用。完整stdout、失败截图、源码和原盘守恒事实已保存。下一步修复该具体故障并继续原生生成，再发行native CORE和进行普通用户GUI/SDK验收；不得停在HOST或工具检查点。详细以M10A2-P6-IMPLEMENTATION.md“当前客体生成检查点”为准。
+> 当前执行检查点：main@cfdcd16已保存完整主源，WSL push退出1、远端未确认。HOST03已通过（41产物/1320输入/源码变化0），codec证明为codec-host-proof-03；八应用快捷键/native宿主后端07通过。真实run02的-11已定位为debug只读来源open的writer=0并最小修复；Windows run03已经实际执行原生SCLD、完成ROOT/SC32API/SCCLIB/SCLIB/SCUI编译/链接/SCDB校验，继续同批其余目标。随后发行绑定同一native字节的CORE，进行普通用户GUI/SDK验收；完整目标仍active。详细以M10A2-P6-IMPLEMENTATION.md“当前客体生成检查点”为准。
 
 > 当前最高检查点：全批主源、默认升级和最终SDK/四TU示例已接齐。SC32 193导出、SCUI1.3/v4 170导出；27个SCCC/SCO/SCLD宿主后端目标通过。统一HOST报告 `build/m10a2-main-studio-01/p6-unified-host-01.json`：exit0、41产物、source变化0，含CORE/九库/十五GUI入口/worker/工具/SH/nano。SCSOUND是明确HOST codec例外，其证明已写入 `build/m10a2-session-sound-integration-01/codec-host-proof.json`。下一项真实Windows客体生成8普通库/新SCCC/SCLD及组件；随后按native LOGIN2/五库重新签发CORE、普通用户GUI/SDK与最终验收。没有新客体结论，不停在HOST检查点。下方旧数字和“尚在草稿”属于沿革，以此段和P6文档首节为准。main最新本地提交仍f101dff；本批新增待保存，远端上次push失败未确认。
 

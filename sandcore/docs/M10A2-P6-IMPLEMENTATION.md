@@ -6,7 +6,9 @@
 
 实际Windows QEMU `m10a2-p6-guest-generation-run-02` 已用旧真实G1生成新版SCCC（load257350B），再由该SCCC生成动态BOOT/SCLD.SCX及SCLDR.SCO。执行BOOT/SCLD时停止于ROOT通用提示 `dependency or symbol (-11)`；-11实际是SC_SCL_IO，尚未确定发生于读取、映像保护或调试模块登记，不能称为缺符号或原生链接通过。失败日志、完整stdout、产物及桌面截图保留，源码/原盘守恒检查通过。此前run01止于主控错误地把后台Shell包装进程当编译器身份，已改为现有前台command，旧源码和报告另存history/run-01。
 
-当前出口：修复这一个实际装载故障，继续同批27目标原生生成；随后以真实native LOGIN2/五库/桌面字节重新生成发行摘要和CORE，并完成普通用户GUI/SDK真实流程。完整M10a2仍active，不能用本段的工具编译成功替代应用运行或最终验收。
+已确证并修复：debug来源只读open传writer=0，FS严格返回INVALID；现内部调用使用稳定非零task_generation(pid)，close仍为0，不改FS权限或pending合同。HOST03增量构建41产物/1320输入/变化0，通过preflight03；真实run03已执行原生SCLD，ROOT/SC32API/SCCLIB/SCLIB/SCUI的系统内编译、链接、取回与SCDB校验通过，余下目标仍在同一VM继续。源码已存main@cfdcd16，WSL推送退出1，远端更新未确认。
+
+当前出口：完成同批27目标原生生成；随后以真实native LOGIN2/五库/桌面字节重新生成发行摘要和CORE，并完成普通用户GUI/SDK真实流程。完整M10a2仍active，不能用本段的工具编译成功替代应用运行或最终验收。
 
 修订：2026-10-16，保存HOST02、八应用快捷键预检及真实客体原生生成的I/O失败边界。
 
