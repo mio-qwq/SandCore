@@ -1,0 +1,152 @@
+{
+  "status": "HOST_DRAFT_CHECKS_PASS_GUEST_UNVERIFIED",
+  "guest_verified": false,
+  "full_host_report": "build/m10a2-debug2-agent-check/report.json",
+  "complete_checks": 15,
+  "changed_since_full_report": [
+    "integration.json",
+    "kernel/sc32_debug.c",
+    "kernel/sc32_debug_modules.inc",
+    "prepare_integration.py"
+  ],
+  "supplemental_kernel_compile": {
+    "exit_code": 0,
+    "observed_exec_chunk": "817001",
+    "command": "wsl.exe --cd /mnt/c/Users/Administrator/Desktop/projectos/sandcore gcc -m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -fno-pie -fno-asynchronous-unwind-tables -msoft-float -mno-sse -mno-mmx -O2 -Wall -Wextra -Werror -Ibuild/m10a2-debug2-agent-check/integration/kernel -Ikernel -Ibuild/m10a2-debug2-agent-check/integration/user -Iuser -Iuser/runtime -c build/m10a2-debug2-agent-check/integration/kernel/sc32_debug.c -o build/m10a2-debug2-agent-check/debug-kernel.o",
+    "sources": [
+      {
+        "path": "kernel/sc32_debug.c",
+        "sha256": "c714171345e4b41bced4f9d4c17c73200256fc713126c4d853267e86344e2f7e"
+      },
+      {
+        "path": "kernel/sc32_debug_modules.inc",
+        "sha256": "e6def8b5cca663c68612c4297e93b6fd59de92c57b2eaf4198eb499b0f3edbae"
+      }
+    ]
+  },
+  "reused": "Unchanged application, SC32, ROOT, decoder and adapter sources retain the successful full host checks; documentation and patch generation are not guest execution evidence.",
+  "outputs": [
+    {
+      "path": "build/m10a2-debug2-agent-check/DEBUG2.SCX",
+      "bytes": 62765,
+      "sha256": "ca7ea83d2ec9e17d9bb1e98683d7d6ea47cdd1b068165e38542ee5c71f14ad1f"
+    },
+    {
+      "path": "build/m10a2-debug2-agent-check/SC32API.SCL",
+      "bytes": 137510,
+      "sha256": "1187a3927b0945153e440beea2f622ef695c4312cb297ac5b021ee0225ebb260"
+    },
+    {
+      "path": "build/m10a2-debug2-agent-check/SCLDR.SCL",
+      "bytes": 20361,
+      "sha256": "333ffe0872c8e5f798e0369d271d3d71545232669644a5cd671a9d976d55ce22"
+    },
+    {
+      "path": "build/m10a2-debug2-agent-check/debug-kernel.o",
+      "bytes": 22124,
+      "sha256": "e66c051443b7fbaa8e2d1ae91643c19b30e75cb6f475e6f6175e3cebf9e15c9c"
+    }
+  ],
+  "drafts": [
+    {
+      "path": "check_host.py",
+      "sha256": "fa7d1d682506c720eb2f23446e113bae3f9d210b7cd1324e86228effc3b37431"
+    },
+    {
+      "path": "DESIGN.md",
+      "sha256": "dc7278c0547c85aff5c6f0e7234c5a3949c3a85ce17e272270b2a997c442975a"
+    },
+    {
+      "path": "docs/SC32-DEBUG.md",
+      "sha256": "45e5a4798e4d9f7b60b19691f8570a3be77b7b603c415f5d97220c9d6654cfa7"
+    },
+    {
+      "path": "finalize_host_report.py",
+      "sha256": "39e400bdfa9d13348ebcc3644ee048edf5a7ac6a35480e7902059d4077ebfc31"
+    },
+    {
+      "path": "format_sources.py",
+      "sha256": "858bbc37abc3592b41ef23967a9212594222f0c23dae30f1075d2bb27344dbfa"
+    },
+    {
+      "path": "integration.json",
+      "sha256": "0b9d94b3d4d4b2bc68733e49ab9215d30bb034ec69db0d861588af7de9fc156d"
+    },
+    {
+      "path": "INTEGRATION.md",
+      "sha256": "67699d3edb4d4fbdde955f4c963f10e8fe869831a48e7360e8f7e56d07764996"
+    },
+    {
+      "path": "kernel/sc32_debug.c",
+      "sha256": "c714171345e4b41bced4f9d4c17c73200256fc713126c4d853267e86344e2f7e"
+    },
+    {
+      "path": "kernel/sc32_debug.h",
+      "sha256": "e9bb682cf5e8d5ce25ab944f27e560e7f7bdf7795bf75c78c003d878bdbbf001"
+    },
+    {
+      "path": "kernel/sc32_debug_modules.inc",
+      "sha256": "e6def8b5cca663c68612c4297e93b6fd59de92c57b2eaf4198eb499b0f3edbae"
+    },
+    {
+      "path": "prepare_integration.py",
+      "sha256": "5a9ed3b8b68bdc7347ed83385365c3f3c3a1a056d859a0736de5600bb8aec098"
+    },
+    {
+      "path": "public/SC32DEBUG.H",
+      "sha256": "61edbdf3fb76e422032bb68669656b4950807601e2edadf9e7b558c5ecda2a68"
+    },
+    {
+      "path": "STATUS.md",
+      "sha256": "7b998d9eb6cf7463f4359d6f05efcd2545fd1d78bdb6ba33cda944722ec92d60"
+    },
+    {
+      "path": "tests/decode_test.c",
+      "sha256": "2dcfacd3392c57ebad0bdaa3127d0959972c0a4a7214fe96f700eb258265c3b3"
+    },
+    {
+      "path": "user/debug2/D2APP.H",
+      "sha256": "7544910a379afc5057f536c26ab2391f417a416059cbdd861ea0142d9d8b87d5"
+    },
+    {
+      "path": "user/debug2/D2DECODE.H",
+      "sha256": "e879d37e94330b8683c3e9d4bc4764da33218262c359e0714bb7e94a7fa628b6"
+    },
+    {
+      "path": "user/debug2/DEBUG2.C",
+      "sha256": "d0a540d0260afb6c2c2db710894224d0874f282b8973de23f78f5cbb07d33e39"
+    },
+    {
+      "path": "user/debug2/DEBUG2.json",
+      "sha256": "18da34af9c7da54812bc9b733c085614f75300fa13f153687e4553cebd30ea19"
+    },
+    {
+      "path": "user/debug2/decode.c",
+      "sha256": "ec358f58c837ba39cb590e7336c8b2b0996989c1f195e8fead39323dffa4a50c"
+    },
+    {
+      "path": "user/debug2/model.c",
+      "sha256": "a805f211262d840e263072055ab9677ad3e9ee5f65c4cef6cf02a22afaa44305"
+    },
+    {
+      "path": "user/debug2/sidecar.c",
+      "sha256": "158df952776dda20153b799ed5923fc7eb4f42201ee7aad1d896d273eb84e124"
+    },
+    {
+      "path": "user/debug2/ui.c",
+      "sha256": "55d6cbc7ba2ed2edf6d86d150f27c585b03b1c4f2debaf0e69b078c6f22b96a2"
+    },
+    {
+      "path": "user/debugapi/sc32_debug.c",
+      "sha256": "dc4aecb4bacff8c49be996bb6f1ff0ef1388adb3a5c4f11a6ee835dcbe9b2f3b"
+    },
+    {
+      "path": "user/debugapi/SC32DEBUGWIRE.H",
+      "sha256": "250f62ebe5f09f60d05b0a123d850508bc0ddac25e0deec73de856e207f3d6eb"
+    },
+    {
+      "path": "user/runtime/scl_debug_registry.c",
+      "sha256": "e1df89189c090b1ac5bf20796ef1210c4dfa1e22ce83fdd18cd97c8000d5ed94"
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+/TMP/P5RT-136b23/ACTUALG1.SCX /TMP/P5RT-136b23/SHELLPROBE.C /HOME/M10SHELL/GENERATED/SHELLPROBE.SCX --dynamic /TMP/P5RT-136b23/SHELLPROBE.json; _m9_status=$?; echo __SCUI_CMD_b380ba7116c749dc66b670b7:$_m9_status:__SCUI_CMD_b380ba7116c749dc66b670b7_END
+SCCC / mio
+TMP/P5RT-136b23/SHELLPROBE.C -> HOME/M10SHELL/GENERATED/SHELLPROBE.SCX
+Validating application manifest
+SCCC: preprocess -> C -> x86
+Preprocessing source and includes
+Parsing C and generating x86
+Linking and writing SCX
+SCCC ERROR TMP/P5RT-136b23/SHELLPROBE.C:139: application unresolved reference is absent from manifest imports
+

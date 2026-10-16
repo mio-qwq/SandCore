@@ -1,0 +1,1 @@
+sessionctl logout 4; _m9_status=$?; echo __SCUI_CMD_3c422ab31373a9fa8e81b029:$_m9_status:__SCUI_CMD_3c422ab31373a9fa8e81b029_END

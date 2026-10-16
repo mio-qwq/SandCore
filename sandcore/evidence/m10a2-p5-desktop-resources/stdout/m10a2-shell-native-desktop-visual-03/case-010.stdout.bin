@@ -1,0 +1,5 @@
+sessionctl list; _m9_status=$?; echo __SCUI_CMD_837fa757a326b247318e322b:$_m9_status:__SCUI_CMD_837fa757a326b247318e322b_END
+ID  UID  GID  TYPE  ACTIVE  TASKS  NAME
+1  1000  1000  user  yes  1  mio
+2  -1  -1  SYSTEM  no  3  SYSTEM
+3  -2  -2  LOCKED  no  0  Locked

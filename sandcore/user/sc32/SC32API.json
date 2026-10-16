@@ -1,8 +1,8 @@
 {
   "name": "SC32API.SCL",
   "abi_major": 1,
-  "abi_minor": 3,
-  "library_version": 5,
+  "abi_minor": 4,
+  "library_version": 6,
   "init": null,
   "fini": "Sc32Finalize",
   "exports": [
@@ -60,6 +60,46 @@
     },
     {
       "name": "ScClipboardWatch",
+      "kind": "function"
+    },
+    {
+      "name": "ScDebugBreakpointAdd",
+      "kind": "function"
+    },
+    {
+      "name": "ScDebugBreakpointRemove",
+      "kind": "function"
+    },
+    {
+      "name": "ScDebugBreakpoints",
+      "kind": "function"
+    },
+    {
+      "name": "ScDebugControl",
+      "kind": "function"
+    },
+    {
+      "name": "ScDebugLaunch",
+      "kind": "function"
+    },
+    {
+      "name": "ScDebugModules",
+      "kind": "function"
+    },
+    {
+      "name": "ScDebugQuery",
+      "kind": "function"
+    },
+    {
+      "name": "ScDebugRead",
+      "kind": "function"
+    },
+    {
+      "name": "ScDebugSegments",
+      "kind": "function"
+    },
+    {
+      "name": "ScDebugSymbols",
       "kind": "function"
     },
     {
@@ -395,6 +435,10 @@
       "kind": "function"
     },
     {
+      "name": "ScPathQuery",
+      "kind": "function"
+    },
+    {
       "name": "ScPathRead",
       "kind": "function"
     },
@@ -447,6 +491,10 @@
       "kind": "function"
     },
     {
+      "name": "ScProcessLaunch",
+      "kind": "function"
+    },
+    {
       "name": "ScProcessQuery",
       "kind": "function"
     },
@@ -495,90 +543,6 @@
       "kind": "function"
     },
     {
-      "name": "ScSystemCapabilities",
-      "kind": "function"
-    },
-    {
-      "name": "ScSystemClock",
-      "kind": "function"
-    },
-    {
-      "name": "ScSystemCpu",
-      "kind": "function"
-    },
-    {
-      "name": "ScSystemMemory",
-      "kind": "function"
-    },
-    {
-      "name": "ScSystemMonotonic",
-      "kind": "function"
-    },
-    {
-      "name": "ScSystemStorage",
-      "kind": "function"
-    },
-    {
-      "name": "ScSystemWait",
-      "kind": "function"
-    },
-    {
-      "name": "ScThemeApply",
-      "kind": "function"
-    },
-    {
-      "name": "ScThemePath",
-      "kind": "function"
-    },
-    {
-      "name": "ScThemeQuery",
-      "kind": "function"
-    },
-    {
-      "name": "ScWindowControl",
-      "kind": "function"
-    },
-    {
-      "name": "ScWindowCreate",
-      "kind": "function"
-    },
-    {
-      "name": "ScWindowDestroy",
-      "kind": "function"
-    },
-    {
-      "name": "ScWindowInvalidate",
-      "kind": "function"
-    },
-    {
-      "name": "ScWindowPlace",
-      "kind": "function"
-    },
-    {
-      "name": "ScWindowQuery",
-      "kind": "function"
-    },
-    {
-      "name": "ScWindowRejectClose",
-      "kind": "function"
-    },
-    {
-      "name": "ScWindowSetOwner",
-      "kind": "function"
-    },
-    {
-      "name": "ScWindowSetTitle",
-      "kind": "function"
-    },
-    {
-      "name": "ScWindowSubmit",
-      "kind": "function"
-    },
-    {
-      "name": "ScProcessLaunch",
-      "kind": "function"
-    },
-    {
       "name": "ScShellHostActivate",
       "kind": "function"
     },
@@ -619,7 +583,91 @@
       "kind": "function"
     },
     {
-      "name": "ScPathQuery",
+      "name": "ScSystemCapabilities",
+      "kind": "function"
+    },
+    {
+      "name": "ScSystemClock",
+      "kind": "function"
+    },
+    {
+      "name": "ScSystemCpu",
+      "kind": "function"
+    },
+    {
+      "name": "ScSystemMemory",
+      "kind": "function"
+    },
+    {
+      "name": "ScSystemMonotonic",
+      "kind": "function"
+    },
+    {
+      "name": "ScSystemStorage",
+      "kind": "function"
+    },
+    {
+      "name": "ScSystemWait",
+      "kind": "function"
+    },
+    {
+      "name": "ScThemeApply",
+      "kind": "function"
+    },
+    {
+      "name": "ScThemePath",
+      "kind": "function"
+    },
+    {
+      "name": "ScThemeQuery",
+      "kind": "function"
+    },
+    {
+      "name": "ScWallpaperQuery",
+      "kind": "function"
+    },
+    {
+      "name": "ScWallpaperSet",
+      "kind": "function"
+    },
+    {
+      "name": "ScWindowControl",
+      "kind": "function"
+    },
+    {
+      "name": "ScWindowCreate",
+      "kind": "function"
+    },
+    {
+      "name": "ScWindowDestroy",
+      "kind": "function"
+    },
+    {
+      "name": "ScWindowInvalidate",
+      "kind": "function"
+    },
+    {
+      "name": "ScWindowPlace",
+      "kind": "function"
+    },
+    {
+      "name": "ScWindowQuery",
+      "kind": "function"
+    },
+    {
+      "name": "ScWindowRejectClose",
+      "kind": "function"
+    },
+    {
+      "name": "ScWindowSetOwner",
+      "kind": "function"
+    },
+    {
+      "name": "ScWindowSetTitle",
+      "kind": "function"
+    },
+    {
+      "name": "ScWindowSubmit",
       "kind": "function"
     }
   ],
@@ -665,8 +713,8 @@
     {
       "name": "SCLDR.SCL",
       "abi_major": 1,
-      "min_minor": 1,
-      "min_version": 2
+      "min_minor": 2,
+      "min_version": 3
     }
   ]
 }

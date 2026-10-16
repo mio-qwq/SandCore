@@ -1,0 +1,118 @@
+{
+  "files": [
+    {
+      "path": "drag/console.txt",
+      "bytes": 3572,
+      "sha256": "bfc5c03991eb92972314c624f4a9f8027ddb03a9f17c22bef7639c0dc3083797"
+    },
+    {
+      "path": "drag/debug-rx.bin",
+      "bytes": 126,
+      "sha256": "e575f5376bb63f5c73aefde6602448f4c2eecf186e6c6a6727fc0c643ee589ce"
+    },
+    {
+      "path": "drag/dragged-SHELL.CAT",
+      "bytes": 5984,
+      "sha256": "fcb376473c2908177dfc9d683accaa4c91a33ca5a014100ac6137df0febc33ac"
+    },
+    {
+      "path": "drag/file-actual-G1-SHELLPROBE-log",
+      "bytes": 20,
+      "sha256": "76f8bfd932a0325450d43f49241a7f0bd43a17c44b9635a626a5af81148f88a4"
+    },
+    {
+      "path": "drag/file-actual-G1-SHELLPROBE-map",
+      "bytes": 1142,
+      "sha256": "4d9802caf5f75f3809a5ed0f644403d6dd78c3d12385eff06ba880766af37974"
+    },
+    {
+      "path": "drag/p5-native-desktop-group-moved-and-saved.png",
+      "bytes": 1373487,
+      "sha256": "541d3614bb59cf9fb8e1a69309ca6e9a2d247e5256e24318863f6b372dc24e41"
+    },
+    {
+      "path": "drag/p5-native-desktop-icon-moved.png",
+      "bytes": 1377108,
+      "sha256": "2586718f7bd0607bbc3ef3074e8d9b7429a397ed148ce7f740cb722570507ce7"
+    },
+    {
+      "path": "drag/p5-native-desktop-resources-ready.png",
+      "bytes": 40196,
+      "sha256": "5de06ed750c3bd45847c4c723652b4fc808b637f3a08f5527b1b72398a1c36c4"
+    },
+    {
+      "path": "drag/shell-runtime.json",
+      "bytes": 408168,
+      "sha256": "b67a6257ac7ffaf847917e8b72a735ab81dff0a2dce360933f7597ced2821c78"
+    },
+    {
+      "path": "drag/native-artifacts/SHELLPROBE.SCX",
+      "bytes": 6588,
+      "sha256": "15a6882056f5939ce9ba2b0318d9fa7f067dff65103973bbdd87120546f745be"
+    },
+    {
+      "path": "cold/cold-restored-SHELL.CAT",
+      "bytes": 5984,
+      "sha256": "fcb376473c2908177dfc9d683accaa4c91a33ca5a014100ac6137df0febc33ac"
+    },
+    {
+      "path": "cold/console.txt",
+      "bytes": 2949,
+      "sha256": "f258f5d20bb227fa957114b80cbd997e3cd38c78c9dfc7f67f9eafb4fc9a28b0"
+    },
+    {
+      "path": "cold/debug-rx.bin",
+      "bytes": 126,
+      "sha256": "e575f5376bb63f5c73aefde6602448f4c2eecf186e6c6a6727fc0c643ee589ce"
+    },
+    {
+      "path": "cold/p5-native-desktop-cold-restored.png",
+      "bytes": 61722,
+      "sha256": "7cf1c878fb6b7aabc2138c460b24e19d7273d30a21ad0893ab3b0e653ba67eb5"
+    },
+    {
+      "path": "cold/p5-native-desktop-resources-ready.png",
+      "bytes": 53394,
+      "sha256": "20ec57ba8cd832fc6c440908c1548834a452c6701421411f2e6917b708eb0935"
+    },
+    {
+      "path": "cold/shell-runtime.json",
+      "bytes": 416399,
+      "sha256": "446d3c820fdf1604b2e4eef02376f3f9b913efe6193ea36ed1148d2e4752c4f9"
+    },
+    {
+      "path": "tools/verify_m10a2_shell_runtime.py",
+      "bytes": 24989,
+      "sha256": "a7cdecc6d96dbca283dec21f898953e1385b6683f29505134d04ef617f90a6b1"
+    },
+    {
+      "path": "tools/m10a2_shell_desktop_flow.py",
+      "bytes": 6925,
+      "sha256": "3051861dec7fa5cb83f71e0907a77da6eca0e6c50b5c9643eab1b5079c1289cd"
+    },
+    {
+      "path": "tools/m10a2_shell_inspect.py",
+      "bytes": 10782,
+      "sha256": "60c9ee9655e4f36d41edc39549957fe2ea1ec885af280a27919188cb8f8999a4"
+    },
+    {
+      "path": "tools/verify_m10a2_scl.py",
+      "bytes": 8666,
+      "sha256": "752dfd87e3775bc8a0accb38cd0639c639eb3188404843634b272d603cd1fa8c"
+    },
+    {
+      "path": "layout/layout.json",
+      "bytes": 3206,
+      "sha256": "88904dad9545c01691e59d193fb059fe4f56f8902362af390becdac57ca46be6"
+    },
+    {
+      "path": "layout/layout.c",
+      "bytes": 1745,
+      "sha256": "2924bce59daf2dd34c2559a5ebf680e392836b53593fcb041c265c3ff8dcd938"
+    }
+  ],
+  "total_bytes": 3813278,
+  "no_disks": true,
+  "full_P5": false,
+  "full_M10a2": false
+}

@@ -1,0 +1,71 @@
+[
+  {
+    "path": "docs/SC32-DEBUG.md",
+    "sha256": "45e5a4798e4d9f7b60b19691f8570a3be77b7b603c415f5d97220c9d6654cfa7"
+  },
+  {
+    "path": "kernel/sc32_debug.c",
+    "sha256": "c714171345e4b41bced4f9d4c17c73200256fc713126c4d853267e86344e2f7e"
+  },
+  {
+    "path": "kernel/sc32_debug.h",
+    "sha256": "e9bb682cf5e8d5ce25ab944f27e560e7f7bdf7795bf75c78c003d878bdbbf001"
+  },
+  {
+    "path": "kernel/sc32_debug_modules.inc",
+    "sha256": "e6def8b5cca663c68612c4297e93b6fd59de92c57b2eaf4198eb499b0f3edbae"
+  },
+  {
+    "path": "user/SC32DEBUG.H",
+    "sha256": "61edbdf3fb76e422032bb68669656b4950807601e2edadf9e7b558c5ecda2a68"
+  },
+  {
+    "path": "user/SCDBGFILE.H",
+    "already_identical": true,
+    "sha256": "c0fe5f1bc8b0e0b691e5f137f9a0bcf8151965ebe3b07f4fd0cc645768a1077c"
+  },
+  {
+    "path": "user/debug2/D2APP.H",
+    "sha256": "7544910a379afc5057f536c26ab2391f417a416059cbdd861ea0142d9d8b87d5"
+  },
+  {
+    "path": "user/debug2/D2DECODE.H",
+    "sha256": "e879d37e94330b8683c3e9d4bc4764da33218262c359e0714bb7e94a7fa628b6"
+  },
+  {
+    "path": "user/debug2/DEBUG2.C",
+    "sha256": "d0a540d0260afb6c2c2db710894224d0874f282b8973de23f78f5cbb07d33e39"
+  },
+  {
+    "path": "user/debug2/DEBUG2.json",
+    "sha256": "18da34af9c7da54812bc9b733c085614f75300fa13f153687e4553cebd30ea19"
+  },
+  {
+    "path": "user/debug2/decode.c",
+    "sha256": "ec358f58c837ba39cb590e7336c8b2b0996989c1f195e8fead39323dffa4a50c"
+  },
+  {
+    "path": "user/debug2/model.c",
+    "sha256": "a805f211262d840e263072055ab9677ad3e9ee5f65c4cef6cf02a22afaa44305"
+  },
+  {
+    "path": "user/debug2/sidecar.c",
+    "sha256": "158df952776dda20153b799ed5923fc7eb4f42201ee7aad1d896d273eb84e124"
+  },
+  {
+    "path": "user/debug2/ui.c",
+    "sha256": "55d6cbc7ba2ed2edf6d86d150f27c585b03b1c4f2debaf0e69b078c6f22b96a2"
+  },
+  {
+    "path": "user/debugapi/SC32DEBUGWIRE.H",
+    "sha256": "250f62ebe5f09f60d05b0a123d850508bc0ddac25e0deec73de856e207f3d6eb"
+  },
+  {
+    "path": "user/debugapi/sc32_debug.c",
+    "sha256": "dc4aecb4bacff8c49be996bb6f1ff0ef1388adb3a5c4f11a6ee835dcbe9b2f3b"
+  },
+  {
+    "path": "user/runtime/scl_debug_registry.c",
+    "sha256": "e1df89189c090b1ac5bf20796ef1210c4dfa1e22ce83fdd18cd97c8000d5ed94"
+  }
+]

@@ -1,0 +1,26 @@
+{
+  "status": "APPLIED",
+  "patch_sha256": "23beb29331589e601a5d57bda60b4bd4922c1217f624ea0498d9cf3b47958213",
+  "files": [
+    {
+      "path": "sandcore/user/s3c.c",
+      "before_sha256": "a4470d205fe5e48181ef6e96c831858a545b0c1eb1565ee51d9c67c2e69a5b92",
+      "after_sha256": "d230b8f230f256c0cff32ec3ab216b6f0cc8ce44233962f1e7cd2976b9263d92"
+    },
+    {
+      "path": "sandcore/user/s3c_emit.inc",
+      "before_sha256": "74a7c0d432d38a44f408e7ac0c27d90a57b5f869296096913f634476c54965b8",
+      "after_sha256": "8ea14db858df51acfecfee22fd1f8afff530addda208f32cb4a3afffe84ef898"
+    },
+    {
+      "path": "sandcore/user/s3c_parse.inc",
+      "before_sha256": "1ca3c6ca14879a6d841ae1cffb5ab6417643ce1d8b1dc1fcddbaade931cb8d09",
+      "after_sha256": "32a8fb198d028b76ea634f731f5216d091404c7fd5fad7957a4d5d882c0d74f5"
+    },
+    {
+      "path": "sandcore/user/s3c_scl.inc",
+      "before_sha256": "14b6066e184fc3c845f9402181cb1df309b62ffde091f98af298ac5145408a27",
+      "after_sha256": "e9d76e5f23720f203871c42821006acd1a4eea2ed27bbe7fe126172b65b7bd21"
+    }
+  ]
+}

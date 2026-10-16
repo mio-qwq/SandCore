@@ -1,0 +1,11 @@
+printf '%s\n' '' '/HOME/M10SHELL/GENERATED/SHELLPROBE.SCX; _p5=$?; echo __P5_RESULT_e4d41d8bf864512d:$_p5; exit $_p5' | su mio; _m9_status=$?; echo __SCUI_CMD_caa96321d761bd365938339b:$_m9_status:__SCUI_CMD_caa96321d761bd365938339b_END
+Password: 
+SHELLPROBE HOST state=1 sid=5 pid=7/2 epoch=1
+SHELLPROBE HOST state=2 sid=5 pid=7/2 epoch=1
+SHELLPROBE NONHOST_ACTIVATE_REJECTED status=-103
+SHELLPROBE HELLO actual_peer=7/2 sid=5 epoch=29
+SHELLPROBE CATALOG applications=29 associations=14 layout=0 epoch=29
+SHELLPROBE HIDDEN_CATALOG_READY host_state=2
+SHELLPROBE HOST state=2 sid=5 pid=7/2 epoch=1
+SHELLPROBE FAIL status=-116
+__P5_RESULT_e4d41d8bf864512d:1

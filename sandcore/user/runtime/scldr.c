@@ -16,6 +16,9 @@ struct ScLoaded {
     ScU32 id, external, edges, pinned, ready, initialized, retiring, borrowed, cursor, metadata_size;
     void (*application_prepare)(void);
     void *application_stack_candidate;
+#ifdef SCL_BOOT_LIBRARY
+    ScU32 debug_module,debug_generation;
+#endif
 };
 struct ScRuntime {
     ScRuntimePlatform platform;
@@ -32,6 +35,9 @@ static int app_runtime_change_allowed(ScRuntime *runtime);
 static int app_runtime_destroy_allowed(ScRuntime *runtime);
 static void app_module_initialized(ScRuntime *runtime,ScLoaded *module);
 static void app_module_releasing(ScRuntime *runtime,ScLoaded *module);
+static int scl_debug_register(ScRuntime *,ScLoaded *);
+static void scl_debug_ready(ScLoaded *);
+static void scl_debug_unregister(ScLoaded *);
 #endif
 
 /* 所有偏移只在完整格式验证后读取。元数据独立保留，段正文搬入
@@ -127,6 +133,9 @@ static void finalize(ScRuntime *r, ScLoaded *m)
 }
 static void release_storage(ScRuntime *r, ScLoaded *m)
 {
+#ifdef SCL_BOOT_LIBRARY
+    scl_debug_unregister(m);
+#endif
 #ifdef SCL_BOOT_LIBRARY
     app_module_releasing(r,m);
 #endif
@@ -224,6 +233,9 @@ static int link_module(ScRuntime *r, ScLoaded *m)
         if ((word(s, 16) & 2) && r->platform.protect_image(r->platform.context,
             m->image + word(s, 0), word(s, 4), 3)) return SC_SCL_IO;
     }
+#ifdef SCL_BOOT_LIBRARY
+    int published=scl_debug_register(r,m);if(published)return published;
+#endif
     ScU32 entry = word(m->metadata, 96);
     if (entry != 0xffffffffu){
         r->invoking=m;r->invoking_kind=1;
@@ -236,6 +248,9 @@ static int link_module(ScRuntime *r, ScLoaded *m)
     if (m->init_next) m->init_next->init_previous = m;
     r->initialized = m;
     m->ready = 1;
+#ifdef SCL_BOOT_LIBRARY
+    scl_debug_ready(m);
+#endif
 #ifdef SCL_BOOT_LIBRARY
     app_module_initialized(r,m);
 #endif
@@ -396,6 +411,11 @@ int ScRuntimeAdoptBootstrap(ScRuntime *r, void *image, const void *metadata, ScU
     zero(m, sizeof(*m));
     m->metadata = (unsigned char *)metadata; m->metadata_size = size; m->image = image;
     m->id = r->next_id++; m->borrowed = m->pinned = m->ready = m->initialized = 1;
+#ifdef SCL_BOOT_LIBRARY
+    int published=scl_debug_register(r,m);
+    if(published){r->platform.release(r->platform.context,m);return published;}
+    scl_debug_ready(m);
+#endif
     m->next = r->modules; if (m->next) m->next->previous = m; r->modules = m;
     m->init_next = r->initialized;
     if (m->init_next) m->init_next->init_previous = m;

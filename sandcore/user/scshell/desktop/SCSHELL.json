@@ -419,6 +419,12 @@
       "size": 1
     },
     {
+      "name": "ScShellIconCacheBudget",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
       "name": "ScShellIconLoad",
       "dependency": "SCSHELL.SCL",
       "kind": "function",
@@ -690,6 +696,12 @@
     },
     {
       "name": "ScUiListen",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUiMeasureText",
       "dependency": "SCUI.SCL",
       "kind": "function",
       "size": 1

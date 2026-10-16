@@ -14,6 +14,7 @@
 #include "paging.h"
 #include "wm.h"
 #include "audio.h"
+#include "sc32_debug.h"
 
 #define BREAKPOINTS 8
 typedef struct { u32 address; u8 original; int used; } breakpoint_t;
@@ -36,6 +37,7 @@ static void debug_unlink(int pid);
 
 void process_reset(int pid)
 {
+    sc32_debug_reset(pid);
     /* 槽位复用清理上一程序所有元数据。退出结果保留到下次 spawn 才清零，
      * 因此 IDE 等待编译子进程时可以在僵尸已经回收后查询退出码。 */
     u8 *p=(u8 *)&PROCESS(pid);
@@ -48,6 +50,7 @@ void process_exit(int pid,int code)
 void process_unmap(int pid,u32 base,u32 bytes)
 {
     if(!task_owned(pid) || !bytes)return;
+    sc32_debug_unmap(pid,base,bytes);
     process_t *p=&PROCESS(pid);
     /* 释放已通过分页整块验证，IF=0期间不会并发重用。这里不恢复
      * 原字节：映像即将消失；保留旧original反而会污染复用的新库。 */
@@ -91,6 +94,9 @@ void process_exception(u32 vector,u32 *frame)
     int pid=task_pid(); process_t *p=&PROCESS(pid); u32 cr2=0;
     if(vector==14) __asm__ __volatile__("mov %%cr2,%0":"=r"(cr2));
     frame[16]&=~0x100u;             /* 单步只执行一条，后续由 STEP 显式打开 TF */
+    int modern=sc32_debug_exception(pid,vector,frame);
+    if(modern==1)return;
+    if(modern==2){pause_fault(pid,frame,cr2);return;}
     if(vector==1 && p->debug_owner>0) {
         if(p->pending>=0) {
             breakpoint_t *b=&p->breaks[p->pending]; u8 opcode=0xCC;
@@ -188,6 +194,7 @@ int process_debug(int owner,int pid,int command,u32 address,void *buffer,u32 len
         p->auto_continue=(command==DBG_CONTINUE);task_state_set(pid,1);return 0;
     }
     if(command==DBG_BREAK) {
+        if(sc32_debug_legacy_conflict(pid,address))return -1;
         for(int i=0;i<BREAKPOINTS;i++) if(p->breaks[i].used && p->breaks[i].address==address) return 0;
         for(int i=0;i<BREAKPOINTS;i++) if(!p->breaks[i].used) {
             breakpoint_t *b=&p->breaks[i]; u8 op=0xCC;
@@ -205,6 +212,29 @@ int process_debug(int owner,int pid,int command,u32 address,void *buffer,u32 len
     }
     return -1;
 }
+int process_debug_authorize(int owner,int pid,u32 generation)
+{
+    return pid>0 && task_owned(pid) && task_owned(owner)
+        && task_generation(pid)==generation && PROCESS(pid).debug_owner==owner
+        && task_generation(owner)==PROCESS(pid).debug_owner_generation
+        && (TASK(pid).state==1 || TASK(pid).state==3);
+}
+int process_debug_legacy_break(int pid,u32 address)
+{
+    if(!task_owned(pid))return 0;
+    for(int i=0;i<BREAKPOINTS;i++)if(PROCESS(pid).breaks[i].used && PROCESS(pid).breaks[i].address==address)return 1;
+    return 0;
+}
+int process_debug_legacy_pending(int pid)
+{return task_owned(pid) && PROCESS(pid).pending>=0;}
+void process_debug_original(int pid,u32 address,u8 *bytes,u32 length)
+{
+    if(!task_owned(pid))return;
+    for(int i=0;i<BREAKPOINTS;i++){
+        breakpoint_t *b=&PROCESS(pid).breaks[i];
+        if(b->used && b->address>=address && b->address-address<length)bytes[b->address-address]=b->original;
+    }
+}
 void process_detach_owner(int owner)
 {
     /* UI 关闭时终止它独占的调试子进程，防止遗留暂停地址空间/断点。
@@ -219,5 +249,5 @@ int process_detach_owner_step(int owner)
     debug_unlink(owner);
     int child=PROCESS(owner).debug_child;
     if(child>=0){debug_unlink(child);task_stop(child);}
-    return PROCESS(owner).debug_child<0;
+    return PROCESS(owner).debug_child<0 && sc32_debug_stop_step(owner);
 }

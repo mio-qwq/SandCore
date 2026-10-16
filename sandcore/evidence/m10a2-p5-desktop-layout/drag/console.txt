@@ -1,0 +1,48 @@
+SandShell M9
+SYSTEM /SYS [SYSTEM] # true; _m9_status=$?; echo __SCUI_CMD_b3955ae7f9109dbd3d870468:$_m9_status:__SCUI_CMD_b3955ae7f9109dbd3d870468_END
+__SCUI_CMD_b3955ae7f9109dbd3d870468:0:__SCUI_CMD_b3955ae7f9109dbd3d870468_END
+SYSTEM /SYS [SYSTEM] # ls /HOME/M10SHELL/HOST; _m9_status=$?; echo __SCUI_CMD_d0fe7a5538cf237431d6ca71:$_m9_status:__SCUI_CMD_d0fe7a5538cf237431d6ca71_END
+__SCUI_CMD_d0fe7a5538cf237431d6ca71:0:__SCUI_CMD_d0fe7a5538cf237431d6ca71_END
+SYSTEM /SYS [SYSTEM] # echo STDLIB_BG_WARM & wait; _m9_status=$?; echo __SCUI_CMD_fa633c48a5a898ea5e9bc876:$_m9_status:__SCUI_CMD_fa633c48a5a898ea5e9bc876_END
+STDLIB_BG_WARM
+__SCUI_CMD_fa633c48a5a898ea5e9bc876:0:__SCUI_CMD_fa633c48a5a898ea5e9bc876_END
+SYSTEM /SYS [SYSTEM] # printf warm > /HOME/M10SHELL/WARM.DAT; cat /HOME/M10SHELL/WARM.DAT; _m9_status=$?; echo __SCUI_CMD_827730eecb345b5eb67c1324:$_m9_status:__SCUI_CMD_827730eecb345b5eb67c1324_END
+warm__SCUI_CMD_827730eecb345b5eb67c1324:0:__SCUI_CMD_827730eecb345b5eb67c1324_END
+SYSTEM /SYS [SYSTEM] # /TMP/P5RT-54e62a/ACTUALG1.SCX /TMP/P5RT-54e62a/SHELLPROBE.C /HOME/M10SHELL/GENERATED/SHELLPROBE.SCX --dynamic /TMP/P5RT-54e62a/SHELLPROBE.json; _m9_status=$?; echo __SCUI_CMD_8ce63deab247dcccae6eb4b9:$_m9_status:__SCUI_CMD_8ce63deab247dcccae6eb4b9_END
+SCCC / mio
+TMP/P5RT-54e62a/SHELLPROBE.C -> HOME/M10SHELL/GENERATED/SHELLPROBE.SCX
+Validating application manifest
+SCCC: preprocess -> C -> x86
+Preprocessing source and includes
+Parsing C and generating x86
+Linking and writing SCX
+SCCC OK SCX DYNAMIC
+Compilation complete
+__SCUI_CMD_8ce63deab247dcccae6eb4b9:0:__SCUI_CMD_8ce63deab247dcccae6eb4b9_END
+SYSTEM /SYS [SYSTEM] # sessionctl list; _m9_status=$?; echo __SCUI_CMD_828c258d5f1dbb8f0ee983e9:$_m9_status:__SCUI_CMD_828c258d5f1dbb8f0ee983e9_END
+ID  UID  GID  TYPE  ACTIVE  TASKS  NAME
+1  1000  1000  user  yes  1  mio
+2  -1  -1  SYSTEM  no  3  SYSTEM
+3  -2  -2  LOCKED  no  0  Locked
+__SCUI_CMD_828c258d5f1dbb8f0ee983e9:0:__SCUI_CMD_828c258d5f1dbb8f0ee983e9_END
+SYSTEM /SYS [SYSTEM] # printf '%s\n' '' '/HOME/M10SHELL/GENERATED/SHELLPROBE.SCX; _p5=$?; echo __P5_RESULT_f0f2d92eb3dbfcda:$_p5; exit $_p5' | su mio; _m9_status=$?; echo __SCUI_CMD_222d76bce832c5a5bc92e270:$_m9_status:__SCUI_CMD_222d76bce832c5a5bc92e270_END
+Password: 
+SHELLPROBE HOST state=1 sid=4 pid=6/1 epoch=1
+SHELLPROBE HOST state=2 sid=4 pid=6/1 epoch=1
+SHELLPROBE NONHOST_ACTIVATE_REJECTED status=-103
+SHELLPROBE HELLO actual_peer=6/1 sid=4 epoch=29
+SHELLPROBE CATALOG applications=29 associations=14 layout=0 epoch=29
+SHELLPROBE HIDDEN_CATALOG_READY host_state=2
+SHELLPROBE HOST state=2 sid=4 pid=6/1 epoch=1
+SHELLPROBE HOST state=3 sid=4 pid=6/1 epoch=1
+SHELLPROBE VISIBLE_ACTIVE sid=4 pid=6/1 epoch=1
+SHELLPROBE PASS ordinary_native_host_and_real_catalog_IPC
+__P5_RESULT_f0f2d92eb3dbfcda:0
+__SCUI_CMD_222d76bce832c5a5bc92e270:0:__SCUI_CMD_222d76bce832c5a5bc92e270_END
+SYSTEM /SYS [SYSTEM] # sessionctl show 4; _m9_status=$?; echo __SCUI_CMD_33ae88a1fb38e3e4337d4685:$_m9_status:__SCUI_CMD_33ae88a1fb38e3e4337d4685_END
+__SCUI_CMD_33ae88a1fb38e3e4337d4685:0:__SCUI_CMD_33ae88a1fb38e3e4337d4685_END
+SYSTEM /SYS [SYSTEM] # sessionctl show 1; _m9_status=$?; echo __SCUI_CMD_9530cc2d6dfd6f779bd22aa3:$_m9_status:__SCUI_CMD_9530cc2d6dfd6f779bd22aa3_END
+__SCUI_CMD_9530cc2d6dfd6f779bd22aa3:0:__SCUI_CMD_9530cc2d6dfd6f779bd22aa3_END
+SYSTEM /SYS [SYSTEM] # sessionctl logout 4; _m9_status=$?; echo __SCUI_CMD_fed8891ce4c01b554d6de9cb:$_m9_status:__SCUI_CMD_fed8891ce4c01b554d6de9cb_END
+__SCUI_CMD_fed8891ce4c01b554d6de9cb:0:__SCUI_CMD_fed8891ce4c01b554d6de9cb_END
+SYSTEM /SYS [SYSTEM] # 

@@ -671,3 +671,8 @@ WAIT40b在同一IF=0入口完整核request、真实GUI队列及对象ready，再
 
 
 2026-10-16修订：SYS_SC32=0x300新增selector0x223 PATH_QUERY。ECX本人32B请求(size/version/path/flags0/reserved4)，EDX本人ScPathInfo48B可扩展输出；只在成功写规范前缀。真实META/祖先权限先于缺名查询，不初始化FD池，错误域精确映射。对应公开SC32PATH.H、SC32API v5，旧syscall/SCAPI/PathStat/Metadata均保持。
+
+
+2026-10-16增量：SC32 ABI1.4/version6增加Debug私有900..91F族（真实owner/代数/暂停现场、动态断点、映像来源/段/符号登记）及CORE selector006 WALL_QUERY（无请求、本人32B版本输出、失败保持）。ROOT在首条R3指令前由可信loader登记，后续SCL在init前分步核验，ROOT私有桥不依赖SC32。实际布局/错误/生命周期见SC32DEBUG.H、私有SC32DEBUGWIRE.H和SC32-DEBUG.md；WALL见SC32-WALL.md。原SCAPI/旧调用/旧八断点槽不改。本批HOST通过，新的联合客体待验。
+
+修订：2026-10-16，登记Debug/壁纸增量及HOST/客体边界；未来007配置/Capture/图片尚未计作当前入口。

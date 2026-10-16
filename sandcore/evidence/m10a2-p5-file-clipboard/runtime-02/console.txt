@@ -1,0 +1,46 @@
+SandShell M9
+SYSTEM /SYS [SYSTEM] # true; _m9_status=$?; echo __SCUI_CMD_25d750b7cada83e016b51dc4:$_m9_status:__SCUI_CMD_25d750b7cada83e016b51dc4_END
+__SCUI_CMD_25d750b7cada83e016b51dc4:0:__SCUI_CMD_25d750b7cada83e016b51dc4_END
+SYSTEM /SYS [SYSTEM] # ls /HOME/M10SHELL/HOST; _m9_status=$?; echo __SCUI_CMD_fa947234b18012b2cbebe562:$_m9_status:__SCUI_CMD_fa947234b18012b2cbebe562_END
+__SCUI_CMD_fa947234b18012b2cbebe562:0:__SCUI_CMD_fa947234b18012b2cbebe562_END
+SYSTEM /SYS [SYSTEM] # echo STDLIB_BG_WARM & wait; _m9_status=$?; echo __SCUI_CMD_c6ba3e3183912f85096353e5:$_m9_status:__SCUI_CMD_c6ba3e3183912f85096353e5_END
+STDLIB_BG_WARM
+__SCUI_CMD_c6ba3e3183912f85096353e5:0:__SCUI_CMD_c6ba3e3183912f85096353e5_END
+SYSTEM /SYS [SYSTEM] # printf warm > /HOME/M10SHELL/WARM.DAT; cat /HOME/M10SHELL/WARM.DAT; _m9_status=$?; echo __SCUI_CMD_b7cec2bf46c4acd45a3cafcb:$_m9_status:__SCUI_CMD_b7cec2bf46c4acd45a3cafcb_END
+warm__SCUI_CMD_b7cec2bf46c4acd45a3cafcb:0:__SCUI_CMD_b7cec2bf46c4acd45a3cafcb_END
+SYSTEM /SYS [SYSTEM] # /TMP/P5RT-99ecff/ACTUALG1.SCX /TMP/P5RT-99ecff/FILECLIPPROBE.C /HOME/M10SHELL/GENERATED/FILECLIPPROBE.SCX --dynamic /TMP/P5RT-99ecff/FILECLIPPROBE.json; _m9_status=$?; echo __SCUI_CMD_8a5f9ead3aeae787282e0190:$_m9_status:__SCUI_CMD_8a5f9ead3aeae787282e0190_END
+SCCC / mio
+TMP/P5RT-99ecff/FILECLIPPROBE.C -> HOME/M10SHELL/GENERATED/FILECLIPPROBE.SCX
+Validating application manifest
+SCCC: preprocess -> C -> x86
+Preprocessing source and includes
+Parsing C and generating x86
+Linking and writing SCX
+SCCC OK SCX DYNAMIC
+Compilation complete
+__SCUI_CMD_8a5f9ead3aeae787282e0190:0:__SCUI_CMD_8a5f9ead3aeae787282e0190_END
+SYSTEM /SYS [SYSTEM] # sessionctl list; _m9_status=$?; echo __SCUI_CMD_9498d01fe0d023b9392845b3:$_m9_status:__SCUI_CMD_9498d01fe0d023b9392845b3_END
+ID  UID  GID  TYPE  ACTIVE  TASKS  NAME
+1  1000  1000  user  yes  1  mio
+2  -1  -1  SYSTEM  no  3  SYSTEM
+3  -2  -2  LOCKED  no  0  Locked
+__SCUI_CMD_9498d01fe0d023b9392845b3:0:__SCUI_CMD_9498d01fe0d023b9392845b3_END
+SYSTEM /SYS [SYSTEM] # printf '%s\n' '' '/HOME/M10SHELL/GENERATED/FILECLIPPROBE.SCX; _p5=$?; echo __P5_RESULT_25b75f3462f04eb4:$_p5; exit $_p5' | su mio; _m9_status=$?; echo __SCUI_CMD_081d34cd7f0db236e90b7add:$_m9_status:__SCUI_CMD_081d34cd7f0db236e90b7add_END
+Password: 
+FILEJOB ID uid=1000 sid=4 generation=12
+FILECLIP PUBLISHER_EXITED operation=1 pid=4/6 epoch=2
+FILECLIP ACK operation=1 stage=3 flags=9 worker=4/7
+FILEJOB CONTENT bytes=131079 path=/HOME/M10SHELL/CLIPDEST/OP-SOURCE.BIN
+FILECLIP PUBLISHER_EXITED operation=2 pid=4/8 epoch=3
+FILECLIP ACK operation=2 stage=4 flags=9 worker=9/1
+FILEJOB CONTENT bytes=131079 path=/HOME/M10SHELL/CLIPDEST/OP-MOVE.BIN
+FILECLIP CUT_RECONCILED_EMPTY epoch=4
+FILEJOB CONTENT bytes=131079 path=/HOME/M10SHELL/OP-SOURCE.BIN
+FILECLIP PASS cross_process_copy_cut_paste_and_publisher_exit
+__P5_RESULT_25b75f3462f04eb4:0
+__SCUI_CMD_081d34cd7f0db236e90b7add:0:__SCUI_CMD_081d34cd7f0db236e90b7add_END
+SYSTEM /SYS [SYSTEM] # sessionctl show 1; _m9_status=$?; echo __SCUI_CMD_d5fdb607a71a64ae3bf3e7f8:$_m9_status:__SCUI_CMD_d5fdb607a71a64ae3bf3e7f8_END
+__SCUI_CMD_d5fdb607a71a64ae3bf3e7f8:0:__SCUI_CMD_d5fdb607a71a64ae3bf3e7f8_END
+SYSTEM /SYS [SYSTEM] # sessionctl logout 4; _m9_status=$?; echo __SCUI_CMD_0be1b0a659035e7e0a087e29:$_m9_status:__SCUI_CMD_0be1b0a659035e7e0a087e29_END
+__SCUI_CMD_0be1b0a659035e7e0a087e29:0:__SCUI_CMD_0be1b0a659035e7e0a087e29_END
+SYSTEM /SYS [SYSTEM] # 

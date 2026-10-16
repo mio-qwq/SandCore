@@ -1,0 +1,11 @@
+{
+  "integration_state": "PENDING_ROOT_SC32_LIBRARY_VERSION_6",
+  "abi_major": 1,
+  "abi_minor": 4,
+  "minimum_library_version": 6,
+  "selector": 6,
+  "exports": [
+    {"name": "ScWallpaperSet", "kind": "function", "size": 1},
+    {"name": "ScWallpaperQuery", "kind": "function", "size": 1}
+  ]
+}

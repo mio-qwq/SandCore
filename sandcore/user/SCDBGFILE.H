@@ -1,0 +1,45 @@
+#ifndef SANDCORE_SCDBGFILE_H
+#define SANDCORE_SCDBGFILE_H
+/* 调试副文件只描述符号，不能登记映射或授予目标进程访问权限。 */
+#define SCDBG_MAGIC "SCDB1MIO"
+#define SCDBG_VERSION 1u
+#define SCDBG_HEADER_SIZE 96u
+#define SCDBG_MACHINE_I386 3u
+#define SCDBG_ADDRESS_VA 1u
+#define SCDBG_ADDRESS_RVA 2u
+#define SCDBG_SYMBOL_SIZE 24u
+#define SCDBG_FILE_SIZE 20u
+#define SCDBG_LINE_SIZE 16u
+#define SCDBG_H_VERSION 8u
+#define SCDBG_H_HEADER_SIZE 12u
+#define SCDBG_H_MACHINE 16u
+#define SCDBG_H_ADDRESS_KIND 20u
+#define SCDBG_H_IMAGE_FILE_SIZE 24u
+#define SCDBG_H_OBJECT_COUNT 28u
+#define SCDBG_H_IMAGE_SHA256 32u
+#define SCDBG_H_SYMBOLS 64u
+#define SCDBG_H_SYMBOL_COUNT 68u
+#define SCDBG_H_FILES 72u
+#define SCDBG_H_FILE_COUNT 76u
+#define SCDBG_H_LINES 80u
+#define SCDBG_H_LINE_COUNT 84u
+#define SCDBG_H_STRINGS 88u
+#define SCDBG_H_STRINGS_SIZE 92u
+/* 符号：名字偏移、地址、尺寸、kind、binding、对象序号。 */
+#define SCDBG_S_NAME 0u
+#define SCDBG_S_ADDRESS 4u
+#define SCDBG_S_SIZE 8u
+#define SCDBG_S_KIND 12u
+#define SCDBG_S_BINDING 16u
+#define SCDBG_S_OBJECT 20u
+/* 文件：对象序号、路径偏移、原文长度、FNV1a32、保留零。 */
+#define SCDBG_F_OBJECT 0u
+#define SCDBG_F_PATH 4u
+#define SCDBG_F_SOURCE_BYTES 8u
+#define SCDBG_F_SOURCE_FNV1A32 12u
+/* 源行：地址、文件序号、从1开始的源行、对象序号。 */
+#define SCDBG_L_ADDRESS 0u
+#define SCDBG_L_FILE 4u
+#define SCDBG_L_LINE 8u
+#define SCDBG_L_OBJECT 12u
+#endif

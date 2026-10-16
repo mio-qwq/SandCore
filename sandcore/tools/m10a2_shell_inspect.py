@@ -29,6 +29,14 @@ FIELDS = {
     'root_failures':'O(UiRoot,paint_failures)', 'root_geometry':'O(UiRoot,geometry)',
     'root_width':'O(UiRoot,width)', 'root_height':'O(UiRoot,height)', 'root_retry':'O(UiRoot,retry)',
 }
+for name in ('items','count','grid_w','grid_h','layout_mode','store','store_revision','save_pending',
+             'layout_unsaved','layout_serial','store_serial','icons_pending','icon_errors',
+             'refresh_pending','gesture','scroll_x','scroll_y','active','visible','store_path'):
+    FIELDS['desk_'+name]='O(Desktop,'+name+')'
+FIELDS['desk_scale']='O(Desktop,metrics)+O(ScUiMetrics,scale_percent)'
+FIELDS['item_size']='sizeof(DeskItem)'
+for name in ('identity','label','x','y','selected','removed','icon_failed','icon','shortcut'):
+    FIELDS['item_'+name]='O(DeskItem,'+name+')'
 
 
 def sha(path):
@@ -150,6 +158,25 @@ def inspect(vm, symbols, layout, desktop_map, pid, generation):
                 item['window_state']['retry']=virtual(root+offsets['root_retry'],2)
             roots.append(item);node=virtual(node+offsets['node_next'])[0]
         observed['roots']=roots
+        if 'desk_items' in offsets:
+            def text(address,maximum=68):
+                data=b''.join(struct.pack('<I',word) for word in virtual(address,(maximum+3)//4))
+                return data[:maximum].split(b'\0',1)[0].decode('utf-8','strict')
+
+            state={name:virtual(desk+offsets['desk_'+name])[0] for name in
+                ('items','count','grid_w','grid_h','layout_mode','store','store_revision','save_pending',
+                 'layout_unsaved','layout_serial','store_serial','icons_pending','icon_errors',
+                 'refresh_pending','gesture','scroll_x','scroll_y','active','visible','scale')}
+            state['store_path']=text(desk+offsets['desk_store_path'])
+            state['rows']=[]
+            for i in range(min(state['count'],32)):
+                item=state['items']+i*offsets['item_size']
+                row={name:virtual(item+offsets['item_'+name])[0] for name in
+                    ('x','y','selected','removed','icon_failed','icon','shortcut')}
+                row['identity']=text(virtual(item+offsets['item_identity'])[0])
+                row['label']=text(virtual(item+offsets['item_label'])[0],128)
+                state['rows'].append(row)
+            observed['desktop_model']=state
     except Exception as error:
         observed['error']=repr(error)
     finally:

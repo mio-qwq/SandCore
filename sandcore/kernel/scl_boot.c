@@ -1,4 +1,5 @@
 #include "scl_boot.h"
+#include "sc32_debug.h"
 #include "task.h"
 #include "task_store.h"
 #include "paging.h"
@@ -163,12 +164,13 @@ int scl_boot_map(u32 user_output,u32 user_descriptor)
     u32 allocation_bytes=image_size+metadata_pages;
     u32 base=paging_module_alloc(pd,allocation_bytes);if(!base)return SCL_BOOT_MEMORY;
     error=root_copy(pd,base,file,metadata_size,allocation_bytes);
+    if(!error)error=sc32_debug_bootstrap_image(pid,base,file,stat[1],allocation_bytes);
     if(!error){
         info[0]=SCL_BOOT_INFO_SIZE;info[1]=SCL_BOOT_INFO_VERSION;info[2]=base;info[3]=base+entry;
         info[4]=base+image_size;info[5]=metadata_size;info[6]=allocation_bytes;info[7]=image_size;
         if(paging_user_copy(pd,user_output,info,sizeof(info),1))error=SCL_BOOT_IO;
     }
-    if(error){(void)paging_module_free(pd,base);return error;}
+    if(error){sc32_debug_unmap(pid,base,allocation_bytes);(void)paging_module_free(pd,base);return error;}
     /* 输出、复制与页保护都成功才提交本人缓存。任何前置失败都不
      * 改用户输出/已有模块；内核从不调用返回的ScApplicationStart。 */
     record->scl_root_base=base;record->scl_root_entry=base+entry;

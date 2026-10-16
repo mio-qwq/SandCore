@@ -245,6 +245,11 @@ static ScStatus desk_create(void)
     context.cache_budget_bytes=2097152;context.undo_budget_bytes=65536;context.scheduling_quantum=64;
     context.error_procedure=desk_ui_error;
     s=ScUiContextCreate(&context,&desk.ui);if(s<0)return s;
+    /* 本批16张原生128px图标本来就由可见items强持，共1MiB像素。
+     * 默认512KiB查找cache只能留7项，会在打开Start时重新创建仍活的
+     * 同图像。2MiB是按实际可见资源留余量的上限，不预分配像素；
+     * 离屏仍撤items引用，缓存按预算/主题/显示/文件代数正常失效。 */
+    s=ScShellIconCacheBudget(2097152);if(s<0)return s;
     ScUiClassDesc custom;memset(&custom,0,sizeof(custom));custom.size=sizeof(custom);custom.version=1;
     custom.name="SandCore.Desktop";custom.paint=desk_paint;custom.event=desk_input;
     s=ScUiClassRegister(desk.ui,&custom,&desk.desktop_class);

@@ -1,0 +1,11 @@
+{
+  "name": "PROJECT.SCL",
+  "abi_major": 1,
+  "abi_minor": 0,
+  "library_version": 1,
+  "init": null,
+  "fini": null,
+  "exports": [{"name":"ProjectStep","kind":"function"},{"name":"ProjectValue","kind":"data"}],
+  "imports": [],
+  "dependencies": []
+}

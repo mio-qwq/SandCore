@@ -14,7 +14,7 @@ from scl_format import validate, FUNCTION, DATA, NO_ENTRY
 ROOT = Path(__file__).resolve().parents[1]
 LIBRARIES = {
     'SCLDR.SCL': ('user/runtime/SCLROOT.json', ('user/runtime/',)),
-    'SC32API.SCL': ('user/sc32/SC32API.json', ('user/sc32/', 'user/guiapi/', 'user/fontapi/', 'user/brokerapi/', 'user/dropapi/')),
+    'SC32API.SCL': ('user/sc32/SC32API.json', ('user/sc32/', 'user/guiapi/', 'user/fontapi/', 'user/brokerapi/', 'user/dropapi/', 'user/debugapi/', 'user/pathapi/', 'user/leaseapi/', 'user/hostapi/', 'user/wallapi/')),
     'SCCLIB.SCL': ('user/stdlib/SCCLIB.json', ('user/stdlib/',)),
     'SCLIB.SCL': ('user/sclib/SCLIB.json', ('user/sclib/',)),
     'SCUI.SCL': ('user/scui/SCUI.json', ('user/scui/',)),
@@ -25,6 +25,10 @@ HEADERS = {
     'SC32GUI.H': 'user/SC32GUI.H', 'SC32FONT.H': 'user/SC32FONT.H',
     'SC32PALETTE.H': 'user/SC32PALETTE.H', 'SC32POPUP.H': 'user/SC32POPUP.H',
     'SC32BROKER.H': 'user/SC32BROKER.H', 'SC32DROP.H': 'user/SC32DROP.H',
+    'SC32DEBUG.H': 'user/SC32DEBUG.H', 'SCDBGFILE.H': 'user/SCDBGFILE.H',
+    'SC32PATH.H':'user/SC32PATH.H', 'SC32LEASE.H':'user/SC32LEASE.H',
+    'SC32HOST.H':'user/SC32HOST.H', 'SC32WALL.H':'user/SC32WALL.H',
+    'SCSHELL.H':'user/SCSHELL.H', 'SCOFMT.H':'user/SCOFMT.H',
     'SCUI.H': 'user/SCUI.H', 'SCLIB.H': 'user/sclib/SCLIB.H',
     # 保持官方头原字节；其../SCTYPES.H必须在INC内正确解析。
     'RUNTIME/SCLDR.H': 'user/runtime/SCLDR.H',
@@ -34,7 +38,8 @@ STANDARD = ('stddef.h','stdint.h','stdbool.h','stdarg.h','limits.h','errno.h',
 FORBIDDEN = ('PRIVATE','WIRE','NUI','SCAPI','SCIO','SCMEM','KERNEL','SCLFMT','SCDYN')
 DOCS = ('M10A2-SDK.md','SCL.md','SC32API.md','SC32-GUI-USER.md','SC32-BROKER.md',
         'SC32-DROP.md','SC32-FONT.md','SCUI.md','SCUI-TEXT.md','SCLIB.md','SCCLIB.md',
-        'SCCC-SCL.md','SCCC-AGGREGATE-ABI.md','THIRD-PARTY.md')
+        'SCCC-SCL.md','SCCC-AGGREGATE-ABI.md','THIRD-PARTY.md','SC32-DEBUG.md',
+        'SCO-AND-LINKER.md','SC32-FILE.md','SCSHELL-DESIGN.md','SCSHELL-IMPLEMENTATION.md','SC32-WALL.md')
 
 
 def digest(body: bytes) -> str:
@@ -368,7 +373,7 @@ def library_headers(name):
     if name == 'SCLIB.SCL':
         return ('user/sclib/SCLIB.H',)
     if name == 'SCLDR.SCL':
-        return ('user/runtime/SCLDR.H',)
+        return ('user/runtime/SCLDR.H','user/debugapi/SC32DEBUGWIRE.H','user/SC32DEBUG.H','user/SC32API.H')
     return ()
 
 

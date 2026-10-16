@@ -111,6 +111,9 @@ static ScStatus probe(void)
         ScU32 events=0;status=ScSystemWait(SC32_EVENT_AUTH,10,&events);if(status<0)return status;
     }
     status=ScSessionControl(identity.session,SC32_SESSION_SHOW);if(status<0)return status;
+    /* 隐藏初始化/IPC/200PIT观察已各自完成；首帧等待必须从真实SHOW
+     * 重新计时，不能把前阶段的耗时冒充可见桌面激活超时。 */
+    record(&begin,sizeof(begin));status=ScSystemMonotonic(&begin);if(status<0)return status;
     status=host_ready(&host,1);if(status<0)return status;
     if(host.pid!=first_pid || host.generation!=first_generation || host.host_epoch!=first_epoch)return SC32_E_STALE;
     printf("SHELLPROBE VISIBLE_ACTIVE sid=%u pid=%u/%u epoch=%u\n",host.session,host.pid,host.generation,host.host_epoch);
@@ -118,6 +121,14 @@ static ScStatus probe(void)
 }
 int main(void)
 {
+    char arguments[32];ScU32 length=0;ScStatus parsed=ScProcessArguments(arguments,sizeof(arguments),&length);
+    if(parsed<0)return 2;
+    if(!strcmp(arguments,"prepare")){
+        record(&begin,sizeof(begin));parsed=ScSystemMonotonic(&begin);if(parsed<0)return 3;
+        ScShellHostInfo host;parsed=host_ready(&host,0);
+        if(parsed<0){printf("SHELLPROBE FAIL prepared=%d\n",parsed);return 4;}
+        printf("SHELLPROBE PREPARED_ONLY sid=%u pid=%u/%u epoch=%u\n",host.session,host.pid,host.generation,host.host_epoch);return 0;
+    }
     ScStatus status=probe();
     ScShellCatalogRelease(catalog);
     ScShellRequestClose(request);

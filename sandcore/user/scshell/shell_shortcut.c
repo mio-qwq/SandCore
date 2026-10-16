@@ -380,6 +380,13 @@ static ScStatus sh_icon_memory(ScUiContext *ui,const unsigned char *p,ScU32 n,Sc
             s=ScBinaryReadU32LE(&reader,&bytes);
             if(s>=0)s=ScBinaryReadU32LE(&reader,&trailer);
             if(s<0||trailer!=0x004F494Du||bytes!=w*h*4||n!=32+bytes)return SC_SHELL_E_INVALID;
+            /* SCB2是已完整核界的i386小端直通ARGB；IconCreate立即复制
+             * 成为自己的像素。原实现先另分配一整张图片，每像素跨SCL
+             * 调BinaryRead，再复制一次；64px的16个图标就有65536次
+             * 无意义逐像素调用。直接交同一原始字节，颜色/alpha/尺寸
+             * 全部保留，不借用随后会释放的文件缓冲。索引SCB1和SCF
+             * 仍按各自格式转换，不把它们解释成ARGB。 */
+            return sh_cause(ScUiIconCreateArgb(w,h,w*4,(const ScU32 *)(p+32),out),63,0);
         } else if(!memcmp(p,"SCB1MIO\0",8)&&format==1&&reserved==0x004F494Du&&n==24+w*h) {
             s=ScDisplayPalette(palette,256);
             if(s<0)return sh_cause(s,63,0);
@@ -387,13 +394,8 @@ static ScStatus sh_icon_memory(ScUiContext *ui,const unsigned char *p,ScU32 n,Sc
         pixels=(ScU32 *)malloc(w*h*4);
         if(!pixels)return SC_SHELL_E_MEMORY;
         for(i=0;i<w*h;++i) {
-            if(format==2) {
-                s=ScBinaryReadU32LE(&reader,pixels+i);
-                if(s<0)goto done;
-            } else {
-                ScU32 slot=p[24+i];
-                pixels[i]=slot?0xFF000000u|palette[slot]:0;
-            }
+            ScU32 slot=p[24+i];
+            pixels[i]=slot?0xFF000000u|palette[slot]:0;
         }
     }
     s=ScUiIconCreateArgb(w,h,w*4,pixels,out);
@@ -623,6 +625,10 @@ ScStatus ScShellIconLoad(ScUiContext *ui,const char *spec,const char *executable
     }
     key[0]=!spec||!*spec?'X':'F';
     strcpy(key+1,absolute);
+    /* SandFS只折叠ASCII大小写；cache必须采用同一名字身份，不能让
+     * 桌面小写link与开始菜单大写注册名为同一SCX重复读盘/解码。
+     * 原显示路径不改，非ASCII字节不做未经FS支持的Unicode折叠。 */
+    for(i=1;key[i];i++)if(key[i]>='a' && key[i]<='z')key[i]=(char)(key[i]-'a'+'A');
     memset(&metadata,0,sizeof(metadata));
     metadata.size=sizeof(metadata);
     metadata.version=1;

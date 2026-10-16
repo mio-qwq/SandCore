@@ -242,3 +242,45 @@ $(BUILD)/fs/SYS/SHELL/SCFILEWORK.SCX: $(BUILD)/SCFILEWORK.SCX
 m10a2-shell-install: $(addprefix $(BUILD)/fs/SYS/LIB/,$(addsuffix .SCL,$(M10A2_SHELL_LIB_NAMES))) $(BUILD)/fs/SYS/SHELL/SCSHELL.SCX $(BUILD)/fs/SYS/SHELL/SCFILEWORK.SCX
 
 $(BUILD)/sc32-library.o: user/SC32PATH.H $(wildcard user/pathapi/*.c user/pathapi/*.H)
+
+# Phase6独立原生对象链接器；只构建开发工具，不重启封存应用/游戏。
+# HOST_BOOTSTRAP仍明确标识，真实SCCC→SCO→SCLD客体证据另行记录。
+M10A2_OBJECT_DIR ?= build/m10a2-object-bootstrap
+.PHONY: m10a2-object-bootstrap m10a2-object-artifacts m10a2-object-install
+m10a2-object-bootstrap:
+	$(MAKE) BUILD=$(M10A2_OBJECT_DIR) M9_BUILD=1 M10_BUILD=1 $(M10A2_OBJECT_DIR)/fs/bin/sccc.scx m10a2-object-artifacts
+$(BUILD)/scld.o: user/scld.c user/SCOFMT.H user/SCDBGFILE.H user/runtime/SCLFMT.H user/runtime/SCDYN.H user/runtime/scl_format.c user/runtime/scd_format.c $(STAMP)
+	$(CC) $(CFLAGS) $(M10A2_SCL_CFLAGS) -Werror -x c -Iuser/stdlib -Iuser -c $< -o $@
+$(BUILD)/SCLD.SCX: $(BUILD)/scld.o user/SCLD.json tools/mkdscx.py tools/scd_format.py
+	$(PY) tools/mkdscx.py $< $@ --manifest user/SCLD.json
+m10a2-object-artifacts: $(BUILD)/SCLD.SCX
+$(BUILD)/fs/BIN/SCLD.SCX: $(BUILD)/SCLD.SCX
+	mkdir -p $(dir $@)
+	cp $< $@
+$(BUILD)/fs/SYS/INC/SCOFMT.H: user/SCOFMT.H
+	mkdir -p $(dir $@)
+	cp $< $@
+$(BUILD)/fs/SYS/INC/SCDBGFILE.H: user/SCDBGFILE.H
+	mkdir -p $(dir $@)
+	cp $< $@
+$(BUILD)/fs/SYS/SRC/SCLD.JSON: user/SCLD.json
+	mkdir -p $(dir $@)
+	cp $< $@
+m10a2-object-install: $(BUILD)/fs/BIN/SCLD.SCX $(BUILD)/fs/SYS/INC/SCOFMT.H $(BUILD)/fs/SYS/INC/SCDBGFILE.H $(BUILD)/fs/SYS/SRC/SCLD.JSON
+
+# Debug2只构建本轮新代码，不启动冻结游戏或复制整盘。
+$(BUILD)/sc32_debug.o: kernel/sc32_debug.c kernel/sc32_debug.h kernel/sc32_debug_modules.inc user/SC32DEBUG.H user/debugapi/SC32DEBUGWIRE.H $(STAMP)
+	$(CC) $(CFLAGS) -Werror -Iuser -Iuser/runtime -Iuser/debugapi -c $< -o $@
+$(BUILD)/sc32-library.o: user/debugapi/sc32_debug.c user/debugapi/SC32DEBUGWIRE.H user/SC32DEBUG.H
+$(BUILD)/scl-root.o: user/runtime/scl_debug_registry.c user/debugapi/SC32DEBUGWIRE.H user/SC32DEBUG.H
+$(BUILD)/debug2.o: user/debug2/DEBUG2.C $(wildcard user/debug2/*.c user/debug2/*.H) user/SC32DEBUG.H user/SCDBGFILE.H $(STAMP)
+	$(CC) $(CFLAGS) $(M10A2_SCL_CFLAGS) -Werror -x c -Iuser -Iuser/sclib -Iuser/stdlib -Iuser/debug2 -c $< -o $@
+$(BUILD)/DEBUG2.SCX: $(BUILD)/debug2.o user/debug2/DEBUG2.json tools/mkdscx.py
+	$(PY) tools/mkdscx.py $< $@ --manifest user/debug2/DEBUG2.json
+.PHONY: m10a2-debug2-artifacts
+m10a2-debug2-artifacts: $(BUILD)/DEBUG2.SCX
+
+include m10a2-apps.mk
+$(BUILD)/sc32-library.o: user/SC32WALL.H $(wildcard user/wallapi/*.c user/wallapi/*.H)
+$(BUILD)/sc32_core.o: kernel/sc32_wall_query.inc user/SC32WALL.H user/wallapi/SC32WALLWIRE.H
+$(BUILD)/wm.o: kernel/wm_wall_snapshot.inc user/SC32WALL.H

@@ -1,0 +1,156 @@
+{
+  "scope": "DRAFT_ONLY_NO_MAIN_MUTATION",
+  "sc32_new_abi": "1.4/v6",
+  "debug_header": "SC32DEBUG.H",
+  "new_exports": [
+    "ScDebugLaunch",
+    "ScDebugQuery",
+    "ScDebugControl",
+    "ScDebugRead",
+    "ScDebugBreakpointAdd",
+    "ScDebugBreakpointRemove",
+    "ScDebugBreakpoints",
+    "ScDebugModules",
+    "ScDebugSegments",
+    "ScDebugSymbols"
+  ],
+  "integration_patch": "integration.patch",
+  "sources": [
+    {
+      "source": "user/debug2/D2APP.H",
+      "target": "user/debug2/D2APP.H"
+    },
+    {
+      "source": "user/debug2/D2DECODE.H",
+      "target": "user/debug2/D2DECODE.H"
+    },
+    {
+      "source": "user/debug2/DEBUG2.C",
+      "target": "user/debug2/DEBUG2.C"
+    },
+    {
+      "source": "user/debug2/DEBUG2.json",
+      "target": "user/debug2/DEBUG2.json"
+    },
+    {
+      "source": "user/debug2/decode.c",
+      "target": "user/debug2/decode.c"
+    },
+    {
+      "source": "user/debug2/model.c",
+      "target": "user/debug2/model.c"
+    },
+    {
+      "source": "user/debug2/sidecar.c",
+      "target": "user/debug2/sidecar.c"
+    },
+    {
+      "source": "user/debug2/ui.c",
+      "target": "user/debug2/ui.c"
+    },
+    {
+      "source": "user/debugapi/SC32DEBUGWIRE.H",
+      "target": "user/debugapi/SC32DEBUGWIRE.H"
+    },
+    {
+      "source": "user/debugapi/sc32_debug.c",
+      "target": "user/debugapi/sc32_debug.c"
+    },
+    {
+      "source": "user/runtime/scl_debug_registry.c",
+      "target": "user/runtime/scl_debug_registry.c"
+    },
+    {
+      "source": "kernel/sc32_debug.c",
+      "target": "kernel/sc32_debug.c"
+    },
+    {
+      "source": "kernel/sc32_debug.h",
+      "target": "kernel/sc32_debug.h"
+    },
+    {
+      "source": "kernel/sc32_debug_modules.inc",
+      "target": "kernel/sc32_debug_modules.inc"
+    }
+  ],
+  "old_sources": [
+    {
+      "path": "kernel/process.c",
+      "sha256": "a934e927d4afb23fe668d8919dbd15879917b32af821218c19e3fa7692a69208"
+    },
+    {
+      "path": "kernel/process.h",
+      "sha256": "fdfd39b6998ab7e1aae484c1d857d86cc177b85ee574f2cd4cb40ba6846f24bd"
+    },
+    {
+      "path": "kernel/task.c",
+      "sha256": "364f2c0027bbfff0e6314348e03e0084a3a6312d26b97dbc01ed8c6eff414326"
+    },
+    {
+      "path": "kernel/scl_boot.c",
+      "sha256": "21c8fe7edfefc96e391387222e020e98275751c7839cf62b2467ce231f27b724"
+    },
+    {
+      "path": "kernel/sc32_core.c",
+      "sha256": "42a9e684e8d4cd4d53d8e3adab2cb786bf49423b4806960a055b7e7d43896bb8"
+    },
+    {
+      "path": "Makefile",
+      "sha256": "f42cee49b4ecbb402a9308fd52119ecec0277d7bd3d5518dc7de3c4ce8f8a814"
+    },
+    {
+      "path": "user/runtime/scldr.c",
+      "sha256": "8f79ec7c5d4ca436327a22b555aa77c8c3c85e047b5ffb0aaa9f22498a25c194"
+    },
+    {
+      "path": "user/runtime/SCLROOT.C",
+      "sha256": "559e5ce155d4bb0477a3a3882ae6a91d9501441a4ac5398a23cf00f8cad96e50"
+    },
+    {
+      "path": "user/sc32/SC32API.C",
+      "sha256": "00a96e0b578fb5b77a8bfd4164e00bf02950bc5709decabe05112b6dc319574f"
+    },
+    {
+      "path": "user/SC32API.H",
+      "sha256": "5f6dbc5fbf6f521b07692c6b6bf6c9e9a815f32fd6bc7dd1bd24a3bbccc81823"
+    },
+    {
+      "path": "tools/stage_m10a2_sdk.py",
+      "sha256": "4f72495b606c5a59fbb9e1ccafe4134f54ada85fdc2e8ed80e3f4c3a75c4a327"
+    },
+    {
+      "path": "user/sc32/SC32API.json",
+      "sha256": "8b8a3d2cd326d3d12d61fd4a901e8f5461aba740308b113dc0cb07c3f52ac2e1"
+    },
+    {
+      "path": "user/runtime/SCLROOT.json",
+      "sha256": "2962252a9f62ed2e87abe9c15662fd5ce9b0b88e8ac955c11d26035553bda8be"
+    },
+    {
+      "path": "m10a2.mk",
+      "sha256": "d28c1d7ac3c11570fae235b39a4a28c79e9cf02b41c33eaff6d2412465186a6f"
+    }
+  ],
+  "preserved_legacy": [
+    {
+      "path": "user/SCAPI.H",
+      "sha256": "81a730450fcb3d310ed841ad3e5c70a3fed32aa7fbd10acac8b888ac7da9ffc1"
+    },
+    {
+      "path": "user/debugger.c",
+      "sha256": "8d00db75a3a3bc898e346314f4e39df836f4d905afe7fffaab0497d66d50f963"
+    },
+    {
+      "path": "user/SCDBG.H",
+      "sha256": "6fa5d5056594d1ce2702ef4dbf90c90a01b419d37932119428a1511eff83feed"
+    },
+    {
+      "path": "user/SCDBG.inc",
+      "sha256": "469627cce23c85c9dd87a838ba6beff97c17f171484fa036b61790bca8bba858"
+    },
+    {
+      "path": "user/m9/scdbg.c",
+      "sha256": "630a6bf4fdaf9d787e0dfb94e6725be8144d9730d15c7132e9c992d861facfe9"
+    }
+  ]
+}

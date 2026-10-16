@@ -1,5 +1,7 @@
 # M10a2 实现与恢复入口
 
+> 2026-10-16当前补充：P5真实文件剪贴板、图标拖动/布局冷恢复、新视觉与连续会话切片通过；完整P5仍待Files跨窗等出口。六个重制应用/SCO/SCLD/调试与壁纸底座已入主源并HOST构建通过，客体未验部分见[M10A2-P6-IMPLEMENTATION](M10A2-P6-IMPLEMENTATION.md)。完整目标继续active。桌面保持Ring3，冷图标对照45→46PIT未证明提速，见新资源证据包；不把HOST或结构简化说成客体/整机性能达标。
+
 正式名称：**SandCore M10a2 — The Application Platform Era**。
 
 2026-10-14 已按用户要求开工；完整持续目标保持active。开工基线 `main@8e1c27abfe1b0c14ddff6d23464a961eabfd8cc0`；完整范围见根 `M10a2RULE.MD` 和 `M10A2-DESIGN.md`。此前SC32检查点为`9bf6d8e4fffffab8e159ee1dc1aa8277b6801463`；本批SCCLIB/SCLIB/R1与当前G1实际结果见[evidence/m10a2-stdlib](../evidence/m10a2-stdlib/README.md)，对应阶段提交从main日志定位。整个M10a2尚未完成，不能以阶段提交关闭目标。
@@ -176,3 +178,10 @@ GUI01五个真实native库安装与get回、普通平台及3013文本/页账通�
 P5隔离候选unified-host-07/08整体构建通过；原实际G1生成SC32API/SCUI/SCSHELL及worker/desktop，所有编译owner页账通过。native-issued-core-01已绑定同一119969B原生桌面（79b9c8f5804055ca4abaa007785b594663403a0c24e562a2ed77faf2a09c207d）。runtime01/02真实启动早退并有限重试回退，尚未ACTIVE；保持失败，当前只加可信host实际退出码诊断并定向重试。最新完整目标见M10A2-CURRENT-GOAL.md；P5、Files2/Studio2/Debug2、其余组件和SDK/最终验收继续。
 
 2026-10-16实际结果：FILEJOB04通过普通UID1000的精确路径查询、131079B COPY/MOVE、持久ACK、客体逐字节和宿主取回内容对照；两份832B恢复日志的头/frame CRC与START/提交/FINISH独立审计通过。退出/注销13830→13830 PF，各池/历史/字体/未归因增量0，输入/原盘保持。证据入口evidence/m10a2-p5-file-jobs/README.md。完整P5、主要组件和SDK仍未完成，持续目标active。
+
+2026-10-16：真实FILECLIP02跨进程Copy/Cut发布者先正常退出、父进程粘贴通过；Cut在实际持久MOVE后Reconcile为空。三份131079B内容和两份恢复日志CRC独立核验通过，退出13830→13830 PF/全owner账零增量，原盘及输入保持。FILECLIP01为检查程序对Wait领票/历史PID的误用，原FAIL保留，未改系统库。证据evidence/m10a2-p5-file-clipboard；接续真实鼠标图标/布局保存与冷启动恢复，不把FILE剪贴板代替FILE拖放。
+
+2026-10-16：desktop-layout01实际PS/2单拖、框选、多图标同时拖动及CRC持久文件逐项匹配通过；cold02全新QEMU进程恢复16项相同坐标，5984B CAT摘要保持fcb376...33ac。两次最终owner账通过，无客体内存写入。证据evidence/m10a2-p5-desktop-layout；本轮暂停私有模型观察不能用作性能指标。后续新默认/标签修复仍待GEN14真实新字节，不拿旧图称新视觉通过。
+
+
+修订：2026-10-16，持久保存新桌面视觉/连续会话与无明确提速结论，六应用及对象/调试/壁纸主源HOST整合；完整P5/P6/SDK继续，未宣布整版完成。

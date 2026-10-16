@@ -17,6 +17,7 @@
 #include "task_store.h"
 #include "scl_boot.h"
 #include "sc32_core.h"
+#include "sc32_debug.h"
 #include "sc32_host.h"
 #include "sc32_file.h"
 #include "sc32_lease.h"
@@ -691,7 +692,9 @@ void syscall_c_common(u32 vec, u32 *frame)
     case SYS_MODULEALLOC:
         frame[11]=paging_module_alloc(TASK(current).pd,frame[8]);break;
     case SYS_MODULEPROTECT:
-        frame[11]=(u32)paging_module_protect(TASK(current).pd,frame[8],frame[10],frame[9]);break;
+        frame[11]=(u32)paging_module_protect(TASK(current).pd,frame[8],frame[10],frame[9]);
+        if(!frame[11])sc32_debug_mapping_changed(current,frame[8],frame[10]);
+        break;
     case SYS_MODULEFREE: {
         u32 bytes=paging_module_size(TASK(current).pd,frame[8]);
         if(!bytes)frame[11]=(u32)-1;
@@ -722,6 +725,8 @@ void syscall_c_common(u32 vec, u32 *frame)
             frame[11]=(u32)sc32_lease_call(current,frame[8],frame[10],frame[9]);
         else if(frame[8]>=0x800u && frame[8]<0x820u)
             frame[11]=(u32)sc32_host_call(current,frame[8],frame[10],frame[9]);
+        else if(frame[8]>=0x900u && frame[8]<0x920u)
+            frame[11]=(u32)sc32_debug_call(current,frame[8],frame[10],frame[9]);
         else frame[11]=(u32)sc32_core_call(current,frame[8],frame[10],frame[9]);
         break;
     case SYS_STATUS:
@@ -1406,6 +1411,7 @@ int task_exec_scx_parts(const char *filename,const char *arguments)
         TASK(pid).args[legacy_args]=0;
         streams_set_arguments(pid,arguments);
         userspace_executable(pid,filename);
+        if(sc32_debug_main_image(pid,filename,load_size,bss_size)){task_stop(pid);return -4;}
     }
     return pid;
 }

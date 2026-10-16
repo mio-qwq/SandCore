@@ -1,0 +1,6 @@
+{
+  "kind": "application",
+  "name": "PROJECT.SCX",
+  "dependencies": [{"name":"SCCLIB.SCL","abi_major":1,"min_minor":0,"min_version":1}],
+  "imports": [{"name":"printf","dependency":"SCCLIB.SCL","kind":"function","size":1}]
+}

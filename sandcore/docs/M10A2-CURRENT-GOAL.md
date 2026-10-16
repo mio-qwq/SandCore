@@ -1,5 +1,7 @@
 # SandCore M10a2 — The Application Platform Era：持续目标
 
+> 最新恢复补充：`M10A2-P6-IMPLEMENTATION.md`记录已整合六应用、SCO/SCLD与调试/壁纸底座。`evidence/m10a2-p5-desktop-resources`保存新视觉/连续会话/布局与零增量回收；冷图标45→46PIT未证明提速。Studio2最后交付中，Canvas/Lens/Settings继续；Installer临时名不是既有GUI，按原CLI文件安装功能收敛，不自设软件包管理目标。完整目标active，不停在本检查点。
+
 2026-10-16。用户要求主代理接手最新工作区，继续到根 `M10a2RULE.MD` 全部完成。此页是可恢复的执行清单，不缩减原合同，也不是版本完成声明。当前统一 main；已有代理落盘成果保留，由主代理整合。旧接力稿为历史快照，当前证据按本页及原始报告判断。
 
 ## 完成条件
@@ -82,3 +84,19 @@ FILEJOB01/02实际typed查询通过，COPY在恢复日志Publish阶段INVALID；
 FILEJOB03仍停recovery2；核对fs_lease_begin发现第二个确定错误：ABSENT且无namespace时target==ns为NULL==NULL，被当作同一真实对象拒绝。改成target非空后再比；CORE15复用GEN13用户产物做相同回归，未扩大用例。
 
 2026-10-16实际结果：FILEJOB04通过普通UID1000的精确路径查询、131079B COPY/MOVE、持久ACK、客体逐字节和宿主取回内容对照；两份832B恢复日志的头/frame CRC与START/提交/FINISH独立审计通过。退出/注销13830→13830 PF，各池/历史/字体/未归因增量0，输入/原盘保持。证据入口evidence/m10a2-p5-file-jobs/README.md。完整P5、主要组件和SDK仍未完成，持续目标active。
+
+2026-10-16：真实FILECLIP02跨进程Copy/Cut发布者先正常退出、父进程粘贴通过；Cut在实际持久MOVE后Reconcile为空。三份131079B内容和两份恢复日志CRC独立核验通过，退出13830→13830 PF/全owner账零增量，原盘及输入保持。FILECLIP01为检查程序对Wait领票/历史PID的误用，原FAIL保留，未改系统库。证据evidence/m10a2-p5-file-clipboard；接续真实鼠标图标/布局保存与冷启动恢复，不把FILE剪贴板代替FILE拖放。
+
+Desktop-layout01实际单拖/框选/组拖/磁盘CAT通过，全部16图标资源就绪且无错误，catalog5984B/CRC/epoch31/revision3，16项磁盘xy与实际模型匹配；最终13830→13830 PF。Cold01在启动VM前因准备器控制路径未做ASCII折叠而误报SYS/INC/ASSERT.H改变，修正仅对明确controlled_keys按FS同规则折叠，其他对象仍逐项原样核验。Cold02已实际冷启动恢复通过，待归档。主代理查看最终原尺寸截图，发现浅壁纸文字对比与空布局80格/128位置间距不一致；主源新默认128×112及FACE/TEXT实测标签已写，旧用户坐标不改，新视觉批次未验证。
+
+2026-10-16：desktop-layout01实际PS/2单拖、框选、多图标同时拖动及CRC持久文件逐项匹配通过；cold02全新QEMU进程恢复16项相同坐标，5984B CAT摘要保持fcb376...33ac。两次最终owner账通过，无客体内存写入。证据evidence/m10a2-p5-desktop-layout；本轮暂停私有模型观察不能用作性能指标。后续新默认/标签修复仍待GEN14真实新字节，不拿旧图称新视觉通过。
+
+
+用户最新决定：撤回启动等待进度条方向，桌面继续Ring3，不把桌面或准备门槛搬入内核；允许优化代码加速。此轮只阅读了boot_scene/main/module2，没有为该提案修改内核。现主源优化ScShellIconLoad的SCB2路径：核界后直接由ScUiIconCreateArgb复制原ARGB，去掉整张临时复制与每像素跨SCL BinaryRead。先在同一分辨率/资源/实际native caller的视觉流程记录冷图标加载分项，准备前后对照；尚不声称加速数据或全桌面性能达标。
+
+主代理Notes2草稿已实写共享Edit/菜单/查找替换/UndoRedo/文本剪贴板及稳定read/私有候选条件保存、保存时新增编辑保护、未保存确认/取消；GCC i386与真实SCCC宿主适配器通过，动态SCX43238B（79公开导入），尚未客体验证/整合。新代理使用用户指定GPT-6.1Sol/max，清楚文件所有权、仅新drafts，不恢复旧代理：Files2已宿主构建/模型定向验证，Debug2新typed gate/真实模块登记和UI正在收齐；真实SCO/原生SCLD已交付HOST_VERIFIED_GUEST_PENDING，原编译器load254319B未扩旧上限，代理继续Studio2完整工程实现。源/状态看各自drafts，不以这些宿主结果称客体或整版完成。
+
+
+ROOT已按四份精确原SHA应用SCO编译器补丁（build/m10a2-object-integration-01/compiler-application.json），新增user/s3c_sco.inc、SCOFMT.H、SCDBGFILE.H、scld.c、SCLD.json，m10a2.mk已接独立object工具目标/正式头安装；旧default-label/sret修复保留，不扩大262108旧限。这是主源实施整合，尚未对新增工具启动客体流程；P5隔离stage故意仍保旧编译器冻结源，原生图标性能前后caller和资源不混淆。
+
+Visual02新标签居中/128×112网格、原壁纸与全部实际icon引用和提交就绪已通过并由主代理查看原尺寸图；P5真实drag/owner仍通过。ICONPROFILE actualG1 caller SHA ccd18a49eb673a5987a84348f189a231c762ea00296d852ec44f5bd5f19511c6，16×128px=1048576B，75 PIT@100Hz，默认512KiB资源cache16 misses/0hits/7entries；只是无窗口资源分项，不是整桌面时间。优化SCB2直接复制/ASCII同名key已在主源；桌面显式2MiB cache只增加 lookup持有预算，不预分配或降尺寸，避免16张可见强持图重复创建。GEN17只更新SCSHELL/desktop原生通过，CORE18正绑定；下一同源caller视觉02→优化后对照，达到本项结束条件即停止该性能矩阵。

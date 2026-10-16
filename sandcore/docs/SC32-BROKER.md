@@ -138,3 +138,5 @@ Drop可信helper共用named Connect的同一事务正文，ACL/真实双方peer�
 Windows双盘ui-platform-guest-01已真实普通su mio：父PID6/gen1、childPID5/gen2、SID4、UID1000/realmNORMAL/flags0；全部87平台检查通过，131079B文本/旧snapshot/CAS、实际IPC发送者/队列/EOF/等待、18页Shared RO/RW与issuer退出、FONT/Palette符合探针。parent实际PTE89→125→89、PT4→4，运行0.781秒/一核CPU0.671875秒。该轮整体仍FAIL：退出全br/drop/window/file/job/pipe对象/页归原，Font owned952/Desktop3818/records5页不变，PF9007→9008，唯一变化wait_pages0→1，主控尚未计旧有限等待heap首次缓存。VM已结束，未记录wait_count/capacity不能追溯把该FAIL改PASS；保持报告/原stdout/截图，下一轮核这份旧缓存真实归属与空闲状态再继续官方边界/G1/原生库与GUI。原盘及构建source/output摘要保持。
 
 上述只是实际平台首组子结果，不是SCUI/整个M10a2通过。当前GUI主控/source独立工具仍收束，完整目标active。
+
+2026-10-16：真实FILECLIP02跨进程Copy/Cut发布者先正常退出、父进程粘贴通过；Cut在实际持久MOVE后Reconcile为空。三份131079B内容和两份恢复日志CRC独立核验通过，退出13830→13830 PF/全owner账零增量，原盘及输入保持。FILECLIP01为检查程序对Wait领票/历史PID的误用，原FAIL保留，未改系统库。证据evidence/m10a2-p5-file-clipboard；接续真实鼠标图标/布局保存与冷启动恢复，不把FILE剪贴板代替FILE拖放。

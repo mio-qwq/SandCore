@@ -53,6 +53,9 @@
 static int module_output;
 static int shared_output;
 static int dynamic_output;
+static int object_output;
+static void sco_line(int where);
+static void finish_sco(const char *output);
 #define BASE ((module_output||shared_output)?0u:0x400000u)
 
 /* 单字节运算符直接保存 ASCII，多字节运算符才分配扩展编号。
@@ -281,12 +284,13 @@ static void tokcopy(Tok *d,Tok *s) { d->k=s->k;
 #include "s3c_std_parse.inc"
 #include "s3c_emit.inc"
 #include "s3c_scl.inc"
+#include "s3c_sco.inc"
 
 int main(void)
 {
 #ifdef SCCC_CLI
     if(cli_parse()<0 || cli_argc<2 || cli_argc>4){
-        cli_text(2,"s3c source.c output.scx [icon.scb | --skm]\ns3c source.c output.SCL --scl manifest.json\ns3c source.c output.SCX --dynamic app.json\n");return 2;
+        cli_text(2,"s3c source.c output.scx [icon.scb | --skm]\ns3c source.c output.SCL --scl manifest.json\ns3c source.c output.SCX --dynamic app.json\ns3c source.c output.SCO --object\n");return 2;
     }
     char *input=cli_argv[0],*output=cli_argv[1],*icon=cli_argc>=3?cli_argv[2]:"";
     char *manifest=cli_argc==4?cli_argv[3]:"";
@@ -297,6 +301,7 @@ int main(void)
     char *input=token(&p),*output=token(&p),*icon=token(&p);
     char *manifest="";
 #endif
+    if(equal(icon,"--object")){object_output=1;shared_output=1;icon="";}
     if(equal(icon,"--skm")){module_output=1;icon="";}
     if(equal(icon,"--scl")){
         shared_output=1;icon="";
@@ -311,7 +316,7 @@ int main(void)
 #endif
     }
 #ifdef SCCC_CLI
-    if(((shared_output || dynamic_output) && cli_argc!=4) || (!(shared_output || dynamic_output) && cli_argc>3)){
+    if(((shared_output || dynamic_output) && !object_output && cli_argc!=4) || (object_output && cli_argc!=3) || (!(shared_output || dynamic_output) && cli_argc>3)){
         cli_text(2,"--scl and --dynamic require exactly one manifest.json argument\n");return 2;
     }
     char input_path[64],output_path[64],resolved_icon[64];
@@ -326,8 +331,8 @@ int main(void)
         /* RESOLVE返回根内无前导斜杠的规范名，不能再次按cwd解析。
          * 两个清单模式的CLI/GUI共用唯一解析点，保留原63B名字容量。 */
         if(sc_resolve(input,shared_input_path,64)<0 || sc_resolve(output,shared_output_path,64)<0
-           || sc_resolve(manifest,shared_manifest_path,64)<0)return 2;
-        input=shared_input_path;output=shared_output_path;manifest=shared_manifest_path;
+           || (!object_output && sc_resolve(manifest,shared_manifest_path,64)<0))return 2;
+        input=shared_input_path;output=shared_output_path;if(!object_output)manifest=shared_manifest_path;
     }
     build_view_begin("SCCC / mio",input,output);
     if(!*input || !*output) {
@@ -356,7 +361,7 @@ int main(void)
     /* manifest同样intern名字到pool，因此工作区取得必须早于清单；
      * 路径/日志别名检查仍在前面，OOM不会借诊断覆盖输入正文。 */
     workspace_acquire();
-    if(shared_output){
+    if(shared_output && !object_output){
         if(!*manifest)fatal("SCL manifest is missing");
         if(build_view_poll("Validating SCL manifest",0,0,1))fatal("compilation cancelled");
         scl_manifest_load(manifest,output);

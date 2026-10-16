@@ -6,8 +6,8 @@
 /* 正式cdecl API。只声明本基础切片的真实入口，寄存器桥留在库内部。
  * 记录调用前填size/version；成功返回规范size，未定义尾部保持不变。 */
 #define SC32_ABI_MAJOR 1u
-#define SC32_ABI_MINOR 3u
-#define SC32_LIBRARY_VERSION 5u
+#define SC32_ABI_MINOR 4u
+#define SC32_LIBRARY_VERSION 6u
 #define SC32_RECORD_VERSION 1u
 #define SC32_PATH_CAPACITY 65u
 #define SC32_INFINITE 0xFFFFFFFFu

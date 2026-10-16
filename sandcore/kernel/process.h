@@ -33,6 +33,11 @@ int process_detach_owner_step(int owner);
 #define DBG_UNBREAK 5
 #define DBG_KILL 6
 #define DBG_PAUSE 7
+/* 新调试gate复用真实owner旁表；这些是内核私有入口，旧SCAPI不变。 */
+int process_debug_authorize(int owner,int pid,u32 generation);
+int process_debug_legacy_break(int pid,u32 address);
+int process_debug_legacy_pending(int pid);
+void process_debug_original(int pid,u32 address,u8 *bytes,u32 length);
 /* M10a1：仅内核任务存储器使用，资源按真实任务申请。 */
 u32 process_task_bytes(void);
 #endif

@@ -36,13 +36,30 @@ static ScStatus desk_paint_item(ScUiPainter *p,ScU32 i)
     }
     ScUiRect label={r.x+desk_scale(4),icon.y+pixels+desk_scale(5),r.width-desk_scale(8),r.height-pixels-desk_scale(18)};
     ScUiText text=desk_text(item->label);
-    if(!item->selected){ScUiRect shadow=label;shadow.x++;shadow.y++;
-        ScStatus drawn=ScUiPainterTextColor(p,&shadow,&text,SC_UI_FONT_BODY,SC_UI_TEXT_WRAP|SC_UI_TEXT_CENTER,
-            SC32_COLOR_DESKTOP_SHADOW);if(drawn<0)return drawn;}
-    ScStatus s=ScUiPainterTextColor(p,&label,&text,SC_UI_FONT_BODY,SC_UI_TEXT_WRAP|SC_UI_TEXT_CENTER,
-        item->selected?SC32_COLOR_SELECT_TEXT:SC32_COLOR_DESKTOP_TEXT);
+    ScU32 flags=SC_UI_TEXT_WRAP|SC_UI_TEXT_ELLIPSIS|SC_UI_TEXT_CENTER;
+    ScUiTextMetrics measured;memset(&measured,0,sizeof(measured));
+    measured.size=sizeof(measured);measured.version=1;
+    ScStatus measured_status=ScUiMeasureText(desk.ui,SC_UI_FONT_BODY,&text,label.width,flags,&measured);
+    if(measured_status<0)return measured_status;
+    /* Painter的CENTER只对单行生效；已测得单行时撤WRAP，实际字与
+     * 居中背板才共用同一坐标。多行背板覆盖整个折行区，不露深色字。 */
+    if(measured.lines==1)flags&=~SC_UI_TEXT_WRAP;
+    if(!item->selected){
+        /* 壁纸内容不受主题限制：固定白字在浅色品牌壁纸上不可辨。
+         * 仅给实际文字范围铺命名FACE，配命名TEXT；保持图标与壁纸
+         * 原像素，Classic/Aurora共用尺寸和行为，不猜测背景亮度。
+         * MeasureText复用框架字体/主题代数缓存，静止画面不额外重绘。 */
+        ScI32 pad=desk_scale(3),width=(ScI32)measured.width;
+        if(width>label.width)width=label.width;
+        if(measured.lines>1)width=label.width;
+        ScI32 height=(ScI32)measured.height;if(height>label.height)height=label.height;
+        ScUiRect backing={label.x+(label.width-width)/2-pad,label.y-pad,width+2*pad,height+2*pad};
+        ScUiPainterFill(p,&backing,SC32_COLOR_FACE);
+    }
+    ScStatus s=ScUiPainterTextColor(p,&label,&text,SC_UI_FONT_BODY,flags,
+        item->selected?SC32_COLOR_SELECT_TEXT:SC32_COLOR_TEXT);
     if(i==desk.focus){ScUiRect outline=r;outline.x+=2;outline.y+=2;outline.width-=4;outline.height-=4;
-        desk_frame(p,&outline,item->selected?SC32_COLOR_SELECT_TEXT:SC32_COLOR_DESKTOP_TEXT);}
+        desk_frame(p,&outline,item->selected?SC32_COLOR_SELECT_TEXT:SC32_COLOR_ACCENT);}
     return s;
 }
 static ScStatus desk_paint(ScUiContext *ui,ScUiNode node,ScUiPainter *p,void *context)
@@ -70,7 +87,7 @@ static ScStatus desk_paint(ScUiContext *ui,ScUiNode node,ScUiPainter *p,void *co
     if(desk.gesture==DESK_DRAG && desk.moved)for(ScU32 i=0;i<desk.drag_count;i++){
         ScUiRect r=desk_item_rect(desk.drag_items[i]);if(!desk_intersects(&r,&damage))continue;
         s=desk_paint_item(p,desk.drag_items[i]);if(s<0)return s;}
-    if(desk.gesture==DESK_BOX && desk.moved)desk_frame(p,&desk.rubber,SC32_COLOR_DESKTOP_TEXT);
+    if(desk.gesture==DESK_BOX && desk.moved)desk_frame(p,&desk.rubber,SC32_COLOR_ACCENT);
     return 0;
 }
 static void desk_select(ScU32 i,ScU32 value)

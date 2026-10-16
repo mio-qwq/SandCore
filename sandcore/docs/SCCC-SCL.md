@@ -1,5 +1,7 @@
 # SCCC 原生 SCL 输出切片
 
+> 2026-10-16主源追加真正独立TU的SCO1MIO对象输出及原生SCLD链接器，格式/静态隔离/重定位/聚合ABI/SCDB sidecar见SCO-AND-LINKER.md。四份精确编译器原像接入；保既有单源dynamic/scl模式与262108B旧容器限额。宿主后端/真实i386执行及主树HOST构建通过，客体对象链路待验，不把HOST或Linux执行称SandCore客体通过。
+
 版本：v0.2，2026-10-14。所属版本：**SandCore M10a2 — The Application Platform Era**。
 
 SCCC 使用自己的词法、预处理、类型、语法和 x86 后端生成机器码，由 `s3c_scl.inc` 直接封装 [SCL v1](SCL.md)。不调用宿主 ELF 打包器，不复制依赖库正文，不生成库的 main/EXIT 入口。实现、输入与宿主检查已收齐，2026-10-14 Windows 客体 SCCC0/G1 编译及真实两库调用通过，证据见第7节；完整 Phase 1 和 M10a2 仍未完成。
@@ -126,3 +128,6 @@ SCCC0在客体生成BASE732B/UPPER1660B并由SCLPROBE实际调用；随后SCCC0�
 | v0.2 | 2026-10-14 | 修复重复RESOLVE及日志根斜杠身份；SCCC0/G1真实两库输出/调用与定向旧格式/失败保留通过，保存首轮失败和原始代码 |
 | v0.3 | 2026-10-14 | 新增独立dynamic应用清单、SCD1/自动CRT和最终BSS回填；宏表基于实际自身输入扩至320，客体启动验收另记 |
 | v0.4 | 2026-10-14 | 等长CRT修复CALL前16B栈对齐，仅重测动态生成与共同CRT检查，保留旧容量/失败和未受影响证据 |
+
+
+修订：2026-10-16，正式接入SCO独立对象、SCLD及SCDB1MIO，主源HOST与同源宿主后端/i386证据分列，真实客体链路待验。

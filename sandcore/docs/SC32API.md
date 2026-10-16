@@ -1,5 +1,7 @@
 # SC32API v1 基础库
 
+> 2026-10-16主源增量：ABI1.4/version6保原154入口，追加10个真实调试与2个壁纸函数，共166导出；ROOT ABI1.2/version3共12导出。Debug合同见SC32-DEBUG.md，壁纸见SC32-WALL.md。本批主源HOST通过，新的联合客体证据待完成；既有v5/P5运行结果不改称v6运行。SCAPI.H原字节冻结保持。
+
 所属版本为 **SandCore M10a2 — The Application Platform Era**。公开入口是完全大写的 `user/SC32API.H`，纯类型来自 `user/SCTYPES.H`，独立库源为 `user/sc32/SC32API.C`，清单为同目录 `SC32API.json`。
 
 **当前状态：主代理已统一构建，并实际执行公开文件/typed-query应用、客体生成的根库和85导出SC32库，以及客体编译的三窗口应用。** 证据与范围见 [m10a2-sc32](../evidence/m10a2-sc32/README.md)。原65个基础函数保留，同库新增20个消息窗口入口与过程生命周期见 [SC32-GUI-USER.md](SC32-GUI-USER.md)。SCUI、剪贴板、通用IPC、共享映射与完整平台仍按 `SC32API-DESIGN.md` 继续；本次实际出口不代表整个Phase 2或M10a2完成。
@@ -173,3 +175,6 @@ GUI100..1ff、FILE200..2ff、clipboard300、IPC400、shared500分别为私有ope
 2026-10-16增量：SC32API保持ABI1.3，库版本升5/154导出，新增独立公开SC32PATH.H的ScPathQuery。selector223精确返回已有48B ScPathInfo，META权限/缺名/IO分别报告且失败不写out，不创建FD；旧PathStat/Metadata错误及SCAPI原字节保持。新Shell和worker要求v5，旧SCUI实际原生字节按公开声明及类型完全相同、版本宏未被实现使用的闭包证据直接复用，不能宣称重新编译。参数及限制见SC32-FILE.md。HOST24与实际G1 generation12通过，文件工作流验证尚在进行。
 
 2026-10-16实际结果：FILEJOB04通过普通UID1000的精确路径查询、131079B COPY/MOVE、持久ACK、客体逐字节和宿主取回内容对照；两份832B恢复日志的头/frame CRC与START/提交/FINISH独立审计通过。退出/注销13830→13830 PF，各池/历史/字体/未归因增量0，输入/原盘保持。证据入口evidence/m10a2-p5-file-jobs/README.md。完整P5、主要组件和SDK仍未完成，持续目标active。
+
+
+修订：2026-10-16，主源ABI1.4/v6共166导出与ROOT1.2/v3，新增调试/壁纸真实接线及HOST构建，联合客体待验；旧API保留。

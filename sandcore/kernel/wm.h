@@ -137,4 +137,5 @@ int wm_sc32_attention_stop(int pid); /* 每调用仅解绑一窗，退出预算�
 u32 wm_sc32_route_epoch(void);
 u32 wm_sc32_session_id(void);
 int wm_sc32_route(const Sc32RawEvent *event);
+int wm_wallpaper_snapshot(int pid,u32 *mode,u32 *session);
 #endif /* SANDCORE_WM_H */

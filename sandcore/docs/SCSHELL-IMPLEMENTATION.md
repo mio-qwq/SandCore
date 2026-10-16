@@ -1,5 +1,7 @@
 # SCSHELL 实施状态与源码交接
 
+> 2026-10-16最新补充：主源已整合。FILEJOB04、FILECLIP02、desktop-layout01/cold02、session-cycle02分别提供普通用户持久COPY/MOVE、跨进程文件剪贴板、真实单/组拖及冷恢复、后续新会话首帧/布局的有效证据。新标签/网格和资源代码对应generation17实际原生字节，最终owner账零增量；冷资源45→46PIT未证明加速。完整P5仍需Files跨窗Drop/关联/任务栏等出口，下面未完成描述按日期保留沿革。
+
 > 2026-10-15后续源码状态：下面“此次仅写两份文档”是本文件最初设计审计的历史记录。现在Phase5已有隔离的实际FS lease/条件提交、host/WM角色、SCSHELL库/worker和桌面正文，正在统一收齐与静态审阅；均未接入当前kernel/user工作源，未构建、未客体运行。不能把隔离源码或P4局部证据改称Phase5完成。
 
 当前入口为 `drafts/m10a2-shell-fs`（freeze2含12个租约入口、METADATA_ONLY与条件SetMode）、`drafts/m10a2-shell-host`（可信固定发行摘要、普通会话host、两surface首帧、窗口分页/动作及必要SCUI painter公开能力）、`drafts/m10a2-shell-r3`（真正动态SCSHELL库正文，仍在收齐）、`drafts/m10a2-shell-worker`（caller-owned worker正文，仍在收齐）和 `drafts/m10a2-shell-desktop`（真正SCSHELL.SCX源码）。文件归属、未验范围与整合片段各见目录文档，不能提前注册当前cap/manifest或运行半批实现。
@@ -129,3 +131,6 @@ SDK、服务与worker可以再细分正文，但公共header/json和同一aggreg
 修订：2026-10-15，建立Phase5现有源码/功能保留审计、真实Phase4局部证据边界、全部SCSHELL缺项、最小安全合同和分工建议；本次仅两份文档，未实现、未构建、未运行Phase5。
 
 2026-10-16修订：主工作区已整合88个实际P5源码路径，SC32ABI1.3/v4共153导出、SCUI ABI1.1/v2共162导出、SCSHELL96导出。Runtime11仅host/client隐藏服务→显示激活/菜单及最终回收切片通过：同PID/gen/epoch，后台29应用/14关联，PF13829→13829，原盘/源码保持。未完成文件job/文件剪贴板/Drop、持久布局重启、窗口管理及会话矩阵；不能把本切片称P5完成。
+
+
+修订：2026-10-16，记录FILECLIP/拖动/冷恢复/连续会话实际通过，新视觉/缓存代码来源及未证明冷资源加速；完整P5未结束。

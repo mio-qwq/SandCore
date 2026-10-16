@@ -1,0 +1,4654 @@
+--- a/Makefile
++++ b/Makefile
+@@ -122,7 +122,7 @@
+ # ---------------- 产物规则 ----------------
+ # 内核参与链接的全部目标文件。entry.o 必须排第一 (链接脚本里 _start 在前)。
+ OBJS := entry.o main.o boot_scene.o idt.o interrupts.o timer.o keyboard.o mouse.o \
+-        memory.o heap.o objpool.o task_store.o session.o core_boot.o paging.o gfx.o ttf.o display.o theme.o image.o image_service.o userspace.o desktop.o wm.o task.o process.o module.o ata.o fs.o serial.o auth.o crypto.o random.o crc.o streams.o management.o simd.o ringdebug.o audio.o rtc.o scl_boot.o scl_validate.o scd_validate.o sc32_core.o sc32_file.o sc32_gui.o sc32_raw.o sc32_font.o sc32_broker.o sc32_drop.o sc32_host.o sc32_lease.o
++        memory.o heap.o objpool.o task_store.o session.o core_boot.o paging.o gfx.o ttf.o display.o theme.o image.o image_service.o userspace.o desktop.o wm.o task.o process.o module.o ata.o fs.o serial.o auth.o crypto.o random.o crc.o streams.o management.o simd.o ringdebug.o audio.o rtc.o scl_boot.o scl_validate.o scd_validate.o sc32_core.o sc32_file.o sc32_gui.o sc32_raw.o sc32_font.o sc32_broker.o sc32_drop.o sc32_host.o sc32_lease.o sc32_debug.o
+ 
+ # mio：全部普通三环C源与私有include一并上盘，让Notes/计算器/
+ # 游戏和通用客户端也能在系统内编辑编译。第三方解码服务单独由
+--- a/kernel/process.c
++++ b/kernel/process.c
+@@ -14,6 +14,7 @@
+ #include "paging.h"
+ #include "wm.h"
+ #include "audio.h"
++#include "sc32_debug.h"
+ 
+ #define BREAKPOINTS 8
+ typedef struct { u32 address; u8 original; int used; } breakpoint_t;
+@@ -36,6 +37,7 @@
+ 
+ void process_reset(int pid)
+ {
++    sc32_debug_reset(pid);
+     /* 槽位复用清理上一程序所有元数据。退出结果保留到下次 spawn 才清零，
+      * 因此 IDE 等待编译子进程时可以在僵尸已经回收后查询退出码。 */
+     u8 *p=(u8 *)&PROCESS(pid);
+@@ -48,6 +50,7 @@
+ void process_unmap(int pid,u32 base,u32 bytes)
+ {
+     if(!task_owned(pid) || !bytes)return;
++    sc32_debug_unmap(pid,base,bytes);
+     process_t *p=&PROCESS(pid);
+     /* 释放已通过分页整块验证，IF=0期间不会并发重用。这里不恢复
+      * 原字节：映像即将消失；保留旧original反而会污染复用的新库。 */
+@@ -91,6 +94,9 @@
+     int pid=task_pid(); process_t *p=&PROCESS(pid); u32 cr2=0;
+     if(vector==14) __asm__ __volatile__("mov %%cr2,%0":"=r"(cr2));
+     frame[16]&=~0x100u;             /* 单步只执行一条，后续由 STEP 显式打开 TF */
++    int modern=sc32_debug_exception(pid,vector,frame);
++    if(modern==1)return;
++    if(modern==2){pause_fault(pid,frame,cr2);return;}
+     if(vector==1 && p->debug_owner>0) {
+         if(p->pending>=0) {
+             breakpoint_t *b=&p->breaks[p->pending]; u8 opcode=0xCC;
+@@ -188,6 +194,7 @@
+         p->auto_continue=(command==DBG_CONTINUE);task_state_set(pid,1);return 0;
+     }
+     if(command==DBG_BREAK) {
++        if(sc32_debug_legacy_conflict(pid,address))return -1;
+         for(int i=0;i<BREAKPOINTS;i++) if(p->breaks[i].used && p->breaks[i].address==address) return 0;
+         for(int i=0;i<BREAKPOINTS;i++) if(!p->breaks[i].used) {
+             breakpoint_t *b=&p->breaks[i]; u8 op=0xCC;
+@@ -205,6 +212,29 @@
+     }
+     return -1;
+ }
++int process_debug_authorize(int owner,int pid,u32 generation)
++{
++    return pid>0 && task_owned(pid) && task_owned(owner)
++        && task_generation(pid)==generation && PROCESS(pid).debug_owner==owner
++        && task_generation(owner)==PROCESS(pid).debug_owner_generation
++        && (TASK(pid).state==1 || TASK(pid).state==3);
++}
++int process_debug_legacy_break(int pid,u32 address)
++{
++    if(!task_owned(pid))return 0;
++    for(int i=0;i<BREAKPOINTS;i++)if(PROCESS(pid).breaks[i].used && PROCESS(pid).breaks[i].address==address)return 1;
++    return 0;
++}
++int process_debug_legacy_pending(int pid)
++{return task_owned(pid) && PROCESS(pid).pending>=0;}
++void process_debug_original(int pid,u32 address,u8 *bytes,u32 length)
++{
++    if(!task_owned(pid))return;
++    for(int i=0;i<BREAKPOINTS;i++){
++        breakpoint_t *b=&PROCESS(pid).breaks[i];
++        if(b->used && b->address>=address && b->address-address<length)bytes[b->address-address]=b->original;
++    }
++}
+ void process_detach_owner(int owner)
+ {
+     /* UI 关闭时终止它独占的调试子进程，防止遗留暂停地址空间/断点。
+@@ -219,5 +249,5 @@
+     debug_unlink(owner);
+     int child=PROCESS(owner).debug_child;
+     if(child>=0){debug_unlink(child);task_stop(child);}
+-    return PROCESS(owner).debug_child<0;
+-}
++    return PROCESS(owner).debug_child<0 && sc32_debug_stop_step(owner);
++}
+--- a/kernel/process.h
++++ b/kernel/process.h
+@@ -33,6 +33,11 @@
+ #define DBG_UNBREAK 5
+ #define DBG_KILL 6
+ #define DBG_PAUSE 7
++/* 新调试gate复用真实owner旁表；这些是内核私有入口，旧SCAPI不变。 */
++int process_debug_authorize(int owner,int pid,u32 generation);
++int process_debug_legacy_break(int pid,u32 address);
++int process_debug_legacy_pending(int pid);
++void process_debug_original(int pid,u32 address,u8 *bytes,u32 length);
+ /* M10a1：仅内核任务存储器使用，资源按真实任务申请。 */
+ u32 process_task_bytes(void);
+ #endif
+--- a/kernel/sc32_core.c
++++ b/kernel/sc32_core.c
+@@ -1,4 +1,5 @@
+ #include "sc32_core.h"
++#include "../user/SC32DEBUG.H"
+ #include "task.h"
+ #include "task_store.h"
+ #include "paging.h"
+@@ -111,7 +112,7 @@
+     if(sc32_drop_available())result.capabilities_lo|=SC32_CAP_DROP_TARGETS;
+     if(fs_lease_available())result.capabilities_hi|=SC32_CAP_LEASES_HI;
+     /* 能力位表示已接入的角色服务合同，不表示当前用户桌面已经ACTIVE。 */
+-    result.capabilities_hi|=SC32_CAP_HOST_HI;
++    result.capabilities_hi|=SC32_CAP_HOST_HI|SC32_DEBUG_CAP_HI;
+     if(fs_lease_available())result.capabilities_hi|=SC32_CAP_PATH_QUERY_HI;
+     result.max_path_bytes=SC32_PATH_CAPACITY;result.max_arguments_bytes=1024;
+     if(mouse_wheel_available())result.capabilities_lo|=SC32_CAP_POINTER_WHEEL;
+--- a/kernel/scl_boot.c
++++ b/kernel/scl_boot.c
+@@ -1,4 +1,5 @@
+ #include "scl_boot.h"
++#include "sc32_debug.h"
+ #include "task.h"
+ #include "task_store.h"
+ #include "paging.h"
+@@ -163,12 +164,13 @@
+     u32 allocation_bytes=image_size+metadata_pages;
+     u32 base=paging_module_alloc(pd,allocation_bytes);if(!base)return SCL_BOOT_MEMORY;
+     error=root_copy(pd,base,file,metadata_size,allocation_bytes);
++    if(!error)error=sc32_debug_bootstrap_image(pid,base,file,stat[1],allocation_bytes);
+     if(!error){
+         info[0]=SCL_BOOT_INFO_SIZE;info[1]=SCL_BOOT_INFO_VERSION;info[2]=base;info[3]=base+entry;
+         info[4]=base+image_size;info[5]=metadata_size;info[6]=allocation_bytes;info[7]=image_size;
+         if(paging_user_copy(pd,user_output,info,sizeof(info),1))error=SCL_BOOT_IO;
+     }
+-    if(error){(void)paging_module_free(pd,base);return error;}
++    if(error){sc32_debug_unmap(pid,base,allocation_bytes);(void)paging_module_free(pd,base);return error;}
+     /* 输出、复制与页保护都成功才提交本人缓存。任何前置失败都不
+      * 改用户输出/已有模块；内核从不调用返回的ScApplicationStart。 */
+     record->scl_root_base=base;record->scl_root_entry=base+entry;
+--- a/kernel/task.c
++++ b/kernel/task.c
+@@ -17,6 +17,7 @@
+ #include "task_store.h"
+ #include "scl_boot.h"
+ #include "sc32_core.h"
++#include "sc32_debug.h"
+ #include "sc32_host.h"
+ #include "sc32_file.h"
+ #include "sc32_lease.h"
+@@ -691,7 +692,9 @@
+     case SYS_MODULEALLOC:
+         frame[11]=paging_module_alloc(TASK(current).pd,frame[8]);break;
+     case SYS_MODULEPROTECT:
+-        frame[11]=(u32)paging_module_protect(TASK(current).pd,frame[8],frame[10],frame[9]);break;
++        frame[11]=(u32)paging_module_protect(TASK(current).pd,frame[8],frame[10],frame[9]);
++        if(!frame[11])sc32_debug_mapping_changed(current,frame[8],frame[10]);
++        break;
+     case SYS_MODULEFREE: {
+         u32 bytes=paging_module_size(TASK(current).pd,frame[8]);
+         if(!bytes)frame[11]=(u32)-1;
+@@ -722,6 +725,8 @@
+             frame[11]=(u32)sc32_lease_call(current,frame[8],frame[10],frame[9]);
+         else if(frame[8]>=0x800u && frame[8]<0x820u)
+             frame[11]=(u32)sc32_host_call(current,frame[8],frame[10],frame[9]);
++        else if(frame[8]>=0x900u && frame[8]<0x920u)
++            frame[11]=(u32)sc32_debug_call(current,frame[8],frame[10],frame[9]);
+         else frame[11]=(u32)sc32_core_call(current,frame[8],frame[10],frame[9]);
+         break;
+     case SYS_STATUS:
+@@ -1406,6 +1411,7 @@
+         TASK(pid).args[legacy_args]=0;
+         streams_set_arguments(pid,arguments);
+         userspace_executable(pid,filename);
++        if(sc32_debug_main_image(pid,filename,load_size,bss_size)){task_stop(pid);return -4;}
+     }
+     return pid;
+ }
+--- a/m10a2.mk
++++ b/m10a2.mk
+@@ -242,3 +242,15 @@
+ m10a2-shell-install: $(addprefix $(BUILD)/fs/SYS/LIB/,$(addsuffix .SCL,$(M10A2_SHELL_LIB_NAMES))) $(BUILD)/fs/SYS/SHELL/SCSHELL.SCX $(BUILD)/fs/SYS/SHELL/SCFILEWORK.SCX
+ 
+ $(BUILD)/sc32-library.o: user/SC32PATH.H $(wildcard user/pathapi/*.c user/pathapi/*.H)
++
++# Debug2只构建本轮新代码，不启动冻结游戏或复制整盘。
++$(BUILD)/sc32_debug.o: kernel/sc32_debug.c kernel/sc32_debug.h kernel/sc32_debug_modules.inc user/SC32DEBUG.H user/debugapi/SC32DEBUGWIRE.H $(STAMP)
++	$(CC) $(CFLAGS) -Werror -Iuser -Iuser/runtime -Iuser/debugapi -c $< -o $@
++$(BUILD)/sc32-library.o: user/debugapi/sc32_debug.c user/debugapi/SC32DEBUGWIRE.H user/SC32DEBUG.H
++$(BUILD)/scl-root.o: user/runtime/scl_debug_registry.c user/debugapi/SC32DEBUGWIRE.H user/SC32DEBUG.H
++$(BUILD)/debug2.o: user/debug2/DEBUG2.C $(wildcard user/debug2/*.c user/debug2/*.H) user/SC32DEBUG.H user/SCDBGFILE.H $(STAMP)
++	$(CC) $(CFLAGS) $(M10A2_SCL_CFLAGS) -Werror -x c -Iuser -Iuser/stdlib -Iuser/debug2 -c $< -o $@
++$(BUILD)/DEBUG2.SCX: $(BUILD)/debug2.o user/debug2/DEBUG2.json tools/mkdscx.py
++	$(PY) tools/mkdscx.py $< $@ --manifest user/debug2/DEBUG2.json
++.PHONY: m10a2-debug2-artifacts
++m10a2-debug2-artifacts: $(BUILD)/DEBUG2.SCX
+--- a/tools/stage_m10a2_sdk.py
++++ b/tools/stage_m10a2_sdk.py
+@@ -14,7 +14,7 @@
+ ROOT = Path(__file__).resolve().parents[1]
+ LIBRARIES = {
+     'SCLDR.SCL': ('user/runtime/SCLROOT.json', ('user/runtime/',)),
+-    'SC32API.SCL': ('user/sc32/SC32API.json', ('user/sc32/', 'user/guiapi/', 'user/fontapi/', 'user/brokerapi/', 'user/dropapi/')),
++    'SC32API.SCL': ('user/sc32/SC32API.json', ('user/sc32/', 'user/guiapi/', 'user/fontapi/', 'user/brokerapi/', 'user/dropapi/', 'user/debugapi/')),
+     'SCCLIB.SCL': ('user/stdlib/SCCLIB.json', ('user/stdlib/',)),
+     'SCLIB.SCL': ('user/sclib/SCLIB.json', ('user/sclib/',)),
+     'SCUI.SCL': ('user/scui/SCUI.json', ('user/scui/',)),
+@@ -25,6 +25,7 @@
+     'SC32GUI.H': 'user/SC32GUI.H', 'SC32FONT.H': 'user/SC32FONT.H',
+     'SC32PALETTE.H': 'user/SC32PALETTE.H', 'SC32POPUP.H': 'user/SC32POPUP.H',
+     'SC32BROKER.H': 'user/SC32BROKER.H', 'SC32DROP.H': 'user/SC32DROP.H',
++    'SC32DEBUG.H': 'user/SC32DEBUG.H', 'SCDBGFILE.H': 'user/SCDBGFILE.H',
+     'SCUI.H': 'user/SCUI.H', 'SCLIB.H': 'user/sclib/SCLIB.H',
+     # 保持官方头原字节；其../SCTYPES.H必须在INC内正确解析。
+     'RUNTIME/SCLDR.H': 'user/runtime/SCLDR.H',
+@@ -34,7 +35,7 @@
+ FORBIDDEN = ('PRIVATE','WIRE','NUI','SCAPI','SCIO','SCMEM','KERNEL','SCLFMT','SCDYN')
+ DOCS = ('M10A2-SDK.md','SCL.md','SC32API.md','SC32-GUI-USER.md','SC32-BROKER.md',
+         'SC32-DROP.md','SC32-FONT.md','SCUI.md','SCUI-TEXT.md','SCLIB.md','SCCLIB.md',
+-        'SCCC-SCL.md','SCCC-AGGREGATE-ABI.md','THIRD-PARTY.md')
++        'SCCC-SCL.md','SCCC-AGGREGATE-ABI.md','THIRD-PARTY.md','SC32-DEBUG.md')
+ 
+ 
+ def digest(body: bytes) -> str:
+@@ -368,7 +369,7 @@
+     if name == 'SCLIB.SCL':
+         return ('user/sclib/SCLIB.H',)
+     if name == 'SCLDR.SCL':
+-        return ('user/runtime/SCLDR.H',)
++        return ('user/runtime/SCLDR.H','user/debugapi/SC32DEBUGWIRE.H','user/SC32DEBUG.H','user/SC32API.H')
+     return ()
+ 
+ 
+--- a/user/SC32API.H
++++ b/user/SC32API.H
+@@ -6,8 +6,8 @@
+ /* 正式cdecl API。只声明本基础切片的真实入口，寄存器桥留在库内部。
+  * 记录调用前填size/version；成功返回规范size，未定义尾部保持不变。 */
+ #define SC32_ABI_MAJOR 1u
+-#define SC32_ABI_MINOR 3u
+-#define SC32_LIBRARY_VERSION 5u
++#define SC32_ABI_MINOR 4u
++#define SC32_LIBRARY_VERSION 6u
+ #define SC32_RECORD_VERSION 1u
+ #define SC32_PATH_CAPACITY 65u
+ #define SC32_INFINITE 0xFFFFFFFFu
+--- a/user/runtime/SCLROOT.C
++++ b/user/runtime/SCLROOT.C
+@@ -4,5 +4,6 @@
+ #include "scd_format.c"
+ #include "scldr.c"
+ #include "scl_platform.c"
++#include "scl_debug_registry.c"
+ #include "scl_termination.c"
+ #include "scl_application.c"
+--- a/user/runtime/SCLROOT.json
++++ b/user/runtime/SCLROOT.json
+@@ -1,23 +1,59 @@
+ {
+   "name": "SCLDR.SCL",
+   "abi_major": 1,
+-  "abi_minor": 1,
+-  "library_version": 2,
++  "abi_minor": 2,
++  "library_version": 3,
+   "init": null,
+   "fini": null,
+   "exports": [
+-    {"name": "ScApplicationStart", "kind": "function"},
+-    {"name": "ScApplicationRuntime", "kind": "function"},
+-    {"name": "ScApplicationRegisterPrepare", "kind": "function"},
+-    {"name": "ScApplicationPinCallback", "kind": "function"},
+-    {"name": "ScApplicationExit", "kind": "function"},
+-    {"name": "ScRuntimeCreate", "kind": "function"},
+-    {"name": "ScRuntimeOpen", "kind": "function"},
+-    {"name": "ScRuntimeClose", "kind": "function"},
+-    {"name": "ScRuntimeSymbol", "kind": "function"},
+-    {"name": "ScRuntimeResolve", "kind": "function"},
+-    {"name": "ScRuntimeQuery", "kind": "function"},
+-    {"name": "ScRuntimeDestroy", "kind": "function"}
++    {
++      "name": "ScApplicationStart",
++      "kind": "function"
++    },
++    {
++      "name": "ScApplicationRuntime",
++      "kind": "function"
++    },
++    {
++      "name": "ScApplicationRegisterPrepare",
++      "kind": "function"
++    },
++    {
++      "name": "ScApplicationPinCallback",
++      "kind": "function"
++    },
++    {
++      "name": "ScApplicationExit",
++      "kind": "function"
++    },
++    {
++      "name": "ScRuntimeCreate",
++      "kind": "function"
++    },
++    {
++      "name": "ScRuntimeOpen",
++      "kind": "function"
++    },
++    {
++      "name": "ScRuntimeClose",
++      "kind": "function"
++    },
++    {
++      "name": "ScRuntimeSymbol",
++      "kind": "function"
++    },
++    {
++      "name": "ScRuntimeResolve",
++      "kind": "function"
++    },
++    {
++      "name": "ScRuntimeQuery",
++      "kind": "function"
++    },
++    {
++      "name": "ScRuntimeDestroy",
++      "kind": "function"
++    }
+   ],
+   "imports": [],
+   "dependencies": []
+--- a/user/runtime/scldr.c
++++ b/user/runtime/scldr.c
+@@ -16,6 +16,9 @@
+     ScU32 id, external, edges, pinned, ready, initialized, retiring, borrowed, cursor, metadata_size;
+     void (*application_prepare)(void);
+     void *application_stack_candidate;
++#ifdef SCL_BOOT_LIBRARY
++    ScU32 debug_module,debug_generation;
++#endif
+ };
+ struct ScRuntime {
+     ScRuntimePlatform platform;
+@@ -32,6 +35,9 @@
+ static int app_runtime_destroy_allowed(ScRuntime *runtime);
+ static void app_module_initialized(ScRuntime *runtime,ScLoaded *module);
+ static void app_module_releasing(ScRuntime *runtime,ScLoaded *module);
++static int scl_debug_register(ScRuntime *,ScLoaded *);
++static void scl_debug_ready(ScLoaded *);
++static void scl_debug_unregister(ScLoaded *);
+ #endif
+ 
+ /* 所有偏移只在完整格式验证后读取。元数据独立保留，段正文搬入
+@@ -127,6 +133,9 @@
+ }
+ static void release_storage(ScRuntime *r, ScLoaded *m)
+ {
++#ifdef SCL_BOOT_LIBRARY
++    scl_debug_unregister(m);
++#endif
+ #ifdef SCL_BOOT_LIBRARY
+     app_module_releasing(r,m);
+ #endif
+@@ -224,6 +233,9 @@
+         if ((word(s, 16) & 2) && r->platform.protect_image(r->platform.context,
+             m->image + word(s, 0), word(s, 4), 3)) return SC_SCL_IO;
+     }
++#ifdef SCL_BOOT_LIBRARY
++    int published=scl_debug_register(r,m);if(published)return published;
++#endif
+     ScU32 entry = word(m->metadata, 96);
+     if (entry != 0xffffffffu){
+         r->invoking=m;r->invoking_kind=1;
+@@ -236,6 +248,9 @@
+     if (m->init_next) m->init_next->init_previous = m;
+     r->initialized = m;
+     m->ready = 1;
++#ifdef SCL_BOOT_LIBRARY
++    scl_debug_ready(m);
++#endif
+ #ifdef SCL_BOOT_LIBRARY
+     app_module_initialized(r,m);
+ #endif
+@@ -396,6 +411,11 @@
+     zero(m, sizeof(*m));
+     m->metadata = (unsigned char *)metadata; m->metadata_size = size; m->image = image;
+     m->id = r->next_id++; m->borrowed = m->pinned = m->ready = m->initialized = 1;
++#ifdef SCL_BOOT_LIBRARY
++    int published=scl_debug_register(r,m);
++    if(published){r->platform.release(r->platform.context,m);return published;}
++    scl_debug_ready(m);
++#endif
+     m->next = r->modules; if (m->next) m->next->previous = m; r->modules = m;
+     m->init_next = r->initialized;
+     if (m->init_next) m->init_next->init_previous = m;
+--- a/user/sc32/SC32API.C
++++ b/user/sc32/SC32API.C
+@@ -18,3 +18,4 @@
+ #include "../hostapi/sc32_launch.c"
+ 
+ #include "../leaseapi/leaseapi.c"
++#include "../debugapi/sc32_debug.c"
+--- a/user/sc32/SC32API.json
++++ b/user/sc32/SC32API.json
+@@ -1,8 +1,8 @@
+ {
+   "name": "SC32API.SCL",
+   "abi_major": 1,
+-  "abi_minor": 3,
+-  "library_version": 5,
++  "abi_minor": 4,
++  "library_version": 6,
+   "init": null,
+   "fini": "Sc32Finalize",
+   "exports": [
+@@ -63,6 +63,46 @@
+       "kind": "function"
+     },
+     {
++      "name": "ScDebugBreakpointAdd",
++      "kind": "function"
++    },
++    {
++      "name": "ScDebugBreakpointRemove",
++      "kind": "function"
++    },
++    {
++      "name": "ScDebugBreakpoints",
++      "kind": "function"
++    },
++    {
++      "name": "ScDebugControl",
++      "kind": "function"
++    },
++    {
++      "name": "ScDebugLaunch",
++      "kind": "function"
++    },
++    {
++      "name": "ScDebugModules",
++      "kind": "function"
++    },
++    {
++      "name": "ScDebugQuery",
++      "kind": "function"
++    },
++    {
++      "name": "ScDebugRead",
++      "kind": "function"
++    },
++    {
++      "name": "ScDebugSegments",
++      "kind": "function"
++    },
++    {
++      "name": "ScDebugSymbols",
++      "kind": "function"
++    },
++    {
+       "name": "ScDefaultWindowProc",
+       "kind": "function"
+     },
+@@ -395,6 +435,10 @@
+       "kind": "function"
+     },
+     {
++      "name": "ScPathQuery",
++      "kind": "function"
++    },
++    {
+       "name": "ScPathRead",
+       "kind": "function"
+     },
+@@ -447,6 +491,10 @@
+       "kind": "function"
+     },
+     {
++      "name": "ScProcessLaunch",
++      "kind": "function"
++    },
++    {
+       "name": "ScProcessQuery",
+       "kind": "function"
+     },
+@@ -495,6 +543,46 @@
+       "kind": "function"
+     },
+     {
++      "name": "ScShellHostActivate",
++      "kind": "function"
++    },
++    {
++      "name": "ScShellHostConnect",
++      "kind": "function"
++    },
++    {
++      "name": "ScShellHostDeactivate",
++      "kind": "function"
++    },
++    {
++      "name": "ScShellHostPrepare",
++      "kind": "function"
++    },
++    {
++      "name": "ScShellHostQuery",
++      "kind": "function"
++    },
++    {
++      "name": "ScShellHostRestart",
++      "kind": "function"
++    },
++    {
++      "name": "ScShellHostWindowAction",
++      "kind": "function"
++    },
++    {
++      "name": "ScShellHostWindowAt",
++      "kind": "function"
++    },
++    {
++      "name": "ScShellHostWindows",
++      "kind": "function"
++    },
++    {
++      "name": "ScShellHostWorkspace",
++      "kind": "function"
++    },
++    {
+       "name": "ScSystemCapabilities",
+       "kind": "function"
+     },
+@@ -572,54 +660,6 @@
+     },
+     {
+       "name": "ScWindowSubmit",
+-      "kind": "function"
+-    },
+-    {
+-      "name": "ScProcessLaunch",
+-      "kind": "function"
+-    },
+-    {
+-      "name": "ScShellHostActivate",
+-      "kind": "function"
+-    },
+-    {
+-      "name": "ScShellHostConnect",
+-      "kind": "function"
+-    },
+-    {
+-      "name": "ScShellHostDeactivate",
+-      "kind": "function"
+-    },
+-    {
+-      "name": "ScShellHostPrepare",
+-      "kind": "function"
+-    },
+-    {
+-      "name": "ScShellHostQuery",
+-      "kind": "function"
+-    },
+-    {
+-      "name": "ScShellHostRestart",
+-      "kind": "function"
+-    },
+-    {
+-      "name": "ScShellHostWindowAction",
+-      "kind": "function"
+-    },
+-    {
+-      "name": "ScShellHostWindowAt",
+-      "kind": "function"
+-    },
+-    {
+-      "name": "ScShellHostWindows",
+-      "kind": "function"
+-    },
+-    {
+-      "name": "ScShellHostWorkspace",
+-      "kind": "function"
+-    },
+-    {
+-      "name": "ScPathQuery",
+       "kind": "function"
+     }
+   ],
+@@ -665,8 +705,8 @@
+     {
+       "name": "SCLDR.SCL",
+       "abi_major": 1,
+-      "min_minor": 1,
+-      "min_version": 2
++      "min_minor": 2,
++      "min_version": 3
+     }
+   ]
+ }
+--- /dev/null
++++ b/docs/SC32-DEBUG.md
+@@ -0,0 +1,51 @@
++# SC32 typed debugging v1
++
++2026-10-16。公开入口 `SC32DEBUG.H`，实现位于 SC32API 1.4 / release 6；引导 ROOT 1.2 / release 3 使用自身 freestanding 私有登记桥，依赖图不增加 SC32API→ROOT→SC32API 环。此文描述已写实现，宿主检查与客体证据分别记录。
++
++## 对象、权限、生命周期
++
++`ScDebugLaunch` 是唯一新公开目标建立入口。描述符含完整旧 streams 命令与三个现有描述符，-1 表示空设备。内核在同一个 IF=0 陷入中实际创建 streams 作业、建立真实 owner 并在首指令前暂停；失败终止并领取本次作业。返回的 `ScDebugRef` 含 PID、进程 generation、binding；不是可猜 PID 附加接口。
++
++每次操作核对真实 caller、owner/owner generation、目标 generation/binding、同 UID 与同 session。没有普通 root 接管其它目标、SYSTEM 身份转换或 Ring0 调试入口。最高 SYSTEM/COM1 的外部硬件边界沿原合同。
++
++`ScDebugQuery` 只在真实暂停时置 `REGISTERS_VALID`；运行期间寄存器记录明确不可用。退出/槽回收可使引用返回 STALE，最终退出码由原生 `ScJobQuery` / `ScJobWait` 领取。调试器退出时，既有 owner 清理链终止专属目标；新增断点/模块旁表按一个对象一步回收，没有任务总量或断点数量宏。
++
++控制的 `stop_generation` 必须与当前暂停完全相同。Continue/Step 只接受暂停；Pause/Terminate 允许活目标。暂停使用真实 saved_esp，Step 打开真实 TF，#DB 后停下。INT3 命中恢复原字节、回退 EIP、下一次执行原指令后重插；在当前 IP 新建断点先进入待重插状态。删除待重插断点取消该状态。模块释放使相应断点失效，PID/模块复用不能沿用原字节。
++
++## 记录与错误
++
++所有公开记录以 32 位小端、4B 对齐，先填 `size/version=1`。输入大小精确；输出可比规范大，但整个声明范围必须可写，成功只写已定义前缀、报告规范 size、未知尾部保留。错误不改普通单记录输出。批量读/枚举在同次陷入内先验全部调用者范围和目标代数，正常成功属于一个暂停代数。
++
++主要尺寸：Ref 24B，LaunchDesc 32B，LaunchInfo 48B，Registers 96B，Snapshot 160B，ReadInfo 32B，Breakpoint 32B，Module 204B，Segment 32B，Symbol 168B，Page 32B。Module.source 是 65B 绝对完整路径；name、表格省略文字只作显示。
++
++返回域沿 SC32：INVALID=-101，VERSION=-102，ACCESS=-103，NOT_FOUND=-104，EXISTS=-105，MEMORY=-106，STALE=-108，IO=-111，BUSY=-113，RANGE=-114。能力位是 `ScCapabilities.capabilities_hi & SC32_DEBUG_CAP_HI`。私有 0x900..0x91F selector 不进入公共 SDK；旧 SCAPI.H / 0x50 / 0x51 / 0x228 的寄存器合同不变。
++
++`ScDebugRead` 每次 1..4096B，分别输出 data 与逐字节 readable。readable=0 时 data=0，GUI显示 `??` / `????????`，不把它当作真实零。输出两数组及结果记录不能重叠。`ORIGINAL_CODE` 还原已登记的新/旧 INT3 原字节用于解码，实际执行仍由 CPU 与内核断点状态控制。
++
++Breakpoints/Modules/Segments/Symbols 按最多64条一页枚举，批大小不是总量上限。Breakpoint/Module 的 `after=0` 从头开始，随后使用上一页 cursor；expected_epoch 非零必须匹配。Segment/Symbol 的 cursor 是下一条索引。FINISHED 是唯一结束依据。所有页都核暂停代数；完整 GUI 候选发布前再核 pause/module/breakpoint 三个代数。
++
++## 真实模块登记
++
++主 SCX 由可信加载器在实际复制及校验同一事务中登记，记录完整容器（含图标）的 SHA256、实际载荷/BSS 范围、源 revision 与分配大小。SCX 没有独立段权限，公开主段如实是原用户可读写、可执行映像；不会虚构 `.text`/`.data` 页隔离。
++
++固定 ROOT 由 `scl_boot` 在真实 root_copy 完成、首条三环指令之前直接登记同一已验证文件及真实映像；随后 Adopt 仅借用该精确内核登记。ROOT 此时已经执行并修改 loader 全局状态，不能在 Adopt 时把它的 BSS 再错误要求为零。
++
++其余默认 SCLDR 库在重定位与保护完成、init 之前登记。内核另行打开来源文件并按64KiB步骤读取、hash、验证 SCL 文件与 loader 提交的元数据；核对真实 MODULE 分配、段范围与当前 RW 页。接着按64KiB步骤逐段比较原始正文/BSS及所有ABS32/PC32重定位，导入反查已经登记的真实同进程依赖。合法 INT3 用其原始字节参与核验。登记期间 MODULEPROTECT 改变 mapping_epoch 会使候选失败。来源文件变化、坏映射、坏 relocation、OOM 均撤销候选；PENDING 期间 ROOT 真实让出 CPU。
++
++内核独立保存已验证元数据和来源摘要；模块视图来自该快照，不扫描 SCLDR 用户堆。init 前显示 INITIALIZING，成功后 READY。源 SHA 是装载时文件身份，不代表可写 data/BSS 永远不变。每次 Segment 查询从真实页表取 R/RW；MIXED 明示混合权限，X 仅是 SCL 的逻辑段声明。当前非 PAE 没有 NX，不宣称完整 W^X。
++
++ROOT 不为自定义 ScRuntimePlatform 伪造来源登记；没有经过默认来源/映射核验的模块不会出现在受验证清单。普通应用即使直接调用私有 gate，也只能登记自己映像，必须通过相同文件/映射/重定位核验，不获得跨进程或内核权限。正常释放前撤登记和对应断点，MODULEFREE、任务异常/退出与槽回收亦撤销。登记不是授予符号地址的读写权限。
++
++## Debug2 界面与符号
++
++默认启动：`/APPS/DEBUG2.SCX --launch /absolute/TARGET.SCX [arguments]`。Studio 启动 Debug2，由 Debug2 创建被调试目标；不先启动目标再猜PID。SCL 使用真实 SCX 宿主加载，不能直接执行 SCL。
++
++反汇编显示真实 i386 指令/操作数/ModRM/SIB/分支目标；未实现的 SSE/FPU、地址宽度前缀或坏/截断编码只消费首个字节显示 db。TF 单步不依赖解码器猜指令长度。寄存器、代码、内存、栈、断点、模块和符号属于同一个暂停副本，运行后统一撤现场可用性。
++
++SCL exports 来自内核保存的正式元数据。补充 `.sdbg` 使用原生工具链唯一 `SCDBGFILE.H` 的 SCDB1MIO v1，路径是完整映像名追加 `.sdbg`。只有装载时完整文件 SHA256/大小、SCX VA/SCL RVA 地址域、所有表/字符串/对象/源文件及每条 symbol/line 的实际模块段范围都通过才发布。TU本地同名符号保留 object_index；源路径和FNV只是来源提示，不授权打开文件，也不声称DWARF级信息。没有 sidecar 时仍显示真实内核导出符号；错误明确说明。
++
++菜单/工具栏/表格/PropertySheet/文件对话框/右键菜单/Splitter/Dock 均为真正 SCUI 对象；Classic/Aurora 同一树，颜色和字体取框架角色。F5继续、F4暂停、F8单步、F9加断点、F2重启、Ctrl+G代码地址、Ctrl+M内存地址、F7跟随分支。地址支持 eip/esp、最多8位十六进制、精确 symbol 或 module!symbol；同名不同地址明确拒绝歧义。
++
++隐藏时绘图 timer 暂停，无目标时不保留采样 timer。运行目标5 ticks查询状态，暂停25 ticks查询，候选按1 tick有限步骤推进；关闭回收使用后台1 tick。目标后台工作不因 GUI 隐藏暂停。模块 epoch 不变时复用 immutable 模块/符号/sidecar，单步不反复读盘。以上结构不是整机性能结论，实测仍待客体。
++
++修订：2026-10-16，新增typed调试、真实模块核验登记、SCDB1MIO消费及SCUI Debug2合同；旧调试入口及SYSTEM边界保留，当前仅有宿主定向证据。
+--- /dev/null
++++ b/kernel/sc32_debug.c
+@@ -0,0 +1,619 @@
++#include "sc32_debug.h"
++#include "sc32_core.h"
++#include "task.h"
++#include "task_store.h"
++#include "process.h"
++#include "paging.h"
++#include "memory.h"
++#include "objpool.h"
++#include "streams.h"
++#include "auth.h"
++#include "session.h"
++#include "fs.h"
++#include "crypto.h"
++#include "../user/debugapi/SC32DEBUGWIRE.H"
++#include "SCLFMT.H"
++
++typedef struct {
++    u32 generation,binding,breaks,modules,pending,break_epoch,module_epoch;
++    u32 stepping,auto_continue,reason,loading,mapping_epoch,break_count,module_count;
++} d2_state_t;
++typedef struct {
++    u32 owner,owner_generation,next,id,generation,address,flags,hits;
++    u8 original;
++} d2_break_t;
++typedef struct {
++    u32 owner,owner_generation,next,metadata,metadata_pages;
++    u32 file,file_pages,source_object,read_at,phase,verify_segment,verify_at,reloc_index;
++    u32 input_metadata,input_metadata_bytes,proof_mapping_epoch,proof_reloc_index,proof_reloc_value;
++    sha256_t hash;
++    ScDebugModule info;
++} d2_module_t;
++static objpool_t d2_states,d2_breaks,d2_modules;
++static int d2_initialized;
++static u32 d2_serial;
++static void d2_zero(void *p,u32 bytes){u8 *b=p;
++    for(u32 i=0;i<bytes;i++)b[i]=0;
++}
++static void d2_text(char *d,u32 capacity,const char *s)
++{u32 n=0;
++    while(n+1<capacity && s[n]){d[n]=s[n];
++        n++;
++    }d[n]=0;
++}
++static int d2_equal(const char *a,const char *b)
++{while(*a && *a==*b){a++;
++        b++;
++    }return *a==*b;
++}
++static u32 d2_word(const u8 *p,u32 offset){return scl_read32(p+offset);
++}
++static int d2_init(void)
++{
++    if(d2_initialized)return 0;
++    if(objpool_init(&d2_states,sizeof(d2_state_t),0)
++    || objpool_init(&d2_breaks,sizeof(d2_break_t),0)
++    || objpool_init(&d2_modules,sizeof(d2_module_t),0))return SC32_E_MEMORY;
++    d2_initialized=1;
++    return 0;
++}
++static u32 d2_next_serial(void)
++{if(d2_serial==0xffffffffu)return 0;
++    return ++d2_serial;
++}
++static d2_state_t *d2_state(int pid,int create)
++{
++    if(d2_init() || !task_owned(pid))return 0;
++    d2_state_t *s=objpool_get(&d2_states,pid);
++    if(!s && create){if(objpool_claim(&d2_states,pid)<0)return 0;
++        s=objpool_get(&d2_states,pid);
++        d2_zero(s,sizeof(*s));
++        s->generation=task_generation(pid);
++        s->break_epoch=s->module_epoch=s->mapping_epoch=1;
++    }
++    return s && s->generation==task_generation(pid)?s:0;
++}
++static d2_break_t *d2_break(u32 id)
++{return id?objpool_get(&d2_breaks,(int)(id-1)):0;
++}
++static d2_module_t *d2_module(u32 id)
++{return id?objpool_get(&d2_modules,(int)(id-1)):0;
++}
++static int d2_overlap(u32 a,u32 an,u32 b,u32 bn)
++{return a<b+bn && b<a+an;
++}
++static int d2_publish(int pid,u32 out,const void *data,u32 bytes)
++{return paging_user_copy(TASK(pid).pd,out,(void *)data,bytes,1)?SC32_E_INVALID:0;
++}
++static int d2_ref(int owner,const ScDebugRef *ref,d2_state_t **out)
++{
++    if(ref->size!=sizeof(*ref) || ref->version!=1 || ref->reserved || !ref->pid
++    || ref->pid>0x7fffffffu || !ref->generation || !ref->binding)return SC32_E_INVALID;
++    int target=(int)ref->pid;
++    if(!task_owned(target) || task_generation(target)!=ref->generation)return SC32_E_STALE;
++    /* 真实owner检查由process私有旁表完成；UID/SID再限制新接口，
++     * 不能用普通root管理权把不属于自己的进程变成调试目标。 */
++    if(!process_debug_authorize(owner,target,ref->generation))return SC32_E_ACCESS;
++    if(auth_uid(owner)!=auth_uid(target) || session_task(owner)!=session_task(target))return SC32_E_ACCESS;
++    d2_state_t *s=d2_state(target,0);
++    if(!s || s->binding!=ref->binding)return SC32_E_STALE;
++     *out=s;
++    return 0;
++}
++static int d2_snapshot(int owner,const ScDebugRef *ref,ScDebugSnapshot *out)
++{
++    d2_state_t *s;
++    int error=d2_ref(owner,ref,&s);
++    if(error)return error;
++    int target=(int)ref->pid;
++    d2_zero(out,sizeof(*out));
++    out->size=sizeof(*out);
++    out->version=1;
++    out->target=*ref;
++    out->state=(u32)TASK(target).state;
++    out->module_epoch=s->module_epoch;
++    out->breakpoint_epoch=s->break_epoch;
++    out->registers.size=sizeof(out->registers);
++    out->registers.version=1;
++    if(out->state==0 || out->state==2){out->state=SC32_DEBUG_EXITED;
++        out->exit_code=task_record(target)->exit_code;
++        return 0;
++    }
++    if(out->state==3){u32 frame[22];
++        if(process_debug(owner,target,DBG_INFO,0,frame,sizeof(frame)))return SC32_E_STALE;
++        ScDebugRegisters *r=&out->registers;
++        r->eax=frame[11];
++        r->ebx=frame[8];
++        r->ecx=frame[10];
++        r->edx=frame[9];
++        r->esi=frame[5];
++        r->edi=frame[4];
++        r->ebp=frame[6];
++        r->esp=frame[17];
++        r->eip=frame[14];
++        r->eflags=frame[16];
++        r->gs=frame[0];
++        r->fs=frame[1];
++        r->es=frame[2];
++        r->ds=frame[3];
++        r->cs=frame[15];
++        r->ss=frame[18];
++        r->vector=frame[12];
++        r->error=frame[13];
++        r->cr2=frame[20];
++        out->stop_generation=frame[21];
++        out->flags=SC32_DEBUG_REGISTERS_VALID;
++        out->reason=s->reason?s->reason:frame[12]==3?SC32_DEBUG_STOP_BREAKPOINT:
++        frame[12]==1?SC32_DEBUG_STOP_STEP:SC32_DEBUG_STOP_EXCEPTION;
++    }
++    return 0;
++}
++static int d2_stopped(int owner,const ScDebugRef *ref,u32 stop,d2_state_t **state)
++{
++    ScDebugSnapshot snap;
++    int error=d2_snapshot(owner,ref,&snap);
++    if(error)return error;
++    if(snap.state!=SC32_DEBUG_PAUSED)return SC32_E_BUSY;
++    if(!stop || snap.stop_generation!=stop)return SC32_E_STALE;
++    return d2_ref(owner,ref,state);
++}
++int sc32_debug_legacy_conflict(int pid,u32 address)
++{
++    d2_state_t *s=d2_state(pid,0);
++    if(!s)return 0;
++    for(u32 id=s->breaks;id;){d2_break_t *b=d2_break(id);
++        if(!b)break;
++        if(b->address==address && !(b->flags&SC32_DEBUG_BP_INVALID))return 1;
++        id=b->next;
++    }
++    return 0;
++}
++int sc32_debug_exception(int pid,u32 vector,u32 *frame)
++{
++    d2_state_t *s=d2_state(pid,0);
++    if(!s || !s->binding)return 0;
++    if(vector==1 && !s->pending && process_debug_legacy_pending(pid)){
++        s->stepping=0;
++        s->reason=SC32_DEBUG_STOP_STEP;
++        return 0;
++    }
++    if(vector==1 && (s->pending || s->stepping)){
++        if(s->pending){d2_break_t *b=d2_break(s->pending);
++            if(b){b->flags&=~SC32_DEBUG_BP_PENDING;
++                if(paging_debug_patch(TASK(pid).pd,b->address,0xcc))b->flags|=SC32_DEBUG_BP_INVALID;
++            }
++            s->pending=0;
++            s->break_epoch++;
++        }
++        s->stepping=0;
++        if(s->auto_continue){s->auto_continue=0;
++            return 1;
++        }
++        s->reason=SC32_DEBUG_STOP_STEP;
++        return 2;
++    }
++    if(vector==3){for(u32 id=s->breaks;id;){d2_break_t *b=d2_break(id);
++            if(!b)break;
++            if(b->address==frame[14]-1 && !(b->flags&SC32_DEBUG_BP_INVALID)){
++                if(paging_debug_patch(TASK(pid).pd,b->address,b->original))return 0;
++                frame[14]--;
++                b->hits++;
++                b->flags|=SC32_DEBUG_BP_PENDING;
++                s->pending=id;
++                s->break_epoch++;
++                s->reason=SC32_DEBUG_STOP_BREAKPOINT;
++                return 2;
++            }
++            id=b->next;
++    }}
++    s->reason=vector==3?SC32_DEBUG_STOP_BREAKPOINT:SC32_DEBUG_STOP_EXCEPTION;
++    return 0;
++}
++static void d2_module_drop(d2_module_t *m)
++{
++    if(m->source_object)fs_native_close(m->source_object,0);
++    if(m->file)pframe_free_run(m->file,m->file_pages);
++    if(m->metadata)pframe_free_run(m->metadata,m->metadata_pages);
++    objpool_release(&d2_modules,(int)m->info.id-1);
++}
++void sc32_debug_unmap(int pid,u32 base,u32 bytes)
++{
++    d2_state_t *s=d2_state(pid,0);
++    if(!s || !bytes)return;
++    s->mapping_epoch++;
++    if(s->loading){d2_module_t *loading=d2_module(s->loading);
++        if(loading && loading->info.base==base){s->loading=0;
++            d2_module_drop(loading);
++    }}
++    for(u32 id=s->breaks;id;){d2_break_t *b=d2_break(id);
++        if(!b)break;
++        if(b->address>=base && b->address-base<bytes){b->flags=SC32_DEBUG_BP_INVALID;
++            if(s->pending==id)s->pending=s->auto_continue=s->stepping=0;
++            s->break_epoch++;
++        }id=b->next;
++    }
++    u32 *link=&s->modules;
++    while(*link){d2_module_t *m=d2_module(*link);
++        if(!m)break;
++        if(m->info.base>=base && m->info.base-base<bytes){*link=m->next;
++            d2_module_drop(m);
++            s->module_count--;
++            s->module_epoch++;
++        }
++        else link=&m->next;
++    }
++}
++void sc32_debug_mapping_changed(int pid,u32 base,u32 bytes)
++{
++    d2_state_t *s=d2_state(pid,0);
++    if(!s || !bytes)return;
++    s->mapping_epoch++;
++    for(u32 id=s->modules;id;){d2_module_t *m=d2_module(id);
++        if(!m)break;
++        if(base<m->info.base+m->info.image_bytes && m->info.base<base+bytes){s->module_epoch++;
++            return;
++        }id=m->next;
++    }
++}
++void sc32_debug_stop(int pid)
++{
++    if(!d2_initialized)return;
++    d2_state_t *s=objpool_get(&d2_states,pid);
++    if(!s)return;
++    /* 目标已经退出，代码页稍后统一释放，不向将被复用的页恢复旧字节。 */
++    while(s->breaks){d2_break_t *b=d2_break(s->breaks);
++        if(!b)break;
++        u32 id=s->breaks;
++        s->breaks=b->next;
++        objpool_release(&d2_breaks,(int)id-1);
++    }
++    while(s->modules){d2_module_t *m=d2_module(s->modules);
++        if(!m)break;
++        s->modules=m->next;
++        d2_module_drop(m);
++    }
++    if(s->loading){d2_module_t *m=d2_module(s->loading);
++        if(m)d2_module_drop(m);
++    }
++    objpool_release(&d2_states,pid);
++}
++int sc32_debug_stop_step(int pid)
++{
++    if(!d2_initialized)return 1;
++    d2_state_t *s=objpool_get(&d2_states,pid);
++    if(!s)return 1;
++    if(s->breaks){u32 id=s->breaks;
++        d2_break_t *b=d2_break(id);
++        s->breaks=b?b->next:0;
++        objpool_release(&d2_breaks,(int)id-1);
++        return 0;
++    }
++    if(s->modules){d2_module_t *m=d2_module(s->modules);
++        if(m){s->modules=m->next;
++            d2_module_drop(m);
++        }else s->modules=0;
++        return 0;
++    }
++    if(s->loading){d2_module_t *m=d2_module(s->loading);
++        s->loading=0;
++        if(m)d2_module_drop(m);
++        return 0;
++    }
++    objpool_release(&d2_states,pid);
++    return 1;
++}
++void sc32_debug_reset(int pid){sc32_debug_stop(pid);
++}
++
++static int d2_launch(int pid,u32 request,u32 output)
++{
++    int error=sc32_core_output(pid,output,sizeof(ScDebugLaunchInfo));
++    if(error)return error;
++    ScDebugLaunchDesc desc;
++    error=sc32_core_input(pid,request,&desc,sizeof(desc));
++    if(error)return error;
++    if(desc.flags || desc.reserved)return SC32_E_INVALID;
++    char command[1088];
++    u32 length=0;
++    for(;length<sizeof(command);length++){if(paging_user_copy(TASK(pid).pd,(u32)desc.command+length,command+length,1,0))return SC32_E_INVALID;
++        if(!command[length])break;
++    }if(!length || length==sizeof(command))return SC32_E_RANGE;
++    for(u32 i=0;i<3;i++)if(desc.streams[i]<-1)return SC32_E_INVALID;
++    int job=streams_exec(pid,command,desc.streams,0);
++    if(job<=0)return job==-2?SC32_E_NOT_FOUND:job==-3?SC32_E_INVALID:job==-4?SC32_E_MEMORY:job==-5?SC32_E_ACCESS:SC32_E_FAILED;
++    u32 jobinfo[8];
++    int child=0;
++    if(streams_job_snapshot(pid,(u32)job,jobinfo)>0)child=(int)jobinfo[3];
++    d2_state_t *s=child?d2_state(child,1):0;
++    u32 binding=d2_next_serial();
++    int rejected=!s?SC32_E_MEMORY:!binding?SC32_E_RANGE:
++    auth_uid(pid)!=auth_uid(child) || session_task(pid)!=session_task(child)?SC32_E_ACCESS:0;
++    if(!rejected && process_debug_bind(child,pid)<0)rejected=SC32_E_FAILED;
++    if(rejected){if(child)task_stop(child);
++        (void)streams_wait(pid,(u32)job,jobinfo);
++        return rejected;
++    }
++    s->binding=binding;
++    s->reason=SC32_DEBUG_STOP_ENTRY;
++    ScDebugLaunchInfo result;
++    d2_zero(&result,sizeof(result));
++    result.size=sizeof(result);
++    result.version=1;
++    result.target.size=sizeof(result.target);
++    result.target.version=1;
++    result.target.pid=(u32)child;
++    result.target.generation=task_generation(child);
++    result.target.binding=binding;
++    result.job=(u32)job;
++    return d2_publish(pid,output,&result,sizeof(result));
++}
++static int d2_control(int pid,Sc32DebugRequest *r,u32 output)
++{
++    int error=sc32_core_output(pid,output,sizeof(ScDebugSnapshot));
++    if(error)return error;
++    d2_state_t *s;
++    error=d2_ref(pid,&r->target,&s);
++    if(error)return error;
++    int target=(int)r->target.pid;
++    if(r->action!=SC32_DEBUG_PAUSE && r->action!=SC32_DEBUG_TERMINATE){
++        error=d2_stopped(pid,&r->target,r->stop,&s);
++        if(error)return error;
++    }
++    if(r->action==SC32_DEBUG_TERMINATE){ScDebugSnapshot result;
++        error=d2_snapshot(pid,&r->target,&result);
++        if(error)return error;
++        result.state=SC32_DEBUG_EXITED;
++        result.flags=0;
++        d2_zero(&result.registers,sizeof(result.registers));
++        result.registers.size=sizeof(result.registers);
++        result.registers.version=1;
++        task_stop(target);
++        return d2_publish(pid,output,&result,sizeof(result));
++    }
++    if(r->action==SC32_DEBUG_PAUSE){if(process_debug(pid,target,DBG_PAUSE,0,0,0))return SC32_E_BUSY;
++        s->reason=SC32_DEBUG_STOP_PAUSE;
++        s->stepping=s->auto_continue=0;
++    }
++    else if(r->action==SC32_DEBUG_STEP || r->action==SC32_DEBUG_CONTINUE){
++        /* TF覆盖的是真实已保存CPU帧。pending的新断点也需要先单步
++         * 原指令；继续时#DB只重插后运行，STEP则把#DB交pause_fault。 */
++        u32 *f=(u32 *)TASK(target).saved_esp;
++        if(r->action==SC32_DEBUG_STEP || s->pending)f[16]|=0x100u;
++        s->stepping=r->action==SC32_DEBUG_STEP;
++        s->auto_continue=r->action==SC32_DEBUG_CONTINUE;
++        s->reason=0;
++        if(process_debug(pid,target,r->action==SC32_DEBUG_STEP?DBG_STEP:DBG_CONTINUE,0,0,0))return SC32_E_BUSY;
++    }else return SC32_E_INVALID;
++    ScDebugSnapshot result;
++    error=d2_snapshot(pid,&r->target,&result);
++    return error?error:d2_publish(pid,output,&result,sizeof(result));
++}
++static int d2_read(int pid,Sc32DebugRequest *r,u32 output)
++{
++    int error=sc32_core_output(pid,output,sizeof(ScDebugReadInfo));
++    if(error)return error;
++    d2_state_t *s;
++    error=d2_stopped(pid,&r->target,r->stop,&s);
++    if(error)return error;
++    if(!r->bytes || r->bytes>SC32_DEBUG_READ_MAX || r->address>0xffffffffu-(r->bytes-1)
++    || r->flags&~SC32_DEBUG_READ_ORIGINAL_CODE)return SC32_E_RANGE;
++    u32 pd=TASK(pid).pd,header[2];
++    if(paging_user_copy(pd,output,header,8,0) || !paging_user_write_range(pd,r->data,r->bytes)
++    || !paging_user_write_range(pd,r->readable,r->bytes)
++    || d2_overlap(r->data,r->bytes,r->readable,r->bytes)
++    || d2_overlap(r->data,r->bytes,output,header[0])
++    || d2_overlap(r->readable,r->bytes,output,header[0]))return SC32_E_INVALID;
++    u8 bytes[256],mask[256];
++    u32 readable=0,target_pd=TASK((int)r->target.pid).pd;
++    for(u32 at=0;at<r->bytes;){u32 count=r->bytes-at,page=4096u-((r->address+at)&4095u);
++        if(count>sizeof(bytes))count=sizeof(bytes);
++        if(count>page)count=page;
++        int valid=!paging_user_copy(target_pd,r->address+at,bytes,count,0);
++        for(u32 i=0;i<count;i++){mask[i]=(u8)valid;
++            if(!valid)bytes[i]=0;
++            else readable++;
++        }
++        if(valid && r->flags&SC32_DEBUG_READ_ORIGINAL_CODE){
++            for(u32 id=s->breaks;id;){d2_break_t *b=d2_break(id);
++                if(!b)break;
++                if(!(b->flags&SC32_DEBUG_BP_INVALID) && b->address>=r->address+at && b->address-(r->address+at)<count){
++                    bytes[b->address-(r->address+at)]=b->original;
++                }
++                id=b->next;
++            }
++            process_debug_original((int)r->target.pid,r->address+at,bytes,count);
++        }
++        if(paging_user_copy(pd,r->data+at,bytes,count,1) || paging_user_copy(pd,r->readable+at,mask,count,1))return SC32_E_INVALID;
++        at+=count;
++    }
++    ScDebugReadInfo info={sizeof(info),1,r->stop,r->address,r->bytes,readable,r->flags,0};
++    return d2_publish(pid,output,&info,sizeof(info));
++}
++static void d2_break_value(const d2_break_t *b,u32 stop,ScDebugBreakpoint *v)
++{d2_zero(v,sizeof(*v));
++    v->size=sizeof(*v);
++    v->version=1;
++    v->id=b->id;
++    v->generation=b->generation;
++    v->address=b->address;
++    v->flags=b->flags;
++    v->hits=b->hits;
++    v->stop_generation=stop;
++}
++static int d2_break_add(int pid,Sc32DebugRequest *r,u32 output)
++{
++    int error=sc32_core_output(pid,output,sizeof(ScDebugBreakpoint));
++    if(error)return error;
++    d2_state_t *s;
++    error=d2_stopped(pid,&r->target,r->stop,&s);
++    if(error)return error;
++    int target=(int)r->target.pid;
++    for(u32 id=s->breaks;id;){d2_break_t *b=d2_break(id);
++        if(!b)break;
++        if(b->address==r->address){ScDebugBreakpoint value;
++            d2_break_value(b,r->stop,&value);
++            return d2_publish(pid,output,&value,sizeof(value));
++        }id=b->next;
++    }
++    if(process_debug_legacy_break(target,r->address))return SC32_E_BUSY;
++    u8 original;
++    if(paging_user_copy(TASK(target).pd,r->address,&original,1,0))return SC32_E_RANGE;
++    if(original==0xcc)return SC32_E_EXISTS;
++    int index=objpool_alloc(&d2_breaks);
++    if(index<0)return SC32_E_MEMORY;
++    u32 generation=d2_next_serial();
++    if(!generation){objpool_release(&d2_breaks,index);
++        return SC32_E_RANGE;
++    }
++    u32 *frame=(u32 *)TASK(target).saved_esp;
++    int at_current=frame[14]==r->address;
++    if(paging_debug_patch(TASK(target).pd,r->address,at_current?original:0xcc)){objpool_release(&d2_breaks,index);
++        return SC32_E_RANGE;
++    }
++    d2_break_t *b=objpool_get(&d2_breaks,index);
++    d2_zero(b,sizeof(*b));
++    b->owner=r->target.pid;
++    b->owner_generation=r->target.generation;
++    b->id=(u32)index+1;
++    b->generation=generation;
++    b->address=r->address;
++    b->original=original;
++    b->flags=SC32_DEBUG_BP_ENABLED;
++    /* 在当前暂停IP新建断点时，原指令还没有执行；先记作待重插，
++     * 下一次STEP/CONT以TF执行它，再重插INT3，不制造同IP空停一次。 */
++    if(at_current){b->flags|=SC32_DEBUG_BP_PENDING;
++        s->pending=b->id;
++    }
++    b->next=s->breaks;
++    s->breaks=b->id;
++    s->break_count++;
++    s->break_epoch++;
++    ScDebugBreakpoint value;
++    d2_break_value(b,r->stop,&value);
++    return d2_publish(pid,output,&value,sizeof(value));
++}
++static int d2_break_remove(int pid,Sc32DebugRequest *r)
++{
++    d2_state_t *s;
++    int error=d2_stopped(pid,&r->target,r->stop,&s);
++    if(error)return error;
++    u32 *link=&s->breaks;
++    while(*link){d2_break_t *b=d2_break(*link);
++        if(!b)break;
++        if(b->id==r->id && b->generation==r->generation){
++            if(!(b->flags&(SC32_DEBUG_BP_PENDING|SC32_DEBUG_BP_INVALID))
++            && paging_debug_patch(TASK((int)r->target.pid).pd,b->address,b->original))return SC32_E_IO;
++            if(s->pending==b->id)s->pending=s->auto_continue=0;
++             *link=b->next;
++            objpool_release(&d2_breaks,(int)b->id-1);
++            s->break_count--;
++            s->break_epoch++;
++            return 0;
++        }
++        link=&b->next;
++    }
++    return SC32_E_STALE;
++}
++
++#include "sc32_debug_modules.inc"
++
++static int d2_page(int pid,u32 operation,Sc32DebugRequest *r,u32 output)
++{
++    int error=sc32_core_output(pid,output,sizeof(ScDebugPage));
++    if(error)return error;
++    d2_state_t *s;
++    error=d2_stopped(pid,&r->target,r->stop,&s);
++    if(error)return error;
++    u32 stride=operation==SC32_D2_BREAKS?sizeof(ScDebugBreakpoint):operation==SC32_D2_MODULES?
++    sizeof(ScDebugModule):operation==SC32_D2_SEGMENTS?sizeof(ScDebugSegment):sizeof(ScDebugSymbol);
++    u32 header[2];
++    if(!r->capacity || r->capacity>SC32_DEBUG_PAGE_MAX || r->after==0xffffffffu
++    || !paging_user_write_range(TASK(pid).pd,r->rows,r->capacity*stride)
++    || paging_user_copy(TASK(pid).pd,output,header,8,0)
++    || d2_overlap(r->rows,r->capacity*stride,output,header[0]))return SC32_E_INVALID;
++    u32 epoch=operation==SC32_D2_BREAKS?s->break_epoch:s->module_epoch;
++    if(r->epoch && r->epoch!=epoch)return SC32_E_STALE;
++    ScDebugPage page={sizeof(page),1,r->stop,epoch,r->after,0,0,0};
++    if(operation==SC32_D2_MODULES || operation==SC32_D2_BREAKS){
++        u32 id=operation==SC32_D2_MODULES?s->modules:s->breaks;
++        page.total=operation==SC32_D2_MODULES?s->module_count:s->break_count;
++        /* cursor直接跟随本目标的稳定拥有链。每页只走实际返回行，
++         * 不为计算total反复扫完整链，也不从头寻找第N页。 */
++        if(r->after){
++            if(operation==SC32_D2_MODULES){d2_module_t *m=d2_module(r->after);
++                if(!m || m->owner!=r->target.pid || m->owner_generation!=r->target.generation
++                || !(m->info.flags&SC32_DEBUG_VERIFIED_SOURCE))return SC32_E_STALE;
++                id=m->next;
++            }else{d2_break_t *b=d2_break(r->after);
++                if(!b || b->owner!=r->target.pid || b->owner_generation!=r->target.generation)return SC32_E_STALE;
++                id=b->next;
++            }
++        }
++        while(id && page.count<r->capacity){u32 next;
++            if(operation==SC32_D2_MODULES){d2_module_t *m=d2_module(id);
++                if(!m)return SC32_E_STALE;
++                next=m->next;
++            }
++            else{d2_break_t *b=d2_break(id);
++                if(!b)return SC32_E_STALE;
++                next=b->next;
++            }
++            if(operation==SC32_D2_MODULES){d2_module_t *m=d2_module(id);
++                if(d2_publish(pid,r->rows+page.count*stride,&m->info,stride))return SC32_E_INVALID;
++            }
++            else{ScDebugBreakpoint value;
++                d2_break_value(d2_break(id),r->stop,&value);
++                if(d2_publish(pid,r->rows+page.count*stride,&value,stride))return SC32_E_INVALID;
++            }
++            page.count++;
++            page.cursor=id;
++            id=next;
++        }
++        if(!id)page.flags=SC32_DEBUG_PAGE_FINISHED;
++    }else{
++        d2_module_t *m=d2_module(r->module);
++        if(!m || !(m->info.flags&SC32_DEBUG_VERIFIED_SOURCE) || m->owner!=r->target.pid || m->owner_generation!=r->target.generation
++        || m->info.generation!=r->module_generation)return SC32_E_STALE;
++        page.total=operation==SC32_D2_SEGMENTS?m->info.segment_count:m->info.symbol_count;
++        if(r->after>page.total)return SC32_E_STALE;
++        for(u32 index=r->after;index<page.total && page.count<r->capacity;index++){
++            if(operation==SC32_D2_SEGMENTS){ScDebugSegment seg;
++                d2_segment(m,index,&seg);
++                if(d2_publish(pid,r->rows+page.count*stride,&seg,stride))return SC32_E_INVALID;
++            }
++            else{ScDebugSymbol symbol;
++                d2_symbol(m,index,&symbol);
++                if(d2_publish(pid,r->rows+page.count*stride,&symbol,stride))return SC32_E_INVALID;
++            }
++            page.count++;
++            page.cursor=index+1;
++        }
++        if(page.cursor==page.total)page.flags=SC32_DEBUG_PAGE_FINISHED;
++    }
++    return d2_publish(pid,output,&page,sizeof(page));
++}
++int sc32_debug_call(int pid,u32 operation,u32 request,u32 output)
++{
++    /* core_input/output在每次陷入重新检查真实caller、IF=0和完整范围。
++     * 登记入口同样只操作本人页表；不存在任意PID/内核地址选项。 */
++    if(d2_init())return SC32_E_MEMORY;
++    if(operation==SC32_D2_LAUNCH)return d2_launch(pid,request,output);
++    if(operation>=SC32_D2_REGISTER && operation<=SC32_D2_READY)return d2_registration(pid,operation,request,output);
++    Sc32DebugRequest r;
++    int error=sc32_core_input(pid,request,&r,sizeof(r));
++    if(error)return error;
++    if(operation==SC32_D2_QUERY){error=sc32_core_output(pid,output,sizeof(ScDebugSnapshot));
++        if(error)return error;
++        ScDebugSnapshot value;
++        error=d2_snapshot(pid,&r.target,&value);
++        return error?error:d2_publish(pid,output,&value,sizeof(value));
++    }
++    if(operation==SC32_D2_CONTROL)return d2_control(pid,&r,output);
++    if(operation==SC32_D2_READ)return d2_read(pid,&r,output);
++    if(operation==SC32_D2_ADD)return d2_break_add(pid,&r,output);
++    if(operation==SC32_D2_REMOVE){if(output)return SC32_E_INVALID;
++        return d2_break_remove(pid,&r);
++    }
++    if(operation>=SC32_D2_BREAKS && operation<=SC32_D2_SYMBOLS)return d2_page(pid,operation,&r,output);
++    return SC32_E_NOT_SUPPORTED;
++}
+--- /dev/null
++++ b/kernel/sc32_debug.h
+@@ -0,0 +1,16 @@
++#ifndef SANDCORE_SC32_DEBUG_H
++#define SANDCORE_SC32_DEBUG_H
++#include "io.h"
++int sc32_debug_call(int pid,u32 operation,u32 request,u32 output);
++/* 异常钩子返回0=旧处理、1=已继续、2=交旧pause_fault保存真实帧。 */
++int sc32_debug_exception(int pid,u32 vector,u32 *frame);
++void sc32_debug_unmap(int pid,u32 base,u32 bytes);
++void sc32_debug_mapping_changed(int pid,u32 base,u32 bytes);
++void sc32_debug_stop(int pid);
++int sc32_debug_stop_step(int pid);
++void sc32_debug_reset(int pid);
++int sc32_debug_legacy_conflict(int pid,u32 address);
++/* 只有可信SCX加载器调用；源文件与真正加载字节仍在同一个IF=0事务。 */
++int sc32_debug_main_image(int pid,const char *path,u32 load,u32 bss);
++int sc32_debug_bootstrap_image(int pid,u32 base,const void *file,u32 file_bytes,u32 allocation_bytes);
++#endif
+--- /dev/null
++++ b/kernel/sc32_debug_modules.inc
+@@ -0,0 +1,461 @@
++/* 此片段只由sc32_debug.c纳入。登记是分阶段真实文件/映像核验，
++ * 每次最多读取/比对64KiB，ROOT在PENDING之间让出；不信任应用声称
++ * 的符号、库名或映射长度，也不进入目标的SCLDR私有链表。 */
++static const u8 *d2_record(const d2_module_t *m,u32 field,u32 stride,u32 index)
++{return (const u8 *)m->metadata+d2_word((const u8 *)m->metadata,field)+stride*index;
++}
++static const char *d2_string(const d2_module_t *m,u32 offset)
++{return (const char *)m->metadata+d2_word((const u8 *)m->metadata,SCL_H_STRINGS)+offset;
++}
++static void d2_segment(d2_module_t *m,u32 index,ScDebugSegment *out)
++{
++    d2_zero(out,sizeof(*out));
++    out->size=sizeof(*out);
++    out->version=1;
++    out->module=m->info.id;
++    out->module_generation=m->info.generation;
++    out->index=index;
++    if(m->info.kind==SC32_DEBUG_MAIN){out->address=m->info.base;
++        out->bytes=m->info.image_bytes;
++        out->access=7;
++    }else{
++        const u8 *s=d2_record(m,SCL_H_SEGMENTS,SCL_SEGMENT_SIZE,index);
++        out->address=m->info.base+d2_word(s,SCL_S_RVA);
++        out->bytes=d2_word(s,SCL_S_MEMORY_SIZE);
++        out->access=d2_word(s,SCL_S_FLAGS);
++    }
++    /* R/RW取现在真实页表；X是格式声明，非PAE并无NX，不能把它
++     * 说成硬件禁止数据页执行。混合RW页明确置MIXED而不猜一个值。 */
++    u32 pd=TASK((int)m->owner).pd,read_only=0,writable=0;
++    if(!paging_user_range(pd,out->address,out->bytes)){out->access=0;
++        return;
++    }
++    u32 *directory=(u32 *)pd;
++    for(u32 at=out->address;at<out->address+out->bytes;){u32 *table=(u32 *)(directory[at>>22]&~4095u);
++        if(table[(at>>12)&1023u]&2u)writable=1;
++        else read_only=1;
++        u32 step=4096u-(at&4095u);
++        if(step>=out->address+out->bytes-at)break;
++        at+=step;
++    }
++    out->access=(out->access&SC32_DEBUG_EXECUTABLE)|SC32_DEBUG_READABLE
++    |(writable&&!read_only?SC32_DEBUG_WRITABLE:0)|(writable&&read_only?SC32_DEBUG_ACCESS_MIXED:0);
++}
++static void d2_symbol(d2_module_t *m,u32 index,ScDebugSymbol *out)
++{
++    const u8 *symbol=d2_record(m,SCL_H_EXPORTS,SCL_EXPORT_SIZE,index);
++    d2_zero(out,sizeof(*out));
++    out->size=sizeof(*out);
++    out->version=1;
++    out->module=m->info.id;
++    out->module_generation=m->info.generation;
++    out->index=index;
++    out->address=m->info.base+d2_word(symbol,SCL_E_RVA);
++    out->bytes=d2_word(symbol,SCL_E_SIZE);
++    out->kind=d2_word(symbol,SCL_E_KIND);
++    out->flags=SC32_DEBUG_SYMBOL_EXPORTED;
++    d2_text(out->name,sizeof(out->name),d2_string(m,d2_word(symbol,SCL_E_NAME)));
++}
++static d2_module_t *d2_named(d2_state_t *state,const char *name)
++{
++    for(u32 id=state->modules;id;){d2_module_t *m=d2_module(id);
++        if(!m)break;
++        if(m->info.kind==SC32_DEBUG_SCL && d2_equal(m->info.name,name))return m;
++        id=m->next;
++    }
++    return 0;
++}
++static int d2_relocation(d2_state_t *state,d2_module_t *m,const u8 *r,u32 *out)
++{
++    const u8 *file=(const u8 *)m->file;
++    u32 target=d2_word(r,SCL_R_TARGET);
++    if(d2_word(r,SCL_R_TARGET_KIND)==SCL_TARGET_INTERNAL)target+=m->info.base;
++    else{
++        const u8 *import=file+d2_word(file,SCL_H_IMPORTS)+target*SCL_IMPORT_SIZE;
++        const u8 *dep=file+d2_word(file,SCL_H_DEPS)+d2_word(import,SCL_I_DEPENDENCY)*SCL_DEPENDENCY_SIZE;
++        const char *strings=(const char *)file+d2_word(file,SCL_H_STRINGS);
++        d2_module_t *dependency=d2_named(state,strings+d2_word(dep,SCL_D_NAME));
++        if(!dependency || dependency->info.abi_major!=d2_word(dep,SCL_D_ABI_MAJOR)
++        || dependency->info.abi_minor<d2_word(dep,SCL_D_MIN_MINOR)
++        || dependency->info.library_version<d2_word(dep,SCL_D_MIN_VERSION))return SC32_E_NOT_FOUND;
++        const char *name=strings+d2_word(import,SCL_I_NAME);
++        int found=0;
++        u32 low=0,count=dependency->info.symbol_count;
++        while(count){u32 half=count/2,index=low+half;
++            const u8 *symbol=d2_record(dependency,SCL_H_EXPORTS,SCL_EXPORT_SIZE,index);
++            const char *current=d2_string(dependency,d2_word(symbol,SCL_E_NAME));
++            const char *a=current,*b=name;
++            while(*a && *a==*b){a++;
++                b++;
++            }int order=(u8)*a-(u8)*b;
++            if(!order){if(d2_word(symbol,SCL_E_KIND)!=d2_word(import,SCL_I_KIND)
++                || d2_word(symbol,SCL_E_SIZE)<d2_word(import,SCL_I_SIZE))return SC32_E_VERSION;
++                target=dependency->info.base+d2_word(symbol,SCL_E_RVA);
++                found=1;
++                break;
++            }
++            if(order<0){low=index+1;
++                count-=half+1;
++            }else count=half;
++        }
++        if(!found)return SC32_E_NOT_FOUND;
++    }
++    u32 value=target+d2_word(r,SCL_R_ADDEND);
++    if(d2_word(r,SCL_R_TYPE)==SCL_RELOC_PC32)value-=m->info.base+d2_word(r,SCL_R_PATCH);
++     *out=value;
++    return 0;
++}
++static int d2_mapping_access(u32 pd,u32 address,u32 bytes,u32 write)
++{
++    if(!paging_user_range(pd,address,bytes))return 0;
++    u32 *directory=(u32 *)pd;
++    u32 end=address+bytes;
++    for(u32 at=address;at<end;){u32 de=directory[at>>22];
++        u32 *table=(u32 *)(de&~4095u);
++        u32 pte=table[(at>>12)&1023u];
++        if(((pte&2u)!=0)!=(write!=0))return 0;
++        u32 step=4096u-(at&4095u);
++        if(step>end-at)break;
++        at+=step;
++    }
++    return 1;
++}
++static int d2_module_begin(int pid,d2_state_t *state,const Sc32DebugRegistration *r,d2_module_t **out)
++{
++    if(!r->path || !r->path_bytes || r->path_bytes>64 || !r->metadata || r->metadata_bytes<128
++    || r->metadata_bytes>SCL_MAX_FILE_SIZE || r->flags || r->module || r->module_generation
++    || r->reserved[0] || r->reserved[1])return SC32_E_INVALID;
++    char path[64],canonical[64];
++    if(paging_user_copy(TASK(pid).pd,r->path,path,r->path_bytes,0)
++    || path[r->path_bytes-1] || r->path_bytes<2)return SC32_E_INVALID;
++    for(u32 i=0;i+1<r->path_bytes;i++)if(!path[i])return SC32_E_INVALID;
++    if(fs_normalize(path,canonical)<=0)return SC32_E_INVALID;
++    for(u32 id=state->modules;id;){d2_module_t *m=d2_module(id);
++        if(!m)break;
++        if(m->info.base==r->base)return SC32_E_EXISTS;
++        id=m->next;
++    }
++    u32 allocation=paging_module_size(TASK(pid).pd,r->base);
++    if(!allocation)return SC32_E_RANGE;
++    u32 source=0;
++    int error=fs_native_open(pid,0,canonical,FS_NATIVE_READ,0,&source);
++    if(error)return error==FS_N_ACCESS?SC32_E_ACCESS:error==FS_N_NOT_FOUND?SC32_E_NOT_FOUND:SC32_E_IO;
++    fs_native_info_t fi;
++    error=fs_native_info(pid,source,FS_ACCESS_READ,&fi);
++    if(error || fi.length<SCL_HEADER_SIZE || fi.length>SCL_MAX_FILE_SIZE){fs_native_close(source,0);
++        return SC32_E_RANGE;
++    }
++    int index=objpool_alloc(&d2_modules);
++    u32 serial=d2_next_serial();
++    if(index<0 || !serial){if(index>=0)objpool_release(&d2_modules,index);
++        fs_native_close(source,0);
++        return SC32_E_MEMORY;
++    }
++    d2_module_t *m=objpool_get(&d2_modules,index);
++    d2_zero(m,sizeof(*m));
++    m->info.size=sizeof(m->info);
++    m->info.version=1;
++    m->info.id=(u32)index+1;
++    m->info.generation=serial;
++    m->owner=(u32)pid;
++    m->owner_generation=task_generation(pid);
++    m->source_object=source;
++    m->info.kind=SC32_DEBUG_SCL;
++    m->info.base=r->base;
++    m->info.allocation_bytes=allocation;
++    m->info.source_bytes=fi.length;
++    m->info.source_revision=fi.revision;
++    m->info.source[0]='/';
++    d2_text(m->info.source+1,sizeof(m->info.source)-1,canonical);
++    m->file_pages=(fi.length+4095u)/4096u;
++    m->file=pframe_alloc_run(m->file_pages);
++    if(!m->file){d2_module_drop(m);
++        return SC32_E_MEMORY;
++    }
++    m->input_metadata=r->metadata;
++    m->input_metadata_bytes=r->metadata_bytes;
++    m->proof_mapping_epoch=state->mapping_epoch;
++    m->proof_reloc_index=0xffffffffu;
++    sha256_init(&m->hash);
++    state->loading=m->info.id;
++     *out=m;
++    return 0;
++}
++static int d2_module_step(int pid,d2_state_t *state,d2_module_t *m)
++{
++    if(m->proof_mapping_epoch!=state->mapping_epoch)return SC32_E_STALE;
++    fs_native_info_t fi;
++    int error=fs_native_info(pid,m->source_object,FS_ACCESS_READ,&fi);
++    if(error || fi.revision!=m->info.source_revision || fi.length!=m->info.source_bytes)return SC32_E_STALE;
++    u8 *file=(u8 *)m->file;
++    u32 budget=65536u;
++    if(m->phase==0){u32 count=m->info.source_bytes-m->read_at;
++        if(count>budget)count=budget;
++        u32 done=0;
++        error=fs_native_read(pid,m->source_object,file+m->read_at,count,m->read_at,&done);
++        if(error || done!=count)return SC32_E_IO;
++        sha256_update(&m->hash,file+m->read_at,count);
++        m->read_at+=count;
++        if(m->read_at!=m->info.source_bytes)return SC32_PENDING;
++        if(scl_validate(file,m->info.source_bytes))return SC32_E_INVALID;
++        u32 metadata_bytes=d2_word(file,SCL_H_STRINGS)+d2_word(file,SCL_H_STRINGS_SIZE);
++        if(metadata_bytes!=m->input_metadata_bytes)return SC32_E_INVALID;
++        u32 image=d2_word(file,SCL_H_IMAGE_SIZE);
++        task_record_t *record=task_record(pid);
++        if(m->info.allocation_bytes!=image && !(record->scl_root_base==m->info.base
++        && record->scl_root_image_size==image && record->scl_root_bytes==m->info.allocation_bytes))return SC32_E_RANGE;
++        const char *name=(const char *)file+d2_word(file,SCL_H_STRINGS)+d2_word(file,SCL_H_NAME);
++        if(d2_named(state,name))return SC32_E_EXISTS;
++        d2_text(m->info.name,sizeof(m->info.name),name);
++        m->info.image_bytes=image;
++        m->info.abi_major=d2_word(file,SCL_H_ABI_MAJOR);
++        m->info.abi_minor=d2_word(file,SCL_H_ABI_MINOR);
++        m->info.library_version=d2_word(file,SCL_H_LIBRARY_VERSION);
++        m->info.segment_count=d2_word(file,SCL_H_SEGMENT_COUNT);
++        m->info.symbol_count=d2_word(file,SCL_H_EXPORT_COUNT);
++        m->metadata_pages=(metadata_bytes+4095u)/4096u;
++        m->metadata=pframe_alloc_run(m->metadata_pages);
++        if(!m->metadata)return SC32_E_MEMORY;
++        sha256_final(&m->hash,m->info.sha256);
++        m->phase=1;
++        m->read_at=0;
++        return SC32_PENDING;
++    }
++    if(m->phase==1){u8 chunk[256];
++        u32 remaining=m->input_metadata_bytes-m->read_at;
++        while(remaining && budget){u32 n=remaining;
++            if(n>sizeof(chunk))n=sizeof(chunk);
++            if(paging_user_copy(TASK(pid).pd,m->input_metadata+m->read_at,chunk,n,0))return SC32_E_INVALID;
++            for(u32 i=0;i<n;i++){if(chunk[i]!=file[m->read_at+i])return SC32_E_INVALID;
++                ((u8 *)m->metadata)[m->read_at+i]=chunk[i];
++            }
++            m->read_at+=n;
++            remaining-=n;
++            budget-=n;
++        }
++        if(remaining)return SC32_PENDING;
++        m->phase=2;
++        return SC32_PENDING;
++    }
++    u32 relocation_count=d2_word(file,SCL_H_RELOC_COUNT);
++    while(m->verify_segment<m->info.segment_count && budget){
++        const u8 *seg=file+d2_word(file,SCL_H_SEGMENTS)+m->verify_segment*SCL_SEGMENT_SIZE;
++        u32 rva=d2_word(seg,SCL_S_RVA),memory=d2_word(seg,SCL_S_MEMORY_SIZE),payload=d2_word(seg,SCL_S_FILE_SIZE);
++        if(!m->verify_at && !d2_mapping_access(TASK(pid).pd,m->info.base+rva,memory,d2_word(seg,SCL_S_FLAGS)&SCL_SEG_W))return SC32_E_ACCESS;
++        while(m->verify_at<memory && budget){u8 actual[256];
++            u32 n=memory-m->verify_at;
++            if(n>sizeof(actual))n=sizeof(actual);
++            if(n>budget)n=budget;
++            if(paging_user_copy(TASK(pid).pd,m->info.base+rva+m->verify_at,actual,n,0))return SC32_E_RANGE;
++            /* 真实调试拥有者可能在init前下INT3；比对原始代码视图，
++             * 不能把合法断点当成坏模块，也不能跳过整条指令的验证。 */
++            process_debug_original(pid,m->info.base+rva+m->verify_at,actual,n);
++            for(u32 id=state->breaks;id;){d2_break_t *bp=d2_break(id);
++                if(!bp)break;
++                if(!(bp->flags&SC32_DEBUG_BP_INVALID) && bp->address>=m->info.base+rva+m->verify_at
++                && bp->address-(m->info.base+rva+m->verify_at)<n){actual[bp->address-(m->info.base+rva+m->verify_at)]=bp->original;
++                }
++                id=bp->next;
++            }
++            for(u32 i=0;i<n;i++){u32 position=m->verify_at+i,at=rva+position;
++                u8 expected=position<payload?file[d2_word(seg,SCL_S_FILE_OFFSET)+position]:0;
++                while(m->reloc_index<relocation_count){const u8 *rel=file+d2_word(file,SCL_H_RELOCS)+m->reloc_index*SCL_RELOC_SIZE;
++                    u32 patch=d2_word(rel,SCL_R_PATCH);
++                    if(at>=patch+4){m->reloc_index++;
++                        continue;
++                    }
++                    if(at>=patch){
++                        if(m->proof_reloc_index!=m->reloc_index){error=d2_relocation(state,m,rel,&m->proof_reloc_value);
++                            if(error)return error;
++                            m->proof_reloc_index=m->reloc_index;
++                        }
++                        expected=(u8)(m->proof_reloc_value>>((at-patch)*8));
++                    }break;
++                }
++                if(actual[i]!=expected)return SC32_E_INVALID;
++            }
++            m->verify_at+=n;
++            budget-=n;
++        }
++        if(m->verify_at==memory){m->verify_segment++;
++            m->verify_at=0;
++        }
++    }
++    if(m->verify_segment<m->info.segment_count)return SC32_PENDING;
++    fs_native_close(m->source_object,0);
++    m->source_object=0;
++    pframe_free_run(m->file,m->file_pages);
++    m->file=m->file_pages=0;
++    m->info.flags=SC32_DEBUG_VERIFIED_SOURCE|SC32_DEBUG_MODULE_INITIALIZING;
++    m->next=state->modules;
++    state->modules=m->info.id;
++    state->module_count++;
++    state->loading=0;
++    state->module_epoch++;
++    return 0;
++}
++static int d2_registration(int pid,u32 operation,u32 request,u32 output)
++{
++    Sc32DebugRegistration r;
++    int error=sc32_core_input(pid,request,&r,sizeof(r));
++    if(error)return error;
++    d2_state_t *s=d2_state(pid,1);
++    if(!s)return SC32_E_MEMORY;
++    if(operation!=SC32_D2_REGISTER){if(output || !r.module || !r.module_generation)return SC32_E_INVALID;
++        u32 *link=&s->modules;
++        while(*link){d2_module_t *m=d2_module(*link);
++            if(!m)return SC32_E_STALE;
++            if(m->info.id==r.module && m->info.generation==r.module_generation && m->info.base==r.base){
++                if(operation==SC32_D2_READY){if(!(m->info.flags&SC32_DEBUG_MODULE_READY) || (m->info.flags&SC32_DEBUG_MODULE_INITIALIZING)){
++                        m->info.flags=(m->info.flags&~SC32_DEBUG_MODULE_INITIALIZING)|SC32_DEBUG_MODULE_READY;
++                        s->module_epoch++;
++                    }
++                    return 0;
++                }
++                /* 注销先撤同映像断点，再移除登记；真实页仍由原MODULEFREE回收。 */
++                u32 base=m->info.base,bytes=m->info.image_bytes;
++                for(u32 id=s->breaks;id;){d2_break_t *b=d2_break(id);
++                    if(!b)break;
++                    if(!(b->flags&(SC32_DEBUG_BP_PENDING|SC32_DEBUG_BP_INVALID)) && b->address>=base && b->address-base<bytes){
++                        (void)paging_debug_patch(TASK(pid).pd,b->address,b->original);
++                    }
++                    id=b->next;
++                }
++                sc32_debug_unmap(pid,base,bytes);
++                return 0;
++            }link=&m->next;
++        }
++        return SC32_E_STALE;
++    }
++    error=sc32_core_output(pid,output,sizeof(Sc32DebugRegistrationResult));
++    if(error)return error;
++    /* 固定ROOT由可信scl_boot在首条用户指令前登记。它已经执行的
++     * loader全局数据不可再与零BSS比对；只借同一内核记录的精确
++     * 映像/只读元数据身份，绝不为任意“borrowed”用户请求开例外。 */
++    task_record_t *boot=task_record(pid);
++    if(r.base==boot->scl_root_base && r.metadata==boot->scl_root_metadata && r.metadata_bytes==boot->scl_root_metadata_size){
++        for(u32 id=s->modules;id;){d2_module_t *root=d2_module(id);
++            if(!root)break;
++            if(root->info.base==r.base && root->info.kind==SC32_DEBUG_SCL && d2_equal(root->info.name,"SCLDR.SCL")){
++                Sc32DebugRegistrationResult result={sizeof(result),1,root->info.id,root->info.generation};
++                return d2_publish(pid,output,&result,sizeof(result));
++            }
++            id=root->next;
++        }
++    }
++    d2_module_t *m=s->loading?d2_module(s->loading):0;
++    if(m){if(m->info.base!=r.base || m->input_metadata!=r.metadata || m->input_metadata_bytes!=r.metadata_bytes)return SC32_E_BUSY;
++    }
++    else{error=d2_module_begin(pid,s,&r,&m);
++        if(error)return error;
++    }
++    error=d2_module_step(pid,s,m);
++    if(error<0){s->loading=0;
++        d2_module_drop(m);
++        return error;
++    }
++    if(error==SC32_PENDING)return error;
++    Sc32DebugRegistrationResult result={sizeof(result),1,m->info.id,m->info.generation};
++    return d2_publish(pid,output,&result,sizeof(result));
++}
++int sc32_debug_main_image(int pid,const char *path,u32 load,u32 bss)
++{
++    if(!load || load>0xffffffffu-bss)return SC32_E_RANGE;
++    d2_state_t *s=d2_state(pid,1);
++    if(!s)return SC32_E_MEMORY;
++    char canonical[64];
++    u32 stat[2],meta[8];
++    if(fs_normalize(path,canonical)<=0 || fs_stat(canonical,stat) || stat[0]!=1 || fs_metadata(canonical,meta))return SC32_E_IO;
++    int index=objpool_alloc(&d2_modules);
++    u32 generation=d2_next_serial();
++    if(index<0 || !generation){if(index>=0)objpool_release(&d2_modules,index);
++        return SC32_E_MEMORY;
++    }
++    d2_module_t *m=objpool_get(&d2_modules,index);
++    d2_zero(m,sizeof(*m));
++    m->owner=(u32)pid;
++    m->owner_generation=task_generation(pid);
++    m->info.size=sizeof(m->info);
++    m->info.version=1;
++    m->info.id=(u32)index+1;
++    m->info.generation=generation;
++    m->info.kind=SC32_DEBUG_MAIN;
++    m->info.base=USER_BASE;
++    m->info.image_bytes=load+bss;
++    m->info.allocation_bytes=(load+bss+4095u)&~4095u;
++    m->info.source_bytes=stat[1];
++    m->info.source_revision=meta[7];
++    m->info.flags=SC32_DEBUG_VERIFIED_SOURCE|SC32_DEBUG_MODULE_READY;
++    m->info.segment_count=1;
++    m->info.source[0]='/';
++    d2_text(m->info.source+1,sizeof(m->info.source)-1,canonical);
++    const char *name=canonical;
++    for(const char *p=canonical;*p;p++)if(*p=='/')name=p+1;
++    d2_text(m->info.name,sizeof(m->info.name),name);
++    sha256_t hash;
++    sha256_init(&hash);
++    u8 chunk[512];
++    for(u32 at=0;at<stat[1];){u32 n=stat[1]-at;
++        if(n>sizeof(chunk))n=sizeof(chunk);
++        if(fs_read_at(canonical,chunk,n,at)!=(int)n){d2_module_drop(m);
++            return SC32_E_IO;
++        }sha256_update(&hash,chunk,n);
++        at+=n;
++    }
++    sha256_final(&hash,m->info.sha256);
++    m->next=s->modules;
++    s->modules=m->info.id;
++    s->module_count++;
++    s->module_epoch++;
++    return 0;
++}
++int sc32_debug_bootstrap_image(int pid,u32 base,const void *source,u32 file_bytes,u32 allocation_bytes)
++{
++    /* 调用者只有刚完成root_copy的可信scl_boot；源是同一已完整
++     * 验证文件。此时ROOT尚未运行，真实来源、映像和BSS由加载器
++     * 直接建立，不必经三环重读文件或信任自报身份。 */
++    d2_state_t *s=d2_state(pid,1);
++    if(!s)return SC32_E_MEMORY;
++    const u8 *file=source;
++    u32 metadata_bytes=d2_word(file,SCL_H_STRINGS)+d2_word(file,SCL_H_STRINGS_SIZE);
++    int index=objpool_alloc(&d2_modules);
++    u32 generation=d2_next_serial();
++    if(index<0 || !generation){if(index>=0)objpool_release(&d2_modules,index);
++        return SC32_E_MEMORY;
++    }
++    d2_module_t *m=objpool_get(&d2_modules,index);
++    d2_zero(m,sizeof(*m));
++    m->owner=(u32)pid;
++    m->owner_generation=task_generation(pid);
++    m->info.size=sizeof(m->info);
++    m->info.version=1;
++    m->info.id=(u32)index+1;
++    m->info.generation=generation;
++    m->metadata_pages=(metadata_bytes+4095u)/4096u;
++    m->metadata=pframe_alloc_run(m->metadata_pages);
++    if(!m->metadata){d2_module_drop(m);
++        return SC32_E_MEMORY;
++    }
++    for(u32 i=0;i<metadata_bytes;i++)((u8 *)m->metadata)[i]=file[i];
++    m->info.kind=SC32_DEBUG_SCL;
++    m->info.base=base;
++    m->info.image_bytes=d2_word(file,SCL_H_IMAGE_SIZE);
++    m->info.allocation_bytes=allocation_bytes;
++    m->info.abi_major=d2_word(file,SCL_H_ABI_MAJOR);
++    m->info.abi_minor=d2_word(file,SCL_H_ABI_MINOR);
++    m->info.library_version=d2_word(file,SCL_H_LIBRARY_VERSION);
++    m->info.segment_count=d2_word(file,SCL_H_SEGMENT_COUNT);
++    m->info.symbol_count=d2_word(file,SCL_H_EXPORT_COUNT);
++    m->info.source_bytes=file_bytes;
++    u32 metadata[8];
++    if(!fs_metadata("/SYS/LIB/SCLDR.SCL",metadata))m->info.source_revision=metadata[7];
++    d2_text(m->info.name,sizeof(m->info.name),"SCLDR.SCL");
++    d2_text(m->info.source,sizeof(m->info.source),"/SYS/LIB/SCLDR.SCL");
++    sha256(file,file_bytes,m->info.sha256);
++    m->info.flags=SC32_DEBUG_VERIFIED_SOURCE|SC32_DEBUG_MODULE_READY;
++    m->next=s->modules;
++    s->modules=m->info.id;
++    s->module_count++;
++    s->module_epoch++;
++    return 0;
++}
+--- /dev/null
++++ b/user/SC32DEBUG.H
+@@ -0,0 +1,108 @@
++#ifndef SANDCORE_SC32DEBUG_H
++#define SANDCORE_SC32DEBUG_H
++#include "SC32API.H"
++
++/* 此头只有稳定三环类型/声明。所有地址均为目标32位用户虚址；
++ * 进程、绑定、暂停、模块四种代数不能互相替代，也不是内核指针。 */
++#define SC32_DEBUG_VERSION 1u
++#define SC32_DEBUG_CAP_HI 8u
++#define SC32_DEBUG_RUNNING 1u
++#define SC32_DEBUG_EXITED 2u
++#define SC32_DEBUG_PAUSED 3u
++#define SC32_DEBUG_STOP_ENTRY 1u
++#define SC32_DEBUG_STOP_PAUSE 2u
++#define SC32_DEBUG_STOP_STEP 3u
++#define SC32_DEBUG_STOP_BREAKPOINT 4u
++#define SC32_DEBUG_STOP_EXCEPTION 5u
++#define SC32_DEBUG_REGISTERS_VALID 1u
++#define SC32_DEBUG_READ_ORIGINAL_CODE 1u
++#define SC32_DEBUG_CONTINUE 1u
++#define SC32_DEBUG_PAUSE 2u
++#define SC32_DEBUG_STEP 3u
++#define SC32_DEBUG_TERMINATE 4u
++#define SC32_DEBUG_READ_MAX 4096u
++#define SC32_DEBUG_PAGE_MAX 64u
++#define SC32_DEBUG_MAIN 1u
++#define SC32_DEBUG_SCL 2u
++#define SC32_DEBUG_VERIFIED_SOURCE 1u
++#define SC32_DEBUG_MODULE_INITIALIZING 2u
++#define SC32_DEBUG_MODULE_READY 4u
++#define SC32_DEBUG_READABLE 1u
++#define SC32_DEBUG_WRITABLE 2u
++#define SC32_DEBUG_EXECUTABLE 4u
++#define SC32_DEBUG_ACCESS_MIXED 8u
++#define SC32_DEBUG_BP_ENABLED 1u
++#define SC32_DEBUG_BP_PENDING 2u
++#define SC32_DEBUG_BP_INVALID 4u
++#define SC32_DEBUG_SYMBOL_EXPORTED 1u
++#define SC32_DEBUG_SYMBOL_FUNCTION 1u
++#define SC32_DEBUG_SYMBOL_DATA 2u
++
++typedef struct { ScU32 size,version,pid,generation,binding,reserved; } ScDebugRef;
++typedef struct {
++    ScU32 size,version;
++    const char *command;
++    ScI32 streams[3];
++    ScU32 flags,reserved;
++} ScDebugLaunchDesc;
++typedef struct {
++    ScU32 size,version; ScDebugRef target; ScJob job; ScU32 reserved[3];
++} ScDebugLaunchInfo;
++typedef struct {
++    ScU32 size,version,eax,ebx,ecx,edx,esi,edi,ebp,esp,eip,eflags;
++    ScU32 cs,ss,ds,es,fs,gs,vector,error,cr2,reserved[3];
++} ScDebugRegisters;
++typedef struct {
++    ScU32 size,version; ScDebugRef target;
++    ScU32 state,stop_generation,reason,module_epoch,breakpoint_epoch,flags;
++    ScI32 exit_code; ScU32 reserved;
++    ScDebugRegisters registers;
++} ScDebugSnapshot;
++typedef struct {
++    ScU32 size,version,stop_generation,address,requested,readable,flags,reserved;
++} ScDebugReadInfo;
++typedef struct {
++    ScU32 size,version,id,generation,address,flags,hits,stop_generation;
++} ScDebugBreakpoint;
++typedef struct {
++    ScU32 size,version,id,generation,kind,base,image_bytes,allocation_bytes;
++    ScU32 abi_major,abi_minor,library_version,flags,segment_count,symbol_count;
++    ScU32 source_bytes,source_revision;
++    unsigned char sha256[32];
++    char name[40],source[SC32_PATH_CAPACITY];
++} ScDebugModule;
++typedef struct {
++    ScU32 size,version,module,module_generation,index,address,bytes,access;
++} ScDebugSegment;
++typedef struct {
++    ScU32 size,version,module,module_generation,index,address,bytes,kind,flags;
++    char name[128];
++    ScU32 reserved;
++} ScDebugSymbol;
++typedef struct {
++    ScU32 size,version,stop_generation,epoch,cursor,count,total,flags;
++} ScDebugPage;
++#define SC32_DEBUG_PAGE_FINISHED 1u
++
++/* 所有输出先填size/version；错误保持输出，较大记录的未知尾部不写。
++ * Launch创建的目标由该调试器独占，关闭调试器时内核终止并回收目标。
++ * 不接受猜PID附加；已有目标引用只有真实拥有者可以使用。 */
++ScStatus ScDebugLaunch(const ScDebugLaunchDesc *,ScDebugLaunchInfo *out);
++ScStatus ScDebugQuery(const ScDebugRef *,ScDebugSnapshot *out);
++ScStatus ScDebugControl(const ScDebugRef *,ScU32 stop_generation,ScU32 action,ScDebugSnapshot *out);
++/* data/readable各bytes字节，readable[i]为0/1；不可读字节data为0且不作
++ * 有效数据。所有片段与result属于同一暂停代数，运行状态拒绝读取。 */
++ScStatus ScDebugRead(const ScDebugRef *,ScU32 stop_generation,ScU32 address,ScU32 bytes,
++    ScU32 flags,void *data,unsigned char *readable,ScDebugReadInfo *result);
++ScStatus ScDebugBreakpointAdd(const ScDebugRef *,ScU32 stop_generation,ScU32 address,ScDebugBreakpoint *out);
++ScStatus ScDebugBreakpointRemove(const ScDebugRef *,ScU32 stop_generation,ScU32 id,ScU32 generation);
++ScStatus ScDebugBreakpoints(const ScDebugRef *,ScU32 stop_generation,ScU32 after,ScU32 expected_epoch,
++    ScDebugBreakpoint *rows,ScU32 capacity,ScDebugPage *out);
++ScStatus ScDebugModules(const ScDebugRef *,ScU32 stop_generation,ScU32 after,ScU32 expected_epoch,
++    ScDebugModule *rows,ScU32 capacity,ScDebugPage *out);
++ScStatus ScDebugSegments(const ScDebugRef *,ScU32 stop_generation,ScU32 module,ScU32 module_generation,
++    ScU32 after,ScDebugSegment *rows,ScU32 capacity,ScDebugPage *out);
++ScStatus ScDebugSymbols(const ScDebugRef *,ScU32 stop_generation,ScU32 module,ScU32 module_generation,
++    ScU32 after,ScDebugSymbol *rows,ScU32 capacity,ScDebugPage *out);
++
++#endif
+--- /dev/null
++++ b/user/SCDBGFILE.H
+@@ -0,0 +1,45 @@
++#ifndef SANDCORE_SCDBGFILE_H
++#define SANDCORE_SCDBGFILE_H
++/* 调试副文件只描述符号，不能登记映射或授予目标进程访问权限。 */
++#define SCDBG_MAGIC "SCDB1MIO"
++#define SCDBG_VERSION 1u
++#define SCDBG_HEADER_SIZE 96u
++#define SCDBG_MACHINE_I386 3u
++#define SCDBG_ADDRESS_VA 1u
++#define SCDBG_ADDRESS_RVA 2u
++#define SCDBG_SYMBOL_SIZE 24u
++#define SCDBG_FILE_SIZE 20u
++#define SCDBG_LINE_SIZE 16u
++#define SCDBG_H_VERSION 8u
++#define SCDBG_H_HEADER_SIZE 12u
++#define SCDBG_H_MACHINE 16u
++#define SCDBG_H_ADDRESS_KIND 20u
++#define SCDBG_H_IMAGE_FILE_SIZE 24u
++#define SCDBG_H_OBJECT_COUNT 28u
++#define SCDBG_H_IMAGE_SHA256 32u
++#define SCDBG_H_SYMBOLS 64u
++#define SCDBG_H_SYMBOL_COUNT 68u
++#define SCDBG_H_FILES 72u
++#define SCDBG_H_FILE_COUNT 76u
++#define SCDBG_H_LINES 80u
++#define SCDBG_H_LINE_COUNT 84u
++#define SCDBG_H_STRINGS 88u
++#define SCDBG_H_STRINGS_SIZE 92u
++/* 符号：名字偏移、地址、尺寸、kind、binding、对象序号。 */
++#define SCDBG_S_NAME 0u
++#define SCDBG_S_ADDRESS 4u
++#define SCDBG_S_SIZE 8u
++#define SCDBG_S_KIND 12u
++#define SCDBG_S_BINDING 16u
++#define SCDBG_S_OBJECT 20u
++/* 文件：对象序号、路径偏移、原文长度、FNV1a32、保留零。 */
++#define SCDBG_F_OBJECT 0u
++#define SCDBG_F_PATH 4u
++#define SCDBG_F_SOURCE_BYTES 8u
++#define SCDBG_F_SOURCE_FNV1A32 12u
++/* 源行：地址、文件序号、从1开始的源行、对象序号。 */
++#define SCDBG_L_ADDRESS 0u
++#define SCDBG_L_FILE 4u
++#define SCDBG_L_LINE 8u
++#define SCDBG_L_OBJECT 12u
++#endif
+--- /dev/null
++++ b/user/debug2/D2APP.H
+@@ -0,0 +1,67 @@
++#ifndef SANDCORE_DEBUG2_APP_H
++#define SANDCORE_DEBUG2_APP_H
++#include "SCUI.H"
++#include "SC32DEBUG.H"
++#include "D2DECODE.H"
++#include <stdlib.h>
++#include <stdio.h>
++#include <string.h>
++#include <limits.h>
++
++enum {D2_CODE,D2_REGISTERS,D2_MEMORY,D2_STACK,D2_BREAKPOINTS,D2_MODULES,D2_SYMBOLS,D2_PANES};
++enum {D2_LAUNCH=100,D2_BROWSE,D2_RESTART,D2_STOP,D2_QUIT,D2_CONTINUE=200,D2_PAUSE,D2_STEP,
++    D2_GOTO_CODE=300,D2_GOTO_MEMORY,D2_BREAK_ADD,D2_BREAK_REMOVE,D2_FOLLOW_IP,D2_PREVIOUS,D2_NEXT,D2_FOLLOW_BRANCH,
++    D2_FLOAT=400,D2_DOCK,D2_RESET_LAYOUT,D2_SAVE_LAYOUT,D2_LOAD_LAYOUT,
++    D2_ACTIVATE_CODE=500,D2_ACTIVATE_STACK,D2_ACTIVATE_MODULE,D2_ACTIVATE_SYMBOL,D2_ABOUT,D2_MODULE_DETAILS};
++typedef struct {
++    ScU32 id,address,aux,generation,flags;
++    char text[5][160];
++} D2Row;
++typedef struct {ScU32 address,module,line,object;char path[128];} D2SourceLine;
++typedef struct D2App D2App;
++typedef struct {
++    D2App *app;ScU32 kind,revision,table,container,listener;
++    ScUiProvider *provider;ScUiSelection *selection;
++} D2Pane;
++typedef struct {
++    ScDebugSnapshot snapshot;
++    ScArray *rows[D2_PANES],*modules,*segments,*lines;
++    ScU32 stage,cursor,epoch,module_index,segment_cursor,symbol_cursor;
++    ScU32 code_address,memory_address,break_cursor,sidecar_module,sidecar_stage,cached_modules;
++    ScFile sidecar_file;unsigned char *sidecar_bytes;ScU32 sidecar_size,sidecar_read,sidecar_cursor;
++    char sidecar_status[160];
++} D2Frame;
++struct D2App {
++    ScUiContext *ui;ScUiNode root,menubar,toolbar,commandbox,addressbox,status,workspace,top,left,right,bottom,dock,tabs,float_root;
++    D2Pane panes[D2_PANES];ScUiMenu *menu,*debug_menu,*view_menu,*file_menu,*tools;
++    ScUiDialog *dialog;ScConfig *saved_layout;
++    ScDebugLaunchInfo launch;ScDebugSnapshot current;
++    D2Frame *frame,*candidate;
++    ScU32 timer,listener,active,closing,visible,revision,code_address,memory_address,follow_ip,closing_ticks,restart_pending,timer_period,timer_root,dialog_kind;
++    char command[1088],message[240],layout_path[65];
++};
++static void D2Record(void *p,ScU32 size){memset(p,0,size);((ScU32 *)p)[0]=size;((ScU32 *)p)[1]=1;}
++static ScUiText D2Text(const char *s){ScUiText t={sizeof(t),1,s,(ScU32)strlen(s)};return t;}
++static ScU32 D2Count(ScArray *a){ScContainerInfo i;D2Record(&i,sizeof(i));return a && ScArrayQuery(a,&i)==0?i.length:0;}
++static const void *D2Data(ScArray *a){ScView v;D2Record(&v,sizeof(v));return a && ScArrayView(a,&v)==0?v.data:0;}
++static ScStatus D2Array(ScU32 stride,ScArray **out){ScArrayDesc d;D2Record(&d,sizeof(d));d.item_bytes=stride;return ScArrayCreate(&d,out);}
++static ScStatus D2Append(ScArray *a,const void *r){return ScArrayInsert(a,D2Count(a),r,1);}
++ScStatus D2RowAppend(ScArray *,D2Row *);
++void D2Error(D2App *,const char *,ScStatus);
++void D2Status(D2App *,const char *);
++void D2FrameDestroy(D2Frame *);
++ScStatus D2CaptureStart(D2App *);
++ScStatus D2CaptureStep(D2App *);
++ScStatus D2BuildUi(D2App *);
++void D2Publish(D2App *,D2Frame *);
++void D2Clear(D2App *);
++ScStatus D2Launch(D2App *,const char *);
++ScStatus D2Control(D2App *,ScU32);
++void D2Poll(D2App *);
++void D2Schedule(D2App *);
++void D2Close(D2App *);
++ScStatus D2Navigate(D2App *,ScU32);
++ScStatus D2SidecarStep(D2App *,D2Frame *);
++int D2AddressInModule(const D2Frame *,const ScDebugModule *,ScU32,ScU32,ScU32);
++void D2Annotate(D2Frame *);
++#endif
+--- /dev/null
++++ b/user/debug2/D2DECODE.H
+@@ -0,0 +1,9 @@
++#ifndef SANDCORE_D2DECODE_H
++#define SANDCORE_D2DECODE_H
++#include "SCTYPES.H"
++typedef struct {
++    ScU32 address,length,target,branch,known,readable;
++    char bytes[48],text[256];
++} D2Instruction;
++void D2Decode(const unsigned char *bytes,const unsigned char *readable,ScU32 count,ScU32 address,D2Instruction *out);
++#endif
+--- /dev/null
++++ b/user/debug2/DEBUG2.C
+@@ -0,0 +1,49 @@
++#include "D2APP.H"
++#include "decode.c"
++#include "model.c"
++#include "sidecar.c"
++#include "ui.c"
++
++int main(void)
++{
++    D2App *a=calloc(1,sizeof(*a));
++    if(!a)return 1;
++    ScStatus s=D2BuildUi(a);
++    if(s==0){char arguments[1088];
++        ScU32 length=0;
++        if(ScProcessArguments(arguments,sizeof(arguments),&length)==0 && length){const char *target=arguments;
++            if(!strncmp(target,"--launch ",9))target+=9;
++            ScUiText text=D2Text(target);
++            ScUiNodeSetText(a->ui,a->commandbox,&text);
++            s=D2Launch(a,target);
++            if(s<0)D2Error(a,"Launch",s);
++        }
++        ScI32 result=0;
++        s=ScUiContextRun(a->ui,&result);
++    }
++    /* 任何构造失败同样走真实owner回收。正常关闭先领作业再停止
++     * context；异常退出的独占调试子进程由内核owner清理链终止。 */
++    if(a->active){ScDebugSnapshot snap;
++        D2Record(&snap,sizeof(snap));
++        ScDebugControl(&a->launch.target,0,SC32_DEBUG_TERMINATE,&snap);
++        ScJobInfo result;
++        D2Record(&result,sizeof(result));
++        ScJobWait(a->launch.job,SC32_INFINITE,&result);
++    }
++    D2FrameDestroy(a->candidate);
++    D2FrameDestroy(a->frame);
++    ScUiDialogRelease(a->dialog);
++    a->dialog=0;
++    if(a->ui){ScUiContextRelease(a->ui);
++        for(ScU32 i=0;i<D2_PANES;i++){ScUiSelectionRelease(a->panes[i].selection);
++            ScUiProviderRelease(a->panes[i].provider);
++    }}
++    ScUiMenuRelease(a->menu);
++    ScUiMenuRelease(a->file_menu);
++    ScUiMenuRelease(a->debug_menu);
++    ScUiMenuRelease(a->view_menu);
++    ScUiMenuRelease(a->tools);
++    ScConfigRelease(a->saved_layout);
++    free(a);
++    return s<0?1:0;
++}
+--- /dev/null
++++ b/user/debug2/DEBUG2.json
+@@ -0,0 +1,644 @@
++{
++  "kind": "application",
++  "name": "DEBUG2.SCX",
++  "dependencies": [
++    {
++      "name": "SC32API.SCL",
++      "abi_major": 1,
++      "min_minor": 4,
++      "min_version": 6
++    },
++    {
++      "name": "SCCLIB.SCL",
++      "abi_major": 1,
++      "min_minor": 0,
++      "min_version": 1
++    },
++    {
++      "name": "SCLIB.SCL",
++      "abi_major": 1,
++      "min_minor": 0,
++      "min_version": 1
++    },
++    {
++      "name": "SCUI.SCL",
++      "abi_major": 1,
++      "min_minor": 1,
++      "min_version": 2
++    }
++  ],
++  "imports": [
++    {
++      "name": "ScArrayCreate",
++      "dependency": "SCLIB.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScArrayGet",
++      "dependency": "SCLIB.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScArrayInsert",
++      "dependency": "SCLIB.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScArrayQuery",
++      "dependency": "SCLIB.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScArrayRelease",
++      "dependency": "SCLIB.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScArrayRetain",
++      "dependency": "SCLIB.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScArraySet",
++      "dependency": "SCLIB.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScArrayView",
++      "dependency": "SCLIB.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScConfigCreate",
++      "dependency": "SCLIB.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScConfigParse",
++      "dependency": "SCLIB.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScConfigRelease",
++      "dependency": "SCLIB.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScConfigSerialize",
++      "dependency": "SCLIB.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScConfigSet",
++      "dependency": "SCLIB.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScDebugBreakpointAdd",
++      "dependency": "SC32API.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScDebugBreakpointRemove",
++      "dependency": "SC32API.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScDebugBreakpoints",
++      "dependency": "SC32API.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScDebugControl",
++      "dependency": "SC32API.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScDebugLaunch",
++      "dependency": "SC32API.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScDebugModules",
++      "dependency": "SC32API.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScDebugQuery",
++      "dependency": "SC32API.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScDebugRead",
++      "dependency": "SC32API.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScDebugSegments",
++      "dependency": "SC32API.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScDebugSymbols",
++      "dependency": "SC32API.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScErrorName",
++      "dependency": "SC32API.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScFileClose",
++      "dependency": "SC32API.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScFileOpen",
++      "dependency": "SC32API.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScFileQuery",
++      "dependency": "SC32API.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScFileRead",
++      "dependency": "SC32API.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScJobQuery",
++      "dependency": "SC32API.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScJobWait",
++      "dependency": "SC32API.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScPathRead",
++      "dependency": "SC32API.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScPathReplace",
++      "dependency": "SC32API.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScPathStat",
++      "dependency": "SC32API.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScProcessArguments",
++      "dependency": "SC32API.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScSessionPath",
++      "dependency": "SC32API.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScStringCStr",
++      "dependency": "SCLIB.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScStringQuery",
++      "dependency": "SCLIB.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScStringRelease",
++      "dependency": "SCLIB.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScStringView",
++      "dependency": "SCLIB.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScSystemMonotonic",
++      "dependency": "SC32API.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScUiBatchBegin",
++      "dependency": "SCUI.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScUiBatchEnd",
++      "dependency": "SCUI.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScUiCommandSet",
++      "dependency": "SCUI.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScUiContextCreate",
++      "dependency": "SCUI.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScUiContextRelease",
++      "dependency": "SCUI.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScUiContextRun",
++      "dependency": "SCUI.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScUiContextStop",
++      "dependency": "SCUI.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScUiDialogQuery",
++      "dependency": "SCUI.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScUiDialogRelease",
++      "dependency": "SCUI.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScUiDialogSelectedPath",
++      "dependency": "SCUI.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScUiDockFloat",
++      "dependency": "SCUI.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScUiDockMove",
++      "dependency": "SCUI.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScUiFileDialog",
++      "dependency": "SCUI.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScUiLayout",
++      "dependency": "SCUI.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScUiLayoutRestore",
++      "dependency": "SCUI.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScUiLayoutSave",
++      "dependency": "SCUI.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScUiListen",
++      "dependency": "SCUI.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScUiMenuBind",
++      "dependency": "SCUI.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScUiMenuCreate",
++      "dependency": "SCUI.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScUiMenuInsert",
++      "dependency": "SCUI.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScUiMenuOpen",
++      "dependency": "SCUI.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScUiMenuRelease",
++      "dependency": "SCUI.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScUiMessageBox",
++      "dependency": "SCUI.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScUiNodeCopyText",
++      "dependency": "SCUI.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScUiNodeDestroy",
++      "dependency": "SCUI.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScUiNodeQuery",
++      "dependency": "SCUI.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScUiNodeSetFont",
++      "dependency": "SCUI.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScUiNodeSetLayout",
++      "dependency": "SCUI.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScUiNodeSetText",
++      "dependency": "SCUI.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScUiPropertySheet",
++      "dependency": "SCUI.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScUiProviderCreate",
++      "dependency": "SCUI.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScUiProviderNotify",
++      "dependency": "SCUI.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScUiProviderRelease",
++      "dependency": "SCUI.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScUiSelectionCreate",
++      "dependency": "SCUI.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScUiSelectionQuery",
++      "dependency": "SCUI.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScUiSelectionRelease",
++      "dependency": "SCUI.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScUiSelectionSet",
++      "dependency": "SCUI.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScUiStatusSetParts",
++      "dependency": "SCUI.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScUiTabAdd",
++      "dependency": "SCUI.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScUiTableSetColumns",
++      "dependency": "SCUI.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScUiTimerCancel",
++      "dependency": "SCUI.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScUiTimerChange",
++      "dependency": "SCUI.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScUiTimerSet",
++      "dependency": "SCUI.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScUiToolbarBind",
++      "dependency": "SCUI.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScUiViewBind",
++      "dependency": "SCUI.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScUiViewEnsureItem",
++      "dependency": "SCUI.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScUiViewHitTest",
++      "dependency": "SCUI.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScUiWidgetCreate",
++      "dependency": "SCUI.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScUiWindowCreate",
++      "dependency": "SCUI.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScUiWindowNative",
++      "dependency": "SCUI.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "ScUtf8Validate",
++      "dependency": "SCLIB.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "calloc",
++      "dependency": "SCCLIB.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "free",
++      "dependency": "SCCLIB.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "malloc",
++      "dependency": "SCCLIB.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "memchr",
++      "dependency": "SCCLIB.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "memcmp",
++      "dependency": "SCCLIB.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "memcpy",
++      "dependency": "SCCLIB.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "memset",
++      "dependency": "SCCLIB.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "snprintf",
++      "dependency": "SCCLIB.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "strcmp",
++      "dependency": "SCCLIB.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "strlen",
++      "dependency": "SCCLIB.SCL",
++      "kind": "function",
++      "size": 1
++    },
++    {
++      "name": "strncmp",
++      "dependency": "SCCLIB.SCL",
++      "kind": "function",
++      "size": 1
++    }
++  ]
++}
+--- /dev/null
++++ b/user/debug2/decode.c
+@@ -0,0 +1,308 @@
++#include "D2DECODE.H"
++#include <string.h>
++#include <stdio.h>
++
++typedef struct {const unsigned char *p,*valid;
++    ScU32 count,at;
++    int bad,width;
++    char segment[5];
++} D2Cursor;
++static const char *d2_r32[8]={"eax","ecx","edx","ebx","esp","ebp","esi","edi"};
++static const char *d2_r16[8]={"ax","cx","dx","bx","sp","bp","si","di"};
++static const char *d2_r8[8]={"al","cl","dl","bl","ah","ch","dh","bh"};
++static const char *d2_cc[16]={"jo","jno","jb","jae","je","jne","jbe","ja","js","jns","jp","jnp","jl","jge","jle","jg"};
++static const char *d2_alu[8]={"add","or","adc","sbb","and","sub","xor","cmp"};
++static const char *d2_shift[8]={"rol","ror","rcl","rcr","shl","shr",0,"sar"};
++static ScU32 d2_take(D2Cursor *c,ScU32 bytes)
++{
++    if(bytes>c->count-c->at || c->at+bytes>15u){c->bad=1;
++        return 0;
++    }
++    ScU32 value=0;
++    for(ScU32 i=0;i<bytes;i++){if(!c->valid[c->at])c->bad=1;
++        value|=(ScU32)c->p[c->at++]<<(i*8);
++    }
++    return value;
++}
++static const char *d2_reg(ScU32 reg,int width)
++{return width==8?d2_r8[reg&7]:width==16?d2_r16[reg&7]:d2_r32[reg&7];
++}
++static void d2_append(char *out,ScU32 cap,const char *text)
++{ScU32 n=(ScU32)strlen(out);
++    if(n<cap)snprintf(out+n,cap-n,"%s",text);
++}
++static void d2_disp(char *out,ScU32 cap,ScU32 value,int signed_value,int have_base)
++{
++    char text[32];
++    if(signed_value && (value&0x80000000u))snprintf(text,sizeof(text),"-0x%X",0u-value);
++    else snprintf(text,sizeof(text),have_base?"+0x%X":"0x%X",value);
++    d2_append(out,cap,text);
++}
++static ScU32 d2_operand(D2Cursor *c,int width,char out[96],ScU32 *reg)
++{
++    ScU32 m=d2_take(c,1),mode=m>>6,rm=m&7;
++     *reg=(m>>3)&7;
++    if(mode==3){snprintf(out,96,"%s",d2_reg(rm,width));
++        return mode;
++    }
++    snprintf(out,96,"%s%s[",width==8?"byte ":width==16?"word ":"dword ",c->segment);
++    int have=0;
++    ScU32 sib=0;
++    if(rm==4){sib=d2_take(c,1);
++        ScU32 base=sib&7,index=(sib>>3)&7,scale=1u<<(sib>>6);
++        if(mode || base!=5){d2_append(out,96,d2_r32[base]);
++            have=1;
++        }
++        if(index!=4){char text[32];
++            snprintf(text,sizeof(text),have?"+%s*%u":"%s*%u",d2_r32[index],scale);
++            d2_append(out,96,text);
++            have=1;
++        }
++        if(!mode && base==5){ScU32 displacement=d2_take(c,4);
++            d2_disp(out,96,displacement,0,have);
++            have=1;
++    }}
++    else if(!mode && rm==5){d2_disp(out,96,d2_take(c,4),0,0);
++        have=1;
++    }
++    else{d2_append(out,96,d2_r32[rm]);
++        have=1;
++    }
++    if(mode==1){ScU32 displacement=(ScU32)(ScI32)(signed char)d2_take(c,1);
++        if(displacement)d2_disp(out,96,displacement,1,have);
++    }
++    if(mode==2){ScU32 displacement=d2_take(c,4);
++        if(displacement)d2_disp(out,96,displacement,1,have);
++    }
++    d2_append(out,96,"]");
++    return mode;
++}
++void D2Decode(const unsigned char *bytes,const unsigned char *readable,ScU32 count,ScU32 address,D2Instruction *out)
++{
++    memset(out,0,sizeof(*out));
++    out->address=address;
++    out->length=1;
++    if(!bytes || !readable || !count || !readable[0]){snprintf(out->bytes,sizeof(out->bytes),"??");
++        snprintf(out->text,sizeof(out->text),"<unreadable>");
++        return;
++    }
++    out->readable=1;
++    D2Cursor c={bytes,readable,count,0,0,32,{0}};
++    const char *name=0;
++    char a[96]={0},b[96]={0};
++    ScU32 reg=0,op=0,rep=0;
++    int lock=0,known=1,modrm=0;
++    for(;;){op=d2_take(&c,1);
++        if(c.bad)break;
++        if(op==0x66){c.width=16;
++            continue;
++        }
++        if(op==0xf2 || op==0xf3){rep=op;
++            continue;
++        }
++        if(op==0xf0){lock=1;
++            continue;
++        }
++        if(op==0x26 || op==0x2e || op==0x36 || op==0x3e || op==0x64 || op==0x65){
++            snprintf(c.segment,sizeof(c.segment),"%s:",op==0x26?"es":op==0x2e?"cs":op==0x36?"ss":op==0x3e?"ds":op==0x64?"fs":"gs");
++            continue;
++        }
++        break;
++    }
++    if(c.bad)known=0;
++    else if(op<=0x3d && (op&7)<=5){ScU32 group=op>>3,form=op&7;
++        name=d2_alu[group];
++        int width=(form&1)?c.width:8;
++        if(form<4){modrm=1;
++            d2_operand(&c,width,a,&reg);
++            snprintf(b,sizeof(b),"%s",d2_reg(reg,width));
++            if(form&2){char temp[96];
++                memcpy(temp,a,sizeof(temp));
++                memcpy(a,b,sizeof(a));
++                memcpy(b,temp,sizeof(b));
++        }}
++        else{snprintf(a,sizeof(a),"%s",d2_reg(0,width));
++            snprintf(b,sizeof(b),"0x%X",d2_take(&c,width==8?1u:(ScU32)c.width/8));
++    }}
++    else if(op>=0x40 && op<=0x5f){name=op<0x48?"inc":op<0x50?"dec":op<0x58?"push":"pop";
++        snprintf(a,sizeof(a),"%s",d2_reg(op&7,c.width));
++    }
++    else if(op==0x60)name=c.width==16?"pusha":"pushad";
++    else if(op==0x61)name=c.width==16?"popa":"popad";
++    else if(op==0x68 || op==0x6a){name="push";
++        ScU32 value=d2_take(&c,op==0x6a?1u:(ScU32)c.width/8);
++        if(op==0x6a)value=(ScU32)(ScI32)(signed char)value;
++        snprintf(a,sizeof(a),"0x%X",value);
++    }
++    else if(op==0x69 || op==0x6b){name="imul";
++        modrm=1;
++        d2_operand(&c,c.width,b,&reg);
++        snprintf(a,sizeof(a),"%s",d2_reg(reg,c.width));
++        ScU32 value=d2_take(&c,op==0x6b?1u:(ScU32)c.width/8);
++        if(op==0x6b)value=(ScU32)(ScI32)(signed char)value;
++        char text[32];
++        snprintf(text,sizeof(text),", 0x%X",value);
++        d2_append(b,sizeof(b),text);
++    }
++    else if(op>=0x70 && op<=0x7f){name=d2_cc[op&15];
++        ScU32 displacement=(ScU32)(ScI32)(signed char)d2_take(&c,1);
++        out->target=address+c.at+displacement;
++        out->branch=1;
++        snprintf(a,sizeof(a),"%08X",out->target);
++    }
++    else if(op==0x80 || op==0x81 || op==0x83){modrm=1;
++        int width=op==0x80?8:c.width;
++        d2_operand(&c,width,a,&reg);
++        name=d2_alu[reg];
++        ScU32 value=d2_take(&c,op==0x81?(ScU32)c.width/8:1u);
++        if(op==0x83)value=(ScU32)(ScI32)(signed char)value;
++        snprintf(b,sizeof(b),"0x%X",value);
++    }
++    else if(op>=0x84 && op<=0x8f && op!=0x8c && op!=0x8e){int width=(op&1)?c.width:8;
++        modrm=1;
++        ScU32 mode=d2_operand(&c,op==0x8d?c.width:width,a,&reg);
++        if(op==0x8f){if(reg)known=0;
++            else name="pop";
++        }
++        else{name=op<0x86?"test":op<0x88?"xchg":op==0x8d?"lea":"mov";
++            if(op==0x8d && mode==3)known=0;
++            snprintf(b,sizeof(b),"%s",d2_reg(reg,op==0x8d?c.width:width));
++            if(op==0x8a || op==0x8b || op==0x8d){char temp[96];
++                memcpy(temp,a,sizeof(temp));
++                memcpy(a,b,sizeof(a));
++                memcpy(b,temp,sizeof(b));
++    }}}
++    else if(op==0x90)name=rep==0xf3?"pause":"nop";
++    else if(op>=0x91 && op<=0x97){name="xchg";
++        snprintf(a,sizeof(a),"%s",d2_reg(0,c.width));
++        snprintf(b,sizeof(b),"%s",d2_reg(op&7,c.width));
++    }
++    else if(op==0x98)name=c.width==16?"cbw":"cwde";
++    else if(op==0x99)name=c.width==16?"cwd":"cdq";
++    else if(op==0x9c)name=c.width==16?"pushf":"pushfd";
++    else if(op==0x9d)name=c.width==16?"popf":"popfd";
++    else if(op>=0xa0 && op<=0xa3){name="mov";
++        int width=(op&1)?c.width:8;
++        ScU32 absolute=d2_take(&c,4);
++        snprintf(a,sizeof(a),"%s",d2_reg(0,width));
++        snprintf(b,sizeof(b),"%s%s[0x%08X]",width==8?"byte ":width==16?"word ":"dword ",c.segment,absolute);
++        if(op&2){char temp[96];
++            memcpy(temp,a,sizeof(temp));
++            memcpy(a,b,sizeof(a));
++            memcpy(b,temp,sizeof(b));
++    }}
++    else if(op==0xa4 || op==0xa5)name=(op&1)?c.width==16?"movsw":"movsd":"movsb";
++    else if(op==0xa6 || op==0xa7)name=(op&1)?c.width==16?"cmpsw":"cmpsd":"cmpsb";
++    else if(op==0xaa || op==0xab)name=(op&1)?c.width==16?"stosw":"stosd":"stosb";
++    else if(op==0xac || op==0xad)name=(op&1)?c.width==16?"lodsw":"lodsd":"lodsb";
++    else if(op==0xae || op==0xaf)name=(op&1)?c.width==16?"scasw":"scasd":"scasb";
++    else if(op==0xa8 || op==0xa9){name="test";
++        int width=op==0xa8?8:c.width;
++        snprintf(a,sizeof(a),"%s",d2_reg(0,width));
++        snprintf(b,sizeof(b),"0x%X",d2_take(&c,(ScU32)width/8));
++    }
++    else if(op>=0xb0 && op<=0xbf){name="mov";
++        int width=op<0xb8?8:c.width;
++        snprintf(a,sizeof(a),"%s",d2_reg(op&7,width));
++        snprintf(b,sizeof(b),"0x%X",d2_take(&c,(ScU32)width/8));
++    }
++    else if(op==0xc2 || op==0xc3){name="ret";
++        if(op==0xc2)snprintf(a,sizeof(a),"0x%X",d2_take(&c,2));
++    }
++    else if(op==0xc6 || op==0xc7){name="mov";
++        modrm=1;
++        int width=op==0xc6?8:c.width;
++        d2_operand(&c,width,a,&reg);
++        if(reg)known=0;
++        snprintf(b,sizeof(b),"0x%X",d2_take(&c,(ScU32)width/8));
++    }
++    else if(op==0xc9)name="leave";
++    else if(op==0xcc)name="int3";
++    else if(op==0xcd){name="int";
++        snprintf(a,sizeof(a),"0x%X",d2_take(&c,1));
++    }
++    else if(op==0xc0 || op==0xc1 || (op>=0xd0 && op<=0xd3)){modrm=1;
++        int width=(op&1)?c.width:8;
++        d2_operand(&c,width,a,&reg);
++        name=d2_shift[reg];
++        if(op==0xc0 || op==0xc1)snprintf(b,sizeof(b),"%u",d2_take(&c,1));
++        else snprintf(b,sizeof(b),op<0xd2?"1":"cl");
++    }
++    else if(op>=0xe0 && op<=0xe3){static const char *names[4]={"loopne","loope","loop","jecxz"};
++        name=names[op-0xe0];
++        ScU32 displacement=(ScU32)(ScI32)(signed char)d2_take(&c,1);
++        out->target=address+c.at+displacement;
++        out->branch=1;
++        snprintf(a,sizeof(a),"%08X",out->target);
++    }
++    else if(op==0xe8 || op==0xe9 || op==0xeb){name=op==0xe8?"call":"jmp";
++        ScU32 displacement=d2_take(&c,op==0xeb?1u:(ScU32)c.width/8);
++        if(op==0xeb)displacement=(ScU32)(ScI32)(signed char)displacement;
++        else if(c.width==16)displacement=(ScU32)(ScI32)(short)displacement;
++        out->target=address+c.at+displacement;
++        if(c.width==16 && op!=0xeb)out->target&=65535u;
++        out->branch=1;
++        snprintf(a,sizeof(a),"%08X",out->target);
++    }
++    else if(op==0xf6 || op==0xf7){static const char *names[8]={"test",0,"not","neg","mul","imul","div","idiv"};
++        modrm=1;
++        int width=op==0xf6?8:c.width;
++        d2_operand(&c,width,a,&reg);
++        name=names[reg];
++        if(reg==0)snprintf(b,sizeof(b),"0x%X",d2_take(&c,(ScU32)width/8));
++    }
++    else if(op==0xfe || op==0xff){static const char *names[8]={"inc","dec","call",0,"jmp",0,"push",0};
++        modrm=1;
++        d2_operand(&c,op==0xfe?8:c.width,a,&reg);
++        name=names[reg];
++        if(op==0xfe && reg>1)known=0;
++    }
++    else if(op==0xfc)name="cld";
++    else if(op==0xfd)name="std";
++    else if(op==0xf8)name="clc";
++    else if(op==0xf9)name="stc";
++    else if(op==0x0f){ScU32 second=d2_take(&c,1);
++        if(second>=0x80 && second<=0x8f){name=d2_cc[second&15];
++            ScU32 displacement=d2_take(&c,(ScU32)c.width/8);
++            if(c.width==16)displacement=(ScU32)(ScI32)(short)displacement;
++            out->target=address+c.at+displacement;
++            if(c.width==16)out->target&=65535u;
++            out->branch=1;
++            snprintf(a,sizeof(a),"%08X",out->target);
++        }
++        else if(second>=0x90 && second<=0x9f){modrm=1;
++            static const char *names[16]={"seto","setno","setb","setae","sete","setne","setbe","seta","sets","setns","setp","setnp","setl","setge","setle","setg"};
++            name=names[second&15];
++            d2_operand(&c,8,a,&reg);
++        }
++        else if(second==0xaf || second==0xb6 || second==0xb7 || second==0xbe || second==0xbf){modrm=1;
++            name=second==0xaf?"imul":second>=0xbe?"movsx":"movzx";
++            d2_operand(&c,second==0xaf?c.width:(second&1)?16:8,b,&reg);
++            snprintf(a,sizeof(a),"%s",d2_reg(reg,c.width));
++        }
++        else if(second>=0xc8 && second<=0xcf && c.width==32){name="bswap";
++            snprintf(a,sizeof(a),"%s",d2_r32[second&7]);
++        }
++        else if(second==0x0b)name="ud2";
++        else if(second==0x31)name="rdtsc";
++        else if(second==0xa2)name="cpuid";
++        else if(second==0x1e && rep==0xf3 && d2_take(&c,1)==0xfb)name="endbr32";
++        else known=0;
++    }else known=0;
++    /* 地址宽度67、SSE/FPU等未实现编码不猜长度。前缀或截断同样只
++     * 回退首字节，避免一条误译吞掉后面的真实指令；TF完全独立。 */
++    if(rep && op!=0x90 && !(op>=0xa4 && op<=0xaf) && strcmp(name?name:"","endbr32"))known=0;
++    if(lock && !modrm)known=0;
++    if(!known || !name || c.bad || !c.at){out->branch=0;
++        out->known=0;
++        out->length=1;
++        snprintf(out->text,sizeof(out->text),"db 0x%02X",bytes[0]);
++    }
++    else{out->length=c.at;
++        out->known=1;
++        const char *prefix=lock?"lock ":rep && op>=0xa4 && op<=0xaf?(rep==0xf2?"repne ":"rep "):"";
++        snprintf(out->text,sizeof(out->text),"%s%s%s%s%s%s",prefix,name,a[0]?" ":"",a,b[0]?", ":"",b);
++    }
++    ScU32 at=0;
++    for(ScU32 i=0;i<out->length && at+3<sizeof(out->bytes);i++)at+=(ScU32)snprintf(out->bytes+at,sizeof(out->bytes)-at,i?" %02X":"%02X",bytes[i]);
++}
+--- /dev/null
++++ b/user/debug2/model.c
+@@ -0,0 +1,463 @@
++#include "D2APP.H"
++
++ScStatus D2RowAppend(ScArray *array,D2Row *row)
++{ScU32 count=D2Count(array);
++    if(count==UINT_MAX)return SC32_E_RANGE;
++    row->id=count+1;
++    return D2Append(array,row);
++}
++void D2FrameDestroy(D2Frame *f)
++{
++    if(!f)return;
++    if(f->sidecar_file)ScFileClose(f->sidecar_file);
++    free(f->sidecar_bytes);
++    for(ScU32 i=0;i<D2_PANES;i++)ScArrayRelease(f->rows[i]);
++    ScArrayRelease(f->modules);
++    ScArrayRelease(f->segments);
++    ScArrayRelease(f->lines);
++    free(f);
++}
++static ScStatus d2_memory(D2App *a,D2Frame *f,ScU32 address,ScU32 bytes,ScU32 flags,unsigned char *data,unsigned char *valid)
++{
++    ScDebugReadInfo info;
++    D2Record(&info,sizeof(info));
++    return ScDebugRead(&a->launch.target,f->snapshot.stop_generation,address,bytes,flags,data,valid,&info);
++}
++static ScStatus d2_primary(D2App *a,D2Frame *f)
++{
++    unsigned char data[1024],valid[1024];
++    ScStatus s;
++    ScU32 code_bytes=f->code_address>UINT_MAX-1023u?UINT_MAX-f->code_address+1u:1024u;
++    s=d2_memory(a,f,f->code_address,code_bytes,SC32_DEBUG_READ_ORIGINAL_CODE,data,valid);
++    if(s<0)return s;
++    for(ScU32 at=0;at<code_bytes && D2Count(f->rows[D2_CODE])<96;){D2Instruction instruction;
++        D2Decode(data+at,valid+at,code_bytes-at,f->code_address+at,&instruction);
++        D2Row r;
++        memset(&r,0,sizeof(r));
++        r.address=instruction.address;
++        r.aux=instruction.target;
++        r.flags=instruction.branch;
++        snprintf(r.text[0],sizeof(r.text[0]),r.address==f->snapshot.registers.eip?">":"");
++        snprintf(r.text[1],sizeof(r.text[1]),"%08X",r.address);
++        snprintf(r.text[2],sizeof(r.text[2]),"%s",instruction.bytes);
++        snprintf(r.text[3],sizeof(r.text[3]),"%s",instruction.text);
++        s=D2RowAppend(f->rows[D2_CODE],&r);
++        if(s<0)return s;
++        at+=instruction.length;
++    }
++    ScDebugRegisters *g=&f->snapshot.registers;
++    const char *names[21]={"EAX","EBX","ECX","EDX","ESI","EDI","EBP","ESP","EIP","EFLAGS","CS","SS","DS","ES","FS","GS","VECTOR","ERROR","CR2","STOP","PID / epoch"};
++    ScU32 values[21]={g->eax,g->ebx,g->ecx,g->edx,g->esi,g->edi,g->ebp,g->esp,g->eip,g->eflags,g->cs,g->ss,g->ds,g->es,g->fs,g->gs,g->vector,g->error,g->cr2,f->snapshot.stop_generation,a->launch.target.pid};
++    for(ScU32 i=0;i<21;i++){D2Row r;
++        memset(&r,0,sizeof(r));
++        r.address=values[i];
++        snprintf(r.text[0],sizeof(r.text[0]),"%s",names[i]);
++        snprintf(r.text[1],sizeof(r.text[1]),"%08X",values[i]);
++        if(i==9)snprintf(r.text[2],sizeof(r.text[2]),"CF%u PF%u AF%u ZF%u SF%u TF%u IF%u DF%u OF%u",g->eflags&1u,(g->eflags>>2)&1u,(g->eflags>>4)&1u,(g->eflags>>6)&1u,(g->eflags>>7)&1u,(g->eflags>>8)&1u,(g->eflags>>9)&1u,(g->eflags>>10)&1u,(g->eflags>>11)&1u);
++        if(i==20)snprintf(r.text[2],sizeof(r.text[2]),"process %u / bind %u",a->launch.target.generation,a->launch.target.binding);
++        s=D2RowAppend(f->rows[D2_REGISTERS],&r);
++        if(s<0)return s;
++    }
++    ScU32 memory_bytes=f->memory_address>UINT_MAX-255u?UINT_MAX-f->memory_address+1u:256u;
++    s=d2_memory(a,f,f->memory_address,memory_bytes,0,data,valid);
++    if(s<0)return s;
++    for(ScU32 at=0;at<memory_bytes;at+=16){D2Row r;
++        memset(&r,0,sizeof(r));
++        r.address=f->memory_address+at;
++        snprintf(r.text[0],sizeof(r.text[0]),"%08X",r.address);
++        ScU32 available=0,bytes=memory_bytes-at;
++        if(bytes>16)bytes=16;
++        for(ScU32 i=0;i<bytes;i++){ScU32 n=(ScU32)strlen(r.text[1]);
++            snprintf(r.text[1]+n,sizeof(r.text[1])-n,valid[at+i]?"%02X ":"?? ",data[at+i]);
++            r.text[2][i]=valid[at+i]?(data[at+i]>=32 && data[at+i]<127?(char)data[at+i]:'.'):'?';
++            if(valid[at+i])available++;
++        }
++        snprintf(r.text[3],sizeof(r.text[3]),"%u/%u readable",available,bytes);
++        s=D2RowAppend(f->rows[D2_MEMORY],&r);
++        if(s<0)return s;
++    }
++    ScU32 stack_bytes=g->esp>UINT_MAX-255u?UINT_MAX-g->esp+1u:256u;
++    s=d2_memory(a,f,g->esp,stack_bytes,0,data,valid);
++    if(s<0)return s;
++    for(ScU32 at=0;at+4<=stack_bytes;at+=4){D2Row r;
++        memset(&r,0,sizeof(r));
++        r.address=g->esp+at;
++        snprintf(r.text[0],sizeof(r.text[0]),"%08X",r.address);
++        int good=valid[at]&&valid[at+1]&&valid[at+2]&&valid[at+3];
++        r.aux=(ScU32)data[at]|((ScU32)data[at+1]<<8)|((ScU32)data[at+2]<<16)|((ScU32)data[at+3]<<24);
++        r.flags=(ScU32)good;
++        if(good)snprintf(r.text[1],sizeof(r.text[1]),"%08X",r.aux);
++        else snprintf(r.text[1],sizeof(r.text[1]),"????????");
++        snprintf(r.text[2],sizeof(r.text[2]),r.address==g->esp?"ESP":r.address==g->ebp?"EBP":r.address==g->ebp+4 && g->ebp<=UINT_MAX-4?"saved return":good?"":"unreadable");
++        s=D2RowAppend(f->rows[D2_STACK],&r);
++        if(s<0)return s;
++    }
++    return 0;
++}
++ScStatus D2CaptureStart(D2App *a)
++{
++    if(!a->active)return SC32_E_STALE;
++    D2Frame *f=calloc(1,sizeof(*f));
++    if(!f)return SC32_E_MEMORY;
++    D2Record(&f->snapshot,sizeof(f->snapshot));
++    ScStatus s=ScDebugQuery(&a->launch.target,&f->snapshot);
++    if(s<0 || f->snapshot.state!=SC32_DEBUG_PAUSED){D2FrameDestroy(f);
++        return s<0?s:SC32_E_BUSY;
++    }
++    f->code_address=a->follow_ip?f->snapshot.registers.eip:a->code_address;
++    f->memory_address=a->memory_address?a->memory_address:f->snapshot.registers.esp&~15u;
++    for(ScU32 i=0;s==0 && i<D2_PANES;i++)s=D2Array(sizeof(D2Row),&f->rows[i]);
++    if(s==0)s=D2Array(sizeof(ScDebugModule),&f->modules);
++    if(s==0)s=D2Array(sizeof(ScDebugSegment),&f->segments);
++    if(s==0)s=D2Array(sizeof(D2SourceLine),&f->lines);
++    /* 模块代数不变时，immutable登记及SHA绑定sidecar属于同一装载
++     * 寿命。单步只重读真实CPU/代码/内存/栈/断点，不反复读盘或
++     * 重建几千个库符号；模块装卸/ready提交会改变内核module_epoch。 */
++    if(s==0 && a->frame && a->frame->snapshot.module_epoch==f->snapshot.module_epoch){
++        ScArray **dest[5]={&f->modules,&f->segments,&f->lines,&f->rows[D2_MODULES],&f->rows[D2_SYMBOLS]};
++        ScArray *source[5]={a->frame->modules,a->frame->segments,a->frame->lines,a->frame->rows[D2_MODULES],a->frame->rows[D2_SYMBOLS]};
++        for(ScU32 i=0;s==0 && i<5;i++){s=ScArrayRetain(source[i]);
++            if(s==0){ScArrayRelease(*dest[i]);
++                 *dest[i]=source[i];
++        }}
++        if(s==0){f->cached_modules=1;
++            snprintf(f->sidecar_status,sizeof(f->sidecar_status),"%s",a->frame->sidecar_status);
++        }
++    }
++    if(s<0){D2FrameDestroy(f);
++        return s;
++    }
++    D2FrameDestroy(a->candidate);
++    a->candidate=f;
++    f->stage=1;
++    a->current=f->snapshot;
++    /* 新暂停一开始就撤旧现场可用性，界面不会把前一次暂停寄存器
++     * 与本次内存/模块拼起来。候选全部收齐并复查后才一次发布。 */
++    D2Clear(a);
++    char text[128];
++    snprintf(text,sizeof(text),"Reading pause %u - panes publish together",f->snapshot.stop_generation);
++    D2Status(a,text);
++    D2Schedule(a);
++    return 0;
++}
++static ScStatus d2_capture_breaks(D2App *a,D2Frame *f)
++{
++    ScDebugBreakpoint rows[32];
++    ScDebugPage p;
++    D2Record(&p,sizeof(p));
++    ScStatus s=ScDebugBreakpoints(&a->launch.target,f->snapshot.stop_generation,f->break_cursor,f->snapshot.breakpoint_epoch,rows,32,&p);
++    if(s<0)return s;
++    for(ScU32 i=0;i<p.count;i++){D2Row r;
++        memset(&r,0,sizeof(r));
++        r.address=rows[i].address;
++        r.aux=rows[i].id;
++        r.generation=rows[i].generation;
++        r.flags=rows[i].flags;
++        snprintf(r.text[0],sizeof(r.text[0]),"%08X",r.address);
++        snprintf(r.text[1],sizeof(r.text[1]),rows[i].flags&SC32_DEBUG_BP_INVALID?"unmapped":rows[i].flags&SC32_DEBUG_BP_PENDING?"hit / rearm":"enabled");
++        snprintf(r.text[2],sizeof(r.text[2]),"%u",rows[i].hits);
++        snprintf(r.text[3],sizeof(r.text[3]),"%u:%u",rows[i].id,rows[i].generation);
++        s=D2RowAppend(f->rows[D2_BREAKPOINTS],&r);
++        if(s<0)return s;
++    }
++    f->break_cursor=p.cursor;
++    if(p.flags&SC32_DEBUG_PAGE_FINISHED)f->stage=f->cached_modules?7:3;
++    return 0;
++}
++static ScStatus d2_capture_modules(D2App *a,D2Frame *f)
++{
++    ScDebugModule rows[16];
++    ScDebugPage p;
++    D2Record(&p,sizeof(p));
++    ScStatus s=ScDebugModules(&a->launch.target,f->snapshot.stop_generation,f->cursor,f->snapshot.module_epoch,rows,16,&p);
++    if(s<0)return s;
++    for(ScU32 i=0;i<p.count;i++){D2Row r;
++        memset(&r,0,sizeof(r));
++        r.address=rows[i].base;
++        r.aux=rows[i].id;
++        r.generation=rows[i].generation;
++        snprintf(r.text[0],sizeof(r.text[0]),"%s",rows[i].name);
++        snprintf(r.text[1],sizeof(r.text[1]),"%08X - %08X",rows[i].base,rows[i].base+rows[i].image_bytes-1);
++        snprintf(r.text[2],sizeof(r.text[2]),rows[i].kind==SC32_DEBUG_MAIN?"SCX":"ABI %u.%u / v%u",rows[i].abi_major,rows[i].abi_minor,rows[i].library_version);
++        snprintf(r.text[3],sizeof(r.text[3]),"%s",rows[i].source);
++        snprintf(r.text[4],sizeof(r.text[4]),"%s / epoch %u",rows[i].flags&SC32_DEBUG_MODULE_INITIALIZING?"initializing":"ready",rows[i].generation);
++        s=D2Append(f->modules,&rows[i]);
++        if(s==0)s=D2RowAppend(f->rows[D2_MODULES],&r);
++        if(s<0)return s;
++    }
++    f->cursor=p.cursor;
++    if(p.flags&SC32_DEBUG_PAGE_FINISHED){f->stage=4;
++        f->module_index=f->cursor=0;
++    }return 0;
++}
++static ScStatus d2_capture_segments(D2App *a,D2Frame *f)
++{
++    ScU32 count=D2Count(f->modules);
++    if(f->module_index>=count){f->stage=5;
++        f->module_index=f->cursor=0;
++        return 0;
++    }
++    ScDebugModule m;
++    if(ScArrayGet(f->modules,f->module_index,&m)<0)return SC32_E_STALE;
++    ScDebugSegment rows[32];
++    ScDebugPage p;
++    D2Record(&p,sizeof(p));
++    ScStatus s=ScDebugSegments(&a->launch.target,f->snapshot.stop_generation,m.id,m.generation,f->cursor,rows,32,&p);
++    if(s<0)return s;
++    if(p.count)s=ScArrayInsert(f->segments,D2Count(f->segments),rows,p.count);
++    if(s<0)return s;
++    f->cursor=p.cursor;
++    if(p.flags&SC32_DEBUG_PAGE_FINISHED){
++        ScU32 ro=0,rw=0,declared_x=0,mixed=0;
++        const ScDebugSegment *segments=D2Data(f->segments);
++        for(ScU32 i=f->segment_cursor;i<D2Count(f->segments);i++){if(segments[i].access&SC32_DEBUG_WRITABLE)rw++;
++            else ro++;
++            if(segments[i].access&SC32_DEBUG_EXECUTABLE)declared_x++;
++            if(segments[i].access&SC32_DEBUG_ACCESS_MIXED)mixed++;
++        }
++        D2Row module_row;
++        if(ScArrayGet(f->rows[D2_MODULES],f->module_index,&module_row)==0){
++            snprintf(module_row.text[4],sizeof(module_row.text[4]),"%s / RO%u RW%u X%u mixed%u / g%u",m.flags&SC32_DEBUG_MODULE_INITIALIZING?"initializing":"ready",ro,rw,declared_x,mixed,m.generation);
++            s=ScArraySet(f->rows[D2_MODULES],f->module_index,&module_row);
++            if(s<0)return s;
++        }
++        f->segment_cursor=D2Count(f->segments);
++        f->module_index++;
++        f->cursor=0;
++    }return 0;
++}
++static ScStatus d2_capture_symbols(D2App *a,D2Frame *f)
++{
++    if(f->module_index>=D2Count(f->modules)){f->stage=6;
++        return 0;
++    }
++    ScDebugModule m;
++    if(ScArrayGet(f->modules,f->module_index,&m)<0)return SC32_E_STALE;
++    ScDebugSymbol rows[32];
++    ScDebugPage p;
++    D2Record(&p,sizeof(p));
++    ScStatus s=ScDebugSymbols(&a->launch.target,f->snapshot.stop_generation,m.id,m.generation,f->cursor,rows,32,&p);
++    if(s<0)return s;
++    for(ScU32 i=0;i<p.count;i++){D2Row r;
++        memset(&r,0,sizeof(r));
++        r.address=rows[i].address;
++        r.aux=m.id;
++        r.generation=m.generation;
++        r.flags=rows[i].bytes;
++        snprintf(r.text[0],sizeof(r.text[0]),"%s",m.name);
++        snprintf(r.text[1],sizeof(r.text[1]),"%s",rows[i].name);
++        snprintf(r.text[2],sizeof(r.text[2]),"%08X",rows[i].address);
++        snprintf(r.text[3],sizeof(r.text[3]),rows[i].kind==SC32_DEBUG_SYMBOL_FUNCTION?"function / %uB":"data / %uB",rows[i].bytes);
++        snprintf(r.text[4],sizeof(r.text[4]),"SCL export / epoch %u",m.generation);
++        s=D2RowAppend(f->rows[D2_SYMBOLS],&r);
++        if(s<0)return s;
++    }
++    f->cursor=p.cursor;
++    if(p.flags&SC32_DEBUG_PAGE_FINISHED){f->module_index++;
++        f->cursor=0;
++    }return 0;
++}
++int D2AddressInModule(const D2Frame *f,const ScDebugModule *m,ScU32 address,ScU32 bytes,ScU32 access)
++{
++    if(!bytes || address>UINT_MAX-(bytes-1))return 0;
++    const ScDebugSegment *segments=D2Data(f->segments);
++    ScU32 n=D2Count(f->segments);
++    for(ScU32 i=0;i<n;i++)if(segments[i].module==m->id && segments[i].module_generation==m->generation
++    && address>=segments[i].address && address-segments[i].address<segments[i].bytes
++    && bytes<=segments[i].bytes-(address-segments[i].address) && (segments[i].access&access)==access)return 1;
++    return 0;
++}
++void D2Annotate(D2Frame *f)
++{
++    const D2Row *symbols=D2Data(f->rows[D2_SYMBOLS]),*breaks=D2Data(f->rows[D2_BREAKPOINTS]);
++    ScU32 count=D2Count(f->rows[D2_SYMBOLS]),break_count=D2Count(f->rows[D2_BREAKPOINTS]);
++    for(ScU32 pane=0;pane<2;pane++){ScArray *array=f->rows[pane?D2_STACK:D2_CODE];
++        for(ScU32 i=0;i<D2Count(array);i++){D2Row r;
++            if(ScArrayGet(array,i,&r)<0)continue;
++            ScU32 address=pane?r.aux:r.address,best=0;
++            int found=-1;
++            if(pane && !r.flags)continue;
++            for(ScU32 j=0;j<count;j++)if(address>=symbols[j].address && address-symbols[j].address<symbols[j].flags && (found<0 || symbols[j].address>best)){best=symbols[j].address;
++                found=(int)j;
++            }
++            if(found>=0)snprintf(r.text[pane?3:4],160,"%.36s!%.96s+0x%X",symbols[found].text[0],symbols[found].text[1],address-best);
++            if(!pane){const D2SourceLine *lines=D2Data(f->lines);
++                ScU32 line_count=D2Count(f->lines),nearest=0;
++                int match=-1;
++                for(ScU32 j=0;j<line_count;j++)if(lines[j].address<=address && (match<0 || lines[j].address>=nearest)
++                && found>=0 && lines[j].module==symbols[found].aux && lines[j].address>=symbols[found].address){nearest=lines[j].address;
++                    match=(int)j;
++                }
++                if(match>=0){char previous[160];
++                    snprintf(previous,sizeof(previous),"%s",r.text[4]);
++                    snprintf(r.text[4],sizeof(r.text[4]),"%.70s | %.64s:%u",previous,lines[match].path,lines[match].line);
++            }}
++            if(!pane)for(ScU32 j=0;j<break_count;j++)if(breaks[j].address==r.address && !(breaks[j].flags&SC32_DEBUG_BP_INVALID))snprintf(r.text[0],sizeof(r.text[0]),r.address==f->snapshot.registers.eip?"> *":"*");
++            (void)ScArraySet(array,i,&r);
++        }
++    }
++}
++ScStatus D2CaptureStep(D2App *a)
++{
++    D2Frame *f=a->candidate;
++    if(!f)return 0;
++    ScStatus s=0;
++    if(f->stage==1){s=d2_primary(a,f);
++        if(s==0)f->stage=2;
++    }
++    else if(f->stage==2)s=d2_capture_breaks(a,f);
++    else if(f->stage==3)s=d2_capture_modules(a,f);
++    else if(f->stage==4)s=d2_capture_segments(a,f);
++    else if(f->stage==5)s=d2_capture_symbols(a,f);
++    else if(f->stage==6){s=D2SidecarStep(a,f);
++        if(s==SC_UI_END){s=0;
++            f->stage=7;
++    }}
++    else{ScDebugSnapshot final;
++        D2Record(&final,sizeof(final));
++        s=ScDebugQuery(&a->launch.target,&final);
++        if(s==0 && (final.state!=SC32_DEBUG_PAUSED || final.stop_generation!=f->snapshot.stop_generation
++        || final.module_epoch!=f->snapshot.module_epoch || final.breakpoint_epoch!=f->snapshot.breakpoint_epoch))s=SC32_E_STALE;
++        if(s==0){D2Annotate(f);
++            a->candidate=0;
++            D2Publish(a,f);
++            return 0;
++    }}
++    if(s<0){D2FrameDestroy(a->candidate);
++        a->candidate=0;
++        D2Error(a,"Paused snapshot",s);
++        return s;
++    }
++    return SC32_PENDING;
++}
++ScStatus D2Launch(D2App *a,const char *command)
++{
++    if(a->active)return SC32_E_BUSY;
++    if(!command || !*command || strlen(command)>=sizeof(a->command))return SC32_E_RANGE;
++    ScDebugLaunchDesc desc;
++    D2Record(&desc,sizeof(desc));
++    desc.command=command;
++    for(ScU32 i=0;i<3;i++)desc.streams[i]=-1;
++    ScDebugLaunchInfo info;
++    D2Record(&info,sizeof(info));
++    ScStatus s=ScDebugLaunch(&desc,&info);
++    if(s<0)return s;
++    snprintf(a->command,sizeof(a->command),"%s",command);
++    a->launch=info;
++    a->active=1;
++    a->follow_ip=1;
++    a->memory_address=0;
++    D2Record(&a->current,sizeof(a->current));
++    return D2CaptureStart(a);
++}
++ScStatus D2Control(D2App *a,ScU32 action)
++{
++    if(!a->active)return SC32_E_STALE;
++    ScDebugSnapshot output;
++    D2Record(&output,sizeof(output));
++    ScStatus s=ScDebugControl(&a->launch.target,a->current.stop_generation,action,&output);
++    if(s<0)return s;
++    a->current=output;
++    D2FrameDestroy(a->candidate);
++    a->candidate=0;
++    if(output.state==SC32_DEBUG_PAUSED)return D2CaptureStart(a);
++    D2Clear(a);
++    D2Status(a,output.state==SC32_DEBUG_RUNNING?"Running - paused panes unavailable":"Target terminating");
++    D2Schedule(a);
++    return 0;
++}
++void D2Poll(D2App *a)
++{
++    if(!a->active){if(a->closing)ScUiContextStop(a->ui,0);
++        D2Schedule(a);
++        return;
++    }
++    ScJobInfo job;
++    D2Record(&job,sizeof(job));
++    ScStatus s=ScJobQuery(a->launch.job,&job);
++    if(s<0 || job.child_pid!=a->launch.target.pid || job.child_generation!=a->launch.target.generation || job.state==SC32_JOB_FINISHED){
++        if(s==0 && job.state==SC32_JOB_FINISHED){ScJobInfo result;
++            D2Record(&result,sizeof(result));
++            (void)ScJobWait(a->launch.job,0,&result);
++            char text[128];
++            snprintf(text,sizeof(text),"Target exited (%d)",job.exit_code);
++            D2Status(a,text);
++        }
++        else D2Error(a,"Target identity expired",s<0?s:SC32_E_STALE);
++        a->active=0;
++        D2FrameDestroy(a->candidate);
++        a->candidate=0;
++        D2Clear(a);
++        if(a->closing)ScUiContextStop(a->ui,0);
++        else if(a->restart_pending){a->restart_pending=0;
++            char command[1088];
++            snprintf(command,sizeof(command),"%s",a->command);
++            ScStatus launched=D2Launch(a,command);
++            if(launched<0)D2Error(a,"Restart",launched);
++        }D2Schedule(a);
++        return;
++    }
++    if(a->closing)return;
++    if(a->candidate){(void)D2CaptureStep(a);
++        D2Schedule(a);
++        return;
++    }
++    ScDebugSnapshot now;
++    D2Record(&now,sizeof(now));
++    s=ScDebugQuery(&a->launch.target,&now);
++    if(s<0){D2Error(a,"Debug state",s);
++        return;
++    }
++    if(now.state!=SC32_DEBUG_PAUSED){if(a->current.state!=now.state){a->current=now;
++            D2Clear(a);
++            D2Status(a,"Running - paused panes unavailable");
++        }return;
++    }
++    if(a->current.state!=now.state || a->current.stop_generation!=now.stop_generation
++    || a->current.module_epoch!=now.module_epoch || a->current.breakpoint_epoch!=now.breakpoint_epoch)(void)D2CaptureStart(a);
++}
++void D2Close(D2App *a)
++{
++    if(a->closing)return;
++    a->closing=1;
++    D2FrameDestroy(a->candidate);
++    a->candidate=0;
++    if(a->active){ScDebugSnapshot result;
++        D2Record(&result,sizeof(result));
++        ScStatus s=ScDebugControl(&a->launch.target,0,SC32_DEBUG_TERMINATE,&result);
++        if(s<0 && s!=SC32_E_STALE)D2Error(a,"Stop target",s);
++        else D2Status(a,"Closing - reclaiming owned target");
++    }
++    else ScUiContextStop(a->ui,0);
++    /* 关闭后即使窗口隐藏，领作业/回收仍推进；这不生成客户帧。 */
++    a->timer_period=0;
++    D2Schedule(a);
++}
++void D2Schedule(D2App *a)
++{
++    ScU32 period=a->closing?1:a->candidate?1:a->active?(a->current.state==SC32_DEBUG_RUNNING?5:25):0;
++    ScUiNode root=a->float_root?a->float_root:a->root;
++    if(!period){if(a->timer)ScUiTimerCancel(a->ui,a->timer);
++        a->timer=a->timer_period=a->timer_root=0;
++        return;
++    }
++    if(a->timer && a->timer_period==period && a->timer_root==root)return;
++    ScUiTimerDesc timer;
++    D2Record(&timer,sizeof(timer));
++    timer.node=root;
++    timer.flags=a->closing?SC_UI_TIMER_BACKGROUND:SC_UI_TIMER_DRAW_ONLY;
++    ScMonotonicClock clock;
++    D2Record(&clock,sizeof(clock));
++    if(ScSystemMonotonic(&clock)<0)return;
++    timer.deadline=clock.ticks;
++    timer.deadline.lo+=period;
++    if(timer.deadline.lo<period)timer.deadline.hi++;
++    timer.period_ticks=period;
++    ScStatus s=a->timer?ScUiTimerChange(a->ui,a->timer,&timer):ScUiTimerSet(a->ui,&timer,&a->timer);
++    if(s==SC_UI_E_STALE){a->timer=0;
++        s=ScUiTimerSet(a->ui,&timer,&a->timer);
++    }
++    if(s==0){a->timer_period=period;
++        a->timer_root=root;
++    }
++}
+--- /dev/null
++++ b/user/debug2/sidecar.c
+@@ -0,0 +1,209 @@
++#include "D2APP.H"
++#include "SCDBGFILE.H"
++
++static ScU32 d2_sdbg_word(const unsigned char *p,ScU32 offset)
++{return (ScU32)p[offset]|((ScU32)p[offset+1]<<8)|((ScU32)p[offset+2]<<16)|((ScU32)p[offset+3]<<24);
++}
++static int d2_sdbg_span(ScU32 *cursor,ScU32 count,ScU32 stride,ScU32 offset,ScU32 total)
++{
++    if(offset!=*cursor || count>(UINT_MAX-*cursor)/stride)return 0;
++     *cursor+=count*stride;
++    return *cursor<=total;
++}
++static const char *d2_sdbg_string(D2Frame *f,ScU32 offset,ScU32 maximum)
++{
++    unsigned char *p=f->sidecar_bytes;
++    ScU32 size=d2_sdbg_word(p,SCDBG_H_STRINGS_SIZE),base=d2_sdbg_word(p,SCDBG_H_STRINGS);
++    if(offset>=size)return 0;
++    const char *s=(const char *)p+base+offset;
++    ScU32 n=0;
++    while(offset+n<size && s[n]){if((unsigned char)s[n]<32 || n==maximum)return 0;
++        n++;
++    }
++    if(offset+n==size || !n || ScUtf8Validate(s,n,0)<0)return 0;
++    return s;
++}
++static int d2_sdbg_address(const ScDebugModule *m,ScU32 value,ScU32 *out)
++{
++    if(m->kind==SC32_DEBUG_SCL){if(value>UINT_MAX-m->base)return 0;
++        value+=m->base;
++    }*out=value;
++    return 1;
++}
++static ScStatus d2_sdbg_header(D2Frame *f,const ScDebugModule *m)
++{
++    const unsigned char *p=f->sidecar_bytes;
++    if(f->sidecar_size<SCDBG_HEADER_SIZE || memcmp(p,SCDBG_MAGIC,8)
++    || d2_sdbg_word(p,SCDBG_H_VERSION)!=SCDBG_VERSION
++    || d2_sdbg_word(p,SCDBG_H_HEADER_SIZE)!=SCDBG_HEADER_SIZE
++    || d2_sdbg_word(p,SCDBG_H_MACHINE)!=SCDBG_MACHINE_I386
++    || d2_sdbg_word(p,SCDBG_H_ADDRESS_KIND)!=(m->kind==SC32_DEBUG_SCL?SCDBG_ADDRESS_RVA:SCDBG_ADDRESS_VA)
++    || d2_sdbg_word(p,SCDBG_H_IMAGE_FILE_SIZE)!=m->source_bytes
++    || !(m->flags&SC32_DEBUG_VERIFIED_SOURCE)
++    || memcmp(p+SCDBG_H_IMAGE_SHA256,m->sha256,32) || !d2_sdbg_word(p,SCDBG_H_OBJECT_COUNT))return SC32_E_STALE;
++    ScU32 cursor=SCDBG_HEADER_SIZE;
++    if(!d2_sdbg_span(&cursor,d2_sdbg_word(p,SCDBG_H_SYMBOL_COUNT),SCDBG_SYMBOL_SIZE,d2_sdbg_word(p,SCDBG_H_SYMBOLS),f->sidecar_size)
++    || !d2_sdbg_span(&cursor,d2_sdbg_word(p,SCDBG_H_FILE_COUNT),SCDBG_FILE_SIZE,d2_sdbg_word(p,SCDBG_H_FILES),f->sidecar_size)
++    || !d2_sdbg_span(&cursor,d2_sdbg_word(p,SCDBG_H_LINE_COUNT),SCDBG_LINE_SIZE,d2_sdbg_word(p,SCDBG_H_LINES),f->sidecar_size)
++    || !d2_sdbg_word(p,SCDBG_H_STRINGS_SIZE)
++    || !d2_sdbg_span(&cursor,d2_sdbg_word(p,SCDBG_H_STRINGS_SIZE),1,d2_sdbg_word(p,SCDBG_H_STRINGS),f->sidecar_size)
++    || cursor!=f->sidecar_size || p[cursor-1])return SC32_E_INVALID;
++    return 0;
++}
++static ScStatus d2_sdbg_validate_record(D2Frame *f,const ScDebugModule *m,ScU32 kind,ScU32 index)
++{
++    const unsigned char *p=f->sidecar_bytes;
++    ScU32 objects=d2_sdbg_word(p,SCDBG_H_OBJECT_COUNT);
++    if(kind==0){const unsigned char *r=p+d2_sdbg_word(p,SCDBG_H_SYMBOLS)+index*SCDBG_SYMBOL_SIZE;
++        ScU32 address,bytes=d2_sdbg_word(r,SCDBG_S_SIZE),symbol_kind=d2_sdbg_word(r,SCDBG_S_KIND);
++        if(!d2_sdbg_string(f,d2_sdbg_word(r,SCDBG_S_NAME),127)
++        || !d2_sdbg_address(m,d2_sdbg_word(r,SCDBG_S_ADDRESS),&address)
++        || (symbol_kind!=1 && symbol_kind!=2) || d2_sdbg_word(r,SCDBG_S_BINDING)>1
++        || d2_sdbg_word(r,SCDBG_S_OBJECT)>=objects
++        || !D2AddressInModule(f,m,address,bytes,symbol_kind==1?SC32_DEBUG_EXECUTABLE:SC32_DEBUG_READABLE))return SC32_E_INVALID;
++    }else if(kind==1){const unsigned char *r=p+d2_sdbg_word(p,SCDBG_H_FILES)+index*SCDBG_FILE_SIZE;
++        if(d2_sdbg_word(r,SCDBG_F_OBJECT)>=objects || !d2_sdbg_string(f,d2_sdbg_word(r,SCDBG_F_PATH),4095)
++        || d2_sdbg_word(r,16))return SC32_E_INVALID;
++    }else{const unsigned char *r=p+d2_sdbg_word(p,SCDBG_H_LINES)+index*SCDBG_LINE_SIZE;
++        ScU32 address,file_index=d2_sdbg_word(r,SCDBG_L_FILE),object=d2_sdbg_word(r,SCDBG_L_OBJECT);
++        if(!d2_sdbg_address(m,d2_sdbg_word(r,SCDBG_L_ADDRESS),&address)
++        || !D2AddressInModule(f,m,address,1,SC32_DEBUG_EXECUTABLE) || !d2_sdbg_word(r,SCDBG_L_LINE)
++        || file_index>=d2_sdbg_word(p,SCDBG_H_FILE_COUNT) || object>=objects)return SC32_E_INVALID;
++        const unsigned char *source=p+d2_sdbg_word(p,SCDBG_H_FILES)+file_index*SCDBG_FILE_SIZE;
++        if(d2_sdbg_word(source,SCDBG_F_OBJECT)!=object)return SC32_E_INVALID;
++    }
++    return 0;
++}
++static void d2_sdbg_next(D2Frame *f)
++{
++    if(f->sidecar_file)ScFileClose(f->sidecar_file);
++    f->sidecar_file=0;
++    free(f->sidecar_bytes);
++    f->sidecar_bytes=0;
++    f->sidecar_stage=f->sidecar_cursor=f->sidecar_read=f->sidecar_size=0;
++    f->sidecar_module++;
++}
++ScStatus D2SidecarStep(D2App *a,D2Frame *f)
++{
++    (void)a;
++    if(f->sidecar_module>=D2Count(f->modules))return SC_UI_END;
++    ScDebugModule module;
++    if(ScArrayGet(f->modules,f->sidecar_module,&module)<0)return SC32_E_STALE;
++    if(!f->sidecar_stage){
++        char path[65];
++        ScU32 n=(ScU32)strlen(module.source);
++        if(n+5>=sizeof(path)){snprintf(f->sidecar_status,sizeof(f->sidecar_status),"Sidecar path exceeds SandFS name limit");
++            d2_sdbg_next(f);
++            return 0;
++        }
++        snprintf(path,sizeof(path),"%s.sdbg",module.source);
++        ScFileOpenDesc desc;
++        D2Record(&desc,sizeof(desc));
++        desc.path=path;
++        desc.flags=SC32_FILE_READ;
++        ScStatus s=ScFileOpen(&desc,&f->sidecar_file);
++        if(s==SC32_E_NOT_FOUND){d2_sdbg_next(f);
++            return 0;
++        }
++        if(s<0){snprintf(f->sidecar_status,sizeof(f->sidecar_status),"Sidecar unavailable: %d",s);
++            d2_sdbg_next(f);
++            return 0;
++        }
++        ScFileInfo info;
++        D2Record(&info,sizeof(info));
++        s=ScFileQuery(f->sidecar_file,&info);
++        if(s<0 || info.length<SCDBG_HEADER_SIZE || info.length>16u*1024u*1024u){snprintf(f->sidecar_status,sizeof(f->sidecar_status),"Sidecar rejected: invalid length");
++            d2_sdbg_next(f);
++            return 0;
++        }
++        f->sidecar_size=info.length;
++        f->sidecar_bytes=malloc(info.length);
++        if(!f->sidecar_bytes)return SC32_E_MEMORY;
++        f->sidecar_stage=1;
++        return 0;
++    }
++    if(f->sidecar_stage==1){ScU32 bytes=f->sidecar_size-f->sidecar_read;
++        if(bytes>65536)bytes=65536;
++        ScIoResult io;
++        D2Record(&io,sizeof(io));
++        ScStatus s=ScFileRead(f->sidecar_file,f->sidecar_bytes+f->sidecar_read,bytes,&io);
++        if(s<0 || io.transferred!=bytes){snprintf(f->sidecar_status,sizeof(f->sidecar_status),"Sidecar rejected: short read");
++            d2_sdbg_next(f);
++            return 0;
++        }
++        f->sidecar_read+=bytes;
++        if(f->sidecar_read==f->sidecar_size){s=d2_sdbg_header(f,&module);
++            if(s<0){snprintf(f->sidecar_status,sizeof(f->sidecar_status),"Sidecar rejected: image identity or format (%d)",s);
++                d2_sdbg_next(f);
++                return 0;
++            }
++            f->sidecar_stage=2;
++            f->sidecar_cursor=0;
++        }return 0;
++    }
++    const unsigned char *p=f->sidecar_bytes;
++    if(f->sidecar_stage>=2 && f->sidecar_stage<=4){ScU32 kind=f->sidecar_stage-2;
++        ScU32 count=d2_sdbg_word(p,kind==0?SCDBG_H_SYMBOL_COUNT:kind==1?SCDBG_H_FILE_COUNT:SCDBG_H_LINE_COUNT);
++        for(ScU32 work=0;work<128 && f->sidecar_cursor<count;work++,f->sidecar_cursor++){
++            ScStatus s=d2_sdbg_validate_record(f,&module,kind,f->sidecar_cursor);
++            if(s<0){snprintf(f->sidecar_status,sizeof(f->sidecar_status),"Sidecar rejected: record outside verified module");
++                d2_sdbg_next(f);
++                return 0;
++        }}
++        if(f->sidecar_cursor==count){f->sidecar_stage++;
++            f->sidecar_cursor=0;
++        }return 0;
++    }
++    if(f->sidecar_stage==5){ScU32 count=d2_sdbg_word(p,SCDBG_H_SYMBOL_COUNT);
++        for(ScU32 work=0;work<128 && f->sidecar_cursor<count;work++,f->sidecar_cursor++){
++            const unsigned char *r=p+d2_sdbg_word(p,SCDBG_H_SYMBOLS)+f->sidecar_cursor*SCDBG_SYMBOL_SIZE;
++            D2Row row;
++            memset(&row,0,sizeof(row));
++            d2_sdbg_address(&module,d2_sdbg_word(r,SCDBG_S_ADDRESS),&row.address);
++            row.aux=module.id;
++            row.generation=module.generation;
++            row.flags=d2_sdbg_word(r,SCDBG_S_SIZE);
++            const char *name=d2_sdbg_string(f,d2_sdbg_word(r,SCDBG_S_NAME),127);
++            snprintf(row.text[0],sizeof(row.text[0]),"%s",module.name);
++            snprintf(row.text[1],sizeof(row.text[1]),"%s",name);
++            snprintf(row.text[2],sizeof(row.text[2]),"%08X",row.address);
++            snprintf(row.text[3],sizeof(row.text[3]),d2_sdbg_word(r,SCDBG_S_KIND)==1?"function / %uB":"data / %uB",row.flags);
++            snprintf(row.text[4],sizeof(row.text[4]),"verified .sdbg / %s TU %u",d2_sdbg_word(r,SCDBG_S_BINDING)?"global":"local",d2_sdbg_word(r,SCDBG_S_OBJECT));
++            /* 重复导出只替换同一真实地址/名字的说明，TU本地符号保留
++             * 独立行；同名局部变量不能合并成一个全局身份。 */
++            int replaced=0;
++            if(d2_sdbg_word(r,SCDBG_S_BINDING)){const D2Row *existing=D2Data(f->rows[D2_SYMBOLS]);
++                for(ScU32 i=0;i<D2Count(f->rows[D2_SYMBOLS]);i++)if(existing[i].aux==module.id && existing[i].address==row.address && !strcmp(existing[i].text[1],name)){
++                    row.id=existing[i].id;
++                    ScStatus s=ScArraySet(f->rows[D2_SYMBOLS],i,&row);
++                    if(s<0)return s;
++                    replaced=1;
++                    break;
++            }}
++            if(!replaced){ScStatus s=D2RowAppend(f->rows[D2_SYMBOLS],&row);
++                if(s<0)return s;
++            }
++        }
++        if(f->sidecar_cursor==count){f->sidecar_stage=6;
++            f->sidecar_cursor=0;
++        }return 0;
++    }
++    ScU32 count=d2_sdbg_word(p,SCDBG_H_LINE_COUNT);
++    for(ScU32 work=0;work<128 && f->sidecar_cursor<count;work++,f->sidecar_cursor++){
++        const unsigned char *r=p+d2_sdbg_word(p,SCDBG_H_LINES)+f->sidecar_cursor*SCDBG_LINE_SIZE;
++        ScU32 file_index=d2_sdbg_word(r,SCDBG_L_FILE);
++        const unsigned char *file=p+d2_sdbg_word(p,SCDBG_H_FILES)+file_index*SCDBG_FILE_SIZE;
++        D2SourceLine line;
++        memset(&line,0,sizeof(line));
++        d2_sdbg_address(&module,d2_sdbg_word(r,SCDBG_L_ADDRESS),&line.address);
++        line.module=module.id;
++        line.line=d2_sdbg_word(r,SCDBG_L_LINE);
++        line.object=d2_sdbg_word(r,SCDBG_L_OBJECT);
++        snprintf(line.path,sizeof(line.path),"%s",d2_sdbg_string(f,d2_sdbg_word(file,SCDBG_F_PATH),4095));
++        ScStatus s=D2Append(f->lines,&line);
++        if(s<0)return s;
++    }
++    if(f->sidecar_cursor==count){snprintf(f->sidecar_status,sizeof(f->sidecar_status),"Verified .sdbg symbols and source lines");
++        d2_sdbg_next(f);
++    }return 0;
++}
+--- /dev/null
++++ b/user/debug2/ui.c
+@@ -0,0 +1,723 @@
++#include "D2APP.H"
++
++static ScStatus d2_ui_event(ScUiContext *,const ScUiEvent *,void *);
++static ScStatus d2_layout(D2App *a,ScUiNode node,ScU32 mode,ScI32 width,ScI32 height,ScU32 flex,ScI32 min_w,ScI32 min_h)
++{
++    ScUiLayoutDesc d;
++    D2Record(&d,sizeof(d));
++    d.mode=mode;
++    d.width=width;
++    d.height=height;
++    d.flex_weight=flex;
++    d.min_width=min_w;
++    d.min_height=min_h;
++    d.max_width=d.max_height=SC_UI_AUTO;
++    d.align_h=d.align_v=SC_UI_STRETCH;
++    d.column_span=d.row_span=1;
++    return ScUiNodeSetLayout(a->ui,node,&d);
++}
++static ScStatus d2_widget(D2App *a,ScUiNode parent,ScU32 kind,const char *text,ScU32 command,ScUiNode *out)
++{
++    ScUiWidgetDesc d;
++    D2Record(&d,sizeof(d));
++    d.kind=kind;
++    d.parent=parent;
++    d.command=command;
++    d.text=D2Text(text);
++    if(kind==SC_UI_TEXTBOX || kind==SC_UI_TABLE)d.flags=SC_UI_FOCUSABLE|SC_UI_TABSTOP;
++    ScStatus s=ScUiWidgetCreate(a->ui,&d,out);
++    if(s==0)s=d2_layout(a,*out,SC_UI_ABSOLUTE,SC_UI_AUTO,SC_UI_AUTO,0,0,0);
++    return s;
++}
++static ScStatus d2_button(D2App *a,ScUiNode parent,const char *text,ScU32 command,ScI32 width)
++{ScUiNode n;
++    ScStatus s=d2_widget(a,parent,SC_UI_BUTTON,text,command,&n);
++    return s<0?s:d2_layout(a,n,SC_UI_ABSOLUTE,width,28,0,width,24);
++}
++static ScStatus d2_provider(void *opaque,const ScUiDataRequest *request,ScUiDataReply *reply)
++{
++    D2Pane *pane=opaque;
++    D2Frame *f=pane->app->frame;
++    ScArray *array=f?f->rows[pane->kind]:0;
++    ScU32 count=D2Count(array);
++    reply->revision=pane->revision;
++    if(request->operation==SC_UI_DATA_COUNT){reply->total=count;
++        return 0;
++    }
++    if(request->operation==SC_UI_DATA_CHILD_COUNT){reply->total=0;
++        return 0;
++    }
++    ScU32 index=request->operation==SC_UI_DATA_CHILD_AT?request->index:request->item?request->item-1:UINT_MAX;
++    if(index>=count)return request->operation==SC_UI_DATA_CHILD_AT?SC_UI_END:SC_UI_E_STALE;
++    const D2Row *rows=D2Data(array);
++    if(!rows)return SC_UI_E_STALE;
++    const D2Row *row=rows+index;
++    reply->item=row->id;
++    reply->total=index;
++    reply->state=SC_UI_VISIBLE|SC_UI_ENABLED;
++    if(request->operation==SC_UI_DATA_INDEX_OF || request->operation==SC_UI_DATA_ITEM || request->operation==SC_UI_DATA_CHILD_AT)return 0;
++    if(request->operation!=SC_UI_DATA_CELL || request->field>=5)return SC_UI_E_NOT_SUPPORTED;
++    reply->value.type=SC_VALUE_UTF8;
++    reply->value.data=row->text[request->field];
++    reply->value.bytes=(ScU32)strlen(row->text[request->field]);
++    return 0;
++}
++static ScStatus d2_pane(D2App *a,ScU32 kind,ScUiNode parent,const char *title,ScU32 command)
++{
++    D2Pane *p=&a->panes[kind];
++    p->app=a;
++    p->kind=kind;
++    p->revision=1;
++    ScStatus s=d2_widget(a,parent,SC_UI_PANEL,"",0,&p->container);
++    if(s<0)return s;
++    s=d2_layout(a,p->container,SC_UI_VBOX,SC_UI_AUTO,SC_UI_AUTO,1,0,0);
++    if(s<0)return s;
++    ScUiNode label;
++    s=d2_widget(a,p->container,SC_UI_LABEL,title,0,&label);
++    if(s==0)s=d2_layout(a,label,SC_UI_ABSOLUTE,SC_UI_AUTO,20,0,0,18);
++    if(s==0)s=ScUiNodeSetFont(a->ui,label,SC_UI_FONT_DENSE);
++    if(s==0)s=d2_widget(a,p->container,SC_UI_TABLE,"",command,&p->table);
++    if(s==0)s=d2_layout(a,p->table,SC_UI_ABSOLUTE,SC_UI_AUTO,SC_UI_AUTO,1,0,0);
++    if(s==0)s=ScUiNodeSetFont(a->ui,p->table,kind==D2_MODULES?SC_UI_FONT_DENSE:SC_UI_FONT_CODE);
++    ScUiProviderDesc provider;
++    D2Record(&provider,sizeof(provider));
++    provider.procedure=d2_provider;
++    provider.context=p;
++    if(s==0)s=ScUiProviderCreate(&provider,&p->provider);
++    if(s==0)s=ScUiSelectionCreate(p->provider,SC_UI_SELECTION_ALLOW_EMPTY,&p->selection);
++    if(s==0)s=ScUiViewBind(a->ui,p->table,p->provider,p->selection);
++    static const char *names[D2_PANES][5]={
++        {"","Address","Bytes","Instruction","Symbol / source"},{"Register","Value","Flags / identity","",""},
++        {"Address","Hex bytes","ASCII","Access",""},{"Address","Value","Role","Symbol",""},
++        {"Address","State","Hits","Identity",""},{"Module","Mapped range","Version","Source","State"},
++        {"Module","Symbol","Address","Kind / size","Provenance"}};
++    static const ScI32 widths[D2_PANES][5]={{28,88,148,286,330},{80,94,310,0,0},{90,405,155,150,0},
++        {90,96,110,310,0},{100,150,70,120,0},{168,190,136,280,170},{145,235,90,130,245}};
++    ScUiColumnDesc columns[5];
++    ScU32 count=0;
++    memset(columns,0,sizeof(columns));
++    for(ScU32 i=0;i<5;i++)if(widths[kind][i]){D2Record(columns+count,sizeof(columns[count]));
++        columns[count].column=count+1;
++        columns[count].field=i;
++        columns[count].title=D2Text(names[kind][i]);
++        columns[count].width=widths[kind][i];
++        columns[count].min_width=i?44:20;
++        columns[count].max_width=1200;
++        columns[count].format=SC_UI_FORMAT_TEXT;
++        count++;
++    }
++    if(s==0)s=ScUiTableSetColumns(a->ui,p->table,columns,count);
++    return s;
++}
++static ScStatus d2_menu_item(D2App *a,ScUiMenu *menu,ScU32 command,const char *label,ScU32 key,ScU32 modifiers)
++{
++    ScUiMenuItem item;
++    D2Record(&item,sizeof(item));
++    item.command=command;
++    item.label=D2Text(label);
++    item.help=D2Text(label);
++    D2Record(&item.shortcut,sizeof(item.shortcut));
++    item.shortcut.key=key;
++    item.shortcut.modifiers=modifiers;
++    ScU32 id;
++    ScStatus s=ScUiMenuInsert(menu,0,&item,&id);
++    if(s<0)return s;
++    ScUiCommandDesc d;
++    D2Record(&d,sizeof(d));
++    d.command=command;
++    d.label=item.label;
++    d.shortcut=item.shortcut;
++    return ScUiCommandSet(a->ui,&d);
++}
++static ScStatus d2_menus(D2App *a)
++{
++    ScStatus s=ScUiMenuCreate(&a->menu);
++    if(s==0)s=ScUiMenuCreate(&a->file_menu);
++    if(s==0)s=ScUiMenuCreate(&a->debug_menu);
++    if(s==0)s=ScUiMenuCreate(&a->view_menu);
++    if(s==0)s=ScUiMenuCreate(&a->tools);
++    if(s<0)return s;
++    struct {ScU32 command,group;
++        const char *text;
++        ScU32 key,mods;
++    } items[]={
++        {D2_BROWSE,0,"&Choose executable...",'o',SC32_MOD_CONTROL},{D2_LAUNCH,0,"&Launch target",SC32_KEY_F1+4,SC32_MOD_CONTROL},
++        {D2_RESTART,0,"&Restart target",SC32_KEY_F1+1,0},{D2_STOP,0,"&Terminate target",SC32_KEY_F1+4,SC32_MOD_SHIFT},{D2_QUIT,0,"E&xit",'q',SC32_MOD_CONTROL},
++        {D2_CONTINUE,1,"&Continue",SC32_KEY_F1+4,0},{D2_PAUSE,1,"&Pause",SC32_KEY_F1+3,0},{D2_STEP,1,"Single &step",SC32_KEY_F1+7,0},
++        {D2_BREAK_ADD,1,"Add &breakpoint",SC32_KEY_F1+8,0},{D2_BREAK_REMOVE,1,"&Remove selected breakpoint",SC32_KEY_DELETE,SC32_MOD_CONTROL},
++        {D2_FOLLOW_IP,1,"Follow instruction &pointer",'i',SC32_MOD_CONTROL},{D2_FOLLOW_BRANCH,1,"Follow selected &branch",SC32_KEY_F1+6,0},
++        {D2_GOTO_CODE,2,"Go to &code address",'g',SC32_MOD_CONTROL},{D2_GOTO_MEMORY,2,"Go to &memory address",'m',SC32_MOD_CONTROL},
++        {D2_PREVIOUS,2,"Previous memory page",SC32_KEY_PAGEUP,SC32_MOD_ALT},{D2_NEXT,2,"Next memory page",SC32_KEY_PAGEDOWN,SC32_MOD_ALT},
++        {D2_FLOAT,2,"&Float information dock",0,0},{D2_DOCK,2,"&Dock information panels",0,0},{D2_RESET_LAYOUT,2,"&Reset layout",0,0},
++        {D2_SAVE_LAYOUT,2,"&Save layout",0,0},{D2_LOAD_LAYOUT,2,"&Load layout",0,0},{D2_MODULE_DETAILS,2,"Module &properties...",0,0},{D2_ABOUT,2,"About Debug 2",SC32_KEY_F1,0}};
++    for(ScU32 i=0;s==0 && i<sizeof(items)/sizeof(items[0]);i++)s=d2_menu_item(a,items[i].group==0?a->file_menu:items[i].group==1?a->debug_menu:a->view_menu,
++    items[i].command,items[i].text,items[i].key,items[i].mods);
++    ScUiMenu *menus[3]={a->file_menu,a->debug_menu,a->view_menu};
++    const char *labels[3]={"&Target","&Debug","&View"};
++    for(ScU32 i=0;s==0 && i<3;i++){ScUiMenuItem item;
++        D2Record(&item,sizeof(item));
++        item.label=D2Text(labels[i]);
++        item.submenu=menus[i];
++        D2Record(&item.shortcut,sizeof(item.shortcut));
++        ScU32 id;
++        s=ScUiMenuInsert(a->menu,0,&item,&id);
++    }
++    ScU32 commands[8]={D2_LAUNCH,D2_RESTART,D2_CONTINUE,D2_PAUSE,D2_STEP,D2_STOP,D2_BREAK_ADD,D2_FOLLOW_IP};
++    const char *tooltext[8]={"Launch","Restart","Continue","Pause","Step","Stop","Breakpoint","Follow EIP"};
++    for(ScU32 i=0;s==0 && i<8;i++){ScUiMenuItem item;
++        D2Record(&item,sizeof(item));
++        item.command=commands[i];
++        item.label=D2Text(tooltext[i]);
++        D2Record(&item.shortcut,sizeof(item.shortcut));
++        ScU32 id;
++        s=ScUiMenuInsert(a->tools,0,&item,&id);
++    }
++    if(s==0)s=ScUiMenuBind(a->ui,a->menubar,a->menu);
++    if(s==0)s=ScUiToolbarBind(a->ui,a->toolbar,a->tools);
++    return s;
++}
++void D2Status(D2App *a,const char *text)
++{
++    snprintf(a->message,sizeof(a->message),"%s",text);
++    if(!a->status)return;
++    ScUiStatusPart parts[2];
++    memset(parts,0,sizeof(parts));
++    D2Record(parts,sizeof(parts[0]));
++    D2Record(parts+1,sizeof(parts[1]));
++    parts[0].part=1;
++    parts[0].width=780;
++    parts[0].text=D2Text(a->message);
++    char target[112];
++    if(a->active)snprintf(target,sizeof(target),"PID %u / process %u / bind %u",a->launch.target.pid,a->launch.target.generation,a->launch.target.binding);
++    else snprintf(target,sizeof(target),"Owned Ring 3 debugging");
++    parts[1].part=2;
++    parts[1].width=-1;
++    parts[1].text=D2Text(target);
++    ScUiStatusSetParts(a->ui,a->status,parts,2);
++}
++void D2Error(D2App *a,const char *operation,ScStatus status)
++{char text[240],name[80];
++    ScU32 bytes=0;
++    if(ScErrorName(status,name,sizeof(name),&bytes)<0)snprintf(name,sizeof(name),"error %d",status);
++    snprintf(text,sizeof(text),"%s: %s (%d)",operation,name,status);
++    D2Status(a,text);
++}
++static void d2_notify(D2App *a)
++{
++    ScUiBatchBegin(a->ui);
++    for(ScU32 i=0;i<D2_PANES;i++){D2Pane *p=a->panes+i;
++        p->revision++;
++        ScUiDataChange d;
++        D2Record(&d,sizeof(d));
++        d.kind=SC_UI_DATA_RESET;
++        d.revision=p->revision;
++        if(p->provider)ScUiProviderNotify(p->provider,&d);
++    }
++    ScUiBatchEnd(a->ui);
++}
++void D2Clear(D2App *a)
++{D2Frame *previous=a->frame;
++    a->frame=0;
++    d2_notify(a);
++    D2FrameDestroy(previous);
++}
++void D2Publish(D2App *a,D2Frame *f)
++{
++    D2Frame *previous=a->frame;
++    a->frame=f;
++    a->current=f->snapshot;
++    a->code_address=f->code_address;
++    a->memory_address=f->memory_address;
++    d2_notify(a);
++    D2FrameDestroy(previous);
++    const char *reason=f->snapshot.reason==SC32_DEBUG_STOP_ENTRY?"entry":f->snapshot.reason==SC32_DEBUG_STOP_STEP?"single step":f->snapshot.reason==SC32_DEBUG_STOP_BREAKPOINT?"breakpoint":f->snapshot.reason==SC32_DEBUG_STOP_PAUSE?"pause":"exception";
++    char text[240];
++    snprintf(text,sizeof(text),"Paused %u (%s) / EIP %08X / %u modules, %u symbols%s%.70s",f->snapshot.stop_generation,reason,f->snapshot.registers.eip,
++    D2Count(f->modules),D2Count(f->rows[D2_SYMBOLS]),f->sidecar_status[0]?" / ":"",f->sidecar_status);
++    D2Status(a,text);
++    const D2Row *rows=D2Data(f->rows[D2_CODE]);
++    for(ScU32 i=0;i<D2Count(f->rows[D2_CODE]);i++)if(rows[i].address==f->snapshot.registers.eip){ScUiSelectionSet(a->panes[D2_CODE].selection,rows[i].id,SC_UI_REPLACE);
++        ScUiViewEnsureItem(a->ui,a->panes[D2_CODE].table,rows[i].id);
++        break;
++    }
++}
++static ScStatus d2_copy_box(D2App *a,ScUiNode node,char *out,ScU32 capacity)
++{
++    ScString *s=0;
++    ScStatus status=ScUiNodeCopyText(a->ui,node,&s);
++    if(status<0)return status;
++    ScView v;
++    D2Record(&v,sizeof(v));
++    status=ScStringView(s,&v);
++    if(status==0){if(v.bytes>=capacity || (v.bytes && memchr(v.data,0,v.bytes)))status=SC32_E_RANGE;
++        else{memcpy(out,v.data,v.bytes);
++            out[v.bytes]=0;
++    }}
++    ScStringRelease(s);
++    return status;
++}
++static ScStatus d2_address(D2App *a,ScU32 *out)
++{
++    char text[160];
++    ScStatus s=d2_copy_box(a,a->addressbox,text,sizeof(text));
++    if(s<0)return s;
++    if(!strcmp(text,"eip")){if(!a->frame)return SC32_E_BUSY;
++         *out=a->frame->snapshot.registers.eip;
++        return 0;
++    }
++    if(!strcmp(text,"esp")){if(!a->frame)return SC32_E_BUSY;
++         *out=a->frame->snapshot.registers.esp;
++        return 0;
++    }
++    const char *p=text;
++    if(p[0]=='0' && (p[1]=='x'||p[1]=='X'))p+=2;
++    ScU32 value=0,digits=0;
++    int valid=1;
++    for(;*p;p++){int d=*p>='0'&&*p<='9'?*p-'0':*p>='a'&&*p<='f'?*p-'a'+10:*p>='A'&&*p<='F'?*p-'A'+10:-1;
++        if(d<0 || digits==8){valid=0;
++            break;
++        }value=(value<<4)|(ScU32)d;
++        digits++;
++    }
++    if(valid && digits){*out=value;
++        return 0;
++    }
++    if(!a->frame)return SC32_E_BUSY;
++    int found=0;
++    const D2Row *rows=D2Data(a->frame->rows[D2_SYMBOLS]);
++    for(ScU32 i=0;i<D2Count(a->frame->rows[D2_SYMBOLS]);i++){char qualified[208];
++        snprintf(qualified,sizeof(qualified),"%s!%s",rows[i].text[0],rows[i].text[1]);
++        if(!strcmp(text,rows[i].text[1]) || !strcmp(text,qualified)){if(found && value!=rows[i].address)return SC32_E_EXISTS;
++            value=rows[i].address;
++            found=1;
++    }}
++    if(!found)return SC32_E_NOT_FOUND;
++     *out=value;
++    return 0;
++}
++ScStatus D2Navigate(D2App *a,ScU32 kind)
++{
++    if(!a->frame || a->candidate)return SC32_E_BUSY;
++    ScU32 address;
++    ScStatus s=d2_address(a,&address);
++    if(s<0)return s;
++    if(kind==D2_GOTO_MEMORY)a->memory_address=address;
++    else{a->code_address=address;
++        a->follow_ip=0;
++    }return D2CaptureStart(a);
++}
++static ScStatus d2_selected(D2App *a,ScU32 kind,D2Row *row)
++{
++    if(!a->frame)return SC32_E_BUSY;
++    ScUiSelectionInfo selection;
++    D2Record(&selection,sizeof(selection));
++    ScStatus s=ScUiSelectionQuery(a->panes[kind].selection,&selection);
++    if(s<0)return s;
++    if(!selection.current)return SC32_E_NOT_FOUND;
++    return ScArrayGet(a->frame->rows[kind],selection.current-1,row);
++}
++static ScStatus d2_dock(D2App *a)
++{
++    if(!a->float_root)return 0;
++    ScStatus s=ScUiDockMove(a->ui,a->dock,a->workspace,SC_UI_DOCK_FILL);
++    if(s<0)return s;
++    ScUiNode floating=a->float_root;
++    a->float_root=0;
++    ScUiNodeDestroy(a->ui,floating);
++    a->timer_period=0;
++    D2Schedule(a);
++    return d2_layout(a,a->dock,SC_UI_VBOX,SC_UI_AUTO,170,1,0,80);
++}
++static ScStatus d2_layout_file(D2App *a,int save)
++{
++    if(!a->layout_path[0]){ScU32 size=0;
++        ScStatus s=ScSessionPath("DEBUG2.LAYOUT",a->layout_path,sizeof(a->layout_path),&size);
++        if(s<0)return s;
++    }
++    ScStatus s=d2_dock(a);
++    if(s<0)return s;
++    ScConfig *config=0;
++    s=ScConfigCreate(&config);
++    if(s<0)return s;
++    if(save){s=ScUiLayoutSave(a->ui,a->root,config);
++        ScString *serialized=0;
++        const char *text=0;
++        ScContainerInfo info;
++        D2Record(&info,sizeof(info));
++        if(s==0)s=ScConfigSerialize(config,0,&serialized);
++        if(s==0)s=ScStringCStr(serialized,&text);
++        if(s==0)s=ScStringQuery(serialized,&info);
++        ScU32 transferred=0;
++        if(s==0)s=ScPathReplace(a->layout_path,text,info.length,&transferred);
++        if(s==0 && transferred!=info.length)s=SC32_E_IO;
++        ScStringRelease(serialized);
++    }else{ScPathStatInfo stat;
++        D2Record(&stat,sizeof(stat));
++        s=ScPathStat(a->layout_path,&stat);
++        if(s==0 && (stat.kind!=SC32_PATH_FILE || !stat.bytes || stat.bytes>65536))s=SC32_E_RANGE;
++        unsigned char *bytes=s==0?malloc(stat.bytes):0;
++        if(s==0 && !bytes)s=SC32_E_MEMORY;
++        ScU32 got=0;
++        if(s==0)s=ScPathRead(a->layout_path,0,bytes,stat.bytes,&got);
++        if(s==0 && got!=stat.bytes)s=SC32_E_IO;
++        ScParseIssue issue;
++        D2Record(&issue,sizeof(issue));
++        if(s==0)s=ScConfigParse(config,bytes,got,0,&issue);
++        if(s==0)s=ScUiLayoutRestore(a->ui,a->root,config);
++        free(bytes);
++    }
++    ScConfigRelease(config);
++    return s;
++}
++static ScStatus d2_dialog_complete(ScUiContext *ui,const ScUiEvent *event,void *opaque)
++{
++    (void)ui;
++    (void)event;
++    D2App *a=opaque;
++    if(!a->dialog)return 0;
++    ScUiDialogInfo info;
++    D2Record(&info,sizeof(info));
++    if(a->dialog_kind==1 && ScUiDialogQuery(a->dialog,&info)==0 && info.stage==SC_UI_DIALOG_DONE && info.command==SC_UI_DIALOG_OK){ScString *path=0;
++        const char *text=0;
++        ScStatus s=ScUiDialogSelectedPath(a->dialog,0,&path);
++        if(s==0)s=ScStringCStr(path,&text);
++        if(s==0){ScUiText t=D2Text(text);
++            s=ScUiNodeSetText(a->ui,a->commandbox,&t);
++        }if(s<0)D2Error(a,"Choose executable",s);
++        ScStringRelease(path);
++    }
++    ScUiDialog *old=a->dialog;
++    a->dialog=0;
++    a->dialog_kind=0;
++    ScUiDialogRelease(old);
++    return 0;
++}
++static ScStatus d2_module_properties(D2App *a)
++{
++    if(a->dialog)return SC32_E_BUSY;
++    D2Row row;
++    ScStatus s=d2_selected(a,D2_MODULES,&row);
++    if(s<0)return s;
++    ScDebugModule module;
++    int found=0;
++    for(ScU32 i=0;i<D2Count(a->frame->modules);i++){
++        if(ScArrayGet(a->frame->modules,i,&module)==0 && module.id==row.aux && module.generation==row.generation){found=1;
++            break;
++    }}
++    if(!found)return SC32_E_STALE;
++    const char *keys[8]={"name","source","identity","mapping","version","file","sha256","permissions"};
++    const char *labels[8]={"Module","Source path","Load identity","Mapped bytes","Library ABI","Source revision","Source SHA256","Current access"};
++    char values[8][160];
++    memset(values,0,sizeof(values));
++    snprintf(values[0],160,"%s",module.name);
++    snprintf(values[1],160,"%s",module.source);
++    snprintf(values[2],160,"module %u / load generation %u",module.id,module.generation);
++    snprintf(values[3],160,"%08X .. %08X / %uB (%uB allocation)",module.base,module.base+module.image_bytes-1,module.image_bytes,module.allocation_bytes);
++    snprintf(values[4],160,module.kind==SC32_DEBUG_MAIN?"SCX main image":"%u.%u / release %u",module.abi_major,module.abi_minor,module.library_version);
++    snprintf(values[5],160,"%uB / revision %u",module.source_bytes,module.source_revision);
++    for(ScU32 i=0;i<32;i++)snprintf(values[6]+i*2,160-i*2,"%02X",module.sha256[i]);
++    snprintf(values[7],160,"%.92s; X is declared, no hardware NX",row.text[4]);
++    ScConfig *config=0;
++    s=ScConfigCreate(&config);
++    ScUiFieldDesc fields[8];
++    memset(fields,0,sizeof(fields));
++    for(ScU32 i=0;s==0 && i<8;i++){ScValue value={sizeof(value),1,SC_VALUE_UTF8,0,0,0,values[i],(ScU32)strlen(values[i])};
++        s=ScConfigSet(config,"MODULE",keys[i],&value);
++        D2Record(fields+i,sizeof(fields[i]));
++        fields[i].field=i+1;
++        fields[i].kind=SC_UI_TEXTBOX;
++        fields[i].flags=SC_UI_FIELD_READONLY;
++        fields[i].section="MODULE";
++        fields[i].key=keys[i];
++        fields[i].label=D2Text(labels[i]);
++    }
++    ScUiPropertySheetDesc d;
++    D2Record(&d,sizeof(d));
++    d.owner=a->root;
++    d.title=D2Text("Verified runtime module properties");
++    d.initial=config;
++    d.context=a;
++    d.completion=d2_dialog_complete;
++    if(s==0){a->dialog_kind=2;
++        s=ScUiPropertySheet(a->ui,&d,fields,8,&a->dialog);
++        if(s<0)a->dialog_kind=0;
++    }ScConfigRelease(config);
++    return s;
++}
++static ScStatus d2_execute(D2App *a,ScU32 command)
++{
++    if(a->closing)return SC32_E_BUSY;
++    if(command==D2_QUIT){D2Close(a);
++        return 0;
++    }
++    if(command==D2_LAUNCH){char target[1088];
++        ScStatus s=d2_copy_box(a,a->commandbox,target,sizeof(target));
++        return s<0?s:D2Launch(a,target);
++    }
++    if(command==D2_BROWSE){if(a->dialog)return SC32_E_BUSY;
++        ScUiFileDialogDesc d;
++        D2Record(&d,sizeof(d));
++        d.owner=a->root;
++        d.flags=SC_UI_FILE_OPEN;
++        d.title=D2Text("Choose executable");
++        d.directory="/APPS";
++        d.completion=d2_dialog_complete;
++        d.context=a;
++        a->dialog_kind=1;
++        ScStatus s=ScUiFileDialog(a->ui,&d,&a->dialog);
++        if(s<0)a->dialog_kind=0;
++        return s;
++    }
++    if(command==D2_RESTART){if(a->active){a->restart_pending=1;
++            ScStatus s=D2Control(a,SC32_DEBUG_TERMINATE);
++            if(s<0)a->restart_pending=0;
++            return s;
++        }
++        char target[1088];
++        snprintf(target,sizeof(target),"%s",a->command);
++        return D2Launch(a,target);
++    }
++    if(command==D2_CONTINUE || command==D2_PAUSE || command==D2_STEP || command==D2_STOP)return D2Control(a,command==D2_CONTINUE?SC32_DEBUG_CONTINUE:command==D2_PAUSE?SC32_DEBUG_PAUSE:command==D2_STEP?SC32_DEBUG_STEP:SC32_DEBUG_TERMINATE);
++    if(command==D2_GOTO_CODE || command==D2_GOTO_MEMORY)return D2Navigate(a,command);
++    if(command==D2_FOLLOW_IP){a->follow_ip=1;
++        return D2CaptureStart(a);
++    }
++    if(command==D2_PREVIOUS || command==D2_NEXT){if(!a->frame)return SC32_E_BUSY;
++        if(command==D2_PREVIOUS){if(a->memory_address<256)return SC32_E_RANGE;
++            a->memory_address-=256;
++        }
++        else{if(a->memory_address>UINT_MAX-256)return SC32_E_RANGE;
++            a->memory_address+=256;
++        }return D2CaptureStart(a);
++    }
++    if(command==D2_BREAK_ADD){ScU32 address;
++        ScStatus s=d2_address(a,&address);
++        if(s<0){D2Row selected;
++            s=d2_selected(a,D2_CODE,&selected);
++            if(s<0)return s;
++            address=selected.address;
++        }
++        ScDebugBreakpoint bp;
++        D2Record(&bp,sizeof(bp));
++        s=ScDebugBreakpointAdd(&a->launch.target,a->current.stop_generation,address,&bp);
++        return s<0?s:D2CaptureStart(a);
++    }
++    if(command==D2_BREAK_REMOVE){D2Row row;
++        ScStatus s=d2_selected(a,D2_BREAKPOINTS,&row);
++        if(s<0)return s;
++        s=ScDebugBreakpointRemove(&a->launch.target,a->current.stop_generation,row.aux,row.generation);
++        return s<0?s:D2CaptureStart(a);
++    }
++    if(command==D2_FOLLOW_BRANCH || command==D2_ACTIVATE_CODE || command==D2_ACTIVATE_STACK || command==D2_ACTIVATE_MODULE || command==D2_ACTIVATE_SYMBOL){
++        ScU32 pane=command==D2_ACTIVATE_STACK?D2_STACK:command==D2_ACTIVATE_MODULE?D2_MODULES:command==D2_ACTIVATE_SYMBOL?D2_SYMBOLS:D2_CODE;
++        D2Row row;
++        ScStatus s=d2_selected(a,pane,&row);
++        if(s<0)return s;
++        ScU32 address=row.address;
++        if(pane==D2_STACK){if(!row.flags)return SC32_E_RANGE;
++            address=row.aux;
++        }
++        if(command==D2_FOLLOW_BRANCH){if(!row.flags)return SC32_E_NOT_SUPPORTED;
++            address=row.aux;
++        }
++        a->code_address=address;
++        a->follow_ip=0;
++        char value[16];
++        snprintf(value,sizeof(value),"%08X",address);
++        ScUiText t=D2Text(value);
++        ScUiNodeSetText(a->ui,a->addressbox,&t);
++        return D2CaptureStart(a);
++    }
++    if(command==D2_FLOAT){if(a->float_root)return SC32_E_BUSY;
++        ScUiWindowDesc d;
++        D2Record(&d,sizeof(d));
++        d.title=D2Text("Debug 2 - modules, symbols and breakpoints");
++        d.client_width=900;
++        d.client_height=340;
++        d.style=SC32_STYLE_STANDARD;
++        d.owner=a->root;
++        ScStatus s=ScUiDockFloat(a->ui,a->dock,&d,&a->float_root);
++        if(s==0)s=d2_layout(a,a->float_root,SC_UI_DOCK_LAYOUT,SC_UI_AUTO,SC_UI_AUTO,1,0,0);
++        return s;
++    }
++    if(command==D2_DOCK)return d2_dock(a);
++    if(command==D2_RESET_LAYOUT){ScStatus s=d2_dock(a);
++        return s<0?s:ScUiLayoutRestore(a->ui,a->root,a->saved_layout);
++    }
++    if(command==D2_SAVE_LAYOUT || command==D2_LOAD_LAYOUT){ScStatus s=d2_layout_file(a,command==D2_SAVE_LAYOUT);
++        if(s==0)D2Status(a,command==D2_SAVE_LAYOUT?"Layout saved":"Layout restored");
++        return s;
++    }
++    if(command==D2_MODULE_DETAILS)return d2_module_properties(a);
++    if(command==D2_ABOUT){if(a->dialog)return SC32_E_BUSY;
++        ScUiMessageBoxDesc d;
++        D2Record(&d,sizeof(d));
++        d.owner=a->root;
++        d.title=D2Text("SandCore Debug 2");
++        d.message=D2Text("Owned processes, true TF / INT3, synchronized paused views, verified runtime SCL modules and SCDB1MIO symbols.\nF5 Continue - F4 Pause - F8 Step - F9 Breakpoint");
++        d.completion=d2_dialog_complete;
++        d.context=a;
++        a->dialog_kind=2;
++        ScStatus s=ScUiMessageBox(a->ui,&d,&a->dialog);
++        if(s<0)a->dialog_kind=0;
++        return s;
++    }
++    return SC32_E_NOT_SUPPORTED;
++}
++static ScStatus d2_ui_event(ScUiContext *ui,const ScUiEvent *e,void *opaque)
++{
++    D2App *a=opaque;
++    (void)ui;
++    if(e->type==SC_UI_EVENT_COMMAND_QUERY && e->phase==SC_UI_TARGET_PHASE && e->bytes==sizeof(ScUiCommandDesc)){
++        ScUiCommandDesc *d=(ScUiCommandDesc *)e->data;
++        int enabled=1;
++        if(d->command==D2_LAUNCH || d->command==D2_BROWSE)enabled=!a->active && !a->closing;
++        else if(d->command==D2_RESTART)enabled=a->command[0] && !a->closing && !a->restart_pending;
++        else if(d->command==D2_PAUSE)enabled=a->active && a->current.state==SC32_DEBUG_RUNNING;
++        else if(d->command==D2_STOP)enabled=a->active;
++        else if(d->command==D2_CONTINUE || d->command==D2_STEP)enabled=a->active && a->current.state==SC32_DEBUG_PAUSED && !a->candidate;
++        else if(d->command>=D2_CONTINUE && d->command<D2_FLOAT)enabled=a->active && a->frame && !a->candidate;
++        if(!enabled)d->flags|=SC_UI_MENU_DISABLED;
++        else d->flags&=~SC_UI_MENU_DISABLED;
++        return 0;
++    }
++    if(e->type==SC_UI_EVENT_CLOSE_REQUEST && e->phase==SC_UI_CAPTURE_PHASE){
++        if(e->node==a->float_root){ScStatus s=d2_dock(a);
++            if(s<0)D2Error(a,"Dock",s);
++            return SC_UI_VETO;
++        }
++        if(e->node==a->root){D2Close(a);
++            return SC_UI_VETO;
++    }}
++    if(e->type==SC_UI_EVENT_TIMER && e->phase==SC_UI_CAPTURE_PHASE){D2Poll(a);
++        return 0;
++    }
++    if(e->type==SC_UI_EVENT_COMMAND && (e->phase==SC_UI_BUBBLE_PHASE || (!e->node && e->phase==SC_UI_TARGET_PHASE))){
++        ScStatus s=d2_execute(a,e->command);
++        D2Schedule(a);
++        if(s<0)D2Error(a,"Command",s);
++        return SC_UI_HANDLED;
++    }
++    if(e->type==SC_UI_EVENT_KEY_DOWN && e->phase==SC_UI_CAPTURE_PHASE && e->key==13 && e->node==a->addressbox){ScStatus s=D2Navigate(a,D2_GOTO_CODE);
++        if(s<0)D2Error(a,"Address",s);
++        return SC_UI_HANDLED;
++    }
++    if(e->type==SC_UI_EVENT_KEY_DOWN && e->phase==SC_UI_CAPTURE_PHASE && e->key==13 && e->node==a->commandbox && !a->active){ScStatus s=d2_execute(a,D2_LAUNCH);
++        if(s<0)D2Error(a,"Launch",s);
++        return SC_UI_HANDLED;
++    }
++    if(e->type==SC_UI_EVENT_VISIBILITY && e->phase==SC_UI_CAPTURE_PHASE && e->node==a->root){
++        ScWindowInfo info;
++        D2Record(&info,sizeof(info));
++        if(ScUiWindowNative(a->ui,a->root,&info)==0){a->visible=(info.state&SC32_WINDOW_VISIBLE)!=0 && !(info.state&SC32_WINDOW_MINIMIZED);
++            if(a->visible)D2Poll(a);
++        }return 0;
++    }
++    if(e->type==SC_UI_EVENT_POINTER_DOWN && e->phase==SC_UI_CAPTURE_PHASE && e->buttons&2u){
++        for(ScU32 i=0;i<D2_PANES;i++)if(e->node==a->panes[i].table){ScUiNodeInfo n;
++            D2Record(&n,sizeof(n));
++            ScU32 item=0,column=0;
++            if(ScUiNodeQuery(a->ui,e->node,&n)==0 && ScUiViewHitTest(a->ui,e->node,e->x-n.rectangle.x,e->y-n.rectangle.y,&item,&column)==0 && item)ScUiSelectionSet(a->panes[i].selection,item,SC_UI_REPLACE);
++            ScU32 popup=0;
++            ScUiMenuOpen(a->ui,e->root,a->debug_menu,e->x,e->y,0,&popup);
++            return SC_UI_HANDLED;
++    }}
++    return 0;
++}
++ScStatus D2BuildUi(D2App *a)
++{
++    ScUiContextDesc c;
++    D2Record(&c,sizeof(c));
++    c.flags=SC_UI_STOP_LAST_ROOT;
++    c.cache_budget_bytes=1024u*1024u;
++    c.undo_budget_bytes=0;
++    c.scheduling_quantum=32;
++    ScStatus s=ScUiContextCreate(&c,&a->ui);
++    if(s<0)return s;
++    ScUiWindowDesc w;
++    D2Record(&w,sizeof(w));
++    w.title=D2Text("SandCore Debug 2");
++    w.client_width=1220;
++    w.client_height=840;
++    w.style=SC32_STYLE_STANDARD;
++    s=ScUiWindowCreate(a->ui,&w,&a->root);
++    if(s<0)return s;
++    s=d2_layout(a,a->root,SC_UI_VBOX,SC_UI_AUTO,SC_UI_AUTO,1,0,0);
++    if(s==0)s=d2_widget(a,a->root,SC_UI_MENUBAR,"",0,&a->menubar);
++    if(s==0)s=d2_layout(a,a->menubar,SC_UI_ABSOLUTE,SC_UI_AUTO,24,0,0,22);
++    if(s==0)s=d2_widget(a,a->root,SC_UI_TOOLBAR,"",0,&a->toolbar);
++    if(s==0)s=d2_layout(a,a->toolbar,SC_UI_ABSOLUTE,SC_UI_AUTO,32,0,0,28);
++    ScUiNode targetrow,label;
++    if(s==0)s=d2_widget(a,a->root,SC_UI_PANEL,"",0,&targetrow);
++    if(s==0)s=d2_layout(a,targetrow,SC_UI_HBOX,SC_UI_AUTO,30,0,0,28);
++    if(s==0)s=d2_widget(a,targetrow,SC_UI_LABEL,"Target",0,&label);
++    if(s==0)s=d2_layout(a,label,SC_UI_ABSOLUTE,54,28,0,0,0);
++    if(s==0)s=d2_widget(a,targetrow,SC_UI_TEXTBOX,"",D2_LAUNCH,&a->commandbox);
++    if(s==0)s=d2_layout(a,a->commandbox,SC_UI_ABSOLUTE,SC_UI_AUTO,28,1,80,24);
++    if(s==0)s=d2_button(a,targetrow,"Browse...",D2_BROWSE,84);
++    if(s==0)s=d2_button(a,targetrow,"Launch",D2_LAUNCH,76);
++    ScUiNode nav;
++    if(s==0)s=d2_widget(a,a->root,SC_UI_PANEL,"",0,&nav);
++    if(s==0)s=d2_layout(a,nav,SC_UI_HBOX,SC_UI_AUTO,30,0,0,28);
++    if(s==0)s=d2_widget(a,nav,SC_UI_LABEL,"Address",0,&label);
++    if(s==0)s=d2_layout(a,label,SC_UI_ABSOLUTE,60,28,0,0,0);
++    if(s==0)s=d2_widget(a,nav,SC_UI_TEXTBOX,"eip",D2_GOTO_CODE,&a->addressbox);
++    if(s==0)s=d2_layout(a,a->addressbox,SC_UI_ABSOLUTE,SC_UI_AUTO,28,1,80,24);
++    if(s==0)s=ScUiNodeSetFont(a->ui,a->addressbox,SC_UI_FONT_CODE);
++    if(s==0)s=d2_button(a,nav,"Code",D2_GOTO_CODE,64);
++    if(s==0)s=d2_button(a,nav,"Memory",D2_GOTO_MEMORY,76);
++    if(s==0)s=d2_button(a,nav,"Add BP",D2_BREAK_ADD,76);
++    if(s==0)s=d2_button(a,nav,"Remove BP",D2_BREAK_REMOVE,92);
++    ScUiNode scroll;
++    if(s==0)s=d2_widget(a,a->root,SC_UI_SCROLL,"",0,&scroll);
++    if(s==0)s=d2_layout(a,scroll,SC_UI_SCROLL_LAYOUT,SC_UI_AUTO,SC_UI_AUTO,1,0,0);
++    if(s==0)s=d2_widget(a,scroll,SC_UI_PANEL,"",0,&a->workspace);
++    if(s==0)s=d2_layout(a,a->workspace,SC_UI_VBOX,SC_UI_AUTO,SC_UI_AUTO,1,600,580);
++    if(s==0)s=d2_widget(a,a->workspace,SC_UI_PANEL,"",0,&a->top);
++    if(s==0)s=d2_layout(a,a->top,SC_UI_HBOX,SC_UI_AUTO,300,3,0,140);
++    if(s==0)s=d2_pane(a,D2_CODE,a->top,"Disassembly - original code bytes",D2_ACTIVATE_CODE);
++    if(s==0)s=d2_layout(a,a->panes[D2_CODE].container,SC_UI_VBOX,SC_UI_AUTO,SC_UI_AUTO,3,260,0);
++    ScUiNode split;
++    if(s==0)s=d2_widget(a,a->top,SC_UI_SPLITTER,"",0,&split);
++    if(s==0)s=d2_layout(a,split,SC_UI_ABSOLUTE,5,SC_UI_AUTO,0,5,0);
++    if(s==0)s=d2_pane(a,D2_REGISTERS,a->top,"Registers - same paused generation",0);
++    if(s==0)s=d2_layout(a,a->panes[D2_REGISTERS].container,SC_UI_VBOX,300,SC_UI_AUTO,0,190,0);
++    if(s==0)s=d2_widget(a,a->workspace,SC_UI_SPLITTER,"",0,&split);
++    if(s==0)s=d2_layout(a,split,SC_UI_ABSOLUTE,SC_UI_AUTO,5,0,0,5);
++    if(s==0)s=d2_widget(a,a->workspace,SC_UI_PANEL,"",0,&a->bottom);
++    if(s==0)s=d2_layout(a,a->bottom,SC_UI_HBOX,SC_UI_AUTO,170,2,0,100);
++    if(s==0)s=d2_pane(a,D2_MEMORY,a->bottom,"Memory - ?? means unreadable",0);
++    if(s==0)s=d2_layout(a,a->panes[D2_MEMORY].container,SC_UI_VBOX,SC_UI_AUTO,SC_UI_AUTO,3,260,0);
++    if(s==0)s=d2_widget(a,a->bottom,SC_UI_SPLITTER,"",0,&split);
++    if(s==0)s=d2_layout(a,split,SC_UI_ABSOLUTE,5,SC_UI_AUTO,0,5,0);
++    if(s==0)s=d2_pane(a,D2_STACK,a->bottom,"Stack - activate a readable value to follow",D2_ACTIVATE_STACK);
++    if(s==0)s=d2_layout(a,a->panes[D2_STACK].container,SC_UI_VBOX,300,SC_UI_AUTO,2,190,0);
++    if(s==0)s=d2_widget(a,a->workspace,SC_UI_SPLITTER,"",0,&split);
++    if(s==0)s=d2_layout(a,split,SC_UI_ABSOLUTE,SC_UI_AUTO,5,0,0,5);
++    if(s==0)s=d2_widget(a,a->workspace,SC_UI_DOCK,"",0,&a->dock);
++    if(s==0)s=d2_layout(a,a->dock,SC_UI_VBOX,SC_UI_AUTO,170,1,0,80);
++    if(s==0)s=d2_widget(a,a->dock,SC_UI_TAB,"",0,&a->tabs);
++    if(s==0)s=d2_layout(a,a->tabs,SC_UI_OVERLAY,SC_UI_AUTO,SC_UI_AUTO,1,0,0);
++    const ScU32 order[3]={D2_MODULES,D2_SYMBOLS,D2_BREAKPOINTS};
++    const char *titles[3]={"Modules","Symbols","Breakpoints"};
++    for(ScU32 i=0;s==0 && i<3;i++){ScU32 pane=order[i];
++        s=d2_pane(a,pane,a->tabs,titles[i],pane==D2_MODULES?D2_ACTIVATE_MODULE:pane==D2_SYMBOLS?D2_ACTIVATE_SYMBOL:0);
++        ScUiText title=D2Text(titles[i]);
++        if(s==0)s=ScUiTabAdd(a->ui,a->tabs,a->panes[pane].container,&title);
++    }
++    if(s==0)s=d2_widget(a,a->root,SC_UI_STATUS,"",0,&a->status);
++    if(s==0)s=d2_layout(a,a->status,SC_UI_ABSOLUTE,SC_UI_AUTO,24,0,0,20);
++    if(s==0)s=d2_menus(a);
++    ScUiSubscription listener;
++    D2Record(&listener,sizeof(listener));
++    listener.phases=SC_UI_TARGET_PHASE|SC_UI_CAPTURE_PHASE|SC_UI_BUBBLE_PHASE;
++    listener.procedure=d2_ui_event;
++    listener.context=a;
++    if(s==0)s=ScUiListen(a->ui,0,&listener,&a->listener);
++    if(s==0)s=ScConfigCreate(&a->saved_layout);
++    if(s==0)s=ScUiLayoutSave(a->ui,a->root,a->saved_layout);
++    if(s==0)s=ScUiLayout(a->ui,a->root);
++    if(s==0){D2Status(a,"Choose a real target or enter an executable command. Target starts paused.");
++        a->visible=1;
++    }return s;
++}
+--- /dev/null
++++ b/user/debugapi/SC32DEBUGWIRE.H
+@@ -0,0 +1,31 @@
++#ifndef SANDCORE_SC32DEBUGWIRE_H
++#define SANDCORE_SC32DEBUGWIRE_H
++#include "../SC32DEBUG.H"
++/* 本头仅内核/SC32API/ROOT私有实现使用，不安装到普通INC。 */
++#define SC32_D2_FIRST 0x900u
++#define SC32_D2_LAUNCH 0x900u
++#define SC32_D2_QUERY 0x901u
++#define SC32_D2_CONTROL 0x902u
++#define SC32_D2_READ 0x903u
++#define SC32_D2_ADD 0x904u
++#define SC32_D2_REMOVE 0x905u
++#define SC32_D2_BREAKS 0x906u
++#define SC32_D2_MODULES 0x907u
++#define SC32_D2_SEGMENTS 0x908u
++#define SC32_D2_SYMBOLS 0x909u
++#define SC32_D2_REGISTER 0x910u
++#define SC32_D2_UNREGISTER 0x911u
++#define SC32_D2_READY 0x912u
++#define SC32_D2_END 0x920u
++#define SC32_D2_ERROR_BASE 0x1200u
++typedef struct {
++    ScU32 size,version; ScDebugRef target;
++    ScU32 stop,action,address,bytes,flags,data,readable,id,generation;
++    ScU32 after,epoch,rows,capacity,module,module_generation;
++} Sc32DebugRequest;
++typedef struct {
++    ScU32 size,version,base,metadata,metadata_bytes,path,path_bytes,flags;
++    ScU32 module,module_generation,reserved[2];
++} Sc32DebugRegistration;
++typedef struct { ScU32 size,version,module,generation; } Sc32DebugRegistrationResult;
++#endif
+--- /dev/null
++++ b/user/debugapi/sc32_debug.c
+@@ -0,0 +1,141 @@
++#include "../sc32/SC32PRIVATE.H"
++#include "SC32DEBUGWIRE.H"
++
++typedef char d2_reference_is_24[(sizeof(ScDebugRef)==24)?1:-1];
++typedef char d2_registers_are_96[(sizeof(ScDebugRegisters)==96)?1:-1];
++typedef char d2_module_is_204[(sizeof(ScDebugModule)==204)?1:-1];
++typedef char d2_request_is_92[(sizeof(Sc32DebugRequest)==92)?1:-1];
++
++static ScStatus sc32_d2_invalid(ScStatus s,ScU32 selector)
++{return sc32_invalid(s,SC32_D2_ERROR_BASE+selector-SC32_D2_FIRST);
++}
++static ScStatus sc32_d2_call(ScU32 selector,const void *request,void *out)
++{return sc32_native(sc32_call(SC32_WIRE_GATE,(ScI32)selector,(ScI32)request,(ScI32)out,0,0,0),
++    SC32_D2_ERROR_BASE+selector-SC32_D2_FIRST);
++}
++static ScStatus sc32_d2_request(const ScDebugRef *target,Sc32DebugRequest *r,ScU32 selector)
++{
++    ScStatus s=sc32_record_in(target,sizeof(*target));
++    if(s<0)return sc32_d2_invalid(s,selector);
++    if(!target->pid || !target->generation || !target->binding || target->reserved)
++    return sc32_d2_invalid(SC32_E_INVALID,selector);
++    sc32_zero(r,sizeof(*r));
++    r->size=sizeof(*r);
++    r->version=1;
++    r->target=*target;
++    return 0;
++}
++ScStatus ScDebugLaunch(const ScDebugLaunchDesc *desc,ScDebugLaunchInfo *out)
++{
++    ScStatus s=sc32_record_out(out,sizeof(*out));
++    if(s<0)return sc32_d2_invalid(s,SC32_D2_LAUNCH);
++    s=sc32_record_in(desc,sizeof(*desc));
++    if(s<0)return sc32_d2_invalid(s,SC32_D2_LAUNCH);
++    ScDebugLaunchDesc local=*desc;
++    if(local.flags || local.reserved)return sc32_d2_invalid(SC32_E_INVALID,SC32_D2_LAUNCH);
++    s=sc32_string(local.command,1087,0);
++    if(s<0)return sc32_d2_invalid(s,SC32_D2_LAUNCH);
++    for(ScU32 i=0;i<3;i++)if(local.streams[i]<-1)return sc32_d2_invalid(SC32_E_INVALID,SC32_D2_LAUNCH);
++    return sc32_d2_call(SC32_D2_LAUNCH,&local,out);
++}
++ScStatus ScDebugQuery(const ScDebugRef *target,ScDebugSnapshot *out)
++{
++    Sc32DebugRequest r;
++    ScStatus s=sc32_record_out(out,sizeof(*out));
++    if(s<0)return sc32_d2_invalid(s,SC32_D2_QUERY);
++    s=sc32_d2_request(target,&r,SC32_D2_QUERY);
++    return s<0?s:sc32_d2_call(SC32_D2_QUERY,&r,out);
++}
++ScStatus ScDebugControl(const ScDebugRef *target,ScU32 stop,ScU32 action,ScDebugSnapshot *out)
++{
++    Sc32DebugRequest r;
++    ScStatus s=sc32_record_out(out,sizeof(*out));
++    if(s<0)return sc32_d2_invalid(s,SC32_D2_CONTROL);
++    s=sc32_d2_request(target,&r,SC32_D2_CONTROL);
++    if(s<0)return s;
++    r.stop=stop;
++    r.action=action;
++    return sc32_d2_call(SC32_D2_CONTROL,&r,out);
++}
++ScStatus ScDebugRead(const ScDebugRef *target,ScU32 stop,ScU32 address,ScU32 bytes,
++ScU32 flags,void *data,unsigned char *readable,ScDebugReadInfo *out)
++{
++    Sc32DebugRequest r;
++    ScStatus s=sc32_record_out(out,sizeof(*out));
++    if(s<0)return sc32_d2_invalid(s,SC32_D2_READ);
++    s=sc32_d2_request(target,&r,SC32_D2_READ);
++    if(s<0)return s;
++    if(!bytes || bytes>SC32_DEBUG_READ_MAX || address>0xffffffffu-(bytes-1)
++    || flags&~SC32_DEBUG_READ_ORIGINAL_CODE)return sc32_d2_invalid(SC32_E_RANGE,SC32_D2_READ);
++    s=sc32_out(data,bytes);
++    if(s==0)s=sc32_out(readable,bytes);
++    if(s<0)return sc32_d2_invalid(s,SC32_D2_READ);
++    if(sc32_overlap(data,bytes,readable,bytes) || sc32_overlap(data,bytes,out,out->size)
++    || sc32_overlap(readable,bytes,out,out->size))return sc32_d2_invalid(SC32_E_INVALID,SC32_D2_READ);
++    r.stop=stop;
++    r.address=address;
++    r.bytes=bytes;
++    r.flags=flags;
++    r.data=(ScU32)data;
++    r.readable=(ScU32)readable;
++    return sc32_d2_call(SC32_D2_READ,&r,out);
++}
++ScStatus ScDebugBreakpointAdd(const ScDebugRef *target,ScU32 stop,ScU32 address,ScDebugBreakpoint *out)
++{
++    Sc32DebugRequest r;
++    ScStatus s=sc32_record_out(out,sizeof(*out));
++    if(s<0)return sc32_d2_invalid(s,SC32_D2_ADD);
++    s=sc32_d2_request(target,&r,SC32_D2_ADD);
++    if(s<0)return s;
++    r.stop=stop;
++    r.address=address;
++    return sc32_d2_call(SC32_D2_ADD,&r,out);
++}
++ScStatus ScDebugBreakpointRemove(const ScDebugRef *target,ScU32 stop,ScU32 id,ScU32 generation)
++{
++    Sc32DebugRequest r;
++    ScStatus s=sc32_d2_request(target,&r,SC32_D2_REMOVE);
++    if(s<0)return s;
++    r.stop=stop;
++    r.id=id;
++    r.generation=generation;
++    return sc32_d2_call(SC32_D2_REMOVE,&r,0);
++}
++static ScStatus sc32_d2_page(ScU32 selector,const ScDebugRef *target,ScU32 stop,ScU32 after,ScU32 epoch,
++ScU32 module,ScU32 generation,void *rows,ScU32 capacity,ScU32 stride,ScDebugPage *out)
++{
++    Sc32DebugRequest r;
++    ScStatus s=sc32_record_out(out,sizeof(*out));
++    if(s<0)return sc32_d2_invalid(s,selector);
++    s=sc32_d2_request(target,&r,selector);
++    if(s<0)return s;
++    if(!capacity || capacity>SC32_DEBUG_PAGE_MAX || !rows || after==0xffffffffu)
++    return sc32_d2_invalid(SC32_E_INVALID,selector);
++    s=sc32_out(rows,capacity*stride);
++    if(s<0)return sc32_d2_invalid(s,selector);
++    if(sc32_overlap(rows,capacity*stride,out,out->size))return sc32_d2_invalid(SC32_E_INVALID,selector);
++    r.stop=stop;
++    r.after=after;
++    r.epoch=epoch;
++    r.rows=(ScU32)rows;
++    r.capacity=capacity;
++    r.module=module;
++    r.module_generation=generation;
++    return sc32_d2_call(selector,&r,out);
++}
++ScStatus ScDebugBreakpoints(const ScDebugRef *target,ScU32 stop,ScU32 after,ScU32 epoch,
++ScDebugBreakpoint *rows,ScU32 capacity,ScDebugPage *out)
++{return sc32_d2_page(SC32_D2_BREAKS,target,stop,after,epoch,0,0,rows,capacity,sizeof(*rows),out);
++}
++ScStatus ScDebugModules(const ScDebugRef *target,ScU32 stop,ScU32 after,ScU32 epoch,
++ScDebugModule *rows,ScU32 capacity,ScDebugPage *out)
++{return sc32_d2_page(SC32_D2_MODULES,target,stop,after,epoch,0,0,rows,capacity,sizeof(*rows),out);
++}
++ScStatus ScDebugSegments(const ScDebugRef *target,ScU32 stop,ScU32 module,ScU32 generation,
++ScU32 after,ScDebugSegment *rows,ScU32 capacity,ScDebugPage *out)
++{return sc32_d2_page(SC32_D2_SEGMENTS,target,stop,after,0,module,generation,rows,capacity,sizeof(*rows),out);
++}
++ScStatus ScDebugSymbols(const ScDebugRef *target,ScU32 stop,ScU32 module,ScU32 generation,
++ScU32 after,ScDebugSymbol *rows,ScU32 capacity,ScDebugPage *out)
++{return sc32_d2_page(SC32_D2_SYMBOLS,target,stop,after,0,module,generation,rows,capacity,sizeof(*rows),out);
++}
+--- /dev/null
++++ b/user/runtime/scl_debug_registry.c
+@@ -0,0 +1,55 @@
++#include "SCLPRIVATE.H"
++#include "../debugapi/SC32DEBUGWIRE.H"
++
++/* ROOT自己的私有桥，启动时SC32API尚未装载，所以不能调用
++ * ScDebug*，也不能把登记回调塞进旧ScRuntimePlatform的ABI尾部。 */
++static int scl_debug_path(ScRuntime *r,ScLoaded *m,char out[64])
++{
++    if(r->platform.read_file!=read_file || r->platform.map_image!=map_image
++    || r->platform.protect_image!=protect_image)return 0;
++    const char *name=module_name(m),*root=r->platform.context;
++    if(!root || system_library(name))root="/SYS/LIB";
++    ScU32 n=0;
++    while(*root){if(n==62)return -1;
++        out[n++]=*root++;
++    }
++    if(!n || out[n-1]!='/')out[n++]='/';
++    while(*name){if(n==63)return -1;
++        out[n++]=*name++;
++    }out[n]=0;
++    return 1;
++}
++static int scl_debug_register(ScRuntime *r,ScLoaded *m)
++{
++    char path[64];
++    int applicable=scl_debug_path(r,m,path);
++    if(applicable<=0)return applicable<0?SC_SCL_RANGE:0;
++    ScU32 bytes=0;
++    while(path[bytes])bytes++;
++    Sc32DebugRegistration input={sizeof(input),1,(ScU32)(ScPointer)m->image,
++        (ScU32)(ScPointer)m->metadata,m->metadata_size,(ScU32)(ScPointer)path,bytes+1,0,0,0,{0,0}};
++    Sc32DebugRegistrationResult result={sizeof(result),1,0,0};
++    int status;
++    do{
++        status=ScRuntimePlatformCall(0x300,SC32_D2_REGISTER,(int)&input,(int)&result,0,0,0);
++        if(status==SC32_PENDING)ScRuntimePlatformCall(7,0,0,0,0,0,0);
++    }while(status==SC32_PENDING);
++    if(status<0)return status==SC32_E_MEMORY?SC_SCL_MEMORY:SC_SCL_IO;
++    m->debug_module=result.module;
++    m->debug_generation=result.generation;
++    return 0;
++}
++static void scl_debug_change(ScLoaded *m,ScU32 operation)
++{
++    if(!m->debug_module)return;
++    Sc32DebugRegistration input={sizeof(input),1,(ScU32)(ScPointer)m->image,0,0,0,0,0,
++        m->debug_module,m->debug_generation,{0,0}};
++    /* 用户正常终止与异常回收都在内核复核真实映射寿命。注销失败不
++     * 强制信任旧登记，随后MODULEFREE/任务清理仍按真实范围撤销。 */
++    (void)ScRuntimePlatformCall(0x300,(int)operation,(int)&input,0,0,0,0);
++    if(operation==SC32_D2_UNREGISTER)m->debug_module=m->debug_generation=0;
++}
++static void scl_debug_ready(ScLoaded *m){scl_debug_change(m,SC32_D2_READY);
++}
++static void scl_debug_unregister(ScLoaded *m){scl_debug_change(m,SC32_D2_UNREGISTER);
++}

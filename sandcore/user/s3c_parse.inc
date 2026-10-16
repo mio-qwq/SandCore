@@ -896,7 +896,7 @@ static void compile_unit(void)
     /* 入口与最终 main 调用由后端 finish_image 统一生成，函数偏移从
      * 预留的 24 字节之后算起。绝对地址仍须等代码/数据布局确定后回填。 */
     code_used=shared_output?0:dynamic_output?64:24;
-    copy(map_text,shared_output?"SCLMAP1MIO\n":dynamic_output?"SCDMAP1MIO\n":"SCSYM1MIO\n",sizeof(map_text));
+    copy(map_text,object_output?"SCOMAP1MIO\n":shared_output?"SCLMAP1MIO\n":dynamic_output?"SCDMAP1MIO\n":"SCSYM1MIO\n",sizeof(map_text));
     map_used=length(map_text);
     while(current_token()->k) {
         /* 顶层声明之间没有半写的输出文件，是检查取消/窗口重排的安全点。

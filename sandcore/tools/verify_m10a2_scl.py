@@ -28,6 +28,10 @@ def prepare(image, build, extra=None, runtime_fixtures=True):
                  'HOME/M10A2/SCLPROBE.SCX':(build/'SCLPROBE.SCX').read_bytes()})
     if extra:
         additions.update(extra)
+    # v5查找按ASCII折叠，控制清单也必须按同一身份比较；冷启动复用
+    # 已准备盘时assert.h等标准小写文件已在原清单中，不能误报它们
+    # 的明确替换为“其它用户对象改变”。未列出的对象仍逐项原样核验。
+    controlled_keys={fold(name) for name in additions}
     temporary = image.with_suffix('.prepared.tmp')
     with ExitStack() as stack:
         disk = mapped(stack,image)
@@ -62,7 +66,7 @@ def prepare(image, build, extra=None, runtime_fixtures=True):
                     digest_payload(record.payload),record.uid,record.gid,record.mode,record.generation):
                     raise AssertionError('准备盘回读失败：'+key)
             for key,before in original.items():
-                if key in additions:
+                if key in controlled_keys:
                     continue
                 r=checked[key]
                 if (digest_payload(r.payload),r.uid,r.gid,r.mode,r.generation)!=before:

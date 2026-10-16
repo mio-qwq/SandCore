@@ -35,6 +35,7 @@
 #include "sc32_gui.h"
 #include "sc32_drop.h"
 #include "sc32_host.h"
+#include "../user/SC32WALL.H"
 
 extern void scene_paint(void);        /* main.c: 沙漠壁纸 (画进后台缓冲) */
 
@@ -131,6 +132,7 @@ static void wm_shell_paint_cancelled(window_record_t *p);
 static void wm_shell_closing(window_record_t *p);
 static void wm_shell_display(desktop_view_t *view);
 static desktop_view_t *view_get(u32 id){return objpool_get(&view_pool,(int)id);}
+#include "wm_wall_snapshot.inc"
 #define nwins (active_view->count)
 #define ntasks (active_view->task_count)
 #define window_order (active_view->order)

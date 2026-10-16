@@ -1,0 +1,71 @@
+{
+  "status": "APPLIED",
+  "patch_sha256": "e044cd6e2a0e49c8dfa6d04d01a1aec0afbc183aa3d3aaad1dfc61318d7d9e49",
+  "files": [
+    {
+      "path": "sandcore/Makefile",
+      "before_sha256": "f42cee49b4ecbb402a9308fd52119ecec0277d7bd3d5518dc7de3c4ce8f8a814",
+      "after_sha256": "41dd87a2fed1b796f416a8d55e895b40294e4ffe335ee92e58bca59c93d352ad"
+    },
+    {
+      "path": "sandcore/kernel/process.c",
+      "before_sha256": "a934e927d4afb23fe668d8919dbd15879917b32af821218c19e3fa7692a69208",
+      "after_sha256": "a14ba4bd5b3da38082eca935e9521bff624c9862c0c11b1123dc2f1b6aed40f0"
+    },
+    {
+      "path": "sandcore/kernel/process.h",
+      "before_sha256": "fdfd39b6998ab7e1aae484c1d857d86cc177b85ee574f2cd4cb40ba6846f24bd",
+      "after_sha256": "0044d0c943a42c475e8170c33b5c757348e4cb6bece314a40f41ca4e33cfbc33"
+    },
+    {
+      "path": "sandcore/kernel/sc32_core.c",
+      "before_sha256": "42a9e684e8d4cd4d53d8e3adab2cb786bf49423b4806960a055b7e7d43896bb8",
+      "after_sha256": "c3143e114339998f4e1c1a2cbefa8a609e6b9b70b0c150cb2fd3b8470cb9e436"
+    },
+    {
+      "path": "sandcore/kernel/scl_boot.c",
+      "before_sha256": "21c8fe7edfefc96e391387222e020e98275751c7839cf62b2467ce231f27b724",
+      "after_sha256": "9fadb0516ac006ab1465a08ffba2ba9e5817cd61a504cc94d27c0e793e61f375"
+    },
+    {
+      "path": "sandcore/kernel/task.c",
+      "before_sha256": "364f2c0027bbfff0e6314348e03e0084a3a6312d26b97dbc01ed8c6eff414326",
+      "after_sha256": "6c1be69f67f60e7f1460694a395a791918dbd86cb37c687d9108b62251011222"
+    },
+    {
+      "path": "sandcore/tools/stage_m10a2_sdk.py",
+      "before_sha256": "4f72495b606c5a59fbb9e1ccafe4134f54ada85fdc2e8ed80e3f4c3a75c4a327",
+      "after_sha256": "5ce4948bbeab3cdd062b5e29f296cc36613a6938bac5dba19e251b35acbe75a5"
+    },
+    {
+      "path": "sandcore/user/SC32API.H",
+      "before_sha256": "5f6dbc5fbf6f521b07692c6b6bf6c9e9a815f32fd6bc7dd1bd24a3bbccc81823",
+      "after_sha256": "0e77851eb66437d2b2afeadf7312b8bf0704d5f61347c5f84f57189819617dda"
+    },
+    {
+      "path": "sandcore/user/runtime/SCLROOT.C",
+      "before_sha256": "559e5ce155d4bb0477a3a3882ae6a91d9501441a4ac5398a23cf00f8cad96e50",
+      "after_sha256": "f194204bc5621c0f2b168ee10f94bb3d2b45949fee10e745637e863d1eb658c4"
+    },
+    {
+      "path": "sandcore/user/runtime/SCLROOT.json",
+      "before_sha256": "2962252a9f62ed2e87abe9c15662fd5ce9b0b88e8ac955c11d26035553bda8be",
+      "after_sha256": "fdb0d391cd433dc27a94e94927d4060ec1c9ad349111e86768d0063d669088c5"
+    },
+    {
+      "path": "sandcore/user/runtime/scldr.c",
+      "before_sha256": "8f79ec7c5d4ca436327a22b555aa77c8c3c85e047b5ffb0aaa9f22498a25c194",
+      "after_sha256": "d575beaabe72991b81a9c74d649ece726938ebe37063e665819aa560923296a5"
+    },
+    {
+      "path": "sandcore/user/sc32/SC32API.C",
+      "before_sha256": "00a96e0b578fb5b77a8bfd4164e00bf02950bc5709decabe05112b6dc319574f",
+      "after_sha256": "71bbbea6e46e3e8daf79768babe3fe1a69e7ab88fb0a9e7c07de21cf7159f78f"
+    },
+    {
+      "path": "sandcore/user/sc32/SC32API.json",
+      "before_sha256": "8b8a3d2cd326d3d12d61fd4a901e8f5461aba740308b113dc0cb07c3f52ac2e1",
+      "after_sha256": "edd0c0937416856b89217f9be32b1c237c6708b2f0481fda0e9c860bf6e1f75e"
+    }
+  ]
+}

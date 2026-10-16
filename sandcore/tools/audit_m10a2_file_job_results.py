@@ -56,7 +56,7 @@ def main():
     parser.add_argument('--out', type=Path, required=True)
     args = parser.parse_args()
     report = json.loads(args.runtime_report.read_text(encoding='utf-8'))
-    if (report.get('status') != 'P5_TYPED_PATH_AND_REAL_FILE_JOBS_PASS'
+    if (report.get('status') not in ('P5_TYPED_PATH_AND_REAL_FILE_JOBS_PASS','P5_REAL_CROSS_PROCESS_FILE_CLIPBOARD_PASS')
             or not report.get('current_inputs_unchanged') or not report.get('source_disk_unchanged')):
         raise ValueError('需要实际通过且输入/原盘保持的原始报告')
     root = args.runtime_report.parent
@@ -65,7 +65,7 @@ def main():
         if path.stat().st_size != row['bytes'] or digest(path) != row['sha256']:
             raise ValueError('取回文件与实际运行报告不同')
     pattern = bytes((i * 37 + 19) & 255 for i in range(131079))
-    for name in ('OP-SOURCE.BIN', 'OP-MOVE.BIN'):
+    for name in (row['name'] for row in report['actual_file_results'] if row['name'].endswith('.BIN')):
         if (root / name).read_bytes() != pattern:
             raise ValueError('实际二进制内容错误')
     audit = dict(status='ACTUAL_COPY_MOVE_BINARY_AND_RECOVERY_CRC_PASS',

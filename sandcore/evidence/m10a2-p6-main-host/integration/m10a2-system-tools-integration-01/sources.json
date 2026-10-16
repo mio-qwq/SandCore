@@ -1,0 +1,107 @@
+[
+  {
+    "source": "sandcore/drafts/m10a2-system-tools/CALC2.C",
+    "target": "sandcore/user/systemtools/CALC2.C",
+    "sha256": "d392b92e43bff9cb3078a581b00b4187af5902a99d6746a1cce4d620d0147d5e"
+  },
+  {
+    "source": "sandcore/drafts/m10a2-system-tools/CALC2.H",
+    "target": "sandcore/user/systemtools/CALC2.H",
+    "sha256": "9c8c3a32e683462e157038995dbeec673e30116f5c55eb9980b17dae7e5efaae"
+  },
+  {
+    "source": "sandcore/drafts/m10a2-system-tools/CALC2.json",
+    "target": "sandcore/user/systemtools/CALC2.json",
+    "sha256": "76766049e7f3374c8dfa17dc5116a311f88897841171e70df93d023b027ebe62"
+  },
+  {
+    "source": "sandcore/drafts/m10a2-system-tools/calc_engine.inc",
+    "target": "sandcore/user/systemtools/calc_engine.inc",
+    "sha256": "cc7b908d0a975b9bf9eca42b49826bd68d572fb9c09235a545fe70a9ba5f0a07"
+  },
+  {
+    "source": "sandcore/drafts/m10a2-system-tools/calc_view.inc",
+    "target": "sandcore/user/systemtools/calc_view.inc",
+    "sha256": "97aa49ceb3064902f280d8f79184419683f1f215f3708b7669da451e42f15c9d"
+  },
+  {
+    "source": "sandcore/drafts/m10a2-system-tools/MONITOR2.C",
+    "target": "sandcore/user/systemtools/MONITOR2.C",
+    "sha256": "40aa3038d43ce3fa15810d912cfea1263cac07c297dec3e3cfd984cf838d707b"
+  },
+  {
+    "source": "sandcore/drafts/m10a2-system-tools/MONITOR2.H",
+    "target": "sandcore/user/systemtools/MONITOR2.H",
+    "sha256": "536f07d26acef5cc100dfc2c64854d2261be7f03cd6f8737c5a8c91c107edbe5"
+  },
+  {
+    "source": "sandcore/drafts/m10a2-system-tools/MONITOR2.json",
+    "target": "sandcore/user/systemtools/MONITOR2.json",
+    "sha256": "2f0511026ef92d71e56aa481d0d81687c12dfcf7f8ebd462d4b769c7a60ce9dd"
+  },
+  {
+    "source": "sandcore/drafts/m10a2-system-tools/monitor_model.inc",
+    "target": "sandcore/user/systemtools/monitor_model.inc",
+    "sha256": "5030f7bff85b976eeaea30cb737bd9cc48568bf9d9551829637fef57070729fd"
+  },
+  {
+    "source": "sandcore/drafts/m10a2-system-tools/monitor_view.inc",
+    "target": "sandcore/user/systemtools/monitor_view.inc",
+    "sha256": "cab7f59979f5285b9f3755b335efea7e727f05bed1db64e950ef192c6611dced"
+  },
+  {
+    "source": "sandcore/drafts/m10a2-system-tools/PALETTE2.C",
+    "target": "sandcore/user/systemtools/PALETTE2.C",
+    "sha256": "faebb03ed1b851d98b6e1e57f9d1d34f3740731c774cdeac34cec3eca5352bab"
+  },
+  {
+    "source": "sandcore/drafts/m10a2-system-tools/PALETTE2.H",
+    "target": "sandcore/user/systemtools/PALETTE2.H",
+    "sha256": "9a71d9e3b748e212424859e05ec8ceb23a1a57423b73ac0310f40540c36c7c01"
+  },
+  {
+    "source": "sandcore/drafts/m10a2-system-tools/PALETTE2.json",
+    "target": "sandcore/user/systemtools/PALETTE2.json",
+    "sha256": "e24e623cfc0a63b7bc7d5d2a015c67f666fef1ed0038c6cc2733c46174af5148"
+  },
+  {
+    "source": "sandcore/drafts/m10a2-system-tools/palette_view.inc",
+    "target": "sandcore/user/systemtools/palette_view.inc",
+    "sha256": "45ec34df45de17f087494b611f6be0d87df24239746c0591054aa74671967523"
+  },
+  {
+    "source": "sandcore/drafts/m10a2-system-tools/TOOLS.H",
+    "target": "sandcore/user/systemtools/TOOLS.H",
+    "sha256": "764161356e162eda97a6efb03771d2864cbaf01f33f0fa9b970242e6f3b57066"
+  },
+  {
+    "source": "sandcore/drafts/m10a2-system-tools/tools_ui.inc",
+    "target": "sandcore/user/systemtools/tools_ui.inc",
+    "sha256": "2cd750db59ecf25a2182f97cd6034e37fbd04e8f2132162784682d9f459bf022"
+  },
+  {
+    "source": "sandcore/drafts/m10a2-system-tools/SC32WALL.H",
+    "target": "sandcore/user/SC32WALL.H",
+    "sha256": "52c8e4293946d9fe9f359387e7a72b29bc3296ee835180558faac88ffd032d6b"
+  },
+  {
+    "source": "sandcore/drafts/m10a2-system-tools/wallapi/SC32WALLWIRE.H",
+    "target": "sandcore/user/wallapi/SC32WALLWIRE.H",
+    "sha256": "afcc68f95f20040fa716be98ff5662e4e23d9d0cb6083f67a7a6bc51e0ae270f"
+  },
+  {
+    "source": "sandcore/drafts/m10a2-system-tools/wallapi/sc32_wall.c",
+    "target": "sandcore/user/wallapi/sc32_wall.c",
+    "sha256": "ddd0f23b55e560d918a54b779a7adab1bb946504e1749732fed7a0d3777549e1"
+  },
+  {
+    "source": "sandcore/drafts/m10a2-system-tools/wallapi/wm_wall_snapshot.inc",
+    "target": "sandcore/kernel/wm_wall_snapshot.inc",
+    "sha256": "34c6d23404956769b575525bb2d62e58bfb3366e5a7030dad33ceed62c923d1c"
+  },
+  {
+    "source": "sandcore/drafts/m10a2-system-tools/wallapi/sc32_wall_query.inc",
+    "target": "sandcore/kernel/sc32_wall_query.inc",
+    "sha256": "3efae5ff1e69ff5a43566944eb5a8b205677fa343d47c5eeb06ce4643291aa55"
+  }
+]

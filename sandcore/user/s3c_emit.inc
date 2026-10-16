@@ -955,6 +955,7 @@ static void emit_statement(int node)
     if(!node) return;
     Node *n=nodes+node;
     error_position=n->where;
+    if(object_output && n->kind!=N_BLOCK)sco_line(n->where);
     int kind=n->kind;
     if(kind==N_BLOCK) for(int a=n->a;a;a=nodes[a].next) emit_statement(a);
     else if(kind==N_EXPR) emit_expression(n->a);
@@ -1059,6 +1060,7 @@ static void map_function(int symbol,int address_value,int where)
     /* SCL函数行与EXPORT共用RVA域；旧SCX/SCD函数行仍为绝对VA。 */
     u32 mapped=(u32)address_value;
     if(shared_output)mapped-=BASE;
+    if(object_output)sco_line(where);
     hex_text(hex,mapped);
     decimal(line,where&65535);
     copy(row,hex,sizeof(row));
@@ -1121,6 +1123,7 @@ static void emit_function(int symbol,int body)
 }
 static void finish_image(const char *output)
 {
+    if(object_output){finish_sco(output);return;}
     if(shared_output){finish_scl(output);return;}
     if(dynamic_output){finish_dynamic(output);return;}
     int main_symbol=find_symbol(module_output?intern("skm_main",8):intern("main",4),0);

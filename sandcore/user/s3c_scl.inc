@@ -648,6 +648,8 @@ static void finish_dynamic(const char *output)
     u32 string_off=sclc_table_size(reloc_off,sclc_fix_count,SCD_RELOC_SIZE),string_size=1u;
     for(int i=0;i<sclc_dep_count;i++){sclc_dependencies[i].string_offset=(int)string_size;string_size+=(u32)length(spelling(sclc_dependencies[i].name))+1u;}
     for(int i=0;i<sclc_import_count;i++){sclc_imports[i].string_offset=(int)string_size;string_size+=(u32)length(spelling(sclc_imports[i].name))+1u;}
+    /* BSS的C对齐取决于整个SCD尾部，字符串补零受旧reader支持。 */
+    string_size+=(0u-((u32)payload_size+string_off+string_size))&3u;
     if(string_off>(u32)(CODE_MAX-payload_size) || string_size>(u32)(CODE_MAX-payload_size)-string_off)fatal("application metadata exceeds initialized image capacity");
     u32 metadata_size=string_off+string_size,load=(u32)payload_size+metadata_size;
     if(load>SCD_MAX_PROGRAM_IMAGE || (u32)bss_used>SCD_MAX_PROGRAM_IMAGE-load)fatal("application code/data/metadata/BSS exceed private address region");

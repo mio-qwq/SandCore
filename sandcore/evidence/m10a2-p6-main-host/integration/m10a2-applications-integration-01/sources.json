@@ -1,0 +1,70 @@
+{
+  "status": "SOURCE_INTEGRATED_GUEST_PENDING",
+  "files": [
+    {
+      "source": "sandcore/drafts/m10a2-files2/FILES2.C",
+      "target": "sandcore/user/files2/FILES2.C",
+      "sha256": "98dabeb0aae454f13e9a9b3215997e1a6d4cddea2633c2b78b3921d1cfeab0bf"
+    },
+    {
+      "source": "sandcore/drafts/m10a2-files2/FILES2.H",
+      "target": "sandcore/user/files2/FILES2.H",
+      "sha256": "b97695d2e396086a83a40237ec78476763ff8f3f518ff6cd9e2dffd2017f51e8"
+    },
+    {
+      "source": "sandcore/drafts/m10a2-files2/FILES2.json",
+      "target": "sandcore/user/files2/FILES2.json",
+      "sha256": "962af660116ad1817347a5092e06875947de3dd6bf4c520ee95e71b72436b0a7"
+    },
+    {
+      "source": "sandcore/drafts/m10a2-files2/files2_model.inc",
+      "target": "sandcore/user/files2/files2_model.inc",
+      "sha256": "4e77c9bc6bf28a6f75023db16ea41d9c6e2932f5ac0ffba36df0cc5caf0adb6d"
+    },
+    {
+      "source": "sandcore/drafts/m10a2-files2/files2_storage.inc",
+      "target": "sandcore/user/files2/files2_storage.inc",
+      "sha256": "7e7832fed70f498a742967122f9a6884c96fe055dabb8e67a20067946cf9ef8f"
+    },
+    {
+      "source": "sandcore/drafts/m10a2-files2/files2_actions.inc",
+      "target": "sandcore/user/files2/files2_actions.inc",
+      "sha256": "d54cf70c0196d074ee7ca65d448cbd2a5cfa45f65971de48e13158d37bb1686e"
+    },
+    {
+      "source": "sandcore/drafts/m10a2-files2/files2_view.inc",
+      "target": "sandcore/user/files2/files2_view.inc",
+      "sha256": "fbd0046f63a8a175302b1c35f170498c54928fdefd5d1fdd1720c31d798f388f"
+    },
+    {
+      "source": "sandcore/drafts/m10a2-notes2/NOTES2.C",
+      "target": "sandcore/user/notes2/NOTES2.C",
+      "sha256": "b9e03693a4be610f22f8c49418fb5f25c9fec5bf120e63913bf90334512ef8e0"
+    },
+    {
+      "source": "sandcore/drafts/m10a2-notes2/NOTES2.H",
+      "target": "sandcore/user/notes2/NOTES2.H",
+      "sha256": "fb76c0c5581f84353440d126f309ddebb68eb61b9f4b832a19854ee6f409f2a7"
+    },
+    {
+      "source": "sandcore/drafts/m10a2-notes2/NOTES2.json",
+      "target": "sandcore/user/notes2/NOTES2.json",
+      "sha256": "8755e8786c8aa9e94b3b51e3535106174864e9cf9cc4d888da0d60e79db6001d"
+    },
+    {
+      "source": "sandcore/drafts/m10a2-notes2/notes_ui.c",
+      "target": "sandcore/user/notes2/notes_ui.c",
+      "sha256": "c61332e512e524d803e895fef04cdad522646ce4a49b42a43967bfc0365fe6bd"
+    },
+    {
+      "source": "sandcore/drafts/m10a2-notes2/notes_io.c",
+      "target": "sandcore/user/notes2/notes_io.c",
+      "sha256": "a6a1f645750e09d9bc61e2df3ee73193ded328bc65539bc797b99102d3129b07"
+    },
+    {
+      "source": "sandcore/drafts/m10a2-notes2/notes_actions.c",
+      "target": "sandcore/user/notes2/notes_actions.c",
+      "sha256": "e32f2cd0470794f98e5953be730cb4c3f408696ce8f2034c2f1aa23ef7ca5050"
+    }
+  ]
+}

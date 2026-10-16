@@ -1,0 +1,15 @@
+{
+  "kernel/process.c": "a934e927d4afb23fe668d8919dbd15879917b32af821218c19e3fa7692a69208",
+  "kernel/process.h": "fdfd39b6998ab7e1aae484c1d857d86cc177b85ee574f2cd4cb40ba6846f24bd",
+  "kernel/task.c": "364f2c0027bbfff0e6314348e03e0084a3a6312d26b97dbc01ed8c6eff414326",
+  "kernel/scl_boot.c": "21c8fe7edfefc96e391387222e020e98275751c7839cf62b2467ce231f27b724",
+  "kernel/sc32_core.c": "42a9e684e8d4cd4d53d8e3adab2cb786bf49423b4806960a055b7e7d43896bb8",
+  "Makefile": "f42cee49b4ecbb402a9308fd52119ecec0277d7bd3d5518dc7de3c4ce8f8a814",
+  "user/runtime/scldr.c": "8f79ec7c5d4ca436327a22b555aa77c8c3c85e047b5ffb0aaa9f22498a25c194",
+  "user/runtime/SCLROOT.C": "559e5ce155d4bb0477a3a3882ae6a91d9501441a4ac5398a23cf00f8cad96e50",
+  "user/sc32/SC32API.C": "00a96e0b578fb5b77a8bfd4164e00bf02950bc5709decabe05112b6dc319574f",
+  "user/SC32API.H": "5f6dbc5fbf6f521b07692c6b6bf6c9e9a815f32fd6bc7dd1bd24a3bbccc81823",
+  "tools/stage_m10a2_sdk.py": "4f72495b606c5a59fbb9e1ccafe4134f54ada85fdc2e8ed80e3f4c3a75c4a327",
+  "user/sc32/SC32API.json": "8b8a3d2cd326d3d12d61fd4a901e8f5461aba740308b113dc0cb07c3f52ac2e1",
+  "user/runtime/SCLROOT.json": "2962252a9f62ed2e87abe9c15662fd5ce9b0b88e8ac955c11d26035553bda8be"
+}

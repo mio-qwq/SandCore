@@ -29,6 +29,12 @@
       "size": 1
     },
     {
+      "name": "ScProcessArguments",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
       "name": "ScSessionControl",
       "dependency": "SC32API.SCL",
       "kind": "function",
@@ -132,6 +138,12 @@
     },
     {
       "name": "printf",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "strcmp",
       "dependency": "SCCLIB.SCL",
       "kind": "function",
       "size": 1

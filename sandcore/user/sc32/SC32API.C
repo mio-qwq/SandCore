@@ -9,6 +9,7 @@ static void sc32_gui_finalize(void);
 #include "sc32_objects.c"
 #include "sc32_file.c"
 #include "../pathapi/path_query.c"
+#include "../wallapi/sc32_wall.c"
 #include "../guiapi/sc32_gui.c"
 #include "../guiapi/sc32_popup.c"
 #include "../fontapi/sc32_font.c"
@@ -18,3 +19,4 @@ static void sc32_gui_finalize(void);
 #include "../hostapi/sc32_launch.c"
 
 #include "../leaseapi/leaseapi.c"
+#include "../debugapi/sc32_debug.c"

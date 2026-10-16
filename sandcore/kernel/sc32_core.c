@@ -1,4 +1,5 @@
 #include "sc32_core.h"
+#include "../user/SC32DEBUG.H"
 #include "task.h"
 #include "task_store.h"
 #include "paging.h"
@@ -13,6 +14,10 @@
 #include "../user/SC32HOST.H"
 #include "../user/SC32PATH.H"
 #include "fs.h"
+#include "wm.h"
+#include "theme.h"
+#include "../user/SC32WALL.H"
+#include "../user/wallapi/SC32WALLWIRE.H"
 #include "../user/sc32/SC32WIRE.H"
 
 #define SC32_PTE_PRESENT 0x001u
@@ -111,7 +116,7 @@ static int capabilities(int pid,u32 request,u32 output)
     if(sc32_drop_available())result.capabilities_lo|=SC32_CAP_DROP_TARGETS;
     if(fs_lease_available())result.capabilities_hi|=SC32_CAP_LEASES_HI;
     /* 能力位表示已接入的角色服务合同，不表示当前用户桌面已经ACTIVE。 */
-    result.capabilities_hi|=SC32_CAP_HOST_HI;
+    result.capabilities_hi|=SC32_CAP_HOST_HI|SC32_DEBUG_CAP_HI;
     if(fs_lease_available())result.capabilities_hi|=SC32_CAP_PATH_QUERY_HI;
     result.max_path_bytes=SC32_PATH_CAPACITY;result.max_arguments_bytes=1024;
     if(mouse_wheel_available())result.capabilities_lo|=SC32_CAP_POINTER_WHEEL;
@@ -211,10 +216,12 @@ static int monotonic_query(int pid,u32 request,u32 output)
     return publish(pid,output,&result,sizeof(result));
 }
 
+#include "sc32_wall_query.inc"
 int sc32_core_call(int pid,u32 operation,u32 request,u32 output)
 {
     int error=caller_valid(pid);if(error)return error;
     switch(operation){
+    case SC32_W_QUERY:return wall_mode_query(pid,request,output);
     case SC32_WIRE_PROBE:return probe(pid,request,output);
     case SC32_WIRE_CAPABILITIES:return capabilities(pid,request,output);
     case SC32_WIRE_PROCESS:return process_query(pid,request,output);

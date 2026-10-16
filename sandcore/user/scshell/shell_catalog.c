@@ -189,7 +189,10 @@ ScStatus ScShellCatalogCreate(ScShellCatalog **out) {
     if(!c)return SC_SHELL_E_MEMORY;
     c->epoch=1;
     c->next_token=1;
-    s=ScShellLayoutCreate(0,0,0,80,80,&c->layout);
+    /* 与桌面首次排布使用同一默认单元。80方格容不下48px图标和
+     * 两行标签，还会在恢复空布局后缩小命中框但保留128px位置间距。
+     * 已保存的用户grid仍按各自记录恢复，不重排用户现有布局。 */
+    s=ScShellLayoutCreate(0,0,0,128,112,&c->layout);
     if(s<0) {
         sh_release(&c->base);
         return s;

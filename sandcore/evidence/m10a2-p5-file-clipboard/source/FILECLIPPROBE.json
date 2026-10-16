@@ -1,0 +1,194 @@
+{
+  "kind": "application",
+  "name": "FILECLIPPROBE.SCX",
+  "dependencies": [
+    {
+      "name": "SC32API.SCL",
+      "abi_major": 1,
+      "min_minor": 3,
+      "min_version": 5
+    },
+    {
+      "name": "SCCLIB.SCL",
+      "abi_major": 1,
+      "min_minor": 0,
+      "min_version": 1
+    },
+    {
+      "name": "SCSHELL.SCL",
+      "abi_major": 1,
+      "min_minor": 0,
+      "min_version": 1
+    }
+  ],
+  "imports": [
+    {
+      "name": "ScClipboardQuery",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScFileClose",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScFileOpen",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScFileRead",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScIdentityQuery",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScJobCancel",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScJobClose",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScJobWait",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScPathQuery",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScProcessArguments",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScProcessSetEnvironment",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScProcessSpawn",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellClipboardCopyFiles",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellClipboardCutFiles",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellClipboardPaste",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellClipboardReconcile",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellErrorQuery",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellFileOperationBegin",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellFileOperationClose",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellFileOperationQuery",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellFileOperationResult",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellFileOperationStep",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScSystemMonotonic",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "fflush",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "memcmp",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "memset",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "printf",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "strcmp",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+/TMP/P5RT-9e37c2/ACTUALG1.SCX /TMP/P5RT-9e37c2/ICONPROFILE.C /HOME/M10SHELL/GENERATED/ICONPROFILE.SCX --dynamic /TMP/P5RT-9e37c2/ICONPROFILE.json; _m9_status=$?; echo __SCUI_CMD_821f43b3afdb42e85964ff4a:$_m9_status:__SCUI_CMD_821f43b3afdb42e85964ff4a_END
+SCCC / mio
+TMP/P5RT-9e37c2/ICONPROFILE.C -> HOME/M10SHELL/GENERATED/ICONPROFILE.SCX
+Validating application manifest
+SCCC: preprocess -> C -> x86
+Preprocessing source and includes
+Parsing C and generating x86
+Linking and writing SCX
+SCCC OK SCX DYNAMIC
+Compilation complete

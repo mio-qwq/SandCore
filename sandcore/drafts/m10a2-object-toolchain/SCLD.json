@@ -1,0 +1,152 @@
+{
+  "kind": "application",
+  "name": "SCLD.SCX",
+  "dependencies": [
+    {
+      "name": "SC32API.SCL",
+      "abi_major": 1,
+      "min_minor": 3,
+      "min_version": 5
+    },
+    {
+      "name": "SCCLIB.SCL",
+      "abi_major": 1,
+      "min_minor": 0,
+      "min_version": 1
+    }
+  ],
+  "imports": [
+    {
+      "name": "__scc_standard",
+      "kind": "function",
+      "size": 1,
+      "dependency": "SCCLIB.SCL"
+    },
+    {
+      "name": "fopen",
+      "kind": "function",
+      "size": 1,
+      "dependency": "SCCLIB.SCL"
+    },
+    {
+      "name": "fclose",
+      "kind": "function",
+      "size": 1,
+      "dependency": "SCCLIB.SCL"
+    },
+    {
+      "name": "fread",
+      "kind": "function",
+      "size": 1,
+      "dependency": "SCCLIB.SCL"
+    },
+    {
+      "name": "fwrite",
+      "kind": "function",
+      "size": 1,
+      "dependency": "SCCLIB.SCL"
+    },
+    {
+      "name": "fseek",
+      "kind": "function",
+      "size": 1,
+      "dependency": "SCCLIB.SCL"
+    },
+    {
+      "name": "ftell",
+      "kind": "function",
+      "size": 1,
+      "dependency": "SCCLIB.SCL"
+    },
+    {
+      "name": "printf",
+      "kind": "function",
+      "size": 1,
+      "dependency": "SCCLIB.SCL"
+    },
+    {
+      "name": "fprintf",
+      "kind": "function",
+      "size": 1,
+      "dependency": "SCCLIB.SCL"
+    },
+    {
+      "name": "snprintf",
+      "kind": "function",
+      "size": 1,
+      "dependency": "SCCLIB.SCL"
+    },
+    {
+      "name": "calloc",
+      "kind": "function",
+      "size": 1,
+      "dependency": "SCCLIB.SCL"
+    },
+    {
+      "name": "realloc",
+      "kind": "function",
+      "size": 1,
+      "dependency": "SCCLIB.SCL"
+    },
+    {
+      "name": "free",
+      "kind": "function",
+      "size": 1,
+      "dependency": "SCCLIB.SCL"
+    },
+    {
+      "name": "qsort",
+      "kind": "function",
+      "size": 1,
+      "dependency": "SCCLIB.SCL"
+    },
+    {
+      "name": "exit",
+      "kind": "function",
+      "size": 1,
+      "dependency": "SCCLIB.SCL"
+    },
+    {
+      "name": "memcpy",
+      "kind": "function",
+      "size": 1,
+      "dependency": "SCCLIB.SCL"
+    },
+    {
+      "name": "memset",
+      "kind": "function",
+      "size": 1,
+      "dependency": "SCCLIB.SCL"
+    },
+    {
+      "name": "memcmp",
+      "kind": "function",
+      "size": 1,
+      "dependency": "SCCLIB.SCL"
+    },
+    {
+      "name": "strlen",
+      "kind": "function",
+      "size": 1,
+      "dependency": "SCCLIB.SCL"
+    },
+    {
+      "name": "strcmp",
+      "kind": "function",
+      "size": 1,
+      "dependency": "SCCLIB.SCL"
+    },
+    {
+      "name": "ScProcessArguments",
+      "kind": "function",
+      "size": 1,
+      "dependency": "SC32API.SCL"
+    },
+    {
+      "name": "ScPathResolve",
+      "kind": "function",
+      "size": 1,
+      "dependency": "SC32API.SCL"
+    }
+  ]
+}
