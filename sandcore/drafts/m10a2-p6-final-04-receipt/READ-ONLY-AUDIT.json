@@ -1,0 +1,163 @@
+{
+  "schema": 1,
+  "status": "PASS_READ_ONLY_LAYERED_INPUTS_NOT_BUILT",
+  "runtime": {
+    "host_report": {
+      "path": "build/m10a2-main-studio-01/p6-unified-host-10.json",
+      "bytes": 364768,
+      "sha256": "67709f3aacb72c6f18ded7be61235d5e9811faf4c41671b7084f46eec254c2ca"
+    },
+    "generation_host_report": {
+      "path": "build/m10a2-main-studio-01/p6-unified-host-09.json",
+      "bytes": 364769,
+      "sha256": "879ceb99215972f60d1dfc76f0102d1a2255c8616685dd980eb4e8d5aba77ae4"
+    },
+    "allowed_kernel_delta": [
+      "kernel/fs_lease.h",
+      "kernel/fs_lease_index.inc",
+      "kernel/fs_lease_open.inc"
+    ],
+    "actual_kernel_delta": [
+      {
+        "path": "kernel/fs_lease.h",
+        "generation_sha256": "d6d0715c2d9ee0f66b2c279f380a1af3e0e4dea28830d046b69ed99724684a14",
+        "runtime_sha256": "723435a27195819d78c43f97a6adda4e725c669f689e0ad4b8844f43146e0bb6"
+      },
+      {
+        "path": "kernel/fs_lease_index.inc",
+        "generation_sha256": "f1c40a0ac70450725f636e31e4d736b60b638f56d13d1db23d127d749b567744",
+        "runtime_sha256": "46f33de6c5ac044ff612f34824ee74727193499178e59f3faa096199dff11bd6"
+      },
+      {
+        "path": "kernel/fs_lease_open.inc",
+        "generation_sha256": "85d401113e2ce8d1f16b4941a41c5c354ca7f7269c1c1287d7385f368c17ca55",
+        "runtime_sha256": "6517091f810073a908704cb6489b2b5776a0b34ed70cd428888f19dbbb62b86a"
+      }
+    ],
+    "all_other_source_inputs_identical": true,
+    "full_runtime_host_verified_by_original_SDK_reader": true,
+    "unknown_runtime_sha_inferred": false,
+    "reviewed_kernel_integration": {
+      "path": "drafts/m10a2-gui02-integration/stable-read-integration.json",
+      "bytes": 1565,
+      "sha256": "6152f4690d82b779c802ab849aed702aa50b68ff5df50459b8c3454d5886bc74"
+    },
+    "reviewed_document_delta": {
+      "path": "docs/SC32-FILE.md",
+      "before_sha256": "0ed799f3ebc13b25cbf207f8d1c471c4d26a295e7d80fbb8db3030cba02674ae",
+      "after_sha256": "53e30db300106931bc778704ccbfb98c93e0e7859181da21c9f78427b6635eb5"
+    }
+  },
+  "generation": {
+    "native_report": {
+      "path": "build/m10a2-p6-target-refresh-04/p6-generation.json",
+      "bytes": 13547318,
+      "sha256": "1ac7e951434d5465a665844019a731609a08c35c4a22a5f42bb6c43fac2b5191"
+    },
+    "host_report": {
+      "path": "build/m10a2-main-studio-01/p6-unified-host-09.json",
+      "bytes": 364769,
+      "sha256": "879ceb99215972f60d1dfc76f0102d1a2255c8616685dd980eb4e8d5aba77ae4"
+    },
+    "refresh_vm_report": {
+      "path": "build/m10a2-p6-refresh-vm-04/refresh-vm.json",
+      "bytes": 1203203,
+      "sha256": "226d9d99ae250c247744430b0247f7c7f30cc315ca1687e2a8e6b604f7317175"
+    },
+    "layout_header_source_roles": {
+      "kernel/task_store.h": {
+        "sha256": "75b81aca73f6803ed5ceded6d562f8d270b615e95e8c0b5b28e2e3a2ea197587",
+        "role": "HOST09_CORE_COMPILE_INPUT"
+      },
+      "kernel/task.h": {
+        "sha256": "d007bfd1ca31a9fa00c206a71623a390195cfaa60fb4494a53cb75646c6dd53f",
+        "role": "HOST09_CORE_COMPILE_INPUT"
+      },
+      "kernel/objpool.h": {
+        "sha256": "6c9ad6007d0b179d4403495c5152b835338e8680f785eeb6851967a97d57b7ed",
+        "role": "HOST09_CORE_COMPILE_INPUT"
+      },
+      "user/scui/SCUIPRIVATE.H": {
+        "sha256": "b7d51e1bf5bd71130ed49e1e77f1c85193416cf9473112634f1a7ce224e56c08",
+        "role": "SCUI_ACTUAL_NATIVE_COMPILE_CLOSURE"
+      },
+      "user/scshell/desktop/DESKTOP.H": {
+        "sha256": "e25d578a648000c19bd213541909f40115f42b33733b7ea255920d80d1cb8afe",
+        "role": "DESKTOP_ACTUAL_NATIVE_COMPILE_CLOSURE"
+      }
+    },
+    "current_prepared_public_header_sources_exact": true,
+    "historical_preflight_task_layout_not_used_for_new_layout": true
+  },
+  "layout_reuse": {
+    "layout_report": {
+      "path": "build/m10a2-p6-gui-coherent-layout-02/layout-proof.json",
+      "bytes": 4604,
+      "sha256": "6b828bbab032c4bb8ceb00ee6a94f7b55cdf0671ec18d2cb807d73240260e80a"
+    },
+    "actual_compilation_binding": {
+      "native_report": {
+        "path": "build/m10a2-p6-target-refresh-04/p6-generation.json",
+        "bytes": 13547318,
+        "sha256": "1ac7e951434d5465a665844019a731609a08c35c4a22a5f42bb6c43fac2b5191"
+      },
+      "host_report": {
+        "path": "build/m10a2-main-studio-01/p6-unified-host-09.json",
+        "bytes": 364769,
+        "sha256": "879ceb99215972f60d1dfc76f0102d1a2255c8616685dd980eb4e8d5aba77ae4"
+      },
+      "refresh_vm_report": {
+        "path": "build/m10a2-p6-refresh-vm-04/refresh-vm.json",
+        "bytes": 1203203,
+        "sha256": "226d9d99ae250c247744430b0247f7c7f30cc315ca1687e2a8e6b604f7317175"
+      },
+      "layout_header_source_roles": {
+        "kernel/task_store.h": {
+          "sha256": "75b81aca73f6803ed5ceded6d562f8d270b615e95e8c0b5b28e2e3a2ea197587",
+          "role": "HOST09_CORE_COMPILE_INPUT"
+        },
+        "kernel/task.h": {
+          "sha256": "d007bfd1ca31a9fa00c206a71623a390195cfaa60fb4494a53cb75646c6dd53f",
+          "role": "HOST09_CORE_COMPILE_INPUT"
+        },
+        "kernel/objpool.h": {
+          "sha256": "6c9ad6007d0b179d4403495c5152b835338e8680f785eeb6851967a97d57b7ed",
+          "role": "HOST09_CORE_COMPILE_INPUT"
+        },
+        "user/scui/SCUIPRIVATE.H": {
+          "sha256": "b7d51e1bf5bd71130ed49e1e77f1c85193416cf9473112634f1a7ce224e56c08",
+          "role": "SCUI_ACTUAL_NATIVE_COMPILE_CLOSURE"
+        },
+        "user/scshell/desktop/DESKTOP.H": {
+          "sha256": "e25d578a648000c19bd213541909f40115f42b33733b7ea255920d80d1cb8afe",
+          "role": "DESKTOP_ACTUAL_NATIVE_COMPILE_CLOSURE"
+        }
+      },
+      "current_prepared_public_header_sources_exact": true,
+      "historical_preflight_task_layout_not_used_for_new_layout": true
+    },
+    "runtime_host_report": {
+      "path": "build/m10a2-main-studio-01/p6-unified-host-10.json",
+      "bytes": 364768,
+      "sha256": "67709f3aacb72c6f18ded7be61235d5e9811faf4c41671b7084f46eec254c2ca"
+    },
+    "five_structure_headers_identical_to_runtime": true,
+    "headers": {
+      "kernel/task_store.h": "75b81aca73f6803ed5ceded6d562f8d270b615e95e8c0b5b28e2e3a2ea197587",
+      "kernel/task.h": "d007bfd1ca31a9fa00c206a71623a390195cfaa60fb4494a53cb75646c6dd53f",
+      "kernel/objpool.h": "6c9ad6007d0b179d4403495c5152b835338e8680f785eeb6851967a97d57b7ed",
+      "user/scui/SCUIPRIVATE.H": "b7d51e1bf5bd71130ed49e1e77f1c85193416cf9473112634f1a7ce224e56c08",
+      "user/scshell/desktop/DESKTOP.H": "e25d578a648000c19bd213541909f40115f42b33733b7ea255920d80d1cb8afe"
+    },
+    "reason": "ONLY_FS_LEASE_IMPLEMENTATION_DELTA_NO_LAYOUT_HEADER_CHANGE",
+    "layout_recompiled": false,
+    "original_layout_proof_modified": false
+  },
+  "user_source_count": 358,
+  "host_verified_source_count": 1327,
+  "host_verified_output_count": 41,
+  "build_started": false,
+  "WSL_or_compiler_started": false,
+  "VM_called": false,
+  "old_reports_modified": false
+}

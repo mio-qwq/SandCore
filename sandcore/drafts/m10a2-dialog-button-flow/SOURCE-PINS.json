@@ -1,0 +1,37 @@
+{
+  "user/scui/ui_layout.c": {
+    "sha256": "b8a21cd1eea50160d0f7c961e71d4558e8a36c6b8ff964c8b8225a92c12d8778",
+    "bytes": 28315,
+    "unchanged": true
+  },
+  "user/scui/scui_layout_helpers.inc": {
+    "sha256": "c20ae82ac40c21056fbbf77980ed070713b5fe8601ebfa0061465d262dc11e33",
+    "bytes": 15879,
+    "unchanged": true
+  },
+  "user/scui/ui_controls.c": {
+    "sha256": "21ee664714d1ee6efe81defe817641665be801427c08624c45d389358ce7d763",
+    "bytes": 57507,
+    "unchanged": true
+  },
+  "user/scui/ui_tree.c": {
+    "sha256": "46d615567c6815abcc659805f7bb9268980e65a307651a1123ce16cd47b94380",
+    "bytes": 28858,
+    "unchanged": true
+  },
+  "user/SCUI.H": {
+    "sha256": "72d54bfea02c732201ce6b2ecad495c933c30353ab49240c74a5831f0010f72a",
+    "bytes": 24386,
+    "unchanged": true
+  },
+  "user/scui/SCUI.json": {
+    "sha256": "05b041f4ae55af9b1e20df36dbde649a7d9ee94e6b2ecf377b3692440d03ecbb",
+    "bytes": 31302,
+    "unchanged": true
+  },
+  "build/m10a2-p6-gui-run-03/p6-gui3-desktop-drop-choice.png": {
+    "sha256": "218b95af9d56136e88a5d9da3f40d11fd6377966cbb39c1955639a2173dc2085",
+    "bytes": 864063,
+    "unchanged": true
+  }
+}

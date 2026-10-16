@@ -1,0 +1,28 @@
+{
+  "status": "FROZEN_NARROW_READ_ONLY_REVIEW_NOT_LIVE_RECOVERY",
+  "files": {
+    "future_transport_diagnostics.py": {
+      "path": "drafts\\m10a2-gui03-serial-review\\future_transport_diagnostics.py",
+      "bytes": 1651,
+      "sha256": "9cc7d0f5b23c7ce9702ef4baf030ce79eb43224af3085d6c4d2e3734a9d12f18"
+    },
+    "OBSERVATION.json": {
+      "path": "drafts\\m10a2-gui03-serial-review\\OBSERVATION.json",
+      "bytes": 3271,
+      "sha256": "ba4474daa68b27d23c2e7d334daf5eb2dff89c0073d78da578bad3a8db58ae87"
+    },
+    "PINS.json": {
+      "path": "drafts\\m10a2-gui03-serial-review\\PINS.json",
+      "bytes": 2682,
+      "sha256": "b11d835013126ac63b9cacfe43c621acd2fe7b921680a641c303cd31b7013901"
+    },
+    "README.md": {
+      "path": "drafts\\m10a2-gui03-serial-review\\README.md",
+      "bytes": 4211,
+      "sha256": "04e41dda8381828d5cda92c4adf647b4e96e2ccd483beb98aa4c45c08cf66919"
+    }
+  },
+  "build_started": false,
+  "vm_calls": 0,
+  "old_v4_modified": false
+}

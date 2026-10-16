@@ -1,0 +1,101 @@
+{
+  "status": "READ_ONLY_V4_PREPARATION_CHECK_PASS_NOT_NATIVE05",
+  "frozen_audit": {
+    "command": [
+      "python",
+      "-B",
+      "drafts/m10a2-p6-followup-refresh-v4/driver.py",
+      "--frozen-audit"
+    ],
+    "observed_exit_code": 0,
+    "direct_actual_get": 36,
+    "inherited_actual_get_alias": 49,
+    "total_sidecars": 85
+  },
+  "python_AST_files": 2,
+  "old_runtime_observer_private_sources": {
+    "kernel/fs.c": {
+      "source": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\kernel\\fs.c",
+      "sha256": "e0e916990807587df741ee023a3d36741bce85f4c15fb5c0523f52351bc2fb52"
+    },
+    "kernel/objpool.c": {
+      "source": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\kernel\\objpool.c",
+      "sha256": "4f94afcb2723a4f90a71c049a2be1314abc827dfab42c5eb0101318f5710ea2d"
+    },
+    "kernel/paging.c": {
+      "source": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\kernel\\paging.c",
+      "sha256": "e8ad73ac5ae3a84f69b7dfae7c3ad74b4f7da9d404cc50e480a9189e0e2a6d36"
+    },
+    "kernel/sc32_debug.c": {
+      "source": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\kernel\\sc32_debug.c",
+      "sha256": "c714171345e4b41bced4f9d4c17c73200256fc713126c4d853267e86344e2f7e"
+    },
+    "kernel/task.c": {
+      "source": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\kernel\\task.c",
+      "sha256": "40495fad1e36bdc1e83e2787e6e18a4da710eea1553959a8ba3ca6f543ece2ef"
+    },
+    "user/SC32DEBUG.H": {
+      "source": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-p6-final-04\\sdk\\SYS\\SDK\\SRC\\user\\SC32DEBUG.H",
+      "sha256": "61edbdf3fb76e422032bb68669656b4950807601e2edadf9e7b558c5ecda2a68"
+    }
+  },
+  "old_runtime_bootstrap_verified": {
+    "SYS/LIB/SCLDR.SCL": {
+      "sha256": "fecf0eb9e6b68ede0357c166b61e61870a2c8ad218a0e6c053a6bc345459e224",
+      "bytes": 60008
+    },
+    "SYS/LIB/SC32API.SCL": {
+      "sha256": "b5a54a79d1aa1d773a766ae85edc9c2162bedfdd7e54d8363a798b7f5c85a647",
+      "bytes": 158590
+    },
+    "SYS/LIB/SCCLIB.SCL": {
+      "sha256": "09baf164f186b11c56ababd2c3d5e4db7351472d0207e917a14cb8d727f0f642",
+      "bytes": 66892
+    },
+    "SYS/LIB/SCLIB.SCL": {
+      "sha256": "a3003e152f8bdea56bada517b185ac9ceef78e5bd389fdeafdfc1947f53ea2a8",
+      "bytes": 146165
+    },
+    "SYS/LIB/SCGFX.SCL": {
+      "sha256": "8bc452b3a781a44d30584713a71ce9b07375833dd64b44db8a58d93078bcc0d9",
+      "bytes": 138309
+    },
+    "SYS/LIB/SCTERM.SCL": {
+      "sha256": "cb81a6d0c8b4d853627e5d4f83f7b791fae918275ee7b6ff48c9cf5c3d809ff0",
+      "bytes": 69412
+    },
+    "SYS/LIB/SCUI.SCL": {
+      "sha256": "159963852994f46afc7deb71cede4b8b56ae39be35b65c602db678be1837bdf6",
+      "bytes": 752812
+    },
+    "SYS/LIB/SCSHELL.SCL": {
+      "sha256": "723b572f533d6af9e37fd5da23484671c36371b2ad906b827d4e95a2a6187fc5",
+      "bytes": 320068
+    },
+    "SYS/LIB/SCSOUND.SCL": {
+      "sha256": "0e3edc724d3f0930566c829def46089167ada5f8a37e0d57a990bef297c19fe1",
+      "bytes": 122536
+    },
+    "SYS/UI/UAX15_1.SCU": {
+      "sha256": "1f3e318ee85ec103902ce8307fa9e3262514a551acb332b8926acce45dd969c2",
+      "bytes": 37048
+    },
+    "SYS/CORE/IMAGE.SCX": {
+      "path": "build/m10a2-main-studio-01/fs/SYS/CORE/IMAGE.SCX",
+      "bytes": 97886,
+      "sha256": "07369c3bcb3bf58a9ca0c16e5c653aaefdd28cac78fa9105e33d5ef8cb5ea0a3"
+    }
+  },
+  "native04_producer_host": "HOST09",
+  "final04_runtime_host": "HOST10",
+  "future_current_host": "HOST11_NOT_YET_PROVIDED",
+  "layout02_sha256": "6b828bbab032c4bb8ceb00ee6a94f7b55cdf0671ec18d2cb807d73240260e80a",
+  "historical_reports_changed": false,
+  "frozen_pinned_inputs_changed": [],
+  "current_preparation_executed": false,
+  "build_started": false,
+  "vm_started": false,
+  "data_disk_copied": false,
+  "main_modified": false,
+  "new_labels_defaulted": false
+}

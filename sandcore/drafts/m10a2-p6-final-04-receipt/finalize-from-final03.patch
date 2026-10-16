@@ -1,0 +1,56 @@
+--- a/drafts/m10a2-p6-final-03-receipt/finalize.py
++++ b/drafts/m10a2-p6-final-04-receipt/finalize.py
+@@ -1,9 +1,9 @@
+-"""final-03独立CORE/严格SDK执行器；默认只写计划，明确PASS通知后才使用--execute。"""
++"""final-04独立CORE/严格SDK执行器；默认只写计划，明确PASS通知后才使用--execute。"""
+ from pathlib import Path
+ import argparse,hashlib,json,os,shlex,subprocess,sys,time,traceback
+ sys.dont_write_bytecode=True
+ HERE=Path(__file__).resolve().parent;ROOT=HERE.parents[1]
+-from bindings import Binding,OUT,NATIVE,VM_REPORT,HOST,HOST_SHA,LIBS,LAYOUT
++from bindings import Binding,OUT,NATIVE,VM_REPORT,HOST,HOST_SHA,GENERATION_HOST,GENERATION_HOST_SHA,LIBS,LAYOUT,NATIVE_SHA,REFRESH_SHA,LAYOUT_SHA
+ sys.path.insert(0,str(ROOT/'tools'))
+ import stage_m10a2_sdk as sdk
+ 
+@@ -47,24 +47,24 @@
+     return codec,stage,['wsl.exe','sh','-lc',command],mode,make
+ 
+ def main():
+-    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--execute',action='store_true');parser.add_argument('--native-report-sha256');parser.add_argument('--refresh-report-sha256');parser.add_argument('--layout-report',type=Path,default=LAYOUT);parser.add_argument('--layout-report-sha256');args=parser.parse_args()
+-    require(sha(HOST)==HOST_SHA,'明确HOST09报告发生变化')
++    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--execute',action='store_true');parser.add_argument('--native-report-sha256',default=NATIVE_SHA);parser.add_argument('--refresh-report-sha256',default=REFRESH_SHA);parser.add_argument('--layout-report',type=Path,default=LAYOUT);parser.add_argument('--layout-report-sha256',default=LAYOUT_SHA);parser.add_argument('--runtime-host-report-sha256');args=parser.parse_args()
++    require(sha(HOST)==HOST_SHA,'明确HOST10报告发生变化')
+     codec,stage,core,mode,make=commands()
+-    plan=dict(schema=1,status='PREPARED_WAITING_FOR_ROOT_EXPLICIT_NATIVE_PASS_NO_EXECUTION',native_report=rel(NATIVE/'p6-generation.json'),host_report=pin(HOST),
+-        out=rel(OUT),new_layout_report=rel(args.layout_report),new_layout_required=True,steps=[dict(name='codec-proof',args=codec),dict(name='sdk-stage',args=stage),dict(name='core-build',args=core,make_args=make)],
++    plan=dict(schema=1,status='PREPARED_LAYERED_PROVENANCE_NOT_EXECUTED',native_report=rel(NATIVE/'p6-generation.json'),host_report=pin(HOST),
++        out=rel(OUT),generation_host_report=pin(GENERATION_HOST),layout_report=pin(args.layout_report),layout_reused_not_recompiled=True,steps=[dict(name='codec-proof',args=codec),dict(name='sdk-stage',args=stage),dict(name='core-build',args=core,make_args=make)],
+         scopes=dict(main_write=False,vm_start=False,disk_copy=False,core_targets_only=2,ordinary_native_libraries=8,host_codec_exception='SCSOUND.SCL_ONLY'))
+     if not args.execute:save(HERE/'PLAN.json',plan);print(plan['status']);return
+-    bound=Binding(args.native_report_sha256,args.refresh_report_sha256)
++    bound=Binding(args.native_report_sha256,args.refresh_report_sha256,args.runtime_host_report_sha256)
+     bound.layout(args.layout_report,args.layout_report_sha256)
+     npath=NATIVE/'p6-generation.json';native=bound.native
+     checked=bound.checked;proof=bound.host;recorded=bound.recorded;outputs=bound.outputs
+     snapshot=bound.snapshot;vm=bound.vm
+-    require(not OUT.exists(),'final-03必须是全新目录，失败不覆盖')
++    require(not OUT.exists(),'final-04必须是全新目录，失败不覆盖')
+     OUT.mkdir(parents=True,exist_ok=False)
+     report=dict(schema=1,status='RUNNING',scope='ACTUAL_NATIVE_BOUND_CORE_BUILD_AND_STRICT_SDK_STAGING_NOT_GUEST_BOOT',native_report=pin(npath),host_report=pin(HOST),steps=[],
+         historical_native_preflight=dict(build_report=native['preflight']['build_report'],build_report_sha256=native['preflight']['build_report_sha256']),
+-        current_refresh_binding=dict(vm_report=pin(VM_REPORT),source_snapshot_scope=native['source_snapshot_scope'],exact_host09_source_snapshot_count=len(snapshot),all_current_sources_equal_host09_and_actual_bytes=True,vm_current_inputs_unchanged=True,vm_source_disk_unchanged=True,current_public_header_sources_exact=True),
+-        new_layout_report=pin(args.layout_report),new_layout_source_binding=bound.metadata,
++        current_refresh_binding=dict(vm_report=pin(VM_REPORT),source_snapshot_scope=native['source_snapshot_scope'],exact_user_source_snapshot_count=len(snapshot),all_native_user_sources_equal_host09_host10_and_actual_bytes=True,vm_current_inputs_unchanged=True,vm_source_disk_unchanged=True,current_public_header_sources_exact=True),
++        layout_report=pin(args.layout_report),native_generation_binding=bound.metadata,runtime_build_binding=bound.runtime_metadata,layout_reuse_evidence=bound.layout_reuse,
+         main_modified=False,vm_started=False,disk_copied=False,guest_boot=False,guest_runtime_verified=False,full_M10a2=False)
+     report_path=OUT/'finalization.json'
+     def persist():save(report_path,report)
+@@ -91,7 +91,7 @@
+         run('core-build',core)
+         changed=[name for name,wanted in watched.items() if not (ROOT/name).is_file() or sha(ROOT/name)!=wanted]
+         report['core_source_files_changed_during_build']=changed;report['core_watched_source_count']=len(watched);persist();require(not changed,'CORE构建期间明确源集合改变')
+-        require(not checked.unchanged(),'HOST09原始输入/输出在执行期间改变')
++        require(not checked.unchanged(),'HOST10原始输入/输出在执行期间改变')
+         report.update(status='BUILT_AND_STAGED_ARTIFACT_INSPECTION_PENDING',sdk_runtime_verified=False);persist()
+         print('CORE_AND_SDK_READY_FOR_READ_ONLY_RECEIPT',flush=True)
+     except BaseException as e:

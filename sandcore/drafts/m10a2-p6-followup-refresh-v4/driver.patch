@@ -1,0 +1,124 @@
+--- frozen-v3/driver.py
++++ new-v4/driver.py
+@@ -6,12 +6,12 @@
+ import traceback
+ 
+ sys.dont_write_bytecode = True
+-from followup import Basis, CORE, HERE, HOST07, LAYOUT, PREVIOUS, PREVIOUS_SHA, ROOT, SDK, WITNESS, inside, read, sha, validated_labels, exact_changed_labels
++from followup import Basis, CORE, GENERATION_HOST, HERE, RUNTIME_HOST, LAYOUT, PREVIOUS, PREVIOUS_SHA, ROOT, SDK, WITNESS, inside, read, sha, validated_labels, exact_changed_labels
+ 
+ 
+ def main():
+     parser = argparse.ArgumentParser(description=__doc__)
+-    parser.add_argument('--frozen-audit', action='store_true', help='只读固定底座、layout和actual-get witness，不读HOST09、不构建、不接VM')
++    parser.add_argument('--frozen-audit', action='store_true', help='只读固定底座、layout和actual-get witness，不读HOST11、不构建、不接VM')
+     parser.add_argument('--label', action='append', help='Root明确批准的完整实际CASES标签；可重复给多个标签')
+     parser.add_argument('--host-report', type=Path)
+     parser.add_argument('--host-sha256')
+@@ -31,10 +31,12 @@
+             build_started=False, vm_started=False), ensure_ascii=False, indent=2))
+         return
+     if any(value is None for value in (args.host_report, args.host_sha256, args.vm_out, args.bundle_out)):
+-        parser.error('计划/执行均须显式给--label、HOST09完整报告SHA及两个全新输出路径')
++        parser.error('计划/执行均须显式给--label、HOST11完整报告SHA及两个全新输出路径')
++    if len(args.host_sha256) != 64 or any(c not in '0123456789abcdefABCDEF' for c in args.host_sha256):
++        raise ValueError('HOST11必须由Root显式给出完整64位SHA256')
+     host_path = inside(args.host_report)
+-    if host_path.name != 'p6-unified-host-09.json':
+-        raise ValueError('本轮只接Root全部修复收齐后的HOST09完整报告')
++    if host_path.name != 'p6-unified-host-11.json':
++        raise ValueError('本轮只接Root全部修复收齐后的HOST11完整报告')
+     basis.pin(host_path, args.host_sha256.lower())
+     vm_out, bundle = args.vm_out.resolve(), args.bundle_out.resolve()
+     for path, prefix in ((vm_out, 'm10a2-p6-refresh-vm-'), (bundle, 'm10a2-p6-target-refresh-')):
+@@ -52,12 +54,12 @@
+     _, recorded, _ = sdk.verified_build(host_path, host_inputs)
+     for name, expected in planned['source_input_sha256'].items():
+         if recorded.get(name) != expected:
+-            raise ValueError('HOST09与实际当前SCCC源快照不一致：' + name)
++            raise ValueError('HOST11与实际当前SCCC源快照不一致：' + name)
+     for name, row in planned['manifests'].items():
+         source = inside(row['source'])
+         relative = source.relative_to(ROOT).as_posix()
+         if recorded.get(relative) != row['sha256']:
+-            raise ValueError('HOST09未固定同一formal NATIVE.JSON：' + name)
++            raise ValueError('HOST11未固定同一formal NATIVE.JSON：' + name)
+     pins.update(host_inputs.pins)
+     bootstrap = {}
+ 
+@@ -65,12 +67,12 @@
+         path = basis.pin(path, expected, size)
+         bootstrap[destination] = path.read_bytes()
+ 
+-    # 所有运行SCL保持final02 SDK的旧原生字节；本轮新库只取回，不覆盖SYS。
++    # 所有运行SCL保持final04 SDK的旧原生字节；本轮新库只取回，不覆盖SYS。
+     for name, row in basis.old['native_libraries'].items():
+         destination = 'SYS/LIB/' + name
+         sdk_row = basis.manifest['files'][destination]
+         if sdk_row['sha256'] != row['sha256'] or sdk_row['bytes'] != row['bytes']:
+-            raise ValueError('final02 SDK与previous八库不一致：' + name)
++            raise ValueError('final04 SDK与previous八库不一致：' + name)
+         basis.pin(ROOT / SDK / destination, row['sha256'], row['bytes'])
+         add(destination, row['path'], row['sha256'], row['bytes'])
+     for destination in ('SYS/LIB/SCSOUND.SCL', 'SYS/UI/UAX15_1.SCU'):
+@@ -85,8 +87,8 @@
+     for row in basis.core_receipt['actual_compiled_programs']:
+         actual = artifacts[row['name']]
+         if row['source']['sha256'] != actual['sha256'] or row['source']['bytes'] != actual['bytes']:
+-            raise ValueError('final02 CORE嵌入程序与旧运行底座不一致')
+-    old_host = read(ROOT / HOST07)
++            raise ValueError('final04 CORE嵌入程序与旧运行底座不一致')
++    old_host = read(ROOT / RUNTIME_HOST)
+     image = next(row for row in old_host['outputs'] if row['path'].endswith('/fs/SYS/CORE/IMAGE.SCX'))
+     add('SYS/CORE/IMAGE.SCX', image['path'], image['sha256'], image['bytes'])
+     core, data = ROOT / CORE, ROOT / 'build/m10a1/sanddata.img'
+@@ -94,21 +96,23 @@
+     observer_pins = {row['path']: row['sha256'] for row in basis.layout_roles.values()}
+     for name, expected in legacy.PRIVATE_SOURCE_PINS.items():
+         if basis.core_inputs['non_generated_compile_sources'].get(name) != expected:
+-            raise ValueError('冻结owner helper私有源不属于实际final02 CORE闭包：' + name)
++            raise ValueError('冻结owner helper私有源不属于实际final04 CORE闭包：' + name)
+         observer_pins[str(basis.source(name, expected))] = expected
+     for path in HERE.glob('*.py'):
+         basis.pins[path] = sha(path)
+     basis.pins[HERE / 'PINS.json'] = sha(HERE / 'PINS.json')
+     pins.update(basis.pins)
+     if host_inputs.unchanged():
+-        raise ValueError('只读准备期间HOST09输入发生变化')
+-    baseline = dict(origin='FINAL02_PRIOR_NATIVE_RUNTIME_NOT_FOLLOWUP_OUTPUT', requested_labels=labels,
++        raise ValueError('只读准备期间HOST11输入发生变化')
++    baseline = dict(origin='FINAL04_PRIOR_NATIVE_RUNTIME_NOT_FOLLOWUP_OUTPUT', requested_labels=labels,
+         previous_report=str(ROOT / PREVIOUS), previous_report_sha256=PREVIOUS_SHA,
++        native04_producer_host=dict(path=str(ROOT / GENERATION_HOST), sha256=sha(ROOT / GENERATION_HOST)),
++        runtime_host=dict(path=str(ROOT / RUNTIME_HOST), sha256=sha(ROOT / RUNTIME_HOST)),
+         core=str(core), core_sha256=sha(core / 'fs/SYS/CORE/CORE.SKM'),
+         sdk_manifest=str(ROOT / SDK / 'MANIFEST.json'), sdk_manifest_sha256=sha(ROOT / SDK / 'MANIFEST.json'),
+         native_libraries={name: dict(bytes=row['bytes'], sha256=row['sha256'])
+                           for name, row in basis.old['native_libraries'].items()},
+-        host_codec_exception='SCSOUND.SCL_ONLY_FIXED_FINAL02_SDK',
++        host_codec_exception='SCSOUND.SCL_ONLY_FIXED_FINAL04_SDK',
+         current_layout_proof=str(ROOT / LAYOUT), current_layout_proof_sha256=sha(ROOT / LAYOUT),
+         actual_layout_source_roles=basis.layout_roles,
+         historical_preflight_task_layout_preserved=True,
+@@ -119,7 +123,7 @@
+             changed=planned['changed_labels'], host_report=str(host_path), host_report_sha256=sha(host_path),
+             bootstrap=baseline, build_started=False, vm_started=False), ensure_ascii=False, indent=2))
+         return
+-    report = dict(status='RUNNING', scope='FOLLOWUP_EXPLICIT_LABEL_NATIVE_REFRESH_WITH_FINAL02_BOOTSTRAP',
++    report = dict(status='RUNNING', scope='FOLLOWUP_EXPLICIT_LABEL_NATIVE_REFRESH_WITH_FINAL04_BOOTSTRAP',
+         cases=[], screenshots=[], warm_observations=[], source_disk_sha256=sha(data),
+         changed_labels=planned['changed_labels'], requested_labels=labels, full_M10a2=False,
+         bootstrap_origin=baseline['origin'], bootstrap_binding=baseline,
+@@ -153,10 +157,10 @@
+                     Path(desktop['path'] + '.sdbg'), desktop['debug']['sha256'], basis.layout)
+                 harness.owner_arguments = (core / 'core.elf', basis.layout, binding, session)
+                 result = target.execute(harness, planned, payload, pins, basis.old, bundle, host_report=host_path,
+-                                        work='/HOME/P6FOLLOWUP2')
++                                        work='/HOME/P6FOLLOWUP4')
+                 report.update(status='EXPLICIT_LABEL_REFRESH_GENERATED', bundle_status=result['status'],
+                               bundle_report=str(bundle / 'p6-generation.json'))
+-                harness.screen('p6-followup-final02-bootstrap-desktop')
++                harness.screen('p6-followup-final04-bootstrap-desktop')
+             except BaseException as error:
+                 report.update(status='FAIL_OR_INTERRUPTED', error=dict(message=str(error), traceback=traceback.format_exc()))
+                 if harness is not None:

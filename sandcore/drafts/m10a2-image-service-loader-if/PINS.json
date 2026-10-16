@@ -1,0 +1,99 @@
+{
+  "schema": 1,
+  "status": "SOURCE_PATCH_ONLY_NOT_BUILT_NOT_GUEST_VERIFIED",
+  "modified": {
+    "kernel/image_service.c": {
+      "before_sha256": "6538a1f5bf84f353a88490bcca5b5d9cb40f6c7981cd235597c2be95d1bab09f",
+      "result_sha256": "8dfb226f68dcdf91cd9bb3717a78e8ebcee158baa9e54846b4e2471c0b38d4f5"
+    },
+    "docs/SC32-IMAGE.md": {
+      "before_sha256": "68501d67492fbf0f4cdfc901b068428d2352f0bf6cb8fddc435826fe04070265",
+      "result_sha256": "cbc8474f5ac4435baf03eff74d69d0edf1d63f336c737ab99a006aa9c22a1e45"
+    }
+  },
+  "patch_sha256": {
+    "image-service-loader-if.patch": "8739bc17a3a1c6c5311d72858e795d767e3ce999696afa8f694fa6fb6828874b",
+    "sc32-image-spec.patch": "3600f5fe29b55eb32d066911bd1bdd554a263c7d5c49524c5df84994a23c3e5d"
+  },
+  "HOST09": {
+    "path": "build/m10a2-main-studio-01/p6-unified-host-09.json",
+    "sha256": "879ceb99215972f60d1dfc76f0102d1a2255c8616685dd980eb4e8d5aba77ae4"
+  },
+  "actual_source_references": {
+    "kernel/main.c": "14723b827c2b6a048e8695d8416cd66653e09ddc0e61cd911d0abaa7450da78c",
+    "kernel/task.c": "40495fad1e36bdc1e83e2787e6e18a4da710eea1553959a8ba3ca6f543ece2ef",
+    "kernel/auth.c": "6a4ffcc8d8ec536ae7977ecad293439ac345250b5a13b2e4e3ce404e3288b1e4",
+    "kernel/image_service.c": "6538a1f5bf84f353a88490bcca5b5d9cb40f6c7981cd235597c2be95d1bab09f",
+    "user/imageapi/sc32_image.c": "980217a61e857af43d9e6426d1bf630473be4b169b689543b3382a403b84ead3",
+    "user/scgfx/io.c": "423277ad20a2dc030643d3a25ff533184bb34bd157df3247e42bd18a8c2f0d2b",
+    "user/imageapps/lifecycle.c": "0afd7f895ef38005126e5fde970162bf6f55a0df13d51a8e09872eba106d007f",
+    "user/codec/service.c": "fd38b1005c8a3919b885fb74f42633b23fd1b05ea534441aa179f05c3f814ac6",
+    "user/codec/decode.c": "caaf23b65a7023286457ddc7ce30141838cf810d6382e04c2fd4469c8a033bdb"
+  },
+  "chain": [
+    "kernel/main.c:314 cli then image_service_poll at321",
+    "kernel/image_service.c:245 sti before auth_service_exec",
+    "kernel/task.c:1315 IF check; parts at1355 returns -4",
+    "kernel/image_service.c:246 worker<0 maps fail raw -3",
+    "user/imageapi/sc32_image.c:35 maps -3 to SC32_E_NOT_SUPPORTED -112"
+  ],
+  "default_path": "/SYS/PICTURES/WELCOME.PNG",
+  "original_SCB": {
+    "path": "/HOME/WELCOME.SCB",
+    "bytes": 230424,
+    "width": 640,
+    "height": 360,
+    "format": "SCB1MIO",
+    "max_palette_slot": 74,
+    "exact_size": true,
+    "sha256": "ed1151aa1e892db7df2711fbf58cfc847257c1c9d80e8bd1d84f1e38e2d610bd"
+  },
+  "original_PNG": {
+    "path": "/SYS/PICTURES/WELCOME.PNG",
+    "bytes": 1715161,
+    "width": 1672,
+    "height": 941,
+    "bit_depth": 8,
+    "color_type": 2,
+    "sha256": "ac3857f26b8f65e39c9669d46dede8cdd8cdb58869512e13867abc60cba75a20",
+    "full_decode": "NOT_EXECUTED"
+  },
+  "saved_GUI03_screenshot": {
+    "path": "build/m10a2-p6-gui-run-03/p6-gui3-notes-default.png",
+    "sha256": "7d91a38799ed7c966e8d36a41d08c19a33230b0da2ca056d0620fce395ef1cbd"
+  },
+  "IRQ_lifetime": {
+    "saved_before_cli": true,
+    "loader_IF_zero": true,
+    "render_hold_preserved": true,
+    "publication_before_IF_restore": true,
+    "failure_and_success_restore_original_IF": true,
+    "memory_barriers": true
+  },
+  "original_kernel_and_doc_unchanged": true,
+  "public_ABI_or_decoder_or_asset_changed": false,
+  "current_VM_touched": false,
+  "user_targets_recompile_required_by_this_patch": false,
+  "new_kernel_build_and_minimal_compressed_image_runtime_regression": "ROOT_AFTER_GUI03_NORMAL_EXIT",
+  "GUI03_IMAGE_actual_preparation": {
+    "session_report": "build/m10a2-p6-gui-run-03/session.json",
+    "report_currently_active_no_whole_report_pin": true,
+    "payload": {
+      "bytes": 97886,
+      "sha256": "07369c3bcb3bf58a9ca0c16e5c653aaefdd28cac78fa9105e33d5ef8cb5ea0a3",
+      "origin": "EXACT_EXISTING_HOST_RUNTIME"
+    },
+    "metadata": [
+      -1,
+      -1,
+      23
+    ]
+  },
+  "checks": [
+    "all referenced implementation SHA match HOST09",
+    "single shared success/failure IF restoration after publication",
+    "draft source transaction textual order",
+    "kernel/doc original SHA unchanged",
+    "actual GUI03 installed IMAGE record identity only"
+  ]
+}

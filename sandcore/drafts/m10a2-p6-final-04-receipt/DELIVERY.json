@@ -1,0 +1,46 @@
+{
+  "schema": 1,
+  "status": "FROZEN_PREPARED_NOT_BUILT_ROOT_WILL_EXECUTE",
+  "files": {
+    "bindings-from-final03.patch": {
+      "bytes": 11579,
+      "sha256": "15402d8a024105534987ffcb3a1a6f6830846f27f522290cb39e1d5953732d21"
+    },
+    "bindings.py": {
+      "bytes": 13097,
+      "sha256": "b13e52b202d75e5327a03ce64be6915858303cdefdc33ee06c10a319409b49dd"
+    },
+    "finalize-from-final03.patch": {
+      "bytes": 5773,
+      "sha256": "b8295c510c63861d2480d97eddbcef7a95ae15bde8d80a9a95f0dc5f91180cd3"
+    },
+    "finalize.py": {
+      "bytes": 9091,
+      "sha256": "97a41a41ac0f8fd9f4a6a0c37f0872850d378dc6ba10abeaf242ddc095ae5a7c"
+    },
+    "inspect-from-final03.patch": {
+      "bytes": 7655,
+      "sha256": "6d841143829cd64c7c865281aa28be7d14dcae2eb13edaa8ce53ca72808fda33"
+    },
+    "inspect_final.py": {
+      "bytes": 10377,
+      "sha256": "b3255eb212c33aae7f7fe677c0d40f01f2b061fcdbe9f6e472018b81fa5a294b"
+    },
+    "PINS.json": {
+      "bytes": 1624,
+      "sha256": "c5287f87019106c6049ddb4df67b5b2f85d6ede2a80f2c2e32791f9bc8ecb05f"
+    },
+    "PLAN.json": {
+      "bytes": 4372,
+      "sha256": "d55e10119b9258b372615da03c132f7f0357435b6ab916ae453ee0fed9166778"
+    },
+    "READ-ONLY-AUDIT.json": {
+      "bytes": 7061,
+      "sha256": "92ee9b174c1f1ad3c460dc6f34323362f3bd999787efd198101e2734bb83c3ee"
+    },
+    "README.md": {
+      "bytes": 3978,
+      "sha256": "4ba61f8b4f4727429b70575605d79211c2050dbb30339c8f442b36f9edaf285f"
+    }
+  }
+}

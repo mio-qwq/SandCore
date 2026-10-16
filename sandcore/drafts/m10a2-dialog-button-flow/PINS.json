@@ -1,0 +1,18 @@
+{
+  "status": "SOURCE_ONLY_NOT_BUILT_NOT_GUEST_VERIFIED",
+  "modified": {
+    "user/scui/ui_dialog.c": {
+      "before_sha256": "3b5d8ac16af4f1aa942a7e1895a7532d899b530b874c1f23d0ac2fdd7b31edfb",
+      "result_sha256": "67dc3cb0b62696b7c5e94278c7442da658d83e2aa3b339e2824c7ad530583b86",
+      "before_bytes": 50507,
+      "result_bytes": 50732
+    },
+    "docs/SCUI.md": {
+      "before_sha256": "ff2bca9e465fde1a403185215ecd7de289f6142993379e2bd10088cc4438a403",
+      "result_sha256": "9190e41ede621227b05610305fb7c91efcfe87f0467b4f2a45c78e9d88e2f3cc",
+      "before_bytes": 20088,
+      "result_bytes": 20590
+    }
+  },
+  "patch_sha256": "0d4e561b6c0ec35b6191cc90331358eb2baa0f2968f9192e40cbf071ff2f7b4d"
+}

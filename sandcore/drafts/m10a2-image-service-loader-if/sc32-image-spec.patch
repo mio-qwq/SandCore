@@ -1,0 +1,15 @@
+--- a/docs/SC32-IMAGE.md
++++ b/docs/SC32-IMAGE.md
+@@ -12,8 +12,12 @@
+ 
+ 内核每块重新检查当前调用者页表，不保存跨调用用户指针；worker只能领取自己被指派的source kind/bytes/path，并读取自己票据的封存字节，不能指定其它owner或内核地址。取消/失败/超时/进程停止撤worker链接并释放输入，异常保留真实暂停诊断卡；提交完整解码后先释放封存输入再申请结果页，降低峰值。服务异常仍按普通Ring3边界处理，SYSTEM外部管理边界不变。
+ 
++排队的IMAGE worker沿统一SCX装载器启动；装载事务必须在IF=0独占共享stage，render_hold只阻止任务切换，不能代替该IF合同。服务保存进入装载段时的IF，在受委托身份下创建worker，并在同一关闭IRQ区发布owner/worker PID与generation、票据及队列状态；成功和失败都在关联收拢后恢复原IF。PNG/JPEG/WebP/BMP解码仍在独立Ring3 worker，不把解码移入内核，也不放宽loader。旧服务启动负值仍归一为raw -3，公开适配仍映射NOT_SUPPORTED；该返回本身不能证明压缩文件格式不支持，须区分worker未启动与解码器真实拒绝。
++
+ Copy先预检完整目的RW区、容量及输出不重叠；SCB按64KiB复核/转换、服务沿旧完整消费语义。IO/来源变化时目的候选可能已有前缀，调用者不得把失败候选发表为当前图。Info与票据在成功消费后只作已完成值，不能再次Query。失败请求仍需Cancel，避免保留诊断资源。
+ 
+ 本草稿宿主/客体证据见STATUS.md；源码实现不等于guest验收。
+ 
+ 修订：2026-10-16，统一Canvas/Lens/Settings/Sound唯一图片合同，明确分片内存封存和异步等待。
++
++修订：2026-10-16，修复IMAGE服务以IF=1进入统一SCX装载器的冲突；保存/恢复原IF，关联发布后才重新允许IRQ，公开ABI与原盘图片不变。

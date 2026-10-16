@@ -1,0 +1,130 @@
+{
+  "status": "READ_ONLY_OFFLINE_LOG_OBSERVATION_NOT_COHERENT_VM_SNAPSHOT",
+  "files": [
+    {
+      "path": "build\\m10a2-p6-gui-run-03\\management-rx.bin",
+      "bytes": 22340,
+      "sha256": "3781bf7276146b0a43d54260451dd527682a1902aa91d70112a25dc8c6ac2cfc"
+    },
+    {
+      "path": "build\\m10a2-p6-gui-run-03\\debug-rx.bin",
+      "bytes": 126,
+      "sha256": "e575f5376bb63f5c73aefde6602448f4c2eecf186e6c6a6727fc0c643ee589ce"
+    },
+    {
+      "path": "build\\m10a2-p6-gui-run-03\\p6-gui.json",
+      "bytes": 1469419,
+      "sha256": "7c6542d354427484124ca33ee259f976edb4e7cc244cd55a5f972613dcf7b80f"
+    }
+  ],
+  "frames": 610,
+  "kinds": {
+    "0x8001": 1,
+    "0x100": 68,
+    "0x8002": 14,
+    "0x800a": 507,
+    "0x8007": 6,
+    "0x8008": 8,
+    "0x8009": 6
+  },
+  "last_frames": [
+    {
+      "kind": "0x800a",
+      "sequence": 535,
+      "result": 0,
+      "payload_hex": "00000000"
+    },
+    {
+      "kind": "0x800a",
+      "sequence": 536,
+      "result": 0,
+      "payload_hex": "00000000"
+    },
+    {
+      "kind": "0x800a",
+      "sequence": 537,
+      "result": 0,
+      "payload_hex": "00000000"
+    },
+    {
+      "kind": "0x800a",
+      "sequence": 538,
+      "result": 0,
+      "payload_hex": "00000000"
+    },
+    {
+      "kind": "0x800a",
+      "sequence": 539,
+      "result": 0,
+      "payload_hex": "00000000"
+    },
+    {
+      "kind": "0x800a",
+      "sequence": 540,
+      "result": 0,
+      "payload_hex": "00000000"
+    },
+    {
+      "kind": "0x800a",
+      "sequence": 540,
+      "result": 0,
+      "payload_hex": "00000000"
+    },
+    {
+      "kind": "0x800a",
+      "sequence": 540,
+      "result": 0,
+      "payload_hex": "00000000"
+    }
+  ],
+  "debug_boot_only_no_stop": true,
+  "management_log_below_console_budget": true,
+  "failed_cli_cases": [
+    {
+      "name": "p6-cli-gui3-notes-startup-task-observation",
+      "command": "ps",
+      "expected_exit": 0,
+      "exit_code": null,
+      "output": "",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_bytes": 0,
+      "wall_seconds": 0.031000000002677552,
+      "error": "RuntimeError('串口连接已中断')",
+      "status": "FAIL_OR_INTERRUPTED"
+    },
+    {
+      "name": "p6-bind-gui3-rebind-after-notes-task-observation",
+      "command": "sessionctl list",
+      "expected_exit": 0,
+      "exit_code": null,
+      "output": "",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_bytes": 0,
+      "wall_seconds": 0.031000000002677552,
+      "error": "RuntimeError('串口连接已中断')",
+      "status": "FAIL_OR_INTERRUPTED"
+    }
+  ],
+  "runtime_session_at_read": {
+    "uid": 1000,
+    "realm": 0,
+    "session": 4,
+    "evidence_case": "p6-bind-gui3-rebind-after-cancel-list",
+    "session_row": {
+      "id": 4,
+      "uid": 1000,
+      "gid": 1000,
+      "type": "user",
+      "active": true,
+      "tasks": 2,
+      "name": "mio"
+    }
+  },
+  "runtime_status_at_read": "INTERACTIVE_UNVERIFIED",
+  "runtime_thread_state_observed": false,
+  "original_failure_repr_observed": false,
+  "primary_cause": "INFERRED_HEARTBEAT_TIMEOUT_LATCH_NOT_CONFIRMED",
+  "live_connection_changed": false,
+  "vm_calls": 0,
+  "source_inputs_modified": false
+}

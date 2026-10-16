@@ -1,0 +1,119 @@
+{
+  "schema": 1,
+  "status": "SOURCE_ONLY_NATIVE04_FINAL04_LAYOUT02_V4_PREPARED_NOT_EXECUTED",
+  "files": {
+    "build/m10a2-p6-target-refresh-04/p6-generation.json": {
+      "bytes": 13547318,
+      "sha256": "1ac7e951434d5465a665844019a731609a08c35c4a22a5f42bb6c43fac2b5191"
+    },
+    "build/m10a2-p6-refresh-vm-04/refresh-vm.json": {
+      "bytes": 1203203,
+      "sha256": "226d9d99ae250c247744430b0247f7c7f30cc315ca1687e2a8e6b604f7317175"
+    },
+    "build/m10a2-p6-target-refresh-03/p6-generation.json": {
+      "bytes": 14897961,
+      "sha256": "fbc1c4519c9f432a67772eb9b7989b166edb7ce29a20a65cc88c5bae63774f2f"
+    },
+    "build/m10a2-p6-refresh-vm-03/refresh-vm.json": {
+      "bytes": 966507,
+      "sha256": "f03755bcb535ee872661f7061bf57b12e8fcc4ea973a9475229ce1ff10bd0a33"
+    },
+    "build/m10a2-p6-guest-generation-run-03/p6-generation.json": {
+      "bytes": 15284667,
+      "sha256": "f5538ba547f2ae38e00f35d35b57e2c0a55ef8282955aefbf221042122c57ddc"
+    },
+    "build/m10a2-main-studio-01/p6-unified-host-09.json": {
+      "bytes": 364769,
+      "sha256": "879ceb99215972f60d1dfc76f0102d1a2255c8616685dd980eb4e8d5aba77ae4"
+    },
+    "build/m10a2-main-studio-01/p6-unified-host-10.json": {
+      "bytes": 364768,
+      "sha256": "67709f3aacb72c6f18ded7be61235d5e9811faf4c41671b7084f46eec254c2ca"
+    },
+    "build/m10a2-p6-final-04/finalization.json": {
+      "bytes": 13802,
+      "sha256": "d8f8c52f02330d5ee9f8f2ab4a134e2b6bc64dcd96343f723c9a9e0b23cffb06"
+    },
+    "build/m10a2-p6-final-04/sdk/MANIFEST.json": {
+      "bytes": 1398316,
+      "sha256": "6038df5a95c534a9d8769355ec827fdf4fca9f9e3eba76457ff57a5c9668329f"
+    },
+    "build/m10a2-p6-final-04/codec-proof.json": {
+      "bytes": 3101,
+      "sha256": "f1f8afea39584815be7f6817c8dde9af38a5c1d57abd8e4a0ce05d07b0d6b2b6"
+    },
+    "drafts/m10a2-p6-final-04-receipt/core-build-receipt.json": {
+      "bytes": 97684,
+      "sha256": "87b715e781b037040c13d2d5ef7b56bf9aaf1447b2118ab0c3f228a64e3c075b"
+    },
+    "drafts/m10a2-p6-final-04-receipt/core-build-inputs.json": {
+      "bytes": 54512,
+      "sha256": "4fb8750e2dadae79c851711e0bb217cec3e9048ff8d21a262029af51e408f0af"
+    },
+    "drafts/m10a2-p6-final-04-receipt/sdk-staging-receipt.json": {
+      "bytes": 89275,
+      "sha256": "5c1a7a84223961e746986ecc071c8a074cb4e5179453efda039442e03a030129"
+    },
+    "build/m10a2-p6-gui-coherent-layout-02/layout-proof.json": {
+      "bytes": 4604,
+      "sha256": "6b828bbab032c4bb8ceb00ee6a94f7b55cdf0671ec18d2cb807d73240260e80a"
+    },
+    "drafts/m10a2-p6-refresh-runner/driver.py": {
+      "bytes": 9020,
+      "sha256": "c97648a400926f7cd1ee3227a2e8dc530b496eb3bea74f06d5e9e537fe1269d6"
+    },
+    "drafts/m10a2-p6-target-refresh/refresh.py": {
+      "bytes": 21239,
+      "sha256": "e2e4e24ecfa7bf051bbfd2c91b3480beb3d8d981cc98847dc682268bf744307d"
+    },
+    "drafts/m10a2-gui-owner-review/owner_snapshot.py": {
+      "bytes": 22143,
+      "sha256": "25d87a8f1b5cbac487ed740416a65031a1c456a9cbaf48505ba739c651f859dc"
+    },
+    "drafts/m10a2-p6-guest-generation/model.py": {
+      "bytes": 33027,
+      "sha256": "3087b2c093dd99350e4049214478bf188a23edb585a4766f529dbc16e50f5bb2"
+    },
+    "drafts/m10a2-p6-followup-refresh/followup.py": {
+      "bytes": 13279,
+      "sha256": "9f6e7497d11a0edc5d5b3485c68e873191c13b22941ada3e1723443bed956e60"
+    },
+    "drafts/m10a2-p6-followup-refresh/driver.py": {
+      "bytes": 11130,
+      "sha256": "0c3517e8717f09e15306842d2dc2d87f877aea289adad09fd5fda86c9dab0cf2"
+    },
+    "drafts/m10a2-p6-followup-refresh/PINS.json": {
+      "bytes": 2609,
+      "sha256": "41fa8f71fc1ce4040dea231c2fc5efa25cc60e92422cf835636aa31e89565f8a"
+    },
+    "drafts/m10a2-p6-followup-refresh/READ-ONLY-CHECK.json": {
+      "bytes": 1579,
+      "sha256": "52d99d5ab1e2455651223a291f6e7434dbbe72230a73273889e93c15ffb837cb"
+    },
+    "drafts/m10a2-p6-followup-refresh-v2/followup.py": {
+      "bytes": 5451,
+      "sha256": "8db9a192c694eeef65979ffc757a93097b60b36e8b7c4c959834b7358dcb9e18"
+    },
+    "drafts/m10a2-p6-followup-refresh-v2/driver.py": {
+      "bytes": 11337,
+      "sha256": "01bd8ed3c66b78062ad60cd27acbb3740931e3222d8a1a36cd9a8b91e10b7029"
+    },
+    "drafts/m10a2-p6-followup-refresh-v3/driver.py": {
+      "bytes": 11337,
+      "sha256": "11abb7f23ac6aa5f0507a70ddeb2a74787ab9fe1abe9adb89bf39785ed311f72"
+    }
+  },
+  "future_host_report_filename": "p6-unified-host-11.json",
+  "future_host_sha256": null,
+  "labels": "REQUIRED_EXPLICIT_REPEAT_LABEL_EXACT_CURRENT_CHANGED_SET",
+  "expected_scope_is_not_default_label": [
+    "SCUI"
+  ],
+  "native_producer_host": "HOST09",
+  "old_runtime_host": "HOST10",
+  "future_current_preparation_host": "HOST11",
+  "old_reports_modified": false,
+  "build_started": false,
+  "vm_started": false,
+  "future_host_sha256_must_be_explicit": true
+}

@@ -1,0 +1,33 @@
+{
+  "status": "SOURCE_ONLY_NOT_BUILT_NOT_GUEST_VERIFIED",
+  "files": {
+    "dialog-button-flow.patch": {
+      "sha256": "0d4e561b6c0ec35b6191cc90331358eb2baa0f2968f9192e40cbf071ff2f7b4d",
+      "bytes": 2105
+    },
+    "make_patch.py": {
+      "sha256": "92e47f7ba0007d9205954a7889b809617ace9798af548e38a29cfc49415d355f",
+      "bytes": 4407
+    },
+    "overlay/docs/SCUI.md": {
+      "sha256": "9190e41ede621227b05610305fb7c91efcfe87f0467b4f2a45c78e9d88e2f3cc",
+      "bytes": 20590
+    },
+    "overlay/user/scui/ui_dialog.c": {
+      "sha256": "67dc3cb0b62696b7c5e94278c7442da658d83e2aa3b339e2824c7ad530583b86",
+      "bytes": 50732
+    },
+    "PINS.json": {
+      "sha256": "402f661176978bccf4ff61dce27167d61ce755ed9b5d1a54bd51e25164d8b4ee",
+      "bytes": 710
+    },
+    "README.md": {
+      "sha256": "b02e9237bbfdc3b6d334e52d2b92c03980f83012a68d141a9f8423be92b337d8",
+      "bytes": 2654
+    },
+    "SOURCE-PINS.json": {
+      "sha256": "991ac74e1adc36269f3df96100e1a05b7eea52d0e01ddc0de7d74c102c230be6",
+      "bytes": 1146
+    }
+  }
+}

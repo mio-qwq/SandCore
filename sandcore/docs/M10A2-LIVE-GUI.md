@@ -2,6 +2,42 @@
 
 2026-10-16。完整持续目标仍 active。先读本页、P6实施状态及根 M10a2RULE.MD；生成、安装和运行分别记载。
 
+## GUI03当前正在运行
+
+### 最新覆盖记录：本节优先于下方早期快照
+
+GUI03的实际业务已新增通过：Notes默认关联打开20B正文；Files→Desktop复制、Desktop→Files移动及确认前取消。移动后源桌面图标无需F5自动消失，目标正文保持，真实REC审阅为DONE/DURABLE。`build/m10a2-p6-gui-run-03/gui3-drop-audit.json` 为 `ACTUAL_DEFERRED_DROP_COPY_MOVE_DURABLE_AND_AUTOMATIC_SOURCE_REFRESH_OBSERVED`；未把业务记录冒充直接捕获FINAL协议包。
+
+Calculator实际计算30、复制后正常退出；新Notes实际CtrlV得到2B的30。`p6-gui3-calculator-to-notes-text.png`已亲自查看。这覆盖此前GUI02文本剪贴板失败，证明此次正文所有权在源应用退出后仍有效。Notes未保存的粘贴稿已选择不保存并正常关闭，Files也已关闭，原20B持久文件保持。当前Terminal2前台，真实键盘输入mkdir -p建立RDESK/RDWORK/RDPLUGIN输出目录；尚待查看执行后画面，不提前宣布命令成功。
+
+管理串口在本轮后段已失效：最后成功绑定仍SID4（gui3-rebind-after-cancel-list），随后run/bind在client.failure检查处未发送客体命令。QMP/HMP及真实GUI继续正常响应；不得继续重复run/bind、清字段或伪造finish。窄审阅 `drafts/m10a2-gui03-serial-review` 支持心跳超时、迟到ACK后宿主锁死的推断，原始cause待正常退出Guest.close的stderr留证，不能据此声称客体死机。本轮最终owner一致账尚不可取得；业务证据与传输FAIL分开保留，不能声称整轮PASS。
+
+运行源为HOST10/native04/final04，当前全部主源及活helper仍冻结。退出后才合入两个已准备的局部补丁：image_service worker启动保持loader要求的IF0，以及SCUI四按钮MessageBox改FLOW自动换行。预期仅SCUI需要新的用户态原生刷新，内核修复另构建，未改变的库/应用证据复用。Studio真实SCL/四TU构建→运行→Debug2、Settings/Installer、Monitor属性、Sound重播/seek仍待完成。不要重复GUI03已通过业务。
+
+本轮运行代码基线为main@befac91（含0384676应用修复和稳定读兼容），推送曾连接失败、远端未确认。final04实际构建回执、GUI03业务审阅及两个补丁位于独立draft，与接力文档同批保存；用户.zcodeignore不动。
+
+### GUI03最新前台与Studio实际失败
+
+普通Terminal的mkdir命令已返回提示符，随后exit0并正常关闭；Studio文件对话框实际列出RDESK、RDWORK、RDPLUGIN，目录已真实建立。Studio打开 `/SYS/SDK/EXAMPLES/RDESK/RDSTATS.SCW`，F5实际运行SCCC生成SCO并运行SCLD。已查看 `p6-gui3-studio-rdstats-link-diagnostic.png`：`SCLD OK RDSTATS.SCL objects=1 image=3718 symbols=6 relocs=6 debug=1690`。此前根内SCO依赖名检查修复已越过，但随后publication失败为-401，未取得当前产物资格，不能称完整构建成功，也不能运行/调试。
+
+静态原因已确认：studio_build.c的publication把conflict_policy设为SC_SHELL_REPLACE，shell_job.c严格要求该保留字段为0；同一调用还缺少必需recovery_path。单删策略仍不完整。后续修复须提供caller-owned唯一REC路径，保持真实冲突epoch/修订绑定的显式决定，不能放宽SCSHELL ABI或绕过真实文件作业/持久化/最终资格检查。Studio已正常关闭，当前主源尚未更改。下一次明确原生刷新集合须把STUDIO2与SCUI一起按实际闭包列出，不能再沿早期“只SCUI”的假设。
+
+Settings实际正常启动并显示显示/桌面/程序/显示资料/环境/配置六页入口。点击100%再预览，`p6-gui3-settings-preview.png`显示真实100%和剩余15秒；35秒后的 `p6-gui3-settings-timeout-revert.png`字体/客户布局已恢复150%外观、预览0秒，但状态文字仍为100%。因此只确认启动和预览生效，自动回退的状态显示仍待核对，不提前写完整PASS。Settings随后正常关闭；当前最新截图 `p6-gui3-desktop-after-settings.png`，尚待下次查看，不再给旧坐标发送输入。
+
+exec **5218**、Windows QEMU **18952**，普通测试SID4/UID:GID1000/realm0，原SID1。报告 `build/m10a2-p6-gui-run-03/p6-gui.json` 为RUNNING。原JSONL入口 `drafts/m10a2-p6-gui-coherent/driver.py`；当前输入绑定仍initial-ordinary-bind，get不清绑定，run会清，之后须真实bind4。不要重启或重放既有动作ID。全主源/tools/SDK/CORE/现有helper均冻结，不在运行时修改。
+
+实际使用native04、HOST10、`build/m10a2-p6-final-04/core`/sdk、原M10a1盘和actual layout02。Root已亲自执行codec-proof、严格SDK、CORE三个步骤均0，再inspect_final退出0。CORE SHA37331d772966e8d02759297bf74b08be3025b3b8e36f1e76d75735dc468529b7，SDK494项/17478446B。新CORE已实际boot到普通会话，finalization中NOT_GUEST_BOOT仅为构建核验时态，实际运行另由GUI03记录。
+
+最新状态：Files2在 `/HOME/P6GUI`、窗口x30/y30/约1030×750；Notes已持久保存20B的NOTE.TXT并正常关闭；Lens误启动后已取消对话框、CtrlQ正常关闭；当前只有Files可见。新名称框Enter已实际创建P6GUI，Esc取消无新目录。Files地址CtrlL只聚焦，重复导航要再CtrlA，不能把旧文字追加成/HOME/HOME/P6GUI后误报路径失败。已修正导航到真正空目录。
+
+Notes从桌面图标正确启动，旧159B原文保留；CtrlN新文档、实际20B正文、Save As到 `/HOME/P6GUI/NOTE.TXT`。截图p6-gui3-note-saved.png已查看，已持久保存且标题无星；get到gui3-note-saved.txt，SHA7def5086c7959c3579cf642bea6e2473349576f26c2c9dbba874db8ec921ec69，代数1514。Files刚F5刷新，最后截图p6-gui3-files-note-association.png，后续先查看再选NOTE按Enter验证关联，不重发保存。
+
+输入陷阱：Start→Home/Right后再Home再Down5误打开Lens，不是Notes。后续直接已见桌面图标，或先看菜单实际高亮再确认。误发的notes-new/type/save请求落在Lens，只打开其Open image对话框，未保存文件；已取消并正常关闭，不把这些请求算Notes流程。真正Notes动作ID含real-notes，成功保存ID为gui3-note-save-confirm。
+
+该误启动暴露真实默认PNG失败-112（p6-gui3-notes-default.png实际是Lens错误框）。静态已确定image_service_poll启动worker前sti与task_loader_stage必须IF0相冲，PNG还未进入codec；默认为/SYS/PICTURES/WELCOME.PNG，不是/HOME/WELCOME.SCB。debug agent正在新draft冻结只去启动前sti的最小补丁，保持loader/render_hold/IRQ恢复，当前主树不动。本VM继续其它独立流程，正常结束后才合入与定向验证，不重编12用户态目标。
+
+其余GUI03定向出口：Notes默认关联、Calc→Notes文本复制、Desktop↔Files延迟Drop真实MOVE后自动消除源图标/取消；Settings与Installer正常启动/必要操作；Monitor属性框；Sound同文件重播/seek；Studio SCW的SCL→四TU构建/运行/Debug2及SDK。新盘尚无RDESK/RDWORK/RDPLUGIN，需真实Terminal mkdir，P6GUI已由Files建立。最后正常关闭所有app/child，show1/logout4，再唯一finish核一致账。
+
 ## 原生刷新04已完成，当前构建稳定读修复
 
 主源已保存main@0384676；此后仅稳定读三内核文件和规范增量待保存。HOST09真实成功；v3确认实际变化恰好12标签，完整源码/正式NATIVE/HOST摘要及85项旧副文件来源保持。`drafts/m10a2-p6-followup-refresh-v3/driver.py` 已退出0，exec37714/QEMU9016关闭。outer `build/m10a2-p6-refresh-vm-04/refresh-vm.json` 为EXPLICIT_LABEL_REFRESH_GENERATED，SHA226d9d99ae250c247744430b0247f7c7f30cc315ca1687e2a8e6b604f7317175；inner `build/m10a2-p6-target-refresh-04/p6-generation.json` 为DECLARED_P6_NATIVE_GENERATION_PASS，SHA1ac7e951434d5465a665844019a731609a08c35c4a22a5f42bb6c43fac2b5191。12项全部真实编译/链接/映像/map/SCDB取回通过，27对象/8普通库/21记录完整，最终physical/unexplained0、unexpected=[]，源及原盘不变。

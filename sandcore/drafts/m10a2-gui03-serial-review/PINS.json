@@ -1,0 +1,74 @@
+{
+  "schema": 1,
+  "source_inputs": {
+    "tools/serial_protocol.py": {
+      "path": "tools\\serial_protocol.py",
+      "bytes": 10904,
+      "sha256": "5493e04fe4a417f7763769b69b90bce437f04906b9965d5b4b5835745c041465"
+    },
+    "tools/verify_m9.py": {
+      "path": "tools\\verify_m9.py",
+      "bytes": 40622,
+      "sha256": "8d758821c49ccc4491c2c2e025e00772476f25e8266d73628c0c0fd57b05f1cc"
+    },
+    "tools/verify_m10a2_ui_gui.py": {
+      "path": "tools\\verify_m10a2_ui_gui.py",
+      "bytes": 113103,
+      "sha256": "42df9dce1013a86136398f8cd3d78d6347b833521c838b3ce82b8c9843c0280f"
+    },
+    "tools/verify_m10a2_ui_platform.py": {
+      "path": "tools\\verify_m10a2_ui_platform.py",
+      "bytes": 47933,
+      "sha256": "4f9ec7435e98cfc4205961c86c90ef305d018096550bb3ad1c60f0fe1d0a364a"
+    },
+    "tools/scserial.py": {
+      "path": "tools\\scserial.py",
+      "bytes": 48750,
+      "sha256": "db133b453fe2c6da23cdbf62383c04872c49c6bb79f64f3f16445c2524376de0"
+    },
+    "tools/verify_m10a2_stdlib.py": {
+      "path": "tools\\verify_m10a2_stdlib.py",
+      "bytes": 46500,
+      "sha256": "01f34b6381ed8a9db34d152baa3ece18a5b7ceeeb3da67006dd3781820f7f279"
+    },
+    "drafts/m10a2-p6-gui-runtime/runtime.py": {
+      "path": "drafts\\m10a2-p6-gui-runtime\\runtime.py",
+      "bytes": 13539,
+      "sha256": "20651143189d331c6adb1e66f0d4a7ac5ccf9bc5f9bf2359e604a8298110325a"
+    },
+    "drafts/m10a2-p6-gui-coherent/driver.py": {
+      "path": "drafts\\m10a2-p6-gui-coherent\\driver.py",
+      "bytes": 8842,
+      "sha256": "8651195db270371007dc92f821516760a366054efd30e4e9f75acff5b423bc55"
+    },
+    "drafts/m10a2-p6-gui-coherent/coherent_runtime.py": {
+      "path": "drafts\\m10a2-p6-gui-coherent\\coherent_runtime.py",
+      "bytes": 15235,
+      "sha256": "eec77fa1951357eb051d8b49010cfaeee9c5fbe37666cbe6be9c6a3f58c13faf"
+    },
+    "kernel/management.c": {
+      "path": "kernel\\management.c",
+      "bytes": 8868,
+      "sha256": "7d744ace695a4b6059a1c4a1c89b6e3be58d4f9d14f71316f162e0fadbad1829"
+    }
+  },
+  "live_file_read_hashes_are_observation_only": [
+    {
+      "path": "build\\m10a2-p6-gui-run-03\\management-rx.bin",
+      "bytes": 22340,
+      "sha256": "3781bf7276146b0a43d54260451dd527682a1902aa91d70112a25dc8c6ac2cfc"
+    },
+    {
+      "path": "build\\m10a2-p6-gui-run-03\\debug-rx.bin",
+      "bytes": 126,
+      "sha256": "e575f5376bb63f5c73aefde6602448f4c2eecf186e6c6a6727fc0c643ee589ce"
+    },
+    {
+      "path": "build\\m10a2-p6-gui-run-03\\p6-gui.json",
+      "bytes": 1469419,
+      "sha256": "7c6542d354427484124ca33ee259f976edb4e7cc244cd55a5f972613dcf7b80f"
+    }
+  ],
+  "old_v4_not_modified": true,
+  "no_vm_operations": true
+}

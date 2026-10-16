@@ -1,0 +1,42 @@
+{
+  "schema": 1,
+  "status": "PREPARED_NOT_BUILT_ROOT_WILL_EXECUTE",
+  "inputs": {
+    "build/m10a2-main-studio-01/p6-unified-host-09.json": {
+      "bytes": 364769,
+      "sha256": "879ceb99215972f60d1dfc76f0102d1a2255c8616685dd980eb4e8d5aba77ae4"
+    },
+    "build/m10a2-main-studio-01/p6-unified-host-10.json": {
+      "bytes": 364768,
+      "sha256": "67709f3aacb72c6f18ded7be61235d5e9811faf4c41671b7084f46eec254c2ca"
+    },
+    "build/m10a2-p6-target-refresh-04/p6-generation.json": {
+      "bytes": 13547318,
+      "sha256": "1ac7e951434d5465a665844019a731609a08c35c4a22a5f42bb6c43fac2b5191"
+    },
+    "build/m10a2-p6-refresh-vm-04/refresh-vm.json": {
+      "bytes": 1203203,
+      "sha256": "226d9d99ae250c247744430b0247f7c7f30cc315ca1687e2a8e6b604f7317175"
+    },
+    "build/m10a2-p6-gui-coherent-layout-02/layout-proof.json": {
+      "bytes": 4604,
+      "sha256": "6b828bbab032c4bb8ceb00ee6a94f7b55cdf0671ec18d2cb807d73240260e80a"
+    },
+    "drafts/m10a2-gui02-integration/stable-read-integration.json": {
+      "bytes": 1565,
+      "sha256": "6152f4690d82b779c802ab849aed702aa50b68ff5df50459b8c3454d5886bc74"
+    }
+  },
+  "read_only_layered_audit": "PASS",
+  "user_source_count": 358,
+  "HOST10_input_count": 1327,
+  "HOST10_output_count": 41,
+  "only_three_reviewed_kernel_inputs_differ": true,
+  "layout02_modified_or_recompiled": false,
+  "new_native_targets_generated": false,
+  "default_finalize_plan_exit_code": 0,
+  "AST_three_sources": "PASS",
+  "codec_SDK_CORE_executed_by_preparation_agent": false,
+  "VM_called": false,
+  "main_or_history_modified": false
+}

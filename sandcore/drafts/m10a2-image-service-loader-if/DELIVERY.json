@@ -1,0 +1,29 @@
+{
+  "status": "SOURCE_PATCH_ONLY_NOT_BUILT_NOT_GUEST_VERIFIED",
+  "files": {
+    "image-service-loader-if.patch": {
+      "sha256": "8739bc17a3a1c6c5311d72858e795d767e3ce999696afa8f694fa6fb6828874b",
+      "bytes": 2127
+    },
+    "overlay/docs/SC32-IMAGE.md": {
+      "sha256": "cbc8474f5ac4435baf03eff74d69d0edf1d63f336c737ab99a006aa9c22a1e45",
+      "bytes": 4229
+    },
+    "overlay/kernel/image_service.c": {
+      "sha256": "8dfb226f68dcdf91cd9bb3717a78e8ebcee158baa9e54846b4e2471c0b38d4f5",
+      "bytes": 13139
+    },
+    "PINS.json": {
+      "sha256": "efb3f0d40d2d3209f0edef00573af7872017282e2fc69ab9333d8da16664d6ba",
+      "bytes": 4242
+    },
+    "README.md": {
+      "sha256": "a30622f776075aa0bf890d8080f6edfe74b2e6ed80f8c4ffccf58eaecff67699",
+      "bytes": 2754
+    },
+    "sc32-image-spec.patch": {
+      "sha256": "3600f5fe29b55eb32d066911bd1bdd554a263c7d5c49524c5df84994a23c3e5d",
+      "bytes": 1939
+    }
+  }
+}
