@@ -1,5 +1,7 @@
 # SandCore M10a2 — The Application Platform Era：持续目标
 
+> 2026-10-16最新覆盖检查点：完整目标仍active。HOST11 exit0/41/source0；SCUI/STUDIO2/SETTINGS2真实原生刷新05完成，27对象/8库/21产物严格集合保留，最终physical_delta0/unexpected=[]。final05 CORE与严格SDK已实际构建核验并启动普通SID4。GUI04中Studio已真实构建/持久发布RDSTATS.SCL和四独立TU的RDESK.SCX，ResearchDesk实际调用该运行期库并显示正确统计；Debug2完成真实entry→TF单步→Continue/Pause→7模块/1509符号→软件断点命中/撤除→目标正常exit0，Debug与Studio正常关闭。默认PNG完整解码/显示及Settings 100%预览超时回到150%且状态文字一致通过。代表证据在evidence/m10a2-p6-gui04-sdk，最终owner账尚未请求；Installer、Sound重播/seek/短PCM、Classic与四按钮画面、最终关闭/恢复/注销/收账及完整交付仍须继续。GUI03业务成功与心跳超时FAIL分开保留。当前活exec33941/QEMU16116，当前前台Settings。所有主源/SDK/CORE/活helper冻结，完整接力以M10A2-LIVE-GUI.md首节为准，下面均保留原检查点时态。
+
 > 最高检查点：main已存0384676。GUI02正常退出后PF13922→13922、资源池/未归属差0；本批12目标原生refresh04全部实际编译/链接/取回和严格读取通过，整体physical/unexplained0、源码/原盘守恒。HOST10随后仅加入三内核文件的稳定读共享修复，exit0/41/source0；用户态产物字节与HOST09相同，native04无需重编。正在按生成HOST09与运行HOST10分层签发final04 CORE/SDK；实际新layout02已生成。修后GUI03、Studio SCL/四TU运行调试及SDK完整出口尚待验，完整目标active。实时入口M10A2-LIVE-GUI.md，下方为保留的较早检查点。
 
 > 最新执行检查点：GUI02已正常关闭所有应用和worker、恢复SID1并注销SID4；一致owner账PF13922→13922、全部资源池差额0、unexplained0，输入和原盘均不变。Notes保存/Files复制移动/Canvas撤销重做保存/Lens原生显示/Calculator数学与历史/Palette真实色值/Monitor历史冻结继续/Sound首次真实PCM已有证据；跨应用文本剪贴板、源拖放自动刷新、Studio链接后流程、Settings/Installer启动及若干应用生命周期问题正在修复。9个局部文件已合入、尚未HOST08或新客体验证；Drop/TEXT1/共享对话框与Sound窄补丁接续。完整目标active，实际边界和下一步以M10A2-LIVE-GUI.md为准。

@@ -1,5 +1,7 @@
 # M10a2 主要应用与工具链实施状态
 
+> GUI04实际执行结果：Studio已在普通SID4通过SCW真实生成并持久发布RDSTATS.SCL及四独立TU的RDESK.SCX。两套REC头/逐帧CRC、三项DURABLE、正式文件长度/路径/generation与实际get一致。ResearchDesk运行并动态调用RDSTATS，实际4行、总和40、均值10、最小-4、最大32。Studio→Debug2首指令、TF单步、继续/暂停、真实7模块/1509符号、INT3断点命中1次/撤除、目标exit0及Debug/Studio正常关闭均已查看。原默认PNG完整解码显示、Settings缩放预览超时回到150%且状态文字同步也通过。证据evidence/m10a2-p6-gui04-sdk；本轮最终资源回收未请求，其余未验组件/主题/交付继续，不能称整个M10a2完成。
+
 > GUI03最新：HOST10/native04/final04已实际运行。文本剪贴板在源Calculator退出后仍可粘贴到Notes；延迟Drop真实COPY/MOVE/DURABLE与自动源刷新、取消保源通过。Monitor进程属性窗口已实际显示。Studio真实SCCC生成SCO、SCLD完成RDSTATS.SCL，但发布参数-401导致整个构建未取得资格；Settings真实缩放预览生效，超时状态文字存在终态竞态。GUI03结束为FAIL_OR_INTERRUPTED，心跳原始cause是TimeoutError（请求10），最终资源账未取得，输入和原盘保持不变。
 
 2026-10-16局部修复已合主源：IMAGE worker按装载器IF0合同启动并在关联发布后恢复原IF；共享Dialog按钮栏FLOW自动换行；Studio为每次发布创建独立REC路径，冲突策略保留字段仍为0，逐项决定只接受本次worker epoch和提交时相同的源/目标修订，外部变更取消；Settings拥有的预览读到0秒时先结清取消再查询真实模式，随后才停止定时器。公开ABI/SCAPI.H均不变。`drafts/m10a2-gui03-integration/integration.json`保存真实前后摘要。

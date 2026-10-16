@@ -2,7 +2,31 @@
 
 2026-10-16。完整持续目标仍 active。先读本页、P6实施状态及根 M10a2RULE.MD；生成、安装和运行分别记载。
 
-## 最新：native05与final05已实际完成，GUI04启动中
+## 最新：native05与final05已实际完成，GUI04运行中
+
+### GUI04实际输入接力（优先）
+
+exec **33941**、Windows QEMU **16116** 已真实READY，普通SID4/UID:GID1000/realm0，原SID1。输入仍绑定 `gui4-rebind-after-journal-directory-list`，get不清绑定；主源/tools/当前SDK/CORE/活helper继续冻结。本地main已保存 **bcba11d**，不是远端推送确认。
+
+真实Terminal已mkdir RDESK/RDWORK/RDPLUGIN、exit0并关闭。Studio已打开SDK RDSTATS.SCW，F5完整SCCC/SCLD及三项持久发布成功；再打开RDESK.SCW，真正四独立TU链接 `objects=4 image=61200 symbols=51 relocs=968 debug=26742`，同样完成持久发布。实际get取得两套正文/map/SDBG和两个REC。`drafts/m10a2-gui04-evidence/audit_studio.py`已执行0，输出 `build/m10a2-p6-gui-run-04/gui4-studio-publication-audit.json`：普通1000:1000/realm0、两套REC头/五帧CRC、三项DONE/stage3/DURABLE、路径、长度与目标generation逐项相等。
+
+正式RDSTATS.SCL3718B，SHA10b7055f8089d0e2a7d345d7821b90296d7def2523271c23a545b21c071fd509，generation1530；RDESK.SCX61200B，SHA56fd50e536554e59a667ffbf8c84fe50ed5b36b2e8783baf4f21ddf5f084641b，generation1570。SCL实际工作目录由只读ls确定为 `/HOME/RDPLUGIN/S000B08CF`，不是截图B/8误读的S000808CF；第一次错误路径get为-1，仅定位失败，不是出版或串口失败，原记录保留。真实REC `P00000001.REC`1344B已成功get。应用REC位于 `/HOME/RDWORK/S000B08D0/P00000001.REC`，同1344B。
+
+F6已实际运行ResearchDesk。根亲自查看 `p6-gui4-rdesk-maximized-settled.png`：原生树/双文档/表格/数据/统计与三类分布，4行、总和40、均值10、最小-4、最大32。MODEL.C只通过真实ScLoadLibrary/ScGetSymbol得到RdStatsBegin/Push/Finish完成统计；Studio也实际捕获 `RDESK_ANALYSIS doc=1 revision=1 rows=4 sum=40 mean=10`。最大化首帧是旧布局过渡，后续settled画面完整重排，不把过渡帧称最终布局。原生应用已X正常关闭。
+
+随后已真实F7启动Debug2，最后图 `p6-gui4-debug-rdesk-entry.png`暂为Studio背景，状态“Debug 2正在拥有并暂停实际目标”；尚未看到Debug2窗口，先等实际启动并取新图，**不要重复F7或猜地址**。需要继续真实首指令/Step/Continue/Pause、动态模块/符号与断点；不能把已接受启动算完整调试PASS。最后GUI窗口和本轮普通会话都尚未收束，最终owner账待真实finish。
+
+### GUI04后续成功，当前前台Settings
+
+Debug2后续已实际出现：首指令暂停1/EIP00400000；F8为暂停2/EIP00400003、ESP从007FFFF0到007FFFD0。Continue后实际目标ResearchDesk运行；重新聚焦Debug后F4得到暂停3/EIP500110EE。浮动信息dock的Modules表亲自查看7项：RDSTATS.SCL（50101000–50101FFF）、SCUI、SCLIB、SCCLIB、SC32API、SCLDR与RDESK.SCX，1509已验证符号；反汇编/寄存器/栈以同暂停代数显示真实系统库符号。
+
+F9在当前EIP增加断点1:102，初态hit/rearm且Hits0（当前停点的正常重置策略）。Continue后目标等待输入，实际点击目标任务栏并按Tab，命中暂停4/breakpoint，Hits1。选择该真实断点行、CtrlDelete后表空；再Continue，并点击ResearchDesk正常X关闭，Debug明确Target exited(0)。CtrlQ退出Debug（含浮动dock），Studio实际显示程序已结束；Studio随后正常X关闭。没有写目标内存或伪造暂停/命中。
+
+Lens无参数启动已实际完成默认 `/SYS/PICTURES/WELCOME.PNG` 解码显示，1672×941、ARGB32/6293408B、Image ready，三棱镜/彩虹与文字完整；`p6-gui4-lens-default-png-result.png`已亲自查看。CtrlQ正常退出。这证明修后worker链执行，不用SCB绕过旧-112。
+
+Settings已真实100%预览，15秒后自动回到150%，状态文字也为150%/预览0秒。前后两张 `p6-gui4-settings-preview-active.png`、`p6-gui4-settings-preview-timeout-result.png`均已查看。**当前只有Settings前台**，位置约x540/y228、840×590；最新帧为timeout-result，X在1360,245，桌面/程序页在约642,327/712,327。不要对旧150%初始x22/y18位置发输入。
+
+这批代表PNG、两套实际native产物/map/SDBG、两份REC及业务审阅已保存 `evidence/m10a2-p6-gui04-sdk/SNAPSHOT.json`，状态明确最终owner未请求。`audit_studio.py`实际0，两个真实文件作业各三项DURABLE，最终正式文件generation与REC逐项一致。还需Installer实际安装、Sound同文件重播/seek及短PCM、Classic主题、四按钮FLOW画面、最终正常关闭/原SID恢复/注销SID4/唯一finish；不重复以上已过业务。心跳日志曾记录14.531秒成功ACK且仍无errors，不能继续沿旧“串口必然失效”判断。
 
 2026-10-16。GUI03 exec5218/QEMU18952已退出1，无活动旧VM。原报告FAIL_OR_INTERRUPTED、源码和原盘保持；真实stderr首cause为心跳TimeoutError“管理请求10无有效回复”。代表业务截图/原始报告/REC保存在 `evidence/m10a2-p6-gui03`，包含Notes关联、延迟Drop及自动源刷新、跨应用文本、Monitor真实进程属性。Studio的SCO/SCLD成功但publication失败、Settings倒计时状态文字、默认PNG失败均分别记录，最终owner未取得，不能称本轮PASS。下方GUI03原记录只作为历史快照，不继续操作已关闭的exec。
 
@@ -14,7 +38,7 @@ Root已实际执行 `drafts/m10a2-p6-final-05-receipt/finalize.py` 三步骤及i
 
 GUI04新入口为 `drafts/m10a2-p6-gui-followup/driver.py`，851 payload/26404040B，预检已实际退出0，完整预检日志在integration/gui04-preflight.log。执行命令已启动，新的exec句柄在Root工具回执中；普通SID/READY须等真实启动结果，不能沿用旧SID绑定。输出 `build/m10a2-p6-gui-run-04`，输入native05/HOST11/final05、原M10a1盘、实际layout02。新driver只将幂等PING的有限单次等待改15秒、仍3次，逐次原始耗时/结果/error写heartbeat.jsonl；真正负ACK/超时仍失败，不清failure、不重连旧会话、不伪造finish。原工具和driver未改，所有新helper及来源也被pin。当前全部主源/现有tools/SDK/CORE/活helper冻结。
 
-本轮优先真实Terminal创建RDESK/RDWORK/RDPLUGIN，Studio打开SDK RDSTATS.SCW构建SCL，再RDESK.SCW四TU构建/运行/Debug2；接续默认PNG、设置超时状态、四按钮换行、Installer和Sound重播/seek。GUI03已过业务不重复。本地已保存到a0fe116的旧代码及接力，其后本批待保存，远端之前连接失败未确认。
+本轮原计划的Terminal目录、Studio SCL/四TU构建/运行/Debug2、默认PNG与设置超时状态已按上方实际记录通过，不重做。下一项为Settings内Classic主题、Installer真实安装、Sound重播/seek/短PCM及四按钮FLOW画面，随后唯一最终owner收账。主源已保存bcba11d，新的GUI04事实和小型证据另批保存；远端之前连接失败未确认。
 
 ## GUI03历史运行快照（已关闭）
 
