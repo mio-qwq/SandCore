@@ -18,6 +18,10 @@ F6已实际运行ResearchDesk。根亲自查看 `p6-gui4-rdesk-maximized-settled
 
 ### GUI04后续成功，当前前台Settings
 
+**当前尾部覆盖（Classic之后，尚待定位）**：Settings已通过真实“Classic→保存主题”，settled画面桌面/图标/窗口/SCUI均为Classic，底部确认持久保存并应用。随后“程序”页的几次鼠标操作没有显示程序表；鼠标+Right曾切到显示资料页，后续Left没有离开资料页。最大化后WM外框变1920宽，但客户内容仍停在原840×590范围，点击最大化后的程序标签也未改变。不能把这些操作计为程序页或安装通过，也不把原因预判为字体、坐标、绘制或进程死锁。真实ps仍有PID3 SETTINGS2，宿主/管理串口正常；不再盲目重复Tab点击，下一项应定位实际应用/SCUI状态或先保留失败后做其它独立业务。
+
+当前Settings是**最大化Classic显示资料页**，不是下面历史的x540普通窗口；最新帧 `p6-gui4-settings-maximized-programs-result.png`，标题X1900,18。真实绑定已更新为 `gui4-rebind-after-settings-process-observation`（SID4）；其后的主源及活helper仍冻结。本地main已保存c5c5bf2（SDK/Debug/PNG/预览证据），之后一次WSL推送exec70054已非零退出，origin/main本地跟踪仍01da6943，不能称已推送；未改代理/VPN或Git全局配置。新问题不阻塞其它独立实现，完整目标继续active。
+
 Debug2后续已实际出现：首指令暂停1/EIP00400000；F8为暂停2/EIP00400003、ESP从007FFFF0到007FFFD0。Continue后实际目标ResearchDesk运行；重新聚焦Debug后F4得到暂停3/EIP500110EE。浮动信息dock的Modules表亲自查看7项：RDSTATS.SCL（50101000–50101FFF）、SCUI、SCLIB、SCCLIB、SC32API、SCLDR与RDESK.SCX，1509已验证符号；反汇编/寄存器/栈以同暂停代数显示真实系统库符号。
 
 F9在当前EIP增加断点1:102，初态hit/rearm且Hits0（当前停点的正常重置策略）。Continue后目标等待输入，实际点击目标任务栏并按Tab，命中暂停4/breakpoint，Hits1。选择该真实断点行、CtrlDelete后表空；再Continue，并点击ResearchDesk正常X关闭，Debug明确Target exited(0)。CtrlQ退出Debug（含浮动dock），Studio实际显示程序已结束；Studio随后正常X关闭。没有写目标内存或伪造暂停/命中。
