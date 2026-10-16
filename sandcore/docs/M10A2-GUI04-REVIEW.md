@@ -42,3 +42,11 @@ SCO13真实SCCC宿主IO后端及严格SCLD两项通过，正式两份NATIVE清�
 原生生成后再形成对应新CORE/SDK，定向验证设置的程序/环境表、属性框、Installer实际文件安装，以及Files取消异常。既有SDK/Debug/PNG/Sound成功不重复；普通会话回收、最终产物和完整合同交付继续。
 
 修订：2026-10-16，保存GUI04唯一最终owner账、声音重播/seek/FLOW实测、三个Provider与共享对话框修复和Files取消未决行为。
+
+## native06与final06实际结果
+
+2026-10-16：v5执行进程正常退出0。native06 inner SHA f2f5d67a8946ebe07c12459e17d85f00cd6538a38f785298d11194fd4dd1c7ba，outer06 SHA 33ce11d3dd1ad4763d462fce27b94270a0d73fc9f7666f925e079feea8eb74ae。两目标实际SCO、SCLD、取回、严格审阅均PASS；完整27对象/8普通库/21产物集合保持，最终physical_delta与unexplained均0、unexpected=[]，输入和原盘保持。
+
+final06三个实际步骤及只读inspect均退出0，SDK494文件/17483978B；CORE摘要仍为5da64fc176cb273803fddd328b02d5123b726440673689cf20aa5e48a3464eff，实际与final05逐字节相同。未变化的内核、库和其它应用不重跑矩阵。对应普通GUI05尚未启动，设置/安装修后行为仍待实际输入验证。
+
+修订：2026-10-16，记录两目标native06真实生成和final06严格构建/SDK结果，明确GUI待验。
