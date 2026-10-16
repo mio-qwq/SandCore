@@ -1,5 +1,8 @@
 # M10a2 当前真实客体接力
 
+> 最新GUI04会话已结束：PF13948→13948、全部资源差额0、输入/原盘保持。声音EOF重播/seek/PCM及四按钮FLOW已实测；Settings三表Provider和共享对话框已修，HOST12/SCO13通过、native06运行中。Files取消后来源进程消失仍未定位。完整事实与当前下一步见 [M10A2-GUI04-REVIEW.md](M10A2-GUI04-REVIEW.md)，以下旧检查点保持历史时态；整版目标仍active。
+
+
 2026-10-16。完整持续目标仍 active。先读本页、P6实施状态及根 M10a2RULE.MD；生成、安装和运行分别记载。
 
 ## 最新：native05与final05已实际完成，GUI04运行中

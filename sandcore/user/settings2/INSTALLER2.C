@@ -1,6 +1,7 @@
 #include "INSTALLER2.H"
 #include "app_ui.inc"
 #include "app_io.inc"
+#include "app_provider.inc"
 #include "install_model.inc"
 #include "install_job.inc"
 #include "install_view.inc"

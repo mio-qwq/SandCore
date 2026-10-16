@@ -1,0 +1,20 @@
+{
+  "status": "REAL_SCCC_HOST_IO_MANIFESTS_PROMOTED_NOT_GUEST_GENERATED",
+  "report_sha256": "69f48f22753fe5429b5002a27e1432c6530ab1db832bbfb42652a510775be16c",
+  "modified": [
+    {
+      "label": "SETTINGS2",
+      "path": "user/settings2/SETTINGS2.NATIVE.JSON",
+      "before_sha256": "30adf726309f6cd35bc628529d4935266f405a790db3220231761c5becbc5238",
+      "after_sha256": "128ec920ef2f6e4fb0860ee04ef28ee96037185976b8e7638c0ffd4c2199debb",
+      "object_sha256": "4dbcd0c9f167b5ac2dc50e9e0f47ffd7c66684b00ca2867963d9796e12674971"
+    },
+    {
+      "label": "INSTALLER2",
+      "path": "user/settings2/INSTALLER2.NATIVE.JSON",
+      "before_sha256": "005848bfcb9045a969536d5870b905cc0efec19eff9164b576befbfb931e34de",
+      "after_sha256": "694950ead58e4870f1bbae208d34977ab07e29bacb7c840a1ba439f40164fc39",
+      "object_sha256": "2e6217793ae8127bced98ca8a019c84855435e6ea2c531d857986d3ca2afaa4e"
+    }
+  ]
+}

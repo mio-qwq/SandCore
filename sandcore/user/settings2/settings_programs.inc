@@ -42,16 +42,9 @@ static ScStatus program_reserve(ScU32 count)
 static ScStatus program_provider(void *unused,const ScUiDataRequest *q,ScUiDataReply *r)
 {
     (void)unused;
-    r->revision=settings.program_model_revision;
-    r->total=settings.row_count;
-    if(q->operation==SC_UI_DATA_COUNT)return 0;
-    ScU32 index=q->operation==SC_UI_DATA_ITEM?q->index:q->item-1;
-    if(index>=settings.row_count)return SC_UI_END;
-    r->item=index+1;
-    if(q->operation==SC_UI_DATA_INDEX_OF){r->value.type=SC_VALUE_U32;
-        r->value.lo=index;
-        return 0;
-    }
+    ScU32 index=0;
+    ScStatus parsed=flat_provider(q,r,settings.row_count,settings.program_model_revision,&index);
+    if(parsed)return parsed==SC_UI_HANDLED?0:parsed;
     if(q->operation==SC_UI_DATA_CELL){ProgramRow *row=settings.rows+index;
         const char *z="";
         /* field保留模型字段编号；column是表头身份，不能借其数值解释行数据。 */

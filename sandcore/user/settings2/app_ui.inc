@@ -18,13 +18,11 @@ static void status(const char *z)
 static ScStatus error(ScStatus code,const char *operation)
 {
     if(code>=0 || code==SC_UI_E_CANCELLED)return code;
-    ScShellErrorInfo e;
-    INIT(e);
-    e.code=e.cause=code;
-    ScUiDialog *d=0;
-    ScShellErrorDialog(app.ui,app.root,&e,operation,&d);
-    ScUiDialogRelease(d);
-    fprintf(stderr,"setup error=%d %s\n",code,operation);
+    char body[384];
+    snprintf(body,sizeof(body),"%s\n错误 %d",operation?operation:"操作未完成",code);
+    status(body);
+    if(app.ui && app.root)message("操作未完成",body);
+    fprintf(stderr,"setup error=%d %s\n",code,operation?operation:"");
     return code;
 }
 static ScStatus layout(ScUiNode node,ScU32 mode,ScI32 width,ScI32 height,ScU32 flex)
@@ -112,16 +110,32 @@ static ScStatus menu_part(const char *title,const AppMenuEntry *entries,ScU32 co
     ScUiMenuRelease(part);
     return s;
 }
+static ScStatus notice_complete(ScUiContext *ui,const ScUiEvent *event,void *context)
+{
+    (void)ui;
+    (void)context;
+    if(event->type==SC_UI_EVENT_DIALOG_COMPLETE && event->data==app.notice){
+        ScUiDialog *done=app.notice;
+        app.notice=0;
+        /* 完成回调仍在库的活跃引用中；先脱开应用指针再领取唯一持有。 */
+        ScUiDialogRelease(done);
+    }
+    return 0;
+}
 static ScStatus message(const char *title,const char *body)
 {
+    if(app.notice)return SC_UI_E_BUSY;
     ScUiMessageBoxDesc d;
     INIT(d);
     d.owner=app.root;
     d.title=text(title);
     d.message=text(body);
+    d.completion=notice_complete;
     ScUiDialog *dialog=0;
     ScStatus s=ScUiMessageBox(app.ui,&d,&dialog);
-    ScUiDialogRelease(dialog);
+    /* OPEN最后Release会取消窗口；持有到完成或app_close，不能创建即丢弃。 */
+    if(s==0)app.notice=dialog;
+    else ScUiDialogRelease(dialog);
     return s;
 }
 static ScStatus app_event(ScUiContext *ui,const ScUiEvent *e,void *unused)
@@ -179,6 +193,10 @@ static ScStatus app_create(const char *title,AppCommand command,AppEvent event)
 }
 static void app_close(void)
 {
+    ScUiDialog *notice=app.notice;
+    app.notice=0;
+    if(notice)ScUiDialogClose(notice,SC_UI_DIALOG_CANCEL);
+    ScUiDialogRelease(notice);
     if(app.ui && app.root)ScUiNodeDestroy(app.ui,app.root);
     ScUiMenuRelease(app.menus);
     ScUiContextRelease(app.ui);
@@ -289,6 +307,7 @@ static ScUiFieldDesc field(ScU32 id,const char *label,const char *key,ScU32 kind
 }
 static ScStatus property(const char *title,ScConfig *initial,const ScUiFieldDesc *fields,ScU32 count,AppEvent apply,void *context)
 {
+    if(app.notice)return SC_UI_E_BUSY;
     ScUiPropertySheetDesc d;
     INIT(d);
     d.owner=app.root;
@@ -296,8 +315,10 @@ static ScStatus property(const char *title,ScConfig *initial,const ScUiFieldDesc
     d.initial=initial;
     d.apply=apply;
     d.context=context;
+    d.completion=notice_complete;
     ScUiDialog *dialog=0;
     ScStatus s=ScUiPropertySheet(app.ui,&d,fields,count,&dialog);
-    ScUiDialogRelease(dialog);
+    if(s==0)app.notice=dialog;
+    else ScUiDialogRelease(dialog);
     return s;
 }

@@ -1,6 +1,7 @@
 #include "SETTINGS2.H"
 #include "app_ui.inc"
 #include "app_io.inc"
+#include "app_provider.inc"
 #include "settings_model.inc"
 #include "settings_programs.inc"
 #include "settings_save.inc"

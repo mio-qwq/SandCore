@@ -1,0 +1,46 @@
+{
+  "status": "APPLIED_NOT_COMPILED_OR_GUEST_VERIFIED",
+  "gui04_report_sha256": "fbe4c9df91b15abb6f6b8092f8f285721d10e440162917d8f885b93884201add",
+  "changed": {
+    "user/settings2/APP.H": {
+      "before_sha256": "72af07968afcefd3cc3ac40351980bd781f2989f943d3621f3c8627334345cfb",
+      "after_sha256": "9358491bbbcd8f84c361ae7d0e35a6ff0b90d7fc7cdb3614f0160d8a58299340"
+    },
+    "user/settings2/SETTINGS2.C": {
+      "before_sha256": "8429f04e688c1471391f56d07b6636f3213d5ce49421ef378ed9a4bc8bb4a53f",
+      "after_sha256": "2b45975af0cb64419d8f3522c49abd3e6ac0f8bf5253323c04fadc64466cd409"
+    },
+    "user/settings2/INSTALLER2.C": {
+      "before_sha256": "ad2d6a6890da455438b08079ad7e87ef67865e01f94db20ceeced7491c071c06",
+      "after_sha256": "d952d469ba3465fe7392c9e23a3f02d2000b7171dd5a7a7ba63e4c7adb3576a6"
+    },
+    "user/settings2/app_provider.inc": {
+      "before_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "after_sha256": "4b0821204b4130f2c7bcf4d3d42280ef4621bcc7c6f9cf29a96a7d1da362e688"
+    },
+    "user/settings2/settings_programs.inc": {
+      "before_sha256": "2067366a0f958b0554129629a058f44c914f48af641e8e1883bc8fea8725448c",
+      "after_sha256": "c7a1faaf8d60732111bb9ab046caf8a7971d218f3edc647146752d961193b7b7"
+    },
+    "user/settings2/settings_model.inc": {
+      "before_sha256": "6d53b4564e449a353472a5c5280a82c19103998c8aafc22233a2b8e09e7e96cf",
+      "after_sha256": "2cf6398e4d3b335bc35ba09e5ea726631509cf86aa22911f3277ee2789bea0de"
+    },
+    "user/settings2/install_model.inc": {
+      "before_sha256": "cb349243ce77b51fa3c451ab7f3b074ec8793b7e365cfc44b2bce62a7962dda4",
+      "after_sha256": "7a5dae01d3328ecc9cc0e2029ee71d3bc559499e6fd309d389e5c12d642648ac"
+    },
+    "user/settings2/app_ui.inc": {
+      "before_sha256": "b770078fba1a896a3c6df39e452cfd5f036eb93c4081aecf4fdabbc7666eb683",
+      "after_sha256": "5f59fef50c6dea7918f9d22120cec6b6df7b1430c0e64b71e9cb5a742036e588"
+    },
+    "user/settings2/SETTINGS2.json": {
+      "before_sha256": "b32aafc00f8981c3e96155b95fd075bd9c1772873ac6035cc2cf46fc3e92a22e",
+      "after_sha256": "074e75caa0794b719aafeb8123a30eb4966560208547c5272c0445ce08a7c214"
+    },
+    "user/settings2/INSTALLER2.json": {
+      "before_sha256": "86b9440eda11e8c8d725cd4bdb73539857cb16c781745454d1e785e8385aecd2",
+      "after_sha256": "b22e5fbe9f5891658b552356e799ba3cca50848277c2dfdbfeab92b5fbe34f06"
+    }
+  }
+}

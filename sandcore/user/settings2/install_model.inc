@@ -97,16 +97,9 @@ static InstallItem *install_current(void)
 static ScStatus install_provider(void *unused,const ScUiDataRequest *q,ScUiDataReply *r)
 {
     (void)unused;
-    r->revision=installer.revision;
-    r->total=installer.count;
-    if(q->operation==SC_UI_DATA_COUNT)return 0;
-    ScU32 index=q->operation==SC_UI_DATA_ITEM?q->index:q->item-1;
-    if(index>=installer.count)return SC_UI_END;
-    r->item=index+1;
-    if(q->operation==SC_UI_DATA_INDEX_OF){r->value.type=SC_VALUE_U32;
-        r->value.lo=index;
-        return 0;
-    }
+    ScU32 index=0;
+    ScStatus parsed=flat_provider(q,r,installer.count,installer.revision,&index);
+    if(parsed)return parsed==SC_UI_HANDLED?0:parsed;
     if(q->operation==SC_UI_DATA_CELL){InstallItem *row=installer.items+index;
         /* CELL只按模型field解释内容，保持字节列的数值类型。 */
         if(q->field==2){r->value.type=SC_VALUE_U32;

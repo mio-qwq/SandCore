@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "status": "FROZEN_NATIVE05_INHERITANCE_FINAL04_RUNTIME",
+  "files": {
+    "drafts/m10a2-p6-followup-refresh-v4/followup.py": {
+      "bytes": 16848,
+      "sha256": "c1086a48d37e7c52662908b912edf04316701059cea66152072691c6b7288f82"
+    },
+    "drafts/m10a2-p6-followup-refresh-v4/driver.py": {
+      "bytes": 11745,
+      "sha256": "eeb744561c32247fa72e02ccd53ffe8f4e6666d70247797e96938c528a0378c6"
+    },
+    "drafts/m10a2-p6-followup-refresh-v4/PINS.json": {
+      "bytes": 4817,
+      "sha256": "09d14e0f79401bbe1c420e54da2173895849ef6c71b9d8010c562a974311b222"
+    },
+    "build/m10a2-p6-target-refresh-05/p6-generation.json": {
+      "bytes": 13644530,
+      "sha256": "9a21978c82563b1d9c31ce36d0384482c1f44dee56cb0ffcda33937e9a26257e"
+    },
+    "build/m10a2-p6-refresh-vm-05/refresh-vm.json": {
+      "bytes": 1155716,
+      "sha256": "80a8a2fa91ee170272a1ac02d6bfc218c7297da0bd1c3460f8c597d6baffafbf"
+    },
+    "build/m10a2-main-studio-01/p6-unified-host-11.json": {
+      "bytes": 364773,
+      "sha256": "15ae392845d5307dd3617778ee461ba53f2e87bc7533b31d29857db40b2b3785"
+    }
+  }
+}

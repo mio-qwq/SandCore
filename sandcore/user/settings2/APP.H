@@ -20,7 +20,7 @@ typedef ScStatus (*AppEvent)(ScUiContext *,const ScUiEvent *,void *);
 typedef struct {ScUiNode node;ScU32 minimum_width;} AppBand;
 typedef struct {
     ScUiContext *ui;ScUiNode root,menu,body,status;
-    ScUiMenu *menus;AppCommand command;AppEvent event;
+    ScUiMenu *menus;ScUiDialog *notice;AppCommand command;AppEvent event;
     ScU32 quit,visible,relayout;char message[320];AppBand *bands;ScU32 band_count,band_capacity;
 } App;
 typedef struct {const char *label;ScU32 command,key,modifiers;} AppMenuEntry;
@@ -49,6 +49,8 @@ static void app_close(void);
 static ScStatus node_text(ScUiNode node,char *out,ScU32 capacity);
 static void set_text(ScUiNode node,const char *z);
 static ScStatus message(const char *title,const char *body);
+static ScStatus notice_complete(ScUiContext *,const ScUiEvent *,void *);
+static ScStatus flat_provider(const ScUiDataRequest *,ScUiDataReply *,ScU32 count,ScU32 revision,ScU32 *index);
 static ScStatus normalize(const char *path,const char *base,char out[65]);
 static ScU32 path_equal(const char *a,const char *b);
 static ScStatus pin_open(const char *path,ScU32 kind,ScU32 lease,ScU32 revision,ScU32 metadata,IoPin *out);

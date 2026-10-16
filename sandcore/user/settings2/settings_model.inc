@@ -103,16 +103,9 @@ static ScStatus settings_load_env(void)
 static ScStatus environment_provider(void *unused,const ScUiDataRequest *q,ScUiDataReply *r)
 {
     (void)unused;
-    r->revision=settings.env_model_revision;
-    r->total=settings.env_count;
-    if(q->operation==SC_UI_DATA_COUNT)return 0;
-    ScU32 index=q->operation==SC_UI_DATA_ITEM?q->index:q->item-1;
-    if(index>=settings.env_count)return SC_UI_END;
-    r->item=index+1;
-    if(q->operation==SC_UI_DATA_INDEX_OF){r->value.type=SC_VALUE_U32;
-        r->value.lo=index;
-        return 0;
-    }
+    ScU32 index=0;
+    ScStatus parsed=flat_provider(q,r,settings.env_count,settings.env_model_revision,&index);
+    if(parsed)return parsed==SC_UI_HANDLED?0:parsed;
     /* CELL由SCUI按列描述的field取值，不把可重排的column身份当数组下标。 */
     if(q->operation==SC_UI_DATA_CELL){const char *z=q->field?settings.env[index].value:settings.env[index].key;
         r->value.type=SC_VALUE_UTF8;
