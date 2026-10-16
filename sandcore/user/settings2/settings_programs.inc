@@ -54,9 +54,10 @@ static ScStatus program_provider(void *unused,const ScUiDataRequest *q,ScUiDataR
     }
     if(q->operation==SC_UI_DATA_CELL){ProgramRow *row=settings.rows+index;
         const char *z="";
-        if(q->column==0)z=program_string(row->label);
-        else if(q->column==1)z=program_string(row->executable);
-        else if(q->column==2)z=row->layer==SC_SHELL_LAYER_SYSTEM?"系统默认":row->layer==SC_SHELL_LAYER_ACCOUNT?"账户":"临时";
+        /* field保留模型字段编号；column是表头身份，不能借其数值解释行数据。 */
+        if(q->field==0)z=program_string(row->label);
+        else if(q->field==1)z=program_string(row->executable);
+        else if(q->field==2)z=row->layer==SC_SHELL_LAYER_SYSTEM?"系统默认":row->layer==SC_SHELL_LAYER_ACCOUNT?"账户":"临时";
         else z=row->removed?"待移除":row->dirty?"草稿":row->flags&SC_SHELL_APP_DISABLED?"禁用":"已登记";
         r->value.type=SC_VALUE_UTF8;
         r->value.data=z;

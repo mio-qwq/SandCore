@@ -1,8 +1,8 @@
 {
   "name": "SCSHELL.SCL",
   "abi_major": 1,
-  "abi_minor": 1,
-  "library_version": 2,
+  "abi_minor": 2,
+  "library_version": 3,
   "init": null,
   "fini": "ScShellFinalize",
   "dependencies": [
@@ -27,8 +27,8 @@
     {
       "name": "SCUI.SCL",
       "abi_major": 1,
-      "min_minor": 3,
-      "min_version": 4
+      "min_minor": 4,
+      "min_version": 5
     }
   ],
   "exports": [
@@ -414,6 +414,18 @@
     },
     {
       "name": "ScShellUnregisterApplication",
+      "kind": "function"
+    },
+    {
+      "name": "ScShellDragBeginEx",
+      "kind": "function"
+    },
+    {
+      "name": "ScShellDropFilesDeferred",
+      "kind": "function"
+    },
+    {
+      "name": "ScShellDropReply",
       "kind": "function"
     }
   ],
@@ -1290,6 +1302,24 @@
     },
     {
       "name": "ScUiDragBegin",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUiDropQuery",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUiDropReply",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUiDropRelease",
       "dependency": "SCUI.SCL",
       "kind": "function",
       "size": 1

@@ -1,0 +1,33 @@
+--- a/user/scui/scui_drop_deferred.inc
++++ b/user/scui/scui_drop_deferred.inc
+@@ -150,8 +150,15 @@
+     ScPointerSetCursor(d->window,SC32_CURSOR_ARROW);
+     free(d->offer);d->offer=0;
+ }
++static int ui_d2_source_retired(UiDrag *d)
++{
++    UiNode *source=ui_node(d->context,d->source),*root=ui_node(d->context,d->root);
++    return !source || !root || (source->private_flags&UI_NODE_RETIRED) || (root->private_flags&UI_NODE_RETIRED);
++}
+ static ScStatus ui_d2_source_step(UiDrag *d)
+ {
++    /* 退役先从节点表移除，clear可等活跃回调；不让闲置channel挡住终止。 */
++    if(ui_d2_source_retired(d))return SC_UI_E_CANCELLED;
+     if(d->deferred_stage==1){
+         ScWideCounter now;ScStatus clock=ui_now(&now);if(clock<0)return clock;
+         if(ui_wide_compare(&now,&d->deadline)>=0)return SC_UI_E_CANCELLED;
+@@ -189,7 +196,13 @@
+         p->receipt_state==SC_UI_DROP_REPLYING?sizeof(ScDragEnvelope)+sizeof(ScUiDropResult):0);
+ }
+ static int ui_d2_source_work(UiDrag *d)
+-{return !d->deferred_stage || (d->deferred_stage==1 && ui_d2_expired(&d->deadline)) || ui_d2_channel_work(d->channel,d->deferred_stage==1?sizeof(ScDragEnvelope):0);}
++{
++    /* 取消与节点退役本身需要清理，不得先用无数据channel把它们过滤掉。
++     * 基础引用仍由原close释放；这里不直接置cancelled，避免跳过那次release。 */
++    if(d->cancelled)return 1;
++    if(d->deferred_stage && ui_d2_source_retired(d))return 1;
++    return !d->deferred_stage || (d->deferred_stage==1 && ui_d2_expired(&d->deadline)) || ui_d2_channel_work(d->channel,d->deferred_stage==1?sizeof(ScDragEnvelope):0);
++}
+ static ScU32 ui_d2_timeout(const ScWideCounter *deadline,ScU32 timeout)
+ {
+     ScWideCounter now;if(ui_now(&now)<0 || ui_wide_compare(&now,deadline)>=0)return 0;

@@ -1,5 +1,8 @@
 # M10a2 主要应用与工具链实施状态
 
+> 最新执行检查点：GUI02已正常关闭所有应用和worker、恢复SID1并注销SID4；一致owner账PF13922→13922、全部资源池差额0、unexplained0，输入和原盘均不变。Notes保存/Files复制移动/Canvas撤销重做保存/Lens原生显示/Calculator数学与历史/Palette真实色值/Monitor历史冻结继续/Sound首次真实PCM已有证据；跨应用文本剪贴板、源拖放自动刷新、Studio链接后流程、Settings/Installer启动及若干应用生命周期问题正在修复。9个局部文件已合入、尚未HOST08或新客体验证；Drop/TEXT1/共享对话框与Sound窄补丁接续。完整目标active，实际边界和下一步以M10A2-LIVE-GUI.md为准。
+
+
 ## 当前最高检查点
 
 2026-10-16：完整 run03 已实际生成 8 普通库、21 工具/应用记录及27 SCO，整体 physical_delta=0、源码/原盘不变。已生成旧 native-bound CORE 和九库 SDK，GUI01 实际普通身份运行了 Files/Notes/Studio/Terminal 的部分流程，但保存和构建暴露共享层缺陷，最终 +205 页未归属，原报告 FAIL 保留。

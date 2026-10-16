@@ -1,0 +1,55 @@
+{
+  "schema": 1,
+  "status": "SOURCE_WIRING_V2_FROZEN_NOT_REFRESHED",
+  "changes": [
+    "explicit_repeat_label_exact_actual_set",
+    "new_report_public_header_sources_from_actual_prepared_map"
+  ],
+  "read_only_check": {
+    "command": "python -B sandcore/drafts/m10a2-p6-followup-refresh-v2/driver.py --frozen-audit",
+    "exit_code": 0,
+    "status": "READ_ONLY_FROZEN_BASIS_AUDIT_PASS_NOT_REFRESHED",
+    "actual_get_direct": 9,
+    "actual_get_inherited_alias": 76
+  },
+  "source_checks": {
+    "AST_two_sources": "PASS",
+    "explicit_known_label_set": "PASS",
+    "empty_duplicate_unknown_linker_and_actual_set_mismatch": "REJECTED",
+    "base_wrapper_fixed_source_pins": "PASS"
+  },
+  "boundaries": {
+    "HOST08_and_final_labels_provided": false,
+    "formal_preparation_executed": false,
+    "new_inherit_or_header_map_generation_executed": false,
+    "build_started": false,
+    "VM_started_or_connected": false,
+    "VM_input_sent": false,
+    "disk_copied": false,
+    "main_or_tools_or_old_wrapper_edited": false,
+    "historical_report_or_layout_sha_replaced": false,
+    "new_API_content_assumed": false
+  },
+  "files": {
+    "driver.py": {
+      "bytes": 11337,
+      "sha256": "01bd8ed3c66b78062ad60cd27acbb3740931e3222d8a1a36cd9a8b91e10b7029"
+    },
+    "followup.py": {
+      "bytes": 5451,
+      "sha256": "8db9a192c694eeef65979ffc757a93097b60b36e8b7c4c959834b7358dcb9e18"
+    },
+    "driver.patch": {
+      "bytes": 6428,
+      "sha256": "02ab74c9c180be7161d71def7fc0ff8530e260778845f23e16fd6522915936bd"
+    },
+    "PINS.json": {
+      "bytes": 762,
+      "sha256": "b88966a48e89618bd28d3f944ac9e627daae24a56d11d3ea6dacc8a2af001784"
+    },
+    "README.md": {
+      "bytes": 4360,
+      "sha256": "bea6a680f73b2d5ea56b47c4ea5f3197d989575e04d50a294b806b6964b563d4"
+    }
+  }
+}

@@ -1,0 +1,12 @@
+--- a/user/sound2/sound_jobs.c
++++ b/user/sound2/sound_jobs.c
+@@ -153,6 +153,9 @@
+     if(s->endpoint)ScIpcClose(s->endpoint);
+     if(!s->cancel && !s->quit_sent)tool_error(SC32_E_FAILED,"音频任务意外退出");
+     free(s->cover);free(s);*slot=0;
++    /* 候选已撤而旧曲EOF后不再发telemetry，必须在清空candidate后
++     * 刷回旧曲实际状态，不能让“正在准备”文案无限残留。 */
++    if(slot==&sound_app.candidate && sound_app.current)sound_changed();
+ }
+ static void sound_promote(void)
+ {

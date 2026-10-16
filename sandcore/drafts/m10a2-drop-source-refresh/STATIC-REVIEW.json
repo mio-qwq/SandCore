@@ -1,0 +1,26 @@
+{
+  "status": "PASS_STATIC_ONLY",
+  "built": false,
+  "guest_verified": false,
+  "checks": [
+    "29 patch sections reconstruct exact overlays",
+    "22 main preimages unchanged",
+    "7 new paths absent from main",
+    "old 170/96 export prefixes preserved",
+    "new manifest imports unique",
+    "old public headers and kernel untouched",
+    "32-bit record size arithmetic 16/56/80/152",
+    "TEXT1 prefix unchanged and lower patch isolated",
+    "C lexical delimiter balance only",
+    "Python AST only"
+  ],
+  "exports": {
+    "SCUI.SCL": 174,
+    "SCSHELL.SCL": 99
+  },
+  "limits": [
+    "No C parser/type/link check",
+    "No SCCC/SCO/native manifest regeneration",
+    "No guest or ABI runtime validation"
+  ]
+}

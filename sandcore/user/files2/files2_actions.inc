@@ -233,6 +233,13 @@ static ScStatus f2_jobs_step(ScU32 *ready)
                 f2.refresh_pending=1;
             }
         }
+        if(job->reviewed && job->deferred){
+            ScStatus ack=ScShellDropReply(job->handle);
+            if(ack==SC_SHELL_READY)*ready=1;
+            if(ack<0&&!first)first=ack;
+            if(ack!=SC_SHELL_END){link=&job->next;continue;}
+            job->deferred=0;
+        }
         if(job->reviewed && !job->conflict && (dialog==SC_SHELL_END || (progress.state==SC_SHELL_JOB_FINISHED
             && !job->failed && !job->uncertain && !job->skipped && !job->retained))){
             *link=job->next;f2_job_close(job);continue;}
@@ -316,33 +323,36 @@ static ScStatus f2_drag_begin(void)
 {
     ScShellFileItem *items=0;ScU32 count=0;ScStatus s=f2_selected(&items,&count);f2.gesture=0;
     if(s==0 && !count)s=SC_UI_E_INVALID;
-    if(s==0)s=ScShellDragBegin(f2.ui,f2.table,items,count,SC_UI_DRAG_COPY|SC_UI_DRAG_MOVE,&f2.drag_token);
+    if(s==0)s=ScShellDragBeginEx(f2.ui,f2.table,items,count,SC_UI_DRAG_COPY|SC_UI_DRAG_MOVE,SC_SHELL_DRAG_DEFERRED,&f2.drag_token);
     free(items);if(s<0){f2.drag_token=0;ScUiCapture(f2.ui,f2.table,0);}return s;
 }
+#include "files2_drop_deferred.inc"
 static ScStatus f2_drop_reply(ScUiContext *ui,const ScUiEvent *event,void *context)
 {
     (void)ui;(void)context;if(event->type!=SC_UI_EVENT_DIALOG_COMPLETE)return 0;
     ScUiDialog *dialog=(ScUiDialog *)event->data;ScUiDialogInfo info;memset(&info,0,sizeof(info));info.size=sizeof(info);info.version=1;
     ScStatus s=ScUiDialogQuery(dialog,&info);
     if(s==0 && info.stage==SC_UI_DIALOG_DONE && (info.command==F2_DROP_COPY || info.command==F2_DROP_MOVE)){
-        f2.pending_drop.chosen_action=info.command==F2_DROP_COPY?SC_UI_DRAG_COPY:SC_UI_DRAG_MOVE;
+        ScU32 action=info.command==F2_DROP_COPY?SC_UI_DRAG_COPY:SC_UI_DRAG_MOVE;
         ScPathInfo target;s=f2_query(f2.drop_destination,&target);
         if(s==0 && (target.kind!=SC32_PATH_DIRECTORY || target.generation!=f2.drop_revision))s=SC_SHELL_E_STALE;
-        ScShellFileJob *job=0;if(s==0)s=f2_recovery();if(s==0)s=ScShellDropFiles(&f2.pending_drop,f2.drop_destination,f2.recovery_path,&job);
-        if(s==0)s=f2_job_adopt(job);
-    }
-    free(f2.drop_bytes);f2.drop_bytes=0;memset(&f2.pending_drop,0,sizeof(f2.pending_drop));
+        ScShellFileJob *job=0;if(s==0)s=f2_recovery();
+        if(s==0)s=ScShellDropFilesDeferred(f2.ui,&f2.drop_receipt,action,f2.drop_destination,f2.recovery_path,&job);
+        if(s==0){f2.drop_stage=0;s=f2_job_adopt(job);if(s==0)f2.jobs->deferred=1;}
+        if(s<0)f2_drop_abort(s);
+    }else f2_drop_abort(s<0?s:SC_UI_E_CANCELLED);
+    f2_drop_forget();
     if(f2.dialog==dialog){f2.dialog=0;ScUiDialogRelease(dialog);}if(s<0)f2_error(s,f2.drop_destination);return 0;
 }
 static ScStatus f2_drop(ScUiContext *ui,const ScUiEvent *event,void *context)
 {
     (void)ui;(void)context;if(!event->data || event->bytes!=sizeof(ScUiDragData))return SC_SHELL_E_PROTOCOL;
     ScUiDragData *data=(ScUiDragData *)event->data;
-    if(data->phase==SC32_DRAG_COMPLETE){f2.drag_token=0;return 0;}
+    if(f2_drop_notice(event,data))return 0;
     if(data->format!=SC32_CLIPBOARD_FILES)return 0;
     if(event->type==SC_UI_EVENT_DRAG_LEAVE){f2.drop_item=0;f2_status("拖放已离开当前窗口");return SC_UI_HANDLED;}
     if(event->type!=SC_UI_EVENT_DRAG_ENTER && event->type!=SC_UI_EVENT_DRAG_OVER && event->type!=SC_UI_EVENT_DROP)return 0;
-    if(f2.dialog || f2.scan.active || f2.exit_pending || !f2.current){data->chosen_action=0;return SC_UI_HANDLED;}
+    if(f2.dialog || f2.drop_receipt.id || f2.scan.active || f2.exit_pending || !f2.current){data->chosen_action=0;return SC_UI_HANDLED;}
     char destination[F2_PATH];strcpy(destination,f2.current->path);ScU32 item=0,column=0,index,expected=f2.current->directory_revision;
     if(event->node==f2.table && ScUiViewHitTest(f2.ui,f2.table,event->x,event->y,&item,&column)==0
         && f2_lookup(f2.current->ids,&item,4,&index)==0 && f2.current->rows[index].kind==SC32_PATH_DIRECTORY)
@@ -361,17 +371,12 @@ static ScStatus f2_drop(ScUiContext *ui,const ScUiEvent *event,void *context)
     if(!action || data->bytes>65536 || !data->bytes || !data->data)return SC_SHELL_E_PROTOCOL;
     void *owned=malloc(data->bytes);if(!owned)return SC_UI_E_MEMORY;memcpy(owned,data->data,data->bytes);
     f2.drop_bytes=owned;f2.pending_drop=*data;f2.pending_drop.data=owned;strcpy(f2.drop_destination,destination);
-    ScUiMenuItem buttons[3];memset(buttons,0,sizeof(buttons));const char *labels[]={"取消","复制到目标","移动到目标"};
-    const ScU32 commands[]={SC_UI_DIALOG_CANCEL,F2_DROP_COPY,F2_DROP_MOVE};
-    for(ScU32 i=0;i<3;i++){buttons[i].size=sizeof(buttons[i]);buttons[i].version=1;buttons[i].command=commands[i];buttons[i].label=f2_text(labels[i]);}
-    if(!(data->actions&SC_UI_DRAG_COPY))buttons[1].flags=SC_UI_MENU_DISABLED;
-    if(!(data->actions&SC_UI_DRAG_MOVE))buttons[2].flags=SC_UI_MENU_DISABLED;
-    char message[180];snprintf(message,sizeof(message),"目标：%s\n只有真实目标提交后才允许移动删源。",destination);
-    ScUiMessageBoxDesc desc;memset(&desc,0,sizeof(desc));desc.size=sizeof(desc);desc.version=1;desc.owner=f2.root;
-    desc.title=f2_text("放置文件");desc.message=f2_text(message);desc.buttons=buttons;desc.button_count=3;
-    desc.default_command=SC_UI_DIALOG_CANCEL;desc.cancel_command=SC_UI_DIALOG_CANCEL;desc.completion=f2_drop_reply;
-    s=ScUiMessageBox(f2.ui,&desc,&f2.dialog);
-    if(s<0){free(f2.drop_bytes);f2.drop_bytes=0;memset(&f2.pending_drop,0,sizeof(f2.pending_drop));}return s<0?s:SC_UI_HANDLED;
+    memset(&f2.drop_receipt,0,sizeof(f2.drop_receipt));f2.drop_receipt.size=sizeof(f2.drop_receipt);f2.drop_receipt.version=1;
+    s=ScUiDropDefer(ui,event,&f2.drop_receipt);
+    if(s<0){f2_drop_forget();return s;}
+    f2.drop_stage=1;
+    /* 只有READY才开模态；此回调仅接收正文，不把传输ACK当文件提交。 */
+    return SC_UI_HANDLED;
 }
 static ScStatus f2_exit_reply(ScUiContext *ui,const ScUiEvent *event,void *context)
 {

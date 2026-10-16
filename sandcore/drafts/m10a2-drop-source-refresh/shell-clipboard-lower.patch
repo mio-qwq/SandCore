@@ -1,0 +1,44 @@
+--- a/user/scshell/shell_clipboard.c
++++ b/user/scshell/shell_clipboard.c
+@@ -335,7 +335,7 @@
+     done:ScBufferRelease(remaining);
+     return sh_cause(s,84,0);
+ }
+-ScStatus ScShellDragBegin(ScUiContext *ui,ScUiNode source,const ScShellFileItem *items,ScU32 count,ScU32 actions,ScU32 *token) {
++static ScStatus sh_drag_begin(ScUiContext *ui,ScUiNode source,const ScShellFileItem *items,ScU32 count,ScU32 actions,ScU32 flags,ScU32 *token) {
+     ScBuffer *files=0,*offer=0;
+     ScDragOffer header;
+     ScDragFormat row;
+@@ -343,7 +343,7 @@
+     const unsigned char *p;
+     ScU32 bytes,n;
+     ScStatus s;
+-    if(!actions||actions&~3u||!token)return SC_SHELL_E_INVALID;
++    if(!actions||actions&~3u||flags&~SC_SHELL_DRAG_DEFERRED||!token)return SC_SHELL_E_INVALID;
+     s=sh_clip_files_encode(items,count,SC32_CLIPBOARD_COPY,&files);
+     if(s>=0)s=sh_buffer_data(files,&p,&bytes);
+     if(s<0)goto done;
+@@ -372,12 +372,16 @@
+     d.source=source;
+     d.actions=actions;
+     d.offer=p;
+-    d.offer_bytes=n;
++    d.offer_bytes=n;d.flags=flags&SC_SHELL_DRAG_DEFERRED?SC_UI_DRAG_DEFERRED:0;
+     if(s>=0)s=ScUiDragBegin(ui,&d,token);
+     done:ScBufferRelease(files);
+     ScBufferRelease(offer);
+     return sh_cause(s,85,0);
+ }
++ScStatus ScShellDragBegin(ScUiContext *ui,ScUiNode source,const ScShellFileItem *items,ScU32 count,ScU32 actions,ScU32 *token)
++{return sh_drag_begin(ui,source,items,count,actions,0,token);}
++ScStatus ScShellDragBeginEx(ScUiContext *ui,ScUiNode source,const ScShellFileItem *items,ScU32 count,ScU32 actions,ScU32 flags,ScU32 *token)
++{return sh_drag_begin(ui,source,items,count,actions,flags,token);}
+ ScStatus ScShellDropFiles(const ScUiDragData *data,const char *destination,const char *recovery,ScShellFileJob **out) {
+     ScBrokerIdentity self;
+     ScShellFileItem *items=0;
+@@ -405,3 +409,5 @@
+     sh_file_items_free(items,count);
+     return s;
+ }
++
++#include "shell_drop_deferred.inc"

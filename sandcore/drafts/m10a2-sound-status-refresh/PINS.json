@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "status": "SOURCE_PATCH_NOT_BUILT_NOT_REPLAY_ROOT_CAUSE",
+  "target": "user/sound2/sound_jobs.c",
+  "function": "sound_collect",
+  "before": {
+    "bytes": 10226,
+    "sha256": "b1cf434a244f5985e999ccefab326eff250c797220a5c9a8dcfee4817808ec7b"
+  },
+  "after": {
+    "bytes": 10467,
+    "sha256": "b0a34e848dd9d24a04660d494700d4a792eb5141e2576369dc13847af0d1b8c4"
+  },
+  "patch_sha256": "f3ac053446afa90f03de5eb70fe6c7950b324f2315e35125dc516be9b6a20c05",
+  "scope": "AFTER_CANDIDATE_COLLECTION_REFRESH_EXISTING_CURRENT_DISPLAY_ONLY",
+  "soundworker_changed": false,
+  "job_protocol_or_audio_state_changed": false,
+  "replay_root_cause_determined": false,
+  "build_started": false,
+  "VM_called": false,
+  "static_reverse_to_before": "PASS"
+}

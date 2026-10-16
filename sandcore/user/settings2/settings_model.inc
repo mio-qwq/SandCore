@@ -113,7 +113,8 @@ static ScStatus environment_provider(void *unused,const ScUiDataRequest *q,ScUiD
         r->value.lo=index;
         return 0;
     }
-    if(q->operation==SC_UI_DATA_CELL){const char *z=q->column?settings.env[index].value:settings.env[index].key;
+    /* CELL由SCUI按列描述的field取值，不把可重排的column身份当数组下标。 */
+    if(q->operation==SC_UI_DATA_CELL){const char *z=q->field?settings.env[index].value:settings.env[index].key;
         r->value.type=SC_VALUE_UTF8;
         r->value.data=z;
         r->value.bytes=(ScU32)strlen(z);

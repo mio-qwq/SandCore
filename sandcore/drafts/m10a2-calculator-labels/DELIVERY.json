@@ -1,0 +1,11 @@
+{
+  "scope": "TWO_VISIBLE_KEY_LABELS_ONLY_NO_MAIN_EDIT",
+  "path": "user/systemtools/calc_view.inc",
+  "before_sha256": "97aa49ceb3064902f280d8f79184419683f1f215f3708b7669da451e42f15c9d",
+  "result_sha256": "9ea410b70e7a70b999b47eb9882f3ff8975f3f07d91a99d1f33b3bee0c52ff37",
+  "patch_sha256": "ff12a27808635b07a7ea542ea2a75b94d28a7affb6c6a751747b8347ba959529",
+  "button_order_and_command_indices_unchanged": true,
+  "new_color_or_font_bytes": false,
+  "host_build": false,
+  "guest_runtime": false
+}

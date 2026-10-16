@@ -1,8 +1,8 @@
 # 新组件只按显式目标构建，不覆盖历史SCX或触发冻结游戏构建。
 M10A2_APP_NAMES := FILES2 NOTES2 DEBUG2 CALC2 PALETTE2 MONITOR2 STUDIO2
-M10A2_APP_HEADERS := $(wildcard user/SC*.H user/sclib/*.H)
+M10A2_APP_HEADERS := $(filter-out user/SCUIDROP.H user/SCSHELLDROP.H,$(wildcard user/SC*.H user/sclib/*.H))
 
-$(BUILD)/files2-native.o: user/files2/FILES2.C $(wildcard user/files2/*.H user/files2/*.inc) $(M10A2_APP_HEADERS) $(STAMP)
+$(BUILD)/files2-native.o: user/files2/FILES2.C user/SCUIDROP.H user/SCSHELLDROP.H $(wildcard user/files2/*.H user/files2/*.inc) $(M10A2_APP_HEADERS) $(STAMP)
 	$(CC) $(CFLAGS) $(M10A2_SCL_CFLAGS) -Werror -x c -Iuser/stdlib -Iuser/sclib -Iuser -c $< -o $@
 $(BUILD)/FILES2.SCX: $(BUILD)/files2-native.o user/files2/FILES2.json tools/mkdscx.py tools/scd_format.py
 	$(PY) tools/mkdscx.py $< $@ --manifest user/files2/FILES2.json

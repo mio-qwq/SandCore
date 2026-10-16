@@ -1,0 +1,72 @@
+{
+  "status": "REVIEWED_SMALL_FIXES_INTEGRATED_NOT_BUILT",
+  "gui_report_sha256": "f93706133d8f3cc85327ce30334f5d73e0f6e34b13d67125c9590cc4fd6af6cc",
+  "modified": [
+    {
+      "path": "user/scshell/shell_name_prompt.inc",
+      "source": "drafts\\m10a2-name-prompt-enter\\result\\shell_name_prompt.inc",
+      "before_sha256": "f90d957791cd84c8be69197aab27306fa9111c5a33118cfe124b5d40d8651a43",
+      "after_sha256": "0faae116c75c788540db8ea9f6df51768ae6647160027cbceb88544043471e58",
+      "bytes": 7717
+    },
+    {
+      "path": "user/notes2/NOTES2.C",
+      "source": "drafts\\m10a2-app-path-arguments\\overlay\\user\\notes2\\NOTES2.C",
+      "before_sha256": "b9e03693a4be610f22f8c49418fb5f25c9fec5bf120e63913bf90334512ef8e0",
+      "after_sha256": "5894444773d92c6104a06bfa293a84b728bf0cd6b0c1a1c77a9f3f556b51571e",
+      "bytes": 2676
+    },
+    {
+      "path": "user/studio2/studio_build.c",
+      "source": "drafts\\m10a2-studio-sco-source-path\\overlay\\user\\studio2\\studio_build.c",
+      "before_sha256": "0a2c2d65ae2634a7d3a04868d4e9df72282f73c200ee1df1ffcfa40b7ee2d789",
+      "after_sha256": "549289e059f9ba70f9bc9b6b429dc4a512b8f0f24f0cf22d0496b7fdc1be6081",
+      "bytes": 29704
+    },
+    {
+      "path": "user/settings2/settings_view.inc",
+      "source": "drafts\\m10a2-settings-startup-review\\overlay\\user\\settings2\\settings_view.inc",
+      "before_sha256": "451467943eaf712b0bf23b5bd7e0a23eca87391fb6feaf2b10611a21f77c449b",
+      "after_sha256": "c80f2cff71f6e243fff67a67eb0622c647ea8798ac058307d599f5705f7aec50",
+      "bytes": 17853
+    },
+    {
+      "path": "user/settings2/settings_model.inc",
+      "source": "drafts\\m10a2-settings-startup-review\\overlay\\user\\settings2\\settings_model.inc",
+      "before_sha256": "f23fdf29e74de721a7dba786c6d0bace8c3fbf8752d4c5310786bbb2a0658066",
+      "after_sha256": "6d53b4564e449a353472a5c5280a82c19103998c8aafc22233a2b8e09e7e96cf",
+      "bytes": 7291
+    },
+    {
+      "path": "user/settings2/settings_programs.inc",
+      "source": "drafts\\m10a2-settings-startup-review\\overlay\\user\\settings2\\settings_programs.inc",
+      "before_sha256": "d177b98dce854dffc7b69b7638893005b5c76762d90855dbfac44ba4d5328d46",
+      "after_sha256": "2067366a0f958b0554129629a058f44c914f48af641e8e1883bc8fea8725448c",
+      "bytes": 14594
+    },
+    {
+      "path": "user/settings2/install_view.inc",
+      "source": "drafts\\m10a2-settings-startup-review\\overlay\\user\\settings2\\install_view.inc",
+      "before_sha256": "d935140ff2a70847d571eb599b5ddc6499367dd0412412db34cddd3ef7b04e34",
+      "after_sha256": "1580ce6e7e6199c7a9e9236a5948449e35a2ad55b3d70ba1e5f31d6226fe9d0c",
+      "bytes": 10609
+    },
+    {
+      "path": "user/settings2/install_model.inc",
+      "source": "drafts\\m10a2-settings-startup-review\\overlay\\user\\settings2\\install_model.inc",
+      "before_sha256": "d1a2672aafa3331c2cf98d7527ea4dcc3647557a5f308e7e7a0a4dca53349709",
+      "after_sha256": "cb349243ce77b51fa3c451ab7f3b074ec8793b7e365cfc44b2bce62a7962dda4",
+      "bytes": 8376
+    },
+    {
+      "path": "user/systemtools/calc_view.inc",
+      "source": "drafts\\m10a2-calculator-labels\\calc_view.inc",
+      "before_sha256": "97aa49ceb3064902f280d8f79184419683f1f215f3708b7669da451e42f15c9d",
+      "after_sha256": "9ea410b70e7a70b999b47eb9882f3ff8975f3f07d91a99d1f33b3bee0c52ff37",
+      "bytes": 16109
+    }
+  ],
+  "public_ABI_changed": false,
+  "build_started": false,
+  "guest_validation_started": false
+}

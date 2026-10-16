@@ -29,14 +29,14 @@
     {
       "name": "SCSHELL.SCL",
       "abi_major": 1,
-      "min_minor": 1,
-      "min_version": 2
+      "min_minor": 2,
+      "min_version": 3
     },
     {
       "name": "SCUI.SCL",
       "abi_major": 1,
-      "min_minor": 3,
-      "min_version": 4
+      "min_minor": 4,
+      "min_version": 5
     }
   ],
   "imports": [
@@ -426,12 +426,6 @@
     },
     {
       "name": "ScShellClipboardText",
-      "dependency": "SCSHELL.SCL",
-      "kind": "function",
-      "size": 1
-    },
-    {
-      "name": "ScShellErrorDialog",
       "dependency": "SCSHELL.SCL",
       "kind": "function",
       "size": 1

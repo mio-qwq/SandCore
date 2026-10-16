@@ -1,0 +1,57 @@
+{
+  "schema": 1,
+  "status": "READ_ONLY_REVIEW_AND_SOURCE_SUPPLEMENT_NOT_BUILT",
+  "reviewed_drop_delivery": {
+    "path": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\drafts\\m10a2-drop-source-refresh\\DELIVERY.json",
+    "sha256": "a86a156a34552d27f9c036e8a7a083afa18d9e4f91dacdaa00c5a005aadedf28"
+  },
+  "target": "user/scui/scui_drop_deferred.inc",
+  "original_frozen_inc": {
+    "path": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\drafts\\m10a2-drop-source-refresh\\scui_drop_deferred.inc",
+    "bytes": 12645,
+    "sha256": "9b37cdeefd5249c44b3200d0d13d09775efddbb058ea777e650ce3b891f94851"
+  },
+  "after": {
+    "bytes": 12871,
+    "sha256": "b6a782d2232543ff4da694b86a0441a5341facecf6faa0f11fd41c7bbb86d499"
+  },
+  "patch_sha256": "941ac88f4e07cbf4fb93c051895b753b1fddd9ec3edaf61993d2eba7e315f534",
+  "issues": [
+    "EOF_USES_PACKET_FLAGS_NOT_MESSAGE_TYPE",
+    "RECEIVER_RETIREMENT_MUST_BE_WORK_EVEN_IF_CHANNEL_EMPTY"
+  ],
+  "normal_first_MOVE_path_blocker_found": false,
+  "scope": [
+    "packet EOF predicate",
+    "shared existing receiver-retired condition in step/work"
+  ],
+  "source_gate_changed": false,
+  "misleading_indentation_changed": false,
+  "manifest_changed": false,
+  "ABI_changed": false,
+  "main_or_original_draft_changed": false,
+  "build_started": false,
+  "VM_called": false,
+  "tests_added": false,
+  "static_reverse_to_identical_original": "PASS",
+  "anchors": [
+    {
+      "before_sha256": "8ba89640e8a2ce205fc36e07c202a58d0ba49f7ee900f376f6e7f840e23e374a",
+      "after_sha256": "050ad314d5222d63157f086c9204d19d00157d40a25a2060599217d196e3896d",
+      "before": "if(packet->type==SC32_IPC_FRAME_EOF)",
+      "after": "if(packet->flags&SC32_IPC_FRAME_EOF)"
+    },
+    {
+      "before_sha256": "fa1397e8d8129b4086452fd61dfcfe6338ccb7c75fa4dbb91f9b2aa924404738",
+      "after_sha256": "4090dfcc748d096f1175e0df6ac71bdd2ff737ba22fc24fe11ca3e69cdb26355",
+      "before": "static ScStatus ui_d2_peer_step(UiDropPeer *p)\n{\n    if(p->receipt_state==SC_UI_DROP_FAILED || !p->receipt_id)return SC_UI_END;\n    UiNode *node=ui_node(p->root->context,p->node);\n    if(!p->root->owner_live || !node || node->generation!=p->node_generation){ui_d2_fail(p,SC_UI_E_CANCELLED);return SC_UI_END;}\n",
+      "after": "static int ui_d2_peer_retired(UiDropPeer *p)\n{\n    UiNode *node=ui_node(p->root->context,p->node);\n    return !p->root->owner_live || !node || node->generation!=p->node_generation;\n}\nstatic ScStatus ui_d2_peer_step(UiDropPeer *p)\n{\n    if(p->receipt_state==SC_UI_DROP_FAILED || !p->receipt_id)return SC_UI_END;\n    if(ui_d2_peer_retired(p)){ui_d2_fail(p,SC_UI_E_CANCELLED);return SC_UI_END;}\n"
+    },
+    {
+      "before_sha256": "5d116990cb907d658deebb5759467bcea2b69794a0b476a9fa3766e3391dcae7",
+      "after_sha256": "470a8ada04ba932d5ce92daf37c658bb9d6314aa62d8c96353ebd3763df5bec8",
+      "before": "    if(!p->deferred)return 1;\n    if(!p->receipt_id || p->receipt_state==SC_UI_DROP_FAILED)return 1;\n",
+      "after": "    if(!p->deferred)return 1;\n    if(!p->receipt_id || p->receipt_state==SC_UI_DROP_FAILED)return 1;\n    /* 目标退役本身就是清理工作；READY后的空channel不能挡住peer_step的撤销。 */\n    if(ui_d2_peer_retired(p))return 1;\n"
+    }
+  ]
+}

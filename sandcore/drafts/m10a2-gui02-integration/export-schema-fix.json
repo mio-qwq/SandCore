@@ -1,0 +1,26 @@
+{
+  "status": "SOURCE_MANIFEST_SCHEMA_CORRECTED_NOT_LINKED",
+  "modified": [
+    {
+      "path": "user/scui/SCUI.json",
+      "before_sha256": "6e40dacfffc3b006d90357bd34235d3aaaba866f99f1d33c27b75b11f7fa43f7",
+      "after_sha256": "05b041f4ae55af9b1e20df36dbde649a7d9ee94e6b2ecf377b3692440d03ecbb",
+      "corrected_exports": [
+        "ScUiDropDefer",
+        "ScUiDropQuery",
+        "ScUiDropReply",
+        "ScUiDropRelease"
+      ]
+    },
+    {
+      "path": "user/scshell/SCSHELL.json",
+      "before_sha256": "11e8d2739667f08868092967c16479823e7a6f344268ce2c870b572650763f9b",
+      "after_sha256": "5a34f0d9077b856e0a64da2aeff40fff21dfaf749b753e9df9c701eea8492533",
+      "corrected_exports": [
+        "ScShellDragBeginEx",
+        "ScShellDropFilesDeferred",
+        "ScShellDropReply"
+      ]
+    }
+  ]
+}

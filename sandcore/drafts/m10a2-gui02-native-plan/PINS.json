@@ -1,0 +1,98 @@
+{
+  "status": "READ_ONLY_PLAN_SOURCE_AST_CHECKED_NOT_BUILT_NOT_EXECUTED",
+  "fixed_source_sha256": {
+    "tools/check_m10a2_p6_objects.py": "6273f2cecc7e936a42fb04779cb29107133fa89a5cf46d9f7a57916acd85e4cd",
+    "drafts/m10a2-p6-guest-generation/model.py": "3087b2c093dd99350e4049214478bf188a23edb585a4766f529dbc16e50f5bb2",
+    "build/m10a2-p6-sco-08/report.json": "c35cb261372cb20067769d60833d36285af345622aee1e7da8e9b4fa807a2513",
+    "build/m10a2-p6-adapter-02/build.json": "254c7271453a02d4554b2e9830cc3b152808937c12d632dd248c62ceec8de9bd",
+    "build/m10a2-p6-adapter-02/compiler.c": "edb7a66b15ace9223740046e0da1ff0e2524006fcf9784b0efbfa095766bb99f",
+    "build/m10a2-p6-adapter-02/sccc-host": "a6dfe92930876400b349ddc33924ac2c5bae76a5dcb8995c1bbbf93b08760696",
+    "build/m10a2-terminal2-agent-native/scld-host": "339561669ebc16143ac8b1e7099830503e818ef150b6dfaa5ceb8a5cdf0ed034",
+    "build/m10a2-p6-target-refresh-03/p6-generation.json": "fbc1c4519c9f432a67772eb9b7989b166edb7ce29a20a65cc88c5bae63774f2f"
+  },
+  "expected_cases": {
+    "SCUI": {
+      "source": "user/scui/SCUI.C",
+      "host_template": "user/scui/SCUI.json",
+      "formal_native": "user/scui/SCUI.NATIVE.JSON",
+      "library": true
+    },
+    "SCSHELL": {
+      "source": "user/scshell/SCSHELL.C",
+      "host_template": "user/scshell/SCSHELL.json",
+      "formal_native": "user/scshell/SCSHELL.NATIVE.JSON",
+      "library": true
+    },
+    "FILES2": {
+      "source": "user/files2/FILES2.C",
+      "host_template": "user/files2/FILES2.json",
+      "formal_native": "user/files2/FILES2.NATIVE.JSON",
+      "library": false
+    },
+    "DESKTOP": {
+      "source": "user/scshell/desktop/SCSHELL.C",
+      "host_template": "user/scshell/desktop/SCSHELL.json",
+      "formal_native": "user/scshell/desktop/SCSHELL.NATIVE.JSON",
+      "library": false
+    },
+    "NOTES2": {
+      "source": "user/notes2/NOTES2.C",
+      "host_template": "user/notes2/NOTES2.json",
+      "formal_native": "user/notes2/NOTES2.NATIVE.JSON",
+      "library": false
+    },
+    "STUDIO2": {
+      "source": "user/studio2/STUDIO2.C",
+      "host_template": "user/studio2/STUDIO2.JSON",
+      "formal_native": "user/studio2/STUDIO2.NATIVE.JSON",
+      "library": false
+    },
+    "SETTINGS2": {
+      "source": "user/settings2/SETTINGS2.C",
+      "host_template": "user/settings2/SETTINGS2.json",
+      "formal_native": "user/settings2/SETTINGS2.NATIVE.JSON",
+      "library": false
+    },
+    "INSTALLER2": {
+      "source": "user/settings2/INSTALLER2.C",
+      "host_template": "user/settings2/INSTALLER2.json",
+      "formal_native": "user/settings2/INSTALLER2.NATIVE.JSON",
+      "library": false
+    },
+    "CALC2": {
+      "source": "user/systemtools/CALC2.C",
+      "host_template": "user/systemtools/CALC2.json",
+      "formal_native": "user/systemtools/CALC2.NATIVE.JSON",
+      "library": false
+    },
+    "PALETTE2": {
+      "source": "user/systemtools/PALETTE2.C",
+      "host_template": "user/systemtools/PALETTE2.json",
+      "formal_native": "user/systemtools/PALETTE2.NATIVE.JSON",
+      "library": false
+    },
+    "MONITOR2": {
+      "source": "user/systemtools/MONITOR2.C",
+      "host_template": "user/systemtools/MONITOR2.json",
+      "formal_native": "user/systemtools/MONITOR2.NATIVE.JSON",
+      "library": false
+    },
+    "SOUND2": {
+      "source": "user/sound2/SOUND2.C",
+      "host_template": "user/sound2/SOUND2.JSON",
+      "formal_native": "user/sound2/SOUND2.NATIVE.JSON",
+      "library": false
+    }
+  },
+  "actual_changed_labels": "NOT_OBSERVED_UNTIL_ROOT_HOST08_COMPLETES_AND_RUNS_READ_ONLY_PLAN",
+  "checks": [
+    "plan.py AST syntax",
+    "existing helper CASES exact labels and entry mapping",
+    "all 8 fixed tool/report/model/source file hashes"
+  ],
+  "main_and_tools_unchanged": true,
+  "no_build_or_VM_started": true,
+  "guest_compile": false,
+  "guest_runtime": false,
+  "formal_manifests_not_promoted": true
+}

@@ -36,6 +36,7 @@ HEADERS = {
     'SC32IMAGE.H':'user/SC32IMAGE.H', 'SCUIARGB.H':'user/SCUIARGB.H',
     'SCGFX.H':'user/SCGFX.H', 'SCGFXDRAW.H':'user/SCGFXDRAW.H', 'SCUICANVAS.H':'user/SCUICANVAS.H',
     'SC32AUTH.H':'user/SC32AUTH.H', 'SCUISECRET.H':'user/SCUISECRET.H',
+    'SCUIDROP.H':'user/SCUIDROP.H', 'SCSHELLDROP.H':'user/SCSHELLDROP.H',
     'SCUI.H': 'user/SCUI.H', 'SCLIB.H': 'user/sclib/SCLIB.H',
     # 保持官方头原字节；其../SCTYPES.H必须在INC内正确解析。
     'RUNTIME/SCLDR.H': 'user/runtime/SCLDR.H',
@@ -43,7 +44,7 @@ HEADERS = {
 STANDARD = ('stddef.h','stdint.h','stdbool.h','stdarg.h','limits.h','errno.h',
             'assert.h','stdlib.h','string.h','ctype.h','stdio.h')
 FORBIDDEN = ('PRIVATE','WIRE','NUI','SCAPI','SCIO','SCMEM','KERNEL','SCLFMT','SCDYN')
-DOCS = ('M10A2-SDK.md','SCL.md','SC32API.md','SC32-GUI-USER.md','SC32-BROKER.md',
+DOCS = ('SCUI-DROP-DEFERRED.md','M10A2-SDK.md','SCL.md','SC32API.md','SC32-GUI-USER.md','SC32-BROKER.md',
         'SC32-DROP.md','SC32-FONT.md','SCUI.md','SCUI-TEXT.md','SCLIB.md','SCCLIB.md',
         'SCCC-SCL.md','SCCC-AGGREGATE-ABI.md','THIRD-PARTY.md','SC32-DEBUG.md',
         'SCO-AND-LINKER.md','SC32-FILE.md','SCSHELL-DESIGN.md','SCSHELL-IMPLEMENTATION.md','SC32-WALL.md','SCGFX.md','SC32-IMAGE.md','SC32-AUTH.md','SCUI-SECRET.md','SESSION2.md')

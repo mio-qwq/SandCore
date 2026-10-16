@@ -1,5 +1,8 @@
 # SandCore M10a2 — The Application Platform Era：持续目标
 
+> 最新执行检查点：GUI02已正常关闭所有应用和worker、恢复SID1并注销SID4；一致owner账PF13922→13922、全部资源池差额0、unexplained0，输入和原盘均不变。Notes保存/Files复制移动/Canvas撤销重做保存/Lens原生显示/Calculator数学与历史/Palette真实色值/Monitor历史冻结继续/Sound首次真实PCM已有证据；跨应用文本剪贴板、源拖放自动刷新、Studio链接后流程、Settings/Installer启动及若干应用生命周期问题正在修复。9个局部文件已合入、尚未HOST08或新客体验证；Drop/TEXT1/共享对话框与Sound窄补丁接续。完整目标active，实际边界和下一步以M10A2-LIVE-GUI.md为准。
+
+
 > 当前执行检查点：完整目标仍 active。SCW、共享 Save As/文件类型列、整数透明合成、紧凑名称提示、Studio 只读命名空间租约修复已合主源。HOST07 exit0/41产物/源变化0；SCO08三个变化目标宿主后端通过。refresh-vm-03 仅真实生成 SCUI/SCSHELL/STUDIO2，其他产物显式复用完整 run03 来源；整轮真实生成/严格审计 PASS，PF14036→14036，源码/原盘守恒。GUI01 已正常关闭应用/注销测试SID，原最终 +205 页未归属，FAIL保留；Terminal 普通身份/管道等真实成功旁证继续保留。新 native CORE/SDK 和下一次一致采样普通GUI接续中，实时恢复入口 M10A2-LIVE-GUI.md。main 已存 f6cd28d，当前修复待保存，远端推送未确认。
 
 > 当前最高检查点：全批主源、默认升级和最终SDK/四TU示例已接齐。SC32 193导出、SCUI1.3/v4 170导出；27个SCCC/SCO/SCLD宿主后端目标通过。统一HOST报告 `build/m10a2-main-studio-01/p6-unified-host-01.json`：exit0、41产物、source变化0，含CORE/九库/十五GUI入口/worker/工具/SH/nano。SCSOUND是明确HOST codec例外，其证明已写入 `build/m10a2-session-sound-integration-01/codec-host-proof.json`。下一项真实Windows客体生成8普通库/新SCCC/SCLD及组件；随后按native LOGIN2/五库重新签发CORE、普通用户GUI/SDK与最终验收。没有新客体结论，不停在HOST检查点。下方旧数字和“尚在草稿”属于沿革，以此段和P6文档首节为准。main最新本地提交仍f101dff；本批新增待保存，远端上次push失败未确认。

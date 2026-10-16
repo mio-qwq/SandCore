@@ -1,0 +1,23 @@
+{
+  "status": "SOURCE_ONLY_NOT_BUILT_NOT_GUEST_VERIFIED",
+  "apply_after": {
+    "draft": "m10a2-drop-source-refresh",
+    "delivery_sha256": "a86a156a34552d27f9c036e8a7a083afa18d9e4f91dacdaa00c5a005aadedf28"
+  },
+  "path": "user/scui/scui_drop_deferred.inc",
+  "before_sha256": "9b37cdeefd5249c44b3200d0d13d09775efddbb058ea777e650ce3b891f94851",
+  "result_sha256": "86e79c5faf7bd6355889d665f948629e91e6f49d766dda86ffb543b7d07adf60",
+  "patch_sha256": "783b6b3492ba0d1c2fab8d75095e560bb2394d119cde8ccd511f794f210f8355",
+  "hunks": 2,
+  "read_only_references": {
+    "user/scui/ui_base.c": "1c30f9803846d360f3a4727c33af404029b756c26999e9b32ff842b014b46630",
+    "user/scui/ui_tree.c": "46d615567c6815abcc659805f7bb9268980e65a307651a1123ce16cd47b94380",
+    "user/scui/ui_data.c": "fbff908e57cf962d0698316a6b53b86f0382d588fa4b8a7fdc236393d27eb2ca"
+  },
+  "static": [
+    "frozen delivery inventory unchanged",
+    "two unique exact anchors",
+    "two local hunks",
+    "no public header or import change"
+  ]
+}

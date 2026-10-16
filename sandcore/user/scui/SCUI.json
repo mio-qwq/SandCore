@@ -1,8 +1,8 @@
 {
   "name": "SCUI.SCL",
   "abi_major": 1,
-  "abi_minor": 3,
-  "library_version": 4,
+  "abi_minor": 4,
+  "library_version": 5,
   "init": null,
   "fini": "ScUiFinalize",
   "exports": [
@@ -684,6 +684,22 @@
     },
     {
       "name": "ScUiWindowShow",
+      "kind": "function"
+    },
+    {
+      "name": "ScUiDropDefer",
+      "kind": "function"
+    },
+    {
+      "name": "ScUiDropQuery",
+      "kind": "function"
+    },
+    {
+      "name": "ScUiDropReply",
+      "kind": "function"
+    },
+    {
+      "name": "ScUiDropRelease",
       "kind": "function"
     }
   ],
@@ -1520,6 +1536,12 @@
       "name": "strtoul",
       "kind": "function",
       "dependency": "SCCLIB.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScBrokerReady",
+      "kind": "function",
+      "dependency": "SC32API.SCL",
       "size": 1
     }
   ],

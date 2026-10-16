@@ -1,0 +1,192 @@
+{
+  "status": "SOURCE_ONLY_NOT_BUILT_NOT_GUEST_VERIFIED",
+  "modified": 22,
+  "added": 7,
+  "patch_sha256": "03e0b4bbc9dbd5cc11a7e7152b7e97c3025200245ac647d498498232360ae27d",
+  "files": {
+    "DESIGN.md": {
+      "sha256": "1748bf43ae547a29be82e53431bcf4eda7fcfeb56bd4fd0fb91e4c073159abf6",
+      "bytes": 8036
+    },
+    "desktop_drop_deferred.inc": {
+      "sha256": "c970caa2e43ac946c9275fbcfcf19d1b025f0aacc36dfdaf2e998f1e56570532",
+      "bytes": 3608
+    },
+    "drop-source-refresh.patch": {
+      "sha256": "03e0b4bbc9dbd5cc11a7e7152b7e97c3025200245ac647d498498232360ae27d",
+      "bytes": 93081
+    },
+    "files2_drop_deferred.inc": {
+      "sha256": "441faf6b3c5ddbae67528e812e616cb68b9f19b5d9cd6c24aee9617aea329367",
+      "bytes": 3759
+    },
+    "HUNK-PINS.json": {
+      "sha256": "6f5b29f2dfb163a5057fa8c6381f32925473c21bca080ffb9cb4614e51a56d84",
+      "bytes": 683
+    },
+    "make_patch.py": {
+      "sha256": "d6e1f7ed5d14703540b631309bf69765514980d2bcffc2773ccba0e266ca14da",
+      "bytes": 29470
+    },
+    "overlay/docs/SC32-DROP.md": {
+      "sha256": "fd0672d9a87715be726562b0095477b7fb2fdc93a4a1f91aecb3d633b220b903",
+      "bytes": 10961
+    },
+    "overlay/docs/SCSHELL-DESIGN.md": {
+      "sha256": "5b53ba77d787f84aadb88f353a81132f034add30f9ae1553606686a16d50d009",
+      "bytes": 40992
+    },
+    "overlay/docs/SCUI-DROP-DEFERRED.md": {
+      "sha256": "7311c06668b8fbed7bc73fdc00cccea200b7333e34bb15aca8773bbbfd94c861",
+      "bytes": 6463
+    },
+    "overlay/docs/SCUI.md": {
+      "sha256": "ff2bca9e465fde1a403185215ecd7de289f6142993379e2bd10088cc4438a403",
+      "bytes": 20088
+    },
+    "overlay/m10a2-apps.mk": {
+      "sha256": "a92345d332c6eea185f75b63f66728c9d2f338af90029f9120dee0d79bf96ec9",
+      "bytes": 2265
+    },
+    "overlay/m10a2.mk": {
+      "sha256": "09eace8bb77a9053520f566d29b61ee63abe62da0ebf4e4fc3b137b1fda2d426",
+      "bytes": 21855
+    },
+    "overlay/tools/stage_m10a2_sdk.py": {
+      "sha256": "8be918fc4404729beb14d727865593c8bf5282b5478922d75c3668c2c35cd18d",
+      "bytes": 39616
+    },
+    "overlay/user/files2/FILES2.H": {
+      "sha256": "0a27065f7c9baf689b36b66c3d36a4ca243398b7880659781548d495b59bf8d3",
+      "bytes": 5701
+    },
+    "overlay/user/files2/FILES2.json": {
+      "sha256": "6dd78ce449ca2c0d0377c87b0d07d8a028fd7986906206d4f1693a6d661f5ed2",
+      "bytes": 21869
+    },
+    "overlay/user/files2/files2_actions.inc": {
+      "sha256": "a5afa5c7bce218c9a7a7693b0b407df5f7679948192354ff6cae2aab9b935a64",
+      "bytes": 35399
+    },
+    "overlay/user/files2/files2_drop_deferred.inc": {
+      "sha256": "441faf6b3c5ddbae67528e812e616cb68b9f19b5d9cd6c24aee9617aea329367",
+      "bytes": 3759
+    },
+    "overlay/user/files2/files2_view.inc": {
+      "sha256": "34bdde7f50eeb6bcd0994fffb1dd2f6db08097542f8ba26d4e32cc04995175f6",
+      "bytes": 33043
+    },
+    "overlay/user/scshell/desktop/DESKTOP.H": {
+      "sha256": "e25d578a648000c19bd213541909f40115f42b33733b7ea255920d80d1cb8afe",
+      "bytes": 4530
+    },
+    "overlay/user/scshell/desktop/desktop_actions.inc": {
+      "sha256": "1500e50c5448b2b573c800a2fc635acb5e037720597b03bffb1ffda463d0effa",
+      "bytes": 32110
+    },
+    "overlay/user/scshell/desktop/desktop_drop_deferred.inc": {
+      "sha256": "c970caa2e43ac946c9275fbcfcf19d1b025f0aacc36dfdaf2e998f1e56570532",
+      "bytes": 3608
+    },
+    "overlay/user/scshell/desktop/desktop_view.inc": {
+      "sha256": "e79d0ad5ddac3acb075434b984b954c643f77188e0349ec5af36924b5d6786a5",
+      "bytes": 19260
+    },
+    "overlay/user/scshell/desktop/SCSHELL.C": {
+      "sha256": "6132dc27f947c75921db76669ed29a92c47ed740a323001e3a67238faaa40c1c",
+      "bytes": 28841
+    },
+    "overlay/user/scshell/desktop/SCSHELL.json": {
+      "sha256": "3518ca6b41c8cb91dde74d9085ec3b1ee748bd3c2552ee63bac59f232ee956a2",
+      "bytes": 21704
+    },
+    "overlay/user/scshell/SCSHELL.json": {
+      "sha256": "7f6be3df7c515971ee249bc5a0fd604dd432cfa7b399a71fd50a59c7440fcfcb",
+      "bytes": 28617
+    },
+    "overlay/user/scshell/SCSHELLPRIVATE.H": {
+      "sha256": "cf5956730869c88022bd275fe0f8a20d664597dfa8639800f1b07ca5d99ea396",
+      "bytes": 9101
+    },
+    "overlay/user/scshell/shell_clipboard.c": {
+      "sha256": "b9695d3337667bc670c04d4d71912868bb86ddb4aaf97fff63aaf5c7c5090b11",
+      "bytes": 15370
+    },
+    "overlay/user/scshell/shell_drop_deferred.inc": {
+      "sha256": "a42f9218e6c33da5dbaadb2d8daf8e093a41fbaa6f2c8e6e47e8d26e6deea515",
+      "bytes": 5452
+    },
+    "overlay/user/scshell/shell_job.c": {
+      "sha256": "d42c5c8af12c4f85c7e3eb38e6bf3b08f6a7919b02d2c212fe4b761528c91eb0",
+      "bytes": 23548
+    },
+    "overlay/user/SCSHELLDROP.H": {
+      "sha256": "e95813de6fecad8f743ce8d69c746f8e1244a435dbd94084b5b61a73434044b1",
+      "bytes": 1050
+    },
+    "overlay/user/scui/SCUI.json": {
+      "sha256": "3729b280a5c8d66ff40dc835eb4052e986d946f332636ec68545af962a1e99d9",
+      "bytes": 29802
+    },
+    "overlay/user/scui/scui_drop_deferred.inc": {
+      "sha256": "9b37cdeefd5249c44b3200d0d13d09775efddbb058ea777e650ce3b891f94851",
+      "bytes": 12645
+    },
+    "overlay/user/scui/SCUIPRIVATE.H": {
+      "sha256": "b7d51e1bf5bd71130ed49e1e77f1c85193416cf9473112634f1a7ce224e56c08",
+      "bytes": 13403
+    },
+    "overlay/user/scui/ui_data.c": {
+      "sha256": "d1bc962cc06e67d0f1635c6e48fefe911000cd0ad52a21a96a06d3c0e82d8580",
+      "bytes": 113876
+    },
+    "overlay/user/SCUIDROP.H": {
+      "sha256": "2a6b197676b7fe5434468543d59f4a66680600a24ee574bccd7b7bf1ec4e798b",
+      "bytes": 1786
+    },
+    "PINS.json": {
+      "sha256": "8779c33249ea445f3e83c2cf5898c234e5cbcf87b1970999187c6641f0d70d2a",
+      "bytes": 7666
+    },
+    "README.md": {
+      "sha256": "a78e71095d399f4c9e0766ed0f3f3d4a9feab9b2192b4d71d9bddc6bce192db7",
+      "bytes": 4071
+    },
+    "SCSHELLDROP.H": {
+      "sha256": "e95813de6fecad8f743ce8d69c746f8e1244a435dbd94084b5b61a73434044b1",
+      "bytes": 1050
+    },
+    "SCUI-DROP-DEFERRED.md": {
+      "sha256": "7311c06668b8fbed7bc73fdc00cccea200b7333e34bb15aca8773bbbfd94c861",
+      "bytes": 6463
+    },
+    "scui_drop_deferred.inc": {
+      "sha256": "9b37cdeefd5249c44b3200d0d13d09775efddbb058ea777e650ce3b891f94851",
+      "bytes": 12645
+    },
+    "SCUIDROP.H": {
+      "sha256": "2a6b197676b7fe5434468543d59f4a66680600a24ee574bccd7b7bf1ec4e798b",
+      "bytes": 1786
+    },
+    "seal_review.py": {
+      "sha256": "747d46550c4068d9d3cfd3bfe7a8eadfc1d1defc1c46f6145f36219d91606253",
+      "bytes": 9026
+    },
+    "shell-clipboard-lower.patch": {
+      "sha256": "47b43485e2a55f219f7587cfd14aa64e6c23dde917b31983bdd54396f9b71861",
+      "bytes": 1931
+    },
+    "shell_drop_deferred.inc": {
+      "sha256": "a42f9218e6c33da5dbaadb2d8daf8e093a41fbaa6f2c8e6e47e8d26e6deea515",
+      "bytes": 5452
+    },
+    "SOURCE-PINS.json": {
+      "sha256": "af7ed303c29336f3cec902c6c637ff7f0f8672c044a6a9f3580b0cad98c16700",
+      "bytes": 1945
+    },
+    "STATIC-REVIEW.json": {
+      "sha256": "939042ac40de6ce64f8a08f86d5be903c82708feb549b7b2ae21863ec0873a8b",
+      "bytes": 721
+    }
+  }
+}

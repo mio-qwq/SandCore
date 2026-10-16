@@ -1,0 +1,38 @@
+--- a/user/scui/scui_drop_deferred.inc
++++ b/user/scui/scui_drop_deferred.inc
+@@ -19,7 +19,7 @@
+     }
+     if(s<0)return s;
+     /* 先领完已排队DATA再认EOF，关闭对端不能吞掉它刚送出的真实终态。 */
+-    if(packet->type==SC32_IPC_FRAME_EOF){ScIpcReceive(channel,0,0,packet);return SC32_E_BROKEN_PIPE;}
++    if(packet->flags&SC32_IPC_FRAME_EOF){ScIpcReceive(channel,0,0,packet);return SC32_E_BROKEN_PIPE;}
+     return ui_drop_receive(channel,out,packet);
+ }
+ 
+@@ -104,11 +104,15 @@
+     if(p->receipt_state!=SC_UI_DROP_SENT){if(p->channel)ScIpcClose(p->channel);p->channel=0;}
+     receipt->id=receipt->generation=0;ui_object_release(&p->object);ScUiContextRelease(c);return 0;
+ }
++static int ui_d2_peer_retired(UiDropPeer *p)
++{
++    UiNode *node=ui_node(p->root->context,p->node);
++    return !p->root->owner_live || !node || node->generation!=p->node_generation;
++}
+ static ScStatus ui_d2_peer_step(UiDropPeer *p)
+ {
+     if(p->receipt_state==SC_UI_DROP_FAILED || !p->receipt_id)return SC_UI_END;
+-    UiNode *node=ui_node(p->root->context,p->node);
+-    if(!p->root->owner_live || !node || node->generation!=p->node_generation){ui_d2_fail(p,SC_UI_E_CANCELLED);return SC_UI_END;}
++    if(ui_d2_peer_retired(p)){ui_d2_fail(p,SC_UI_E_CANCELLED);return SC_UI_END;}
+     if(p->deferred==1){
+         ScWideCounter now;ScStatus s=ui_now(&now);if(s<0)return s;
+         if(ui_wide_compare(&now,&p->deadline)>=0)return SC_UI_E_CANCELLED;
+@@ -183,6 +187,8 @@
+ {
+     if(!p->deferred)return 1;
+     if(!p->receipt_id || p->receipt_state==SC_UI_DROP_FAILED)return 1;
++    /* 目标退役本身就是清理工作；READY后的空channel不能挡住peer_step的撤销。 */
++    if(ui_d2_peer_retired(p))return 1;
+     /* 超时本身也是待处理事件；不能只把Wait压到0却一直跳过真正清理。 */
+     if(p->deferred<3 && ui_d2_expired(&p->deadline))return 1;
+     return ui_d2_channel_work(p->channel,p->deferred==1?sizeof(ScDragEnvelope):

@@ -1,0 +1,16 @@
+--- a/user/sound2/sound_ui.c
++++ b/user/sound2/sound_ui.c
+@@ -188,10 +188,10 @@
+ static ScStatus sound_ui(void)
+ {
+     ScStatus status=tool_create("SandCore 音乐",820,560,sound_command,sound_event);if(status<0)return status;
+-    static const ToolMenuEntry file_menu[]={{"打开…",S2_OPEN,'O',SC32_MOD_CONTROL},{"复制文件路径",S2_COPY,0,0},{"退出",TOOLS_EXIT,0,0}};
+-    static const ToolMenuEntry play_menu[]={{"播放 / 暂停",S2_PLAY,' ',0},{"停止",S2_STOP,0,0},{"重新播放",S2_REPLAY,'R',SC32_MOD_CONTROL},
++    static const ToolMenuEntry file_menu[]={{"打开…",S2_OPEN,'o',SC32_MOD_CONTROL},{"复制文件路径",S2_COPY,0,0},{"退出",TOOLS_EXIT,0,0}};
++    static const ToolMenuEntry play_menu[]={{"播放 / 暂停",S2_PLAY,' ',0},{"停止",S2_STOP,0,0},{"重新播放",S2_REPLAY,'r',SC32_MOD_CONTROL},
+         {"后退 10 秒",S2_BACK,0,0},{"前进 10 秒",S2_FORWARD,0,0},{"取消准备",S2_CANCEL,0,0}};
+-    static const ToolMenuEntry view_menu[]={{"迷你模式",S2_MINI,'M',SC32_MOD_CONTROL},{"最大化 / 还原",S2_FULL,SC32_KEY_F1+10,0},{"关于",TOOLS_ABOUT,0,0}};
++    static const ToolMenuEntry view_menu[]={{"迷你模式",S2_MINI,'m',SC32_MOD_CONTROL},{"最大化 / 还原",S2_FULL,SC32_KEY_F1+10,0},{"关于",TOOLS_ABOUT,0,0}};
+     status=tool_menu_part("文件",file_menu,3);if(!status)status=tool_menu_part("播放",play_menu,6);
+     if(!status)status=tool_menu_part("视图",view_menu,3);
+     if(!status)status=tool_layout(tool.toolbar,SC_UI_FLOW,SC_UI_AUTO,SC_UI_AUTO,0);

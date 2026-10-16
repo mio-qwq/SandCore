@@ -1,0 +1,52 @@
+{
+  "unchanged": {
+    "user/SCUI.H": {
+      "sha256": "72d54bfea02c732201ce6b2ecad495c933c30353ab49240c74a5831f0010f72a",
+      "unchanged": true
+    },
+    "user/SCSHELL.H": {
+      "sha256": "fa6c1406cb2ad9609e59ee7fc97540da074573e68432ffea37d42a13a1f7519e",
+      "unchanged": true
+    },
+    "user/SC32DROP.H": {
+      "sha256": "c8ad8ed6d7e9459c9ebd0b656a7f69d385e337825023a09652fe312740b43db3",
+      "unchanged": true
+    },
+    "kernel/sc32_drop.c": {
+      "sha256": "d7fb71d45380abdce9040812d0603c0807a1e63d6a4fa0f736f826f7e77de370",
+      "unchanged": true
+    }
+  },
+  "evidence": {
+    "build/m10a2-p6-gui-run-02/drop-journal-audit.json": {
+      "sha256": "6fbc9c68b6ee7e37e6c51b695e61b6979be7a651530fcfd0e6bb674fe12c0a69",
+      "bytes": 2955,
+      "scope": "PRE_FIX_ORIGINAL_EVIDENCE_ONLY"
+    },
+    "build/m10a2-p6-gui-run-02/drop-cancel-audit.json": {
+      "sha256": "99f8cee35f0510857e9a6fdc43ef68631a0b50ad8367c6a3c4e9ca3eaeadaf24",
+      "bytes": 1091,
+      "scope": "PRE_FIX_ORIGINAL_EVIDENCE_ONLY"
+    },
+    "build/m10a2-p6-gui-run-02/desktop-drop-copy-journal.rec": {
+      "sha256": "ad3b29b40c92091e87f9937d231bd2b90e4db84191847a78e3c7cd70d0427f3e",
+      "bytes": 832,
+      "scope": "PRE_FIX_ORIGINAL_EVIDENCE_ONLY"
+    },
+    "build/m10a2-p6-gui-run-02/desktop-drop-move-journal.rec": {
+      "sha256": "2b5d62d2d826476ee9d0df563c7d2af01722986dc4d5475a2c9c202e954e2864",
+      "bytes": 832,
+      "scope": "PRE_FIX_ORIGINAL_EVIDENCE_ONLY"
+    },
+    "build/m10a2-p6-gui-run-02/p6-desktop-after-move-refresh.png": {
+      "sha256": "7b827840807499eaaf778c5032fca672b39c3b1bb862bf2aba8d1d6b9508ce17",
+      "bytes": 847539,
+      "scope": "PRE_FIX_ORIGINAL_EVIDENCE_ONLY"
+    },
+    "build/m10a2-p6-gui-run-02/p6-desktop-manual-refresh.png": {
+      "sha256": "9647d046d34a35f30a88b894bade2d468d29490246b7840bd73aa5a472a24b8c",
+      "bytes": 863403,
+      "scope": "PRE_FIX_ORIGINAL_EVIDENCE_ONLY"
+    }
+  }
+}

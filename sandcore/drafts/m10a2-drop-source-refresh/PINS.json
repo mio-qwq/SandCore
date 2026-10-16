@@ -1,0 +1,168 @@
+{
+  "status": "SOURCE_ONLY_NOT_BUILT_NOT_GUEST_VERIFIED",
+  "modified": {
+    "user/scui/SCUIPRIVATE.H": {
+      "before_sha256": "62a62bf304bb05812b7db0f33c2a9ec1640770f33c8e4c9eb38905695737f7bc",
+      "result_sha256": "b7d51e1bf5bd71130ed49e1e77f1c85193416cf9473112634f1a7ce224e56c08",
+      "before_bytes": 13378,
+      "result_bytes": 13403
+    },
+    "user/scui/ui_data.c": {
+      "before_sha256": "fbff908e57cf962d0698316a6b53b86f0382d588fa4b8a7fdc236393d27eb2ca",
+      "result_sha256": "d1bc962cc06e67d0f1635c6e48fefe911000cd0ad52a21a96a06d3c0e82d8580",
+      "before_bytes": 110614,
+      "result_bytes": 113876
+    },
+    "user/scui/SCUI.json": {
+      "before_sha256": "119bac0b8e51e5abfa3dc1cbf1b7800e2d59f0af851ac24303420590046cdbf0",
+      "result_sha256": "3729b280a5c8d66ff40dc835eb4052e986d946f332636ec68545af962a1e99d9",
+      "before_bytes": 30881,
+      "result_bytes": 29802
+    },
+    "user/scshell/SCSHELLPRIVATE.H": {
+      "before_sha256": "328b66671449b81166e45029673bfd356bf361f21f04bfa31669f146ae177321",
+      "result_sha256": "cf5956730869c88022bd275fe0f8a20d664597dfa8639800f1b07ca5d99ea396",
+      "before_bytes": 8842,
+      "result_bytes": 9101
+    },
+    "user/scshell/shell_job.c": {
+      "before_sha256": "4abe01a543ff204b8d6c76aa65dcb2dffe38d282cb058226c8480700f1332057",
+      "result_sha256": "d42c5c8af12c4f85c7e3eb38e6bf3b08f6a7919b02d2c212fe4b761528c91eb0",
+      "before_bytes": 24066,
+      "result_bytes": 23548
+    },
+    "user/scshell/shell_clipboard.c": {
+      "before_sha256": "fb5acb791a2be1ca7fca4eab2c3b27860984dc7b48c0538a3222ab30a57e8f2a",
+      "result_sha256": "b9695d3337667bc670c04d4d71912868bb86ddb4aaf97fff63aaf5c7c5090b11",
+      "before_bytes": 15237,
+      "result_bytes": 15370
+    },
+    "user/scshell/SCSHELL.json": {
+      "before_sha256": "ca71470830687c867e1fd149983c7daf46630952c424c3229caca541cfd159f5",
+      "result_sha256": "7f6be3df7c515971ee249bc5a0fd604dd432cfa7b399a71fd50a59c7440fcfcb",
+      "before_bytes": 29408,
+      "result_bytes": 28617
+    },
+    "user/files2/FILES2.H": {
+      "before_sha256": "b97695d2e396086a83a40237ec78476763ff8f3f518ff6cd9e2dffd2017f51e8",
+      "result_sha256": "0a27065f7c9baf689b36b66c3d36a4ca243398b7880659781548d495b59bf8d3",
+      "before_bytes": 5642,
+      "result_bytes": 5701
+    },
+    "user/files2/files2_actions.inc": {
+      "before_sha256": "d54cf70c0196d074ee7ca65d448cbd2a5cfa45f65971de48e13158d37bb1686e",
+      "result_sha256": "a5afa5c7bce218c9a7a7693b0b407df5f7679948192354ff6cae2aab9b935a64",
+      "before_bytes": 35796,
+      "result_bytes": 35399
+    },
+    "user/files2/files2_view.inc": {
+      "before_sha256": "c7de9698e27275ff8e57d08dc94389598f60b3758d86968ccfd7c435092e84a7",
+      "result_sha256": "34bdde7f50eeb6bcd0994fffb1dd2f6db08097542f8ba26d4e32cc04995175f6",
+      "before_bytes": 32932,
+      "result_bytes": 33043
+    },
+    "user/files2/FILES2.json": {
+      "before_sha256": "b852c6b877d1ef802b0675a0858b0e1aebd2f4a325b9c69b5b61dd68df5eab03",
+      "result_sha256": "6dd78ce449ca2c0d0377c87b0d07d8a028fd7986906206d4f1693a6d661f5ed2",
+      "before_bytes": 21261,
+      "result_bytes": 21869
+    },
+    "user/scshell/desktop/DESKTOP.H": {
+      "before_sha256": "c99f8f7e111086f9f8b833809eaacf4c7fd3d699bf91c740ddd3fde897cdf73f",
+      "result_sha256": "e25d578a648000c19bd213541909f40115f42b33733b7ea255920d80d1cb8afe",
+      "before_bytes": 4421,
+      "result_bytes": 4530
+    },
+    "user/scshell/desktop/desktop_view.inc": {
+      "before_sha256": "375fd8b4981941255b71a6718b93c33409d2a1d39ccebf1f850def04bcf64fcb",
+      "result_sha256": "e79d0ad5ddac3acb075434b984b954c643f77188e0349ec5af36924b5d6786a5",
+      "before_bytes": 19249,
+      "result_bytes": 19260
+    },
+    "user/scshell/desktop/desktop_actions.inc": {
+      "before_sha256": "233c499c258f86b0b64f4e692771fad30f3ef04a2b97c418a8d255e6ee0a9443",
+      "result_sha256": "1500e50c5448b2b573c800a2fc635acb5e037720597b03bffb1ffda463d0effa",
+      "before_bytes": 31414,
+      "result_bytes": 32110
+    },
+    "user/scshell/desktop/SCSHELL.C": {
+      "before_sha256": "361be572abfdcd7b248b44eff5b5a507b2321db80b712e91d21394fcee303470",
+      "result_sha256": "6132dc27f947c75921db76669ed29a92c47ed740a323001e3a67238faaa40c1c",
+      "before_bytes": 28293,
+      "result_bytes": 28841
+    },
+    "user/scshell/desktop/SCSHELL.json": {
+      "before_sha256": "0081dc0a3db3f334065d19251b7c0ae690644abd233b791b2d3c9c8e146d3f62",
+      "result_sha256": "3518ca6b41c8cb91dde74d9085ec3b1ee748bd3c2552ee63bac59f232ee956a2",
+      "before_bytes": 22136,
+      "result_bytes": 21704
+    },
+    "m10a2-apps.mk": {
+      "before_sha256": "e89405d51adddb0a44320928a558e0040526ee4469867a2d59ee3b97de6bf2b9",
+      "result_sha256": "a92345d332c6eea185f75b63f66728c9d2f338af90029f9120dee0d79bf96ec9",
+      "before_bytes": 2181,
+      "result_bytes": 2265
+    },
+    "m10a2.mk": {
+      "before_sha256": "26cba034f9236617173900ecf90be51b815115be5f0f48a8b19c811da53ce8a0",
+      "result_sha256": "09eace8bb77a9053520f566d29b61ee63abe62da0ebf4e4fc3b137b1fda2d426",
+      "before_bytes": 21749,
+      "result_bytes": 21855
+    },
+    "tools/stage_m10a2_sdk.py": {
+      "before_sha256": "76b9d70bc6d85e4e51f8c1e32553dcc105c89f6d6ddfc301eef25deb327fb988",
+      "result_sha256": "8be918fc4404729beb14d727865593c8bf5282b5478922d75c3668c2c35cd18d",
+      "before_bytes": 39518,
+      "result_bytes": 39616
+    },
+    "docs/SCUI.md": {
+      "before_sha256": "a75a024c0f71d307d73c09829db3955c4e41c36dd6d2ace84314e816c534c524",
+      "result_sha256": "ff2bca9e465fde1a403185215ecd7de289f6142993379e2bd10088cc4438a403",
+      "before_bytes": 19586,
+      "result_bytes": 20088
+    },
+    "docs/SCSHELL-DESIGN.md": {
+      "before_sha256": "b216b499e2216ae32f87455fa1ba11fef31fb7409f91c764a8ecaf62c29c45d9",
+      "result_sha256": "5b53ba77d787f84aadb88f353a81132f034add30f9ae1553606686a16d50d009",
+      "before_bytes": 40577,
+      "result_bytes": 40992
+    },
+    "docs/SC32-DROP.md": {
+      "before_sha256": "f398f84602532fdbbb9da252baa96f3fdb6d29fe225dc1ce0779730416451c8c",
+      "result_sha256": "fd0672d9a87715be726562b0095477b7fb2fdc93a4a1f91aecb3d633b220b903",
+      "before_bytes": 10665,
+      "result_bytes": 10961
+    }
+  },
+  "added": {
+    "user/SCUIDROP.H": {
+      "result_sha256": "2a6b197676b7fe5434468543d59f4a66680600a24ee574bccd7b7bf1ec4e798b",
+      "result_bytes": 1786
+    },
+    "user/scui/scui_drop_deferred.inc": {
+      "result_sha256": "9b37cdeefd5249c44b3200d0d13d09775efddbb058ea777e650ce3b891f94851",
+      "result_bytes": 12645
+    },
+    "user/SCSHELLDROP.H": {
+      "result_sha256": "e95813de6fecad8f743ce8d69c746f8e1244a435dbd94084b5b61a73434044b1",
+      "result_bytes": 1050
+    },
+    "user/scshell/shell_drop_deferred.inc": {
+      "result_sha256": "a42f9218e6c33da5dbaadb2d8daf8e093a41fbaa6f2c8e6e47e8d26e6deea515",
+      "result_bytes": 5452
+    },
+    "user/files2/files2_drop_deferred.inc": {
+      "result_sha256": "441faf6b3c5ddbae67528e812e616cb68b9f19b5d9cd6c24aee9617aea329367",
+      "result_bytes": 3759
+    },
+    "user/scshell/desktop/desktop_drop_deferred.inc": {
+      "result_sha256": "c970caa2e43ac946c9275fbcfcf19d1b025f0aacc36dfdaf2e998f1e56570532",
+      "result_bytes": 3608
+    },
+    "docs/SCUI-DROP-DEFERRED.md": {
+      "result_sha256": "7311c06668b8fbed7bc73fdc00cccea200b7333e34bb15aca8773bbbfd94c861",
+      "result_bytes": 6463
+    }
+  },
+  "patch_sha256": "03e0b4bbc9dbd5cc11a7e7152b7e97c3025200245ac647d498498232360ae27d"
+}

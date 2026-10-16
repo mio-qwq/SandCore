@@ -1,0 +1,26 @@
+{
+  "schema": 1,
+  "status": "FROZEN_SOURCE_SUPPLEMENT_NOT_BUILT",
+  "files": {
+    "PINS.json": {
+      "bytes": 3319,
+      "sha256": "fb13c7c8dc3e6d9a31b5a2c9dc9ec9a630c55c7303c396da13acb428f72a09ed"
+    },
+    "README.md": {
+      "bytes": 2414,
+      "sha256": "647305cd14b5542211a1c304668a8d8506e8560aba4964267a21bd4d5b53c19f"
+    },
+    "review-supplement.patch": {
+      "bytes": 1975,
+      "sha256": "941ac88f4e07cbf4fb93c051895b753b1fddd9ec3edaf61993d2eba7e315f534"
+    },
+    "scui_drop_deferred.inc.after": {
+      "bytes": 12871,
+      "sha256": "b6a782d2232543ff4da694b86a0441a5341facecf6faa0f11fd41c7bbb86d499"
+    },
+    "scui_drop_deferred.inc.before": {
+      "bytes": 12645,
+      "sha256": "9b37cdeefd5249c44b3200d0d13d09775efddbb058ea777e650ce3b891f94851"
+    }
+  }
+}

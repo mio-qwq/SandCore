@@ -1,0 +1,113 @@
+{
+  "status": "ACTUAL_SCO_HOST_BACKEND_MANIFESTS_PROMOTED_NOT_GUEST_COMPILE",
+  "modified": [
+    {
+      "label": "SCUI",
+      "path": "user\\scui\\SCUI.NATIVE.JSON",
+      "origin": "build\\m10a2-p6-sco-10\\SCUI.NATIVE.JSON",
+      "before_sha256": "8143dc26b7f6ebe7ba7a376112dc6bfece32edea8131bf53b72c1dab35616c70",
+      "after_sha256": "81fc4c2ed02f3de183c52996ad264cd0bd62f3dccd7b438235a713952335ce39",
+      "object_sha256": "1d455eca50752b95208d3662eadd931c383d0e01c4d5a4939f2c603b08fc5633",
+      "backend_report_sha256": "8c91cb282bf185b1680ba3be8784ff283db7f8c1d2e47e703c00965f32f627d0"
+    },
+    {
+      "label": "SCSHELL",
+      "path": "user\\scshell\\SCSHELL.NATIVE.JSON",
+      "origin": "build\\m10a2-p6-sco-10\\SCSHELL.NATIVE.JSON",
+      "before_sha256": "3412973cd5e5f7c969782ee5171c9162dfd7dff6e6accd84dbf4df8397dc0a31",
+      "after_sha256": "3a5e4a52069ea473fe0b46473a8086065afa77abb080518576cf187a6b27b1b2",
+      "object_sha256": "37fce2045dc1dba8ba984dc4baad0bf659a7eea06b6e160bf2a8760f47e26c05",
+      "backend_report_sha256": "8c91cb282bf185b1680ba3be8784ff283db7f8c1d2e47e703c00965f32f627d0"
+    },
+    {
+      "label": "FILES2",
+      "path": "user\\files2\\FILES2.NATIVE.JSON",
+      "origin": "build\\m10a2-p6-sco-09\\FILES2.NATIVE.JSON",
+      "before_sha256": "e1a61165102392cfbec32595f7b812e728da252037cca5be3429b89b40636b9a",
+      "after_sha256": "639cfed473c8f307bcf5659988b681224d02ab983e14848ab4de503086ee45cf",
+      "object_sha256": "b26a0e8657e145ca906583f9b2d79107939f40b860eaadeb4e469ceb0aaf3e85",
+      "backend_report_sha256": "aeaf32657296658878f1b514b21265a7203ab3fc05e21c38e85fbc4d8229cb1f"
+    },
+    {
+      "label": "DESKTOP",
+      "path": "user\\scshell\\desktop\\SCSHELL.NATIVE.JSON",
+      "origin": "build\\m10a2-p6-sco-09\\DESKTOP.NATIVE.JSON",
+      "before_sha256": "997677bf8e8ffc125620c60d499daefa0ec92e0bbf6de48be10051c486602937",
+      "after_sha256": "6fcd283ce1fbf3b6882e8391a79e276b14abafcbc556b2cb72a1856182c41aa1",
+      "object_sha256": "81218adcb2b9bf0d2a07583d4aed40748dcbc959e4d508970b319bdeb5501b6c",
+      "backend_report_sha256": "aeaf32657296658878f1b514b21265a7203ab3fc05e21c38e85fbc4d8229cb1f"
+    },
+    {
+      "label": "NOTES2",
+      "path": "user\\notes2\\NOTES2.NATIVE.JSON",
+      "origin": "build\\m10a2-p6-sco-09\\NOTES2.NATIVE.JSON",
+      "before_sha256": "488ad8b6105655dbaa1a7b5ba131308d7a94b2d218151192a344718004ec6448",
+      "after_sha256": "5f153f2f7d17f966760d056ddae496c08e2427787c4aa76112e0d8870644ca2c",
+      "object_sha256": "85d9bc079e7c714cccc4e5df83a7038b3bfacd0fbd014b0c3ebc1bc0bd88faaa",
+      "backend_report_sha256": "aeaf32657296658878f1b514b21265a7203ab3fc05e21c38e85fbc4d8229cb1f"
+    },
+    {
+      "label": "STUDIO2",
+      "path": "user\\studio2\\STUDIO2.NATIVE.JSON",
+      "origin": "build\\m10a2-p6-sco-09\\STUDIO2.NATIVE.JSON",
+      "before_sha256": "8eccc98d66d88398b1337aef6185c00dfb12ee9c29573c3e671260d7282149a1",
+      "after_sha256": "0ced288d8164e307e3d5af43c8329d815a374419d5c67ed2d9686a76bdce6b8c",
+      "object_sha256": "e73ba733e5a9e8f9cd3bb3645e26520a41b43be8251c03a728d666289ca71aec",
+      "backend_report_sha256": "aeaf32657296658878f1b514b21265a7203ab3fc05e21c38e85fbc4d8229cb1f"
+    },
+    {
+      "label": "SETTINGS2",
+      "path": "user\\settings2\\SETTINGS2.NATIVE.JSON",
+      "origin": "build\\m10a2-p6-sco-09\\SETTINGS2.NATIVE.JSON",
+      "before_sha256": "89ab8257be4d36bc7394e51133547610cc028751498864dbed21c29a56161d50",
+      "after_sha256": "30adf726309f6cd35bc628529d4935266f405a790db3220231761c5becbc5238",
+      "object_sha256": "d62080e958037e1808142a6cbfd088e6f567044d5ae8fe2f51e3bdaf59ff87f0",
+      "backend_report_sha256": "aeaf32657296658878f1b514b21265a7203ab3fc05e21c38e85fbc4d8229cb1f"
+    },
+    {
+      "label": "INSTALLER2",
+      "path": "user\\settings2\\INSTALLER2.NATIVE.JSON",
+      "origin": "build\\m10a2-p6-sco-09\\INSTALLER2.NATIVE.JSON",
+      "before_sha256": "0024323c51da0e85e9f2186d1ffdac95d85deff4db2f2b6447932e56b2e83c13",
+      "after_sha256": "005848bfcb9045a969536d5870b905cc0efec19eff9164b576befbfb931e34de",
+      "object_sha256": "b6caee60775c77175a3048b92a02efa14ac998a2b48c619f13499fb278752ac8",
+      "backend_report_sha256": "aeaf32657296658878f1b514b21265a7203ab3fc05e21c38e85fbc4d8229cb1f"
+    },
+    {
+      "label": "CALC2",
+      "path": "user\\systemtools\\CALC2.NATIVE.JSON",
+      "origin": "build\\m10a2-p6-sco-09\\CALC2.NATIVE.JSON",
+      "before_sha256": "fab9c768bd1c14746ab02fb836e3c40f81f1da94f50a459b14a801e83bc15ee9",
+      "after_sha256": "c23ee13ba188e9cd6a87752c0b70b270e7e77d0e41c0e854ff744eab71870cc8",
+      "object_sha256": "6f9b398420f8f9cf3d7ece78f5311f27c37bd98c3d64ba8ad89f2fc5a4786d32",
+      "backend_report_sha256": "aeaf32657296658878f1b514b21265a7203ab3fc05e21c38e85fbc4d8229cb1f"
+    },
+    {
+      "label": "PALETTE2",
+      "path": "user\\systemtools\\PALETTE2.NATIVE.JSON",
+      "origin": "build\\m10a2-p6-sco-09\\PALETTE2.NATIVE.JSON",
+      "before_sha256": "d767dbc121d7f36649211a88fe1503b80bec37c14e189bfe434a06292158d89a",
+      "after_sha256": "dec2813a518c8bcbbc54bc670ba21f01fc789865230a08de52e20bb067fe9e71",
+      "object_sha256": "5f969b1a36f056a6e51a464e0f1df5dcab342ba56b8f977e56986860dee6234e",
+      "backend_report_sha256": "aeaf32657296658878f1b514b21265a7203ab3fc05e21c38e85fbc4d8229cb1f"
+    },
+    {
+      "label": "MONITOR2",
+      "path": "user\\systemtools\\MONITOR2.NATIVE.JSON",
+      "origin": "build\\m10a2-p6-sco-09\\MONITOR2.NATIVE.JSON",
+      "before_sha256": "f156b75e643dd5f30d028a3f0fca7767e9df5acf9b3c86e9d85a45009e91d9d7",
+      "after_sha256": "299f0348f9ad98aae3b23a9bfeca52b4cd5393f19ddfe13156cfc61570fb8c4c",
+      "object_sha256": "05a79ef72ad22c8f6f8fe2d10170298b2b16ea9bd63af0688ffd073fff10cb26",
+      "backend_report_sha256": "aeaf32657296658878f1b514b21265a7203ab3fc05e21c38e85fbc4d8229cb1f"
+    },
+    {
+      "label": "SOUND2",
+      "path": "user\\sound2\\SOUND2.NATIVE.JSON",
+      "origin": "build\\m10a2-p6-sco-09\\SOUND2.NATIVE.JSON",
+      "before_sha256": "208037dcf782d2d716304d5cdc501729450b89e876fe54ba9a80e8a890275d2c",
+      "after_sha256": "ba430e84a0bd88b6d9083baa2440b17c9f2c43d1242ef9822f73752c2b2492a7",
+      "object_sha256": "e77a8ec00e73208f3f27e06393867a8ee28df9eabc7d191eb54022bfe28e3bc3",
+      "backend_report_sha256": "aeaf32657296658878f1b514b21265a7203ab3fc05e21c38e85fbc4d8229cb1f"
+    }
+  ]
+}

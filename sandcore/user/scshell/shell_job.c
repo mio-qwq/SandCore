@@ -158,6 +158,7 @@ static void sh_job_dispose(ShObject *base) {
     ScBufferRelease(job->outgoing);
     ScBufferRelease(job->receive);
     ScBufferRelease(job->clip);
+    sh_drop_release(job);
     free(job->scratch);
     if(!sh_quiet&&job->desc.context_drop)job->desc.context_drop(job->desc.context,0);
 }
@@ -423,6 +424,7 @@ ScStatus ScShellFileOperationStep(ScShellFileJob *job,ScU32 timeout) {
     if(!sh_valid(job,SH_JOB))return SC_SHELL_E_STALE;
     if(job->base.depth)return SC_SHELL_E_BUSY;
     if(job->closed)return 0;
+    sh_drop_poll(job);
     sh_enter(&job->base);
     job->base.notification_error=0;
     for(i=0;i<SH_JOB_BATCH&&!job->base.closing&&!job->closed;++i) {

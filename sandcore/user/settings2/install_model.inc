@@ -108,10 +108,11 @@ static ScStatus install_provider(void *unused,const ScUiDataRequest *q,ScUiDataR
         return 0;
     }
     if(q->operation==SC_UI_DATA_CELL){InstallItem *row=installer.items+index;
-        if(q->column==2){r->value.type=SC_VALUE_U32;
+        /* CELL只按模型field解释内容，保持字节列的数值类型。 */
+        if(q->field==2){r->value.type=SC_VALUE_U32;
             r->value.lo=row->length;
         }
-        else {const char *z=q->column==0?(row->kind==SC32_PATH_DIRECTORY?"<目录>":row->source):q->column==1?row->destination:install_state(row->state);
+        else {const char *z=q->field==0?(row->kind==SC32_PATH_DIRECTORY?"<目录>":row->source):q->field==1?row->destination:install_state(row->state);
             r->value.type=SC_VALUE_UTF8;
             r->value.data=z;
             r->value.bytes=(ScU32)strlen(z);

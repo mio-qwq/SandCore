@@ -1,6 +1,7 @@
 #ifndef SANDCORE_SCSHELLPRIVATE_H
 #define SANDCORE_SCSHELLPRIVATE_H
 #include "SCSHELL.H"
+#include "SCSHELLDROP.H"
 #include "SCSHELLWIRE.H"
 #include "SC32REPLACE.H"
 #include <stdlib.h>
@@ -64,6 +65,8 @@ struct ScShellFileJob {
     ScIpcEndpoint listener;ScIpcChannel channel;ScJob managed;
     ScU32 child_pid,child_generation,stage,offset,conflict_valid,clip_epoch;
     ScU32 clip_operation,closed,cancel_requested;unsigned char *scratch;
+    ScUiContext *drop_ui;ScUiDropReceipt drop_receipt;ScUiDropResult drop_result;
+    ScU32 drop_index,drop_reviewed,drop_done,drop_cancelled;
 };
 typedef struct ShProvider ShProvider;
 struct ShProvider {
@@ -146,6 +149,8 @@ static ScStatus sh_clip_read(ScU32 format,ScBuffer **out,ScU32 *epoch);
 static ScStatus sh_job_queue(ScShellFileJob *,ScU32 opcode,ScBuffer *body);
 static ScStatus sh_job_hold(ScShellFileJob *);
 static void sh_menu_provider_release(ShProvider *);
+static void sh_drop_poll(ScShellFileJob *);
+static void sh_drop_release(ScShellFileJob *);
 static void sh_ui_text(const char *,ScUiText *);
 static ScStatus sh_widget(ScUiContext *,ScUiNode,ScU32 kind,const char *text,ScU32 command,ScI32 height,ScUiNode *out);
 static ScStatus sh_dialog_label(ScShellDialog *,const char *);

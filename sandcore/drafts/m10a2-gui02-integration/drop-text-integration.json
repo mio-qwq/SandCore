@@ -1,0 +1,215 @@
+{
+  "status": "DROP_AND_TEXT_SOURCE_INTEGRATED_NOT_BUILT",
+  "modified": [
+    {
+      "path": "user/scui/SCUIPRIVATE.H",
+      "before_sha256": "62a62bf304bb05812b7db0f33c2a9ec1640770f33c8e4c9eb38905695737f7bc",
+      "carrier_sha256": "b7d51e1bf5bd71130ed49e1e77f1c85193416cf9473112634f1a7ce224e56c08",
+      "after_sha256": "b7d51e1bf5bd71130ed49e1e77f1c85193416cf9473112634f1a7ce224e56c08",
+      "untouched_lines_preserved": true
+    },
+    {
+      "path": "user/scui/ui_data.c",
+      "before_sha256": "fbff908e57cf962d0698316a6b53b86f0382d588fa4b8a7fdc236393d27eb2ca",
+      "carrier_sha256": "d1bc962cc06e67d0f1635c6e48fefe911000cd0ad52a21a96a06d3c0e82d8580",
+      "after_sha256": "d1bc962cc06e67d0f1635c6e48fefe911000cd0ad52a21a96a06d3c0e82d8580",
+      "untouched_lines_preserved": true
+    },
+    {
+      "path": "user/scui/SCUI.json",
+      "before_sha256": "119bac0b8e51e5abfa3dc1cbf1b7800e2d59f0af851ac24303420590046cdbf0",
+      "carrier_sha256": "3729b280a5c8d66ff40dc835eb4052e986d946f332636ec68545af962a1e99d9",
+      "after_sha256": "6e40dacfffc3b006d90357bd34235d3aaaba866f99f1d33c27b75b11f7fa43f7",
+      "untouched_lines_preserved": true
+    },
+    {
+      "path": "user/scshell/SCSHELLPRIVATE.H",
+      "before_sha256": "328b66671449b81166e45029673bfd356bf361f21f04bfa31669f146ae177321",
+      "carrier_sha256": "cf5956730869c88022bd275fe0f8a20d664597dfa8639800f1b07ca5d99ea396",
+      "after_sha256": "cf5956730869c88022bd275fe0f8a20d664597dfa8639800f1b07ca5d99ea396",
+      "untouched_lines_preserved": true
+    },
+    {
+      "path": "user/scshell/shell_job.c",
+      "before_sha256": "4abe01a543ff204b8d6c76aa65dcb2dffe38d282cb058226c8480700f1332057",
+      "carrier_sha256": "d42c5c8af12c4f85c7e3eb38e6bf3b08f6a7919b02d2c212fe4b761528c91eb0",
+      "after_sha256": "e25cb6608c2161d5834e4661295de99b63b004a0e5700f928cbe8b0d32ed6fa3",
+      "untouched_lines_preserved": true
+    },
+    {
+      "path": "user/scshell/shell_clipboard.c",
+      "before_sha256": "fb5acb791a2be1ca7fca4eab2c3b27860984dc7b48c0538a3222ab30a57e8f2a",
+      "carrier_sha256": "b9695d3337667bc670c04d4d71912868bb86ddb4aaf97fff63aaf5c7c5090b11",
+      "after_sha256": "b2950aac4f5e0c31a9511d3f21269bcca8fa09607aef62a8444bf9036e1ca49c",
+      "untouched_lines_preserved": true,
+      "TEXT1_functions": [
+        "ScShellClipboardText",
+        "ScShellClipboardReadText"
+      ]
+    },
+    {
+      "path": "user/scshell/SCSHELL.json",
+      "before_sha256": "ca71470830687c867e1fd149983c7daf46630952c424c3229caca541cfd159f5",
+      "carrier_sha256": "7f6be3df7c515971ee249bc5a0fd604dd432cfa7b399a71fd50a59c7440fcfcb",
+      "after_sha256": "11e8d2739667f08868092967c16479823e7a6f344268ce2c870b572650763f9b",
+      "untouched_lines_preserved": true
+    },
+    {
+      "path": "user/files2/FILES2.H",
+      "before_sha256": "b97695d2e396086a83a40237ec78476763ff8f3f518ff6cd9e2dffd2017f51e8",
+      "carrier_sha256": "0a27065f7c9baf689b36b66c3d36a4ca243398b7880659781548d495b59bf8d3",
+      "after_sha256": "0a27065f7c9baf689b36b66c3d36a4ca243398b7880659781548d495b59bf8d3",
+      "untouched_lines_preserved": true
+    },
+    {
+      "path": "user/files2/files2_actions.inc",
+      "before_sha256": "d54cf70c0196d074ee7ca65d448cbd2a5cfa45f65971de48e13158d37bb1686e",
+      "carrier_sha256": "a5afa5c7bce218c9a7a7693b0b407df5f7679948192354ff6cae2aab9b935a64",
+      "after_sha256": "a5afa5c7bce218c9a7a7693b0b407df5f7679948192354ff6cae2aab9b935a64",
+      "untouched_lines_preserved": true
+    },
+    {
+      "path": "user/files2/files2_view.inc",
+      "before_sha256": "c7de9698e27275ff8e57d08dc94389598f60b3758d86968ccfd7c435092e84a7",
+      "carrier_sha256": "34bdde7f50eeb6bcd0994fffb1dd2f6db08097542f8ba26d4e32cc04995175f6",
+      "after_sha256": "34bdde7f50eeb6bcd0994fffb1dd2f6db08097542f8ba26d4e32cc04995175f6",
+      "untouched_lines_preserved": true
+    },
+    {
+      "path": "user/files2/FILES2.json",
+      "before_sha256": "b852c6b877d1ef802b0675a0858b0e1aebd2f4a325b9c69b5b61dd68df5eab03",
+      "carrier_sha256": "6dd78ce449ca2c0d0377c87b0d07d8a028fd7986906206d4f1693a6d661f5ed2",
+      "after_sha256": "6dd78ce449ca2c0d0377c87b0d07d8a028fd7986906206d4f1693a6d661f5ed2",
+      "untouched_lines_preserved": true
+    },
+    {
+      "path": "user/scshell/desktop/DESKTOP.H",
+      "before_sha256": "c99f8f7e111086f9f8b833809eaacf4c7fd3d699bf91c740ddd3fde897cdf73f",
+      "carrier_sha256": "e25d578a648000c19bd213541909f40115f42b33733b7ea255920d80d1cb8afe",
+      "after_sha256": "e25d578a648000c19bd213541909f40115f42b33733b7ea255920d80d1cb8afe",
+      "untouched_lines_preserved": true
+    },
+    {
+      "path": "user/scshell/desktop/desktop_view.inc",
+      "before_sha256": "375fd8b4981941255b71a6718b93c33409d2a1d39ccebf1f850def04bcf64fcb",
+      "carrier_sha256": "e79d0ad5ddac3acb075434b984b954c643f77188e0349ec5af36924b5d6786a5",
+      "after_sha256": "e79d0ad5ddac3acb075434b984b954c643f77188e0349ec5af36924b5d6786a5",
+      "untouched_lines_preserved": true
+    },
+    {
+      "path": "user/scshell/desktop/desktop_actions.inc",
+      "before_sha256": "233c499c258f86b0b64f4e692771fad30f3ef04a2b97c418a8d255e6ee0a9443",
+      "carrier_sha256": "1500e50c5448b2b573c800a2fc635acb5e037720597b03bffb1ffda463d0effa",
+      "after_sha256": "1500e50c5448b2b573c800a2fc635acb5e037720597b03bffb1ffda463d0effa",
+      "untouched_lines_preserved": true
+    },
+    {
+      "path": "user/scshell/desktop/SCSHELL.C",
+      "before_sha256": "361be572abfdcd7b248b44eff5b5a507b2321db80b712e91d21394fcee303470",
+      "carrier_sha256": "6132dc27f947c75921db76669ed29a92c47ed740a323001e3a67238faaa40c1c",
+      "after_sha256": "6132dc27f947c75921db76669ed29a92c47ed740a323001e3a67238faaa40c1c",
+      "untouched_lines_preserved": true
+    },
+    {
+      "path": "user/scshell/desktop/SCSHELL.json",
+      "before_sha256": "0081dc0a3db3f334065d19251b7c0ae690644abd233b791b2d3c9c8e146d3f62",
+      "carrier_sha256": "3518ca6b41c8cb91dde74d9085ec3b1ee748bd3c2552ee63bac59f232ee956a2",
+      "after_sha256": "7dea585b5710b371257a3dbbc8e0b380c8a4508c9a2a19f9eea90424a514fe4b",
+      "untouched_lines_preserved": true
+    },
+    {
+      "path": "m10a2-apps.mk",
+      "before_sha256": "e89405d51adddb0a44320928a558e0040526ee4469867a2d59ee3b97de6bf2b9",
+      "carrier_sha256": "a92345d332c6eea185f75b63f66728c9d2f338af90029f9120dee0d79bf96ec9",
+      "after_sha256": "a92345d332c6eea185f75b63f66728c9d2f338af90029f9120dee0d79bf96ec9",
+      "untouched_lines_preserved": true
+    },
+    {
+      "path": "m10a2.mk",
+      "before_sha256": "26cba034f9236617173900ecf90be51b815115be5f0f48a8b19c811da53ce8a0",
+      "carrier_sha256": "09eace8bb77a9053520f566d29b61ee63abe62da0ebf4e4fc3b137b1fda2d426",
+      "after_sha256": "fd71832cbcc2f9c2ff8c67ff07ff07f2e5b1b500490475c597832b58a0a0992b",
+      "untouched_lines_preserved": true
+    },
+    {
+      "path": "tools/stage_m10a2_sdk.py",
+      "before_sha256": "76b9d70bc6d85e4e51f8c1e32553dcc105c89f6d6ddfc301eef25deb327fb988",
+      "carrier_sha256": "8be918fc4404729beb14d727865593c8bf5282b5478922d75c3668c2c35cd18d",
+      "after_sha256": "8be918fc4404729beb14d727865593c8bf5282b5478922d75c3668c2c35cd18d",
+      "untouched_lines_preserved": true
+    },
+    {
+      "path": "docs/SCUI.md",
+      "before_sha256": "a75a024c0f71d307d73c09829db3955c4e41c36dd6d2ace84314e816c534c524",
+      "carrier_sha256": "ff2bca9e465fde1a403185215ecd7de289f6142993379e2bd10088cc4438a403",
+      "after_sha256": "ff2bca9e465fde1a403185215ecd7de289f6142993379e2bd10088cc4438a403",
+      "untouched_lines_preserved": true
+    },
+    {
+      "path": "docs/SCSHELL-DESIGN.md",
+      "before_sha256": "b216b499e2216ae32f87455fa1ba11fef31fb7409f91c764a8ecaf62c29c45d9",
+      "carrier_sha256": "5b53ba77d787f84aadb88f353a81132f034add30f9ae1553606686a16d50d009",
+      "after_sha256": "5b53ba77d787f84aadb88f353a81132f034add30f9ae1553606686a16d50d009",
+      "untouched_lines_preserved": true
+    },
+    {
+      "path": "docs/SC32-DROP.md",
+      "before_sha256": "f398f84602532fdbbb9da252baa96f3fdb6d29fe225dc1ce0779730416451c8c",
+      "carrier_sha256": "fd0672d9a87715be726562b0095477b7fb2fdc93a4a1f91aecb3d633b220b903",
+      "after_sha256": "5fcf030f8eb4bc80a46392d9b14d0ff0866bf634395fb3e9e976aff9df8d23f9",
+      "untouched_lines_preserved": true
+    },
+    {
+      "path": "user/SCUIDROP.H",
+      "before_sha256": null,
+      "carrier_sha256": "2a6b197676b7fe5434468543d59f4a66680600a24ee574bccd7b7bf1ec4e798b",
+      "after_sha256": "2a6b197676b7fe5434468543d59f4a66680600a24ee574bccd7b7bf1ec4e798b",
+      "untouched_lines_preserved": true
+    },
+    {
+      "path": "user/scui/scui_drop_deferred.inc",
+      "before_sha256": null,
+      "carrier_sha256": "9b37cdeefd5249c44b3200d0d13d09775efddbb058ea777e650ce3b891f94851",
+      "after_sha256": "9b37cdeefd5249c44b3200d0d13d09775efddbb058ea777e650ce3b891f94851",
+      "untouched_lines_preserved": true
+    },
+    {
+      "path": "user/SCSHELLDROP.H",
+      "before_sha256": null,
+      "carrier_sha256": "e95813de6fecad8f743ce8d69c746f8e1244a435dbd94084b5b61a73434044b1",
+      "after_sha256": "e95813de6fecad8f743ce8d69c746f8e1244a435dbd94084b5b61a73434044b1",
+      "untouched_lines_preserved": true
+    },
+    {
+      "path": "user/scshell/shell_drop_deferred.inc",
+      "before_sha256": null,
+      "carrier_sha256": "a42f9218e6c33da5dbaadb2d8daf8e093a41fbaa6f2c8e6e47e8d26e6deea515",
+      "after_sha256": "a42f9218e6c33da5dbaadb2d8daf8e093a41fbaa6f2c8e6e47e8d26e6deea515",
+      "untouched_lines_preserved": true
+    },
+    {
+      "path": "user/files2/files2_drop_deferred.inc",
+      "before_sha256": null,
+      "carrier_sha256": "441faf6b3c5ddbae67528e812e616cb68b9f19b5d9cd6c24aee9617aea329367",
+      "after_sha256": "441faf6b3c5ddbae67528e812e616cb68b9f19b5d9cd6c24aee9617aea329367",
+      "untouched_lines_preserved": true
+    },
+    {
+      "path": "user/scshell/desktop/desktop_drop_deferred.inc",
+      "before_sha256": null,
+      "carrier_sha256": "c970caa2e43ac946c9275fbcfcf19d1b025f0aacc36dfdaf2e998f1e56570532",
+      "after_sha256": "c970caa2e43ac946c9275fbcfcf19d1b025f0aacc36dfdaf2e998f1e56570532",
+      "untouched_lines_preserved": true
+    },
+    {
+      "path": "docs/SCUI-DROP-DEFERRED.md",
+      "before_sha256": null,
+      "carrier_sha256": "7311c06668b8fbed7bc73fdc00cccea200b7333e34bb15aca8773bbbfd94c861",
+      "after_sha256": "7311c06668b8fbed7bc73fdc00cccea200b7333e34bb15aca8773bbbfd94c861",
+      "untouched_lines_preserved": true
+    }
+  ],
+  "old_public_headers_byte_preserved": true,
+  "build_started": false,
+  "guest_validation_started": false
+}

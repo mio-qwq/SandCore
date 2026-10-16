@@ -35,7 +35,7 @@ static ScStatus desk_begin_transfer(void)
     /* 保留本次真实选择，撤的只是尚未提交的布局预览。ScUiDragBegin会
      * 接管同一源capture；失败时显式释放，绝不在UP误提交图标坐标。 */
     desk.gesture=desk.moved=0;
-    if(s==0)s=ScShellDragBegin(desk.ui,desk.canvas,items,count,SC_UI_DRAG_COPY|SC_UI_DRAG_MOVE,&desk.external_drag);
+    if(s==0)s=ScShellDragBeginEx(desk.ui,desk.canvas,items,count,SC_UI_DRAG_COPY|SC_UI_DRAG_MOVE,SC_SHELL_DRAG_DEFERRED,&desk.external_drag);
     free(items);if(s<0){desk.external_drag=0;ScUiCapture(desk.ui,desk.canvas,0);}
     ScUiInvalidate(desk.ui,desk.canvas,0);return s;
 }
@@ -371,18 +371,25 @@ static ScStatus desk_drop_reply(ScUiContext *ui,const ScUiEvent *event,void *con
     ScUiDialog *dialog=(ScUiDialog *)event->data;ScUiDialogInfo info;
     memset(&info,0,sizeof(info));info.size=sizeof(info);info.version=1;
     ScStatus s=ScUiDialogQuery(dialog,&info);
-    if(s==0 && (info.command==DESK_DROP_COPY || info.command==DESK_DROP_MOVE)){
+    if(s==0 && info.stage==SC_UI_DIALOG_DONE && info.command!=SC_UI_DIALOG_CANCEL){
+        ScPathInfo target;memset(&target,0,sizeof(target));target.size=sizeof(target);target.version=1;
+        s=ScPathQuery(desk.drop_destination,&target);
+        if(s==0&&(target.kind!=SC32_PATH_DIRECTORY||target.generation!=desk.drop_revision))s=SC_SHELL_E_STALE;
+    }
+    if(s==0 && info.stage==SC_UI_DIALOG_DONE && (info.command==DESK_DROP_COPY || info.command==DESK_DROP_MOVE)){
         desk.pending_drop.chosen_action=info.command==DESK_DROP_COPY?SC_UI_DRAG_COPY:SC_UI_DRAG_MOVE;
         ScShellFileJob *job=0;s=desk_recovery();
-        if(s==0)s=ScShellDropFiles(&desk.pending_drop,desk.drop_destination,desk.recovery_path,&job);
-        if(s==0)s=desk_job_display(job);
-    }else if(s==0 && info.command==DESK_DROP_LINK){
+        if(s==0)s=ScShellDropFilesDeferred(desk.ui,&desk.drop_receipt,desk.pending_drop.chosen_action,desk.drop_destination,desk.recovery_path,&job);
+        if(s==0){desk.drop_stage=0;s=desk_job_display(job);if(desk.job==job)desk.job_deferred=1;}
+    }else if(s==0 && info.stage==SC_UI_DIALOG_DONE && info.command==DESK_DROP_LINK){
+        memset(&desk.drop_result,0,sizeof(desk.drop_result));desk.drop_result.size=sizeof(desk.drop_result);desk.drop_result.version=1;desk.drop_result.action=SC_UI_DRAG_COPY;
         /* 值记录来自实际已验Drop；这里仍独立核公开FILES布局及整数边界，
          * 快捷方式只记路径，不借其声称的object/revision授予任何权限。 */
         ScClipboardFiles header;
         if(desk.pending_drop.bytes<sizeof(header))s=SC_SHELL_E_PROTOCOL;
         else {memcpy(&header,desk.drop_bytes,sizeof(header));
             if(header.size!=sizeof(header) || header.version!=1)s=SC_SHELL_E_PROTOCOL;
+            desk.drop_result.items_total=header.count;
             ScU32 offset=sizeof(header);
             for(ScU32 i=0;s==0 && i<header.count;i++){
                 ScClipboardFileRow row;
@@ -401,12 +408,21 @@ static ScStatus desk_drop_reply(ScUiContext *ui,const ScUiEvent *event,void *con
                 desc.icon="";desc.application="";desc.profile=0;
                 ScShellShortcut *link=0;s=ScShellShortcutCreate(&desc,&link);
                 ScU32 revision=0;if(s==0)s=ScShellShortcutWrite(link,path,0,&revision);
-                ScShellShortcutRelease(link);if(s==0)desk.refresh_pending=1;offset+=row.record_bytes;
+                ScShellShortcutRelease(link);if(s==0){if(!revision){s=SC_SHELL_E_UNKNOWN;break;}desk.drop_result.items_durable++;desk.refresh_pending=1;}offset+=row.record_bytes;
             }
             if(s==0 && offset!=desk.pending_drop.bytes)s=SC_SHELL_E_PROTOCOL;
         }
     }
-    free(desk.drop_bytes);desk.drop_bytes=0;memset(&desk.pending_drop,0,sizeof(desk.pending_drop));
+    if(desk.drop_receipt.id){
+        if(info.command==DESK_DROP_LINK && desk.drop_result.items_total){
+            desk.drop_result.status=s<0?s:0;
+            if(s==0&&desk.drop_result.items_durable==desk.drop_result.items_total)desk.drop_result.flags=SC_UI_DROP_COMMITTED;
+            else {desk.drop_result.failed=1;if(s>=0)desk.drop_result.status=SC_SHELL_E_UNKNOWN;}
+            ScStatus replied=ScUiDropReply(desk.ui,&desk.drop_receipt,&desk.drop_result);desk.drop_stage=3;
+            if(replied<0){ScUiDropRelease(desk.ui,&desk.drop_receipt);desk.drop_stage=0;if(s==0)s=replied;}
+        }else desk_drop_abort(s<0?s:SC_UI_E_CANCELLED);
+    }
+    desk_drop_forget();
     if(desk.dialog==dialog){desk.dialog=0;ScUiDialogRelease(dialog);}
     desk_error(s,desk.drop_destination);return s;
 }
@@ -418,13 +434,13 @@ static ScStatus desk_drop(ScUiContext *ui,const ScUiEvent *event,void *context)
     if(data->format!=SC32_CLIPBOARD_FILES)return 0;
     if(event->type==SC_UI_EVENT_DRAG_LEAVE){ScU32 previous=desk.drop_target;desk.drop_target=DESK_NONE;desk_invalidate_item(previous);return 0;}
     if(event->type==SC_UI_EVENT_DRAG_ENTER || event->type==SC_UI_EVENT_DRAG_OVER){
-        if(desk.job || desk.dialog){data->chosen_action=0;return SC_UI_HANDLED;}
+        if(desk.job || desk.dialog || desk.drop_receipt.id){data->chosen_action=0;return SC_UI_HANDLED;}
         ScU32 hit=desk_hit(event->x,event->y);if(hit!=DESK_NONE && desk.items[hit].kind!=SC32_PATH_DIRECTORY)hit=DESK_NONE;
         if(hit!=desk.drop_target){ScU32 previous=desk.drop_target;desk.drop_target=hit;desk_invalidate_item(previous);desk_invalidate_item(hit);}
         data->chosen_action=(data->actions&SC_UI_DRAG_COPY)?SC_UI_DRAG_COPY:(data->actions&SC_UI_DRAG_MOVE)?SC_UI_DRAG_MOVE:0;return SC_UI_HANDLED;
     }
     if(event->type==SC_UI_EVENT_DROP){
-        if(desk.job || desk.dialog)return SC_SHELL_E_BUSY;
+        if(desk.job || desk.dialog || desk.drop_receipt.id)return SC_SHELL_E_BUSY;
         ScU32 hit=desk_hit(event->x,event->y);
         strcpy(desk.drop_destination,desk.desktop_path);
         if(hit!=DESK_NONE && desk.items[hit].kind==SC32_PATH_DIRECTORY){
@@ -436,22 +452,13 @@ static ScStatus desk_drop(ScUiContext *ui,const ScUiEvent *event,void *context)
         ScU32 previous=desk.drop_target;desk.drop_target=DESK_NONE;desk_invalidate_item(previous);
         void *owned=malloc(data->bytes);if(!owned)return SC_UI_E_MEMORY;
         memcpy(owned,data->data,data->bytes);desk.pending_drop=*data;desk.pending_drop.data=owned;desk.drop_bytes=owned;
-        ScUiMenuItem buttons[4];memset(buttons,0,sizeof(buttons));
-        const char *labels[4]={"取消","复制到目标","移动到目标","创建快捷方式"};
-        const ScU32 commands[4]={SC_UI_DIALOG_CANCEL,DESK_DROP_COPY,DESK_DROP_MOVE,DESK_DROP_LINK};
-        for(ScU32 i=0;i<4;i++){buttons[i].size=sizeof(buttons[i]);buttons[i].version=1;
-            buttons[i].command=commands[i];buttons[i].label=desk_text(labels[i]);}
-        if(!(data->actions&SC_UI_DRAG_COPY))buttons[1].flags=SC_UI_MENU_DISABLED;
-        if(!(data->actions&SC_UI_DRAG_MOVE))buttons[2].flags=SC_UI_MENU_DISABLED;
-        ScUiMessageBoxDesc desc;memset(&desc,0,sizeof(desc));desc.size=sizeof(desc);desc.version=1;
-        desc.owner=desk.desktop;desc.title=desk_text("放置文件");
-        char message[200];snprintf(message,sizeof(message),"目标：%s\n请选择文件操作。快捷方式只保存目标路径。",desk.drop_destination);
-        desc.message=desk_text(message);
-        desc.buttons=buttons;desc.button_count=4;desc.default_command=SC_UI_DIALOG_CANCEL;
-        desc.cancel_command=SC_UI_DIALOG_CANCEL;desc.completion=desk_drop_reply;
-        ScStatus s=ScUiMessageBox(desk.ui,&desc,&desk.dialog);
-        if(s<0){free(desk.drop_bytes);desk.drop_bytes=0;memset(&desk.pending_drop,0,sizeof(desk.pending_drop));}
-        desk_error(s,desk.desktop_path);return s<0?s:SC_UI_HANDLED;
+        ScPathInfo metadata;memset(&metadata,0,sizeof(metadata));metadata.size=sizeof(metadata);metadata.version=1;
+        ScStatus s=ScPathQuery(desk.drop_destination,&metadata);
+        if(s==0&&metadata.kind!=SC32_PATH_DIRECTORY)s=SC_SHELL_E_INVALID;
+        if(s==0){desk.drop_revision=metadata.generation;memset(&desk.drop_receipt,0,sizeof(desk.drop_receipt));
+            desk.drop_receipt.size=sizeof(desk.drop_receipt);desk.drop_receipt.version=1;s=ScUiDropDefer(ui,event,&desk.drop_receipt);}
+        if(s<0){desk_drop_forget();return s;}
+        desk.drop_stage=1;return SC_UI_HANDLED;
     }
     return 0;
 }

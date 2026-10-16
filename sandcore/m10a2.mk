@@ -137,7 +137,7 @@ $(BUILD)/sc32_broker.o: kernel/sc32_broker.c kernel/sc32_broker.h user/SC32BROKE
 	$(CC) $(CFLAGS) -Werror -c $< -o $@
 $(BUILD)/sc32_drop.o: kernel/sc32_drop.c kernel/sc32_drop.h user/SC32DROP.H user/dropapi/SC32DROPWIRE.H $(STAMP)
 	$(CC) $(CFLAGS) -Werror -c $< -o $@
-$(BUILD)/scui-library.o: user/scui/SCUI.C user/SCUI.H $(wildcard user/scui/*.c user/scui/*.H) user/SC32API.H user/SC32BROKER.H user/SC32DROP.H user/SC32FONT.H user/SC32POPUP.H $(STAMP)
+$(BUILD)/scui-library.o: user/scui/SCUI.C user/SCUI.H user/SCUIDROP.H $(wildcard user/scui/*.c user/scui/*.H user/scui/*.inc) user/SC32API.H user/SC32BROKER.H user/SC32DROP.H user/SC32FONT.H user/SC32POPUP.H $(STAMP)
 	$(CC) $(CFLAGS) $(M10A2_SCL_CFLAGS) -Werror -x c -Iuser/stdlib -Iuser/sclib -Iuser -c $< -o $@
 $(BUILD)/SCUI.SCL: $(BUILD)/scui-library.o user/scui/SCUI.json tools/mkscl.py tools/scl_format.py
 	$(PY) tools/mkscl.py $< $@ --manifest user/scui/SCUI.json
@@ -216,7 +216,7 @@ M10A2_SHELL_DIR ?= build/m10a2-shell-bootstrap
 .PHONY: m10a2-shell-bootstrap m10a2-shell-artifacts m10a2-shell-install
 m10a2-shell-bootstrap:
 	$(MAKE) BUILD=$(M10A2_SHELL_DIR) M9_BUILD=1 M10_BUILD=1 $(M10A2_SHELL_DIR)/sandcore.img $(M10A2_SHELL_DIR)/fs/SYS/CORE/CORE.SKM m10a2-shell-artifacts m10a2-ui-resources m10a2-shell-install
-$(BUILD)/scshell-library.o: user/scshell/SCSHELL.C user/SCSHELL.H $(wildcard user/scshell/*.c user/scshell/*.H) user/SC32HOST.H user/SC32LEASE.H user/SCUI.H $(STAMP)
+$(BUILD)/scshell-library.o: user/scshell/SCSHELL.C user/SCSHELL.H user/SCUIDROP.H user/SCSHELLDROP.H $(wildcard user/scshell/*.c user/scshell/*.H user/scshell/*.inc) user/SC32HOST.H user/SC32LEASE.H user/SCUI.H $(STAMP)
 	$(CC) $(CFLAGS) $(M10A2_SCL_CFLAGS) -Werror -x c -Iuser/stdlib -Iuser/sclib -Iuser -c $< -o $@
 $(BUILD)/SCSHELL.SCL: $(BUILD)/scshell-library.o user/scshell/SCSHELL.json tools/mkscl.py tools/scl_format.py
 	$(PY) tools/mkscl.py $< $@ --manifest user/scshell/SCSHELL.json
@@ -224,7 +224,7 @@ $(BUILD)/scfilework.o: user/shellworker/SCFILEWORK.C $(wildcard user/shellworker
 	$(CC) $(CFLAGS) $(M10A2_SCL_CFLAGS) -Werror -x c -Iuser/stdlib -Iuser/sclib -Iuser -c $< -o $@
 $(BUILD)/SCFILEWORK.SCX: $(BUILD)/scfilework.o user/shellworker/SCFILEWORK.json tools/mkdscx.py tools/scd_format.py
 	$(PY) tools/mkdscx.py $< $@ --manifest user/shellworker/SCFILEWORK.json
-$(BUILD)/scshell-desktop.o: user/scshell/desktop/SCSHELL.C $(wildcard user/scshell/desktop/*.inc user/scshell/desktop/*.H) user/SCSHELL.H user/SC32HOST.H user/SCUI.H $(STAMP)
+$(BUILD)/scshell-desktop.o: user/scshell/desktop/SCSHELL.C user/SCUIDROP.H user/SCSHELLDROP.H $(wildcard user/scshell/desktop/*.inc user/scshell/desktop/*.H) user/SCSHELL.H user/SC32HOST.H user/SCUI.H $(STAMP)
 	$(CC) $(CFLAGS) $(M10A2_SCL_CFLAGS) -Werror -x c -Iuser/stdlib -Iuser/sclib -Iuser -c $< -o $@
 $(BUILD)/SCSHELL.SCX: $(BUILD)/scshell-desktop.o user/scshell/desktop/SCSHELL.json tools/mkdscx.py tools/scd_format.py
 	$(PY) tools/mkdscx.py $< $@ --manifest user/scshell/desktop/SCSHELL.json

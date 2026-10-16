@@ -1,0 +1,120 @@
+{
+  "status": "SOURCE_PROVED_DEFECT_ACTUAL_LAUNCH_REPORTED_EXIT_STATUS_NOT_OBSERVED",
+  "modified": {
+    "user/settings2/settings_view.inc": {
+      "before_sha256": "451467943eaf712b0bf23b5bd7e0a23eca87391fb6feaf2b10611a21f77c449b",
+      "result_sha256": "c80f2cff71f6e243fff67a67eb0622c647ea8798ac058307d599f5705f7aec50",
+      "before_bytes": 17754,
+      "result_bytes": 17853
+    },
+    "user/settings2/settings_model.inc": {
+      "before_sha256": "f23fdf29e74de721a7dba786c6d0bace8c3fbf8752d4c5310786bbb2a0658066",
+      "result_sha256": "6d53b4564e449a353472a5c5280a82c19103998c8aafc22233a2b8e09e7e96cf",
+      "before_bytes": 7193,
+      "result_bytes": 7291
+    },
+    "user/settings2/settings_programs.inc": {
+      "before_sha256": "d177b98dce854dffc7b69b7638893005b5c76762d90855dbfac44ba4d5328d46",
+      "result_sha256": "2067366a0f958b0554129629a058f44c914f48af641e8e1883bc8fea8725448c",
+      "before_bytes": 14490,
+      "result_bytes": 14594
+    },
+    "user/settings2/install_view.inc": {
+      "before_sha256": "d935140ff2a70847d571eb599b5ddc6499367dd0412412db34cddd3ef7b04e34",
+      "result_sha256": "1580ce6e7e6199c7a9e9236a5948449e35a2ad55b3d70ba1e5f31d6226fe9d0c",
+      "before_bytes": 10511,
+      "result_bytes": 10609
+    },
+    "user/settings2/install_model.inc": {
+      "before_sha256": "d1a2672aafa3331c2cf98d7527ea4dcc3647557a5f308e7e7a0a4dca53349709",
+      "result_sha256": "cb349243ce77b51fa3c451ab7f3b074ec8793b7e365cfc44b2bce62a7962dda4",
+      "before_bytes": 8295,
+      "result_bytes": 8376
+    }
+  },
+  "patch_sha256": "0ac08ac1e05b86fbe5c4b6e8a1952bc28224c9a971a91ac6ad3d198dc92a1663",
+  "installer_patch_sha256": "68ff196a1b2a98cafcbac919ab8bf027f47a4386b17996ad8ffea9346f084974",
+  "refresh_labels": [
+    "SETTINGS2",
+    "INSTALLER2"
+  ],
+  "primary_refresh_labels": [
+    "SETTINGS2"
+  ],
+  "dependencies": {
+    "user/settings2/SETTINGS2.C": "8429f04e688c1471391f56d07b6636f3213d5ce49421ef378ed9a4bc8bb4a53f",
+    "user/settings2/app_ui.inc": "b770078fba1a896a3c6df39e452cfd5f036eb93c4081aecf4fdabbc7666eb683",
+    "user/settings2/APP.H": "72af07968afcefd3cc3ac40351980bd781f2989f943d3621f3c8627334345cfb",
+    "user/scui/ui_provider.c": "acdae2b9a38fbef3513340342c564cd9f702a15a867a1eb33d074c5a11882c79",
+    "user/scui/ui_data.c": "fbff908e57cf962d0698316a6b53b86f0382d588fa4b8a7fdc236393d27eb2ca",
+    "user/scui/ui_base.c": "1c30f9803846d360f3a4727c33af404029b756c26999e9b32ff842b014b46630",
+    "user/scui/ui_tree.c": "46d615567c6815abcc659805f7bb9268980e65a307651a1123ce16cd47b94380",
+    "user/scui/ui_layout.c": "b8a21cd1eea50160d0f7c961e71d4558e8a36c6b8ff964c8b8225a92c12d8778",
+    "user/scui/ui_controls.c": "21ee664714d1ee6efe81defe817641665be801427c08624c45d389358ce7d763",
+    "user/scui/ui_menu.c": "b84afc54e8192bb5a71823f2da39a59d4836b2c5223fc7f237d6b39082f242b9",
+    "user/scshell/shell_client.c": "2062c6b95eb7cc4a1a6e7ba8e3962a3d2f6d461b73e53d7d9b1326102bd6c095",
+    "kernel/session.c": "24c7c3a9160d38bf1cfc46e192a341ac4f108be9e931b9e013a69ea3fc179d27",
+    "user/SCUI.H": "72d54bfea02c732201ce6b2ecad495c933c30353ab49240c74a5831f0010f72a"
+  },
+  "actual_GUI02_source_pins_match": true,
+  "constructor_rejection": {
+    "stage": "settings_create first settings_table(programs)",
+    "supplied_first_column_id": 0,
+    "SCUI_rejects_zero_column": true,
+    "raw_status": -301,
+    "main_return_if_reached": 301,
+    "needs_previous_calls_success": true
+  },
+  "cell_mapping": {
+    "SCUI_DATA_CELL_uses": "request.field",
+    "request_column_default": 0,
+    "fixed_column_ids": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "unchanged_data_fields": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  "menu_launch_confirmed_by_Root": true,
+  "actual_saved_process_rows": [
+    {
+      "case": "p6-cli-settings-selected-launch-ps",
+      "pid": 4,
+      "uid": 1000,
+      "gid": 1000,
+      "state": 1,
+      "name": "SETTINGS2.S",
+      "stdout_sha256": "5157078200172003984daecdd3dad3a1d18917aa96a45d54a5749c8d5c69e0da"
+    }
+  ],
+  "selected_menu_screenshot": {
+    "path": "/mnt/c/Users/Administrator/Desktop/projectos/sandcore/build/m10a2-p6-gui-run-02/p6-settings-selected-before-enter.png",
+    "sha256": "6738e7b59ec9d7ea425b9f08cb650c528f11eafd61f7f3dbfc53a4552ffc74c4"
+  },
+  "late_exit_code_observed": false,
+  "ordinary_Terminal_exit_code_observed_by_this_agent": false,
+  "installer_same_source_defect": true,
+  "installer_runtime_execution_claimed": false,
+  "sorting": {
+    "sortable_column_flags_enabled": false,
+    "provider_sort_enabled": false,
+    "SCUI_sort_maps_column_ID_to_descriptor_field": true,
+    "new_sorting_feature_added": false
+  },
+  "no_new_imports": true,
+  "manifests_not_modified": true,
+  "public_SCUI_contract_not_modified": true,
+  "original_main_unchanged": true,
+  "main_entry": {
+    "path": "user/settings2/SETTINGS2.C",
+    "before_sha256": "8429f04e688c1471391f56d07b6636f3213d5ce49421ef378ed9a4bc8bb4a53f",
+    "result_sha256": "8429f04e688c1471391f56d07b6636f3213d5ce49421ef378ed9a4bc8bb4a53f",
+    "modified": false
+  }
+}

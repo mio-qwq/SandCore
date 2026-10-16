@@ -1,0 +1,40 @@
+--- a/user/settings2/settings_view.inc
++++ b/user/settings2/settings_view.inc
+@@ -194,7 +194,8 @@
+     if(s==0)s=ScUiViewBind(app.ui,*node,*provider,*selection);
+     ScUiColumnDesc columns[4];
+     for(ScU32 i=0;i<count;i++){INIT(columns[i]);
+-        columns[i].column=i;
++        /* column是非零控件身份，field才是provider使用的零起始数据字段。 */
++        columns[i].column=i+1;
+         columns[i].field=i;
+         columns[i].title=text(titles[i]);
+         columns[i].width=i==1?280:150;
+--- a/user/settings2/settings_model.inc
++++ b/user/settings2/settings_model.inc
+@@ -113,7 +113,8 @@
+         r->value.lo=index;
+         return 0;
+     }
+-    if(q->operation==SC_UI_DATA_CELL){const char *z=q->column?settings.env[index].value:settings.env[index].key;
++    /* CELL由SCUI按列描述的field取值，不把可重排的column身份当数组下标。 */
++    if(q->operation==SC_UI_DATA_CELL){const char *z=q->field?settings.env[index].value:settings.env[index].key;
+         r->value.type=SC_VALUE_UTF8;
+         r->value.data=z;
+         r->value.bytes=(ScU32)strlen(z);
+--- a/user/settings2/settings_programs.inc
++++ b/user/settings2/settings_programs.inc
+@@ -54,9 +54,10 @@
+     }
+     if(q->operation==SC_UI_DATA_CELL){ProgramRow *row=settings.rows+index;
+         const char *z="";
+-        if(q->column==0)z=program_string(row->label);
+-        else if(q->column==1)z=program_string(row->executable);
+-        else if(q->column==2)z=row->layer==SC_SHELL_LAYER_SYSTEM?"系统默认":row->layer==SC_SHELL_LAYER_ACCOUNT?"账户":"临时";
++        /* field保留模型字段编号；column是表头身份，不能借其数值解释行数据。 */
++        if(q->field==0)z=program_string(row->label);
++        else if(q->field==1)z=program_string(row->executable);
++        else if(q->field==2)z=row->layer==SC_SHELL_LAYER_SYSTEM?"系统默认":row->layer==SC_SHELL_LAYER_ACCOUNT?"账户":"临时";
+         else z=row->removed?"待移除":row->dirty?"草稿":row->flags&SC_SHELL_APP_DISABLED?"禁用":"已登记";
+         r->value.type=SC_VALUE_UTF8;
+         r->value.data=z;

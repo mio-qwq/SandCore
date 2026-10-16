@@ -6,7 +6,7 @@
 #include <SC32LEASE.H>
 #include <SC32BROKER.H>
 #include <SC32HOST.H>
-#include <SCSHELL.H>
+#include <SCSHELLDROP.H>
 #include <SCUI.H>
 #include <SCLIB.H>
 #include <stdlib.h>
@@ -85,7 +85,7 @@ struct F2Job {
     ScShellFileResult observation;
     ScU32 final,read_index,reviewed,durable,retained,uncertain,failed,skipped;
     ScU32 last_state,last_item,conflict_epoch;
-    ScU32 decision;
+    ScU32 decision,deferred;
     ScStatus last_error;
 };
 
@@ -134,7 +134,7 @@ typedef struct {
         recovery_serial,ui_error,drop_revision,reconnect_timer,reconnect_pending;
     ScI32 press_x,press_y;
     void *drop_bytes;
-    ScUiDragData pending_drop;
+    ScUiDragData pending_drop;ScUiDropReceipt drop_receipt;ScU32 drop_stage;
     char drop_destination[F2_PATH],recovery_directory[F2_PATH],bookmark_path[F2_PATH],
         recovery_path[F2_PATH],filter_text[F2_QUERY],pending_file[F2_PATH],message[320];
 } F2App;

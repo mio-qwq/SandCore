@@ -1,0 +1,53 @@
+{
+  "status": "SOURCE_PATCH_ONLY_NOT_BUILT_NOT_GUEST_VERIFIED",
+  "files": {
+    "PINS.json": {
+      "sha256": "af01dbdc1319e2fd2846781bbc51610f1697b36d503c66e26b0bd5be0893d35e",
+      "bytes": 7640
+    },
+    "README.md": {
+      "sha256": "f9480f07b00682408fcccd8f1e67072ed034b807f5747f264b8dad29d858c83a",
+      "bytes": 2872
+    },
+    "lifetime.patch": {
+      "sha256": "5315ec162acc5e988edc67a9d2b1b65fff696cdf0341a62467cf745cb206e3e1",
+      "bytes": 4356
+    },
+    "overlay/user/sound2/SOUND2.JSON": {
+      "sha256": "a002c6f139a76cf36b45b87dda2cc8b2015b60094a0567271c81807da425d1ba",
+      "bytes": 10955
+    },
+    "overlay/user/sound2/sound_ui.c": {
+      "sha256": "f84f437f87bde63d8c302307a7fed1af1150d5160837b6847d8651b121c41d3f",
+      "bytes": 15509
+    },
+    "overlay/user/systemtools/CALC2.json": {
+      "sha256": "88f02faf7cc8ef332948293604b445fd353a0f4d4fd87f6fab14e1da31b7ac9e",
+      "bytes": 8691
+    },
+    "overlay/user/systemtools/MONITOR2.json": {
+      "sha256": "bd8e28eeeedc012cea043cf0fe36a94e001d8d205525115a5954fd38d9cb9824",
+      "bytes": 10235
+    },
+    "overlay/user/systemtools/PALETTE2.json": {
+      "sha256": "b0a89ecba1153231960996ef155d19e4d485caec9e43ace81929f184078a0712",
+      "bytes": 8560
+    },
+    "overlay/user/systemtools/TOOLS.H": {
+      "sha256": "99a235edc70acae9cb421880455691aa9f18322bd41156b656b2aea7358ce810",
+      "bytes": 2053
+    },
+    "overlay/user/systemtools/tools_ui.inc": {
+      "sha256": "33efe6175e2f52ef3f2cc3e74ba908b762ec6e0b99675afbe190e0eb36700c90",
+      "bytes": 11334
+    },
+    "prepare.py": {
+      "sha256": "a322461e979191a527c330d46cad64aca37f78ed0068f9b28528db32f0263980",
+      "bytes": 9058
+    },
+    "sound_shortcuts.patch": {
+      "sha256": "40c3eb3b7fe69ed4e35e8deb043a2e7ef011d808fc1e70a6fcd705fc34a11d23",
+      "bytes": 1524
+    }
+  }
+}

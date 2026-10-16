@@ -1,6 +1,7 @@
 #ifndef SANDCORE_SCUIPRIVATE_H
 #define SANDCORE_SCUIPRIVATE_H
 #include "../SCUI.H"
+#include "../SCUIDROP.H"
 #include "../SCUISECRET.H"
 #include "../SC32FONT.H"
 #include "../SC32BROKER.H"

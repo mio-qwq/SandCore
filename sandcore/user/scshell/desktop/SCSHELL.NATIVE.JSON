@@ -23,14 +23,14 @@
     {
       "name": "SCSHELL.SCL",
       "abi_major": 1,
-      "min_minor": 1,
-      "min_version": 2
+      "min_minor": 2,
+      "min_version": 3
     },
     {
       "name": "SCUI.SCL",
       "abi_major": 1,
-      "min_minor": 3,
-      "min_version": 4
+      "min_minor": 4,
+      "min_version": 5
     }
   ],
   "imports": [
@@ -575,6 +575,12 @@
       "size": 1
     },
     {
+      "name": "ScUiDialogClose",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
       "name": "ScUiDropTargetRegister",
       "dependency": "SCUI.SCL",
       "kind": "function",
@@ -929,13 +935,43 @@
       "size": 1
     },
     {
-      "name": "ScShellDragBegin",
+      "name": "ScUiDropDefer",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUiDropQuery",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUiDropReply",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUiDropRelease",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellDragBeginEx",
       "dependency": "SCSHELL.SCL",
       "kind": "function",
       "size": 1
     },
     {
-      "name": "ScShellDropFiles",
+      "name": "ScShellDropFilesDeferred",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellDropReply",
       "dependency": "SCSHELL.SCL",
       "kind": "function",
       "size": 1

@@ -1,0 +1,28 @@
+--- a/user/settings2/install_view.inc
++++ b/user/settings2/install_view.inc
+@@ -179,7 +179,8 @@
+     const char *titles[]={"来源","目标","字节","结果"};
+     ScUiColumnDesc columns[4];
+     for(ScU32 i=0;i<4;i++){INIT(columns[i]);
+-        columns[i].column=i;
++        /* 表头身份从1开始；实际来源/目标/字节/结果仍按原field取值。 */
++        columns[i].column=i+1;
+         columns[i].field=i;
+         columns[i].title=text(titles[i]);
+         columns[i].width=i==2?90:i==3?230:230;
+--- a/user/settings2/install_model.inc
++++ b/user/settings2/install_model.inc
+@@ -108,10 +108,11 @@
+         return 0;
+     }
+     if(q->operation==SC_UI_DATA_CELL){InstallItem *row=installer.items+index;
+-        if(q->column==2){r->value.type=SC_VALUE_U32;
++        /* CELL只按模型field解释内容，保持字节列的数值类型。 */
++        if(q->field==2){r->value.type=SC_VALUE_U32;
+             r->value.lo=row->length;
+         }
+-        else {const char *z=q->column==0?(row->kind==SC32_PATH_DIRECTORY?"<目录>":row->source):q->column==1?row->destination:install_state(row->state);
++        else {const char *z=q->field==0?(row->kind==SC32_PATH_DIRECTORY?"<目录>":row->source):q->field==1?row->destination:install_state(row->state);
+             r->value.type=SC_VALUE_UTF8;
+             r->value.data=z;
+             r->value.bytes=(ScU32)strlen(z);

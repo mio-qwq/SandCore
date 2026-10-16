@@ -1,0 +1,69 @@
+{
+  "schema": 1,
+  "status": "SOURCE_ONLY_HOST09_V3_PREPARED_NOT_EXECUTED",
+  "v2_origin": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\drafts\\m10a2-p6-followup-refresh-v2",
+  "v2_source_sha256": {
+    "driver.py": "01bd8ed3c66b78062ad60cd27acbb3740931e3222d8a1a36cd9a8b91e10b7029",
+    "followup.py": "8db9a192c694eeef65979ffc757a93097b60b36e8b7c4c959834b7358dcb9e18",
+    "PINS.json": "b88966a48e89618bd28d3f944ac9e627daae24a56d11d3ea6dacc8a2af001784",
+    "READ-ONLY-CHECK.json": "4e201df7e371521357b0fecb4ab0c3de2e4410d1a2a43c496ac1004dc52fcc1c",
+    "README.md": "bea6a680f73b2d5ea56b47c4ea5f3197d989575e04d50a294b806b6964b563d4"
+  },
+  "base_v1_path": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\drafts\\m10a2-p6-followup-refresh",
+  "BASE_PINS_unchanged": {
+    "followup.py": "9f6e7497d11a0edc5d5b3485c68e873191c13b22941ada3e1723443bed956e60",
+    "driver.py": "0c3517e8717f09e15306842d2dc2d87f877aea289adad09fd5fda86c9dab0cf2",
+    "PINS.json": "41fa8f71fc1ce4040dea231c2fc5efa25cc60e92422cf835636aa31e89565f8a",
+    "READ-ONLY-CHECK.json": "52d99d5ab1e2455651223a291f6e7434dbbe72230a73273889e93c15ffb837cb"
+  },
+  "driver_before_sha256": "01bd8ed3c66b78062ad60cd27acbb3740931e3222d8a1a36cd9a8b91e10b7029",
+  "driver_result_sha256": "11abb7f23ac6aa5f0507a70ddeb2a74787ab9fe1abe9adb89bf39785ed311f72",
+  "driver_patch_sha256": "04d7b7fe0e323217a276c25075bd5f3049b8cd1ce0de899dbf42a96f601efcaf",
+  "driver_only_changes": {
+    "filename_literals": 1,
+    "HOST_documentation_error_literals": 6,
+    "reverse_substitution_byte_identical": true
+  },
+  "followup_sha256": "8db9a192c694eeef65979ffc757a93097b60b36e8b7c4c959834b7358dcb9e18",
+  "followup_byte_identical_to_v2": true,
+  "own_HERE_py_files": [
+    "driver.py",
+    "followup.py"
+  ],
+  "own_HERE_PINS": "PINS.json",
+  "explicit_labels": [
+    "SCUI",
+    "SCSHELL",
+    "FILES2",
+    "DESKTOP",
+    "NOTES2",
+    "STUDIO2",
+    "SETTINGS2",
+    "INSTALLER2",
+    "CALC2",
+    "PALETTE2",
+    "MONITOR2",
+    "SOUND2"
+  ],
+  "label_defaults_added": false,
+  "verified_build_and_source_formal_guards_unchanged": true,
+  "old_reports_and_helpers_unchanged": true,
+  "checks": [
+    "two Python ASTs",
+    "7 fixed string inverse-transform byte identity",
+    "v1 four BASE hashes",
+    "v2 five file hashes unchanged"
+  ],
+  "preflight_executed": false,
+  "frozen_audit_executed": false,
+  "build_started": false,
+  "vm_started": false,
+  "HOST09_report_identity_only": {
+    "path": "build/m10a2-main-studio-01/p6-unified-host-09.json",
+    "sha256": "879ceb99215972f60d1dfc76f0102d1a2255c8616685dd980eb4e8d5aba77ae4",
+    "exit_code": 0,
+    "outputs": 41,
+    "source_files_modified_during_build": [],
+    "v3_preflight_not_run": true
+  }
+}

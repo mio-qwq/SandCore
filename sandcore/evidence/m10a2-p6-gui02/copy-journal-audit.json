@@ -1,0 +1,55 @@
+{
+  "status": "ACTUAL_SINGLE_GUI_COPY_DURABLE_ACK_AND_BODY_VERIFIED",
+  "header_crc": true,
+  "frame_crcs": true,
+  "ordinary_uid": 1000,
+  "body_bytes": 20,
+  "body_sha256": "7def5086c7959c3579cf642bea6e2473349576f26c2c9dbba874db8ec921ec69",
+  "journal_sha256": "b73fa0e9dd88ee9cb7846ad43e5d700f1005dcb9257431b4c443f2349101e457",
+  "frames": [
+    {
+      "type": 256,
+      "sequence": 1,
+      "item": 0,
+      "state": 2,
+      "stage": 0,
+      "status": 0,
+      "flags": 0,
+      "bytes": 0,
+      "worker_pid": 4,
+      "worker_generation": 15,
+      "source": "",
+      "destination": ""
+    },
+    {
+      "type": 3,
+      "sequence": 2,
+      "item": 1,
+      "state": 1,
+      "stage": 3,
+      "status": 0,
+      "flags": 1,
+      "bytes": 20,
+      "worker_pid": 4,
+      "worker_generation": 15,
+      "source": "/HOME/P6GUI/NOTE.TXT",
+      "destination": "/HOME/P6GUI/CLIP/NOTE.TXT"
+    },
+    {
+      "type": 257,
+      "sequence": 3,
+      "item": 0,
+      "state": 6,
+      "stage": 0,
+      "status": 0,
+      "flags": 0,
+      "bytes": 0,
+      "worker_pid": 4,
+      "worker_generation": 15,
+      "source": "",
+      "destination": ""
+    }
+  ],
+  "new_vm_or_guest_operation": false,
+  "gui_workflow_global_pass": false
+}

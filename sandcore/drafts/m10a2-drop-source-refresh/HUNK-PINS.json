@@ -1,0 +1,12 @@
+{
+  "path": "user/scshell/shell_clipboard.c",
+  "normalization": "UTF8_LF",
+  "before_marker": "ScStatus ScShellDragBegin(",
+  "result_marker": "static ScStatus sh_drag_begin(",
+  "before_line": 338,
+  "untouched_prefix_sha256": "c349061249f75cd4d0af27e174a1a1b5521913960272326d0763f32fb0c6a337",
+  "before_lower_sha256": "c8b65cfe69a7c8b53511654a54e76c98315eacb413797c2f4757e6fd2dcab319",
+  "result_lower_sha256": "dc44060b3ac4143ef9783b3228e0002b05feb2cc10e88b4d1b62313eeb8b9974",
+  "lower_patch_sha256": "47b43485e2a55f219f7587cfd14aa64e6c23dde917b31983bdd54396f9b71861",
+  "merge": "Apply lower hunks only; preserve independent TEXT1 top changes; record combined real digest."
+}

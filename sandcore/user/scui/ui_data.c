@@ -1814,6 +1814,9 @@ struct UiDropPeer {
     unsigned char *body;
     ScWideCounter deadline;
     ScU32 listed;
+    UiDropPeer *receipt_next;
+    ScU32 receipt_id,receipt_state,deferred,allowed_actions;ScI32 receipt_status;
+    ScUiDropResult receipt_result;
 };
 struct UiDrag {
     UiObject object;
@@ -1830,10 +1833,12 @@ struct UiDrag {
     ScDragEnvelope last;
     ScWideCounter deadline;
     ScU32 cancelled,captured;
+    ScU32 deferred_opt,deferred_stage,deferred_actions,deferred_notified;ScStatus deferred_failure;
 };
 static UiDropRoot *ui_drop_roots;
 static UiDrag *ui_drags;
 static ScU32 ui_drag_nonce=1;
+#include "scui_drop_deferred.inc"
 
 static UiDropRoot *ui_drop_root_find(ScUiContext *c,ScU32 root)
 {for(UiDropRoot *r=ui_drop_roots;r;r=r->next)if(r->context==c && r->root==root && !r->object.closing)return r;
@@ -1855,7 +1860,7 @@ static ScDropToken ui_drop_token(const ScDropInfo *info)
     return token;
 }
 static int ui_drop_envelope(const ScDragEnvelope *e,ScU32 bytes)
-{return bytes>=sizeof(*e) && e->size==sizeof(*e) && e->version==1 && e->type>=SC32_DRAG_OFFER && e->type<=SC32_DRAG_REJECT && e->body_bytes==bytes-sizeof(*e) && (e->nonce_lo || e->nonce_hi);
+{return bytes>=sizeof(*e) && e->size==sizeof(*e) && ((e->version==1 && e->type>=SC32_DRAG_OFFER && e->type<=SC32_DRAG_REJECT) || (e->version==2 && e->type>=SC32_DRAG_OFFER && e->type<=UI_D2_FINAL)) && e->body_bytes==bytes-sizeof(*e) && (e->nonce_lo || e->nonce_hi);
 }
 static ScStatus ui_drag_offer_check(const void *body,ScU32 available,int whole)
 {
@@ -1882,7 +1887,7 @@ static ScStatus ui_drop_send(ScIpcChannel channel,const ScDragEnvelope *envelope
     if(!frame)return SC_UI_E_MEMORY;
     ScDragEnvelope e=*envelope;
     e.size=sizeof(e);
-    e.version=1;
+    e.version=envelope->version==2?2:1;
     e.body_bytes=bytes;
     memcpy(frame,&e,sizeof(e));
     if(bytes)memcpy(frame+sizeof(e),body,bytes);
@@ -1903,7 +1908,7 @@ static void ui_drop_peer_dispose(UiObject *object,int quiet)
     ui_object_release(&p->root->object);
 }
 static void ui_drop_peer_close(UiDropPeer *p)
-{if(p->listed){p->listed=0;
+{if(p->listed){ui_d2_fail(p,p->receipt_status<0?p->receipt_status:SC_UI_E_CANCELLED);p->listed=0;
         ui_object_release(&p->object);
     }
 }
@@ -2105,7 +2110,9 @@ static ScStatus ui_drop_callback(UiDropNode *target,ScU32 type,ScUiDragData *dat
     event.y=y-node->rectangle.y;
     event.data=data;
     event.bytes=sizeof(*data);
+    const ScUiEvent *previous_drop_event=ui_drop_current_event;ui_drop_current_event=&event;
     s=target->description.procedure(node->owner,&event,target->description.context);
+    ui_drop_current_event=previous_drop_event;
     if(s==SC_UI_VETO)s=SC_UI_E_CANCELLED;
     else if(s>0)s=0;
     if(s==0 && (node->private_flags&UI_NODE_RETIRED || target->object.closing || !target->active))s=SC_UI_E_STALE;
@@ -2152,6 +2159,7 @@ static int ui_drop_same_round(const ScDragEnvelope *a,const ScDragEnvelope *b)
 }
 static ScStatus ui_drop_peer_step(UiDropPeer *p)
 {
+    if(p->deferred)return ui_d2_peer_step(p);
     ScStatus s;
     ScWideCounter now;
     ui_now(&now);
@@ -2229,7 +2237,7 @@ static ScStatus ui_drop_peer_step(UiDropPeer *p)
             if(!actions)s=SC_UI_E_CANCELLED;
             else s=ui_drop_callback(target,same?SC_UI_EVENT_DRAG_OVER:SC_UI_EVENT_DRAG_ENTER,&data,p->information.client_x,p->information.client_y);
             if(s==0 && (data.chosen_action==SC_UI_DRAG_COPY || data.chosen_action==SC_UI_DRAG_MOVE) && (data.chosen_action&actions)){
-                p->action=data.chosen_action;
+                p->action=data.chosen_action;p->allowed_actions=actions;
                 p->node=target_node;
                 p->node_generation=target_generation;
                 p->phase=SC32_DRAG_ACCEPT;
@@ -2246,7 +2254,7 @@ static ScStatus ui_drop_peer_step(UiDropPeer *p)
         free(frame);
         return 0;
     }
-    if(!ui_drop_same_round(e,&p->envelope) || e->format!=p->format || e->chosen_action!=p->action){free(frame);
+    if(!ui_drop_same_round(e,&p->envelope) || e->format!=p->format || e->chosen_action!=p->action || e->version!=p->envelope.version){free(frame);
         return SC_UI_E_INVALID;
     }
     if(e->type==SC32_DRAG_CANCEL){free(frame);
@@ -2266,11 +2274,14 @@ static ScStatus ui_drop_peer_step(UiDropPeer *p)
     if(s==0){if(e->body_bytes)memcpy(p->body+p->received,frame+sizeof(*e),e->body_bytes);
         p->received+=e->body_bytes;
         if(p->received==p->total){
-            ScUiDragData data={sizeof(data),1,SC32_DRAG_TRANSFER,p->format,p->information.actions,p->action,p->total,p->body,p->sender};
+            ScUiDragData data={sizeof(data),1,SC32_DRAG_TRANSFER,p->format,p->envelope.version==2?p->allowed_actions:p->information.actions,p->action,p->total,p->body,p->sender};
+            UiDropPeer *previous_peer=ui_drop_current_peer;ui_drop_current_peer=p;
             s=ui_drop_callback(target,SC_UI_EVENT_DROP,&data,current.client_x,current.client_y);
+            ui_drop_current_peer=previous_peer;
             if(s==0 && data.chosen_action!=p->action)s=SC_UI_E_INVALID;
             p->envelope.status=s;
-            p->phase=s<0?SC32_DRAG_REJECT:SC32_DRAG_COMPLETE;
+            if(s<0&&p->deferred)ui_d2_fail(p,s);
+            p->phase=s<0?SC32_DRAG_REJECT:p->deferred?SC32_DRAG_TRANSFER:SC32_DRAG_COMPLETE;
         }
     }
     free(frame);
@@ -2278,6 +2289,10 @@ static ScStatus ui_drop_peer_step(UiDropPeer *p)
 }
 static void ui_drag_disconnect(UiDrag *d,int cancel)
 {
+    if(d->channel && cancel && d->deferred_stage && !d->deferred_notified){
+        ScDragEnvelope reply=d->last;reply.type=SC32_DRAG_CANCEL;reply.format=d->format;reply.status=SC_UI_E_CANCELLED;
+        reply.chosen_action=0;ui_drop_send(d->channel,&reply,0,0);
+    }
     if(d->channel){ScIpcClose(d->channel);
         d->channel=0;
     }
@@ -2295,6 +2310,11 @@ static void ui_drag_dispose(UiObject *object,int quiet)
     UiDrag **slot=&ui_drags;
     while(*slot && *slot!=d)slot=&(*slot)->next;
     if(*slot)*slot=d->next;
+    if(d->deferred_opt&&!d->deferred_notified&&!quiet&&!ui_quiet){
+        ScUiDropResult result;ui_d2_result(&result,d->deferred_failure<0?d->deferred_failure:SC_UI_E_CANCELLED);
+        result.action=d->action;if(d->deferred_stage || d->phase==SC32_DRAG_COMPLETE)result.uncertain=1;
+        d->deferred_notified=1;ui_d2_notice(d,SC32_DRAG_CANCEL,&result);
+    }
     ui_drag_disconnect(d,1);
     UiNode *source=ui_node(d->context,d->source);
     if(source && d->captured){ScUiCapture(d->context,d->source,0);
@@ -2319,11 +2339,11 @@ ScStatus ScUiDragBegin(ScUiContext *context,const ScUiDragDesc *desc,ScU32 *toke
     void *candidate=0;
     ScInputSnapshot input;
     if(s<0 || !token)return s<0?s:SC_UI_E_INVALID;
-    if(!desc->actions || desc->actions&~3u || desc->flags || !ui_data_reserved(desc->reserved,4))return SC_UI_E_INVALID;
+    if(!desc->actions || desc->actions&~3u || desc->flags&~SC_UI_DRAG_DEFERRED || !ui_data_reserved(desc->reserved,4))return SC_UI_E_INVALID;
     source=ui_node(context,desc->source);
     root=ui_root(context,desc->source);
     if(!source || !root || !root->window)return SC_UI_E_STALE;
-    for(UiDrag *drag=ui_drags;drag;drag=drag->next)if(drag->context==context)return SC_UI_E_BUSY;
+    for(UiDrag *drag=ui_drags;drag;drag=drag->next)if(drag->context==context&&!drag->deferred_stage)return SC_UI_E_BUSY;
     if(ui_drag_nonce==UINT_MAX)return SC_UI_E_RANGE;
     s=ui_drag_offer_check(desc->offer,desc->offer_bytes,1);
     if(s<0)return s;
@@ -2342,7 +2362,7 @@ ScStatus ScUiDragBegin(ScUiContext *context,const ScUiDragDesc *desc,ScU32 *toke
     d->window=root->window->window;
     d->generation=root->window->information.generation;
     d->epoch=input.input_epoch;
-    d->actions=desc->actions;
+    d->actions=desc->actions;d->deferred_opt=(desc->flags&SC_UI_DRAG_DEFERRED)!=0;
     d->token=d->nonce=ui_drag_nonce++;
     d->offer=(unsigned char *)malloc(desc->offer_bytes);
     if(!d->offer){s=SC_UI_E_MEMORY;
@@ -2448,6 +2468,7 @@ static ScStatus ui_drag_point(UiDrag *d,ScI32 x,ScI32 y)
     ui_drag_disconnect(d,1);
     d->target=target;
     ScDragEnvelope offer={sizeof(ScDragEnvelope),1,SC32_DRAG_OFFER,d->nonce,0,d->window,d->generation,target.target_id,target.target_generation,target.ticket_lo,target.ticket_hi,0,d->actions,0,0,0};
+    offer.version=d->deferred_opt?2:1;
     d->last=offer;
     ScDropValidateRequest request=ui_drop_validation(&d->last);
     s=ScDropConnect(&request,&d->channel);
@@ -2461,6 +2482,7 @@ static ScStatus ui_drag_point(UiDrag *d,ScI32 x,ScI32 y)
 }
 static ScStatus ui_drag_source_step(UiDrag *d)
 {
+    if(d->deferred_stage)return ui_d2_source_step(d);
     ScWideCounter now;
     ScStatus s=ui_now(&now);
     /* 取时失败不能把未定义值或假零时钟用于判断票据是否过期。 */
@@ -2508,7 +2530,7 @@ static ScStatus ui_drag_source_step(UiDrag *d)
     if(e->nonce_lo<d->last.nonce_lo && e->nonce_hi==d->last.nonce_hi && e->ticket_lo==d->last.ticket_lo && e->ticket_hi==d->last.ticket_hi){free(frame);
         return 0;
     }
-    if(!ui_drop_same_round(e,&d->last) || e->status<0){free(frame);
+    if(!ui_drop_same_round(e,&d->last) || e->version!=d->last.version || e->status<0){free(frame);
         return SC_UI_E_CANCELLED;
     }
     if(d->phase==SC32_DRAG_ACCEPT && e->type==SC32_DRAG_ACCEPT){
@@ -2531,10 +2553,21 @@ static ScStatus ui_drag_source_step(UiDrag *d)
         d->phase=SC32_DRAG_TRANSFER;
         ScPointerSetCursor(d->window,d->action==SC_UI_DRAG_COPY?SC32_CURSOR_DRAG_COPY:SC32_CURSOR_DRAG_MOVE);
     }
+    else if(d->deferred_opt && d->phase==SC32_DRAG_COMPLETE && e->version==2 && e->type==UI_D2_HOLD){
+        ScU32 allowed=d->actions&d->target.actions;
+        if(e->format!=d->format || !e->allowed_actions || (e->allowed_actions&~allowed) || e->chosen_action!=d->action || !(e->allowed_actions&d->action))s=SC_UI_E_INVALID;
+        else {ScDropToken ticket=ui_drop_token(&d->target);s=ScDropComplete(&ticket,d->action);
+            if(s==0){d->deferred_stage=1;d->deferred_actions=e->allowed_actions;
+                d->target.ticket_lo=d->target.ticket_hi=0;
+                ScStatus notice=ui_d2_notice(d,SC_UI_DRAG_HANDOFF,0);if(notice<0)d->context->notification_error=notice;
+                ui_d2_detach_pointer(d);
+            }
+        }
+    }
     else if(d->phase==SC32_DRAG_COMPLETE && e->type==SC32_DRAG_COMPLETE && e->format==d->format && e->chosen_action==d->action){
         ScDropToken ticket=ui_drop_token(&d->target);
         s=ScDropComplete(&ticket,d->action);
-        if(s==0){UiNode *source=ui_node(d->context,d->source);
+        if(s==0){d->deferred_notified=1;UiNode *source=ui_node(d->context,d->source);
             if(source){ScUiDragData data={sizeof(data),1,SC32_DRAG_COMPLETE,d->format,d->actions,d->action,0,0,packet.sender};
                 ScStatus notice=ui_event(source,SC_UI_EVENT_DROP,&data,sizeof(data));
                 if(notice<0)d->context->notification_error=notice;
@@ -2586,9 +2619,9 @@ static ScStatus ui_drag_pump(ScUiContext *context)
             if(peer)ui_object_retain(&peer->object,UI_DROP_PEER_OBJECT);
             while(peer){UiDropPeer *following=peer->next;
                 if(following)ui_object_retain(&following->object,UI_DROP_PEER_OBJECT);
-                if(budget && root->owner_live && peer->listed){ScStatus s=ui_drop_peer_step(peer);
+                if(budget && root->owner_live && peer->listed && ui_d2_peer_work(peer)){ScStatus s=ui_drop_peer_step(peer);
                     budget--;
-                    if(s==SC_UI_END || (s<0 && s!=SC32_E_AGAIN)){ui_drop_peer_close(peer);
+                    if(s==SC_UI_END || (s<0 && s!=SC32_E_AGAIN)){if(s<0)ui_d2_fail(peer,s);ui_drop_peer_close(peer);
                         if(s<0 && s!=SC32_E_BROKEN_PIPE)context->notification_error=ui_cause(context,s,UI_OP_DATA,peer->node);
                     }
                 }
@@ -2603,9 +2636,9 @@ static ScStatus ui_drag_pump(ScUiContext *context)
     if(drag)ui_object_retain(&drag->object,UI_DRAG_OBJECT);
     while(drag){UiDrag *next=drag->next;
         if(next)ui_object_retain(&next->object,UI_DRAG_OBJECT);
-        if(drag->context==context && budget){ScStatus s=drag->cancelled?SC_UI_E_CANCELLED:ui_drag_source_step(drag);
+        if(drag->context==context && budget && ui_d2_source_work(drag)){ScStatus s=drag->cancelled?SC_UI_E_CANCELLED:ui_drag_source_step(drag);
             budget--;
-            if(s==SC_UI_END || (s<0 && s!=SC32_E_AGAIN)){ui_drag_close(drag);
+            if(s==SC_UI_END || (s<0 && s!=SC32_E_AGAIN)){if(s<0)drag->deferred_failure=s;ui_drag_close(drag);
                 if(s<0)context->notification_error=ui_cause(context,s,UI_OP_DATA,drag->source);
             }
         }
@@ -2618,7 +2651,7 @@ static ScStatus ui_drag_pump(ScUiContext *context)
 static ScStatus ui_drag_event(UiNode *root,const ScUiEvent *event)
 {
     UiDrag *d;
-    for(d=ui_drags;d;d=d->next)if(d->context==root->owner && d->root==root->root)break;
+    for(d=ui_drags;d;d=d->next)if(d->context==root->owner && d->root==root->root&&!d->deferred_stage)break;
     if(!d)return 0;
     if(event->type==SC_UI_EVENT_CAPTURE_LOST || event->type==SC_UI_EVENT_INPUT_SYNC || event->type==SC_UI_EVENT_FOCUS_OUT
         || (event->type==SC_UI_EVENT_KEY_DOWN && event->key==27)){ScUiDragCancel(root->owner,d->token);
@@ -2641,8 +2674,14 @@ static ScStatus ui_drag_event(UiNode *root,const ScUiEvent *event)
 }
 static ScU32 ui_drag_wait(ScUiContext *context,ScU32 timeout)
 {
-    for(UiDrag *d=ui_drags;d;d=d->next)if(d->context==context)return timeout>1?1:timeout;
-    for(UiDropRoot *r=ui_drop_roots;r;r=r->next)if(r->context==context && r->peers)return timeout>1?1:timeout;
+    for(UiDrag *d=ui_drags;d;d=d->next)if(d->context==context){
+        if(!d->deferred_stage){if(timeout>1)timeout=1;}
+        else {if(ui_d2_source_work(d))return 0;if(d->deferred_stage==1)timeout=ui_d2_timeout(&d->deadline,timeout);}
+    }
+    for(UiDropRoot *r=ui_drop_roots;r;r=r->next)if(r->context==context)for(UiDropPeer *p=r->peers;p;p=p->next)if(p->listed){
+        if(!p->deferred){if(timeout>1)timeout=1;}
+        else {if(ui_d2_peer_work(p))return 0;if(p->deferred<3)timeout=ui_d2_timeout(&p->deadline,timeout);}
+    }
     return timeout;
 }
 static void ui_drag_state(UiNode *node)
@@ -2674,6 +2713,7 @@ static void ui_drag_node_destroy(UiNode *node,int quiet)
 }
 static void ui_drag_finish(void)
 {
+    while(ui_drop_receipts){UiDropPeer *p=ui_drop_receipts;ScUiContext *owner=p->root->context;ui_drop_receipts=p->receipt_next;p->receipt_next=0;p->receipt_id=0;ui_object_release(&p->object);ScUiContextRelease(owner);}
     while(ui_drags){UiDrag *d=ui_drags;
         ui_drags=d->next;
         d->next=0;

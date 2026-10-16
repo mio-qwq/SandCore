@@ -354,6 +354,7 @@ static void desk_close(void)
     desk_items_free(desk.refresh_items,desk.refresh_count);
     for(ScU32 i=0;i<desk.command_count;i++)ScShellApplicationRelease(desk.commands[i].app);
     free(desk.commands);
+    if(desk.drop_receipt.id)ScUiDropRelease(desk.ui,&desk.drop_receipt);
     ScShellCatalogRelease(desk.catalog);ScUiContextRelease(desk.ui);memset(&desk,0,sizeof(desk));
 }
 static ScStatus desk_clock(void)
@@ -385,6 +386,7 @@ int main(void)
     while(!desk.quit){
         ScU32 business_ready=0;
         status=ScUiContextStep(desk.ui,0);if(status<0)break;
+        ScStatus drop_step=desk_drop_step(&business_ready);if(drop_step<0)desk_error(drop_step,desk.drop_destination);
         ScStatus activated=desk_activate();if(activated<0){status=activated;break;}
         status=ScShellServiceStep(desk.service,0);if(status<0 && status!=SC32_E_AGAIN)break;
         ScShellServiceInfo service;memset(&service,0,sizeof(service));service.size=sizeof(service);service.version=1;
@@ -419,8 +421,14 @@ int main(void)
                     ScShellClipboardReconcile(desk.job,&clip);desk.job_done=1;desk.refresh_pending=1;}
                 /* 正常全成功可收起进度；部分失败/取消/不明结果留给用户
                  * 看真实已提交与未完成项，不以完成百分比吞掉错误。 */
-                if(dialog==SC_SHELL_END || (info.state==SC_SHELL_JOB_FINISHED && !info.items_failed && !info.items_skipped
-                    && !(info.flags&SC_SHELL_SOURCE_RETAINED))){
+                ScU32 drop_wait=0;
+                if(desk.job_deferred){ScStatus ack=ScShellDropReply(desk.job);
+                    if(ack==SC_SHELL_READY)business_ready=1;
+                    if(ack==SC_SHELL_END)desk.job_deferred=0;else drop_wait=1;
+                    if(ack<0)desk_error(ack,desk.drop_destination);
+                }
+                if(!drop_wait && (dialog==SC_SHELL_END || (info.state==SC_SHELL_JOB_FINISHED && !info.items_failed && !info.items_skipped
+                    && !(info.flags&SC_SHELL_SOURCE_RETAINED)))){
                     ScShellDialogClose(desk.progress);desk.progress=0;ScShellFileOperationClose(desk.job);desk.job=0;}
             }else if(s<0 && !desk.progress)desk_error(s,desk.desktop_path);
         }

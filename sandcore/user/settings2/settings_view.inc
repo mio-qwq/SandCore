@@ -194,7 +194,8 @@ static ScStatus settings_table(ScUiNode page,ScUiNode *node,ScUiDataProc procedu
     if(s==0)s=ScUiViewBind(app.ui,*node,*provider,*selection);
     ScUiColumnDesc columns[4];
     for(ScU32 i=0;i<count;i++){INIT(columns[i]);
-        columns[i].column=i;
+        /* column是非零控件身份，field才是provider使用的零起始数据字段。 */
+        columns[i].column=i+1;
         columns[i].field=i;
         columns[i].title=text(titles[i]);
         columns[i].width=i==1?280:150;

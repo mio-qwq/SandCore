@@ -235,3 +235,5 @@ Classic为真正矩形凸凹边、选中/焦点/disabled、固定像素图标；
 2026-10-16合同澄清：PREPARED表示可信PID/gen已绑定两surface与监听endpoint，可连接并以HELLO确定后台服务；ACTIVE仍要求两张真正首帧并控制窗口动作。隐藏会话不画首帧、不计显示激活超时，服务继续泵IPC/文件任务；显示切换后才取得Window PREPARING资格并Activate。HostInfo的PREPARING表示仍缺首帧，WindowInfo的PREPARING仅表示当前可绘资格，二者不能混为普通可见性。
 
 2026-10-16名称提示修订：ScShellMenu的新建目录/重命名/冲突改名使用公开SCUI模态Window和标准Label/Textbox/Button，320×170逻辑客户区、中文标题及新建/重命名/取消动作，无PropertySheet页签或Apply。焦点全选，Enter确认、Esc/关闭取消；非法输入保留原文。校验后先销提示窗口让出同owner模态槽，再进入原受管文件事务，只有原持久ACK可确认文件结果。Properties及其完整元数据/权限页不变，公开ABI/导出不变。本修复为隔离源码草稿，尚未构建或客体验证。
+
+2026-10-16：SCSHELL ABI1.2/library3在独立SCSHELLDROP.H追加DragBeginEx、DropFilesDeferred和DropReply，旧96入口及SCSHELL.H保持；旧Begin严格flags0。新FILE路径只从认证receipt建绑定job，逐项DONE+DURABLE与RENAME/SOURCE_REMOVED证明来源改变，最后才通知一次视图失效，不据传输ACK删第二次。详见SCUI-DROP-DEFERRED；本组隔离源码，尚未构建或运行。

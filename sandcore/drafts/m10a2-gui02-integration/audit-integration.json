@@ -1,0 +1,9 @@
+{
+  "status": "INDEPENDENT_REVIEW_FIXES_INTEGRATED_NOT_BUILT",
+  "target": "user/scui/scui_drop_deferred.inc",
+  "before_sha256": "af1e64abd10d46115f76ec01255d257d6c7d57ccd62b80ecf614f5c6cf544f4b",
+  "after_sha256": "6b5877a3652c34576f67f33163daa97b8d1c31fe9acd837932a7d40759f013b9",
+  "anchors": 3,
+  "source_cancel_gate_preserved": true,
+  "GCC_warning_fix_preserved": true
+}

@@ -2,9 +2,9 @@
 
 所属版本：**SandCore M10a2 — The Application Platform Era**。完整范围和公开接口设计见 [SCUI-DESIGN.md](SCUI-DESIGN.md)。完整框架和OS协调正文已统一构建，实际客体G1生成158入口SCUI及应用；普通会话平台、官方3013个Unicode边界与双向结构体ABI已通过。**真实GUI流程仍在修复验收，SCUI和M10a2尚未验收通过。** 当前证据见 [原生平台检查点](../evidence/m10a2-ui-platform/README.md)；每项旧证据按实际源码闭包复用，不冒充新行为通过。
 
-公开入口是完全大写 [SCUI.H](../user/SCUI.H)，158个正式接口由Ring3 `SCUI.SCL` ABI1.0/library_version1实现。DocumentBoundary与ContextRootNext是真实SDK入口。直接最低依赖为SC32API ABI1.2/library_version3、SCCLIB1.0/v1、SCLIB1.0/v1；ROOT通过既定有向依赖图引用。新增Font/Broker/Popup必须实际接线再置cap。应用没有寄存器/中断桥，没有复制NUI/库正文，没有Ring0权限。
+公开基础入口在完全大写 [SCUI.H](../user/SCUI.H)，异步Drop追加入口在 [SCUIDROP.H](../user/SCUIDROP.H)。本组源码manifest为174入口、Ring3 `SCUI.SCL` ABI1.4/library_version5；新增部分尚待统一构建与客体验证。DocumentBoundary与ContextRootNext是真实SDK入口。直接最低依赖为SC32API ABI1.2/library_version3、SCCLIB1.0/v1、SCLIB1.0/v1；ROOT通过既定有向依赖图引用。新增Font/Broker/Popup必须实际接线再置cap。应用没有寄存器/中断桥，没有复制NUI/库正文，没有Ring0权限。
 
-[SCUI.C](../user/scui/SCUI.C)聚合同一职责正文，[SCUI.json](../user/scui/SCUI.json)仅列真实158公开定义和实际导入，内部ScUiFinalize是fini，helper不导出。SDK将自有大写头与标准小写头安装到正式/SYS/INC；仓库聚合构建提供user、user/sclib、user/stdlib三个include目录。
+[SCUI.C](../user/scui/SCUI.C)聚合同一职责正文，[SCUI.json](../user/scui/SCUI.json)保留原170公开入口并追加4项Drop定义，导入继续按真实对象核对，内部ScUiFinalize是fini，helper不导出。SDK将自有大写头与标准小写头安装到正式/SYS/INC；仓库聚合构建提供user、user/sclib、user/stdlib三个include目录。
 
 ## 共同ABI与归属
 
@@ -95,3 +95,5 @@ Copy/Cut/Paste使用真实session clipboard事务及immutable snapshot，源退�
 2026-10-16：build23/refresh09实际补齐node0上下文CAPTURE/BUBBLE，并由原G1生成SCUI及Demo；GUI21真实Drop/ACK已成功但主控行首边界误超时，原失败保留。只借紧邻start前的一个换行修正主控，实际原日志回归及旧标记拒绝通过。GUI22最终DECLARED_NATIVE_FIVE_LIBRARY_ORDINARY_GUI_SECOND_ROUND_PASS，共91项，GUI_behavior_verified/source_disk_unchanged/current_inputs_unchanged均true；两主题、100/150/200%实际字宽/换行、溢出菜单、文件保存/错误、Drop提交及Complete、静止/隐藏零提交、窗口恢复、正常return与最终owner/PF归账通过。主代理已查看Classic与200%原尺寸截图。公开158入口/137导入未变，SCAPI原SHA保持。静止200PIT实际2.032秒、QEMU一核CPU0.171875秒；checkbox观察127PIT包含F12/串口，不冒充纯输入延迟。证据evidence/m10a2-p4-context-and-p5-generation/index.json，不代表整版完成。
 
 2026-10-16修订：Phase5主源ABI1.1/v2保留158入口，新增ScUiPainterClear/TextColor/Bounds/ContextWaitTimeout共162。透明桌面只清本人clip，图标传ENABLED，命名角色阴影与内核单一路径壁纸共同合成；Context混合泵按真实下一期限等待。隐藏Window不持首帧资格，实际选中后PREPARING才允许有限完整Submit/End，随后Activate；后台Shell服务不等待绘制。当前仅Runtime11阶段切片通过，不代表全部组件已重制。
+
+2026-10-16：SCUI ABI1.4/library5在独立SCUIDROP.H追加Defer/Query/Reply/Release，ScUiDragDesc显式flag才选v2，旧SCUI.H和flags0即时回调/ACK保持。新FILE拖放先HOLD/READY消费短传输票，再确认/真实job/最终结果；等待不强制1tick。详见SCUI-DROP-DEFERRED，隔离源码尚未构建或客体验证。

@@ -1,3 +1,4 @@
+#include "desktop_drop_deferred.inc"
 /* 像素仅从命名角色取色。Classic与Aurora共用命中、选择和布局模型，
  * 真图标保留内容色；资源缺失的回退仍区分目录与文档轮廓。 */
 static void desk_frame(ScUiPainter *p,const ScUiRect *r,ScU32 role)
@@ -159,7 +160,7 @@ static ScStatus desk_input(ScUiContext *ui,const ScUiEvent *event,void *context)
     (void)context;
     if(event->type==SC_UI_EVENT_DROP && event->data && event->bytes==sizeof(ScUiDragData)){
         const ScUiDragData *data=(const ScUiDragData *)event->data;
-        if(data->phase==SC32_DRAG_COMPLETE){desk.external_drag=0;return 0;}
+        if(desk_drop_notice(event,data))return 0;
     }
     if(event->type==SC_UI_EVENT_CAPTURE_LOST || event->type==SC_UI_EVENT_INPUT_SYNC){desk_gesture_cancel();return 0;}
     if(event->type==SC_UI_EVENT_KEY_DOWN){ScU32 key=event->key,mod=event->modifiers;

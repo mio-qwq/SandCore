@@ -1,0 +1,25 @@
+{
+  "status": "SOURCE_ONLY_NOT_BUILT_NOT_GUEST_VERIFIED",
+  "files": {
+    "drop-cancel-gate.patch": {
+      "sha256": "783b6b3492ba0d1c2fab8d75095e560bb2394d119cde8ccd511f794f210f8355",
+      "bytes": 1800
+    },
+    "make_patch.py": {
+      "sha256": "7337c3798619c21a2b983267cf025a8f0d23caea69edeff9a1e245972debf06e",
+      "bytes": 4462
+    },
+    "overlay/user/scui/scui_drop_deferred.inc": {
+      "sha256": "86e79c5faf7bd6355889d665f948629e91e6f49d766dda86ffb543b7d07adf60",
+      "bytes": 13348
+    },
+    "PINS.json": {
+      "sha256": "50a76b802e8823d00a67d724dced6e406fb3290a24509a3a6fb0d046000f03c6",
+      "bytes": 1009
+    },
+    "README.md": {
+      "sha256": "54c558d665ec47b0e8436c04a523c33a97547aa78c0afa8b43a94363cca8f219",
+      "bytes": 2509
+    }
+  }
+}

@@ -23,14 +23,14 @@
     {
       "name": "SCUI.SCL",
       "abi_major": 1,
-      "min_minor": 1,
-      "min_version": 2
+      "min_minor": 4,
+      "min_version": 5
     },
     {
       "name": "SCSHELL.SCL",
       "abi_major": 1,
-      "min_minor": 0,
-      "min_version": 1
+      "min_minor": 2,
+      "min_version": 3
     }
   ],
   "imports": [
@@ -383,18 +383,6 @@
       "size": 1
     },
     {
-      "name": "ScShellDragBegin",
-      "dependency": "SCSHELL.SCL",
-      "kind": "function",
-      "size": 1
-    },
-    {
-      "name": "ScShellDropFiles",
-      "dependency": "SCSHELL.SCL",
-      "kind": "function",
-      "size": 1
-    },
-    {
       "name": "ScShellErrorDialog",
       "dependency": "SCSHELL.SCL",
       "kind": "function",
@@ -630,6 +618,12 @@
     },
     {
       "name": "ScUiContextWaitTimeout",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUiDialogClose",
       "dependency": "SCUI.SCL",
       "kind": "function",
       "size": 1
@@ -1046,6 +1040,48 @@
       "name": "ScUiCommandSet",
       "dependency": "SCUI.SCL",
       "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellDragBeginEx",
+      "kind": "function",
+      "dependency": "SCSHELL.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScShellDropFilesDeferred",
+      "kind": "function",
+      "dependency": "SCSHELL.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScShellDropReply",
+      "kind": "function",
+      "dependency": "SCSHELL.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScUiDropDefer",
+      "kind": "function",
+      "dependency": "SCUI.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScUiDropQuery",
+      "kind": "function",
+      "dependency": "SCUI.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScUiDropReply",
+      "kind": "function",
+      "dependency": "SCUI.SCL",
+      "size": 1
+    },
+    {
+      "name": "ScUiDropRelease",
+      "kind": "function",
+      "dependency": "SCUI.SCL",
       "size": 1
     }
   ]

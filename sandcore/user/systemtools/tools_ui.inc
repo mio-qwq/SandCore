@@ -47,8 +47,12 @@ static ScStatus tool_error(ScStatus s,const char *operation)
     if(ScErrorQuery(&native)==0 && native.code==s){error.domain=native.domain;
         error.raw=native.raw;
     }
-    ScUiDialog *dialog=0;
-    if(tool.ui && tool.root && ScShellErrorDialog(tool.ui,tool_dialog_owner(),&error,operation,&dialog)==0)ScUiDialogRelease(dialog);
+    /* ScShellErrorDialog没有完成回调入口；不能创建后立即丢掉唯一引用。
+     * 保留同样的底层错误字段，交本应用有生命周期的只读通知显示。 */
+    char message[512];
+    snprintf(message,sizeof(message),"操作未完成。\n%s\n错误 %d · 原因 %d · 域 %u · 底层值 %d",
+        operation?operation:"",error.code,error.cause,error.domain,error.raw);
+    if(tool.ui && tool.root)tool_message("操作未完成",message);
     fprintf(stderr,"system-tool error=%d operation=%s\n",s,operation?operation:"");
     return s;
 }
@@ -144,8 +148,21 @@ static ScStatus tool_copy(const char *text)
     if(s==0)tool_status("已复制到系统文本剪贴板");
     return s;
 }
+static ScStatus tool_notice_complete(ScUiContext *ui,const ScUiEvent *event,void *context)
+{
+    (void)ui;
+    (void)context;
+    if(event->type==SC_UI_EVENT_DIALOG_COMPLETE && event->data==tool.notice){
+        ScUiDialog *done=tool.notice;
+        tool.notice=0;
+        /* 先脱开本地引用；Release可能进入析构，不能留下可再次领取的指针。 */
+        ScUiDialogRelease(done);
+    }
+    return 0;
+}
 static ScStatus tool_message(const char *title,const char *message)
 {
+    if(tool.notice)return SC_UI_E_BUSY;
     ScUiMessageBoxDesc d;
     memset(&d,0,sizeof(d));
     d.size=sizeof(d);
@@ -153,9 +170,13 @@ static ScStatus tool_message(const char *title,const char *message)
     d.owner=tool_dialog_owner();
     d.title=tool_text(title);
     d.message=tool_text(message);
+    d.completion=tool_notice_complete;
     ScUiDialog *dialog=0;
     ScStatus s=ScUiMessageBox(tool.ui,&d,&dialog);
-    ScUiDialogRelease(dialog);
+    /* 成功返回OPEN时，caller仍拥有唯一引用；保存至完成或tool_close。
+     * 已有未关通知绝不被新的通知覆盖，也不改SCUI的最后Release取消合同。 */
+    if(s==0)tool.notice=dialog;
+    else ScUiDialogRelease(dialog);
     return s;
 }
 static ScStatus tool_string_node(ScUiNode node,ScString **out,const char **z)
@@ -275,6 +296,10 @@ static ScStatus tool_create(const char *title,ScU32 width,ScU32 height,ToolComma
 }
 static void tool_close(void)
 {
+    ScUiDialog *notice=tool.notice;
+    tool.notice=0;
+    /* 最后Release会取消仍OPEN的通知；回调看到已脱链，不会二次释放。 */
+    ScUiDialogRelease(notice);
     if(tool.ui && tool.root)ScUiNodeDestroy(tool.ui,tool.root);
     ScUiMenuRelease(tool.menus);
     ScUiContextRelease(tool.ui);

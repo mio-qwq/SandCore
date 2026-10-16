@@ -17,6 +17,7 @@ struct ToolWindow {
     ScUiContext *ui;
     ScUiNode root,menu,toolbar,content,status;
     ScUiMenu *menus;
+    ScUiDialog *notice;
     ScUiMetrics metrics;
     ScU32 visible,quit;
     ToolCommandProc command;

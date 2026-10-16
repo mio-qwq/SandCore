@@ -193,7 +193,7 @@ static ScStatus f2_table_event(ScUiContext *ui,const ScUiEvent *event,void *cont
 {
     (void)context;
     if(event->type==SC_UI_EVENT_DROP && event->data && event->bytes==sizeof(ScUiDragData)){
-        const ScUiDragData *drop=event->data;if(drop->phase==SC32_DRAG_COMPLETE){f2.drag_token=0;return 0;}}
+        const ScUiDragData *drop=event->data;if(f2_drop_notice(event,drop))return 0;}
     if(event->type==SC_UI_EVENT_SELECTION_CHANGED){if(!f2.publishing)f2_status(0);return 0;}
     if(event->type==SC_UI_EVENT_CAPTURE_LOST || event->type==SC_UI_EVENT_INPUT_SYNC || event->type==SC_UI_EVENT_FOCUS_OUT){f2_gesture_cancel(0);return 0;}
     if(event->type==SC_UI_EVENT_KEY_DOWN){ScU32 key=event->key,mods=event->modifiers,command=0;
@@ -386,6 +386,7 @@ static ScStatus f2_catalog_step(ScU32 *ready)
 static ScStatus f2_background(ScU32 *ready)
 {
     ScStatus first=f2_catalog_step(ready),s;
+    s=f2_drop_step(ready);if(s<0&&!first)first=s;
     ScU32 menu_busy=0;
     if(f2.shell_menu){s=ScShellMenuStep(f2.shell_menu,0);if(s==SC_SHELL_READY)*ready=1;
         if(s==SC_SHELL_PENDING || s==SC_SHELL_READY)menu_busy=1;
@@ -411,7 +412,7 @@ static ScStatus f2_background(ScU32 *ready)
     if(f2.properties){s=ScShellDialogStep(f2.properties);if(s==SC_SHELL_READY)*ready=1;
         if(s==SC_SHELL_END){ScShellDialogClose(f2.properties);f2.properties=0;f2.refresh_pending=1;}}
     if(f2.bookmark_save_pending && !f2.writer.active && !f2.exit_pending){s=f2_bookmarks_save();if(s<0 && !first)first=s;*ready=1;}
-    ScU32 jobs_active=0;for(F2Job *job=f2.jobs;job;job=job->next)if(!job->final)jobs_active=1;
+    ScU32 jobs_active=0;for(F2Job *job=f2.jobs;job;job=job->next)if(!job->final || job->deferred)jobs_active=1;
     if(f2.refresh_pending && f2.visible && !menu_busy && !jobs_active && !f2.scan.active && !f2.order.active
         && !f2.gesture && !f2.dialog && !f2.exit_pending){
         f2.refresh_pending=0;f2_tree_invalidate();s=f2_navigate(f2.current?f2.current->path:"/",F2_NAV_REFRESH,0,
@@ -438,6 +439,7 @@ static void f2_close(void)
     ScUiSelectionRelease(f2.selection);ScUiSelectionRelease(f2.tree_selection);
     ScUiProviderRelease(f2.table_provider);ScUiProviderRelease(f2.tree_provider);
     ScUiMenuRelease(f2.menus);ScUiMenuRelease(f2.places);ScUiMenuRelease(f2.history_menu);
+    if(f2.drop_receipt.id)ScUiDropRelease(f2.ui,&f2.drop_receipt);
     ScHashRelease(f2.icons);ScHashRelease(f2.tree_index);ScUiContextRelease(f2.ui);
     f2_snapshot_free(f2.current);for(ScU32 i=0;i<f2.node_count;i++)free(f2.nodes[i].children);
     free(f2.nodes);free(f2.tree_queue);free(f2.history);free(f2.bookmarks);free(f2.drop_bytes);

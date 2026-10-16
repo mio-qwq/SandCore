@@ -1,0 +1,127 @@
+{
+  "status": "SOURCE_PATCH_ONLY_NOT_BUILT_NOT_GUEST_VERIFIED",
+  "modified": {
+    "user/systemtools/TOOLS.H": {
+      "before_sha256": "764161356e162eda97a6efb03771d2864cbaf01f33f0fa9b970242e6f3b57066",
+      "result_sha256": "99a235edc70acae9cb421880455691aa9f18322bd41156b656b2aea7358ce810",
+      "before_bytes": 2029,
+      "result_bytes": 2053
+    },
+    "user/systemtools/tools_ui.inc": {
+      "before_sha256": "8ac3d66668684d0f4eff64c6c6055412517d668db2f8b1675852c442676e82ff",
+      "result_sha256": "33efe6175e2f52ef3f2cc3e74ba908b762ec6e0b99675afbe190e0eb36700c90",
+      "before_bytes": 10098,
+      "result_bytes": 11334
+    },
+    "user/sound2/sound_ui.c": {
+      "before_sha256": "a4802d52f1bf9593c520efa0a99d7befd7d23903b84bff65268b4fc34ee822b5",
+      "result_sha256": "f84f437f87bde63d8c302307a7fed1af1150d5160837b6847d8651b121c41d3f",
+      "before_bytes": 15509,
+      "result_bytes": 15509
+    },
+    "user/systemtools/CALC2.json": {
+      "before_sha256": "368ef644614b6bd553659894968cce3c3ad4598446c366296d8542853405f3b9",
+      "result_sha256": "88f02faf7cc8ef332948293604b445fd353a0f4d4fd87f6fab14e1da31b7ac9e",
+      "before_bytes": 8817,
+      "result_bytes": 8691
+    },
+    "user/systemtools/PALETTE2.json": {
+      "before_sha256": "74ed68306433005a1eacbe84435f58d49979b8385e69e80f6e6294d8461c6e20",
+      "result_sha256": "b0a89ecba1153231960996ef155d19e4d485caec9e43ace81929f184078a0712",
+      "before_bytes": 8686,
+      "result_bytes": 8560
+    },
+    "user/systemtools/MONITOR2.json": {
+      "before_sha256": "b7951f0227e68664012f9e083f34be1081b80bcea7a5a7f7bb208379bdd3ed18",
+      "result_sha256": "bd8e28eeeedc012cea043cf0fe36a94e001d8d205525115a5954fd38d9cb9824",
+      "before_bytes": 10361,
+      "result_bytes": 10235
+    },
+    "user/sound2/SOUND2.JSON": {
+      "before_sha256": "c3698cdbf5e64422e49e6b067177101bc57953ecea7e2653784632a0a456f0d2",
+      "result_sha256": "a002c6f139a76cf36b45b87dda2cc8b2015b60094a0567271c81807da425d1ba",
+      "before_bytes": 11081,
+      "result_bytes": 10955
+    }
+  },
+  "patches": {
+    "lifetime": "5315ec162acc5e988edc67a9d2b1b65fff696cdf0341a62467cf745cb206e3e1",
+    "sound_shortcuts": "40c3eb3b7fe69ed4e35e8deb043a2e7ef011d808fc1e70a6fcd705fc34a11d23"
+  },
+  "refresh_labels": [
+    "CALC2",
+    "PALETTE2",
+    "MONITOR2",
+    "SOUND2"
+  ],
+  "actual_native_consumer_closures": {
+    "CALC2": {
+      "user/systemtools/TOOLS.H": "764161356e162eda97a6efb03771d2864cbaf01f33f0fa9b970242e6f3b57066",
+      "user/systemtools/tools_ui.inc": "8ac3d66668684d0f4eff64c6c6055412517d668db2f8b1675852c442676e82ff"
+    },
+    "PALETTE2": {
+      "user/systemtools/TOOLS.H": "764161356e162eda97a6efb03771d2864cbaf01f33f0fa9b970242e6f3b57066",
+      "user/systemtools/tools_ui.inc": "8ac3d66668684d0f4eff64c6c6055412517d668db2f8b1675852c442676e82ff"
+    },
+    "MONITOR2": {
+      "user/systemtools/TOOLS.H": "764161356e162eda97a6efb03771d2864cbaf01f33f0fa9b970242e6f3b57066",
+      "user/systemtools/tools_ui.inc": "8ac3d66668684d0f4eff64c6c6055412517d668db2f8b1675852c442676e82ff"
+    },
+    "SOUND2": {
+      "user/systemtools/TOOLS.H": "764161356e162eda97a6efb03771d2864cbaf01f33f0fa9b970242e6f3b57066",
+      "user/systemtools/tools_ui.inc": "8ac3d66668684d0f4eff64c6c6055412517d668db2f8b1675852c442676e82ff"
+    }
+  },
+  "native_report": "/mnt/c/Users/Administrator/Desktop/projectos/sandcore/build/m10a2-p6-target-refresh-03/p6-generation.json",
+  "native_report_sha256": "fbc1c4519c9f432a67772eb9b7989b166edb7ce29a20a65cc88c5bae63774f2f",
+  "gui_report": "/mnt/c/Users/Administrator/Desktop/projectos/sandcore/build/m10a2-p6-gui-run-02/p6-gui.json",
+  "gui_input_sha256": {
+    "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\user\\systemtools\\TOOLS.H": "764161356e162eda97a6efb03771d2864cbaf01f33f0fa9b970242e6f3b57066",
+    "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-p6-final-02\\sdk\\SYS\\SDK\\SRC\\user\\systemtools\\TOOLS.H": "764161356e162eda97a6efb03771d2864cbaf01f33f0fa9b970242e6f3b57066",
+    "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\user\\systemtools\\tools_ui.inc": "8ac3d66668684d0f4eff64c6c6055412517d668db2f8b1675852c442676e82ff",
+    "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-p6-final-02\\sdk\\SYS\\SDK\\SRC\\user\\systemtools\\tools_ui.inc": "8ac3d66668684d0f4eff64c6c6055412517d668db2f8b1675852c442676e82ff",
+    "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\user\\sound2\\sound_ui.c": "a4802d52f1bf9593c520efa0a99d7befd7d23903b84bff65268b4fc34ee822b5",
+    "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-p6-final-02\\sdk\\SYS\\SDK\\SRC\\user\\sound2\\sound_ui.c": "a4802d52f1bf9593c520efa0a99d7befd7d23903b84bff65268b4fc34ee822b5",
+    "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\user\\systemtools\\CALC2.json": "368ef644614b6bd553659894968cce3c3ad4598446c366296d8542853405f3b9",
+    "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-p6-final-02\\sdk\\SYS\\SDK\\SRC\\user\\systemtools\\CALC2.json": "368ef644614b6bd553659894968cce3c3ad4598446c366296d8542853405f3b9",
+    "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\user\\systemtools\\PALETTE2.json": "74ed68306433005a1eacbe84435f58d49979b8385e69e80f6e6294d8461c6e20",
+    "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-p6-final-02\\sdk\\SYS\\SDK\\SRC\\user\\systemtools\\PALETTE2.json": "74ed68306433005a1eacbe84435f58d49979b8385e69e80f6e6294d8461c6e20",
+    "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\user\\systemtools\\MONITOR2.json": "b7951f0227e68664012f9e083f34be1081b80bcea7a5a7f7bb208379bdd3ed18",
+    "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-p6-final-02\\sdk\\SYS\\SDK\\SRC\\user\\systemtools\\MONITOR2.json": "b7951f0227e68664012f9e083f34be1081b80bcea7a5a7f7bb208379bdd3ed18",
+    "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\user\\sound2\\SOUND2.JSON": "c3698cdbf5e64422e49e6b067177101bc57953ecea7e2653784632a0a456f0d2",
+    "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-p6-final-02\\sdk\\SYS\\SDK\\SRC\\user\\sound2\\SOUND2.JSON": "c3698cdbf5e64422e49e6b067177101bc57953ecea7e2653784632a0a456f0d2"
+  },
+  "error_dialog_same_last_reference_defect": true,
+  "error_operation_and_code_cause_domain_raw_preserved": true,
+  "duplicate_notice_policy": "BUSY_KEEP_EXISTING_OPEN_NOTICE",
+  "completion_then_clear_reference": true,
+  "tool_close_clears_before_last_release": true,
+  "no_new_public_API_or_import": true,
+  "HOST_templates_removed_import": "ScShellErrorDialog",
+  "NATIVE_manifests_not_modified": true,
+  "Sound_shortcuts": {
+    "before": [
+      "O",
+      "R",
+      "M"
+    ],
+    "result": [
+      "o",
+      "r",
+      "m"
+    ],
+    "displayed_shortcut_labels_unchanged": true
+  },
+  "dependencies": {
+    "user/scui/ui_base.c": "1c30f9803846d360f3a4727c33af404029b756c26999e9b32ff842b014b46630",
+    "user/scui/ui_dialog.c": "3b5d8ac16af4f1aa942a7e1895a7532d899b530b874c1f23d0ac2fdd7b31edfb",
+    "user/scui/ui_menu.c": "b84afc54e8192bb5a71823f2da39a59d4836b2c5223fc7f237d6b39082f242b9",
+    "user/scui/ui_dispatch.c": "b3c683401c14d397989f3187dcaa0d47c4b159eecbfab8c03264dbe4da5069e9",
+    "user/scshell/shell_dialog.c": "87ce319a0a4669d75fe737218fe1db82d5a287c0582cf7c6f17505bb5a511ca8",
+    "kernel/keyboard.c": "5502ce304c306a8f00a6959757ffa989526658432277d945a000caa9f0cb6647",
+    "kernel/wm.c": "0767492aa351b584fb0afb9abe525629dc81e949f71588af94cbe42d244640e6"
+  },
+  "original_sources_unchanged": true,
+  "palette_resize_patch": false,
+  "monitor_terminate_confirm_not_modified": true
+}

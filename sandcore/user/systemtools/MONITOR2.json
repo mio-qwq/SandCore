@@ -131,12 +131,6 @@
       "size": 1
     },
     {
-      "name": "ScShellErrorDialog",
-      "dependency": "SCSHELL.SCL",
-      "kind": "function",
-      "size": 1
-    },
-    {
       "name": "ScStringCStr",
       "dependency": "SCLIB.SCL",
       "kind": "function",

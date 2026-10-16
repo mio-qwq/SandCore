@@ -1,0 +1,18 @@
+{
+  "schema": 1,
+  "status": "SOURCE_ONLY_EXPLICIT_LABEL_WIRING_NOT_EXECUTED",
+  "base_driver": {
+    "path": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\drafts\\m10a2-p6-followup-refresh\\driver.py",
+    "sha256": "0c3517e8717f09e15306842d2dc2d87f877aea289adad09fd5fda86c9dab0cf2"
+  },
+  "driver_sha256": "01bd8ed3c66b78062ad60cd27acbb3740931e3222d8a1a36cd9a8b91e10b7029",
+  "driver_patch_sha256": "02ab74c9c180be7161d71def7fc0ff8530e260778845f23e16fd6522915936bd",
+  "source_hunks": 13,
+  "explicit_label_set_required": true,
+  "expected_label_set_not_hardcoded": true,
+  "new_API_content_assumed": false,
+  "historical_reports_modified": false,
+  "old_wrapper_modified": false,
+  "build_started": false,
+  "vm_started": false
+}

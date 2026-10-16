@@ -1,0 +1,45 @@
+{
+  "status": "SOURCE_PATCH_ONLY_NOT_BUILT_NOT_VM_EXECUTED",
+  "files": {
+    "PINS.json": {
+      "sha256": "d18c6045bb3114f6dc55b9acff793c2285ec4463fe0efd94c030e832c7d7fa0a",
+      "bytes": 5049
+    },
+    "README.md": {
+      "sha256": "0ccd67b5f93a47a8a76534f6d36a7251f53d3ed6b66894c2dfae1c0e4810a08b",
+      "bytes": 4006
+    },
+    "installer-column-field.patch": {
+      "sha256": "68ff196a1b2a98cafcbac919ab8bf027f47a4386b17996ad8ffea9346f084974",
+      "bytes": 1390
+    },
+    "overlay/user/settings2/install_model.inc": {
+      "sha256": "cb349243ce77b51fa3c451ab7f3b074ec8793b7e365cfc44b2bce62a7962dda4",
+      "bytes": 8376
+    },
+    "overlay/user/settings2/install_view.inc": {
+      "sha256": "1580ce6e7e6199c7a9e9236a5948449e35a2ad55b3d70ba1e5f31d6226fe9d0c",
+      "bytes": 10609
+    },
+    "overlay/user/settings2/settings_model.inc": {
+      "sha256": "6d53b4564e449a353472a5c5280a82c19103998c8aafc22233a2b8e09e7e96cf",
+      "bytes": 7291
+    },
+    "overlay/user/settings2/settings_programs.inc": {
+      "sha256": "2067366a0f958b0554129629a058f44c914f48af641e8e1883bc8fea8725448c",
+      "bytes": 14594
+    },
+    "overlay/user/settings2/settings_view.inc": {
+      "sha256": "c80f2cff71f6e243fff67a67eb0622c647ea8798ac058307d599f5705f7aec50",
+      "bytes": 17853
+    },
+    "prepare.py": {
+      "sha256": "d91835fae0586201cafb9d72b880a8398b5bf2717215fc59023a46f5303cc58f",
+      "bytes": 8351
+    },
+    "settings-column-field.patch": {
+      "sha256": "0ac08ac1e05b86fbe5c4b6e8a1952bc28224c9a971a91ac6ad3d198dc92a1663",
+      "bytes": 2113
+    }
+  }
+}

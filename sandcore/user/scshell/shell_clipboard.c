@@ -17,12 +17,41 @@ static ScStatus sh_clip_offer(ScU32 format,const void *data,ScU32 bytes,ScU32 ex
     return sh_cause(s,80,0);
 }
 ScStatus ScShellClipboardText(const ScUiText *text,ScU32 epoch,ScClipboardInfo *out) {
+    ScClipboardDesc desc;
+    ScClipboardCandidate candidate=0;
+    unsigned char *owned;
+    ScU32 bytes;
     ScStatus s=sh_record(text,sizeof(*text));
     if(s<0)return s;
+    if(sh_record(out,sizeof(*out))<0)return SC_SHELL_E_INVALID;
+    /* ScUiText只是span，不能越界读取终止字节。先核公开64MiB正文上限，
+     * 再加TEXT1所需的一个NUL，也避免极大长度先被memchr/UTF8扫描。 */
+    if(text->bytes>=0x04000000u)return sh_cause(SC_SHELL_E_RANGE,80,0);
     if(text->bytes&&(!text->data||memchr(text->data,0,text->bytes)))return SC_SHELL_E_INVALID;
     s=ScUtf8Validate(text->data,text->bytes,0);
     if(s<0)return SC_SHELL_E_UTF8;
-    return sh_clip_offer(SC32_CLIPBOARD_TEXT,text->data,text->bytes,epoch,out);
+    bytes=text->bytes+1u;
+    memset(&desc,0,sizeof(desc));
+    desc.size=sizeof(desc);
+    desc.version=1;
+    /* 与SCUI Copy一致给格式元数据留余量；接近公开预算上限时饱和，
+     * 最终真实charge仍由Broker核验，不把私有br_format布局写进用户库。 */
+    desc.budget_bytes=bytes>0x04000000u-4096u?0x04000000u:bytes+4096u;
+    owned=(unsigned char *)malloc(bytes);
+    if(!owned)return sh_cause(SC_SHELL_E_MEMORY,80,0);
+    if(text->bytes)memcpy(owned,text->data,text->bytes);
+    owned[text->bytes]=0;
+    s=ScClipboardBegin(&desc,&candidate);
+    if(s>=0)s=ScClipboardOffer(candidate,SC32_CLIPBOARD_TEXT,owned,bytes);
+    /* Offer同步完成分段复制后，候选独立拥有正文；Commit/CAS不再借用owned。 */
+    free(owned);
+    if(s>=0) {
+        s=ScClipboardCommit(candidate,epoch,out);
+        if(s>=0)candidate=0;
+    }
+    s=sh_cause(s,80,0);
+    if(candidate)ScClipboardAbort(candidate);
+    return s;
 }
 static ScStatus sh_clip_read(ScU32 format,ScBuffer **out,ScU32 *epoch) {
     ScClipboardInfo info;
@@ -96,8 +125,10 @@ ScStatus ScShellClipboardReadText(ScString **out,ScU32 *epoch) {
     if(!out||!epoch)return SC_SHELL_E_INVALID;
     s=sh_clip_read(SC32_CLIPBOARD_TEXT,&b,&e);
     if(s>=0)s=sh_buffer_data(b,&p,&n);
-    if(s>=0&&(memchr(p,0,n)||ScUtf8Validate(p,n,0)<0))s=SC_SHELL_E_UTF8;
-    if(s>=0)s=ScStringCreate(p,n,&str);
+    /* TEXT1的bytes含唯一末尾NUL；先验边界，再只把正文交给UTF8和ScString。 */
+    if(s>=0&&(!n||p[n-1]||memchr(p,0,n-1)))s=SC_SHELL_E_PROTOCOL;
+    if(s>=0&&ScUtf8Validate(p,n-1,0)<0)s=SC_SHELL_E_UTF8;
+    if(s>=0)s=ScStringCreate(p,n-1,&str);
     ScBufferRelease(b);
     if(s<0)return sh_cause(s,81,0);
     *out=str;
@@ -335,7 +366,7 @@ ScStatus ScShellClipboardReconcile(ScShellFileJob *job,ScClipboardInfo *out) {
     done:ScBufferRelease(remaining);
     return sh_cause(s,84,0);
 }
-ScStatus ScShellDragBegin(ScUiContext *ui,ScUiNode source,const ScShellFileItem *items,ScU32 count,ScU32 actions,ScU32 *token) {
+static ScStatus sh_drag_begin(ScUiContext *ui,ScUiNode source,const ScShellFileItem *items,ScU32 count,ScU32 actions,ScU32 flags,ScU32 *token) {
     ScBuffer *files=0,*offer=0;
     ScDragOffer header;
     ScDragFormat row;
@@ -343,7 +374,7 @@ ScStatus ScShellDragBegin(ScUiContext *ui,ScUiNode source,const ScShellFileItem 
     const unsigned char *p;
     ScU32 bytes,n;
     ScStatus s;
-    if(!actions||actions&~3u||!token)return SC_SHELL_E_INVALID;
+    if(!actions||actions&~3u||flags&~SC_SHELL_DRAG_DEFERRED||!token)return SC_SHELL_E_INVALID;
     s=sh_clip_files_encode(items,count,SC32_CLIPBOARD_COPY,&files);
     if(s>=0)s=sh_buffer_data(files,&p,&bytes);
     if(s<0)goto done;
@@ -372,12 +403,16 @@ ScStatus ScShellDragBegin(ScUiContext *ui,ScUiNode source,const ScShellFileItem 
     d.source=source;
     d.actions=actions;
     d.offer=p;
-    d.offer_bytes=n;
+    d.offer_bytes=n;d.flags=flags&SC_SHELL_DRAG_DEFERRED?SC_UI_DRAG_DEFERRED:0;
     if(s>=0)s=ScUiDragBegin(ui,&d,token);
     done:ScBufferRelease(files);
     ScBufferRelease(offer);
     return sh_cause(s,85,0);
 }
+ScStatus ScShellDragBegin(ScUiContext *ui,ScUiNode source,const ScShellFileItem *items,ScU32 count,ScU32 actions,ScU32 *token)
+{return sh_drag_begin(ui,source,items,count,actions,0,token);}
+ScStatus ScShellDragBeginEx(ScUiContext *ui,ScUiNode source,const ScShellFileItem *items,ScU32 count,ScU32 actions,ScU32 flags,ScU32 *token)
+{return sh_drag_begin(ui,source,items,count,actions,flags,token);}
 ScStatus ScShellDropFiles(const ScUiDragData *data,const char *destination,const char *recovery,ScShellFileJob **out) {
     ScBrokerIdentity self;
     ScShellFileItem *items=0;
@@ -405,3 +440,5 @@ ScStatus ScShellDropFiles(const ScUiDragData *data,const char *destination,const
     sh_file_items_free(items,count);
     return s;
 }
+
+#include "shell_drop_deferred.inc"

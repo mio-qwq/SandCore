@@ -1,0 +1,94 @@
+--- a/drafts/m10a2-p6-followup-refresh/driver.py
++++ b/drafts/m10a2-p6-followup-refresh-v2/driver.py
+@@ -1,4 +1,4 @@
+-"""只接本轮三标签刷新；默认只读计划，Root显式--execute之后才创建VM。"""
++"""只刷新Root逐项显式指定且与真实变化完全相等的标签；默认不创建VM。"""
+ from pathlib import Path
+ import argparse
+ import json
+@@ -6,12 +6,13 @@
+ import traceback
+ 
+ sys.dont_write_bytecode = True
+-from followup import ALLOWED, Basis, CORE, HERE, HOST07, LAYOUT, PREVIOUS, PREVIOUS_SHA, ROOT, SDK, WITNESS, inside, read, sha
++from followup import Basis, CORE, HERE, HOST07, LAYOUT, PREVIOUS, PREVIOUS_SHA, ROOT, SDK, WITNESS, inside, read, sha, validated_labels, exact_changed_labels
+ 
+ 
+ def main():
+     parser = argparse.ArgumentParser(description=__doc__)
+     parser.add_argument('--frozen-audit', action='store_true', help='只读固定底座、layout和actual-get witness，不读HOST08、不构建、不接VM')
++    parser.add_argument('--label', action='append', help='Root明确批准的完整实际CASES标签；可重复给多个标签')
+     parser.add_argument('--host-report', type=Path)
+     parser.add_argument('--host-sha256')
+     parser.add_argument('--vm-out', type=Path)
+@@ -30,10 +31,10 @@
+             build_started=False, vm_started=False), ensure_ascii=False, indent=2))
+         return
+     if any(value is None for value in (args.host_report, args.host_sha256, args.vm_out, args.bundle_out)):
+-        parser.error('计划/执行均须显式给HOST08完整报告SHA及两个全新输出路径')
++        parser.error('计划/执行均须显式给--label、HOST08完整报告SHA及两个全新输出路径')
+     host_path = inside(args.host_report)
+     if host_path.name != 'p6-unified-host-08.json':
+-        raise ValueError('本轮只接Root三patch后的HOST08完整报告')
++        raise ValueError('本轮只接Root全部修复收齐后的HOST08完整报告')
+     basis.pin(host_path, args.host_sha256.lower())
+     vm_out, bundle = args.vm_out.resolve(), args.bundle_out.resolve()
+     for path, prefix in ((vm_out, 'm10a2-p6-refresh-vm-'), (bundle, 'm10a2-p6-target-refresh-')):
+@@ -41,12 +42,12 @@
+             raise ValueError('需要build内对应前缀的两个全新输出目录')
+     legacy = basis.legacy()
+     target, sdk = legacy.target, legacy.sdk
+-    planned, payload, pins, previous = target.preparation(ROOT / PREVIOUS, PREVIOUS_SHA, allowed=ALLOWED)
++    labels = validated_labels(args.label, target.contract.cases())
++    planned, payload, pins, previous = target.preparation(ROOT / PREVIOUS, PREVIOUS_SHA, allowed=labels)
+     if previous != basis.old:
+         raise ValueError('preparation读取的previous与固定原报告不同')
+-    # 三个实际缺陷均应已合入；范围更小/更大都停在准备，不能拿无变化冒充刷新。
+-    if set(planned['changed_labels']) != set(ALLOWED):
+-        raise ValueError('本轮需精确三个实际变化标签：' + str(planned['changed_labels']))
++    # Caller指定集合仍必须等于逐字节闭包比较的实际集合，不自动扩大范围。
++    exact_changed_labels(labels, planned['changed_labels'])
+     host_inputs = sdk.Inputs()
+     _, recorded, _ = sdk.verified_build(host_path, host_inputs)
+     for name, expected in planned['source_input_sha256'].items():
+@@ -101,7 +102,7 @@
+     pins.update(basis.pins)
+     if host_inputs.unchanged():
+         raise ValueError('只读准备期间HOST08输入发生变化')
+-    baseline = dict(origin='FINAL02_PRIOR_NATIVE_RUNTIME_NOT_FOLLOWUP_OUTPUT',
++    baseline = dict(origin='FINAL02_PRIOR_NATIVE_RUNTIME_NOT_FOLLOWUP_OUTPUT', requested_labels=labels,
+         previous_report=str(ROOT / PREVIOUS), previous_report_sha256=PREVIOUS_SHA,
+         core=str(core), core_sha256=sha(core / 'fs/SYS/CORE/CORE.SKM'),
+         sdk_manifest=str(ROOT / SDK / 'MANIFEST.json'), sdk_manifest_sha256=sha(ROOT / SDK / 'MANIFEST.json'),
+@@ -118,9 +119,9 @@
+             changed=planned['changed_labels'], host_report=str(host_path), host_report_sha256=sha(host_path),
+             bootstrap=baseline, build_started=False, vm_started=False), ensure_ascii=False, indent=2))
+         return
+-    report = dict(status='RUNNING', scope='FOLLOWUP_THREE_TARGET_NATIVE_REFRESH_WITH_FINAL02_BOOTSTRAP',
++    report = dict(status='RUNNING', scope='FOLLOWUP_EXPLICIT_LABEL_NATIVE_REFRESH_WITH_FINAL02_BOOTSTRAP',
+         cases=[], screenshots=[], warm_observations=[], source_disk_sha256=sha(data),
+-        changed_labels=planned['changed_labels'], full_M10a2=False,
++        changed_labels=planned['changed_labels'], requested_labels=labels, full_M10a2=False,
+         bootstrap_origin=baseline['origin'], bootstrap_binding=baseline,
+         host_report=str(host_path), host_report_sha256=sha(host_path),
+         core_binding=dict(elf_sha256=sha(core / 'core.elf'), core_sha256=sha(core / 'fs/SYS/CORE/CORE.SKM')),
+@@ -131,7 +132,7 @@
+         (vm_out / 'refresh-vm.json').write_text(json.dumps(report, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+ 
+     legacy.first.BUILD = core
+-    with basis.bind_sidecars(target), legacy.first.harness_configuration():
++    with basis.bind_generation(target, planned), legacy.first.harness_configuration():
+         with legacy.QemuSession(core / 'sandcore.img', data, vm_out, 'tcg', True, audio=False, memory=256,
+                 data_prepare=lambda image: legacy.prepare(image, core, dict(payload, **bootstrap), runtime_fixtures=False)) as vm:
+             guest, harness = legacy.GuiGuest(vm), None
+@@ -152,8 +153,8 @@
+                     Path(desktop['path'] + '.sdbg'), desktop['debug']['sha256'], basis.layout)
+                 harness.owner_arguments = (core / 'core.elf', basis.layout, binding, session)
+                 result = target.execute(harness, planned, payload, pins, basis.old, bundle, host_report=host_path,
+-                                        work='/HOME/P6FOLLOWUP')
+-                report.update(status='THREE_TARGET_REFRESH_GENERATED', bundle_status=result['status'],
++                                        work='/HOME/P6FOLLOWUP2')
++                report.update(status='EXPLICIT_LABEL_REFRESH_GENERATED', bundle_status=result['status'],
+                               bundle_report=str(bundle / 'p6-generation.json'))
+                 harness.screen('p6-followup-final02-bootstrap-desktop')
+             except BaseException as error:

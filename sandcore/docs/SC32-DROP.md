@@ -67,3 +67,5 @@ Ticket低字是真实池槽+1、高字是不会静默回绕复用的序号；序
 修订：2026-10-15，收齐真实内核票据/WM命中、30秒handoff、PID/peer144记录与动态清理链，旧SCAPI字节保持，待统一验证。
 
 2026-10-15静态授权修复：捕获丢失不当作UP。handoff前核起始真实input epoch及仍有capture，失捕/失焦/INPUTSYNC立即撤票，重获capture不能复活旧票；真正UP的At或仍同输入资格下Validate才冻结handoff，之后合法ACK不要求继续capture。新增事实只在内核local WmDropFact，公开144B布局不变，未运行。
+
+2026-10-16：旧ScDropComplete仍只消费传输轮次、不证明文件提交。显式SCUI v2在HOLD/READY前消费30秒输入票，后续只在已认证channel/nonce/owner上传真实job终态，不延长旧票或增加内核权限。源视图只在最终结果后复核实际FS，旧v1语义保持。详见SCUI-DROP-DEFERRED，待统一构建与客体验证。

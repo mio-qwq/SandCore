@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "status": "FROZEN_SOURCE_PATCH_NOT_BUILT_NOT_GUEST_VERIFIED",
+  "static_scope_check": "PASS_EXACTLY_TWO_FUNCTIONS_REVERSE_TO_IDENTICAL_BEFORE",
+  "lower_unchanged_bytes": 11658,
+  "build_started": false,
+  "VM_called": false,
+  "runtime_tests_added": false,
+  "files": {
+    "clipboard-text.patch": {
+      "bytes": 2691,
+      "sha256": "c6db96f5c1d98595b2b5f40a6c4896bd156776d494178da1809eb425bd9f656e"
+    },
+    "shell_clipboard.c.before": {
+      "bytes": 15237,
+      "sha256": "fb5acb791a2be1ca7fca4eab2c3b27860984dc7b48c0538a3222ab30a57e8f2a"
+    },
+    "shell_clipboard.c.after": {
+      "bytes": 16734,
+      "sha256": "a9999323fc798061a04dc5842174422ff11b97f33e2bbd338519a3745b03101b"
+    },
+    "PINS.json": {
+      "bytes": 4497,
+      "sha256": "e20ec87941c46bb10cc02532a710263069321836cf416f50d17a2369187858de"
+    },
+    "README.md": {
+      "bytes": 3517,
+      "sha256": "c2469ee1798cf2c3672d7b790306d9940c2f7c7f9b419396a2beb890784f5b88"
+    }
+  }
+}

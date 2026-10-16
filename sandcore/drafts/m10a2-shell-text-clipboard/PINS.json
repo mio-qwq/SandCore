@@ -1,0 +1,127 @@
+{
+  "schema": 1,
+  "status": "SOURCE_PATCH_ONLY_NOT_BUILT_NOT_GUEST_VERIFIED",
+  "target": "user/scshell/shell_clipboard.c",
+  "before": {
+    "file": "shell_clipboard.c.before",
+    "bytes": 15237,
+    "sha256": "fb5acb791a2be1ca7fca4eab2c3b27860984dc7b48c0538a3222ab30a57e8f2a"
+  },
+  "after": {
+    "file": "shell_clipboard.c.after",
+    "bytes": 16734,
+    "sha256": "a9999323fc798061a04dc5842174422ff11b97f33e2bbd338519a3745b03101b"
+  },
+  "patch": {
+    "file": "clipboard-text.patch",
+    "sha256": "c6db96f5c1d98595b2b5f40a6c4896bd156776d494178da1809eb425bd9f656e",
+    "carrier_line_endings": "LF",
+    "target_original_line_endings": "CRLF"
+  },
+  "functions": {
+    "ScShellClipboardText": {
+      "before_bytes": 422,
+      "before_sha256": "4ca999248df7d1ba7d2ef3300bbfc26b348ca83739ecd23df9e6edb859a3d363",
+      "after_bytes": 1765,
+      "after_sha256": "3d9a5dee025c7f04d45d0c27b934e461d95364d9a655e1d80a5ac949305c2f3b"
+    },
+    "ScShellClipboardReadText": {
+      "before_bytes": 531,
+      "before_sha256": "0deb70478f4195c2c369a7e0601d40229ac80eeb416a3a2f0d4da109dbe239d8",
+      "after_bytes": 685,
+      "after_sha256": "17ce68a8c0485fd532c04f751ce6ca838370abcf0526a3202b36b471337b7e51"
+    }
+  },
+  "unchanged": {
+    "prefix_before_writer_sha256": "727c25092ef795e443580b8f5a8aa0950dfae75c753362a1f9c55a9f8e29a816",
+    "between_writer_and_reader_sha256": "089edcc9c46ad1389abda2aff3c1532cde13effe4fd5870ad0579817acad623a",
+    "lower_from": "static ScStatus sh_clip_files_encode(",
+    "lower_bytes": 11658,
+    "lower_sha256": "b1abae3538c842d46209f68e33117dad4914116e8bce10b94ba5692b0d8c864b",
+    "lower_byte_identical": true,
+    "includes_changed": false,
+    "public_headers_changed": false,
+    "ABI_or_selector_changed": false,
+    "new_imports": []
+  },
+  "input_sha256": {
+    "user/scshell/shell_clipboard.c": {
+      "bytes": 15237,
+      "sha256": "fb5acb791a2be1ca7fca4eab2c3b27860984dc7b48c0538a3222ab30a57e8f2a"
+    },
+    "user/scshell/SCSHELLPRIVATE.H": {
+      "bytes": 8842,
+      "sha256": "328b66671449b81166e45029673bfd356bf361f21f04bfa31669f146ae177321"
+    },
+    "user/scshell/shell_base.c": {
+      "bytes": 9667,
+      "sha256": "a9662cbd3534f9ada82cfb5a06ab56620be1ca9050a7f7b9f03d328a50ba8439"
+    },
+    "user/SCSHELL.H": {
+      "bytes": 17316,
+      "sha256": "fa6c1406cb2ad9609e59ee7fc97540da074573e68432ffea37d42a13a1f7519e"
+    },
+    "user/SC32BROKER.H": {
+      "bytes": 7474,
+      "sha256": "41a92354b7138d378181fbcf93ecbc6ff27bb88eea3008dbaa9380790a254ac8"
+    },
+    "user/SC32API.H": {
+      "bytes": 13011,
+      "sha256": "0e77851eb66437d2b2afeadf7312b8bf0704d5f61347c5f84f57189819617dda"
+    },
+    "user/SCAPI.H": {
+      "bytes": 38476,
+      "sha256": "81a730450fcb3d310ed841ad3e5c70a3fed32aa7fbd10acac8b888ac7da9ffc1"
+    },
+    "user/brokerapi/sc32_broker.c": {
+      "bytes": 15842,
+      "sha256": "9bb802caf6fbbc29be6eddf43663eab02dc408ea390a44fcd758473504e4270a"
+    },
+    "kernel/sc32_broker.c": {
+      "bytes": 91681,
+      "sha256": "aaf86f806709fde7bd4a16f4cb8d8a78d71379714e02eb40928df964c255449e"
+    },
+    "user/scui/ui_edit.c": {
+      "bytes": 93021,
+      "sha256": "ae9d836f57ac2728c1a60234194262ffed3e9739b34dd5b211d10d1f9d8eec9c"
+    },
+    "user/sclib/sclib_utf8.c": {
+      "bytes": 4947,
+      "sha256": "8bb5c152b9bba9cf07c30a24e037f18e289d4b8253ea8cfbb8da5d4439792971"
+    },
+    "user/sclib/sclib_string.c": {
+      "bytes": 9589,
+      "sha256": "5d6cd27fb3116310246df21884b2f612eba40cbf077211593603525868185bbe"
+    },
+    "docs/SC32-BROKER.md": {
+      "bytes": 22597,
+      "sha256": "3c71a0f03416c6988db4016d23303b2cf0bd21ccc92d5050fa68a912365a59ce"
+    },
+    "user/scshell/SCSHELL.NATIVE.JSON": {
+      "bytes": 27984,
+      "sha256": "3412973cd5e5f7c969782ee5171c9162dfd7dff6e6accd84dbf4df8397dc0a31"
+    }
+  },
+  "known_imports_used": [
+    "malloc",
+    "free",
+    "memcpy",
+    "memchr",
+    "memset",
+    "ScUtf8Validate",
+    "ScClipboardBegin",
+    "ScClipboardOffer",
+    "ScClipboardCommit",
+    "ScClipboardAbort",
+    "ScStringCreate"
+  ],
+  "checks": {
+    "two_exact_function_replacements_only": true,
+    "lower_byte_comparison": "PASS",
+    "main_source_still_exact_before_at_check": true,
+    "existing_native_manifest_has_all_called_imports": true,
+    "build_started": false,
+    "VM_called": false,
+    "runtime_test_started": false
+  }
+}

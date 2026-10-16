@@ -179,7 +179,8 @@ static ScStatus installer_create(void)
     const char *titles[]={"来源","目标","字节","结果"};
     ScUiColumnDesc columns[4];
     for(ScU32 i=0;i<4;i++){INIT(columns[i]);
-        columns[i].column=i;
+        /* 表头身份从1开始；实际来源/目标/字节/结果仍按原field取值。 */
+        columns[i].column=i+1;
         columns[i].field=i;
         columns[i].title=text(titles[i]);
         columns[i].width=i==2?90:i==3?230:230;

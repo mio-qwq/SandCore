@@ -1,6 +1,6 @@
 #ifndef SANDCORE_DESKTOP_PRIVATE_H
 #define SANDCORE_DESKTOP_PRIVATE_H
-#include <SCSHELL.H>
+#include <SCSHELLDROP.H>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -54,6 +54,7 @@ typedef struct {
     ScUiDialog *dialog;
     ScU32 edit_item,edit_revision,edit_new;char edit_path[68];
     ScUiDragData pending_drop;void *drop_bytes;
+    ScUiDropReceipt drop_receipt;ScUiDropResult drop_result;ScU32 drop_stage,drop_revision,job_deferred;
     ScU32 recovery_nonce;
     ScU32 external_drag;
     ScU32 drop_target;

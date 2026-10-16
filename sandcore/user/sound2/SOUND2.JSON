@@ -425,12 +425,6 @@
       "size": 1
     },
     {
-      "name": "ScShellErrorDialog",
-      "dependency": "SCSHELL.SCL",
-      "kind": "function",
-      "size": 1
-    },
-    {
       "name": "malloc",
       "dependency": "SCCLIB.SCL",
       "kind": "function",
