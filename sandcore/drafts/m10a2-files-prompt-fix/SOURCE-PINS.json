@@ -1,0 +1,30 @@
+{
+  "user/SCUI.H": {
+    "sha256": "72d54bfea02c732201ce6b2ecad495c933c30353ab49240c74a5831f0010f72a",
+    "bytes": 24386
+  },
+  "user/scui/ui_dialog.c": {
+    "sha256": "3edbc873669548cefa6495e191c2b3a88544d9d994e7134d7002da9b2607ac4d",
+    "bytes": 50166
+  },
+  "user/scui/ui_tree.c": {
+    "sha256": "46d615567c6815abcc659805f7bb9268980e65a307651a1123ce16cd47b94380",
+    "bytes": 28858
+  },
+  "user/scui/ui_dispatch.c": {
+    "sha256": "b3c683401c14d397989f3187dcaa0d47c4b159eecbfab8c03264dbe4da5069e9",
+    "bytes": 44005
+  },
+  "user/scshell/shell_dialog.c": {
+    "sha256": "87ce319a0a4669d75fe737218fe1db82d5a287c0582cf7c6f17505bb5a511ca8",
+    "bytes": 25552
+  },
+  "user/files2/files2_actions.inc": {
+    "sha256": "d54cf70c0196d074ee7ca65d448cbd2a5cfa45f65971de48e13158d37bb1686e",
+    "bytes": 35796
+  },
+  "build/m10a2-p6-gui-run-01/p6-native-files-mkdir-dialog.png": {
+    "sha256": "9a3b3fa1b3eb487e7f1728b167ce4896abaa4f8ce763a480b13bc9ac250b6fd4",
+    "bytes": 866256
+  }
+}

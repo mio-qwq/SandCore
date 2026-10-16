@@ -242,12 +242,8 @@ def actual_native(name: str, provenance_path: Path, manifest: dict, inputs: Inpu
         # 小型归档保留完整原报告，其stdout绝对路径仍指向原验证目录。
         # 不猜另一份同名日志；只读取报告给出的精确路径及SHA，且不离开仓库。
         inputs.read(Path(cases[0]['stdout_path']), cases[0]['stdout_sha256'], cases[0]['stdout_bytes'])
-    required = final_sdk.implementation_headers(ROOT,roots,set(public_headers) | set(SHARED_HEADERS))
-    for folder in roots:
-        files = final_sdk.native_sources(ROOT,folder)
-        for file in files:
-            key = file.relative_to(ROOT).as_posix()
-            required.add(key)
+    required = final_sdk.implementation_headers(ROOT,roots,set(public_headers) | set(SHARED_HEADERS),
+        entry=final_sdk.NATIVE_ENTRIES[name])
     for key in sorted(required):
         if key not in source:
             raise ValueError('native generation缺自身源码/public布局集合：' + key)
@@ -257,7 +253,9 @@ def actual_native(name: str, provenance_path: Path, manifest: dict, inputs: Inpu
         provenance_sha256=sha(provenance_path), origin_report=str(generation_path), origin_report_sha256=sha(generation_path),
         generation_case=item['compile_case'], generation_source_input_sha256=source,
         current_unchanged_source_closure={key: source[key] for key in sorted(required)},
-        source_reuse_rule='OWN_IMPLEMENTATION_AND_SHARED_LAYOUT_EXACT_PROVIDER_ABI_AND_IMPORT_CLOSURE',
+        source_reuse_rule='ACTUAL_AGGREGATE_INCLUDE_AND_PUBLIC_LAYOUT_EXACT_PROVIDER_ABI_AND_IMPORT_CLOSURE',
+        native_entry_source=final_sdk.NATIVE_ENTRIES[name],
+        noncompiled_source_archive_origin='CURRENT_HOST_INPUTS_NOT_GUEST_COMPILE_CLAIM',
         compiler_sha256=cases[0].get('compiler_sha256'), bytes=len(body), sha256=digest(body),
         prior_generated_file_executed=item.get('executed_this_generated_file', False),
         staging_is_execution_evidence=False)

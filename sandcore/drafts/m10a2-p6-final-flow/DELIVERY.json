@@ -1,0 +1,36 @@
+{
+  "status": "FROZEN_FINAL_FLOW_PREPARATION_NOT_EXECUTED",
+  "files": [
+    {
+      "path": "CORE-SDK.md",
+      "bytes": 5262,
+      "sha256": "0d72d2ee162070cee91c66c2d1f53fd01c0a4f32d16b01abfe6bcc73aa25b877"
+    },
+    {
+      "path": "freeze.py",
+      "bytes": 2387,
+      "sha256": "ebb9c8d6bb451fd6b8532f7b65fe71bb572f2c9181d6bdb4a58a2ed0d42ffdb4"
+    },
+    {
+      "path": "prepare_candidate.py",
+      "bytes": 18226,
+      "sha256": "96b8086386550bd7b99a6a20f094acbc9ef09ca29c44e2a511243330fade8755"
+    },
+    {
+      "path": "README.md",
+      "bytes": 8081,
+      "sha256": "e821115717d7f11d15ff05123fd26bd548580db58d4f7644e40fa530491a4732"
+    },
+    {
+      "path": "SOURCE-PINS.json",
+      "bytes": 3002,
+      "sha256": "b34d162f2a402288a093821d7fbe87f96d47377bf824ad2c9e9fc0260941c05a"
+    }
+  ],
+  "native_generation_current_status": "Partial run03 progress only; actual final PASS required by helper",
+  "main_modified": false,
+  "git_used": false,
+  "vm_started": false,
+  "build_executed": false,
+  "data_copied": false
+}

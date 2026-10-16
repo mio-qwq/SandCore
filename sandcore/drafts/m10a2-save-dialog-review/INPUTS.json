@@ -1,0 +1,151 @@
+{
+  "schema": 1,
+  "status": "FROZEN_CAUSE_CONFIRMED_SOURCE_REVIEW_ONLY",
+  "scope": "GUI01_NEW_FILE_SAVE_DIALOG_API_SEMANTICS_MISMATCH",
+  "date": "2026-10-16",
+  "report_sha256": "8da0b7cec9b259e9f029548f2bc8458018c356a5d6feba0ae49baece20bb94ec",
+  "sources": {
+    "user/scui/ui_dialog.c": {
+      "sha256": "3edbc873669548cefa6495e191c2b3a88544d9d994e7134d7002da9b2607ac4d",
+      "host03_input_sha256": "3edbc873669548cefa6495e191c2b3a88544d9d994e7134d7002da9b2607ac4d"
+    },
+    "user/scui/SCUIPRIVATE.H": {
+      "sha256": "374c2c98c7da78cd7b8956764ec1b9143d1fec20b3361444634b2fd8658ca3a0",
+      "host03_input_sha256": "374c2c98c7da78cd7b8956764ec1b9143d1fec20b3361444634b2fd8658ca3a0"
+    },
+    "user/scui/SCUI.json": {
+      "sha256": "d5f76e378f1e1de18499604185dab1cbb00310b9de410721bda50a880c88f553",
+      "host03_input_sha256": "d5f76e378f1e1de18499604185dab1cbb00310b9de410721bda50a880c88f553"
+    },
+    "user/scui/SCUI.NATIVE.JSON": {
+      "sha256": "f7ba0ca60219804635c91ae538059d706c61d1d3c07e444554eb35d042e59fbc",
+      "host03_input_sha256": "f7ba0ca60219804635c91ae538059d706c61d1d3c07e444554eb35d042e59fbc"
+    },
+    "user/SCUI.H": {
+      "sha256": "72d54bfea02c732201ce6b2ecad495c933c30353ab49240c74a5831f0010f72a",
+      "host03_input_sha256": "72d54bfea02c732201ce6b2ecad495c933c30353ab49240c74a5831f0010f72a"
+    },
+    "user/SC32PATH.H": {
+      "sha256": "f0bc29ab842043c7d63791ee8c7ff83760e9c84d5b6aa80e74544a9c4851d037",
+      "host03_input_sha256": "f0bc29ab842043c7d63791ee8c7ff83760e9c84d5b6aa80e74544a9c4851d037"
+    },
+    "user/SC32API.H": {
+      "sha256": "0e77851eb66437d2b2afeadf7312b8bf0704d5f61347c5f84f57189819617dda",
+      "host03_input_sha256": "0e77851eb66437d2b2afeadf7312b8bf0704d5f61347c5f84f57189819617dda"
+    },
+    "user/notes2/notes_actions.c": {
+      "sha256": "e32f2cd0470794f98e5953be730cb4c3f408696ce8f2034c2f1aa23ef7ca5050",
+      "host03_input_sha256": "e32f2cd0470794f98e5953be730cb4c3f408696ce8f2034c2f1aa23ef7ca5050"
+    },
+    "user/notes2/notes_io.c": {
+      "sha256": "de06866d2d19c23d0d5c33c54ca8068bdf1663cf2410c16a9c6ebebef1664b2c",
+      "host03_input_sha256": "de06866d2d19c23d0d5c33c54ca8068bdf1663cf2410c16a9c6ebebef1664b2c"
+    },
+    "user/sc32/sc32_path.c": {
+      "sha256": "1eda869b2a1845aa8fe253f505eca9939c8d307c8f01206be15f8a4eb6b6b6dc",
+      "host03_input_sha256": "1eda869b2a1845aa8fe253f505eca9939c8d307c8f01206be15f8a4eb6b6b6dc"
+    },
+    "user/sc32/sc32_support.c": {
+      "sha256": "faa7b3df51e0b0dd4ae7334a416dc30769aa09a5f9e2c0ac2b175dab533bdd18",
+      "host03_input_sha256": "faa7b3df51e0b0dd4ae7334a416dc30769aa09a5f9e2c0ac2b175dab533bdd18"
+    },
+    "user/pathapi/path_query.c": {
+      "sha256": "4bf68620d8b60570d1d96617bbfe15a3497980d6b99e3b0f19a267d71097495d",
+      "host03_input_sha256": "4bf68620d8b60570d1d96617bbfe15a3497980d6b99e3b0f19a267d71097495d"
+    },
+    "kernel/fs.c": {
+      "sha256": "e0e916990807587df741ee023a3d36741bce85f4c15fb5c0523f52351bc2fb52",
+      "host03_input_sha256": "e0e916990807587df741ee023a3d36741bce85f4c15fb5c0523f52351bc2fb52"
+    },
+    "kernel/task.c": {
+      "sha256": "40495fad1e36bdc1e83e2787e6e18a4da710eea1553959a8ba3ca6f543ece2ef",
+      "host03_input_sha256": "40495fad1e36bdc1e83e2787e6e18a4da710eea1553959a8ba3ca6f543ece2ef"
+    },
+    "kernel/fs_path_query.inc": {
+      "sha256": "46b4c9c678750bb66ad67274de3669aa39b96d9274513645b7a397c3cbb50426",
+      "host03_input_sha256": "46b4c9c678750bb66ad67274de3669aa39b96d9274513645b7a397c3cbb50426"
+    },
+    "kernel/sc32_path_query.inc": {
+      "sha256": "8716ea616790609dae95a16b8eb15e68efcf7175e08c0ae132ba442528acdc46",
+      "host03_input_sha256": "8716ea616790609dae95a16b8eb15e68efcf7175e08c0ae132ba442528acdc46"
+    },
+    "kernel/sc32_file.c": {
+      "sha256": "2792ef65e0f2d53db41a08ac9fcf62d9e70963eba643debe2111f6c566df5fed",
+      "host03_input_sha256": "2792ef65e0f2d53db41a08ac9fcf62d9e70963eba643debe2111f6c566df5fed"
+    }
+  },
+  "host03_report": {
+    "path": "build/m10a2-main-studio-01/p6-unified-host-03.json",
+    "sha256": "0f74b114e32275112b325c6bb9a07c9cb608e261a92376ed4e5a0f12a128f30a"
+  },
+  "native_report": {
+    "path": "build/m10a2-p6-guest-generation-run-03/p6-generation.json",
+    "sha256": "f5538ba547f2ae38e00f35d35b57e2c0a55ef8282955aefbf221042122c57ddc"
+  },
+  "actual_ui": {
+    "path": "build/m10a2-p6-guest-generation-run-03/native-libraries/SCUI.SCL",
+    "sha256": "975e4dcb1ec4336486a8d8a8ee550183ab1895a0e7b6736c1f62cfa9a5d9c991",
+    "bytes": 732380,
+    "path_imports": [
+      {
+        "name": "ScPathCreate",
+        "dep_index": 0,
+        "dependency": "SC32API.SCL",
+        "kind": 1,
+        "size": 1
+      },
+      {
+        "name": "ScPathMetadata",
+        "dep_index": 0,
+        "dependency": "SC32API.SCL",
+        "kind": 1,
+        "size": 1
+      },
+      {
+        "name": "ScPathResolve",
+        "dep_index": 0,
+        "dependency": "SC32API.SCL",
+        "kind": 1,
+        "size": 1
+      },
+      {
+        "name": "ScPathStat",
+        "dep_index": 0,
+        "dependency": "SC32API.SCL",
+        "kind": 1,
+        "size": 1
+      },
+      {
+        "name": "ScPathJoin",
+        "dep_index": 2,
+        "dependency": "SCLIB.SCL",
+        "kind": 1,
+        "size": 1
+      }
+    ],
+    "object_compile_case": "SCUI-actual-SCCC-object"
+  },
+  "actual_provider": {
+    "path": "build/m10a2-p6-guest-generation-run-03/native-libraries/SC32API.SCL",
+    "sha256": "b5a54a79d1aa1d773a766ae85edc9c2162bedfdd7e54d8363a798b7f5c85a647",
+    "abi_major": 1,
+    "abi_minor": 4,
+    "library_version": 6,
+    "query_export": {
+      "name": "ScPathQuery",
+      "rva": 45079,
+      "size": 406,
+      "kind": 1
+    }
+  },
+  "screenshot": {
+    "path": "build/m10a2-p6-gui-run-01/p6-native-notes-saved.png",
+    "bytes": 700755,
+    "sha256": "17ce34cb9a95376bdf5f64f9f6881dfcc3aaeccffa610e18343ad307fdbaa598"
+  },
+  "main_or_helpers_modified": false,
+  "build_executed": false,
+  "qemu_started": false,
+  "fix_applied": false,
+  "fix_runtime_verified": false
+}

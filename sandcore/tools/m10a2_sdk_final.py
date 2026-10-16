@@ -13,6 +13,11 @@ CODEC_HEADERS=('user/SCSOUND.H','user/SCTYPES.H','user/SC32API.H','user/SC32LEAS
 PUBLIC_ADDITIONS=('SCUITABS.H','SC32REPLACE.H','SC32CONFIG.H','SC32CAPTURE.H','SCSHELLABSENT.H','SCSOUND.H','SC32TERMINAL.H','SCUITERM.H')
 OPTIONAL_AUTH=('SC32AUTH.H','SCUIAUTH.H')
 SOURCE_SUFFIXES={'.c','.h','.inc','.asm','.json','.s'}
+NATIVE_ENTRIES={
+    'SCLDR.SCL':'user/runtime/SCLROOT.C','SC32API.SCL':'user/sc32/SC32API.C',
+    'SCCLIB.SCL':'user/stdlib/SCCLIB.C','SCLIB.SCL':'user/sclib/SCLIB.C',
+    'SCUI.SCL':'user/scui/SCUI.C','SCSHELL.SCL':'user/scshell/SCSHELL.C',
+    'SCGFX.SCL':'user/scgfx/SCGFX.C','SCTERM.SCL':'user/scterm/SCTERM.C'}
 
 def configure(root,libraries,headers,docs):
     manifest,roots=libraries['SC32API.SCL']
@@ -45,9 +50,14 @@ def native_sources(root,folder):
     return [p for p in (root/folder).rglob('*') if p.is_file() and p.suffix.lower() in SOURCE_SUFFIXES-{'.json'}
             and not (folder=='user/scshell/' and p.is_relative_to(root/'user/scshell/desktop'))]
 
-def implementation_headers(root,roots,extra):
+def implementation_headers(root,roots,extra,entry=None):
     # 公共声明位于库源目录外；按实际literal include补闭包，避免新Secret/PTY头被固定列表漏掉。
-    required=set(extra);pending=[p for folder in roots for p in native_sources(root,folder)]+[root/name for name in extra];seen=set()
+    # 原生来源核实际聚合入口的完整literal include闭包；目录中未接线的
+    # 历史草稿仍由required_sources完整归档并按HOST输入固定，但它们没有
+    # 参加本库编译，不能反过来要求一份虚假的客体编译来源。
+    seeds=[root/entry] if entry else [p for folder in roots for p in native_sources(root,folder)]
+    required=set(extra)|{p.relative_to(root).as_posix() for p in seeds}
+    pending=seeds+[root/name for name in extra];seen=set()
     while pending:
         file=pending.pop().resolve(strict=True)
         if file in seen:continue

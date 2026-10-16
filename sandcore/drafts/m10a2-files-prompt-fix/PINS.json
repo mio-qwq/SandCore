@@ -1,0 +1,36 @@
+{
+  "status": "SOURCE_ONLY_NOT_BUILT_NOT_GUEST_VERIFIED",
+  "modified": {
+    "user/scshell/SCSHELLPRIVATE.H": {
+      "before_sha256": "7a1129195d3641395c9a1697616635bdf65c2323a25580f64cad2981c692ef41",
+      "after_sha256": "328b66671449b81166e45029673bfd356bf361f21f04bfa31669f146ae177321",
+      "before_bytes": 8778,
+      "after_bytes": 8842
+    },
+    "user/scshell/shell_menu.c": {
+      "before_sha256": "4ad09cd699c7538026d4c03f0495f66f82594fd98591f9c76b356ebd74dfa862",
+      "after_sha256": "9eb741860e9816e7df942df3f4fd436829cc250a9291966090453e55ab754a13",
+      "before_bytes": 30020,
+      "after_bytes": 27984
+    },
+    "user/scshell/SCSHELL.json": {
+      "before_sha256": "ecbea8ff366fbe63d79693252ee682e1b37d2160bc29cdee37d90da4f6d2b67e",
+      "after_sha256": "469a45213c0d1ebde3c4af38c7a5fc42189c7e9b6e8419aed99c62291483ae1f",
+      "before_bytes": 29171,
+      "after_bytes": 27755
+    },
+    "docs/SCSHELL-DESIGN.md": {
+      "before_sha256": "f026426fc56d9fe09f6cc9438ffec9e08d0e9b27c205218bc5f7395c8e801cdf",
+      "after_sha256": "b216b499e2216ae32f87455fa1ba11fef31fb7409f91c764a8ecaf62c29c45d9",
+      "before_bytes": 39988,
+      "after_bytes": 40577
+    }
+  },
+  "added": {
+    "user/scshell/shell_name_prompt.inc": {
+      "after_sha256": "f90d957791cd84c8be69197aab27306fa9111c5a33118cfe124b5d40d8651a43",
+      "after_bytes": 7084
+    }
+  },
+  "patch_sha256": "a8b780ccc4fb02f3d2fc320075c59ad19a8f51e7dfe240775e31a28ee501e8f5"
+}

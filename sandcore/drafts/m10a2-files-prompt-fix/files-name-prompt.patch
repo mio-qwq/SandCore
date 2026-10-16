@@ -1,0 +1,336 @@
+--- a/user/scshell/SCSHELLPRIVATE.H
++++ b/user/scshell/SCSHELLPRIVATE.H
+@@ -72,7 +72,8 @@
+ struct ScShellMenu {
+     ShObject base;ScShellMenuDesc desc;ScShellFileItem *items;char *directory;
+     ScUiMenu *menu;ShProvider **providers;ScU32 provider_count;
+-    ScArray *commands;ScShellFileJob *job;ScShellDialog *dialog;ScUiDialog *prompt;
++    ScArray *commands;ScShellFileJob *job;ScShellDialog *dialog;ScUiNode prompt,prompt_name,prompt_status;
++    ScU32 prompt_listener,prompt_intent;
+     char *recovery;ScU32 pending_command,prompt_kind,catalog_epoch;
+     ScUiDialog *conflict_prompt;ScShellFileResult conflict_snapshot;
+ };
+--- a/user/scshell/shell_menu.c
++++ b/user/scshell/shell_menu.c
+@@ -58,7 +58,8 @@
+     if(m->dialog)ScShellDialogClose(m->dialog);
+     if(m->job)sh_release(&m->job->base);
+     if(!sh_quiet) {
+-        if(m->prompt)ScUiDialogRelease(m->prompt);
++        if(m->prompt_listener)ScUiDisconnect(m->desc.ui,m->prompt_listener);
++        if(m->prompt)ScUiNodeDestroy(m->desc.ui,m->prompt);
+         if(m->conflict_prompt)ScUiDialogRelease(m->conflict_prompt);
+         ScUiMenuRelease(m->menu);
+         if(m->desc.ui)ScUiContextRelease(m->desc.ui);
+@@ -421,67 +422,24 @@
+     }
+     return s;
+ }
+-static ScStatus sh_menu_name_prompt(ScShellMenu *m,ScU32 command) {
+-    ScConfig *initial=0;
+-    ScValue v;
+-    ScUiFieldDesc field;
+-    ScUiPropertySheetDesc d;
+-    ScStatus s;
+-    const char *name="New directory";
+-    if(command==SC_SHELL_COMMAND_RENAME) {
+-        name=strrchr(m->items[0].source,'/');
+-        name=name?name+1:m->items[0].source;
+-    } else if(command==0x7300) {
+-        name=strrchr(m->conflict_snapshot.destination,'/');
+-        name=name?name+1:m->conflict_snapshot.destination;
+-    }
+-    s=ScConfigCreate(&initial);
+-    memset(&v,0,sizeof(v));
+-    v.size=sizeof(v);
+-    v.version=1;
+-    v.type=SC_VALUE_UTF8;
+-    v.data=name;
+-    v.bytes=(ScU32)strlen(name);
+-    if(s>=0)s=ScConfigSet(initial,"operation","name",&v);
+-    if(s<0)goto done;
+-    memset(&field,0,sizeof(field));
+-    field.size=sizeof(field);
+-    field.version=1;
+-    field.field=1;
+-    field.kind=SC_UI_TEXTBOX;
+-    field.flags=SC_UI_FIELD_REQUIRED;
+-    field.page=1;
+-    field.section="operation";
+-    field.key="name";
+-    sh_ui_text("Name",&field.label);
+-    memset(&d,0,sizeof(d));
+-    d.size=sizeof(d);
+-    d.version=1;
+-    d.owner=m->dialog&&m->dialog->root?m->dialog->root:m->desc.owner;
+-    d.initial=initial;
+-    sh_ui_text(command==SC_SHELL_COMMAND_RENAME||command==0x7300?"Rename":"New directory",&d.title);
+-    s=ScUiPropertySheet(m->desc.ui,&d,&field,1,&m->prompt);
+-    if(s>=0)m->prompt_kind=command;
+-    done:ScConfigRelease(initial);
+-    return sh_cause(s,106,0);
+-}
++#include "shell_name_prompt.inc"
+ static ScStatus sh_menu_name_commit(ScShellMenu *m) {
+-    ScConfig *values=0;
+-    ScValue v;
++    ScString *input=0;
++    ScView v;
+     ScString *joined=0;
+     const char *text;
+     char *name=0,*base=0;
+     ScShellFileItem item;
+-    ScU32 i;
++    ScU32 i,kind=m->prompt_kind;
+     ScStatus s;
+-    s=ScUiDialogCopyValues(m->prompt,&values);
++    s=ScUiNodeCopyText(m->desc.ui,m->prompt_name,&input);
+     if(s<0)goto done;
+     memset(&v,0,sizeof(v));
+     v.size=sizeof(v);
+     v.version=1;
+-    s=ScConfigGet(values,"operation","name",&v);
++    s=ScStringView(input,&v);
+     if(s<0)goto done;
+-    if(v.type!=SC_VALUE_UTF8||!v.bytes||v.bytes>63||memchr(v.data,0,v.bytes)) {
++    if(!v.bytes||v.bytes>63||memchr(v.data,0,v.bytes)) {
+         s=SC_SHELL_E_INVALID;
+         goto done;
+     }
+@@ -504,9 +462,9 @@
+     item.size=sizeof(item);
+     item.version=1;
+     item.item=1;
+-    if(m->prompt_kind==SC_SHELL_COMMAND_RENAME||m->prompt_kind==0x7300) {
++    if(kind==SC_SHELL_COMMAND_RENAME||kind==0x7300) {
+         char *slash;
+-        s=sh_copy_text(m->prompt_kind==0x7300?m->conflict_snapshot.destination:m->items[0].source,64,0,&base);
++        s=sh_copy_text(kind==0x7300?m->conflict_snapshot.destination:m->items[0].source,64,0,&base);
+         if(s<0)goto done;
+         slash=strrchr(base,'/');
+         if(!slash) {
+@@ -514,7 +472,7 @@
+             goto done;
+         }
+         slash[1]=0;
+-        if(m->prompt_kind!=0x7300)item=m->items[0];
++        if(kind!=0x7300)item=m->items[0];
+     } else {
+         if(!m->directory) {
+             s=SC_SHELL_E_INVALID;
+@@ -528,7 +486,10 @@
+     if(s>=0)s=ScStringCStr(joined,&text);
+     if(s<0)goto done;
+     item.destination=text;
+-    if(m->prompt_kind==0x7300) {
++    /* 同owner只准一个modal child；校验成功才让出名称窗，再建原进度窗。 */
++    s=sh_menu_name_close(m);
++    if(s<0)goto done;
++    if(kind==0x7300) {
+         ScShellConflictDecision decision;
+         memset(&decision,0,sizeof(decision));
+         decision.size=sizeof(decision);
+@@ -540,11 +501,15 @@
+         decision.expected_destination_revision=m->conflict_snapshot.destination_revision;
+         decision.new_path=text;
+         s=ScShellFileOperationResolveConflict(m->job,&decision);
+-    } else s=sh_menu_job_start(m,m->prompt_kind==SC_SHELL_COMMAND_RENAME?SC_SHELL_RENAME:SC_SHELL_MKDIR,&item,1,0);
++    } else s=sh_menu_job_start(m,kind==SC_SHELL_COMMAND_RENAME?SC_SHELL_RENAME:SC_SHELL_MKDIR,&item,1,0);
++    if(s<0&&!m->base.closing&&(!m->job||(kind==0x7300&&m->job->conflict_valid))) {
++        /* Begin/Resolve没有成功，保留原输入供修正；真正成功仍只由原任务ACK决定。 */
++        sh_menu_name_open(m,kind,name);
++    }
+     done:free(name);
+     free(base);
+     ScStringRelease(joined);
+-    ScConfigRelease(values);
++    ScStringRelease(input);
+     return sh_cause(s,107,0);
+ }
+ ScStatus ScShellMenuExecute(ScShellMenu *m,ScU32 command) {
+@@ -747,17 +712,13 @@
+     if(!sh_valid(m,SH_MENU))return SC_SHELL_E_STALE;
+     if(m->base.depth)return SC_SHELL_E_BUSY;
+     sh_enter(&m->base);
+-    if(m->prompt) {
+-        ScUiDialogInfo info;
+-        memset(&info,0,sizeof(info));
+-        info.size=sizeof(info);
+-        info.version=1;
+-        s=ScUiDialogQuery(m->prompt,&info);
+-        if(s>=0&&(info.stage==SC_UI_DIALOG_DONE||info.stage==SC_UI_DIALOG_CANCELLED)) {
+-            if(info.stage==SC_UI_DIALOG_DONE&&info.command==SC_UI_DIALOG_OK)s=sh_menu_name_commit(m);
+-            ScUiDialogRelease(m->prompt);
+-            m->prompt=0;
+-            m->prompt_kind=0;
++    if(m->prompt&&m->prompt_intent) {
++        ScU32 intent=m->prompt_intent;
++        m->prompt_intent=0;
++        if(intent==SC_UI_DIALOG_CANCEL)s=sh_menu_name_close(m);
++        else {
++            s=sh_menu_name_commit(m);
++            if(s<0&&m->prompt)sh_menu_name_error(m,s);
+         }
+     }
+     if(s>=0&&m->dialog) {
+--- a/user/scshell/SCSHELL.json
++++ b/user/scshell/SCSHELL.json
+@@ -1061,7 +1061,7 @@
+       "size": 1
+     },
+     {
+-      "name": "ScUiDialogCopyValues",
++      "name": "ScUiEditSelectAll",
+       "kind": "function",
+       "dependency": "SCUI.SCL",
+       "size": 1
+@@ -1241,7 +1241,7 @@
+       "size": 1
+     },
+     {
+-      "name": "ScUiPropertySheet",
++      "name": "ScUiMetricsQuery",
+       "kind": "function",
+       "dependency": "SCUI.SCL",
+       "size": 1
+--- a/docs/SCSHELL-DESIGN.md
++++ b/docs/SCSHELL-DESIGN.md
+@@ -233,3 +233,5 @@
+ 2026-10-16实施修订：主题高度是逻辑像素，host角色工作区和原生窗口是物理像素；桌面初建及主题/DPI变化使用同一换算，初始隐藏任务栏窗先满足普通40px最小高度，再由Prepare设置角色精确高度。默认账户继续使用旧SYS菜单和DESK，新catalog/恢复目录使用/HOME/.DESKTOP，避免向uid0的SYS父目录创建文件；其它账户沿SessionPath，先建本人私有父目录。所有新增SCUI布局显式span=1，Shell说明标签换行。未改变旧SessionPath/SCAPI语义；本批已统一构建并实际生成，P5运行验收继续。
+ 
+ 2026-10-16合同澄清：PREPARED表示可信PID/gen已绑定两surface与监听endpoint，可连接并以HELLO确定后台服务；ACTIVE仍要求两张真正首帧并控制窗口动作。隐藏会话不画首帧、不计显示激活超时，服务继续泵IPC/文件任务；显示切换后才取得Window PREPARING资格并Activate。HostInfo的PREPARING表示仍缺首帧，WindowInfo的PREPARING仅表示当前可绘资格，二者不能混为普通可见性。
++
++2026-10-16名称提示修订：ScShellMenu的新建目录/重命名/冲突改名使用公开SCUI模态Window和标准Label/Textbox/Button，320×170逻辑客户区、中文标题及新建/重命名/取消动作，无PropertySheet页签或Apply。焦点全选，Enter确认、Esc/关闭取消；非法输入保留原文。校验后先销提示窗口让出同owner模态槽，再进入原受管文件事务，只有原持久ACK可确认文件结果。Properties及其完整元数据/权限页不变，公开ABI/导出不变。本修复为隔离源码草稿，尚未构建或客体验证。
+--- /dev/null
++++ b/user/scshell/shell_name_prompt.inc
+@@ -0,0 +1,130 @@
++/* 单个名字不是配置属性页。只组合公开标准控件，尺寸与字体仍服从同一SCUI context。 */
++static const char sh_menu_name_rule[]="名称不能含空格或路径分隔符（最多63字节）。";
++static ScStatus sh_menu_name_close(ScShellMenu *m) {
++    ScUiNode root=m->prompt;
++    ScStatus s=0;
++    if(root)s=ScUiNodeDestroy(m->desc.ui,root);
++    if(s<0&&s!=SC_UI_E_STALE)return s;
++    if(m->prompt_listener)ScUiDisconnect(m->desc.ui,m->prompt_listener);
++    m->prompt=m->prompt_name=m->prompt_status=0;
++    m->prompt_listener=m->prompt_intent=m->prompt_kind=0;
++    return 0;
++}
++static ScStatus sh_menu_name_event(ScUiContext *ui,const ScUiEvent *event,void *context) {
++    ScShellMenu *m=(ScShellMenu *)context;
++    ScU32 handled=0;
++    ScStatus s=0;
++    if(!sh_valid(m,SH_MENU)||sh_quiet)return 0;
++    sh_enter(&m->base);
++    if(event->type==SC_UI_EVENT_DESTROY&&event->node==m->prompt) {
++        m->prompt=m->prompt_name=m->prompt_status=0;
++        m->prompt_listener=m->prompt_intent=m->prompt_kind=0;
++    } else if(event->type==SC_UI_EVENT_CLOSE_REQUEST ||
++        (event->type==SC_UI_EVENT_KEY_DOWN&&event->key==27)) {
++        m->prompt_intent=SC_UI_DIALOG_CANCEL;
++        handled=1;
++    } else if(event->type==SC_UI_EVENT_COMMAND&&
++        (event->command==SC_UI_DIALOG_OK||event->command==SC_UI_DIALOG_CANCEL)) {
++        /* 只锁存一次意图；取消优先，实际事务留到现有MenuStep，避免输入回调重入磁盘操作。 */
++        if(!m->prompt_intent||event->command==SC_UI_DIALOG_CANCEL)m->prompt_intent=event->command;
++        handled=1;
++    } else if(event->type==SC_UI_EVENT_VALUE_CHANGED&&event->node==m->prompt_name) {
++        ScUiText text;
++        sh_ui_text(sh_menu_name_rule,&text);
++        s=ScUiNodeSetText(ui,m->prompt_status,&text);
++        if(s>=0)s=ScUiNodeSetState(ui,m->prompt_name,SC_UI_INVALID,0);
++    }
++    sh_leave(&m->base);
++    return s<0?s:(handled?SC_UI_HANDLED:0);
++}
++static ScStatus sh_menu_name_layout(ScShellMenu *m,ScUiNode node,ScU32 mode,ScI32 width,ScI32 height,ScU32 flex) {
++    ScUiLayoutDesc layout;
++    memset(&layout,0,sizeof(layout));
++    layout.size=sizeof(layout);layout.version=1;
++    layout.mode=mode;layout.width=width;layout.height=height;
++    layout.max_width=layout.max_height=SC_UI_AUTO;
++    layout.column_span=layout.row_span=1;
++    layout.align_h=layout.align_v=SC_UI_STRETCH;
++    layout.flex_weight=flex;layout.gap=8;
++    if(node==m->prompt)layout.padding[0]=layout.padding[1]=layout.padding[2]=layout.padding[3]=12;
++    return ScUiNodeSetLayout(m->desc.ui,node,&layout);
++}
++static ScStatus sh_menu_name_open(ScShellMenu *m,ScU32 command,const char *name) {
++    ScUiWindowDesc window;
++    ScUiSubscription listener;
++    ScUiMetrics metrics;
++    ScWindowInfo owner;
++    ScDisplayInfo display;
++    ScUiNode label=0,bar=0,spacer=0,accept=0,cancel=0;
++    ScU32 scale,w,h;
++    ScStatus s;
++    memset(&metrics,0,sizeof(metrics));metrics.size=sizeof(metrics);metrics.version=1;
++    memset(&owner,0,sizeof(owner));owner.size=sizeof(owner);owner.version=1;
++    memset(&display,0,sizeof(display));display.size=sizeof(display);display.version=1;
++    memset(&window,0,sizeof(window));window.size=sizeof(window);window.version=1;
++    window.owner=m->dialog&&m->dialog->root?m->dialog->root:m->desc.owner;
++    s=ScUiMetricsQuery(m->desc.ui,window.owner,&metrics);
++    if(s>=0)s=ScUiWindowNative(m->desc.ui,window.owner,&owner);
++    if(s>=0)s=ScDisplayQuery(&display);
++    if(s<0)return sh_cause(s,106,0);
++    scale=metrics.scale_percent?metrics.scale_percent:100;
++    w=(320*scale+50)/100;h=(170*scale+50)/100;
++    if(display.width<96||display.height<80)return SC_SHELL_E_RANGE;
++    if(w>display.width-2)w=display.width-2;
++    if(h>display.height-40)h=display.height-40;
++    window.client_width=w;window.client_height=h;
++    window.x=owner.x+(owner.width-(ScI32)w)/2;
++    window.y=owner.y+(owner.height-(ScI32)h)/2;
++    if(window.x<0)window.x=0;
++    if(window.y<0)window.y=0;
++    if(window.x>(ScI32)(display.width-w-2))window.x=(ScI32)(display.width-w-2);
++    if(window.y>(ScI32)(display.height-h-40))window.y=(ScI32)(display.height-h-40);
++    window.style=SC32_STYLE_CLOSE|SC32_STYLE_MODAL;
++    sh_ui_text(command==SC_SHELL_COMMAND_NEW_DIRECTORY?"新建文件夹":"重命名",&window.title);
++    s=ScUiWindowCreate(m->desc.ui,&window,&m->prompt);
++    if(s<0)return sh_cause(s,106,0);
++    m->prompt_kind=command;m->prompt_intent=0;
++    s=sh_menu_name_layout(m,m->prompt,SC_UI_VBOX,SC_UI_AUTO,SC_UI_AUTO,0);
++    if(s>=0)s=sh_widget(m->desc.ui,m->prompt,SC_UI_LABEL,"名称",0,20,&label);
++    if(s>=0)s=sh_widget(m->desc.ui,m->prompt,SC_UI_TEXTBOX,name,0,30,&m->prompt_name);
++    if(s>=0)s=ScUiLabelAssociate(m->desc.ui,label,m->prompt_name);
++    if(s>=0)s=sh_widget(m->desc.ui,m->prompt,SC_UI_LABEL,sh_menu_name_rule,0,36,&m->prompt_status);
++    if(s>=0)s=sh_widget(m->desc.ui,m->prompt,SC_UI_PANEL,"",0,30,&bar);
++    if(s>=0)s=sh_widget(m->desc.ui,bar,SC_UI_LABEL,"",0,30,&spacer);
++    if(s>=0)s=sh_menu_name_layout(m,spacer,SC_UI_ABSOLUTE,0,30,1);
++    if(s>=0)s=sh_widget(m->desc.ui,bar,SC_UI_BUTTON,command==SC_SHELL_COMMAND_NEW_DIRECTORY?"新建":"重命名",SC_UI_DIALOG_OK,30,&accept);
++    if(s>=0)s=sh_menu_name_layout(m,accept,SC_UI_ABSOLUTE,88,30,0);
++    if(s>=0)s=sh_widget(m->desc.ui,bar,SC_UI_BUTTON,"取消",SC_UI_DIALOG_CANCEL,30,&cancel);
++    if(s>=0)s=sh_menu_name_layout(m,cancel,SC_UI_ABSOLUTE,88,30,0);
++    if(s>=0)s=ScUiButtonSetDefault(m->desc.ui,m->prompt,accept);
++    memset(&listener,0,sizeof(listener));listener.size=sizeof(listener);listener.version=1;
++    listener.phases=SC_UI_TARGET_PHASE|SC_UI_BUBBLE_PHASE;
++    listener.procedure=sh_menu_name_event;listener.context=m;
++    if(s>=0)s=ScUiListen(m->desc.ui,m->prompt,&listener,&m->prompt_listener);
++    if(s>=0)s=ScUiLayout(m->desc.ui,m->prompt);
++    if(s>=0)s=ScUiFocus(m->desc.ui,m->prompt_name);
++    if(s>=0)s=ScUiEditSelectAll(m->desc.ui,m->prompt_name);
++    if(s<0)sh_menu_name_close(m);
++    return sh_cause(s,106,0);
++}
++static ScStatus sh_menu_name_prompt(ScShellMenu *m,ScU32 command) {
++    const char *name="新建文件夹";
++    if(command==SC_SHELL_COMMAND_RENAME) {
++        name=strrchr(m->items[0].source,'/');
++        name=name?name+1:m->items[0].source;
++    } else if(command==0x7300) {
++        name=strrchr(m->conflict_snapshot.destination,'/');
++        name=name?name+1:m->conflict_snapshot.destination;
++    }
++    return sh_menu_name_open(m,command,name);
++}
++static void sh_menu_name_error(ScShellMenu *m,ScStatus status) {
++    char message[120];
++    ScUiText text;
++    if(status==SC_SHELL_E_INVALID)sh_ui_text("请输入1-63字节名称；不含空格、斜杠或冒号。",&text);
++    else if(status==SC_SHELL_E_RANGE)sh_ui_text("完整路径过长，请缩短名称。",&text);
++    else {snprintf(message,sizeof(message),"未能继续（错误 %d）；请核对任务或修改名称。",status);sh_ui_text(message,&text);}
++    ScUiNodeSetText(m->desc.ui,m->prompt_status,&text);
++    ScUiNodeSetState(m->desc.ui,m->prompt_name,SC_UI_INVALID,SC_UI_INVALID);
++    ScUiFocus(m->desc.ui,m->prompt_name);
++}

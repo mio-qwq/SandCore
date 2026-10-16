@@ -1,0 +1,53 @@
+{
+  "status": "HELPER_AND_PLAN_IMPLEMENTED_NOT_EXECUTED",
+  "python_syntax": "PASS",
+  "build_started": false,
+  "qemu_started": false,
+  "generation_files_written": false,
+  "main_written": false,
+  "gui_workflow_pass": false,
+  "entry": "runtime.GuiRuntime + runtime.serve",
+  "outer_owns": "QemuSession/GuiGuest/RefreshHarness and native/SDK preparation",
+  "operations": [
+    "run",
+    "bind",
+    "keys",
+    "type",
+    "click",
+    "drag",
+    "screen",
+    "get",
+    "audio_start",
+    "audio_stop",
+    "finish"
+  ],
+  "missing_runtime_inputs": [
+    "Root actual native execution VM/context",
+    "actual current screenshot points",
+    "ordinary selected SID and real product facts/ACKs/module observations"
+  ],
+  "files": {
+    "RUNBOOK.md": "fde9a913f3ebabed67aaa3432e766aeede54caddce1d25bff85392c4d20c97c0",
+    "evidence.py": "463a04f39c334a818ced155d122de089510d3164e43089f4c37d269029a33d4b",
+    "freeze.py": "85d661e0ffa482a86546f2eeac049233273a665b23401d99ee4749a65a19fef4",
+    "runtime.py": "20651143189d331c6adb1e66f0d4a7ac5ccf9bc5f9bf2359e604a8298110325a"
+  },
+  "readonly_reference_sha256": {
+    "drafts/m10a2-p6-gui-flow/GUI-FLOW.md": "f4ee921f73101da1468bb522cb6a90b09136835793ff106515a6c613224c8be0",
+    "drafts/m10a2-p6-gui-flow/flow_input.py": "2705cab6a8eb872a0dbb240ad2676dc04bfa0b72ed47b2bf86b3ae6bd00e52ae",
+    "tools/scui_input.py": "7f0cd2aa1fff2ac6704369450067ee3fd143d2aee1c8e4a63af4acf7ece38e50",
+    "tools/verify_m10a2_ui_gui.py": "42df9dce1013a86136398f8cd3d78d6347b833521c838b3ce82b8c9843c0280f",
+    "tools/verify_m10a2_ui_platform.py": "4f9ec7435e98cfc4205961c86c90ef305d018096550bb3ad1c60f0fe1d0a364a",
+    "tools/verify_m10a2_shell_runtime.py": "f950079caaaeed276f81746faf04d56361760570f1097c9327189a03c4ecbc52",
+    "tools/audit_m10a2_file_job_results.py": "eb7777e5d9e9b609b11fe700fa9cd328135ddfb66c2c415e56588f5604164a62",
+    "tools/scserial.py": "db133b453fe2c6da23cdbf62383c04872c49c6bb79f64f3f16445c2524376de0",
+    "tools/verify_m9_sound.py": "576393e02cd7841c4f4f454b1539f114deafaa269a09d40c4906ead478e95e0d",
+    "user/SCSHELL.H": "fa6c1406cb2ad9609e59ee7fc97540da074573e68432ffea37d42a13a1f7519e",
+    "user/SC32DEBUG.H": "61edbdf3fb76e422032bb68669656b4950807601e2edadf9e7b558c5ecda2a68",
+    "user/shellworker/worker_recovery.c": "1b75131a2d257c2cf497027d4390867d89c7cb89bc0ec8e0ca8f9aba6841349a",
+    "user/scshell/SCSHELLWIRE.H": "9d8300d708772e7bdeecb9f98e8ab188ca54f182f9aba7d79e13e74af6e22a6e",
+    "user/studio2/studio_build.c": "69249a23196d36ac5420e336bc605b37025d279d4721a2b75471fbf81dbfd4a0",
+    "user/debug2/ui.c": "55d6cbc7ba2ed2edf6d86d150f27c585b03b1c4f2debaf0e69b078c6f22b96a2",
+    "user/debug2/model.c": "a805f211262d840e263072055ab9677ad3e9ee5f65c4cef6cf02a22afaa44305"
+  }
+}

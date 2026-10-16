@@ -18,7 +18,7 @@ from mkfs_m10 import mapped, release_views, parents, write_image, check_main, di
 
 ROOT = Path(__file__).resolve().parents[1]
 
-def prepare(image, build, extra=None, runtime_fixtures=True):
+def prepare(image, build, extra=None, runtime_fixtures=True, metadata=None):
     core = (build/'fs/SYS/CORE/CORE.SKM').read_bytes()
     check_main(core)
     additions = {'SYS/CORE/CORE.SKM':core}
@@ -32,6 +32,20 @@ def prepare(image, build, extra=None, runtime_fixtures=True):
     # 已准备盘时assert.h等标准小写文件已在原清单中，不能误报它们
     # 的明确替换为“其它用户对象改变”。未列出的对象仍逐项原样核验。
     controlled_keys={fold(name) for name in additions}
+    # 正式候选替换既有对象时必须保留其身份；旧测试调用不传本参数，
+    # 仍沿原默认值。覆盖只限明确载荷，不能借此改未列出的用户文件。
+    if metadata is None:
+        metadata={}
+    if not isinstance(metadata,dict):
+        raise ValueError('metadata必须为明确路径到UID/GID/mode的字典')
+    for name,attributes in metadata.items():
+        if not isinstance(name,str) or name!=fold(name) or name not in controlled_keys:
+            raise ValueError('metadata路径必须为明确载荷的折叠根内路径')
+        if not isinstance(attributes,(tuple,list)) or len(attributes)!=3:
+            raise ValueError('metadata必须包含UID/GID/mode三个整数')
+        uid,gid,mode=attributes
+        if any(type(value) is not int for value in attributes) or not (-1<=uid<=0x7fffffff and -1<=gid<=0x7fffffff and 0<=mode<=63):
+            raise ValueError('metadata身份或权限范围错误')
     temporary = image.with_suffix('.prepared.tmp')
     with ExitStack() as stack:
         disk = mapped(stack,image)
@@ -52,7 +66,8 @@ def prepare(image, build, extra=None, runtime_fixtures=True):
             return counter
         for name,body in additions.items():
             uid=-1 if name.startswith('SYS/') else 1000
-            records[fold(name)]=Record(name,body,uid,uid,23,generation())
+            attributes=metadata.get(fold(name),(uid,uid,23))
+            records[fold(name)]=Record(name,body,*attributes,generation())
         parents(records,generation)
         if commit==0xffffffff:
             raise ValueError('目录代数耗尽')
@@ -74,6 +89,7 @@ def prepare(image, build, extra=None, runtime_fixtures=True):
     # 原始基盘始终只读；这里只替换启动器为本轮创建的独立副本。
     os.replace(temporary,image)
     return dict(controlled_paths=sorted(additions),preserved_other_objects=len(original)-1,
+                metadata_override_paths=sorted(metadata),
                 directory_sectors=directory,entries=count,
                 host_bootstrap_libraries=True,guest_sccc_compiled=False,
                 installed_core_payload_sha256=core[72:104].hex())

@@ -1,0 +1,26 @@
+{
+  "status": "IMPLEMENTED_UNEXECUTED_TARGET_REFRESH",
+  "syntax": "PASS",
+  "build_started": false,
+  "qemu_started": false,
+  "main_written": false,
+  "prior_generation_written": false,
+  "gui_controller_written": false,
+  "candidate_patch_required": false,
+  "final_patch_and_runtime_inputs": "PENDING_ROOT",
+  "current_assumption": "SCSHELL plus any actually changed transitive label",
+  "files": {
+    "DESIGN.md": "2093be742d805751aae181f1a6e2330a6aabe7a87499fc18ce27e5080ddc537c",
+    "README.md": "7d9384746034e5ae28def861589a125c5e2c3afc0abc8c3d7da5d88c9d2893d2",
+    "freeze.py": "c969cb7ef707e1d5dc79ee866414f6c30843a836ae6faca315702f4cb254779d",
+    "refresh.py": "e2e4e24ecfa7bf051bbfd2c91b3480beb3d8d981cc98847dc682268bf744307d"
+  },
+  "readonly_references": {
+    "tools/stage_m10a2_sdk.py": "76b9d70bc6d85e4e51f8c1e32553dcc105c89f6d6ddfc301eef25deb327fb988",
+    "tools/m10a2_sdk_final.py": "2eea72ed8555a1c1c05d1a6c903c10791c0b022c235f287a61cb5a00d7487c73",
+    "tools/refresh_m10a2_ui_native.py": "2b1f05da290f65cc06b4df2397ba05b2adf433330c6e2a44cc6cedeb7da4dcd7",
+    "drafts/m10a2-p6-final-flow/prepare_candidate.py": "96b8086386550bd7b99a6a20f094acbc9ef09ca29c44e2a511243330fade8755",
+    "drafts/m10a2-p6-guest-generation/model.py": "3087b2c093dd99350e4049214478bf188a23edb585a4766f529dbc16e50f5bb2",
+    "build/m10a2-p6-guest-generation-run-03/p6-generation.json": "f5538ba547f2ae38e00f35d35b57e2c0a55ef8282955aefbf221042122c57ddc"
+  }
+}

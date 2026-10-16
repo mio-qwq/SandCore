@@ -13,3 +13,7 @@
 只做一个小离线 records 转换检查和必要源码编译检查，不启动客体或扩矩阵。Root 整合真实候选打包、生成精确动态 manifest，并统一验证菜单/关联/Files↔Desktop Drop。
 
 修订：2026-10-16，按真实发布字节及现有 ACCOUNT-only Store/Load 合同收敛。
+
+最终候选安装沿单次prepare/write_image接明确metadata覆盖：旧对象保原UID/GID/mode，新SYS文件使用SYSTEM身份，新APPS/BIN使用既有默认；覆盖只限显式载荷，未列出对象逐项守恒。确有变化的旧运行程序及默认小文本沿SYS/M10BASE/XXXXXXXX.OLD和INDEX.JSON归档，保原身份；已有同字节/身份历史可复用，旧INDEX先归档，原盘只读。实际安装回读须同时核正文和元数据，未执行规划不能称已迁移。
+
+修订：2026-10-16，最终单会话候选明确元数据及被替换原件归档，避免旧测试准备器默认值覆盖用户身份。

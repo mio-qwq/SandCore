@@ -1,0 +1,260 @@
+{
+  "schema": 1,
+  "status": "STATIC_ARTIFACTS_AND_NATIVE_ISSUANCE_VERIFIED_NOT_GUEST_BOOT",
+  "date": "2026-10-16",
+  "scope": "READ_ONLY_EXISTING_CORE_BUILD_RECEIPT",
+  "build_command": "make -j4 BUILD=build/m10a2-p6-final-01/core M9_BUILD=1 M10_BUILD=1 SHELL_HOST_IMAGE=build/m10a2-p6-guest-generation-run-03/native-artifacts/SCSHELL.SCX LOGIN2_ISSUE_IMAGE=build/m10a2-p6-guest-generation-run-03/native-artifacts/LOGIN2.SCX LOGIN2_ISSUE_LIBRARIES=build/m10a2-p6-guest-generation-run-03/native-libraries M10_PUBLIC_KEY=assets/trust/M10-OWNER-ED25519.PUB build/m10a2-p6-final-01/core/sandcore.img build/m10a2-p6-final-01/core/fs/SYS/CORE/CORE.SKM",
+  "build_exit": {
+    "reported_exit_code": 0,
+    "source": "Root explicit successful execution statement",
+    "reviewer_observed_process": false,
+    "log_final_package_message": "CORE: image=597584 B, BSS=384840 B, entry=0, sha256=39e2eeb25f4c84335be0fc3717bd11164ccb03fe58a0bb3397a22495a964d8aa"
+  },
+  "log": {
+    "path": "build/m10a2-p6-final-01/core-build-01.log",
+    "bytes": 177965,
+    "sha256": "a36e9de8e78b2b035b7794d3715f20d18901f23886db9d315a40bce569a51443"
+  },
+  "artifacts": {
+    "boot.bin": {
+      "path": "build/m10a2-p6-final-01/core/boot.bin",
+      "bytes": 512,
+      "sha256": "a7e9dae45d3802f59bb8a04df5f4b65b166ee04143d25decaa1237afcca072ed"
+    },
+    "loader.elf": {
+      "path": "build/m10a2-p6-final-01/core/loader.elf",
+      "bytes": 13032,
+      "sha256": "b0c1f30df9792dc003cf9c1a6206c9920075c5ae362cc4ffe2bbd6b43eba6eb5"
+    },
+    "loader.bin": {
+      "path": "build/m10a2-p6-final-01/core/loader.bin",
+      "bytes": 7008,
+      "sha256": "874cc5cb9f58353812cd13fbb15a2d5a1fd63dd1e90920a95c873fac05e35a75"
+    },
+    "loader.sym": {
+      "path": "build/m10a2-p6-final-01/core/loader.sym",
+      "bytes": 1213,
+      "sha256": "52833f1431a2ff9879a06963fd4181b32f7bb2e5ecddaffce464f5f753a46fa9"
+    },
+    "sandcore.img": {
+      "path": "build/m10a2-p6-final-01/core/sandcore.img",
+      "bytes": 1474560,
+      "sha256": "47921cc2f9f0a23ea404cbd041a216931844023eedbcdbb4c824e9a55a8cfb3f"
+    },
+    "core.elf": {
+      "path": "build/m10a2-p6-final-01/core/core.elf",
+      "bytes": 672892,
+      "sha256": "7300fc668e335dfa33c69d17c7c5760f72f87d47d17fd937b05fbde79300caf0"
+    },
+    "core.bin": {
+      "path": "build/m10a2-p6-final-01/core/core.bin",
+      "bytes": 597584,
+      "sha256": "39e2eeb25f4c84335be0fc3717bd11164ccb03fe58a0bb3397a22495a964d8aa"
+    },
+    "core.sym": {
+      "path": "build/m10a2-p6-final-01/core/core.sym",
+      "bytes": 58320,
+      "sha256": "ba8aba21608280a23613418abb10a2b7e02f832899badf448b7347203d7e0d7e"
+    },
+    "fs/SYS/CORE/CORE.SKM": {
+      "path": "build/m10a2-p6-final-01/core/fs/SYS/CORE/CORE.SKM",
+      "bytes": 597712,
+      "sha256": "6f697fd6c09d38e409504ad987d3de945d47593f565678fde799ea4944989811"
+    }
+  },
+  "core": {
+    "image_bytes": 597584,
+    "bss_offset": 598016,
+    "bss_bytes": 384840,
+    "memory_bytes": 982856,
+    "entry_rva": 0,
+    "payload_sha256": "39e2eeb25f4c84335be0fc3717bd11164ccb03fe58a0bb3397a22495a964d8aa",
+    "elf_flat": {
+      "base": 8388608,
+      "entry": 8388608,
+      "sections": [
+        {
+          "address": 8388608,
+          "bytes": 565381,
+          "flags": 6,
+          "sha256": "e09113e562d49376f27764f3c5804ea77aaa30e74b3035ce19d260d7fb0755cb"
+        },
+        {
+          "address": 8954016,
+          "bytes": 31846,
+          "flags": 2,
+          "sha256": "484f972c26155986480a6744d2073e79b2dbf1a8980299043dd176d80c26916b"
+        },
+        {
+          "address": 8985888,
+          "bytes": 304,
+          "flags": 3,
+          "sha256": "195c2bed69d08f57a8391e4c8fd1e1ea00b1b04f02e949e5fb0b02ba420db19d"
+        }
+      ],
+      "padding_bytes": 53
+    },
+    "skm2_header_crc_and_payload_sha256_valid": true
+  },
+  "loader": {
+    "elf_flat": {
+      "base": 65536,
+      "entry": 65536,
+      "sections": [
+        {
+          "address": 65536,
+          "bytes": 5676,
+          "flags": 6,
+          "sha256": "467d070d01759f5d53e84efb7b9e255c6d19de6304c7c1855f89ef5b5284affd"
+        },
+        {
+          "address": 71232,
+          "bytes": 1312,
+          "flags": 2,
+          "sha256": "5a38c69a2567df62da7f21790e95b2528d7ef83c8719241640cd8f18c56a8499"
+        }
+      ],
+      "padding_bytes": 20
+    },
+    "floppy_exact_boot_loader_and_zero_padding": true
+  },
+  "native_origin": {
+    "report": {
+      "path": "build/m10a2-p6-guest-generation-run-03/p6-generation.json",
+      "bytes": 15284667,
+      "sha256": "f5538ba547f2ae38e00f35d35b57e2c0a55ef8282955aefbf221042122c57ddc"
+    },
+    "status": "DECLARED_P6_NATIVE_GENERATION_PASS",
+    "libraries": 8,
+    "artifacts": 21,
+    "objects": 27,
+    "original_report_source_inputs_unchanged": true,
+    "original_report_source_disk_unchanged": true,
+    "original_report_owner_physical_delta": 0
+  },
+  "host03_source": {
+    "report": {
+      "path": "build/m10a2-main-studio-01/p6-unified-host-03.json",
+      "bytes": 362751,
+      "sha256": "0f74b114e32275112b325c6bb9a07c9cb608e261a92376ed4e5a0f12a128f30a"
+    },
+    "run03_preflight_report_sha256": "0f74b114e32275112b325c6bb9a07c9cb608e261a92376ed4e5a0f12a128f30a",
+    "exact_actual_d_source_files": 294,
+    "actual_d_files": 94,
+    "all_current_compile_dependencies_equal_host03_source_pins": true
+  },
+  "generated_headers": {
+    "count": 6,
+    "listed_separately_in": "drafts/m10a2-p6-native-core-receipt/core-build-inputs.json",
+    "native_issue_headers_intentionally_differ_from_host_bootstrap": true
+  },
+  "issued_programs": [
+    {
+      "name": "LOGIN2.SCX",
+      "native_source": {
+        "path": "build/m10a2-p6-guest-generation-run-03/native-artifacts/LOGIN2.SCX",
+        "bytes": 44871,
+        "sha256": "58bbdfc16452a8a2e62626b380d27807fa0fa36424dd382d0811971b8fec33dc"
+      },
+      "actual_compiled_digest_address": 8976448,
+      "sha256": "58bbdfc16452a8a2e62626b380d27807fa0fa36424dd382d0811971b8fec33dc",
+      "compile_case": "LOGIN2-actual-native-SCLD-link"
+    },
+    {
+      "name": "SCSHELL.SCX",
+      "native_source": {
+        "path": "build/m10a2-p6-guest-generation-run-03/native-artifacts/SCSHELL.SCX",
+        "bytes": 139680,
+        "sha256": "7053cd7c96b512e41955fea13ecb01e1677f433668b04d4186fe3697f327eab4"
+      },
+      "actual_compiled_digest_address": 8976480,
+      "sha256": "7053cd7c96b512e41955fea13ecb01e1677f433668b04d4186fe3697f327eab4",
+      "compile_case": "DESKTOP-actual-native-SCLD-link"
+    }
+  ],
+  "actual_compiled_login_resources": [
+    {
+      "destination": "SYS/LIB/SCLDR.SCL",
+      "actual_compiled_record": 8976736,
+      "source": {
+        "path": "build/m10a2-p6-guest-generation-run-03/native-libraries/SCLDR.SCL",
+        "bytes": 60008,
+        "sha256": "fecf0eb9e6b68ede0357c166b61e61870a2c8ad218a0e6c053a6bc345459e224"
+      }
+    },
+    {
+      "destination": "SYS/LIB/SC32API.SCL",
+      "actual_compiled_record": 8976776,
+      "source": {
+        "path": "build/m10a2-p6-guest-generation-run-03/native-libraries/SC32API.SCL",
+        "bytes": 158590,
+        "sha256": "b5a54a79d1aa1d773a766ae85edc9c2162bedfdd7e54d8363a798b7f5c85a647"
+      }
+    },
+    {
+      "destination": "SYS/LIB/SCCLIB.SCL",
+      "actual_compiled_record": 8976816,
+      "source": {
+        "path": "build/m10a2-p6-guest-generation-run-03/native-libraries/SCCLIB.SCL",
+        "bytes": 66892,
+        "sha256": "09baf164f186b11c56ababd2c3d5e4db7351472d0207e917a14cb8d727f0f642"
+      }
+    },
+    {
+      "destination": "SYS/LIB/SCLIB.SCL",
+      "actual_compiled_record": 8976856,
+      "source": {
+        "path": "build/m10a2-p6-guest-generation-run-03/native-libraries/SCLIB.SCL",
+        "bytes": 146165,
+        "sha256": "a3003e152f8bdea56bada517b185ac9ceef78e5bd389fdeafdfc1947f53ea2a8"
+      }
+    },
+    {
+      "destination": "SYS/LIB/SCUI.SCL",
+      "actual_compiled_record": 8976896,
+      "source": {
+        "path": "build/m10a2-p6-guest-generation-run-03/native-libraries/SCUI.SCL",
+        "bytes": 732380,
+        "sha256": "975e4dcb1ec4336486a8d8a8ee550183ab1895a0e7b6736c1f62cfa9a5d9c991"
+      }
+    },
+    {
+      "destination": "SYS/UI/UAX15_1.SCU",
+      "actual_compiled_record": 8976936,
+      "source": {
+        "path": "assets/ui/UAX15_1.SCU",
+        "bytes": 37048,
+        "sha256": "1f3e318ee85ec103902ce8307fa9e3262514a551acb332b8926acce45dd969c2"
+      }
+    }
+  ],
+  "public_key": {
+    "source": {
+      "path": "assets/trust/M10-OWNER-ED25519.PUB",
+      "bytes": 32,
+      "sha256": "fc0f26d1b2f3cfea86ca19f3d5d37acd2fea932f683307887ace3bda7200e4f7"
+    },
+    "configured": true,
+    "actual_compiled_address": 8982944,
+    "same_bytes_as_host03_actual_compiled_key": true,
+    "host03_original_raw_key_snapshot_present": false,
+    "private_key_accessed": false
+  },
+  "inputs_index": {
+    "path": "drafts/m10a2-p6-native-core-receipt/core-build-inputs.json",
+    "bytes": 79247,
+    "sha256": "21536480b0114a43703c907c46be5bbcd9241d3e29354e7e626b6dc5eb794dc3"
+  },
+  "inspector_script": {
+    "path": "drafts/m10a2-p6-native-core-receipt/make_receipt.py",
+    "bytes": 15792,
+    "sha256": "cd462220af530d171dd20de8b619915b3a7c2b1bf6645cc59c743f4c92c41337"
+  },
+  "reviewer_observed_build_before_after": false,
+  "observed_input_stability_scope": "RECEIPT_READ_WINDOW_ONLY",
+  "guest_booted": false,
+  "guest_runtime_verified": false,
+  "SDK_staging_verified": false,
+  "full_M10a2": false,
+  "receipt_read_inputs_unchanged": true
+}

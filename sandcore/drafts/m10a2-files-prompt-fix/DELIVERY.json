@@ -1,0 +1,24 @@
+{
+  "status": "SOURCE_ONLY_NOT_BUILT_NOT_GUEST_VERIFIED",
+  "checks": [
+    "before_image_sha_unchanged",
+    "patch_and_overlay_sha",
+    "python_ast",
+    "manifest_json_and_import_delta_only"
+  ],
+  "files": {
+    "DESIGN.md": "cd32b5ebebfcb27f805d796132f8ecdcdadc605de553fc67ac42db65c51edb6a",
+    "files-name-prompt.patch": "a8b780ccc4fb02f3d2fc320075c59ad19a8f51e7dfe240775e31a28ee501e8f5",
+    "freeze.py": "fcdd0883e223e1d14e6aa50661208942ab77e767fb7ba6aa4d97deced6665267",
+    "make_patch.py": "b1f56477743561947cfdaf16f44c147906ec42e96d769c10b0de893c63415f3f",
+    "overlay/docs/SCSHELL-DESIGN.md": "b216b499e2216ae32f87455fa1ba11fef31fb7409f91c764a8ecaf62c29c45d9",
+    "overlay/user/scshell/SCSHELL.json": "469a45213c0d1ebde3c4af38c7a5fc42189c7e9b6e8419aed99c62291483ae1f",
+    "overlay/user/scshell/SCSHELLPRIVATE.H": "328b66671449b81166e45029673bfd356bf361f21f04bfa31669f146ae177321",
+    "overlay/user/scshell/shell_menu.c": "9eb741860e9816e7df942df3f4fd436829cc250a9291966090453e55ab754a13",
+    "overlay/user/scshell/shell_name_prompt.inc": "f90d957791cd84c8be69197aab27306fa9111c5a33118cfe124b5d40d8651a43",
+    "PINS.json": "53f252398540f18628fb3fc7d1a9c1857d4cd6658f0b35e6e75f11208d5cf10c",
+    "README.md": "f44be97e07816b3e65d6e062d03ec7b0f17e9dc2f3037b56c36fe742c9752a5a",
+    "shell_name_prompt.inc": "f90d957791cd84c8be69197aab27306fa9111c5a33118cfe124b5d40d8651a43",
+    "SOURCE-PINS.json": "a05f7a6c58be3d8abab75ec749b4942c284815bbce02018362f594fb35c1294d"
+  }
+}
