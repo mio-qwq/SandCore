@@ -4,7 +4,7 @@
 
 **从引导器、内核到桌面和原生开发工具的 32 位 x86 操作系统。**
 
-当前源码已修复普通编译、保存可能触发的 SandFS 目录文件名填充污染，及其导致的下次启动失败。修复与保留用户文件的恢复结果见[目录写回修复](sandcore/evidence/m10a2-directory-repair/README.md)。M10a2.1 原发布包尚未包含此后续修复。
+**最新补丁 [M10a2.2](https://github.com/mio-qwq/SandCore/releases/tag/M10a2.2)** 已包含 SandFS 目录文件名填充修复，防止普通编译、保存把未初始化的名字尾部写入目录并导致下次启动失败。运行盘的主内核和恢复内核均已更新，SDK及盘内文档同步；用户态程序、库和 API/ABI 不变。见[补丁说明](sandcore/docs/M10A2.2-RELEASE.md)及[目录写回修复](sandcore/evidence/m10a2-directory-repair/README.md)。原 M10a2 / M10a2.1 Release 和附件完整保留。
 
 **M10a2.1 产品修正**：Studio 支持直接打开 C 构建、新建程序项目及具体编译错误；恢复 SCAPI.H 源码兼容，修正文件夹双击、滚动边界和 Files 编辑入口。默认 HelloWorld 已实际构建、运行。见[产品修正记录](sandcore/docs/M10A2-APPLICATION-PRODUCT-FIX.md)、[Studio 使用说明](sandcore/docs/STUDIO2-USER-GUIDE.md)及[补丁下载入口](https://github.com/mio-qwq/SandCore/releases/tag/M10a2.1)。
 
@@ -19,7 +19,7 @@ M10a2运行包仅含run.py、run.bat和两个盘，默认SDL原生相对鼠标/�
 | 入口 | 内容 |
 |---|---|
 | [M10a2交付检查](sandcore/docs/M10A2-ACCEPTANCE.md) | 当前平台、SDK、真实证据与准确限制 |
-| [M10a2运行包/SDK](https://github.com/mio-qwq/SandCore/releases/tag/M10a2) | 正式下载；[发布说明及校验凭证](sandcore/docs/M10A2-PUBLISHED.md) |
+| [M10a2.2运行包/SDK](https://github.com/mio-qwq/SandCore/releases/tag/M10a2.2) | 最新补丁；[发布说明及校验凭证](sandcore/docs/M10A2-PUBLISHED.md) |
 | [M10a1 Preview 下载](https://github.com/mio-qwq/SandCore/releases/tag/M10a1) | 已验收的开发运行包；[发布说明](sandcore/docs/M10A1-PREVIEW.md) |
 | [构建与运行](#构建与运行) | 从源码构建当前系统、启动已有版本 |
 | [架构](#系统架构) | 启动链、内核、用户态、会话和扩展 |

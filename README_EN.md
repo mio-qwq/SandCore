@@ -6,7 +6,7 @@
 
 **A 32-bit x86 operating system spanning the bootloader, kernel, desktop environment, and native development tools.**
 
-The current source fixes a SandFS directory name padding bug that normal compilation and saving could trigger, preventing the next boot. See the [repair and file preservation record](sandcore/evidence/m10a2-directory-repair/README.md). The original M10a2.1 release package does not yet include this follow-up fix.
+**Latest patch: [M10a2.2](https://github.com/mio-qwq/SandCore/releases/tag/M10a2.2).** It fixes uninitialized SandFS directory name padding that normal compilation and saving could persist, preventing the next boot. Both primary and recovery kernels are updated, with matching SDK and on-disk documentation. User programs, libraries and API/ABI are unchanged. See the [patch notes](sandcore/docs/M10A2.2-RELEASE.md) and [repair record](sandcore/evidence/m10a2-directory-repair/README.md). The original M10a2 and M10a2.1 releases and assets are preserved.
 
 **M10a2.1 product fixes:** Studio can build an opened C file, create a program project and show specific compiler errors. Legacy SCAPI.H source support, directory navigation, scroll bounds and the Files editor action are fixed. The default HelloWorld project was compiled and run in SandCore. See the [repair record](sandcore/docs/M10A2-APPLICATION-PRODUCT-FIX.md), [Studio guide](sandcore/docs/STUDIO2-USER-GUIDE.md) and [patch download](https://github.com/mio-qwq/SandCore/releases/tag/M10a2.1).
 
@@ -17,7 +17,7 @@ Current version: **SandCore M10a2 — The Application Platform Era**. Ring3 SCL,
 | Entry point | Description |
 |---|---|
 | [M10a2 delivery audit](sandcore/docs/M10A2-ACCEPTANCE.md) | Current platform, SDK, actual verification evidence, and limitations |
-| [M10a2 runtime and SDK](https://github.com/mio-qwq/SandCore/releases/tag/M10a2) | Published downloads; [release receipt](sandcore/docs/M10A2-PUBLISHED.md) |
+| [M10a2.2 runtime and SDK](https://github.com/mio-qwq/SandCore/releases/tag/M10a2.2) | Latest patch; [release receipt](sandcore/docs/M10A2-PUBLISHED.md) |
 | [Download M10a1 Preview](https://github.com/mio-qwq/SandCore/releases/tag/M10a1) | Accepted development build; [release notes](sandcore/docs/M10A1-PREVIEW.md) |
 | [Building and running](#building-and-running) | Build the current system from source or launch an existing version |
 | [Architecture](#system-architecture) | Boot sequence, kernel, user space, sessions, and extensions |

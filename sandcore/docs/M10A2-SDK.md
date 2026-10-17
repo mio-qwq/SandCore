@@ -1,5 +1,7 @@
 # M10a2 公开 SDK 与来源合同
 
+2026-10-17 **M10a2.2补丁SDK**沿用M10a2.1全部编译器、链接器、9库、公共头、例子与许可原字节，仅同步文件系统修复规范、本补丁说明及本文，并更新MANIFEST/HASHES/SHA256SUMS。原编译来源记录保留，新增文档复制来源另行标注；不重复构建或客体测试。运行盘主核/恢复主核的修复见[M10A2.2-RELEASE.md](M10A2.2-RELEASE.md)。
+
 SandCore M10a2 — The Application Platform Era。最终来源为HOST21/native11/final12；文档统一后只restage到build/m10a2-sdk-delivery-02，不重编未变库。8个普通原生库、实际guest G1/SCLD和唯一SCSOUND宿主codec分别绑定来源，最后SDK清单/文件摘要以该目录MANIFEST、HASHES、SHA256SUMS为准。SDK staging本身的SDK_runtime_verified=false保持；真实复杂开发流程另由GUI04/GUI12和[M10A2-ACCEPTANCE.md](M10A2-ACCEPTANCE.md)证明。不能将staging工具自己的旧PREVIEW/未运行状态字段误解为抹去独立GUI证据，也不能把GUI证据写回旧staging原报告。交付包与限制见[M10A2-RELEASE.md](M10A2-RELEASE.md)。
 
 2026-10-17 产品修正另绑定 HOST26/native15/final15，交付 SDK 为 `build/m10a2-sdk-delivery-03`。新增 Studio 使用说明，恢复 `/SYS/INC/SCAPI.H`、`SCIO.H`、`SCMEM.H` 的源码兼容，SCAPI.H 冻结原字节不变；SCUI ABI1.4 的库修订为8。新建程序、旧源码及具体错误的实际结果见 [产品修正](M10A2-APPLICATION-PRODUCT-FIX.md)。上段保留首发包来源，新 SDK 不冒充首发原字节。
