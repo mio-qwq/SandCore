@@ -35,3 +35,7 @@ TakeInput仅交出模型生成的字节，传输和部分写重试由调用应�
 本规格随实现交Root整合；宿主模型与机器码生成不等于客体GUI或CLI已验收。
 
 2026-10-17布局修订：GUI10累计输出后实际提示行落在客户区外。Terminal2的通用dock控件创建器将TAB原有OVERLAY覆盖为ABSOLUTE，使内部页保留80×24自然尺寸，绘制被裁剪但PTY仍采用超出视口的行数。现在仅TAB保留OVERLAY，页及终端实际arrange按剩余内容区同步PTY；不更改SCTERM字节解析、历史/ANSI或公开ABI。本修复尚待本批HOST/真实原生生成及短定向GUI验证，GUI10旧证据不覆盖新代码。
+
+2026-10-17后续：HOST16、两个目标实际native09生成/严格reader/零差owner通过；final10 CORE及494项SDK已核验，CORE与GUI10相同。GUI11定向运行正在启动，尚不声明本应用修复通过；原生证据见evidence/m10a2-native09。
+
+修订：2026-10-17，GUI11定向客体检查完成：终端30行后提示符可见，配置保存权限失败后的临时清理成功，最终owner零差；证据evidence/m10a2-gui11。

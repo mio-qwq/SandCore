@@ -271,3 +271,7 @@ GUI10通过普通SID4的真实Terminal启动Installer，再用文件对话框添
 修订：2026-10-17，记录主核批量PIO及原错误/持久化/loader边界、同文件前后读盘测量和普通GUI真实持久安装/回读/正常退出；本轮最终owner13948→13948、全部资源增量0，driver退出0、输入/原盘保持；证据evidence/m10a2-pio-gui10。
 
 2026-10-17 Settings清理修订：发布后的临时文件Info可能携带当前目录epoch，但文件Remove合同只接受object/revision条件且expected_snapshot_epoch必须为0；Settings此前照抄Info该字段，内核会返回INVALID并留.C31。本次仅修应用请求为0，保留本人独占lease、object/revision和真实Advance/DURABLE判据，不放宽内核权限或条件。本批尚未验证临时文件真实移除，不将静态定位改称回归通过。
+
+2026-10-17后续：HOST16、两个目标实际native09生成/严格reader/零差owner通过；final10 CORE及494项SDK已核验，CORE与GUI10相同。GUI11定向运行正在启动，尚不声明本应用修复通过；原生证据见evidence/m10a2-native09。
+
+修订：2026-10-17，GUI11定向客体检查完成：终端30行后提示符可见，配置保存权限失败后的临时清理成功，最终owner零差；证据evidence/m10a2-gui11。

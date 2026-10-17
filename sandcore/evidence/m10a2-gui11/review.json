@@ -1,0 +1,112 @@
+{
+  "status": "DECLARED_GUI11_FACTS_REVIEW",
+  "full_M10a2": false,
+  "driver_exit_code": 0,
+  "qemu_pid": 22336,
+  "qemu_closed": true,
+  "terminal": {
+    "lines": 30,
+    "prompt_and_cursor_visible": true,
+    "subsequent_echo_visible": true
+  },
+  "settings": {
+    "ordinary_uid": 1000,
+    "save_denied": -103,
+    "temporary_cleanup_after_settled_failure": true,
+    "reload_restored_original_environment": true,
+    "normal_exit": 0
+  },
+  "files_drag": {
+    "physical_hold_ms": 350,
+    "diagnostic_only": true,
+    "confirmation_appeared": true,
+    "cancel_retained_source": true,
+    "normal_exit": 0,
+    "ui_error": -313,
+    "cause": -103,
+    "original_fast_drag_unresolved": true,
+    "permission_error_unresolved": true
+  },
+  "owner": {
+    "before_physical_pages": 13948,
+    "after_physical_pages": 13948,
+    "physical_delta": 0,
+    "attributed_physical_delta": 0,
+    "unexplained_delta": 0,
+    "unexpected": []
+  },
+  "inputs_unchanged": true,
+  "original_disk_unchanged": true,
+  "files": {
+    "p6-gui.json.gz": {
+      "source": "build\\m10a2-p6-gui-run-11\\p6-gui.json",
+      "source_sha256": "0691f186eeafb7d56c8ff641f0d73879ec31f0e521999cc4f79ed2b5c769f6f9",
+      "archive_sha256": "489edc49ededadcc892b0847e6d9b309de2447d26409d69b3d3b448ce0eb852d"
+    },
+    "screenshots/terminal-output-lines.png": {
+      "source": "build\\m10a2-p6-gui-run-11\\p6-gui11-terminal-output-lines.png",
+      "source_sha256": "423a6f8db7f4dc3b496baa2983cb6f8cad10247868ddf7711639fb9b571d2b24",
+      "archive_sha256": "423a6f8db7f4dc3b496baa2983cb6f8cad10247868ddf7711639fb9b571d2b24"
+    },
+    "screenshots/terminal-echo-after-scroll.png": {
+      "source": "build\\m10a2-p6-gui-run-11\\p6-gui11-terminal-echo-after-scroll.png",
+      "source_sha256": "a8723046b46aba5c38c2e2c1763d2e3397cc723a57f56dc089bf5cf0c6fb6127",
+      "archive_sha256": "a8723046b46aba5c38c2e2c1763d2e3397cc723a57f56dc089bf5cf0c6fb6127"
+    },
+    "screenshots/settings-env-draft.png": {
+      "source": "build\\m10a2-p6-gui-run-11\\p6-gui11-settings-env-draft.png",
+      "source_sha256": "b85e52075c74c7bb2fbfe518780bbcdeedbf535e6dec9b08b53f352c7849c270",
+      "archive_sha256": "b85e52075c74c7bb2fbfe518780bbcdeedbf535e6dec9b08b53f352c7849c270"
+    },
+    "screenshots/settings-env-save-settled.png": {
+      "source": "build\\m10a2-p6-gui-run-11\\p6-gui11-settings-env-save-settled.png",
+      "source_sha256": "828d84bd6b510543b349e62ba647d5d498276ea67d2951e18d88d863793c5be2",
+      "archive_sha256": "828d84bd6b510543b349e62ba647d5d498276ea67d2951e18d88d863793c5be2"
+    },
+    "screenshots/settings-reload-confirm.png": {
+      "source": "build\\m10a2-p6-gui-run-11\\p6-gui11-settings-reload-confirm.png",
+      "source_sha256": "6c7fc9c87d58549831ede628371189b7a7a0ca0cfcabaff0eafe10c78e78f91a",
+      "archive_sha256": "6c7fc9c87d58549831ede628371189b7a7a0ca0cfcabaff0eafe10c78e78f91a"
+    },
+    "screenshots/held-drop-screen.png": {
+      "source": "build\\m10a2-p6-gui-run-11\\p6-gui11-held-drop-screen.png",
+      "source_sha256": "342208253ab4aaaa1f514548a25c39eeb884612c4e94931a487401f9e6acc4c7",
+      "archive_sha256": "342208253ab4aaaa1f514548a25c39eeb884612c4e94931a487401f9e6acc4c7"
+    },
+    "screenshots/after-drop-cancel.png": {
+      "source": "build\\m10a2-p6-gui-run-11\\p6-gui11-after-drop-cancel.png",
+      "source_sha256": "3157b324f316b7b07ecb39c4a4dfaab00406811417fbdac1a21fc2206e28c827",
+      "archive_sha256": "3157b324f316b7b07ecb39c4a4dfaab00406811417fbdac1a21fc2206e28c827"
+    },
+    "screenshots/after-files-normal-close.png": {
+      "source": "build\\m10a2-p6-gui-run-11\\p6-gui11-after-files-normal-close.png",
+      "source_sha256": "df9881452a2d88ef4064ae179dfde6aaa173222e8062eeea186ca3d7137344e1",
+      "archive_sha256": "df9881452a2d88ef4064ae179dfde6aaa173222e8062eeea186ca3d7137344e1"
+    },
+    "screenshots/shell-exited.png": {
+      "source": "build\\m10a2-p6-gui-run-11\\p6-gui11-shell-exited.png",
+      "source_sha256": "ba5bf0b0fa5bb9f17389436fef1007bda6e11eb88e32d7be8852c5811cad2f08",
+      "archive_sha256": "ba5bf0b0fa5bb9f17389436fef1007bda6e11eb88e32d7be8852c5811cad2f08"
+    },
+    "setting.log": {
+      "source": "build\\m10a2-p6-gui-run-11\\setting.log",
+      "source_sha256": "c74bcc2fbea955dbe789fbee0dbdd5c47dec2cdd805bd8a45d42fae8d3f362d9",
+      "archive_sha256": "c74bcc2fbea955dbe789fbee0dbdd5c47dec2cdd805bd8a45d42fae8d3f362d9"
+    },
+    "files-diag.log": {
+      "source": "build\\m10a2-p6-gui-run-11\\files-diag.log",
+      "source_sha256": "572e96fe9f8a1ebfd95ea8347bfc5dfd6bee508ab74026fae2a47eedfbe66a28",
+      "archive_sha256": "572e96fe9f8a1ebfd95ea8347bfc5dfd6bee508ab74026fae2a47eedfbe66a28"
+    },
+    "stdout/p6-cli-gui11-home-after-save-terminal-state.bin": {
+      "source": "build\\m10a2-p6-gui-run-11\\case-013.stdout.bin",
+      "source_sha256": "6d083ece5899f381ccaf7905965cf808fbc3ba03fd40fc9bd4d103940830ec42",
+      "archive_sha256": "6d083ece5899f381ccaf7905965cf808fbc3ba03fd40fc9bd4d103940830ec42"
+    },
+    "stdout/p6-cli-gui11-post-close-ps.bin": {
+      "source": "build\\m10a2-p6-gui-run-11\\case-017.stdout.bin",
+      "source_sha256": "fb132144bfd04089f0bd9602e55be08150b1e8607ee0d5a635e1252e70544630",
+      "archive_sha256": "fb132144bfd04089f0bd9602e55be08150b1e8607ee0d5a635e1252e70544630"
+    }
+  }
+}

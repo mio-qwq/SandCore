@@ -1,0 +1,14 @@
+ls -a /HOME; _m9_status=$?; echo __SCUI_CMD_900e1b1c7aa2d9e88fe43fab:$_m9_status:__SCUI_CMD_900e1b1c7aa2d9e88fe43fab_END
+.
+..
+.DESKTOP
+FEATURE.C
+HELLO.C
+HELLO.SCX
+HELLO.SCX.log
+HELLO.SCX.map
+RACE
+ROOT
+WELCOME.SCB
+demo.asm
+notes.txt

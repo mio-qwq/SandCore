@@ -1,34 +1,19 @@
 # M10a2 当前运行与接续
 
 <!-- CURRENT-BEGIN -->
-2026-10-17。完整M10a2目标保持active，主代理独立工作。四文件试玩仍为native06；用户盘未覆盖。当前已验切片为HOST15/native08/final09。Windows WHPX GUI10已真实收束：exec64591退出0、QEMU10232关闭；测试SID4已注销、原SID1恢复。成果已保存main@bc55021；WSL的gh凭据推送实际连接github.com:443失败，远端未确认。随后两应用小修正在收齐，旧GUI10证据不覆盖新源码。
+2026-10-17。完整目标active，主代理独立工作。当前无代理持有的活QEMU：GUI11 exec27067已实际退出0，QEMU22336关闭，测试SID4注销、原SID1恢复。HOST16/native09/final10全部固定输入与原盘保持。旧活句柄不能继续输入，源码冻结已解除。
 
-| 项目 | 实际状态 |
-|---|---|
-| 默认显示与QEMU | GTK实际per-monitor/144与宿主150%一致，WHPX优先；原尺寸设置/文件对话框清楚。用户现已实际确认“我试了现在可以快捷键”，与代理先前未确认的自动按键分列 |
-| 定时器错误修复 | SCUI Timer回调沿普通消息ERROR通知合同，不直接结束上下文，保留firing/retired/revision生命周期；SCO16、HOST14、native08通过。尚不声称已证明Files313原始根因 |
-| 原生刷新08 | 只重新生成SCUI，四个07应用经逐项实际对象/链接/SCDB/源闭包/get资格审阅后复用。27对象/8普通库/21产物；最终PF零差额，严格SDK reader未改，原盘/输入保持 |
-| 新CORE/SDK | HOST15只改主内核ATA PIO传输；所有用户产物及BOOT_READ_ONLY引导与HOST14相同。final09三步骤退出0，inspect_final通过；CORE 542f1f795408a9d383d95acfff9cd0a34a82356311e71fd34d2e5be197a9890b；SDK494项/17488090B。GUI10实际业务及零差owner已收束 |
-| 原16页调查 | 独立只读VM已正常关闭：唯一新64KiB arena内两块分别为数字9/3的1600B字形，原盘保持。没有改写native07原FAIL，也未豁免GUI01的205页 |
-| GUI08/09 | 08冷资源90秒预算失败保留。09冷资源完成177.593秒，最终owner零差额；QEMU17436已不在，但外层finish后中断，原报告RUNNING未改为PASS。部分证据见evidence/m10a2-gui09-partial |
-| GUI10 / PIO读写 | 相同230424B文件校验697678241一致；time cksum宿主3.188→0.437秒、客体PIT0.59→0.31秒；冷资源阶段177.593→26.109秒。普通Installer实际73B/DURABLE1/错误0/权限核实/源保留/回读SHA一致/exit0。不称整机帧率或完整开机时间 |
-| GUI10 / 应用和模式 | Debug F5两次继续、F4暂停、7模块1765符号、F9两处断点与表2→1→0、目标及Debug exit0。实际1024×768/150% Keep后关闭再开显示预览0；随后恢复1920×1080/150%和预览0。Shell退出0，Terminal实际X关闭，ps无残留应用 |
-| GUI10 / 最终owner | 同暂停13948→13948，归属0/未解释0，全部池/字体/桌面增量0；driver退出0，所有输入与原盘保持。证据evidence/m10a2-pio-gui10 |
-| 已有可复用业务 | GUI04复杂SCW/独立SCL/四TU/真实调试、PCM与零差owner；GUI06安装73B持久提交和正常exit0。GUI06 Files取消exit313及Settings临时.C31仍按缺陷保留 |
+用户明确授权用当前数据盘覆盖四文件试玩目录，已完成且逐字节摘要核验：C:/Users/Administrator/Desktop/test/sanddata.img 为GUI11真实结束后的256MiB原生盘，SHA48568dd9c2fb9e07c9343b59a7af58db83938ab6dc8b88621a5320b8c5785ea0。run.py/run.bat/启动盘保持；启动盘与GUI11精确相同，目录仍只四文件。凭证evidence/m10a2-test-current-01/delivery.json。此前不覆盖用户试玩盘的约束已被本次明确请求更新；不能据此擅自覆盖下一次用户修改。
 
-新证据：[native08](../evidence/m10a2-native08/review.json)、[只读heap调查](../evidence/m10a2-parent-heap-02/review.json)。原07报告未改，资格审阅使用独立DECLARED_P6_ARTIFACT_FACTS_AUDIT_PASS，明确original_owner_account_pass=false；不将原轮次失败换名为PASS。新08必须且已经另取真实owner终账。
+GUI11实际终端30行和后续echo的提示符/光标均可见，Settings保存被现有权限规则拒绝-103后的临时文件已清理，重读恢复原环境，正常exit0。Files真实350ms按住的诊断手势出现确认框，取消保留源，正常exit0；但files-diag.log仍记UI error=-313 cause=-103 operation=7 node=12。原快拖失败和新权限通知仍未解决，不把延长手势当产品修复。
 
-接续：先静态定位Files拖放提前结束（SYSTEM只读源和新HOME/1000所有源均未弹确认，Files两次正常exit0、日志空，不能称GUI06取消313修复）。独立审阅Settings临时.C31清理、Terminal累计输出后的末尾可见性、Installer默认结果列在可视区外；只针对确证缺陷修改并做最小有效回归。随后收齐合同剩余权限/会话/兼容与统一交付。GUI10已结束，不能再向exec64591输入。当前证据[PIO/GUI10](../evidence/m10a2-pio-gui10/README.md)，原失败不改写，全合同继续active。
+同暂停最终owner13948→13948，全部池/字体/桌面/归属/未解释增量0。证据evidence/m10a2-gui11。新native09/final10实际凭证在evidence/m10a2-native09，严格SDK reader没有放宽。
 
-新两应用修复（客体未验）：Terminal2的dock创建器对TAB保留OVERLAY，不再把24行自然高度放到裁剪区外；Settings临时文件Remove按文件合同传expected_snapshot_epoch=0，保留object/revision/lease身份。新构建目录build/m10a2-main-appfix-01复用386文件/10043653B编译中间物，没有复制数据盘；HOST15及final09原路径保留，前字节/准备凭证在drafts/m10a2-appfix-01。HOST16实际exit0/41产物/源变化0，SHAa38c9b326d9bb89d8daab3761fd95bac3976d504fe3d424c016e5ff96c137e29；与HOST15逐项比较只有SETTINGS2.SCX、TERMINAL2.SCX变。Files和Installer未随此批修改。
+下一步：准确定位Files首次目标票据/UP及权限通知的真实调用路径，避免猜测性放宽内核验证；处理Installer默认结果列可见性。复用已验复杂SCW/独立SCL/四TU/调试、音频、主题/模式、PIO及兼容结果，再收齐全合同剩余出口与统一交付。不启动无关矩阵，不复用已经结束的VM句柄。
 
-原生09已经完整PASS：exec7795退出0/QEMU6960关闭，SETTINGS2和TERMINAL2真实SCCC/SCLD/get成功，27对象/8库/21产物保持，最终physical0/归属0/未解释0，严格reader未改、输入原盘保持。inner SHA57fa08a3e2ce36e350a0f88f6d56ab93a2418789ec22723ce2c762d10813f32b，outer SHA0a90b72477f46fd02a73fea42d60debab2c7860c0bd3c164893bd7a0f6d5ff69，证据evidence/m10a2-native09。final10三步骤和inspect通过，SDK494项/17489703B；CORE与final09完全相同542f1f795408a9d383d95acfff9cd0a34a82356311e71fd34d2e5be197a9890b，ELF仍7f07f554bb9aa9fae1fe533b41b81ceefd7c7714b128de0441b7d13fce17b532。GUI修复尚待。
+main仍以e5c37a5为最近已保存代码；上次WSL gh凭据推送实际github.com:443连接失败，远端未确认。只用main、无Release、SCAPI冻结、私钥仅用户持有、M8封存保持。
 
-GUI11已启动准备进入普通SID：drafts/m10a2-p6-gui-11/driver.py，输出build/m10a2-p6-gui-run-11，HOST16/native09/final10，显式WHPX。只回归Terminal真实累计输出末尾与Settings保存失败后的临时清理；Files拖放使用显式--drag-settle-ms 350真实按住后松开诊断，记录实际停留，不注入Drop或写内存；原GUI10快拖失败保留，不把诊断手势当产品修复。主源/tools/SDK/CORE/当前helper冻结。普通SID和活句柄以实际READY/本轮工具为准，不复用已结束GUI10。
-
-SCAPI.H冻结摘要81a730450fcb3d310ed841ad3e5c70a3fed32aa7fbd10acac8b888ac7da9ffc1。只用main、无Release、不读私钥、不重启M8；用户盘与旧成果保留。
-
-修订：2026-10-17，保存GUI10实际退出0、PIO读写/快捷键/1024真实模式及零差owner，明确未解缺陷和下一步。
+修订：2026-10-17，保存GUI11实际零差退出、定向结果与用户授权四文件数据盘覆盖。
 <!-- CURRENT-END -->
 
 <details>
@@ -195,3 +180,38 @@ SCAPI.H冻结SHA81a730450fcb3d310ed841ad3e5c70a3fed32aa7fbd10acac8b888ac7da9ffc1
 修订：2026-10-17，补刷新07实际FAIL、PID1 heap精确16页定位及无当前VM；不将生成成功改成整轮PASS。
 
 修订：2026-10-17，GUI08仅冷资源等待超时，保存真实5→1进度和输入/原盘保持；GUI09用同一候选和原完成判据，有限冷启动预算180秒。
+
+<details>
+<summary>GUI11启动前的上一检查点（历史状态）</summary>
+
+
+2026-10-17。完整M10a2目标保持active，主代理独立工作。四文件试玩仍为native06；用户盘未覆盖。当前已验切片为HOST15/native08/final09。Windows WHPX GUI10已真实收束：exec64591退出0、QEMU10232关闭；测试SID4已注销、原SID1恢复。GUI10成果已保存main@bc55021；两应用修复和native09已保存main@e5c37a5；WSL的gh凭据推送实际连接github.com:443失败，远端未确认。随后两应用小修正在收齐，旧GUI10证据不覆盖新源码。
+
+| 项目 | 实际状态 |
+|---|---|
+| 默认显示与QEMU | GTK实际per-monitor/144与宿主150%一致，WHPX优先；原尺寸设置/文件对话框清楚。用户现已实际确认“我试了现在可以快捷键”，与代理先前未确认的自动按键分列 |
+| 定时器错误修复 | SCUI Timer回调沿普通消息ERROR通知合同，不直接结束上下文，保留firing/retired/revision生命周期；SCO16、HOST14、native08通过。尚不声称已证明Files313原始根因 |
+| 原生刷新08 | 只重新生成SCUI，四个07应用经逐项实际对象/链接/SCDB/源闭包/get资格审阅后复用。27对象/8普通库/21产物；最终PF零差额，严格SDK reader未改，原盘/输入保持 |
+| 新CORE/SDK | HOST15只改主内核ATA PIO传输；所有用户产物及BOOT_READ_ONLY引导与HOST14相同。final09三步骤退出0，inspect_final通过；CORE 542f1f795408a9d383d95acfff9cd0a34a82356311e71fd34d2e5be197a9890b；SDK494项/17488090B。GUI10实际业务及零差owner已收束 |
+| 原16页调查 | 独立只读VM已正常关闭：唯一新64KiB arena内两块分别为数字9/3的1600B字形，原盘保持。没有改写native07原FAIL，也未豁免GUI01的205页 |
+| GUI08/09 | 08冷资源90秒预算失败保留。09冷资源完成177.593秒，最终owner零差额；QEMU17436已不在，但外层finish后中断，原报告RUNNING未改为PASS。部分证据见evidence/m10a2-gui09-partial |
+| GUI10 / PIO读写 | 相同230424B文件校验697678241一致；time cksum宿主3.188→0.437秒、客体PIT0.59→0.31秒；冷资源阶段177.593→26.109秒。普通Installer实际73B/DURABLE1/错误0/权限核实/源保留/回读SHA一致/exit0。不称整机帧率或完整开机时间 |
+| GUI10 / 应用和模式 | Debug F5两次继续、F4暂停、7模块1765符号、F9两处断点与表2→1→0、目标及Debug exit0。实际1024×768/150% Keep后关闭再开显示预览0；随后恢复1920×1080/150%和预览0。Shell退出0，Terminal实际X关闭，ps无残留应用 |
+| GUI10 / 最终owner | 同暂停13948→13948，归属0/未解释0，全部池/字体/桌面增量0；driver退出0，所有输入与原盘保持。证据evidence/m10a2-pio-gui10 |
+| 已有可复用业务 | GUI04复杂SCW/独立SCL/四TU/真实调试、PCM与零差owner；GUI06安装73B持久提交和正常exit0。GUI06 Files取消exit313及Settings临时.C31仍按缺陷保留 |
+
+新证据：[native08](../evidence/m10a2-native08/review.json)、[只读heap调查](../evidence/m10a2-parent-heap-02/review.json)。原07报告未改，资格审阅使用独立DECLARED_P6_ARTIFACT_FACTS_AUDIT_PASS，明确original_owner_account_pass=false；不将原轮次失败换名为PASS。新08必须且已经另取真实owner终账。
+
+接续：先静态定位Files拖放提前结束（SYSTEM只读源和新HOME/1000所有源均未弹确认，Files两次正常exit0、日志空，不能称GUI06取消313修复）。独立审阅Settings临时.C31清理、Terminal累计输出后的末尾可见性、Installer默认结果列在可视区外；只针对确证缺陷修改并做最小有效回归。随后收齐合同剩余权限/会话/兼容与统一交付。GUI10已结束，不能再向exec64591输入。当前证据[PIO/GUI10](../evidence/m10a2-pio-gui10/README.md)，原失败不改写，全合同继续active。
+
+新两应用修复（客体未验）：Terminal2的dock创建器对TAB保留OVERLAY，不再把24行自然高度放到裁剪区外；Settings临时文件Remove按文件合同传expected_snapshot_epoch=0，保留object/revision/lease身份。新构建目录build/m10a2-main-appfix-01复用386文件/10043653B编译中间物，没有复制数据盘；HOST15及final09原路径保留，前字节/准备凭证在drafts/m10a2-appfix-01。HOST16实际exit0/41产物/源变化0，SHAa38c9b326d9bb89d8daab3761fd95bac3976d504fe3d424c016e5ff96c137e29；与HOST15逐项比较只有SETTINGS2.SCX、TERMINAL2.SCX变。Files和Installer未随此批修改。
+
+原生09已经完整PASS：exec7795退出0/QEMU6960关闭，SETTINGS2和TERMINAL2真实SCCC/SCLD/get成功，27对象/8库/21产物保持，最终physical0/归属0/未解释0，严格reader未改、输入原盘保持。inner SHA57fa08a3e2ce36e350a0f88f6d56ab93a2418789ec22723ce2c762d10813f32b，outer SHA0a90b72477f46fd02a73fea42d60debab2c7860c0bd3c164893bd7a0f6d5ff69，证据evidence/m10a2-native09。final10三步骤和inspect通过，SDK494项/17489703B；CORE与final09完全相同542f1f795408a9d383d95acfff9cd0a34a82356311e71fd34d2e5be197a9890b，ELF仍7f07f554bb9aa9fae1fe533b41b81ceefd7c7714b128de0441b7d13fce17b532。GUI修复尚待。
+
+GUI11已启动准备进入普通SID：exec27067/QEMU22336，drafts/m10a2-p6-gui-11/driver.py，输出build/m10a2-p6-gui-run-11，HOST16/native09/final10，显式WHPX。只回归Terminal真实累计输出末尾与Settings保存失败后的临时清理；Files拖放使用显式--drag-settle-ms 350真实按住后松开诊断，记录实际停留，不注入Drop或写内存；原GUI10快拖失败保留，不把诊断手势当产品修复。主源/tools/SDK/CORE/当前helper冻结。普通SID和活句柄以实际READY/本轮工具为准，不复用已结束GUI10。
+
+SCAPI.H冻结摘要81a730450fcb3d310ed841ad3e5c70a3fed32aa7fbd10acac8b888ac7da9ffc1。只用main、无Release、不读私钥、不重启M8；用户盘与旧成果保留。
+
+修订：2026-10-17，保存GUI10实际退出0、PIO读写/快捷键/1024真实模式及零差owner，明确未解缺陷和下一步。
+
+</details>

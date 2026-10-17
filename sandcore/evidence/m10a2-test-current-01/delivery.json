@@ -1,0 +1,21 @@
+{
+  "status": "VERIFIED_USER_REQUESTED_DATA_DISK_REPLACEMENT",
+  "source": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-p6-gui-run-11\\sanddata.img",
+  "target": "C:\\Users\\Administrator\\Desktop\\test\\sanddata.img",
+  "bytes": 268435456,
+  "sha256": "48568dd9c2fb9e07c9343b59a7af58db83938ab6dc8b88621a5320b8c5785ea0",
+  "replaced_sha256": "8051d123789a55de2704f0d140208e3b86f1ffb3b19f6159d2f068a334a2776f",
+  "unchanged_files": {
+    "run.py": "7edfc8627bf36e290bad65de640037b1a59862a88a4a510f762d665e22e924d5",
+    "run.bat": "ea9f0e859f894ce9e773ba617f77460f13bd9b6d751135f48c8b2801327a4039",
+    "sandcore.img": "47921cc2f9f0a23ea404cbd041a216931844023eedbcdbb4c824e9a55a8cfb3f"
+  },
+  "boot_matches_actual_gui11": true,
+  "source_report": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-p6-gui-run-11\\p6-gui.json",
+  "source_report_sha256": "0691f186eeafb7d56c8ff641f0d73879ec31f0e521999cc4f79ed2b5c769f6f9",
+  "gui11_driver_exit_code": 0,
+  "qemu_running_before_copy": false,
+  "test_directory_contains_only_requested_four_files": true,
+  "full_M10a2": false,
+  "known_remaining": "Files quick drag timing and related UI permission notification remain unresolved; original failures retained."
+}
