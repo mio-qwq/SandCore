@@ -16,6 +16,8 @@ def main():
     parser.add_argument("--check", action="store_true", help="check the launcher and disks without starting QEMU")
     parser.add_argument("--accel", choices=("auto", "whpx", "tcg"), default="auto",
                         help="auto prefers WHPX hardware acceleration and falls back to TCG")
+    parser.add_argument("--display", choices=("sdl", "gtk"), default="sdl",
+                        help="SDL uses native relative mouse input; GTK remains available for diagnosis")
     args = parser.parse_args()
     root = Path(__file__).resolve().parent
     boot, data = root / "sandcore.img", root / "sanddata.img"
@@ -39,8 +41,9 @@ def main():
     if args.check:
         print("Ready: run.bat or python run.py")
         print("Boot disk: 1.44 MiB; data disk: 256 MiB; QEMU: " + qemu)
-        print("Acceleration preference: " + acceleration + "; GTK native pixels; graphical monitor enabled.")
+        print("Acceleration preference: " + acceleration + "; display: " + args.display + "; graphical monitor enabled.")
         return 0
+    display = "sdl,gl=off,window-close=on" if args.display == "sdl" else "gtk,zoom-to-fit=off,show-menubar=on,show-tabs=on,window-close=on"
     # fresh fw_cfg熵不写入发行盘；临时目录离开with后自动回收，试玩目录始终四文件。
     with tempfile.TemporaryDirectory(prefix="sandcore-m10a2-") as temporary:
         entropy = Path(temporary) / "entropy.bin"
@@ -48,7 +51,7 @@ def main():
         command = [qemu, "-name", "SandCore M10a2 - The Application Platform Era",
             "-machine", "accel=" + acceleration, "-cpu", "qemu32", "-smp", "1", "-m", "256",
             "-vga", "std", "-boot", "a", "-display",
-            "gtk,zoom-to-fit=off,show-menubar=on,show-tabs=on,window-close=on",
+            display,
             "-monitor", "vc", "-serial", "none", "-serial", "none", "-parallel", "none",
             "-rtc", "base=utc", "-fw_cfg", "name=opt/sandcore/entropy,file=" + str(entropy),
             "-drive", "format=raw,if=floppy,file=" + str(boot),
@@ -63,8 +66,20 @@ def main():
         if "HIGHDPIAWARE" not in [value.upper() for value in layers]:
             layers.append("HIGHDPIAWARE")
         environment["__COMPAT_LAYER"] = " ".join(layers)
+        if args.display == "sdl":
+            # PS/2客体需要真实相对量。GTK靠宿主坐标差及边缘回中，
+            # Windows全屏捕获失效时会撞隐形墙；SDL改走Raw Input。
+            # 坐标保持物理像素，由QEMU只转换一次；最近邻避免字形再被滤糊。
+            environment.update(SDL_WINDOWS_DPI_AWARENESS="permonitorv2",
+                               SDL_WINDOWS_DPI_SCALING="0",
+                               SDL_MOUSE_RELATIVE_MODE_WARP="0",
+                               SDL_MOUSE_RELATIVE_SCALING="0",
+                               SDL_RENDER_SCALE_QUALITY="nearest")
         print("Starting SandCore M10a2 (" + acceleration + "). Close the QEMU window to exit.", flush=True)
-        print("Ctrl+Alt+G: release/grab input; Ctrl+Alt+2: monitor; Ctrl+Alt+1: guest display.", flush=True)
+        if args.display == "sdl":
+            print("Ctrl+Alt+F: fullscreen/windowed; Ctrl+Alt+G: release/grab when windowed; Ctrl+Alt+2: toggle monitor.", flush=True)
+        else:
+            print("Ctrl+Alt+F: fullscreen/windowed; Ctrl+Alt+G: release/grab; Ctrl+Alt+2/1: monitor/guest display.", flush=True)
         return subprocess.call(command, cwd=root, env=environment)
 
 

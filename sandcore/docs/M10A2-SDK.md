@@ -1,6 +1,6 @@
 # M10a2 公开 SDK 与来源合同
 
-SandCore M10a2 — The Application Platform Era。最终 SDK staging 增量已实现；普通系统库、G1/SCLD、codec 例外与独立 ResearchDesk 的来源分别记录。当前最终整套 SDK 尚未用最新真实客体 provenance 完成 staging，ResearchDesk 的客体编译、运行和 GUI/回收仍待统一验证。2026-10-15 的五库 preview 和双示例宿主结果继续保留，不能覆盖本批新增组件。
+SandCore M10a2 — The Application Platform Era。最终 SDK staging 增量已实现；普通系统库、G1/SCLD、codec 例外与独立 ResearchDesk 的来源分别记录。2026-10-17的final11已经用HOST20/native10真实来源完成严格staging：496项/17503689B，八普通原生库、实际G1/SCLD及唯一SCSOUND宿主codec例外均逐项绑定。普通身份ResearchDesk已在GUI04经Studio的SCW工作区实际编译独立RDSTATS.SCL和四个TU的RDESK.SCX，运行与Debug2模块/符号/断点有独立证据；不将此扩成每个示例功能或整版完成。最新拖放/UI增量的普通交互仍由GUI12收束。2026-10-15五库preview和双示例宿主结果保留原时态。
 
 ## 内容与边界
 
@@ -19,7 +19,7 @@ SandCore M10a2 — The Application Platform Era。最终 SDK staging 增量已�
 | SYS/UI、SYS/FONT | 真实 Unicode 数据/oracle 与原始凤凰 12/16px TTF |
 | SYS/LICENSE | 所纳入第三方的固定完整源码、嵌套实现、完整许可/版权/来源与项目许可 |
 
-普通原生库为 SCLDR、SC32API、SCCLIB、SCLIB、SCUI、SCGFX、SCSHELL、SCTERM，均以 `.SCL` 安装。SCSOUND 是单列的固定用户已授权宿主 codec 例外。实际 ABI major/minor/library_version 来自所选 SCL；本规范不把库版本固定写死在过时计数中。SC32 当前整合 ABI 1.4/v6；SCUI 后续公共增量按实际 provider manifest/二进制共同核验。
+普通原生库为 SCLDR、SC32API、SCCLIB、SCLIB、SCUI、SCGFX、SCSHELL、SCTERM，均以 `.SCL` 安装。SCSOUND 是单列的固定用户已授权宿主 codec 例外。实际 ABI major/minor/library_version 来自所选 SCL；本规范不把库版本固定写死在过时计数中。当前实际SC32API为ABI1.5/v7（194导出），SCUI为ABI1.4/v6（174导出）；独立SC32DROP2.H声明新释放凭证入口最低版本，基础SC32API.H旧声明原字节保留。所有版本按实际provider manifest/二进制共同核验。
 
 公共头包括 SC32API 及 GUI/Font/Palette/Popup/Broker/Drop/Debug/Path/Lease/Replace/Host/Wall/Audio/SIMD/Config/Capture/Image/Auth/Terminal 独立头；SCUI/SCUITABS/SCUIARGB/SCUICANVAS/SCUISECRET、SCGFX/SCGFXDRAW、SCLIB、SCSHELL/SCSHELLABSENT、SCSOUND、SCUITERM、SCOFMT、SCDBGFILE、SCTYPES 和 RUNTIME/SCLDR。最终白名单由实际同批工具读取，所有 literal include 必须在 INC 闭合。源码新增实现目录时 SC32 聚合的真实 C include 根会纳入来源集合；audioapi/configapi/PTY 均不能遗漏。
 
@@ -86,3 +86,5 @@ EDIT2 和 UTILITY 原例及历史证据保留。它们原先的直接 FILE 保�
 | 2026-10-16 | 原生来源核真实聚合include闭包；未接线历史草稿仍完整归档、按HOST固定，不伪称guest编译。 |
 
 2026-10-16：公开SCW工作区合同、示例路径和SDK归档接线。
+
+修订：2026-10-17，更新final11真实原生来源SDK与GUI04普通SCW/独立SCL/四TU运行调试事实，明确新释放凭证接口版本及GUI12尚未验证范围。

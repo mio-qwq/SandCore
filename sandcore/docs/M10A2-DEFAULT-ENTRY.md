@@ -32,3 +32,10 @@ SCCC宿主IO实际检查14中SCUI/Debug/Files/Settings通过；Installer首次�
 2026-10-17后续：用户实际确认“我试了现在可以快捷键”。代理本次暂停无盘窗口检查被用户Esc中止并正常关闭，未取得可引用的自动按键结果；用户的实际确认与代理自动化证据分列。新HOST14/native08/final08已有实际构建/生成与零差owner，尚未覆盖用户试玩盘，修后GUI09继续。
 
 2026-10-17本轮收束：HOST15/native08/final09的Windows WHPX GUI10实际完成1024×768/150%预览、Keep、关闭重开查询预览0；1920×1080/150%恢复及预览0。Settings文字/响应式按钮实际截图已查看；Debug F5/F4/F9有独立真实GUI证据。最终资源零差、driver退出0；四文件用户盘未覆盖，完整M10a2继续active。参见[PIO与GUI10](../evidence/m10a2-pio-gui10/README.md)。
+
+
+2026-10-17全屏输入后续：用户报告GTK全屏后鼠标停止，并要求停止computer-use、避免过度验证。已停止该工具，仅读启动器、PS/2驱动和上游源码。GTK的gd_motion_event以宿主位置差生成相对量、到屏幕边缘靠gdk_device_warp回中；上游Windows GTK捕获缺陷见https://gitlab.com/qemu-project/qemu/-/issues/2225。该机制与现象相符，但没有本机真实输入证据确认就是同一缺陷，不能称根因已证。
+
+试玩run.py默认改为SDL，明确Raw Input、关闭SDL额外相对量缩放、采用物理DPI坐标和最近邻；HIGHDPIAWARE及WHPX优先保持，--display gtk可作显式诊断。SDL的Ctrl+Alt+F切换全屏；Ctrl+Alt+G只在窗口模式释放捕获；Ctrl+Alt+2切换monitor窗口。已经对实际安装QEMU支持的后端及两个--check入口核验，未启动新试玩VM、未写两盘/bat；实际全屏行为仍待用户或后续获准的输入验证。具体脚本摘要和检查记录见evidence/m10a2-fullscreen-entry-01/delivery.json。
+
+修订：2026-10-17，记录全屏相对输入的源码推断、SDL规避交付及尚未实测边界；不将上游master等同本机精确提交源码。

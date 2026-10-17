@@ -1,21 +1,23 @@
 # M10a2 当前运行与接续
 
 <!-- CURRENT-BEGIN -->
-2026-10-17。完整M10a2持续目标active，主代理独立工作，无subagent。当前实际活进程：native10 exec4991 / Windows QEMU15372，输出build/m10a2-p6-refresh-vm-10和build/m10a2-p6-target-refresh-10。已完成引导、桌面资源就绪、工具身份取回及变化源码上传，尚未取得最终生成和owner账。主源、tools、当前v9 helper、旧编译底座及所有已固定输入冻结；只可继续读/等同一会话，不复用已关闭GUI11句柄。
+2026-10-17。完整M10a2目标active，主代理独立工作，无subagent，也不使用computer-use。当前实际会话为GUI12：exec90027 / Windows QEMU4644，输出build/m10a2-p6-gui-run-12，HOST20/native10/final11、WHPX、Windows双盘无头输入。正在启动和建立普通桌面，尚未取得新交互结论或最终owner账。全部运行源、tools、SDK/CORE和活helper冻结；下方旧句柄都不复用。
 
-本批实现：独立SC32DROP2.H / ScDropAtRelease / SYS300 selector427，绑定真实capture UP的输入epoch、消息序号、原点、源/目标几何与可见代数及目标登记代数；30秒期限、成功一次消费。旧ScDropAt、基础SC32API.H和SCAPI原字节保持。SC32API库1.5/v7、SCUI1.4/v6。SCUI对排队MOVE/UP沿真实UP凭证接线，不用当前指针猜落点；自动tooltip重核当前输入资格。Installer根据实际DPI分配初始列宽，保留手动调宽与水平滚动。
+native10已实际exit0、QEMU15372关闭。inner SHA1e39068eeec9de3027f1c04e666b0f24b60ec4795d5ef860a7f376994ffad740，outer SHAd37f10f5904e1ff3e5d9cd472047f20ca7ce7679b82abcf2eabddc78c3ed3b0c；27对象/8普通库/21产物、严格reader、源和原盘守恒通过。owner14050→14066，实际+16页由同暂停的allocator块、5个新增时钟字形和一个65536B arena/PTE归属，未解释0；没有固定16页宽限，也没有重分类原native07 FAIL。证据evidence/m10a2-native10。
 
-HOST20已实际exit0 / 41产物 / 源变化0，SHA4f0980b97bb3e8b95b99779a4273269108917df17936b864e5a541c913c658b7。SCO19三个实际后端检查通过，正式NATIVE清单与真实SCO导入表匹配。原生10只刷新SC32API、SCUI、INSTALLER2；编译器及其余闭包完全复用。冻结编译VM使用final04旧CORE/旧库，生成的新库只取回，不装进旧运行底座；旧task/WM观察源码按真实保留前字节且完整SHA匹配，不冒充当前源码。证据evidence/m10a2-release-drag-host20；新字节还没有GUI PASS。
+final11已实际完成codec-proof、严格SDK、CORE构建及只读产物核对，两个执行器均exit0。CORE SHA2a6feb8315f9f7036dd2ac62592dc000e44c301763008f28265be7b268ef131e；SDK496项/17503689B，普通八库及G1/SCLD有真实客体来源，只有SCSOUND沿既有host codec例外。构建源变化0，旧中间物只作make输入，新内核和发行表已实际重编；新镜像尚未GUI验收。证据evidence/m10a2-final11。
 
-用户试玩目录已按明确请求更新为GUI11结束后的256MiB数据盘，SHA48568dd9c2fb9e07c9343b59a7af58db83938ab6dc8b88621a5320b8c5785ea0。run.py/run.bat/启动盘保持且仅四文件。凭证evidence/m10a2-test-current-01；不能擅自再次覆盖用户之后的修改。
+本批实现：SC32DROP2.H / ScDropAtRelease / SYS300 selector427，绑定真实capture UP的输入epoch、消息序号、原点、源/目标几何和可见代数及目标登记，30秒期限/成功一次消费。旧ScDropAt、基础SC32API.H和SCAPI原字节保持。SC32API实际1.5/v7、SCUI1.4/v6。SCUI排队MOVE/UP使用真实UP凭证；自动tooltip重核输入资格。Installer初始列宽按实际DPI分配。
 
-GUI11已真实exit0 / QEMU22336关闭，测试SID4注销、原SID1恢复，最终owner13948→13948且各池/字体/桌面/归属/未解释增量0，输入原盘保持。终端30行后提示符/光标和后续echo通过；Settings保存拒权后的临时清理/重读通过。350ms诊断手势的确认/取消保源与Files正常exit0有证据，但原快拖提前结束、operation7/node12 tooltip拒权日志仍按原失败保留，新源码必须另验。
+GUI12范围严格收敛：无350ms额外按住的快拖/取消/tooltip、Installer结果列，最后正常退出和一次owner账。独立DROPUP源码仅依赖公开SDK，在普通身份由真实手势检查无UP/错误序号/错误点/保留字段/真实UP/重复消费及输出保持；SCCC实际后端+严格链接已通过，仅源码和清单进入会话盘，不安装宿主SCX。首次准备因Windows路径键分隔符不一致在启动VM前失败，修正另记PREPARATION，不改产品判据。
 
-下一步：先等exec4991实际收束，取得真实native10结果和最终owner/输入守恒，不能将中途产物当整轮PASS；成功后按同一HOST20/native10签发final11 CORE/严格SDK。只做新字节快拖/取消/tooltip/Installer结果列的必要普通GUI与新输入凭证拒绝边界检查，复用已验IDE复杂SCW/独立SCL/四TU/调试、PCM、主题/显示、PIO与其他未变证据，再收齐全合同与统一交付。若生成失败，保留原日志并只修具体原因。
+用户试玩数据盘已按明确请求更新为GUI11结束后的256MiB盘，交付SHA48568dd9c2fb9e07c9343b59a7af58db83938ab6dc8b88621a5320b8c5785ea0，凭证evidence/m10a2-test-current-01。之后用户可能已有修改，不能擅自再覆盖。最新只更新run.py，SHA bf979ae2208b59f763b06a53027cea48852ca911887df64abf09efb19a5c14b8：默认SDL原生Raw Input、物理DPI坐标、最近邻，保WHPX优先和GTK可选。全屏鼠标属于尚未实测的入口规避，不称根因确证或修复PASS；两盘和bat未写，凭证evidence/m10a2-fullscreen-entry-01。用户原QEMU4452已实际关闭；不要自动重启试玩盘。
 
-最近已保存源码基点2728eb6；本批将保存新的阶段提交，不代表整版完成。WSL gh上次推送实际github.com:443连接失败，远端未确认。只用main、无Release、不读取私钥、M8封存和原盘保留。SCAPI冻结SHA81a730450fcb3d310ed841ad3e5c70a3fed32aa7fbd10acac8b888ac7da9ffc1。
+GUI11已实际exit0，SID4注销/原SID1恢复，owner13948→13948且各池/字体/桌面/未解释增量0。Terminal30行提示符、设置拒权后的临时清理/重读通过；350ms诊断拖放的确认/取消保源和Files正常exit0有证据。旧快拖失败及operation7/node12 tooltip拒权日志原样保留。IDE复杂SCW/独立SCL/四TU/调试、PCM、主题/显示、PIO及其它未变证据直接复用。
 
-修订：2026-10-17，保存真实UP授权与两项界面修正、HOST20/SCO19及native10活句柄；新客体交互仍待验。
+下一步：继续同一exec90027，实际READY后先看截图再输入；收齐上述必要回归和最后owner，随后整理完整合同证据/文档/最终交付，不增加排列组合。当前main@7add897，后续自产helper/evidence/入口修改待阶段保存；原用户未跟踪目录不纳入。WSL gh上次github.com:443连接失败，远端未确认。只main、无Release、不碰私钥、M8封存及原盘保持。SCAPI冻结SHA81a730450fcb3d310ed841ad3e5c70a3fed32aa7fbd10acac8b888ac7da9ffc1。
+
+修订：2026-10-17，持久化native10真实终态、final11构建和GUI12活句柄，补SDL入口规避的未实测边界。
 <!-- CURRENT-END -->
 
 <details>

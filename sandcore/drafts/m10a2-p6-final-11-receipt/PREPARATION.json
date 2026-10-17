@@ -1,0 +1,19 @@
+{
+  "status": "NATIVE10_HOST20_FINAL11_PREPARED_NOT_EXECUTED",
+  "original_helpers": {
+    "drafts\\m10a2-p6-final-10-receipt\\bindings.py": "4366487d3d77194ef2036978dde972bf4ea622868474017f89c8d8c725b43a47",
+    "drafts\\m10a2-p6-final-10-receipt\\finalize.py": "7ba10433d4a1ed5f7ff7617b4178328aa671f0bd5e914115c289a4db4dd18fa7",
+    "drafts\\m10a2-p6-final-10-receipt\\inspect_final.py": "790b3d346fe0239b4d56096aa9639c215af08198f7bdc65fd2bd0f9235478b6b"
+  },
+  "native_report_sha256": "1e39068eeec9de3027f1c04e666b0f24b60ec4795d5ef860a7f376994ffad740",
+  "outer_report_sha256": "d37f10f5904e1ff3e5d9cd472047f20ca7ce7679b82abcf2eabddc78c3ed3b0c",
+  "host_report_sha256": "4f0980b97bb3e8b95b99779a4273269108917df17936b864e5a541c913c658b7",
+  "changed_user_targets": [
+    "SC32API",
+    "SCUI",
+    "INSTALLER2"
+  ],
+  "core_reuses_final10_intermediate_objects": true,
+  "new_core_build_required": true,
+  "vm_started": false
+}

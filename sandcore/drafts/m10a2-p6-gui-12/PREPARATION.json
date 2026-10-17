@@ -1,0 +1,27 @@
+{
+  "status": "GUI12_PREPARED_NOT_STARTED",
+  "originals": {
+    "drafts\\m10a2-p6-gui-11\\driver.py": "f2b7dba55bb873c6fbd43c3b319e2c8b8c184606d21824576bccdf4288cdee26",
+    "drafts\\m10a2-gui-owner-review\\owner_snapshot.py": "25d87a8f1b5cbac487ed740416a65031a1c456a9cbaf48505ba739c651f859dc",
+    "drafts\\m10a2-p6-gui-coherent\\coherent_runtime.py": "eec77fa1951357eb051d8b49010cfaeee9c5fbe37666cbe6be9c6a3f58c13faf",
+    "drafts\\m10a2-release-drag-01\\before\\kernel\\task.c": "40495fad1e36bdc1e83e2787e6e18a4da710eea1553959a8ba3ca6f543ece2ef"
+  },
+  "task_source_sha256": "f42f0136f5ab5b52f3ad643a3de43ead68ad92f8f893b054c6b79bfb99ab0199",
+  "task_change": "only syscall selector upper bound CANCEL -> AT_RELEASE",
+  "private_structure_fields_changed": false,
+  "observer_logic_changed": false,
+  "layout02_reused": true,
+  "checks_removed": false,
+  "old_owner205_exempted": false,
+  "hold_before_release_ms": 0,
+  "new_helpers": {
+    "coherent_runtime.py": "29f09de6c0a8c3cf5fdaaddcb66beede20f1cc0815eb2d000e9bdd0b90f1e966",
+    "driver.py": "d0cb1600bff682a731da2e849e7818690b9b786a7c106f37b8cd2635f15765f2",
+    "owner_snapshot.py": "d99587369b93615a2517db490227db04e16f57903e1177aa97880f113cf5c22b"
+  },
+  "preflight_correction": {
+    "problem": "Windows native path separators in independent probe report keys",
+    "vm_started": false,
+    "previous_driver_sha256": "9f108f460b364026d3e751e72e00a7c5ef67aab5ee0110fbddabf4d363f3252c"
+  }
+}

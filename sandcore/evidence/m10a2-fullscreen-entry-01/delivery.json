@@ -1,0 +1,25 @@
+{
+  "status": "SDL_RAW_INPUT_WORKAROUND_DELIVERED_INTERACTIVE_FULLSCREEN_UNVERIFIED",
+  "previous_launcher_sha256": "7edfc8627bf36e290bad65de640037b1a59862a88a4a510f762d665e22e924d5",
+  "launcher_sha256": "bf979ae2208b59f763b06a53027cea48852ca911887df64abf09efb19a5c14b8",
+  "target": "C:\\Users\\Administrator\\Desktop\\test\\run.py",
+  "checks": [
+    {
+      "display": "sdl",
+      "exit_code": 0,
+      "stdout": "Ready: run.bat or python run.py\nBoot disk: 1.44 MiB; data disk: 256 MiB; QEMU: C:\\Program Files\\qemu\\qemu-system-x86_64.exe\nAcceleration preference: whpx:tcg; display: sdl; graphical monitor enabled.\n",
+      "stderr": ""
+    },
+    {
+      "display": "gtk",
+      "exit_code": 0,
+      "stdout": "Ready: run.bat or python run.py\nBoot disk: 1.44 MiB; data disk: 256 MiB; QEMU: C:\\Program Files\\qemu\\qemu-system-x86_64.exe\nAcceleration preference: whpx:tcg; display: gtk; graphical monitor enabled.\n",
+      "stderr": ""
+    }
+  ],
+  "disks_written": false,
+  "bat_written": false,
+  "existing_vm_restarted": false,
+  "computer_use_after_user_stop": false,
+  "full_M10a2": false
+}
