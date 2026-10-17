@@ -20,7 +20,7 @@ UiDialogButton;
 struct ScUiDialog {
     UiObject object;
     ScUiContext *context;
-    ScUiNode root,owner,list,path_edit,name_edit,status,tabs;
+    ScUiNode root,owner,list,path_edit,name_edit,status,tabs,filter_button;
     ScU32 type,stage,command,flags,completed,committed,default_command,cancel_command,timer,filter;
     ScStatus error;
     ScUiEventProc validate,apply,completion;
@@ -35,6 +35,8 @@ struct ScUiDialog {
     ScConfig *values;
     UiDialogField *fields;
     ScU32 field_count,next_row;
+    ScU32 click_item,click_tick;
+    ScI32 click_x,click_y;
     ScUiDialog *overwrite;
     ScString *pending_save;
     ScHash *row_index;
@@ -243,7 +245,7 @@ static ScStatus ui_dialog_buttons(ScUiDialog *d,const ScUiMenuItem *buttons,ScU3
             fallback[i].version=1;
         }
         fallback[0].command=SC_UI_DIALOG_OK;
-        fallback[0].label=ui_dialog_text("确定");
+        fallback[0].label=ui_dialog_text(d->type==UI_DIALOG_FILE?(d->flags&SC_UI_FILE_DIRECTORY?"选择文件夹":d->flags&SC_UI_FILE_SAVE?"保存":"打开"):"确定");
         fallback[1].command=SC_UI_DIALOG_CANCEL;
         fallback[1].label=ui_dialog_text("取消");
         buttons=fallback;
@@ -558,6 +560,7 @@ static ScStatus ui_dialog_directory_step(ScUiDialog *d)
             ScUiText path;
             ui_text_view(d->directory,&path);
             ScUiNodeSetText(d->context,d->path_edit,&path);
+            if(d->flags&SC_UI_FILE_DIRECTORY){ScUiText empty=ui_dialog_text("");ScUiNodeSetText(d->context,d->name_edit,&empty);}
             ui_dialog_status(d,"",s);
         }
         else{ScArrayRelease(d->pending_rows);
@@ -573,6 +576,7 @@ static ScStatus ui_dialog_directory_step(ScUiDialog *d)
 }
 static ScStatus ui_dialog_directory(ScUiDialog *d,const char *path)
 {
+    d->click_item=0;
     char resolved[64];
     ScU32 length;
     ScDirectory handle=0;
@@ -644,8 +648,9 @@ ScStatus ScUiFileDialog(ScUiContext *context,const ScUiFileDialogDesc *desc,ScUi
     if(s==0){text=ui_dialog_text("新建目录");
         s=ui_dialog_widget(d,bar,SC_UI_BUTTON,&text,UI_DIALOG_FOLDER,&button);
     }
-    if(s==0 && d->filters){text=ui_dialog_text("过滤");
-        s=ui_dialog_widget(d,bar,SC_UI_BUTTON,&text,UI_DIALOG_FILTER,&button);
+    if(s==0 && d->filters){ScUiMenuItem selected;memset(&selected,0,sizeof(selected));selected.size=sizeof(selected);selected.version=1;
+        s=ScUiMenuGet(d->filters,d->filter,&selected);
+        if(s==0)s=ui_dialog_widget(d,bar,SC_UI_BUTTON,&selected.label,UI_DIALOG_FILTER,&d->filter_button);
     }
     if(s==0){text=ui_dialog_text("排序");
         s=ui_dialog_widget(d,bar,SC_UI_BUTTON,&text,UI_DIALOG_SORT,&button);
@@ -677,9 +682,19 @@ ScStatus ScUiFileDialog(ScUiContext *context,const ScUiFileDialogDesc *desc,ScUi
         columns[2].title=ui_dialog_text("类型");
         columns[2].format=SC_UI_FORMAT_TEXT;
         if(s==0)s=ScUiTableSetColumns(context,d->list,columns,3);
+        if(s==0){ScUiSubscription sub;memset(&sub,0,sizeof(sub));sub.size=sizeof(sub);sub.version=1;
+            sub.phases=SC_UI_TARGET_PHASE;sub.type=SC_UI_EVENT_POINTER_UP;sub.procedure=ui_dialog_event;sub.context=d;ScU32 token;
+            s=ScUiListen(context,d->list,&sub,&token);
+        }
+    }
+    if(s==0)s=ui_dialog_widget(d,d->root,SC_UI_PANEL,0,0,&bar);
+    if(s==0){ui_dialog_layout(d,bar,SC_UI_HBOX,SC_UI_AUTO,28,0,0);
+        text=ui_dialog_text(desc->flags&SC_UI_FILE_DIRECTORY?"文件夹：":"文件名：");
+        s=ui_dialog_widget(d,bar,SC_UI_LABEL,&text,0,&button);
     }
     if(s==0){text=ui_dialog_text("");
-        s=ui_dialog_widget(d,d->root,SC_UI_TEXTBOX,&text,0,&d->name_edit);
+        s=ui_dialog_widget(d,bar,SC_UI_TEXTBOX,&text,0,&d->name_edit);
+        if(s==0){ui_dialog_layout(d,d->name_edit,SC_UI_ABSOLUTE,SC_UI_AUTO,SC_UI_AUTO,1,0);ScUiLabelAssociate(context,button,d->name_edit);}
     }
     if(s==0){text=ui_dialog_text("");
         s=ui_dialog_widget(d,d->root,SC_UI_LABEL,&text,0,&d->status);
@@ -1041,6 +1056,10 @@ static ScStatus ui_dialog_combo_values(ScUiDialog *d,UiDialogField *field,const 
     if(s==0)s=ScUiSelectionCreate(field->options,0,&field->selection);
     if(s==0)s=ScUiViewBind(d->context,field->node,field->options,field->selection);
     if(s==0)s=ScUiSelectionSet(field->selection,selected?selected:first,SC_UI_REPLACE);
+    if(s==0){ScValue label;memset(&label,0,sizeof(label));label.size=sizeof(label);label.version=1;
+        s=ScModelGet(model,selected?selected:first,"label",&label);
+        if(s==0){ScUiText text={sizeof(text),1,label.data,label.bytes};s=ScUiNodeSetText(d->context,field->node,&text);}
+    }
     ScModelRelease(model);
     return ui_data_status(s);
 }
@@ -1197,6 +1216,24 @@ ScStatus ScUiDialogClose(ScUiDialog *d,ScU32 command)
     ui_object_leave(&d->object);
     return s;
 }
+static ScStatus ui_dialog_activate_row(ScUiDialog *d,ScU32 id)
+{
+    UiDialogRow row;ScString *path=0;const char *z=0;
+    ScStatus s=ui_dialog_selected_row(d,id,&row);
+    if(s<0)return s;
+    /* 选目录和进入目录是不同动作。双击/Enter始终导航，只有“选择”按钮
+     * 才提交目录，不能在目录选择器里把双击解释成提前结束。 */
+    if(row.information.kind==SC32_PATH_DIRECTORY){
+        s=ui_dialog_join(d,row.information.name,&path);
+        if(s==0)s=ScStringCStr(path,&z);
+        if(s==0)s=ui_dialog_directory(d,z);
+        ScStringRelease(path);return s;
+    }
+    if(d->flags&SC_UI_FILE_DIRECTORY)return SC_UI_E_INVALID;
+    ScUiText name=ui_dialog_text(row.information.name);
+    s=ScUiNodeSetText(d->context,d->name_edit,&name);
+    return s<0?s:ScUiDialogClose(d,SC_UI_DIALOG_OK);
+}
 static ScStatus ui_dialog_event(ScUiContext *context,const ScUiEvent *event,void *opaque)
 {
     ScUiDialog *d=(ScUiDialog *)opaque;
@@ -1211,6 +1248,21 @@ static ScStatus ui_dialog_event(ScUiContext *context,const ScUiEvent *event,void
         if(s>=0)s=SC_UI_HANDLED;
     }
     else if(event->type==SC_UI_EVENT_TIMER && event->command==d->timer)s=ui_dialog_directory_step(d);
+    else if(d->type==UI_DIALOG_FILE && event->node==d->list && event->current==d->list && event->type==SC_UI_EVENT_POINTER_UP && (!event->message||(event->message->data[3]&1u))){
+        ScU32 item=0,column=0;
+        s=ScUiViewHitTest(context,d->list,event->x,event->y,&item,&column);
+        if(s==SC_UI_E_NOT_FOUND){d->click_item=0;s=0;}
+        else if(s==0 && item && !d->directory_handle){
+            ScI32 dx=event->x-d->click_x,dy=event->y-d->click_y;
+            if(item==d->click_item && event->tick-d->click_tick<=40u && dx>=-4&&dx<=4&&dy>=-4&&dy<=4){
+                d->click_item=0;s=ui_dialog_activate_row(d,item);
+            }
+            else{d->click_item=item;d->click_tick=event->tick;d->click_x=event->x;d->click_y=event->y;
+                UiDialogRow row;if(ui_dialog_selected_row(d,item,&row)==0 && row.information.kind!=SC32_PATH_DIRECTORY){ScUiText name=ui_dialog_text(row.information.name);s=ScUiNodeSetText(context,d->name_edit,&name);}
+            }
+            if(s>=0)s=SC_UI_HANDLED;
+        }
+    }
     else if(event->type==SC_UI_EVENT_COMMAND){
         if(d->type==UI_DIALOG_FILE && (event->command==UI_DIALOG_UP || event->command==UI_DIALOG_FOLDER)){
             ScString *name=0,*path=0;
@@ -1234,9 +1286,12 @@ static ScStatus ui_dialog_event(ScUiContext *context,const ScUiEvent *event,void
             info.version=1;
             s=ScUiMenuQuery(d->filters,&info);
             if(s==0 && info.length){d->filter=d->filter%info.length+1;
+                ScUiMenuItem selected;memset(&selected,0,sizeof(selected));selected.size=sizeof(selected);selected.version=1;
+                s=ScUiMenuGet(d->filters,d->filter,&selected);
+                if(s==0)s=ScUiNodeSetText(context,d->filter_button,&selected.label);
                 const char *z;
                 ScStringCStr(d->directory,&z);
-                s=ui_dialog_directory(d,z);
+                if(s==0)s=ui_dialog_directory(d,z);
             }
         }
         else if(d->type==UI_DIALOG_FILE && event->command==UI_DIALOG_SORT)s=ui_dialog_sort(d);
@@ -1253,6 +1308,11 @@ static ScStatus ui_dialog_event(ScUiContext *context,const ScUiEvent *event,void
             if(s==0)s=ScStringCStr(path,&z);
             if(s==0)s=ui_dialog_directory(d,z);
             ScStringRelease(path);
+        }
+        else if(event->node==d->list){
+            ScUiSelectionInfo selected;memset(&selected,0,sizeof(selected));selected.size=sizeof(selected);selected.version=1;
+            s=ScUiSelectionQuery(d->selection,&selected);
+            if(s==0)s=selected.current?ui_dialog_activate_row(d,selected.current):SC_UI_E_NOT_FOUND;
         }
         else s=ScUiDialogClose(d,SC_UI_DIALOG_OK);
         if(s>=0)s=SC_UI_HANDLED;

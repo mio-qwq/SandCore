@@ -299,7 +299,19 @@
       "size": 1
     },
     {
+      "name": "ScShellFileOperationConflict",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
       "name": "ScShellFileOperationQuery",
+      "dependency": "SCSHELL.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScShellFileOperationResolveConflict",
       "dependency": "SCSHELL.SCL",
       "kind": "function",
       "size": 1
@@ -677,6 +689,18 @@
       "size": 1
     },
     {
+      "name": "ScUiScrollQuery",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUiScrollTo",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
       "name": "ScUiSelectionCreate",
       "dependency": "SCUI.SCL",
       "kind": "function",
@@ -827,6 +851,12 @@
       "size": 1
     },
     {
+      "name": "fread",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
       "name": "free",
       "dependency": "SCCLIB.SCL",
       "kind": "function",
@@ -870,6 +900,12 @@
     },
     {
       "name": "memset",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "qsort",
       "dependency": "SCCLIB.SCL",
       "kind": "function",
       "size": 1
@@ -931,18 +967,6 @@
     {
       "name": "strtoul",
       "dependency": "SCCLIB.SCL",
-      "kind": "function",
-      "size": 1
-    },
-    {
-      "name": "ScShellFileOperationConflict",
-      "dependency": "SCSHELL.SCL",
-      "kind": "function",
-      "size": 1
-    },
-    {
-      "name": "ScShellFileOperationResolveConflict",
-      "dependency": "SCSHELL.SCL",
       "kind": "function",
       "size": 1
     }

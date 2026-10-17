@@ -88,6 +88,7 @@ typedef struct {
     U manifest_revision,manifest_doc,manifest_document_revision,verify_count,verify_next,verify_files,verify_strings,verify_bytes;
     StChild child;
     char directory[68],candidate[68],response[68];
+    char automatic_manifest[68],failure[1024],first_error[768];
     ScShellFileJob *filejob;
     ScShellDialog *progress;
     ScShellFileItem items[3];
@@ -96,7 +97,7 @@ typedef struct {
 StBuild;
 typedef struct {
     ScUiContext *ui;
-    ScUiNode root,menu,toolbar,status,body,upper,tree_panel,tree,tree_split,tabs,lower_split,out_panel,out_tabs,output_page,diagnostic_page,output,diagnostics,search,needle,replacement,caseless;
+    ScUiNode root,menu,toolbar,status,body,upper,tree_panel,tree,tree_split,tabs,lower_split,out_panel,out_tabs,output_page,diagnostic_page,output,diagnostics,search,needle,replacement,caseless,welcome;
     ScUiNode float_output,float_tree;
     ScUiMenu *menus[7];
     ScUiProvider *tree_provider,*diag_provider;
@@ -110,8 +111,10 @@ typedef struct {
     ScConfig *config;
     char project_path[68],compiler[68],linker[68],manifest_path[68],output_path[68],debug_host[68],publish_dir[68],workspace[68],includes[256],arguments[512];
     U target_scl;
+    U simple,after_build,output_forced,project_create_pending;
+    char project_location[68];
     ScUiDocument *output_document;
-    U output_bytes;
+    U output_bytes,output_follow;
     char message[256],title[192];
     U command_flags[64],busy_refresh,quit_requested,stopping,success,success_epoch,success_generation,output_revision,output_revisions[3];
     StIo *io;
@@ -127,8 +130,8 @@ static Studio st;
 enum {
     S_NEW=0x8600,S_OPEN,S_SAVE,S_SAVE_AS,S_SAVE_ALL,S_CLOSE,S_PROJECT_NEW,S_PROJECT_OPEN,S_PROJECT_SAVE,S_ADD,S_REMOVE,S_CONFIG,
     S_UNDO,S_REDO,S_CUT,S_COPY,S_PASTE,S_ALL,S_FIND,S_NEXT,S_PREVIOUS,S_REPLACE,S_REPLACE_ALL,S_HIDE_FIND,
-    S_BUILD,S_CANCEL,S_RUN,S_DEBUG,S_PUBLISH,S_FLOAT_OUTPUT,S_DOCK_OUTPUT,S_FLOAT_TREE,S_DOCK_TREE,S_LAYOUT_SAVE,S_LAYOUT_RESET,S_SDK,S_ABOUT,S_EXIT,S_COUNT,
-    S_DIALOG_OPEN=1,S_DIALOG_NEW,S_DIALOG_SAVE,S_DIALOG_PROJECT_OPEN,S_DIALOG_PROJECT_SAVE,S_DIALOG_ADD,S_DIALOG_PUBLISH,S_DIALOG_CONFIG,S_DIALOG_CONFIRM,
+    S_BUILD,S_CANCEL,S_RUN,S_DEBUG,S_PUBLISH,S_FLOAT_OUTPUT,S_DOCK_OUTPUT,S_FLOAT_TREE,S_DOCK_TREE,S_LAYOUT_SAVE,S_LAYOUT_RESET,S_SDK,S_ABOUT,S_EXIT,S_NEW_HEADER,S_COUNT,
+    S_DIALOG_OPEN=1,S_DIALOG_NEW,S_DIALOG_SAVE,S_DIALOG_PROJECT_OPEN,S_DIALOG_PROJECT_SAVE,S_DIALOG_ADD,S_DIALOG_PUBLISH,S_DIALOG_CONFIG,S_DIALOG_CONFIRM,S_DIALOG_NEW_HEADER,S_DIALOG_PROJECT_CREATE,S_DIALOG_PROJECT_LOCATION,
     S_CONFIRM_SAVE=0x8700,S_CONFIRM_DISCARD,S_CONFIRM_CANCEL,
     S_IO_OPEN=1,S_IO_SAVE,S_IO_PROJECT_OPEN,S_IO_PROJECT_SAVE,
     S_READ=1,S_WRITE,S_FLUSH,S_PUBLISH_IO,S_ADVANCE,S_CLEAN,
@@ -136,6 +139,8 @@ enum {
     S_ACTION_CLOSE=1,S_ACTION_EXIT,S_ACTION_PROJECT_OPEN,S_ACTION_PROJECT_NEW
 };
 static void rec(void *,U);
+static const char *leaf(const char *);
+static ScStatus join(char [68],const char *,const char *);
 static ScUiText text(const char *);
 static void status(const char *);
 static void error(ScStatus,const char *);
@@ -159,6 +164,11 @@ static ScStatus path(const char *,char [68]);
 static int same_name(const char *,const char *);
 static ScStatus project_load(const void *,U,U,const char *);
 static ScStatus project_defaults(void);
+static ScStatus project_single(const char *);
+static U source_name(const char *);
+static ScStatus new_project_dialog(void);
+static ScStatus new_project_details(void);
+static ScStatus new_project_create(ScConfig *);
 static ScStatus project_add(const char *);
 static void project_notify(void);
 static ScStatus config_dialog(void);
@@ -166,6 +176,10 @@ static void config_set(ScConfig *,const char *,const char *,const char *);
 static ScStatus config_read(ScConfig *);
 static ScStatus project_encode(ScString **);
 static ScStatus build_begin(void);
+static void build_fail(ScStatus);
+static ScStatus automatic_manifest(void);
+static void application_image_name(const char *,char [36]);
+static void output_reveal(void);
 static void build_step(void);
 static void child_step(StChild *,U);
 static ScStatus spawn(StChild *,const char *,U);

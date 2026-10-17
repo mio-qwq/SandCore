@@ -2,7 +2,7 @@
   "name": "SCUI.SCL",
   "abi_major": 1,
   "abi_minor": 4,
-  "library_version": 6,
+  "library_version": 8,
   "init": null,
   "fini": "ScUiFinalize",
   "exports": [

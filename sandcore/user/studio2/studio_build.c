@@ -120,6 +120,8 @@ static void output_append(U build,const void *bytes,U count)
             sizeof(t),1,v.data,v.bytes
         };
         s=ScUiDocumentReplace(st.output_document,info.bytes,0,&t,SC_UI_REPLACE_NO_UNDO);
+        if(s>=0){ScUiTextSelection end;rec(&end,sizeof(end));end.anchor=end.caret=info.bytes+v.bytes;ScUiEditSetSelection(st.ui,st.output,&end);}
+        if(s>=0)st.output_follow=1;
     }
     if(s<0)status("输出显示资源不足；构建退出码仍独立检查");
     ScStringRelease(clean);
@@ -130,6 +132,11 @@ static void child_line(StChild *c,U stream,U build)
     U n=c->used[stream];
     if(!n)return;
     c->pending[stream][n]=0;
+    if(build && !st.build.first_error[0] && (!strncmp(c->pending[stream],"SCCC ERROR ",11)||!strncmp(c->pending[stream],"SCLD ERROR ",11))){
+        U keep=n;if(keep>=sizeof(st.build.first_error))keep=sizeof(st.build.first_error)-1u;
+        while(keep&&((unsigned char)c->pending[stream][keep]&192u)==128u)keep--;
+        memcpy(st.build.first_error,c->pending[stream],keep);st.build.first_error[keep]=0;
+    }
     if(build)diagnostic(c->pending[stream],st.build.generation);
     output_append(build,c->pending[stream],n);
     c->used[stream]=0;
@@ -299,7 +306,8 @@ static ScStatus inputs_current(void)
     }
     ScPathInfo q;
     rec(&q,sizeof(q));
-    ScStatus s=ScPathQuery(st.manifest_path,&q);
+    if(st.simple&&!b->automatic_manifest[0])return 0;
+    ScStatus s=ScPathQuery(st.simple?b->automatic_manifest:st.manifest_path,&q);
     return s<0?s:q.generation!=b->manifest_revision?SC32_E_STALE:0;
 }
 static ScStatus outputs_current(void)
@@ -320,16 +328,27 @@ static ScStatus outputs_current(void)
     return 0;
 }
 static void build_fail(ScStatus s){
-    if(!st.build.error)st.build.error=s;
-    st.build.cancel=1;
-    st.success=0;
-    status("构建未完成，旧产物不取得运行资格");
+    StBuild *b=&st.build;
+    if(!b->error){
+        b->error=s;
+        const char *stage=b->phase==S_BUILD_SAVE?"保存源码/创建构建目录":b->phase==S_BUILD_PIN?"读取源码或SDK头文件":b->phase==S_BUILD_COMPILE?"编译":b->phase==S_BUILD_LINK?"链接":b->phase==S_BUILD_SETTLE?"检查源码和写入程序":b->phase==S_BUILD_COPY?"保存构建结果":"构建";
+        const char *cause=s==SC32_E_ACCESS?"没有访问权限":s==SC32_E_NOT_FOUND?"找不到所需文件或符号":s==SC32_E_STALE?"源码或文件在构建期间发生变化":s==SC32_E_NO_SPACE?"磁盘空间不足":s==SC32_E_MEMORY?"内存不足":s==SC32_E_CANCELLED?"操作已取消":"请查看下方工具的原始报错";
+        snprintf(b->failure,sizeof(b->failure),"%s失败：%s（%d）\n%s",stage,cause,s,b->first_error);
+        output_append(1,b->failure,(U)strlen(b->failure));output_append(1,"\n",1);
+    }
+    b->cancel=1;st.success=0;st.after_build=0;
+    output_reveal();status("构建失败；下方输出保留了具体错误");
 }
 static ScStatus build_begin(void)
 {
     StBuild *b=&st.build;
     if(b->phase||st.io||st.running.capture.job)return SC32_E_BUSY;
-    if(!st.member_count)return SC32_E_INVALID;
+    if(st.simple==1u&&st.active){ScStatus selected=project_single(st.active->path);if(selected<0)return selected;}
+    U sources=0;for(U i=0;i<st.member_count;i++)sources+=st.members[i].source!=0;
+    if(!sources){error(SC32_E_INVALID,"当前项目还没有 C 源文件；请新建、打开或添加一个 C 文件，再选择构建");return 0;}
+    ScPathInfo tool;rec(&tool,sizeof(tool));ScStatus available=ScPathQuery(st.compiler,&tool);
+    if(available>=0)available=ScPathQuery(st.linker,&tool);
+    if(available<0){char missing[256];snprintf(missing,sizeof(missing),"找不到编译或链接工具。\n编译器：%s\n链接器：%s",st.compiler,st.linker);error(available,missing);return 0;}
     U next=b->generation+1u;
     if(!next)return SC32_E_RANGE;
     free(b->inputs);
@@ -358,7 +377,9 @@ static ScStatus build_begin(void)
     ScUiDocumentQuery(st.output_document,&q);
     ScUiText empty=text("");
     ScUiDocumentReplace(st.output_document,0,q.bytes,&empty,SC_UI_REPLACE_NO_UNDO);
-    ScUiTabSelect(st.ui,st.out_tabs,st.output_page);
+    ScUiTabSelect(st.ui,st.out_tabs,st.output_page);output_reveal();
+    char beginning[256];snprintf(beginning,sizeof(beginning),"开始构建 %s\n输出文件：%s\n",st.simple?"当前 C 程序":"项目",st.output_path);
+    output_append(1,beginning,(U)strlen(beginning));
     status("保存本次工程输入…");
     refresh();
     return 0;
@@ -405,7 +426,7 @@ static ScStatus sco_sources(StInput *in)
             if(!c)break;
         }
         system[9]=0;
-        if(!strcmp(system,"/SYS/INC/")){
+        if(!strcmp(system,"/SYS/INC/")||st.simple){
             U found=0;
             for(U k=0;k<b->dependency_count;k++)if(same_name(absolute,b->dependencies[k].path))found=1;
             if(!found){
@@ -493,7 +514,8 @@ static ScStatus publication(U exporting,const char *directory)
     ScStatus s=ScShellFileOperationBegin(&d,&b->filejob);
     if(s>=0){
         b->publishing=exporting?2u:1u;
-        ScShellProgress(st.ui,st.root,b->filejob,&b->progress);
+        if(exporting)ScShellProgress(st.ui,st.root,b->filejob,&b->progress);
+        else status("正在保存构建结果…");
     }
     return s;
 }
@@ -555,7 +577,7 @@ static void publication_step(void)
         if(s>=0&&(r.status<0||!(r.flags&SC_SHELL_DURABLE)||!r.destination_revision))s=r.status<0?r.status:SC32_E_IO;
         if(s>=0&&!exporting)st.output_revisions[i]=r.destination_revision;
     }
-    ScShellDialogClose(b->progress);
+    if(b->progress)ScShellDialogClose(b->progress);
     b->progress=0;
     ScShellFileOperationClose(b->filejob);
     b->filejob=0;
@@ -571,7 +593,7 @@ static void publication_step(void)
             st.success_epoch=st.epoch;
             st.success_generation=b->generation;
             st.output_revision=out.generation;
-            status("本次SCX/SCL、map与SDBG已发布");
+            status("构建成功。可运行、调试；生成文件已保存");
         }
         else build_fail(s);
         b->phase=S_BUILD_CLEAN;
@@ -655,7 +677,8 @@ static void build_step(void)
             build_fail(s);
             return;
         }
-        s=join(b->candidate,b->directory,leaf(st.output_path));
+        char image_name[36];if(st.simple)application_image_name(st.output_path,image_name);
+        s=join(b->candidate,b->directory,st.simple?image_name:leaf(st.output_path));
         if(s>=0)s=join(b->response,b->directory,"OBJECTS.RSP");
         if(s<0||strlen(b->candidate)>59u){
             build_fail(SC32_E_RANGE);
@@ -697,15 +720,12 @@ static void build_step(void)
             b->next++;
             return;
         }
-        ScPathInfo q;
-        rec(&q,sizeof(q));
-        ScStatus s=ScPathQuery(st.manifest_path,&q);
-        if(s>=0)s=pin_open(&b->manifest,st.manifest_path,q.generation,0);
-        if(s<0){
-            build_fail(s);
-            return;
+        if(!st.simple){
+            ScPathInfo q;rec(&q,sizeof(q));ScStatus s=ScPathQuery(st.manifest_path,&q);
+            if(s>=0)s=pin_open(&b->manifest,st.manifest_path,q.generation,0);
+            if(s<0){snprintf(b->first_error,sizeof(b->first_error),"链接清单不存在或不可读取：%s；在项目设置中检查路径。",st.manifest_path);build_fail(s);return;}
+            b->manifest_revision=q.generation;
         }
-        b->manifest_revision=q.generation;
         StDoc *manifest=document_path(st.manifest_path);
         if(manifest){
             b->manifest_doc=manifest->id;
@@ -733,6 +753,7 @@ static void build_step(void)
         while(b->next<b->input_count&&!b->inputs[b->next].member.source)b->next++;
         if(b->next==b->input_count){
             b->phase=S_BUILD_LINK;
+            if(st.simple){ScStatus s=automatic_manifest();if(s<0){build_fail(s);return;}}
             b->linking=0;
             return;
         }
@@ -790,7 +811,7 @@ static void build_step(void)
             return;
         }
         char cmd[384];
-        int n=snprintf(cmd,sizeof(cmd),"%s %s %s %s @%s",st.linker,b->candidate,st.target_scl?"--scl":"--dynamic",st.manifest_path,b->response);
+        int n=snprintf(cmd,sizeof(cmd),"%s %s %s %s @%s",st.linker,b->candidate,st.target_scl?"--scl":"--dynamic",st.simple?b->automatic_manifest:st.manifest_path,b->response);
         if(n<0||(U)n>=sizeof(cmd)){
             build_fail(SC32_E_RANGE);
             return;
@@ -848,7 +869,8 @@ static void build_step(void)
         b->cancel=0;
         if(b->error){
             st.success=0;
-            error(b->error,"构建结束：未取得当前产物资格");
+            st.after_build=0;output_reveal();
+            error(b->error,b->failure[0]?b->failure:"构建已取消或清理失败，具体错误见下方输出");
         }
         refresh();
     }

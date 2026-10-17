@@ -9,7 +9,7 @@ static ScStatus notice_done(ScUiContext *ui,const ScUiEvent *e,void *opaque)
 }
 static void error(ScStatus code,const char *message)
 {
-    char body[512];
+    char body[1536];
     snprintf(body,sizeof(body),"%s\n状态：%d",message?message:"操作未完成",code);
     status(body);
     if(!st.ui||st.notice)return;
@@ -92,7 +92,7 @@ static void perform(U action)
         return;
     }
     if(action==S_ACTION_PROJECT_NEW){
-        ScStatus s=project_defaults();
+        ScStatus s=new_project_dialog();
         if(s<0)error(s,"无法创建工程");
         return;
     }
@@ -113,7 +113,7 @@ static void perform(U action)
                 return;
             }
         }
-        if(st.project_dirty){
+        if(st.project_dirty&&(st.simple!=1u||st.project_path[0])){
             confirm(action,0);
             return;
         }
@@ -138,7 +138,7 @@ static ScStatus request(U action)
         st.pending_doc=st.active->id;
         if(q.flags&SC_UI_DOCUMENT_DIRTY)return confirm(action,st.active->id);
     }
-    if((action==S_ACTION_PROJECT_NEW||action==S_ACTION_PROJECT_OPEN)&&st.project_dirty)return confirm(action,0);
+    if((action==S_ACTION_PROJECT_NEW||action==S_ACTION_PROJECT_OPEN)&&st.project_dirty&&(st.simple!=1u||st.project_path[0]))return confirm(action,0);
     perform(action);
     return 0;
 }
@@ -181,6 +181,9 @@ static ScStatus dialog_done(ScUiContext *ui,const ScUiEvent *e,void *opaque)
                 st.quit_requested=0;
             }
         }
+        else if(kind==S_DIALOG_PROJECT_CREATE){
+            if(e->command==SC_UI_DIALOG_OK){ScConfig *values=0;s=ScUiDialogCopyValues(dialog,&values);if(s>=0)s=new_project_create(values);ScConfigRelease(values);}
+        }
         else if(kind==S_DIALOG_CONFIG){
             ScConfig *candidate=0;
             s=ScUiDialogCopyValues(dialog,&candidate);
@@ -193,7 +196,7 @@ static ScStatus dialog_done(ScUiContext *ui,const ScUiEvent *e,void *opaque)
                 st.project_revision++;
                 changed();
                 project_notify();
-                status("工程配置已更新，旧构建资格失效");
+                status("项目设置已更新；下次运行前将重新构建");
             }
             ScConfigRelease(candidate);
         }
@@ -204,25 +207,28 @@ static ScStatus dialog_done(ScUiContext *ui,const ScUiEvent *e,void *opaque)
             if(s>=0)s=ScStringCStr(selected,&p);
             if(s>=0){
                 char absolute[68];
-                s=path(p,absolute);
+                s=kind==S_DIALOG_NEW||kind==S_DIALOG_NEW_HEADER?source_save_name(p,absolute,kind==S_DIALOG_NEW_HEADER):path(p,absolute);
                 if(s>=0&&kind==S_DIALOG_OPEN)s=io_open(absolute,S_IO_OPEN,0);
-                else if(s>=0&&kind==S_DIALOG_NEW){
+                else if(s>=0&&(kind==S_DIALOG_NEW||kind==S_DIALOG_NEW_HEADER)){
                     ScPathInfo q;
                     rec(&q,sizeof(q));
                     ScStatus exists=ScPathQuery(absolute,&q);
                     if(exists!=SC32_E_NOT_FOUND)s=exists<0?exists:SC32_E_EXISTS;
                     else{
-                        s=doc_new(absolute,"",0,0,0);
-                        if(s>=0)s=project_add(absolute);
+                        const char *initial=kind==S_DIALOG_NEW_HEADER?"/* 在这里声明共享的函数和类型。 */\n":"#include <stdio.h>\n\nint main(void)\n{\n    printf(\"Hello, world!\\n\");\n    return 0;\n}\n";
+                        s=doc_new(absolute,initial,(U)strlen(initial),0,0);
+                        if(s>=0)s=st.simple?project_single(absolute):project_add(absolute);
                     }
                 }
                 else if(s>=0&&kind==S_DIALOG_SAVE){
                     StDoc *d=document(owner?owner:st.pending_doc?st.pending_doc:st.active?st.active->id:0);
                     s=d?io_save(d,absolute):SC32_E_STALE;
                 }
+                else if(s>=0&&kind==S_DIALOG_PROJECT_LOCATION){strcpy(st.project_location,absolute);st.project_create_pending=1;}
                 else if(s>=0&&kind==S_DIALOG_PROJECT_OPEN)s=io_open(absolute,S_IO_PROJECT_OPEN,0);
                 else if(s>=0&&kind==S_DIALOG_PROJECT_SAVE)s=io_project_save(absolute);
                 else if(s>=0&&kind==S_DIALOG_ADD){
+                    if(st.simple==1u)st.simple=2u;
                     for(U i=0;i<info.selected_count&&s>=0;i++){
                         ScString *item=0;
                         const char *name=0;
@@ -251,7 +257,12 @@ static ScStatus dialog_done(ScUiContext *ui,const ScUiEvent *e,void *opaque)
     if(s<0){
         st.pending_action=0;
         st.save_all=0;
-        error(s,kind==S_DIALOG_PROJECT_SAVE?"工作区未保存；请使用 .SCW。自动补全只创建新目标；覆盖时显式选择完整文件名。":"操作未完成；原文档与工程保留");
+        error(s,kind==S_DIALOG_PROJECT_CREATE?
+            (s==SC32_E_EXISTS?"同名项目文件夹已存在；请选择其他项目名称。":s==SC32_E_RANGE?"项目名称或保存路径过长；名称最多 20 个字母、数字或下划线，请选择较短的保存位置。":s==SC32_E_INVALID?"项目名称请使用字母、数字或下划线。":"项目创建失败；请检查保存位置的写入权限。"):
+            kind==S_DIALOG_NEW||kind==S_DIALOG_NEW_HEADER?
+            (s==SC32_E_EXISTS?"同名文件已存在；请选择其他名称，或使用“打开文件”编辑已有文件。":"无法创建文件；请检查名称和保存位置的写入权限。"):
+            kind==S_DIALOG_PROJECT_SAVE?"项目未保存；文件类型为 SCW（.SCW），无后缀时自动补全。":
+            kind==S_DIALOG_CONFIG?"项目设置无效；检查工具、输出和文件夹路径。关闭自动链接时需指定链接清单；SCL 库目标需关闭自动链接。":"文件操作失败；请检查所选路径、文件类型和访问权限。");
     }
     refresh();
     return 0;
@@ -264,9 +275,15 @@ static ScStatus file_dialog(U kind)
     rec(&d,sizeof(d));
     d.owner=st.root;
     d.directory="/HOME";
-    d.title=text(kind==S_DIALOG_SAVE?"另存文档":kind==S_DIALOG_NEW?"新建文件":kind==S_DIALOG_PROJECT_OPEN?"打开工作区（.SCW）":kind==S_DIALOG_PROJECT_SAVE?"保存工作区（默认 .SCW）":kind==S_DIALOG_PUBLISH?"发布到目录":"选择文件");
-    d.flags=kind==S_DIALOG_SAVE||kind==S_DIALOG_PROJECT_SAVE?SC_UI_FILE_SAVE|SC_UI_FILE_OVERWRITE:kind==S_DIALOG_NEW?SC_UI_FILE_SAVE:kind==S_DIALOG_PUBLISH?SC_UI_FILE_DIRECTORY:SC_UI_FILE_OPEN;
+    d.title=text(kind==S_DIALOG_PROJECT_LOCATION?"新建项目：选择保存文件夹":kind==S_DIALOG_SAVE?"另存文档":kind==S_DIALOG_NEW?"新建 C 源文件（自动补 .C）":kind==S_DIALOG_NEW_HEADER?"新建头文件（自动补 .H）":kind==S_DIALOG_PROJECT_OPEN?"打开项目（.SCW）":kind==S_DIALOG_PROJECT_SAVE?"保存项目（自动补 .SCW）":kind==S_DIALOG_PUBLISH?"选择发布文件夹":"打开文件");
+    d.flags=kind==S_DIALOG_SAVE||kind==S_DIALOG_PROJECT_SAVE?SC_UI_FILE_SAVE|SC_UI_FILE_OVERWRITE:kind==S_DIALOG_NEW||kind==S_DIALOG_NEW_HEADER?SC_UI_FILE_SAVE:kind==S_DIALOG_PUBLISH||kind==S_DIALOG_PROJECT_LOCATION?SC_UI_FILE_DIRECTORY:SC_UI_FILE_OPEN;
     if(kind==S_DIALOG_ADD)d.flags|=SC_UI_FILE_MULTI;
+    if(kind==S_DIALOG_NEW||kind==S_DIALOG_NEW_HEADER){
+        rec(&filter,sizeof(filter));filter.item=1;filter.command=1;
+        filter.label=text(kind==S_DIALOG_NEW_HEADER?"头文件（*.H）":"C 源文件（*.C）");
+        filter.help=text(kind==S_DIALOG_NEW_HEADER?"*.H;*.h":"*.C;*.c");
+        d.filters=&filter;d.filter_count=1;d.selected_filter=1;
+    }
     if(kind==S_DIALOG_PROJECT_OPEN||kind==S_DIALOG_PROJECT_SAVE){
         rec(&filter,sizeof(filter));
         filter.item=1;filter.command=1;
@@ -289,28 +306,28 @@ static ScStatus config_dialog(void)
     ScUiPropertySheetDesc d;
     rec(&d,sizeof(d));
     d.owner=st.root;
-    d.title=text("工作区配置");
+    d.title=text("项目设置（高级）");
     d.initial=st.config;
     d.completion=dialog_done;
     const char *keys[]={
-        "kind","compiler","linker","manifest","output","include_dirs","workspace","arguments","debug_host","publish_dir"
+        "kind","output","auto_link","manifest","arguments","compiler","linker","include_dirs","workspace","debug_host","publish_dir"
     };
     const char *labels[]={
-        "目标（SCX / SCL）","原生SCCC","原生SCLD","应用或库manifest","正式输出","包含目录（分号分隔）","构建工作目录","运行参数","SCL调试宿主SCX","发布目录"
+        "程序类型（SCX / SCL）","输出文件","自动链接系统库","自定义链接清单（可选）","运行参数","C 编译器","链接器","头文件目录（分号分隔）","构建临时文件夹","库调试宿主（SCX）","发布文件夹"
     };
-    ScUiFieldDesc fields[10];
+    ScUiFieldDesc fields[11];
     memset(fields,0,sizeof(fields));
-    for(U i=0;i<10;i++){
+    for(U i=0;i<11;i++){
         rec(fields+i,sizeof(fields[i]));
         fields[i].field=i+1;
-        fields[i].kind=SC_UI_TEXTBOX;
+        fields[i].kind=i==2?SC_UI_CHECKBOX:SC_UI_TEXTBOX;
         fields[i].page=i<5?0u:1u;
         fields[i].label=text(labels[i]);
         fields[i].section="project";
         fields[i].key=keys[i];
-        if(i<5||i==6)fields[i].flags=SC_UI_FIELD_REQUIRED;
+        if(i<2||i==5||i==6||i==8)fields[i].flags=SC_UI_FIELD_REQUIRED;
     }
-    ScStatus s=ScUiPropertySheet(st.ui,&d,fields,10,&st.dialog);
+    ScStatus s=ScUiPropertySheet(st.ui,&d,fields,11,&st.dialog);
     if(s>=0)st.dialog_kind=S_DIALOG_CONFIG;
     return s;
 }
@@ -426,6 +443,7 @@ static void navigate(U id)
 }
 static void dock_panel(U tree,U floating)
 {
+    if(!tree)st.output_forced=1;
     ScUiNode panel=tree?st.tree_panel:st.out_panel,*root=tree?&st.float_tree:&st.float_output;
     ScStatus s=0;
     if(floating){
@@ -457,7 +475,7 @@ static void dock_panel(U tree,U floating)
         ScUiNode old=*root;
         s=ScUiNodeMove(st.ui,panel,tree?st.upper:st.body,tree?st.tree_split:0);
         if(s>=0){
-            layout(panel,tree?SC_UI_VBOX:SC_UI_DOCK_LAYOUT,tree?230:SC_UI_AUTO,tree?SC_UI_AUTO:220,0,0);
+            layout(panel,tree?SC_UI_VBOX:SC_UI_DOCK_LAYOUT,tree?230:SC_UI_AUTO,tree?SC_UI_AUTO:140,0,0);
             U visible=(st.compact&(tree?1u:2u))?0:SC_UI_VISIBLE;
             ScUiNodeSetState(st.ui,panel,SC_UI_VISIBLE,visible);
             ScUiNodeSetState(st.ui,tree?st.tree_split:st.lower_split,SC_UI_VISIBLE,visible);
@@ -517,14 +535,18 @@ static void command(U cmd)
         if(d)ScUiFocus(st.ui,d->edit);
     }
     else if(cmd>=S_NEXT&&cmd<=S_REPLACE_ALL)s=find(cmd);
-    else if(cmd==S_BUILD)s=build_begin();
+    else if(cmd==S_BUILD){st.after_build=0;s=build_begin();}
     else if(cmd==S_CANCEL){
         if(st.io)st.io->cancel=1;
         if(st.build.phase)st.build.cancel=1;
         st.running.cancel=1;
         if(st.build.filejob)ScShellFileOperationCancel(st.build.filejob);
     }
-    else if(cmd==S_RUN||cmd==S_DEBUG)s=run(cmd==S_DEBUG);
+    else if(cmd==S_RUN||cmd==S_DEBUG){
+        if(!st.success||st.success_epoch!=st.epoch){s=build_begin();if(s>=0&&st.build.phase)st.after_build=cmd;}
+        else s=run(cmd==S_DEBUG);
+    }
+    else if(cmd==S_NEW_HEADER)s=file_dialog(S_DIALOG_NEW_HEADER);
     else if(cmd==S_PUBLISH)s=file_dialog(S_DIALOG_PUBLISH);
     else if(cmd==S_FLOAT_TREE||cmd==S_DOCK_TREE)dock_panel(1,cmd==S_FLOAT_TREE);
     else if(cmd==S_FLOAT_OUTPUT||cmd==S_DOCK_OUTPUT)dock_panel(0,cmd==S_FLOAT_OUTPUT);
@@ -540,17 +562,22 @@ static void command(U cmd)
         ScUiSplitterSet(st.ui,st.tree_split,230);
         ScUiNodeInfo area;
         rec(&area,sizeof(area));
-        if(ScUiNodeQuery(st.ui,st.body,&area)>=0)ScUiSplitterSet(st.ui,st.lower_split,area.rectangle.height>260?area.rectangle.height-220:80);
+        if(ScUiNodeQuery(st.ui,st.body,&area)>=0)ScUiSplitterSet(st.ui,st.lower_split,area.rectangle.height>180?area.rectangle.height-140:80);
         ScUiLayout(st.ui,st.root);
     }
-    else if(cmd==S_SDK)s=io_open("/SYS/SDK/DOCS/M10A2-SDK.MD",S_IO_OPEN,0);
+    else if(cmd==S_SDK)s=io_open("/SYS/SDK/DOC/M10A2-SDK.md",S_IO_OPEN,0);
     else if(cmd==S_ABOUT)status("Studio 2 · 独立SCO / 原生SCLD / SCUI多文档 / Debug 2");
     else if(cmd==S_EXIT)s=request(S_ACTION_EXIT);
-    if(s<0)error(s,"命令未完成");
+    if(s<0)error(s,cmd==S_BUILD?"无法开始构建，请查看下方具体原因":cmd==S_RUN||cmd==S_DEBUG?"无法启动程序，请查看构建输出":"操作未完成");
     refresh();
 }
 static void ui_tick(void)
 {
+    if(st.project_create_pending&&!st.dialog&&!st.io){st.project_create_pending=0;ScStatus s=new_project_details();if(s<0)error(s,"无法打开新建项目对话框");}
+    if(st.after_build&&!st.build.phase&&!st.io&&!st.dialog){
+        U action=st.after_build;st.after_build=0;
+        if(st.success){ScStatus s=run(action==S_DEBUG);if(s<0)error(s,"程序未能启动，构建输出已保留");}
+    }
     if(st.save_all&&!st.io&&!st.dialog&&!st.build.phase){
         for(StDoc *d=st.documents;d;d=d->next){
             ScUiDocumentInfo q;
@@ -567,6 +594,10 @@ static void ui_tick(void)
         }
         st.save_all=0;
         status("所有文档已保存");
+    }
+    if(st.config_save_requested&&!st.save_all&&!st.io&&!st.dialog&&!st.build.phase){
+        st.config_save_requested=0;
+        ScStatus s=io_project_save(st.project_path);if(s<0)error(s,"项目未能保存，源码保留在编辑器中");
     }
 }
 static ScStatus event(ScUiContext *ui,const ScUiEvent *e,void *opaque)
@@ -600,8 +631,8 @@ static ScStatus event(ScUiContext *ui,const ScUiEvent *e,void *opaque)
                     ScUiNodeSetState(st.ui,st.tree_split,SC_UI_VISIBLE,compact&1u?0:SC_UI_VISIBLE);
                 }
                 if(!st.float_output){
-                    ScUiNodeSetState(st.ui,st.out_panel,SC_UI_VISIBLE,compact&2u?0:SC_UI_VISIBLE);
-                    ScUiNodeSetState(st.ui,st.lower_split,SC_UI_VISIBLE,compact&2u?0:SC_UI_VISIBLE);
+                    ScUiNodeSetState(st.ui,st.out_panel,SC_UI_VISIBLE,st.output_forced?SC_UI_VISIBLE:0);
+                    ScUiNodeSetState(st.ui,st.lower_split,SC_UI_VISIBLE,st.output_forced?SC_UI_VISIBLE:0);
                 }
             }
         }
@@ -643,6 +674,7 @@ static ScStatus event(ScUiContext *ui,const ScUiEvent *e,void *opaque)
     }
     if(e->type==SC_UI_EVENT_SELECTION_CHANGED&&e->node==st.tabs&&e->bytes==sizeof(ScUiNode)){
         ScUiNode page=*(const ScUiNode *)e->data;
+        if(page==st.welcome)st.active=0;
         for(StDoc *d=st.documents;d;d=d->next)if(d->page==page)st.active=d;
         refresh();
         return 0;

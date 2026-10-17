@@ -3,7 +3,9 @@
 #include "studio_project.c"
 #include "studio_syntax.c"
 #include "studio_build.c"
+#include "studio_auto.c"
 #include "studio_ui.c"
+#include "studio_start.c"
 #include "studio_actions.c"
 int main(void)
 {
@@ -36,7 +38,18 @@ int main(void)
         if(st.quit_requested && !st.io && !st.build.phase && !st.running.capture.job && !st.running.artifact.live && !st.dialog)perform(S_ACTION_EXIT);
         if(st.active && st.active->syntax_revision!=st.active->revision)syntax(st.active);
         ScU32 wait=(!st.io&&!st.build.phase&&!st.running.capture.job&&!st.running.artifact.live)?SC32_INFINITE:1u;
-        ScUiContextStep(st.ui,wait);
+        /* 文本追加只使布局失效，不能立刻拿旧高度滚动。先合并本轮输出，
+           完成一次布局再跟随末行；这一轮不等待消息，避免最终结果藏在下方。 */
+        ScUiContextStep(st.ui,st.output_follow?0u:wait);
+        if(st.output_follow){
+            ScUiScrollInfo scroll;
+            rec(&scroll,sizeof(scroll));
+            if(ScUiScrollQuery(st.ui,st.output,&scroll)>=0){
+                ScWideCounter left={0,0};
+                ScUiScrollTo(st.ui,st.output,&left,&scroll.content_height);
+            }
+            st.output_follow=0;
+        }
     }
     /* 正常退出只在IO/child/发布终态领取之后到达，不靠fini无界等待。 */
     for(StDoc *d=st.documents;d;){

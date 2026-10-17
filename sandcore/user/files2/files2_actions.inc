@@ -16,7 +16,7 @@ static ScStatus f2_error(ScStatus status,const char *path)
     if(ScShellErrorQuery(&error)<0 || error.code!=status){error.code=status;error.cause=status;
         ScErrorInfo native;memset(&native,0,sizeof(native));native.size=sizeof(native);native.version=1;
         if(ScErrorQuery(&native)==0 && native.code==status){error.cause=native.code;error.domain=native.domain;error.raw=native.raw;}}
-    char message[240];snprintf(message,sizeof(message),"操作未完成（%d） · %s",status,path?path:"");f2_status(message);
+    char message[240];snprintf(message,sizeof(message),"操作未完成（%d） | %s",status,path?path:"");f2_status(message);
     if(f2.ui && f2.root){ScUiDialog *dialog=0;
         if(ScShellErrorDialog(f2.ui,f2_dialog_owner(),&error,path?path:"",&dialog)==0)ScUiDialogRelease(dialog);}
     fprintf(stderr,"Files2 error=%d path=%s\n",status,path?path:"");return status;
@@ -48,6 +48,14 @@ static ScStatus f2_launch(const char *executable,const char *document)
 }
 static ScU32 f2_extension(const char *path,const char *extension)
 {const char *actual=strrchr(f2_leaf(path),'.');return actual && !f2_compare_text(actual,extension);}
+static ScStatus f2_launch_default(const char *modern,const char *legacy,const char *document)
+{
+    ScPathInfo info;memset(&info,0,sizeof(info));info.size=sizeof(info);info.version=1;
+    ScStatus s=ScPathQuery(modern,&info);
+    /* 发行程序与右键入口使用同一现代默认；只有未安装才回退。启动
+     * 失败或权限错误必须交给用户，不能悄悄启动另一套旧程序。 */
+    return s==SC32_E_NOT_FOUND?f2_launch(legacy,document):s<0?s:f2_launch(modern,document);
+}
 static ScStatus f2_open_one(const ScShellFileItem *item,ScU32 mode)
 {
     ScStatus s=f2_check_item(item);if(s<0)return s;
@@ -57,14 +65,16 @@ static ScStatus f2_open_one(const ScShellFileItem *item,ScU32 mode)
         s=ScShellShortcutRead(item->source,&shortcut);
         if(s==0)s=ScShellShortcutLaunch(shortcut,f2.catalog,&launched);
         ScShellShortcutRelease(shortcut);return s;}
-    if(f2_extension(item->source,".SCX") && mode!=1)return f2_launch(mode==2?"/APPS/DEBUGGER.SCX":item->source,mode==2?item->source:0);
+    if(f2_extension(item->source,".SCX") && mode!=1)return mode==2?f2_launch_default("/APPS/DEBUG2.SCX","/APPS/DEBUGGER.SCX",item->source):f2_launch(item->source,0);
     if(!mode && f2.catalog){ScLaunchInfo launched;memset(&launched,0,sizeof(launched));launched.size=sizeof(launched);launched.version=1;
         s=ScShellOpen(f2.catalog,item->source,"open",&launched);
         if(s!=SC_SHELL_E_NOT_FOUND && s!=SC_SHELL_E_NOT_SUPPORTED)return s;}
     static const char *pictures[]={".SCB",".BMP",".PNG",".JPG",".JPEG",".WEBP"};
-    for(ScU32 i=0;i<sizeof(pictures)/sizeof(pictures[0]);i++)if(f2_extension(item->source,pictures[i]))return f2_launch("/APPS/LENS.SCX",item->source);
-    static const char *texts[]={".C",".H",".INC",".ASM",".TXT",".CFG",".LOG"};
-    for(ScU32 i=0;i<sizeof(texts)/sizeof(texts[0]);i++)if(f2_extension(item->source,texts[i]))return f2_launch("/APPS/IDE.SCX",item->source);
+    for(ScU32 i=0;i<sizeof(pictures)/sizeof(pictures[0]);i++)if(f2_extension(item->source,pictures[i]))return f2_launch_default("/APPS/LENS2.SCX","/APPS/LENS.SCX",item->source);
+    static const char *sources[]={".C",".H",".INC",".ASM",".SCW"};
+    for(ScU32 i=0;i<sizeof(sources)/sizeof(sources[0]);i++)if(f2_extension(item->source,sources[i]))return f2_launch_default("/APPS/STUDIO2.SCX","/APPS/IDE.SCX",item->source);
+    static const char *texts[]={".TXT",".CFG",".LOG",".JSON",".MD",".INI"};
+    for(ScU32 i=0;i<sizeof(texts)/sizeof(texts[0]);i++)if(f2_extension(item->source,texts[i]))return f2_launch_default("/APPS/NOTES2.SCX","/APPS/NOTE.SCX",item->source);
     f2_status("未知二进制；请在右键菜单中选择“Open with”");return SC_SHELL_E_NOT_SUPPORTED;
 }
 static ScStatus f2_open_items(const ScShellFileItem *items,ScU32 count,ScU32 mode)
@@ -73,7 +83,7 @@ static ScStatus f2_open_items(const ScShellFileItem *items,ScU32 count,ScU32 mod
     for(ScU32 i=0;i<count;i++){
         /* 多选中的目录保留为单次导航，避免同一窗口连续导航时只留下最后一个。 */
         if(count>1 && items[i].kind==SC32_PATH_DIRECTORY){ScStatus checked=f2_check_item(items+i);if(checked<0)return checked;
-            ScStatus s=f2_launch("/APPS/FILES.SCX",items[i].source);if(s<0)return s;}
+            ScStatus s=f2_launch_default("/APPS/FILES2.SCX","/APPS/FILES.SCX",items[i].source);if(s<0)return s;}
         else {ScStatus s=f2_open_one(items+i,mode);if(s<0)return s;}
     }
     f2_status("已分派打开请求");return 0;
@@ -205,7 +215,7 @@ static ScStatus f2_jobs_step(ScU32 *ready)
             job->last_state=progress.state;job->last_item=progress.current_item;
             static const char *states[]={"等待","启动工作进程","规划文件","传输中","等待冲突决定","正在取消","已结束","已取消","操作失败","结果不确定"};
             const char *state=progress.state<sizeof(states)/sizeof(states[0])?states[progress.state]:states[0];
-            char text[200];snprintf(text,sizeof(text),"文件作业：%u / %u 项 · %s",progress.items_done,progress.items_total,state);f2_status(text);}
+            char text[200];snprintf(text,sizeof(text),"文件作业：%u / %u 项 | %s",progress.items_done,progress.items_total,state);f2_status(text);}
         if(progress.state<SC_SHELL_JOB_FINISHED){ScStatus conflict=f2_conflict_step(job,&progress);if(conflict<0 && !first)first=conflict;}
         else if(!job->reviewed){
             job->final=1;*ready=1;
@@ -228,7 +238,7 @@ static ScStatus f2_jobs_step(ScU32 *ready)
                 if(reconcile<0 && reconcile!=SC_SHELL_E_STALE && reconcile!=SC_SHELL_E_INVALID && !first)first=reconcile;
                 if(progress.state==SC_SHELL_JOB_UNKNOWN && !job->uncertain)job->uncertain++;
                 if(progress.state==SC_SHELL_JOB_FAILED && !job->failed)job->failed++;
-                char text[220];snprintf(text,sizeof(text),"已持久提交 %u 项 · 来源保留 %u · 跳过/取消 %u · 失败 %u · 不确定 %u",
+                char text[220];snprintf(text,sizeof(text),"已持久提交 %u 项 | 来源保留 %u | 跳过/取消 %u | 失败 %u | 不确定 %u",
                     job->durable,job->retained,job->skipped,job->failed,job->uncertain);f2_status(text);
                 f2.refresh_pending=1;
             }
@@ -364,7 +374,7 @@ static ScStatus f2_drop(ScUiContext *ui,const ScUiEvent *event,void *context)
     if(!(data->actions&action))action=data->actions&SC_UI_DRAG_COPY?SC_UI_DRAG_COPY:data->actions&SC_UI_DRAG_MOVE?SC_UI_DRAG_MOVE:0;
     data->chosen_action=action;
     if(event->type!=SC_UI_EVENT_DROP){if(f2.drop_item!=item || strcmp(f2.drop_destination,destination)){
-            f2.drop_item=item;strcpy(f2.drop_destination,destination);char message[150];snprintf(message,sizeof(message),"放置到 %s · %s",destination,action==SC_UI_DRAG_MOVE?"移动":"复制");f2_status(message);}return SC_UI_HANDLED;}
+            f2.drop_item=item;strcpy(f2.drop_destination,destination);char message[150];snprintf(message,sizeof(message),"放置到 %s | %s",destination,action==SC_UI_DRAG_MOVE?"移动":"复制");f2_status(message);}return SC_UI_HANDLED;}
     ScPathInfo metadata;ScStatus s=f2_query(destination,&metadata);if(s<0)return s;
     if(metadata.kind!=SC32_PATH_DIRECTORY || (expected && metadata.generation!=expected))return SC_SHELL_E_STALE;
     f2.drop_revision=metadata.generation;
@@ -455,7 +465,7 @@ static ScStatus f2_command(ScU32 command)
         ScUiNodeQuery(f2.ui,f2.toolbar,&node);return ScUiMenuOpen(f2.ui,f2.root,f2.places,8,node.rectangle.y+node.rectangle.height,0,&f2.popup);}
     if(command==F2_OPEN_WITH){f2_status("在共享菜单的 Open with 子菜单选择应用");return f2_menu_prepare(SC_SHELL_MENU_SELECTION,32,100,1);}
     if(command==F2_ABOUT){ScUiMessageBoxDesc desc;memset(&desc,0,sizeof(desc));desc.size=sizeof(desc);desc.version=1;desc.owner=f2.root;
-        desc.title=f2_text("Files 2");desc.message=f2_text("SandCore 原生文件管理器\n分页目录 · 虚拟详情 · 系统剪贴板 · 受管文件事务\n当前 SandFS 不支持空格路径；未提供时间戳字段。");
+        desc.title=f2_text("Files 2");desc.message=f2_text("SandCore 原生文件管理器\n分页目录 | 虚拟详情 | 系统剪贴板 | 受管文件事务\n当前 SandFS 不支持空格路径；未提供时间戳字段。");
         ScUiDialog *dialog=0;ScStatus s=ScUiMessageBox(f2.ui,&desc,&dialog);ScUiDialogRelease(dialog);return s;}
     if(command==SC_SHELL_COMMAND_OPEN || command==F2_EDIT || command==F2_DEBUG){
         ScShellFileItem *items=0;ScU32 count=0;ScStatus s=f2_selected(&items,&count);

@@ -6,9 +6,11 @@
 
 **A 32-bit x86 operating system spanning the bootloader, kernel, desktop environment, and native development tools.**
 
+**M10a2.1 product fixes:** Studio can build an opened C file, create a program project and show specific compiler errors. Legacy SCAPI.H source support, directory navigation, scroll bounds and the Files editor action are fixed. The default HelloWorld project was compiled and run in SandCore. See the [repair record](sandcore/docs/M10A2-APPLICATION-PRODUCT-FIX.md), [Studio guide](sandcore/docs/STUDIO2-USER-GUIDE.md) and [patch download](https://github.com/mio-qwq/SandCore/releases/tag/M10a2.1).
+
 SandCore is developed by [mio](https://github.com/mio-qwq/). The project includes BIOS boot support, paging and preemptive multitasking, the SandFS filesystem, a multi-user desktop, graphical applications, audio, IPv4 networking, custom executable formats, and an in-system C compiler, assembler, and debugger capable of compiling and running programs within SandCore itself.
 
-Current version: **SandCore M10a2 — The Application Platform Era**. Ring3 SCL, the four core libraries, SCUI, the desktop and major applications, and the native SCCC/SCLD multi-source SCW workflow have implementation and execution evidence. See the [delivery audit](sandcore/docs/M10A2-ACCEPTANCE.md), [SDK](sandcore/docs/M10A2-SDK.md), and [release notes](sandcore/docs/M10A2-RELEASE.md). Final runtime inputs are HOST21/native11/final12. GUI12 ended with zero resource difference; GUI13 verified leaving the desktop, logout and local sign-in, while its original resource FAIL (+8 pages on the first retained login view) remains disclosed. The launcher uses DPI-aware SDL raw mouse input and prefers WHPX; the user confirmed shortcuts and fullscreen mouse behavior. Maximum guest mode is 1920x1080; a 16:10 host uses aspect-preserving bars. [M10a2 is published](https://github.com/mio-qwq/SandCore/releases/tag/M10a2); runtime and SDK asset digests were checked. The [source commit](https://github.com/mio-qwq/SandCore/commit/53090db84670d4b875c1ceb164c77ada52cc025a) has an actual valid GitHub signature. M10a1, M9 and M8a are preserved. Full M10 and the base-kernel freeze are not declared complete.
+Current version: **SandCore M10a2 — The Application Platform Era**. Ring3 SCL, the four core libraries, SCUI, the desktop and major applications, and the native SCCC/SCLD multi-source SCW workflow have implementation and execution evidence. See the [delivery audit](sandcore/docs/M10A2-ACCEPTANCE.md), [SDK](sandcore/docs/M10A2-SDK.md), and [release notes](sandcore/docs/M10A2-RELEASE.md). The initial M10a2 release uses HOST21/native11/final12; the M10a2.1 patch uses HOST26/native15/final15. GUI12 ended with zero resource difference; GUI13 verified leaving the desktop, logout and local sign-in, while its original resource FAIL (+8 pages on the first retained login view) remains disclosed. The launcher uses DPI-aware SDL raw mouse input and prefers WHPX; the user confirmed shortcuts and fullscreen mouse behavior. Maximum guest mode is 1920x1080; a 16:10 host uses aspect-preserving bars. [M10a2 is published](https://github.com/mio-qwq/SandCore/releases/tag/M10a2); runtime and SDK asset digests were checked. The [source commit](https://github.com/mio-qwq/SandCore/commit/53090db84670d4b875c1ceb164c77ada52cc025a) has an actual valid GitHub signature. M10a1, M9 and M8a are preserved. Full M10 and the base-kernel freeze are not declared complete.
 
 | Entry point | Description |
 |---|---|
@@ -135,10 +137,6 @@ projectos/
 ├── README_EN.md                 English main README (this file)
 ├── LICENSE                      Limited source code license (English / Chinese)
 ├── DEVELOPMENT-LOG.md           Original root README; development and acceptance history
-├── AGENTS.md                    Workspace engineering, compatibility, licensing, and process rules
-├── HANDOFF.md                   Development handoff and internal status notes
-├── AUDIT-NOTES.md               Historical review notes
-├── M8_GOAL.md                   Original M8 goals
 ├── build.bat                    Current system build entry; defaults to M10a1
 ├── build-version.bat            Historical source-snapshot rebuild entry
 ├── run-m10a1.bat                Current development-acceptance runner
@@ -351,7 +349,7 @@ See [M10A1-ACCEPTANCE.md](sandcore/docs/M10A1-ACCEPTANCE.md) for existing eviden
 
 Paths beginning with `tools/` in the table above are relative to `sandcore/`. The extension ecosystem also has `ext/tools/` for icons, payloads, and SCX packaging, plus package-specific scripts under `SoftwarePack1/tools/`.
 
-Changes to the kernel, drivers, formats, and system calls must be accompanied by updates to the corresponding specifications. `SCAPI.H` is authoritative for the user-program interface. Verification uses Windows QEMU, actual guest inputs, and screenshots, retaining valid historical evidence and selecting checks based on the risks introduced by changes. See [AGENTS.md](AGENTS.md) for detailed rules and acceptance reports for actual milestone results.
+Changes to the kernel, drivers, formats, and system calls must update the corresponding specifications. The frozen `SCAPI.H` preserves the legacy user interface; new capabilities use SC32API and system libraries. Verification uses Windows QEMU and actual guest inputs, reuses unaffected evidence, and limits new checks to the actual changes. Acceptance reports describe milestone results.
 
 ## Documentation Index
 
@@ -431,7 +429,7 @@ Some specifications retain earlier headings or statements such as "not yet verif
 | [SOURCE-BACKUP](sandcore/docs/SOURCE-BACKUP.md), [history](history/README.md) | Preservation scope, content deduplication, and provenance |
 | [THIRD-PARTY](sandcore/docs/THIRD-PARTY.md) | Third-party sources, fonts, and licensing records |
 | [Historical snapshots](snapshots/README.md), [runnable packages](releases/README.md) | Source snapshots and compact dual-disk packages for past versions |
-| [Development log](DEVELOPMENT-LOG.md), [handoff notes](HANDOFF.md), [audit notes](AUDIT-NOTES.md) | Internal processes and historical statuses |
+| [Development log](DEVELOPMENT-LOG.md) | Development stages and historical statuses |
 
 ### M9 and Earlier Versions
 
@@ -445,7 +443,6 @@ Some specifications retain earlier headings or statements such as "not yet verif
 | [GAMES](sandcore/docs/GAMES.md) | Game prototypes and historical scope |
 | [FILM](sandcore/docs/FILM.md), [FILM-STORYBOARD](sandcore/docs/FILM-STORYBOARD.md), [MATH-FILM](sandcore/docs/MATH-FILM.md) | Archived film/player goals, storyboards, and host-rendering work |
 | [M6A](sandcore/docs/M6A.md), [M6](sandcore/docs/M6.md), [M7](sandcore/docs/M7.md) | Historical milestone acceptance |
-| [M8_GOAL](M8_GOAL.md) | Original full M8 goals |
 
 ## Source Code, Licensing, and Release Status
 

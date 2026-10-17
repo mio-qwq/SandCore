@@ -19,7 +19,7 @@
       "legacy": "/APPS/IDE.SCX",
       "icon": "@STUDIO",
       "category": "开发",
-      "types": "c h inc asm"
+      "types": "c h inc asm scw"
     },
     {
       "id": "sandcore.debug",
@@ -46,7 +46,7 @@
       "legacy": "/APPS/NOTE.SCX",
       "icon": "@NOTE",
       "category": "系统",
-      "types": "txt cfg log"
+      "types": "txt cfg log json md ini"
     },
     {
       "id": "sandcore.canvas",

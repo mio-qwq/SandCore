@@ -1,0 +1,78 @@
+{
+  "status": "PRODUCT_PATCH_ASSETS_PREPARED",
+  "tag": "M10a2.1",
+  "assets": {
+    "SandCore-M10a2.1.zip": {
+      "bytes": 21516644,
+      "sha256": "b46a8a71ecaaaa979bb13e912a1731a2692fe85dc60acf8f49ff3439942d276b",
+      "entries": 4
+    },
+    "SandCore-M10a2.1-SDK.zip": {
+      "bytes": 5248164,
+      "sha256": "416a7a8c18bed154053b8dbfc5ca611646e0d7d78e53633e76b275b728de9a5e",
+      "entries": 509
+    }
+  },
+  "sums_sha256": "19131137aab9189d062b8cf31a03314c91f5df3e0f947c4c441a884da24dd3a6",
+  "core_sha256": "5f08dbf9add85136fab3922f51bdb3db43c8238f22b6301ace565f3540391ae3",
+  "sdk_manifest_sha256": "e200decece6c3ed6a613ef58e63e0364e655b55a592f5d2601bfde96f69095f9",
+  "sdk_payload_files": 506,
+  "runtime_file_sha256": {
+    "run.bat": "ea9f0e859f894ce9e773ba617f77460f13bd9b6d751135f48c8b2801327a4039",
+    "run.py": "bf979ae2208b59f763b06a53027cea48852ca911887df64abf09efb19a5c14b8",
+    "sandcore.img": "47921cc2f9f0a23ea404cbd041a216931844023eedbcdbb4c824e9a55a8cfb3f",
+    "sanddata.img": "46cca280a38d24a43aab61fa16a37546164a00edf880180261968a5438541263"
+  },
+  "source_disk_unchanged": true,
+  "user_test_disk_packaged": false,
+  "runtime_four_files_only": true,
+  "new_qemu_runs": 0,
+  "new_compiler_runs": 0,
+  "sdk_library_revisions": {
+    "SCLDR.SCL": [
+      1,
+      2,
+      3
+    ],
+    "SC32API.SCL": [
+      1,
+      5,
+      7
+    ],
+    "SCCLIB.SCL": [
+      1,
+      0,
+      1
+    ],
+    "SCLIB.SCL": [
+      1,
+      0,
+      1
+    ],
+    "SCUI.SCL": [
+      1,
+      4,
+      8
+    ],
+    "SCGFX.SCL": [
+      1,
+      0,
+      1
+    ],
+    "SCSHELL.SCL": [
+      1,
+      2,
+      3
+    ],
+    "SCTERM.SCL": [
+      1,
+      0,
+      1
+    ],
+    "SCSOUND.SCL": [
+      1,
+      0,
+      1
+    ]
+  }
+}

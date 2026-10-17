@@ -24,8 +24,8 @@ static void f2_status(const char *message)
     if(!f2.status)return;
     ScUiSelectionInfo selected;memset(&selected,0,sizeof(selected));selected.size=sizeof(selected);selected.version=1;
     if(f2.selection)ScUiSelectionQuery(f2.selection,&selected);
-    char count[128];snprintf(count,sizeof(count),"%u 项 · 已选 %u%s",f2.current?f2.current->visible:0,selected.count,
-        f2.bookmark_serial!=f2.saved_serial?" · 书签未保存":"");
+    char count[128];snprintf(count,sizeof(count),"%u 项 | 已选 %u%s",f2.current?f2.current->visible:0,selected.count,
+        f2.bookmark_serial!=f2.saved_serial?" | 书签未保存":"");
     ScUiStatusPart parts[2];memset(parts,0,sizeof(parts));
     for(ScU32 i=0;i<2;i++){parts[i].size=sizeof(parts[i]);parts[i].version=1;parts[i].part=i+1;}
     parts[0].width=-1;parts[0].text=f2_text(f2.message);parts[1].width=248;parts[1].text=f2_text(count);

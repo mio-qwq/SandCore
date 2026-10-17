@@ -66,10 +66,14 @@ static ScStatus include_valid(const char *s)
 }
 static ScStatus config_read(ScConfig *c)
 {
+    ScValue automatic;rec(&automatic,sizeof(automatic));
+    ScStatus automatic_status=ScConfigGet(c,"project","auto_link",&automatic);
+    U automatic_mode=automatic_status>=0&&automatic.type==SC_VALUE_BOOL&&automatic.lo;
+    if(automatic_status<0&&automatic_status!=SC_UTIL_E_NOT_FOUND)return automatic_status;
     char compiler[68],linker[68],manifest[68],output[68],host[68],publish[68],workspace[68],includes[256],arguments[512],kind[16];
     ScStatus s=config_path(c,"compiler",compiler,0);
     if(s>=0)s=config_path(c,"linker",linker,0);
-    if(s>=0)s=config_path(c,"manifest",manifest,0);
+    if(s>=0)s=config_path(c,"manifest",manifest,automatic_mode);
     if(s>=0)s=config_path(c,"output",output,0);
     if(s>=0)s=config_path(c,"debug_host",host,1);
     if(s>=0)s=config_path(c,"publish_dir",publish,1);
@@ -80,6 +84,7 @@ static ScStatus config_read(ScConfig *c)
     if(s>=0)s=config_string(c,"kind",kind,sizeof(kind),1);
     if(s<0)return s;
     if(strcmp(kind,"SCX")&&strcmp(kind,"SCL"))return SC32_E_INVALID;
+    if(automatic_mode&&!strcmp(kind,"SCL"))return SC32_E_INVALID;
     U n=(U)strlen(output);
     if(n<5u||n>59u||strcmp(output+n-4u,!strcmp(kind,"SCL")?".SCL":".SCX"))return SC32_E_RANGE;
     const char *suffix[3]={
@@ -102,6 +107,7 @@ static ScStatus config_read(ScConfig *c)
     strcpy(st.includes,includes);
     strcpy(st.arguments,arguments);
     st.target_scl=!strcmp(kind,"SCL");
+    st.simple=automatic_mode?(st.simple?st.simple:2u):0u;
     return 0;
 }
 static void config_number(ScConfig *c,const char *section,const char *key,U value)
@@ -113,11 +119,18 @@ static void config_number(ScConfig *c,const char *section,const char *key,U valu
     ScStatus q=ScConfigSet(c,section,key,&v);
     if(q<0&&!st.config_error)st.config_error=q;
 }
+static void config_bool(ScConfig *c,const char *key,U value)
+{
+    ScValue v;rec(&v,sizeof(v));v.type=SC_VALUE_BOOL;v.lo=value!=0;
+    ScStatus s=ScConfigSet(c,"project",key,&v);if(s<0&&!st.config_error)st.config_error=s;
+}
 static ScStatus project_encode(ScString **out)
 {
     st.config_error=0;
     config_number(st.config,"project","schema",1);
     config_number(st.config,"project","file_count",st.member_count);
+    config_number(st.config,"project","automatic",st.simple);
+    config_bool(st.config,"auto_link",st.simple!=0);
     for(U i=0;i<st.member_count;i++){
         char section[32];
         snprintf(section,sizeof(section),"file.%u",i);
@@ -137,9 +150,9 @@ static ScStatus project_defaults(void)
     ScConfig *c=0;
     ScStatus s=ScConfigCreate(&c);
     if(s<0)return s;
-    config_set(c,"project","compiler","/BIN/SCCC.SCX");
-    config_set(c,"project","linker","/BIN/SCLD.SCX");
-    config_set(c,"project","manifest","/HOME/HELLO.JSON");
+    config_set(c,"project","compiler","/SYS/BIN/SCCC.SCX");
+    config_set(c,"project","linker","/SYS/BIN/SCLD.SCX");
+    config_set(c,"project","manifest","");
     config_set(c,"project","output","/HOME/HELLO.SCX");
     config_set(c,"project","kind","SCX");
     config_set(c,"project","include_dirs","");
@@ -147,6 +160,7 @@ static ScStatus project_defaults(void)
     config_set(c,"project","debug_host","");
     config_set(c,"project","publish_dir","/HOME");
     config_set(c,"project","workspace","/HOME");
+    config_bool(c,"auto_link",1);
     config_number(c,"project","schema",1);
     config_number(c,"project","file_count",0);
     s=st.config_error<0?st.config_error:config_read(c);
@@ -156,6 +170,7 @@ static ScStatus project_defaults(void)
     }
     ScConfigRelease(st.config);
     st.config=c;
+    st.simple=1;
     st.member_count=0;
     st.project_path[0]=0;
     st.project_disk_revision=0;
@@ -165,6 +180,33 @@ static ScStatus project_defaults(void)
     changed();
     project_notify();
     return 0;
+}
+static U source_name(const char *name)
+{
+    const char *suffix=strrchr(name,'.');
+    return suffix&&same_name(suffix,".C");
+}
+static ScStatus project_single(const char *name)
+{
+    if(!st.simple)return 0;
+    if(!source_name(name)){
+        const char *suffix=strrchr(name,'.');
+        return suffix&&(same_name(suffix,".H")||same_name(suffix,".INC"))?project_add(name):0;
+    }
+    if(st.simple==2u)return project_add(name);
+    for(U i=0;i<st.member_count;i++)if(st.members[i].source&&same_name(st.members[i].path,name))return 0;
+    const char *base=leaf(name);U n=(U)strlen(base);
+    if(n<3u||n>53u)return SC32_E_RANGE;
+    char output[68];
+    int bytes=snprintf(output,sizeof(output),"/HOME/%.*s.SCX",(int)(n-2u),base);
+    if(bytes<0||(U)bytes>59u||same_name(output,name))return SC32_E_RANGE;
+    /* 单文件编辑不要求先保存项目；输出始终放本人HOME，不写只读示例目录。 */
+    /* 头文件也是当前工作的一部分；切换单个C不能丢掉待保存的头成员。 */
+    U kept=0;for(U i=0;i<st.member_count;i++)if(!st.members[i].source)st.members[kept++]=st.members[i];
+    st.member_count=kept;
+    strcpy(st.output_path,output);
+    config_set(st.config,"project","output",output);
+    return project_add(name);
 }
 static ScStatus project_add(const char *name)
 {
@@ -241,8 +283,11 @@ static ScStatus project_load(const void *bytes,U count,U revision,const char *na
     }
     if(s>=0){
         char output[68],manifest[68];
+        ScValue automatic;rec(&automatic,sizeof(automatic));
+        ScStatus mode=ScConfigGet(candidate,"project","auto_link",&automatic);
+        U automatic_mode=mode>=0&&automatic.type==SC_VALUE_BOOL&&automatic.lo;
         s=config_path(candidate,"output",output,0);
-        if(s>=0)s=config_path(candidate,"manifest",manifest,0);
+        if(s>=0)s=config_path(candidate,"manifest",manifest,automatic_mode);
         const char *suffix[3]={
             ".sdbg",".map",""
         };
@@ -267,6 +312,8 @@ static ScStatus project_load(const void *bytes,U count,U revision,const char *na
         ScConfigRelease(st.config);
         st.config=candidate;
         candidate=0;
+        ScValue automatic;rec(&automatic,sizeof(automatic));
+        st.simple=ScConfigGet(st.config,"project","automatic",&automatic)>=0&&automatic.type==SC_VALUE_U32&&automatic.lo<=2u?automatic.lo:0;
         strcpy(st.project_path,name);
         st.project_disk_revision=revision;
         changed();

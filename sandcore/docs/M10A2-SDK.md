@@ -2,6 +2,8 @@
 
 SandCore M10a2 — The Application Platform Era。最终来源为HOST21/native11/final12；文档统一后只restage到build/m10a2-sdk-delivery-02，不重编未变库。8个普通原生库、实际guest G1/SCLD和唯一SCSOUND宿主codec分别绑定来源，最后SDK清单/文件摘要以该目录MANIFEST、HASHES、SHA256SUMS为准。SDK staging本身的SDK_runtime_verified=false保持；真实复杂开发流程另由GUI04/GUI12和[M10A2-ACCEPTANCE.md](M10A2-ACCEPTANCE.md)证明。不能将staging工具自己的旧PREVIEW/未运行状态字段误解为抹去独立GUI证据，也不能把GUI证据写回旧staging原报告。交付包与限制见[M10A2-RELEASE.md](M10A2-RELEASE.md)。
 
+2026-10-17 产品修正另绑定 HOST26/native15/final15，交付 SDK 为 `build/m10a2-sdk-delivery-03`。新增 Studio 使用说明，恢复 `/SYS/INC/SCAPI.H`、`SCIO.H`、`SCMEM.H` 的源码兼容，SCAPI.H 冻结原字节不变；SCUI ABI1.4 的库修订为8。新建程序、旧源码及具体错误的实际结果见 [产品修正](M10A2-APPLICATION-PRODUCT-FIX.md)。上段保留首发包来源，新 SDK 不冒充首发原字节。
+
 ## 内容与边界
 
 `tools/stage_m10a2_sdk.py` 只核验和复制，输出目录必须不存在。它不构建、不启动 QEMU、不修改镜像或当前 /SYS、不建立 ZIP/Release。检查失败保留失败记录，不覆盖或删除旧 SDK。每次读取固定 SHA，开始复制前、复制后与 metadata 提交后再核输入守恒；SHA256SUMS 覆盖实际 payload、MANIFEST、PROVENANCE 和 HASHES，HASHES 明确不自引用。
@@ -19,13 +21,13 @@ SandCore M10a2 — The Application Platform Era。最终来源为HOST21/native11
 | SYS/UI、SYS/FONT | 真实 Unicode 数据/oracle 与原始凤凰 12/16px TTF |
 | SYS/LICENSE | 所纳入第三方的固定完整源码、嵌套实现、完整许可/版权/来源与项目许可 |
 
-普通原生库为 SCLDR、SC32API、SCCLIB、SCLIB、SCUI、SCGFX、SCSHELL、SCTERM，均以 `.SCL` 安装。SCSOUND 是单列的固定用户已授权宿主 codec 例外。实际 ABI major/minor/library_version 来自所选 SCL；本规范不把库版本固定写死在过时计数中。当前实际SC32API为ABI1.5/v7（194导出），SCUI为ABI1.4/v6（174导出）；独立SC32DROP2.H声明新释放凭证入口最低版本，基础SC32API.H旧声明原字节保留。所有版本按实际provider manifest/二进制共同核验。
+普通原生库为 SCLDR、SC32API、SCCLIB、SCLIB、SCUI、SCGFX、SCSHELL、SCTERM，均以 `.SCL` 安装。SCSOUND 是单列的固定用户已授权宿主 codec 例外。实际 ABI major/minor/library_version 来自所选 SCL；本规范不把库版本固定写死在过时计数中。当前实际SC32API为ABI1.5/v7（194导出），SCUI为ABI1.4/v8（174导出）；独立SC32DROP2.H声明新释放凭证入口最低版本，基础SC32API.H旧声明原字节保留。所有版本按实际provider manifest/二进制共同核验。
 
 公共头包括 SC32API 及 GUI/Font/Palette/Popup/Broker/Drop/Debug/Path/Lease/Replace/Host/Wall/Audio/SIMD/Config/Capture/Image/Auth/Terminal 独立头；SCUI/SCUITABS/SCUIARGB/SCUICANVAS/SCUISECRET、SCGFX/SCGFXDRAW、SCLIB、SCSHELL/SCSHELLABSENT、SCSOUND、SCUITERM、SCOFMT、SCDBGFILE、SCTYPES 和 RUNTIME/SCLDR。最终白名单由实际同批工具读取，所有 literal include 必须在 INC 闭合。源码新增实现目录时 SC32 聚合的真实 C include 根会纳入来源集合；audioapi/configapi/PTY 均不能遗漏。
 
 标准头正好为 stddef.h、stdint.h、stdbool.h、stdarg.h、limits.h、errno.h、assert.h、stdlib.h、string.h、ctype.h、stdio.h。标准 C 运行库只存在于 Ring3，实际支持/限制见 SCCLIB。标准32位整数/指针与真实结构返回 ABI 见 SCCC-AGGREGATE-ABI。
 
-PRIVATE、WIRE、内核头、旧 SCAPI/SCIO/SCMEM、私有动态格式和 codec 的宿主兼容头不得进入 INC。原字节源码可归档到 SRC，不能借源码归档把私有桥宣称公开接口。SCAPI.H 原字节和旧 ABI、旧 SCX 262108B load 限制保持。
+PRIVATE、WIRE、内核头、私有动态格式和 codec 的宿主兼容头不得进入 INC。冻结的旧公开头 SCAPI.H 及 SCIO.H、SCMEM.H 继续安装到 SYS/INC，保留旧源码编译支持；这是明确的兼容头清单，不放行其它私有调用桥。SCAPI.H 保持冻结原字节和旧 ABI，旧 SCX 262108B load 限制保持。普通源码可在 Studio 直接打开构建，使用方法见 STUDIO2-USER-GUIDE；新能力仍通过 SC32API 和系统库公开。
 
 ## 普通原生来源与复用
 
@@ -91,3 +93,5 @@ EDIT2 和 UTILITY 原例及历史证据保留。它们原先的直接 FILE 保�
 
 
 修订：2026-10-17，统一HOST21/native11/final12、GUI12与登录回归实际范围，SDK及发布入口同批整理。
+
+修订：2026-10-17，恢复三个旧公开兼容头的 INC 接线，新增 Studio 用户说明；本轮运行结果另列。

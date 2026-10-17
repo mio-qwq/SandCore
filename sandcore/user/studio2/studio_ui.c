@@ -5,9 +5,9 @@ typedef struct {
 StCommand;
 static const StCommand commands[]={
     {
-        "新建文件…",'n',SC32_MOD_CONTROL
+        "新建 C 文件…",'n',SC32_MOD_CONTROL
     },{
-        "打开文件…",'o',SC32_MOD_CONTROL
+        "打开源码…",'o',SC32_MOD_CONTROL
     },{
         "保存",'s',SC32_MOD_CONTROL
     },{
@@ -18,17 +18,17 @@ static const StCommand commands[]={
         "关闭文档",'w',SC32_MOD_CONTROL
     },
     {
-        "新建工作区",0,0
+        "新建项目",0,0
     },{
-        "打开工作区…",0,0
+        "打开项目（SCW）…",0,0
     },{
-        "保存工作区",0,0
+        "保存项目…",0,0
     },{
         "添加文件…",0,0
     },{
         "从工程移除",0,0
     },{
-        "工程配置…",0,0
+        "项目设置（高级）…",0,0
     },
     {
         "撤销",'z',SC32_MOD_CONTROL
@@ -57,13 +57,13 @@ static const StCommand commands[]={
         "收起查找",0,0
     },
     {
-        "构建",SC32_KEY_F1+4,0
+        "构建 F7",SC32_KEY_F1+6,0
     },{
         "取消作业",27,0
     },{
-        "运行",SC32_KEY_F1+5,0
+        "运行 Ctrl+F5",SC32_KEY_F1+4,SC32_MOD_CONTROL
     },{
-        "调试",SC32_KEY_F1+6,0
+        "开始调试 F5",SC32_KEY_F1+4,0
     },{
         "发布…",0,0
     },
@@ -85,6 +85,8 @@ static const StCommand commands[]={
         "关于 Studio 2",0,0
     },{
         "退出",0,0
+    },{
+        "新建头文件（.H）…",0,0
     }
 };
 static ScStatus layout(ScUiNode node,U mode,int width,int height,U flex,U dock)
@@ -172,7 +174,7 @@ static ScStatus provider(void *opaque,const ScUiDataRequest *q,ScUiDataReply *r)
     r->revision=revision;
     r->state=SC_UI_VISIBLE|SC_UI_ENABLED;
     if(q->operation==SC_UI_DATA_COUNT||q->operation==SC_UI_DATA_CHILD_COUNT){
-        r->total=diagnostics?st.error_count:q->parent==1u?st.member_count+1u:q->parent?0u:1u;
+        r->total=diagnostics?st.error_count:q->parent==1u?st.member_count+(st.simple?0u:1u):q->parent?0u:1u;
         return 0;
     }
     U index=q->index;
@@ -189,7 +191,7 @@ static ScStatus provider(void *opaque,const ScUiDataRequest *q,ScUiDataReply *r)
         else{
             for(index=0;index<st.member_count;index++)if(st.members[index].id+2u==q->item)break;
             if(index==st.member_count)return SC_UI_E_NOT_FOUND;
-            index++;
+            if(!st.simple)index++;
             r->parent=1;
         }
         r->total=index;
@@ -204,12 +206,12 @@ static ScStatus provider(void *opaque,const ScUiDataRequest *q,ScUiDataReply *r)
             if(index)return SC_UI_E_NOT_FOUND;
             r->item=1;
         }
-        else if(q->parent==1u&&index==0u){
+        else if(q->parent==1u&&index==0u&&!st.simple){
             r->item=2;
             r->parent=1;
         }
-        else if(q->parent==1u&&index-1u<st.member_count){
-            r->item=st.members[index-1u].id+2u;
+        else if(q->parent==1u&&index-(st.simple?0u:1u)<st.member_count){
+            r->item=st.members[index-(st.simple?0u:1u)].id+2u;
             r->parent=1;
         }
         else return SC_UI_E_NOT_FOUND;
@@ -226,7 +228,7 @@ static ScStatus provider(void *opaque,const ScUiDataRequest *q,ScUiDataReply *r)
         r->item=d->id;
     }
     else if(q->item==1){
-        label=st.project_path[0]?leaf(st.project_path):"未保存工程";
+        label=st.project_path[0]?leaf(st.project_path):st.simple==1u?"当前程序":"未保存项目";
         r->item=1;
         r->state|=SC_UI_EXPANDED;
     }
@@ -281,7 +283,7 @@ static ScStatus menus(void)
     ScStatus s=0;
     for(U i=0;i<7&&s>=0;i++)s=ScUiMenuCreate(st.menus+i);
     const U file[]={
-        S_NEW,S_OPEN,S_SAVE,S_SAVE_AS,S_SAVE_ALL,S_CLOSE,0,S_EXIT
+        S_NEW,S_NEW_HEADER,S_OPEN,0,S_PROJECT_NEW,S_PROJECT_OPEN,S_PROJECT_SAVE,0,S_SAVE,S_SAVE_AS,S_SAVE_ALL,S_CLOSE,0,S_EXIT
     },project[]={
         S_PROJECT_NEW,S_PROJECT_OPEN,S_PROJECT_SAVE,0,S_ADD,S_REMOVE,S_CONFIG
     },edit[]={
@@ -329,6 +331,15 @@ static void status(const char *message)
         ScUiStatusSetParts(st.ui,st.status,&p,1);
     }
 }
+static void output_reveal(void)
+{
+    if(!st.ui||!st.out_panel)return;
+    st.output_forced=1;
+    ScUiNodeSetState(st.ui,st.out_panel,SC_UI_VISIBLE,SC_UI_VISIBLE);
+    ScUiNodeSetState(st.ui,st.lower_split,SC_UI_VISIBLE,SC_UI_VISIBLE);
+    ScUiTabSelect(st.ui,st.out_tabs,st.output_page);
+    ScUiLayout(st.ui,st.root);
+}
 static void refresh(void)
 {
     if(!st.ui||st.busy_refresh)return;
@@ -337,7 +348,7 @@ static void refresh(void)
     rec(&doc,sizeof(doc));
     if(st.active)ScUiDocumentQuery(st.active->text,&doc);
     char title[192];
-    snprintf(title,sizeof(title),"%s%s — Studio 2",st.active&&(doc.flags&SC_UI_DOCUMENT_DIRTY)?"* ":"",st.active?leaf(st.active->path):"工程工作区");
+    snprintf(title,sizeof(title),"%s%s%sStudio 2",st.active&&(doc.flags&SC_UI_DOCUMENT_DIRTY)?"* ":"",st.active?leaf(st.active->path):"",st.active?" - ":"");
     if(strcmp(title,st.title)){
         strcpy(st.title,title);
         ScUiText t=text(title);
@@ -361,9 +372,10 @@ static void refresh(void)
         if(cmd>=S_UNDO&&cmd<=S_HIDE_FIND)disabled=!st.active;
         if(cmd==S_UNDO)disabled=!st.active||!doc.can_undo;
         if(cmd==S_REDO)disabled=!st.active||!doc.can_redo;
-        if(cmd==S_BUILD)disabled=st.build.phase||st.io||!st.member_count||st.running.capture.job;
+        if(cmd==S_BUILD)disabled=st.build.phase||st.io||st.running.capture.job;
         if(cmd==S_CANCEL)disabled=!st.build.phase&&!st.io&&!st.running.capture.job&&!st.build.filejob;
-        if(cmd==S_RUN||cmd==S_DEBUG||cmd==S_PUBLISH)disabled=!st.success||st.success_epoch!=st.epoch||st.build.phase||st.running.capture.job||st.io||st.build.filejob;
+        if(cmd==S_RUN||cmd==S_DEBUG)disabled=st.build.phase||st.running.capture.job||st.io||st.build.filejob;
+        if(cmd==S_PUBLISH)disabled=!st.success||st.success_epoch!=st.epoch||st.build.phase||st.running.capture.job||st.io||st.build.filejob;
         if(cmd>=S_PROJECT_NEW&&cmd<=S_CONFIG)disabled=st.build.phase||st.io;
         U flags=disabled?SC_UI_MENU_DISABLED:0;
         if(st.command_flags[i]==flags+1u)continue;
@@ -448,8 +460,27 @@ static ScStatus ui_build(void)
     if(s>=0)s=layout(st.tree,SC_UI_ABSOLUTE,SC_UI_AUTO,SC_UI_AUTO,1,0);
     NODE(st.upper,SC_UI_SPLITTER,tree_split,SC_UI_ABSOLUTE,5,SC_UI_AUTO,0,0);
     NODE(st.upper,SC_UI_TAB,tabs,SC_UI_OVERLAY,SC_UI_AUTO,SC_UI_AUTO,1,0);
+    NODE(st.tabs,SC_UI_PANEL,welcome,SC_UI_SCROLL_LAYOUT,SC_UI_AUTO,SC_UI_AUTO,1,0);
+    ScUiNode welcome_content=0;
+    if(s>=0)s=widget(st.welcome,SC_UI_PANEL,"",0,&welcome_content);
+    if(s>=0)s=layout(welcome_content,SC_UI_VBOX,SC_UI_AUTO,SC_UI_AUTO,0,0);
+    if(s>=0){ScUiLayoutDesc page;rec(&page,sizeof(page));s=ScUiNodeGetLayout(st.ui,welcome_content,&page);
+        if(s>=0){for(U i=0;i<4;i++)page.padding[i]=16;page.gap=8;s=ScUiNodeSetLayout(st.ui,welcome_content,&page);}}
+    ScUiText welcome_title=text("开始");
+    if(s>=0)s=ScUiTabAdd(st.ui,st.tabs,st.welcome,&welcome_title);
+    const char *intro[]={"Studio 2","新建程序或打开 C 文件，直接开始编写。","构建 F7    运行 Ctrl+F5    调试 F5","构建错误和程序输出显示在下方。","项目树组织多文件；项目设置在“工程”菜单。"};
+    for(U i=0;i<5&&s>=0;i++){
+        ScUiNode label=0;s=widget(welcome_content,SC_UI_LABEL,intro[i],0,&label);
+        if(s>=0)s=layout(label,SC_UI_ABSOLUTE,SC_UI_AUTO,SC_UI_AUTO,0,0);
+    }
+    const char *start_labels[]={"新建程序项目…","打开源码…","打开项目（SCW）…"};
+    U start_commands[]={S_PROJECT_NEW,S_OPEN,S_PROJECT_OPEN};
+    for(U i=0;i<3&&s>=0;i++){
+        ScUiNode button=0;s=widget(welcome_content,SC_UI_BUTTON,start_labels[i],start_commands[i],&button);
+        if(s>=0)s=layout(button,SC_UI_ABSOLUTE,280,32,0,0);
+    }
     NODE(st.body,SC_UI_SPLITTER,lower_split,SC_UI_ABSOLUTE,SC_UI_AUTO,5,0,0);
-    NODE(st.body,SC_UI_DOCK,out_panel,SC_UI_DOCK_LAYOUT,SC_UI_AUTO,220,0,0);
+    NODE(st.body,SC_UI_DOCK,out_panel,SC_UI_DOCK_LAYOUT,SC_UI_AUTO,140,0,0);
     NODE(st.out_panel,SC_UI_TAB,out_tabs,SC_UI_OVERLAY,SC_UI_AUTO,SC_UI_AUTO,1,SC_UI_DOCK_FILL);
     NODE(st.out_tabs,SC_UI_PANEL,output_page,SC_UI_DOCK_LAYOUT,SC_UI_AUTO,SC_UI_AUTO,1,0);
     NODE(st.output_page,SC_UI_EDIT,output,SC_UI_ABSOLUTE,SC_UI_AUTO,SC_UI_AUTO,1,SC_UI_DOCK_FILL);
@@ -503,9 +534,11 @@ static ScStatus ui_build(void)
     sub.procedure=event;
     U token=0;
     if(s>=0)s=ScUiListen(st.ui,st.root,&sub,&token);
+    if(s>=0)s=ScUiNodeSetState(st.ui,st.out_panel,SC_UI_VISIBLE,0);
+    if(s>=0)s=ScUiNodeSetState(st.ui,st.lower_split,SC_UI_VISIBLE,0);
     if(s>=0)s=ScUiLayout(st.ui,st.root);
     if(s>=0){
-        status("就绪：添加独立C/头文件，配置manifest，再按F5构建");
+        status("新建或打开 C 文件；F7 构建，Ctrl+F5 运行，F5 调试");
         refresh();
     }
     return s;

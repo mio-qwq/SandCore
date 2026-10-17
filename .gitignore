@@ -22,3 +22,16 @@ __pycache__/
 /ext/**/build/*.scb
 /ext/**/build/*.scx
 /ext/**/build/*.ppm
+
+# 代理指令、提示词、反思与接力记录暂只留本机；禁止删除本地文件。
+# 这是当前上传范围，未来用户要求上传时再调整，不代表永久不上传。
+/AGENTS.md
+/M10a2RULE.MD
+/m10a2handoff.md
+/HANDOFF.md
+/M8_GOAL.md
+/AUDIT-NOTES.md
+/DEVELOPMENT-REFLECTION.md
+/USERSPACE-PRODUCT-PROMPT.md
+/.zcodeignore
+/sandcore/drafts/m10a2-ide-usability-01/priority_rules.md

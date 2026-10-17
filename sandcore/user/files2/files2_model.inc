@@ -93,7 +93,9 @@ static void f2_kind_label(F2Entry *row)
      * 的半个汉字交给公共Provider，导致整个可见帧校验失败。 */
     if(!f2_compare_text(extension,".C") || !f2_compare_text(extension,".H")
         || !f2_compare_text(extension,".INC") || !f2_compare_text(extension,".ASM"))strcpy(row->type,"源代码");
-    else if(!f2_compare_text(extension,".TXT") || !f2_compare_text(extension,".CFG") || !f2_compare_text(extension,".LOG"))strcpy(row->type,"文本");
+    else if(!f2_compare_text(extension,".SCW"))strcpy(row->type,"项目");
+    else if(!f2_compare_text(extension,".TXT") || !f2_compare_text(extension,".CFG") || !f2_compare_text(extension,".LOG")
+        || !f2_compare_text(extension,".JSON") || !f2_compare_text(extension,".MD") || !f2_compare_text(extension,".INI"))strcpy(row->type,"文本");
     else if(!f2_compare_text(extension,".SCB") || !f2_compare_text(extension,".BMP") || !f2_compare_text(extension,".PNG")
         || !f2_compare_text(extension,".JPG") || !f2_compare_text(extension,".JPEG") || !f2_compare_text(extension,".WEBP"))strcpy(row->type,"图像");
     else strcpy(row->type,"文件");
@@ -184,7 +186,7 @@ static ScStatus f2_scan_step(void)
     }
     if(s<0){f2_scan_cancel();return s;}
     if(page.flags&SC32_DIRECTORY_FINISHED){s=ScDirectoryClose(scan->directory);scan->directory=0;if(s<0){f2_scan_cancel();return s;}}
-    char text[160];snprintf(text,sizeof(text),snapshot->search?"搜索中：%u 项匹配 · %u 个目录 · %u 个不可读目录":"已读取 %u 项 · %u 个目录 · %u 个不可读目录",
+    char text[160];snprintf(text,sizeof(text),snapshot->search?"搜索中：%u 项匹配 | %u 个目录 | %u 个不可读目录":"已读取 %u 项 | %u 个目录 | %u 个不可读目录",
         snapshot->count,scan->visited,snapshot->skipped);f2_status(text);return 0;
 }
 static void f2_order_cancel(void)
@@ -246,7 +248,7 @@ static ScStatus f2_publish_order(void)
                 strcpy(f2.history[f2.history_index].path,snapshot->path);f2.history_count=f2.history_index+1;}
         }
         ScUiText path=f2_text(snapshot->path);ScUiNodeSetText(f2.ui,f2.address,&path);
-        char title[120];snprintf(title,sizeof(title),snapshot->search?"Files 2 · 搜索 %s":"Files 2 · %s",snapshot->path);
+        char title[120];snprintf(title,sizeof(title),snapshot->search?"Files 2 | 搜索 %s":"Files 2 | %s",snapshot->path);
         ScUiText heading=f2_text(title);ScUiWindowSetTitle(f2.ui,f2.root,&heading);
     }
     f2.sort_field=sort->field;f2.sort_descending=sort->descending;f2.publishing=1;
@@ -264,7 +266,7 @@ static ScStatus f2_publish_order(void)
             ScUiSelectionSet(f2.selection,snapshot->rows[index].id,SC_UI_REPLACE);
             ScUiViewEnsureItem(f2.ui,f2.table,snapshot->rows[index].id);}
         f2.pending_file[0]=0;}
-    char message[200];snprintf(message,sizeof(message),snapshot->search?"搜索完成：%u / %u 项 · %u 个目录未能读取":"%u / %u 项 · %u 个目录未能读取",
+    char message[200];snprintf(message,sizeof(message),snapshot->search?"搜索完成：%u / %u 项 | %u 个目录未能读取":"%u / %u 项 | %u 个目录未能读取",
         snapshot->visible,snapshot->count,snapshot->skipped);f2_status(message);
     ScUiNodeSetState(f2.ui,f2.scan_progress,SC_UI_VISIBLE,0);
     free(sort->scratch);memset(sort,0,sizeof(*sort));return s;

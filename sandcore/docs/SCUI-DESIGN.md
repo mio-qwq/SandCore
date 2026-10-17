@@ -8,7 +8,7 @@
 
 | 依据 | 当前可用事实 | 本设计的边界 |
 |---|---|---|
-| [M10a2RULE.MD](../../M10a2RULE.MD) §4.4/7/8/9 | 完整控件树、菜单、表格、树、对话框、编辑；Classic 一等主题；主要组件复用 | 不以 NUI.inc 动态化、少量按钮或换皮替代框架 |
+| 本地开发合同 §4.4/7/8/9 | 完整控件树、菜单、表格、树、对话框、编辑；Classic 一等主题；主要组件复用 | 不以 NUI.inc 动态化、少量按钮或换皮替代框架 |
 | [SC32GUI.H](../user/SC32GUI.H)、[SC32-GUI.md](SC32-GUI.md)、[SC32-GUI-USER.md](SC32-GUI-USER.md) | 20 项正式 GUI 入口；64B 消息、96B 精确窗口/输入、64B paint、64B submit；CREATE 两段、modal、capture、真实键通断、局部提交 | 控件、文字和菜单的过程在 Ring3；kernel 不保存控件树 |
 | [SC32API.H](../user/SC32API.H) | 当前新源 ABI1.1/v2，86 入口；ScCallbackPin 已实际接线；Theme24 角色、显示 scale、文件对象/目录分页/宽单调时钟 | 新源正在验证；CLIPBOARD/IPC 能力位和 TIMER 常量本身不等于相应 API 已有 |
 | [SCLIB.H](../user/sclib/SCLIB.H)、[SCLIB.md](SCLIB.md) | 冻结的 163 项容器、严格 UTF8、模型、事件、cache/lease 正文与清单 | 当前进入统一验证，不复制它的算法；ScModel 是通用模型，不是现成的虚拟表格/编辑器 |

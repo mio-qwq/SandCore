@@ -6,10 +6,10 @@ typedef struct {const char *old_line,*new_line;} DefMenuLine;
 typedef struct {ScU32 line,app;const char *label,*legacy,*icon;} DefImported;
 static const DefApp def_apps[]={
     {"sandcore.files","文件","/APPS/FILES2.SCX","/APPS/FILES.SCX","@FILES","系统","directory"},
-    {"sandcore.studio","开发工作室","/APPS/STUDIO2.SCX","/APPS/IDE.SCX","@STUDIO","开发","c h inc asm"},
+    {"sandcore.studio","开发工作室","/APPS/STUDIO2.SCX","/APPS/IDE.SCX","@STUDIO","开发","c h inc asm scw"},
     {"sandcore.debug","调试器","/APPS/DEBUG2.SCX","/APPS/DEBUGGER.SCX","@DEBUG","开发",""},
     {"sandcore.settings","设置","/APPS/SETTINGS2.SCX","/APPS/SETTINGS.SCX","@SETTINGS","系统",""},
-    {"sandcore.notes","笔记","/APPS/NOTES2.SCX","/APPS/NOTE.SCX","@NOTE","系统","txt cfg log"},
+    {"sandcore.notes","笔记","/APPS/NOTES2.SCX","/APPS/NOTE.SCX","@NOTE","系统","txt cfg log json md ini"},
     {"sandcore.canvas","画板","/APPS/CANVAS2.SCX","/APPS/CANVAS.SCX","@CANVAS","系统",""},
     {"sandcore.lens","图片","/APPS/LENS2.SCX","/APPS/LENS.SCX","@LENS","系统","scb bmp png jpg jpeg webp"},
     {"sandcore.monitor","系统监视器","/APPS/MONITOR2.SCX","/APPS/MONITOR.SCX","@MONITOR","系统",""},

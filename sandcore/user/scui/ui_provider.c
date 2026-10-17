@@ -321,6 +321,7 @@ static ScStatus ui_tree_candidate(UiView *v,ScHash *expanded,ScU32 count,ScU32 r
 done:ScArrayRelease(candidate);
     return s;
 }
+static void ui_view_scroll_limit(UiNode *,ScWideCounter *);
 static ScStatus ui_view_prepare(UiNode *n)
 {
     UiView *v=n->view;
@@ -356,7 +357,8 @@ static ScStatus ui_view_prepare(UiNode *n)
     n->state&=~SC_UI_BUSY;
     ui_tree_effective(n);
     s=SC_UI_OK;
-done:ScArrayRelease(candidate);
+done:if(s==0 && !v->retired){ScWideCounter maximum;ui_view_scroll_limit(n,&maximum);}
+    ScArrayRelease(candidate);
     s=ui_cause(n->owner,s,UI_OP_PROVIDER,n->id);
     ui_view_leave(n,v);
     return s;
@@ -718,6 +720,18 @@ static void ui_pair_row(ScU32 row,ScU32 height,ScWideCounter *out)
     out->lo=lo+(hi<<16);
     out->hi=(hi>>16)+(out->lo<lo);
 }
+static void ui_view_scroll_limit(UiNode *n,ScWideCounter *maximum)
+{
+    ScU32 height=ui_view_row_height(n),viewport=n->rectangle.height>0?(ScU32)n->rectangle.height:0;
+    ui_pair_row(n->view->total,height,&n->content_height);
+    /* 表头固定占一行。上限是内容减可见区域，目录缩短或窗口变大也立即
+     * 归位；不能只处理滚轮向上减法，任由向下偏移无限增长成空白页。 */
+    if(n->kind==SC_UI_TABLE)ui_wide_add(&n->content_height,height);
+    *maximum=n->content_height;
+    if(!maximum->hi && maximum->lo<=viewport)maximum->lo=0;
+    else{ScU32 old=maximum->lo;maximum->lo-=viewport;if(old<viewport)maximum->hi--;}
+    if(ui_wide_compare(&n->scroll_y,maximum)>0)n->scroll_y=*maximum;
+}
 static void ui_view_changed(UiNode *n,const ScUiDataChange *change)
 {
     UiView *v=n->view;
@@ -834,6 +848,7 @@ ScStatus ScUiViewEnsureItem(ScUiContext *c,ScUiNode id,ScU32 item)
     if(n->kind==SC_UI_TABLE && visible)visible--;
     if(row<offset)ui_pair_row(row,height,&n->scroll_y);
     else if(!visible || row-offset>=visible)ui_pair_row(visible?row-visible+1:row,height,&n->scroll_y);
+    {ScWideCounter maximum;ui_view_scroll_limit(n,&maximum);}
     ui_node_damage(n);
     s=SC_UI_OK;
 done:s=ui_cause(n->owner,s,UI_OP_PROVIDER,n->id);
@@ -1278,19 +1293,22 @@ static ScStatus ui_view_event(UiNode *n,const ScUiEvent *event)
         goto handled;
         }
     if(event->type==SC_UI_EVENT_WHEEL && event->message){ScI32 delta=(ScI32)event->message->data[2];
-        ScU32 amount=(delta<0?0u-(ScU32)delta:(ScU32)delta)*ui_view_row_height(n)*3;
+        ScU32 magnitude=delta<0?0u-(ScU32)delta:(ScU32)delta,amount=ui_scroll_wheel_amount(delta,ui_view_row_height(n));
         if(v->editor){s=ScUiTableEndEdit(n->owner,n->id,1);
             if(s!=0)goto handled;
             if(v->retired){s=SC_UI_E_CANCELLED;
                 goto done;
                 }}
+        ScWideCounter maximum,before=n->scroll_y;ui_view_scroll_limit(n,&maximum);
         if(delta>0){if(!n->scroll_y.hi && n->scroll_y.lo<amount)n->scroll_y.lo=0;
             else{ScU32 old=n->scroll_y.lo;
                 n->scroll_y.lo-=amount;
                 if(old<amount)n->scroll_y.hi--;
                 }}
-        else ui_wide_add(&n->scroll_y,amount);
-        ui_node_damage(n);
+        else if(magnitude){ScU32 high=n->scroll_y.hi;ui_wide_add(&n->scroll_y,amount);
+            if(n->scroll_y.hi<high || ui_wide_compare(&n->scroll_y,&maximum)>0)n->scroll_y=maximum;
+        }
+        if(ui_wide_compare(&before,&n->scroll_y))ui_node_damage(n);
         goto handled;
         }
     if(event->type==SC_UI_EVENT_KEY_DOWN){ScU32 row=0,step=0;

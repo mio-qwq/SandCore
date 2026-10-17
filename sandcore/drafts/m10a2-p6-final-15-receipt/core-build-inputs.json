@@ -1,0 +1,790 @@
+{
+  "schema": 1,
+  "scope": "ACTUAL_CORE_BUILD_INPUT_SNAPSHOT_AND_D_DEPENDENCIES",
+  "before_snapshot": {
+    "path": "build/m10a2-p6-final-15/core-source-before.json",
+    "bytes": 132447,
+    "sha256": "d33c4fb61152eb697271a70ceaf513cd06991c5474ba89c127098ee7e121d54c"
+  },
+  "d_files": {
+    "build/m10a2-p6-final-15/core/ata.d": {
+      "sha256": "029aae3c2604105025983cf5bec67118ce8008708cf4b197de5a6f0c785cdac9",
+      "target": "build/m10a2-p6-final-15/core/ata.o",
+      "dependency_count": 3
+    },
+    "build/m10a2-p6-final-15/core/audio.d": {
+      "sha256": "54000d88cebc37a2e7914735949be9bd16a97db57cd7ae07851f8f4d0987f385",
+      "target": "build/m10a2-p6-final-15/core/audio.o",
+      "dependency_count": 8
+    },
+    "build/m10a2-p6-final-15/core/auth.d": {
+      "sha256": "59a60b45d4cd9500bda6dd9111f14d83b6d1d1c473928b97b15ca0a1948e958a",
+      "target": "build/m10a2-p6-final-15/core/auth.o",
+      "dependency_count": 34
+    },
+    "build/m10a2-p6-final-15/core/boot_scene.d": {
+      "sha256": "c1cb8f3008bc8c70637d6698255f7095e7939111e69b17204c919a716499c987",
+      "target": "build/m10a2-p6-final-15/core/boot_scene.o",
+      "dependency_count": 7
+    },
+    "build/m10a2-p6-final-15/core/core_boot.d": {
+      "sha256": "95298514578dbf1b90fe3e1ed759c069012f419984ffee672fcd536f2c17964a",
+      "target": "build/m10a2-p6-final-15/core/core_boot.o",
+      "dependency_count": 6
+    },
+    "build/m10a2-p6-final-15/core/core_signature.d": {
+      "sha256": "f86990758f86be703272c7466e8e6e1cb2b78e4b44c00b45028fda1183edfc93",
+      "target": "build/m10a2-p6-final-15/core/core_signature.o",
+      "dependency_count": 8
+    },
+    "build/m10a2-p6-final-15/core/crc.d": {
+      "sha256": "462190280bae11676c48b6d68b84415d90f5a3a7ff6b4bf7643278e6994e3b85",
+      "target": "build/m10a2-p6-final-15/core/crc.o",
+      "dependency_count": 3
+    },
+    "build/m10a2-p6-final-15/core/crypto.d": {
+      "sha256": "b5531c362ab3954907a2691204e2c5a769a9577a3d747192f2b0420872a593e1",
+      "target": "build/m10a2-p6-final-15/core/crypto.o",
+      "dependency_count": 3
+    },
+    "build/m10a2-p6-final-15/core/desktop.d": {
+      "sha256": "68f4db28807f5c6e1baaa77640b967b08953d7d0ce0ee96d28269f7ff598046c",
+      "target": "build/m10a2-p6-final-15/core/desktop.o",
+      "dependency_count": 34
+    },
+    "build/m10a2-p6-final-15/core/display.d": {
+      "sha256": "66135f75a86d2aec20e2cf8791816c7bfac04faec4728734c56f3dd0b5a700f6",
+      "target": "build/m10a2-p6-final-15/core/display.o",
+      "dependency_count": 24
+    },
+    "build/m10a2-p6-final-15/core/e1000.d": {
+      "sha256": "7361f604f833e720d8a02041c92ad9b20d9e48b3ab8824eed8d246e66d29f442",
+      "target": "build/m10a2-p6-final-15/core/e1000.o",
+      "dependency_count": 7
+    },
+    "build/m10a2-p6-final-15/core/fs.d": {
+      "sha256": "44b5c8ed0e71afea61c0116d6d09de5592b4834a1b3cf37af7562bafe75e355d",
+      "target": "build/m10a2-p6-final-15/core/fs.o",
+      "dependency_count": 31
+    },
+    "build/m10a2-p6-final-15/core/gfx.d": {
+      "sha256": "d10475f2b08523fc78e48fb750ce0e0af6d953e88fb548b5cda779f51f71e731",
+      "target": "build/m10a2-p6-final-15/core/gfx.o",
+      "dependency_count": 10
+    },
+    "build/m10a2-p6-final-15/core/heap.d": {
+      "sha256": "56656e1a81f6608db4649f4b502d158596c8439d5bc34b837b9c200aeeefe1f6",
+      "target": "build/m10a2-p6-final-15/core/heap.o",
+      "dependency_count": 4
+    },
+    "build/m10a2-p6-final-15/core/image.d": {
+      "sha256": "8d29061d312a384b0977297c1f88c9ac9d801ce6af1715a1bc7bc2100b3ae1d6",
+      "target": "build/m10a2-p6-final-15/core/image.o",
+      "dependency_count": 8
+    },
+    "build/m10a2-p6-final-15/core/image_service.d": {
+      "sha256": "f0b31c92a553fb2e3692b5d477f073aab950a21bdc38e5f20d9b0415d86feaf6",
+      "target": "build/m10a2-p6-final-15/core/image_service.o",
+      "dependency_count": 31
+    },
+    "build/m10a2-p6-final-15/core/interrupts.d": {
+      "sha256": "906234a64aff91c5827dbfcf4b0aed0ea88dee448238bedf2b4a5cb77712cbf1",
+      "target": "build/m10a2-p6-final-15/core/interrupts.o",
+      "dependency_count": 31
+    },
+    "build/m10a2-p6-final-15/core/keyboard.d": {
+      "sha256": "b7ad9be0dbce1881a54166f14c20c7884b333186afaaafcb5e57ba02d91da5de",
+      "target": "build/m10a2-p6-final-15/core/keyboard.o",
+      "dependency_count": 6
+    },
+    "build/m10a2-p6-final-15/core/loader-ata.d": {
+      "sha256": "e7bf287b962f63da8d9d0f4a200b2ec7ce3117e45a8f7489fa6ff326e54463b8",
+      "target": "build/m10a2-p6-final-15/core/loader-ata.o",
+      "dependency_count": 3
+    },
+    "build/m10a2-p6-final-15/core/loader-crc.d": {
+      "sha256": "ef89b79aec0b317105d8900c414b930d08f0f30dba5fac4b24836332947920d0",
+      "target": "build/m10a2-p6-final-15/core/loader-crc.o",
+      "dependency_count": 3
+    },
+    "build/m10a2-p6-final-15/core/loader-crypto.d": {
+      "sha256": "f6a439ea050aa8af2f4d10fbedaa2e2300898d2fdab20128e5e7bd1c2d251dd5",
+      "target": "build/m10a2-p6-final-15/core/loader-crypto.o",
+      "dependency_count": 3
+    },
+    "build/m10a2-p6-final-15/core/loader-main.d": {
+      "sha256": "37180560801a3d7d74e96f4bc16274364320860fb2846fa80eaa312aac5e1ea8",
+      "target": "build/m10a2-p6-final-15/core/loader-main.o",
+      "dependency_count": 9
+    },
+    "build/m10a2-p6-final-15/core/lwip/src/core/altcp.d": {
+      "sha256": "540dbb630097c7d05c77483edf1b8019abfb3e4c13eac74d2041c3a623894b28",
+      "target": "build/m10a2-p6-final-15/core/lwip/src/core/altcp.o",
+      "dependency_count": 8
+    },
+    "build/m10a2-p6-final-15/core/lwip/src/core/altcp_alloc.d": {
+      "sha256": "5e2c21b269f9f5d18f184f7c3f38ed4df098f489670cf6724482303837873b6c",
+      "target": "build/m10a2-p6-final-15/core/lwip/src/core/altcp_alloc.o",
+      "dependency_count": 8
+    },
+    "build/m10a2-p6-final-15/core/lwip/src/core/altcp_tcp.d": {
+      "sha256": "d6205f424496c7f63c57fc059d5872fdc50bdf0ae3b7e227c200b0d62e5a10a5",
+      "target": "build/m10a2-p6-final-15/core/lwip/src/core/altcp_tcp.o",
+      "dependency_count": 8
+    },
+    "build/m10a2-p6-final-15/core/lwip/src/core/def.d": {
+      "sha256": "8a638962745e7cc3f7baee05c9d831225bf8824d85cb0c1c53cbb48b64ca2744",
+      "target": "build/m10a2-p6-final-15/core/lwip/src/core/def.o",
+      "dependency_count": 10
+    },
+    "build/m10a2-p6-final-15/core/lwip/src/core/dns.d": {
+      "sha256": "fba1dc6bbf81cfc2098e9e491db440bbee8f78705a6141cf1236f8a52f05f706",
+      "target": "build/m10a2-p6-final-15/core/lwip/src/core/dns.o",
+      "dependency_count": 32
+    },
+    "build/m10a2-p6-final-15/core/lwip/src/core/inet_chksum.d": {
+      "sha256": "db3f2d12e82cb821c0a0d71be4a36a1ed27d4c5f3c2a8f49c77de42355204eda",
+      "target": "build/m10a2-p6-final-15/core/lwip/src/core/inet_chksum.o",
+      "dependency_count": 17
+    },
+    "build/m10a2-p6-final-15/core/lwip/src/core/init.d": {
+      "sha256": "edf8e721aa6f7fb5b74b8a71778fd568c4f6f2f4a0709c4b46a08df6c3765a49",
+      "target": "build/m10a2-p6-final-15/core/lwip/src/core/init.o",
+      "dependency_count": 51
+    },
+    "build/m10a2-p6-final-15/core/lwip/src/core/ip.d": {
+      "sha256": "51f5315c98886a603ed82196d9c8bec6ee2ff21f178b92776a3b6424cf0f603c",
+      "target": "build/m10a2-p6-final-15/core/lwip/src/core/ip.o",
+      "dependency_count": 27
+    },
+    "build/m10a2-p6-final-15/core/lwip/src/core/ipv4/acd.d": {
+      "sha256": "70325751dd199889fcf857e5febb86c36de20ef81508a5235f0def0487e5defc",
+      "target": "build/m10a2-p6-final-15/core/lwip/src/core/ipv4/acd.o",
+      "dependency_count": 31
+    },
+    "build/m10a2-p6-final-15/core/lwip/src/core/ipv4/autoip.d": {
+      "sha256": "46af0195597430a19d1e3e92a5fb815e5df34b3ac15cf718481484c0f5e043b5",
+      "target": "build/m10a2-p6-final-15/core/lwip/src/core/ipv4/autoip.o",
+      "dependency_count": 8
+    },
+    "build/m10a2-p6-final-15/core/lwip/src/core/ipv4/etharp.d": {
+      "sha256": "a051a81810d12ada421f3474f7ca233b9f8fe217ba7392be028d481890a625a3",
+      "target": "build/m10a2-p6-final-15/core/lwip/src/core/ipv4/etharp.o",
+      "dependency_count": 42
+    },
+    "build/m10a2-p6-final-15/core/lwip/src/core/ipv4/icmp.d": {
+      "sha256": "e9dcf9f3203d399e9732e438a41f4454572f4c573c3f9ef884588ad79b2adf34",
+      "target": "build/m10a2-p6-final-15/core/lwip/src/core/ipv4/icmp.o",
+      "dependency_count": 32
+    },
+    "build/m10a2-p6-final-15/core/lwip/src/core/ipv4/igmp.d": {
+      "sha256": "b858775314aa16c1ee3ee94f3ce9d7f4ee67f45196deb532cfeab8196f4dab25",
+      "target": "build/m10a2-p6-final-15/core/lwip/src/core/ipv4/igmp.o",
+      "dependency_count": 8
+    },
+    "build/m10a2-p6-final-15/core/lwip/src/core/ipv4/ip4.d": {
+      "sha256": "c299dd8095c25d80c95213c9bec538b09051a539a735aa9732fd4db7a1de88b3",
+      "target": "build/m10a2-p6-final-15/core/lwip/src/core/ipv4/ip4.o",
+      "dependency_count": 44
+    },
+    "build/m10a2-p6-final-15/core/lwip/src/core/ipv4/ip4_addr.d": {
+      "sha256": "da4b71c0c68866062e74a8cc18ef05eec31532346d91ce62f1f8849b49c1bcf4",
+      "target": "build/m10a2-p6-final-15/core/lwip/src/core/ipv4/ip4_addr.o",
+      "dependency_count": 22
+    },
+    "build/m10a2-p6-final-15/core/lwip/src/core/ipv4/ip4_frag.d": {
+      "sha256": "55124a6cee7d82fc95575b30c83f5e8ea6a7ab961dd3a7cff8cc888c8529f1ef",
+      "target": "build/m10a2-p6-final-15/core/lwip/src/core/ipv4/ip4_frag.o",
+      "dependency_count": 32
+    },
+    "build/m10a2-p6-final-15/core/lwip/src/core/mem.d": {
+      "sha256": "7cf6a7b7917667a9f72d36cccf5cc66dec07304037be399b352b7cf234aae2a5",
+      "target": "build/m10a2-p6-final-15/core/lwip/src/core/mem.o",
+      "dependency_count": 19
+    },
+    "build/m10a2-p6-final-15/core/lwip/src/core/memp.d": {
+      "sha256": "d38086fe8c2186601f909753ca48018c642fa8a3120a88e029ca4a714fa825d2",
+      "target": "build/m10a2-p6-final-15/core/lwip/src/core/memp.o",
+      "dependency_count": 58
+    },
+    "build/m10a2-p6-final-15/core/lwip/src/core/netif.d": {
+      "sha256": "4f0443d29bca2ac8503ab2b5772988741c44fc3e9c096d3bdf949d2f4f8c333f",
+      "target": "build/m10a2-p6-final-15/core/lwip/src/core/netif.o",
+      "dependency_count": 50
+    },
+    "build/m10a2-p6-final-15/core/lwip/src/core/pbuf.d": {
+      "sha256": "4a38c2cd7225b68024f17456c7b5b5ea34eae92a3e1fff653ab14b887866efbf",
+      "target": "build/m10a2-p6-final-15/core/lwip/src/core/pbuf.o",
+      "dependency_count": 35
+    },
+    "build/m10a2-p6-final-15/core/lwip/src/core/raw.d": {
+      "sha256": "c6959131aeb1ec9a956422679d6596be832245f77eda7a2f62eaa61e704df51f",
+      "target": "build/m10a2-p6-final-15/core/lwip/src/core/raw.o",
+      "dependency_count": 31
+    },
+    "build/m10a2-p6-final-15/core/lwip/src/core/stats.d": {
+      "sha256": "3f4c4b8e29e3d42f9c01936b1ade2a53ffbd3550a0799b68d49c072bd8f26164",
+      "target": "build/m10a2-p6-final-15/core/lwip/src/core/stats.o",
+      "dependency_count": 16
+    },
+    "build/m10a2-p6-final-15/core/lwip/src/core/sys.d": {
+      "sha256": "81593d1931a0faabc8fcc1ba04c68296a86afcf0a09d7c6fe66d3b6404cc20cc",
+      "target": "build/m10a2-p6-final-15/core/lwip/src/core/sys.o",
+      "dependency_count": 9
+    },
+    "build/m10a2-p6-final-15/core/lwip/src/core/tcp.d": {
+      "sha256": "6e9e68673b65c7d6d8925491b55012f6a64e01eb43fb0a29d3cc9554f7c69d12",
+      "target": "build/m10a2-p6-final-15/core/lwip/src/core/tcp.o",
+      "dependency_count": 36
+    },
+    "build/m10a2-p6-final-15/core/lwip/src/core/tcp_in.d": {
+      "sha256": "25c994df4714cbbd20a02073c16d802c6f41b9cfefdb7c74dd81e8c487e4a79b",
+      "target": "build/m10a2-p6-final-15/core/lwip/src/core/tcp_in.o",
+      "dependency_count": 37
+    },
+    "build/m10a2-p6-final-15/core/lwip/src/core/tcp_out.d": {
+      "sha256": "91e1d6624f1be8ae9f94154b0c60dc724d0bab076fce28f87eee68af72237c42",
+      "target": "build/m10a2-p6-final-15/core/lwip/src/core/tcp_out.o",
+      "dependency_count": 37
+    },
+    "build/m10a2-p6-final-15/core/lwip/src/core/udp.d": {
+      "sha256": "aa8638dd3edb9e9559cd840bfb1359d6fb501bb9660d7fc45eacddc5de27595c",
+      "target": "build/m10a2-p6-final-15/core/lwip/src/core/udp.o",
+      "dependency_count": 43
+    },
+    "build/m10a2-p6-final-15/core/lwip/src/netif/ethernet.d": {
+      "sha256": "ec8474971211cb35e831622ad78dec843ca1519a699d0f9d9d47bdbd905098a6",
+      "target": "build/m10a2-p6-final-15/core/lwip/src/netif/ethernet.o",
+      "dependency_count": 36
+    },
+    "build/m10a2-p6-final-15/core/main.d": {
+      "sha256": "ae926d20da9ced661c9efd9096fa647dbda4a9c1439a56caa3909709c9eb7d2c",
+      "target": "build/m10a2-p6-final-15/core/main.o",
+      "dependency_count": 65
+    },
+    "build/m10a2-p6-final-15/core/management.d": {
+      "sha256": "8412301d2bf4cecfd67f53e00c929c136b72dea2f42d5edba27a1501f2a87779",
+      "target": "build/m10a2-p6-final-15/core/management.o",
+      "dependency_count": 11
+    },
+    "build/m10a2-p6-final-15/core/memory.d": {
+      "sha256": "0fcf31ccdc61ba27a9d338aa801866677b0ad1377e19693e7bf59d1c9f50b44f",
+      "target": "build/m10a2-p6-final-15/core/memory.o",
+      "dependency_count": 3
+    },
+    "build/m10a2-p6-final-15/core/module2.d": {
+      "sha256": "467eb7ce79059107c3b9886d1fb5687ea57c706f285a1ec9887567ed85a351ec",
+      "target": "build/m10a2-p6-final-15/core/module2.o",
+      "dependency_count": 34
+    },
+    "build/m10a2-p6-final-15/core/monocypher-ed25519.d": {
+      "sha256": "87bfc0be2d9954805f4abb901d0351dba3cd2f066ba53ef02a7b17b5f641da95",
+      "target": "build/m10a2-p6-final-15/core/monocypher-ed25519.o",
+      "dependency_count": 3
+    },
+    "build/m10a2-p6-final-15/core/monocypher.d": {
+      "sha256": "d5ff9594dae2dc0f8ef8bcd8e4f91b82c5d6a9dae4011a6820e8c0f51b855776",
+      "target": "build/m10a2-p6-final-15/core/monocypher.o",
+      "dependency_count": 2
+    },
+    "build/m10a2-p6-final-15/core/mouse.d": {
+      "sha256": "ee787d3432de0df1c4cfc2d067a7c283c79fff83c6a8cf06037a72db62806997",
+      "target": "build/m10a2-p6-final-15/core/mouse.o",
+      "dependency_count": 6
+    },
+    "build/m10a2-p6-final-15/core/net_port/dhcp.d": {
+      "sha256": "96d021acdba71a22fd9dada82a7156f00d258156980290b13a4c1fb85ea1cda4",
+      "target": "build/m10a2-p6-final-15/core/net_port/dhcp.o",
+      "dependency_count": 43
+    },
+    "build/m10a2-p6-final-15/core/net_port/loopback.d": {
+      "sha256": "5d5bf456447a98d42e8bc23e8b388c6137c74b0f6c58431e1e18dc45fb3ff188",
+      "target": "build/m10a2-p6-final-15/core/net_port/loopback.o",
+      "dependency_count": 31
+    },
+    "build/m10a2-p6-final-15/core/net_port/port.d": {
+      "sha256": "34e753990b5f1a9f7619fa50567c8f8e991c6856f8479c1acdfc8d1c2e827362",
+      "target": "build/m10a2-p6-final-15/core/net_port/port.o",
+      "dependency_count": 10
+    },
+    "build/m10a2-p6-final-15/core/net_port/timeouts.d": {
+      "sha256": "0715fb999632c7a5736300828be11e33a70e0e1b317a0b3860664c520fd91f0d",
+      "target": "build/m10a2-p6-final-15/core/net_port/timeouts.o",
+      "dependency_count": 55
+    },
+    "build/m10a2-p6-final-15/core/net_socket.d": {
+      "sha256": "3618618933b22e2296f05fdaca70395e8aaec8a201a50c2314d064758b2c455e",
+      "target": "build/m10a2-p6-final-15/core/net_socket.o",
+      "dependency_count": 50
+    },
+    "build/m10a2-p6-final-15/core/network.d": {
+      "sha256": "6cbd94030696ba4c4db5a9cbedfaec5427cd23deba06af458ff92eba582b459d",
+      "target": "build/m10a2-p6-final-15/core/network.o",
+      "dependency_count": 51
+    },
+    "build/m10a2-p6-final-15/core/objpool.d": {
+      "sha256": "00e032696e72e3f6c7d657b0f017bced4d8968b03157bc417b7c550faea1abb1",
+      "target": "build/m10a2-p6-final-15/core/objpool.o",
+      "dependency_count": 4
+    },
+    "build/m10a2-p6-final-15/core/paging.d": {
+      "sha256": "90cb3dcde571d38bd878cb8225e5dc237d9d22ce34951f49d1ed6df261ae085f",
+      "target": "build/m10a2-p6-final-15/core/paging.o",
+      "dependency_count": 5
+    },
+    "build/m10a2-p6-final-15/core/process.d": {
+      "sha256": "40779a3050428af5364ee0b3ac017af925c0daa8230fd47af064ceaae1e63634",
+      "target": "build/m10a2-p6-final-15/core/process.o",
+      "dependency_count": 27
+    },
+    "build/m10a2-p6-final-15/core/random.d": {
+      "sha256": "53f0adec90b1bbdd47c413a209e7e0e69d4dccaa8469e20cfd9d3ed320c47e56",
+      "target": "build/m10a2-p6-final-15/core/random.o",
+      "dependency_count": 4
+    },
+    "build/m10a2-p6-final-15/core/ringdebug.d": {
+      "sha256": "29bd9047de4731409dd129c99c9812308c3501e757847def1428c9fe462c0d0d",
+      "target": "build/m10a2-p6-final-15/core/ringdebug.o",
+      "dependency_count": 7
+    },
+    "build/m10a2-p6-final-15/core/rtc.d": {
+      "sha256": "61c5d03fbce250515efbf4f63dad9bd7e7bf44fcc84f9a2cdc9604d68c11feed",
+      "target": "build/m10a2-p6-final-15/core/rtc.o",
+      "dependency_count": 3
+    },
+    "build/m10a2-p6-final-15/core/sc32_broker.d": {
+      "sha256": "5f4ba24bddcf0c29b1d72b3a6a12c26f9cb535c472ebf6fd72ddb80b4f78118b",
+      "target": "build/m10a2-p6-final-15/core/sc32_broker.o",
+      "dependency_count": 27
+    },
+    "build/m10a2-p6-final-15/core/sc32_core.d": {
+      "sha256": "991a46f4e735719b20709aa5f075ec22a01b026e1f6fa57370e0526abbbd582d",
+      "target": "build/m10a2-p6-final-15/core/sc32_core.o",
+      "dependency_count": 59
+    },
+    "build/m10a2-p6-final-15/core/sc32_debug.d": {
+      "sha256": "ca2185473bb41e912f306d7d2aaf99a06fb5530cbff7108ce93f1627364cbbc2",
+      "target": "build/m10a2-p6-final-15/core/sc32_debug.o",
+      "dependency_count": 25
+    },
+    "build/m10a2-p6-final-15/core/sc32_drop.d": {
+      "sha256": "34f84fdbedcf6ce13daf45db7bef37c8f94fc81d3f51aa66d35fc074af80a263",
+      "target": "build/m10a2-p6-final-15/core/sc32_drop.o",
+      "dependency_count": 34
+    },
+    "build/m10a2-p6-final-15/core/sc32_file.d": {
+      "sha256": "90c891ac26edf1b4f38de5189e0ebc305cd2eea310adabb59ec8f1c30aaefe7e",
+      "target": "build/m10a2-p6-final-15/core/sc32_file.o",
+      "dependency_count": 33
+    },
+    "build/m10a2-p6-final-15/core/sc32_font.d": {
+      "sha256": "66509a0464cc11778f8ca777b119fc81474cd84f8de9841429bd4b78f9316b01",
+      "target": "build/m10a2-p6-final-15/core/sc32_font.o",
+      "dependency_count": 15
+    },
+    "build/m10a2-p6-final-15/core/sc32_gui.d": {
+      "sha256": "8936134e798b251a7ec720317ffe089a7e44c9dcb553437b11497270a30cbd26",
+      "target": "build/m10a2-p6-final-15/core/sc32_gui.o",
+      "dependency_count": 31
+    },
+    "build/m10a2-p6-final-15/core/sc32_host.d": {
+      "sha256": "2c0a67a2e1f599e220e2445e00d585eeacd45378ddd06adef3cb86336f94e90d",
+      "target": "build/m10a2-p6-final-15/core/sc32_host.o",
+      "dependency_count": 27
+    },
+    "build/m10a2-p6-final-15/core/sc32_image.d": {
+      "sha256": "9f7a68b536457ee9221b8769e575cd55eefade4d8e0f2e1e92fe4c0bdfc105ca",
+      "target": "build/m10a2-p6-final-15/core/sc32_image.o",
+      "dependency_count": 16
+    },
+    "build/m10a2-p6-final-15/core/sc32_lease.d": {
+      "sha256": "f35d1dbad1532d6fffc950f9e3929b6f824b0c9b8e9f422a0b26e60e7d30823a",
+      "target": "build/m10a2-p6-final-15/core/sc32_lease.o",
+      "dependency_count": 17
+    },
+    "build/m10a2-p6-final-15/core/sc32_raw.d": {
+      "sha256": "da74a5c7fe5ad27bedd4f06f752d741de3790a894da86e4b0092b8983b4c969a",
+      "target": "build/m10a2-p6-final-15/core/sc32_raw.o",
+      "dependency_count": 22
+    },
+    "build/m10a2-p6-final-15/core/scd_validate.d": {
+      "sha256": "a62ffa68230cfdf02831dd79bbc5c0290cf65512bc7cbff1a0e610910b0a8aa8",
+      "target": "build/m10a2-p6-final-15/core/scd_validate.o",
+      "dependency_count": 2
+    },
+    "build/m10a2-p6-final-15/core/scl_boot.d": {
+      "sha256": "105d70c84aa6cc79cfcc154c0dc90bacf7578ff3e41736055760fd0cc530a757",
+      "target": "build/m10a2-p6-final-15/core/scl_boot.o",
+      "dependency_count": 11
+    },
+    "build/m10a2-p6-final-15/core/scl_validate.d": {
+      "sha256": "0ddeb9c032dbbe27c8a1ac3233efb47b4663c5be1a59b105a1c4baf69024265d",
+      "target": "build/m10a2-p6-final-15/core/scl_validate.o",
+      "dependency_count": 2
+    },
+    "build/m10a2-p6-final-15/core/serial.d": {
+      "sha256": "f689df07b352b1bb8f8e46b85eeb304ad1d931fd4df456724d081b396b6c7203",
+      "target": "build/m10a2-p6-final-15/core/serial.o",
+      "dependency_count": 3
+    },
+    "build/m10a2-p6-final-15/core/session.d": {
+      "sha256": "88413e860f3447abf7ec0407665c75adf9fc014244fb859b61b036b51646849b",
+      "target": "build/m10a2-p6-final-15/core/session.o",
+      "dependency_count": 44
+    },
+    "build/m10a2-p6-final-15/core/simd.d": {
+      "sha256": "bcb8d73982942799e8874b500f1bdcf1d4bb39bc2d7ab64929b2905dfb74e50f",
+      "target": "build/m10a2-p6-final-15/core/simd.o",
+      "dependency_count": 4
+    },
+    "build/m10a2-p6-final-15/core/streams.d": {
+      "sha256": "93aa5d749a935fb71792a581761ef0ad65013f6a8082e9d21cc8b87028136011",
+      "target": "build/m10a2-p6-final-15/core/streams.o",
+      "dependency_count": 36
+    },
+    "build/m10a2-p6-final-15/core/task.d": {
+      "sha256": "cc1d09ab6573475b4378d84711e2faa9f72b78db0d518ca4bfa8c9cdba27672f",
+      "target": "build/m10a2-p6-final-15/core/task.o",
+      "dependency_count": 76
+    },
+    "build/m10a2-p6-final-15/core/task_store.d": {
+      "sha256": "a07489143ed3c985417f86cdce50ee7c9bc91057730fac5650b33d7436ff8af6",
+      "target": "build/m10a2-p6-final-15/core/task_store.o",
+      "dependency_count": 5
+    },
+    "build/m10a2-p6-final-15/core/theme.d": {
+      "sha256": "ad8f18d6468f0b206976b0e1e826c97d417f337516da64ea1e3bba15df0984d3",
+      "target": "build/m10a2-p6-final-15/core/theme.o",
+      "dependency_count": 28
+    },
+    "build/m10a2-p6-final-15/core/timer.d": {
+      "sha256": "b5a06fb375c8972f19b2a5de6e730474b2e19a7a135d902a8998bafd22a95af2",
+      "target": "build/m10a2-p6-final-15/core/timer.o",
+      "dependency_count": 3
+    },
+    "build/m10a2-p6-final-15/core/ttf.d": {
+      "sha256": "eb1b6f8b02221af5fb01e86e48493639a6d26815f581de9290f7df018bc0062b",
+      "target": "build/m10a2-p6-final-15/core/ttf.o",
+      "dependency_count": 6
+    },
+    "build/m10a2-p6-final-15/core/userspace.d": {
+      "sha256": "f72a2de153913277ec69ea4072223db892db0879cd9883e3ee5c3f1255484ce9",
+      "target": "build/m10a2-p6-final-15/core/userspace.o",
+      "dependency_count": 30
+    },
+    "build/m10a2-p6-final-15/core/wm.d": {
+      "sha256": "853d73a1ac22da1ba12a7727348c649e3dd0a8c7c4b482fedb8041ad34f383bb",
+      "target": "build/m10a2-p6-final-15/core/wm.o",
+      "dependency_count": 61
+    }
+  },
+  "non_generated_compile_sources": {
+    "kernel/ata.c": "d9097554b6c11a599850a043a296380699cfa6f734a2fd0d155757c04a0c6ffc",
+    "kernel/io.h": "b475c80afa24a3dc900b048c3d2c71c5fa893978e041081954a23093d59610da",
+    "kernel/ata.h": "38a68449622e33cc18f678ebb025bd83f46285e77439f4f87573c2affe5b399e",
+    "kernel/audio.c": "4f2a30f8d71b0bb8c6e2b22230cb9f6bd4f908bc019aac4cd5dfa654ece44aee",
+    "kernel/audio.h": "5f945e723b272458e8f381a967de7957ec0a61e741c0497936abceeef254bfe4",
+    "kernel/task.h": "d007bfd1ca31a9fa00c206a71623a390195cfaa60fb4494a53cb75646c6dd53f",
+    "kernel/auth.h": "3c9f3e300319b1ac0652169dc3a2e3f6cc07151f3b65e0b6047889e8813e9e8d",
+    "kernel/memory.h": "ae27d28088555dadc70f834a39de528882787071ff9d098edd8106b695c56752",
+    "kernel/timer.h": "c5341b3092e3aae96029b8764879578fcd683b4e238f4575b2a35b6905354896",
+    "kernel/fs.h": "05daf8687b761a59cdb813c9e7223a056c7a2085e064504b94450a9fc1ece78a",
+    "kernel/auth.c": "d8d5dfa734753f6a2bd1c1cf0cc5f2f88f330217d3a67959488c148f2632bf7c",
+    "kernel/crypto.h": "7d58e21a79e482aa3a4d6c1d2815b7ee2b4ccb6dca48c5c56cfece1dcaed7778",
+    "kernel/random.h": "4b2660d0345917cc2bca36f7001da05747e0c7bf75742002330de78995633ba7",
+    "kernel/process.h": "0044d0c943a42c475e8170c33b5c757348e4cb6bece314a40f41ca4e33cfbc33",
+    "kernel/streams.h": "296c8b4d80da0104a27781402a9afcc9094ee62f097a6251d8677ccf46698c54",
+    "kernel/session.h": "cdf9a1de62e3e58ef75020e576450cfa640df333226397d3b0075eaa34f5921c",
+    "kernel/login_role.inc": "b027945dd4a1ec6abe90c50f2954eb9b353fd9e8b67b54fea84be7639d1a5553",
+    "kernel/sc32_core.h": "89628eb620298b75d6eeae80349f0ead90c8496c3e98c4ba4150012139385564",
+    "kernel/paging.h": "de9ac1188557b7cb8f38bd921a8884796e9f2ad62587cf30c88c2e3d8edc78ff",
+    "user/sc32/SC32GUIWIRE.H": "9dc729bae107d11e641c1fe0fa7b2d2e56e5edaf3ac035689504c399cd7e4b5b",
+    "user/sc32/SC32WIRE.H": "8b327411c06e252c0fb814d9428b74a955ac549cedc4dc21355f96f4e56a602b",
+    "user/SC32API.H": "0e77851eb66437d2b2afeadf7312b8bf0704d5f61347c5f84f57189819617dda",
+    "user/SCTYPES.H": "f705794dfb569a00241613b1e19b5bd0c8875fdd68e074c72c5fb9bbf6a690d2",
+    "user/SC32GUI.H": "171dc602ec71ba77ec3d5bd043e7ce9a3d6d8cd27814d43185d51a0a12e522f2",
+    "user/SC32FONT.H": "a748bfc260e9cf222ec405a45cc78292bfc648d8d1cc7e4e6746898675268126",
+    "user/SC32PALETTE.H": "36afa347d4339f99e3d4d18e77694666cdf30960a364b412fcd8131cce1ec20b",
+    "user/SC32POPUP.H": "3005dbe6a3d48097723aee7a2bf2f66f7059f5ea6e4afca277886ea6a957023b",
+    "user/sc32/SC32FILEWIRE.H": "ee14d085aa5c3adb0c3283eceff11fa33e94effb14f24b803184670cd8df5655",
+    "user/sc32/SC32BROKERWIRE.H": "182c86097f2312f47c837910729210da72856c2223010844fd3a8f01e9e1f0d7",
+    "user/SC32BROKER.H": "41a92354b7138d378181fbcf93ecbc6ff27bb88eea3008dbaa9380790a254ac8",
+    "user/fontapi/SC32FONTWIRE.H": "47aa026fd646f6b43223c0be321e70efc277b7f7d78ce4a365361286a1e4c162",
+    "user/debugapi/SC32DEBUGWIRE.H": "250f62ebe5f09f60d05b0a123d850508bc0ddac25e0deec73de856e207f3d6eb",
+    "user/SC32DEBUG.H": "61edbdf3fb76e422032bb68669656b4950807601e2edadf9e7b558c5ecda2a68",
+    "kernel/boot_scene.c": "6e8e3ba031b93bf4d6b79483cbdc03f39b4d23a373423a8549c058dc9a0a5977",
+    "kernel/boot_scene.h": "a2cc077569aee10daf11614be3cc531b8d89b475116089090409d1c2b2fa45b4",
+    "kernel/gfx.h": "02ae34cdb53f7ab3f7cdc3cedcc9aaf4fdcc0c86f39d19f0cb5641acf30b3bbd",
+    "kernel/display.h": "009d792b3d902bcef204d29e82acb1ba57c58a8f6627239ba68573d673d7caf8",
+    "kernel/desktop.h": "f70cc8cacb7cc761048b2e693107c833e6639b28d83ced27c0a30ae3a695baae",
+    "kernel/theme.h": "4df3886b1f603e34b8492857744181f4f7b7e3523042be46f65680e14fde6cc4",
+    "kernel/core_boot.c": "965e29d6e79a143ff12255cb18dcff2d09bd3fc4bfe8403cc8417c37aeb1a3b2",
+    "kernel/core_image.h": "f222476608cd3f8c2da00714023d3e0cb2c7fe4fd742d6627584feeef317ebf8",
+    "kernel/crc.h": "ce78710f12657e313d89b60f9a6c2d4f8013a05f9ae6ce3ad5def1658b49106d",
+    "kernel/interrupts.h": "7d8e7cc86d14ee5406f0d8e6f619baf081ef6bf113fdcb3b0d334fa07811650e",
+    "kernel/core_signature.c": "e09ea8334c3349d82ea8aaf69911ce5a53fb63ed51c44de7c175b67f6703762e",
+    "kernel/core_signature.h": "00f46d34e19ac186030427a4049f681840ec8559c5d753b3ae8880ca48400420",
+    "third_party/monocypher/src/optional/monocypher-ed25519.h": "3a3035181f991a158d0e1c7567258f0bae8ba0f1f23c5512b4a1db1b3c9730ce",
+    "third_party/monocypher/src/monocypher.h": "fcaf6ed771358bb4f40fba016f6518ae86ec02b1b877d2cc35ad92d3a26fd7b3",
+    "kernel/crc.c": "e16eab8bc45354e9f7b49b877700035e11ca57fecbb57ba373711ddfb4d974fd",
+    "kernel/crypto.c": "55f9c369191446e38bcfc2e8b80c487df415557eb5dbd677c0b17346e6c7d1aa",
+    "kernel/desktop.c": "cd6ebda391aa8baba8248f8a43701ac1cff8f6277120fd9e5b984a420fd4ad90",
+    "kernel/palette.h": "df3d1f60aeaf55eecdee525cef09fe32d1d6e7ca08fbf9d07b8739764ef0b046",
+    "kernel/image.h": "2bd77c457314130e06016a949ac24d6f50c9c5026354921a9f084ba4b2979d31",
+    "kernel/image_service.h": "7e3afe7d08b53ac821316727374f79eb23b0e4a3d9b78e92c0ad06038300bae6",
+    "kernel/objpool.h": "6c9ad6007d0b179d4403495c5152b835338e8680f785eeb6851967a97d57b7ed",
+    "kernel/wm.h": "25e90e0a1c7a4c93d0f56cc6eb29ddce412b769617956bbe6b576407b0bed32d",
+    "kernel/sc32_raw.h": "7895cd368f789a723c4eb48aaf47aa1bcd262a2b1653a75df5660da3ed1d769b",
+    "user/SC32DROP2.H": "acb7e31d43a95d76507be3844b4eff586efba000dd7b2eb11ed12f895ac32fc9",
+    "user/SC32DROP.H": "c8ad8ed6d7e9459c9ebd0b656a7f69d385e337825023a09652fe312740b43db3",
+    "kernel/display.c": "3915557c9d81d94b664178fbfa5c3ef8cfbbee9258c1fbfcb2060c89d7637cd3",
+    "kernel/e1000.c": "d502ff5631c7ed4470509e7f0541e70fceb6d32c2e2f7dd0779dea5909303e0a",
+    "kernel/e1000.h": "eee099e47daf6acb3fa8b7a9e274264451c051f2c928a02cd8b3296eb8ea876f",
+    "kernel/fs.c": "e0e916990807587df741ee023a3d36741bce85f4c15fb5c0523f52351bc2fb52",
+    "user/configapi/SC32REPLACEWIRE.H": "ae2895be600a768e705dc6c5ae82a6a6d5c26737e5533bb3be29cdc0f967933a",
+    "kernel/task_store.h": "75b81aca73f6803ed5ceded6d562f8d270b615e95e8c0b5b28e2e3a2ea197587",
+    "kernel/sc32_file.h": "8ccfecae2f62b38f23ac14590b610fc3d64336fe6d601bfaafb2108110d45cf0",
+    "kernel/fs_lease.h": "723435a27195819d78c43f97a6adda4e725c669f689e0ad4b8844f43146e0bb6",
+    "user/SC32LEASE.H": "e724f522bdc883df656d4851e7dbe45d1cb40282de05c7fee66ad09c7665f943",
+    "user/leaseapi/SC32LEASEWIRE.H": "60adac3541e003cdd10c6d40e0b1e0f17d1b5d2e188afc5737ea6ca2ec2cdc4c",
+    "kernel/fs_lease_private.inc": "98112a6a3fd35e07e43606af04cacf1db97cd14ba6de069f6467d1f6a976942d",
+    "kernel/fs_lease.inc": "026a5952786594b43f5a1bb03c2d194accc0fa2097b80862256e3563723a30b3",
+    "kernel/fs_lease_index.inc": "46f33de6c5ac044ff612f34824ee74727193499178e59f3faa096199dff11bd6",
+    "kernel/fs_lease_native.inc": "912ec0de00abb51d9bfbc9a785046084cfb5cd0bbb539db0c94a75b00818107a",
+    "kernel/fs_lease_open.inc": "6517091f810073a908704cb6489b2b5776a0b34ed70cd428888f19dbbb62b86a",
+    "kernel/fs_lease_operation.inc": "58a47ef6d2a25a3a290479ad9f236a2ebdc17c6de350d18d38758095b844829f",
+    "kernel/fs_lease_commit.inc": "7e382a96f9515b7367263d7100019db43c3d98857a4af6da3d769ad1ed4c7752",
+    "kernel/fs_lease_cleanup.inc": "e88f41075d63d381b1a4ef124b4b922d02d936ad653ea55e2e2ba1f94a656666",
+    "kernel/fs_path_query.inc": "46b4c9c678750bb66ad67274de3669aa39b96d9274513645b7a397c3cbb50426",
+    "kernel/gfx.c": "5f7ddba8233a8b999685dbb9bb24358c9ecc3cb845132f70697b1ce0727e8dd9",
+    "kernel/ttf.h": "d36b8c64fcb006951d89b1a73198e75c803a8531c157dceecbcd1101152d0479",
+    "kernel/font.h": "7f27867745b269635f289987011079b6430b593a6b66a0c63cf77e34e28db992",
+    "kernel/font16.h": "b0c7d247ab5ea333380c360dd341cadc39de1ae40e090988241c42c7f6beec0b",
+    "kernel/heap.c": "e131cc1eeab70a3a93cb1d1139af1095800a386e457b9f199bb4002a6341cbbc",
+    "kernel/heap.h": "cbcb131bc4223c8bf65a0a5873f0e3176e96961438084b9d5b224f0ed9c6806d",
+    "kernel/image.c": "e7c62aaa55fccff40a2d6112eda62cb02e80c4115657b8c691199dbc7a141815",
+    "kernel/image_service.c": "8dfb226f68dcdf91cd9bb3717a78e8ebcee158baa9e54846b4e2471c0b38d4f5",
+    "kernel/userspace.h": "f2604b737f1fdf45ade93f809d7acb237b89d50eb2e93dcd07aff8ee185de7e0",
+    "kernel/image_memory.inc": "f848e79fcc4607ec6c3fecc9ec74ac5d99d78577cdb5ac49e27dc40c533c1bc1",
+    "kernel/interrupts.c": "9550e1b4cd6680be529fdb5f216d6a139e6ed0b7828d83390c57f3512ab1295b",
+    "kernel/module.h": "68d83c31054edb06f7cebf9d06fc255a743ac97dfdae840f216917e731e46537",
+    "kernel/keyboard.h": "0020282fa5211b247c4c8813a5b76eb08eea9b74824469b4feaad4ce9bc6db28",
+    "kernel/mouse.h": "28b08c854eb1d1bbdd299bf365a56bd7ea928ae38bac8cc13c01106999ad08db",
+    "kernel/serial.h": "f942b8c36184ac01aff52676410646ad14f8ab4d6a9e93b55365e64236495278",
+    "kernel/ringdebug.h": "95c16076c785d78e3d1b5548d5a31444e36003e609d49ed56e2805e4b6c9f718",
+    "kernel/keyboard.c": "5502ce304c306a8f00a6959757ffa989526658432277d945a000caa9f0cb6647",
+    "boot/loader.c": "2512d5ed958f26fe3567014863c3b0d311f750aa51cd9b071188b4876f265aa5",
+    "third_party/lwip/src/core/altcp.c": "3c6653588772a62efdd11ceeffa760847f95d8ec98889c7551e9a1eb8326f8cd",
+    "third_party/lwip/src/include/lwip/opt.h": "d750b825d4e399eca387bdeb98a78dc96267095eb8f15cdb39e4e88d23c14360",
+    "kernel/net_port/lwipopts.h": "63ecdf6e572b81d2f77320d1a1ee40cdf1d3a54da0f796a8636dcec0e3a2d07d",
+    "kernel/net_port/port.h": "cfcbac5adec4a822dd4b141888cb0c5b32b9321b7d3139e77d5aec5b30327f00",
+    "third_party/lwip/src/include/lwip/debug.h": "1f3545fc48dec531f2dff50fffa1094bd4bdd0fca5bb96e32f82c559e33a4fce",
+    "third_party/lwip/src/include/lwip/arch.h": "9801c4638064a3f7f27a90ed4b01867fa65128c67303d40536867dad1ad03f78",
+    "kernel/net_port/arch/cc.h": "737490f17e490c70345850a6076824a6a94ac65b604226f463d6d2756219e1de",
+    "third_party/lwip/src/core/altcp_alloc.c": "90db26c801a4a6466e188e8b5a6b8d2aac2e6f39b4ceeb0f825e7b35ae1786c7",
+    "third_party/lwip/src/core/altcp_tcp.c": "55119d3a2213bff38a3734834391c48475c1fd6eb35cc0ffdde74ef0ed657a3a",
+    "third_party/lwip/src/core/def.c": "a12f3ef6c087efb6d4ec524cf332ff438d2504c17d60c263d0bb1b82b79eb2cd",
+    "third_party/lwip/src/include/lwip/def.h": "224152c2266e14b418ee0e7e1704df9c103011630240548221a91cf6aff64d90",
+    "kernel/net_port/string.h": "f2c6a5062f9379eb0db0deb7700b864629ad39bf8e8e6ec6705fd490240c298d",
+    "third_party/lwip/src/core/dns.c": "fe35ede9919974da54598630cc08d654ccc30b668c45b09668c3ba572686b26c",
+    "third_party/lwip/src/include/lwip/udp.h": "f9783bca6b68b10c229185559e0ae7e79bb793e1d6c244c7b26408516187f1f8",
+    "third_party/lwip/src/include/lwip/pbuf.h": "0b84e49877d81241874c101d24aa6fd815e6e78407f0894f88af371e04437196",
+    "third_party/lwip/src/include/lwip/err.h": "af26b573fc5c6a31877fdcde35e15382ac0c8b01f35af3f5a4429f9cf5dd323d",
+    "third_party/lwip/src/include/lwip/netif.h": "6e958aa1bd23b7381c09a873f7af919323f87ec50a2d3055a46f75275c2a121b",
+    "third_party/lwip/src/include/lwip/ip_addr.h": "90e9886f4fc5e96058d19d3504415d52ee37d8ebd7d29aeede3435f247cb4146",
+    "third_party/lwip/src/include/lwip/ip4_addr.h": "58f6c9a179e8719fb91f2b76b489be45e05365c3958dbba55f00a4d134adf535",
+    "third_party/lwip/src/include/lwip/ip6_addr.h": "9dea395e61fdcc6676afdfd322838c185cb87d8b38c39b0ad0b83b206f300c00",
+    "third_party/lwip/src/include/lwip/stats.h": "02d5512b59cce1c006388c6535134dd7f84e866ecca5f72bc632fb0718634b9f",
+    "third_party/lwip/src/include/lwip/mem.h": "6a3403dd83cc564cdb1b2f712baf925b522fe2755ccebef3dc17ffd3c19319c6",
+    "third_party/lwip/src/include/lwip/memp.h": "79dfd019219330cf08deb1360483eb7d1da7a1a7a304034ef65ad52feefba1ef",
+    "third_party/lwip/src/include/lwip/priv/memp_std.h": "86cdf1d80f2716a07011dc763e5fa614cd2b555382cb7d6750176116def67a0f",
+    "third_party/lwip/src/include/lwip/priv/memp_priv.h": "37aff2894bbe25f1888e43b96be80f4c1a43a24867c0fc9aceb4093328682937",
+    "third_party/lwip/src/include/lwip/priv/mem_priv.h": "c90c9b64c8ea95c05d5b8b10d706acb53b6cc124166e8dd85b397698679f7920",
+    "third_party/lwip/src/include/lwip/ip.h": "dc040fd513b7fff5de699e235e2a09623f2a80d813c09ae91f9c6af067f756e8",
+    "third_party/lwip/src/include/lwip/ip4.h": "188a62765c765fb07cda26a695f17c9c1674c0da7539c71e4d8f79b3f6f6ba21",
+    "third_party/lwip/src/include/lwip/prot/ip4.h": "033570c0b7657f5475959f7b74d9e23c6f8e81498495d5b23d8c2eeb0640d7a7",
+    "third_party/lwip/src/include/lwip/ip6.h": "7681c2948f700aa565c387ca20654f7322991ca15de7fd4e8f342a8ce44abe57",
+    "third_party/lwip/src/include/lwip/prot/ip.h": "eb5371e5ac58467253d813bc58726e317f91abadb10336497de0d64645ec01cd",
+    "third_party/lwip/src/include/lwip/prot/udp.h": "b56daa8ff1e8e52cdd4f720297f07af2a96feea254db86768e20e157d7ce2784",
+    "third_party/lwip/src/include/lwip/dns.h": "962c462c90afd41ed010b961f539c11b2baba3e8a6bfe584f331a5e4d43c1b05",
+    "third_party/lwip/src/include/lwip/prot/dns.h": "34049c0f7f489aaec12d0589dc51ecfb24408dba422f605d8deb207c44d02b8f",
+    "third_party/lwip/src/core/inet_chksum.c": "fc82b44fc866704a51c0aacd6037b10802b88e8576e1b691917cd2b863878b1b",
+    "third_party/lwip/src/include/lwip/inet_chksum.h": "df6720f78e47afde2315d6a9dee1bb5b26f76692ce3e040c574409493435c933",
+    "third_party/lwip/src/core/init.c": "e79eface962c17e082bc6d2f9bc0eef16be4cbef1deca3e8248fc7b171b0a49f",
+    "third_party/lwip/src/include/lwip/init.h": "b5ab1373f83c2ead8413d681351d1275ce6c6375c25e2bc555c4098d2d9a5307",
+    "third_party/lwip/src/include/lwip/sys.h": "3455bc027fd97de759f962f664c6084242f08dd80e5c65834cc05aa0a0802e8e",
+    "third_party/lwip/src/include/lwip/sockets.h": "cd8af60d7acd3158103cd2b141884cecea79d4011daaa6c9e3f987bb21f8ad84",
+    "third_party/lwip/src/include/lwip/raw.h": "e9efc60e31f2ff39a98b1367968ac724fc91ecdc115a74fc44813b761f02caf7",
+    "third_party/lwip/src/include/lwip/priv/tcp_priv.h": "07df02da365d83e5a488b4cf9e61d8319132d11b6830a7fe6b04c2912fd3d4c9",
+    "third_party/lwip/src/include/lwip/tcp.h": "eb514477b21ed78dd4d527f4aea3bed5585200e285b85c666689b9c43b77a89a",
+    "third_party/lwip/src/include/lwip/tcpbase.h": "cf4b048f3bc228ab364cde15eb6be5eca961fab09036c699c2c4b1437ab90aff",
+    "third_party/lwip/src/include/lwip/icmp.h": "84f63c9fbc6f6d66ef437f834279c25c20bfa78834eb0ee347c70377f7f8d8c8",
+    "third_party/lwip/src/include/lwip/prot/icmp.h": "5acac93c34363f3ca07f3f14c8861f09cf822096e6654941a307f1c78914cf5c",
+    "third_party/lwip/src/include/lwip/prot/tcp.h": "db67bb5ea0517a8cd9e30ebf655743f69ce05e77ca6e4a113e8c60e69bd7c48a",
+    "third_party/lwip/src/include/lwip/igmp.h": "abf5ff1e19ec61690b6e8d55c8ee11afd1556b77c8b0fc452d5eb490810cc27f",
+    "third_party/lwip/src/include/lwip/timeouts.h": "a383b43e3ba021d06ff3791d223db46cb3385e8dcdfcec0221ef2a006243c022",
+    "third_party/lwip/src/include/lwip/etharp.h": "bd50bec728d92dbd790a1504e52f42e4e1bdd018380c2b116f0dd8d3ed44e3f9",
+    "third_party/lwip/src/include/lwip/prot/ethernet.h": "0d8dab96e78a88835525ef03299666e7007434874a6b63c0206aee499c7e3ad9",
+    "third_party/lwip/src/include/lwip/prot/ieee.h": "ec85a505aba178178743b34429f463a41ac43d3750d63901c7e1273dcd0a2ba6",
+    "third_party/lwip/src/include/lwip/prot/etharp.h": "55164c0d047f1279982fef9681491c8811f8482976aff7fab9b63a9a589ded76",
+    "third_party/lwip/src/include/lwip/nd6.h": "79fa57b4bded6763d38f5e4fa56aa2fac8117bf76ffc69869e05357af88951d6",
+    "third_party/lwip/src/include/lwip/mld6.h": "026348d23012aa1c2210ae53f2a5ddf3a273cf004ef597a1861266a01d4ca86e",
+    "third_party/lwip/src/include/lwip/api.h": "39a93870e9151ab0a4a70c007c931cf3b642b0704eee43aa662aba9cb9d14f4a",
+    "third_party/lwip/src/include/netif/ppp/ppp_opts.h": "4a3507a0cc400a05592d15252ac6513044f1e514be26ba6502fe0b055daa2bc8",
+    "third_party/lwip/src/include/netif/ppp/ppp_impl.h": "6470c520bf42767fdb850ce6028e494ea67ed12258499c3f7c4eb86d58d2998e",
+    "third_party/lwip/src/core/ip.c": "82d0fc6b45c6d1af88bdece3229fc9821274263c261369de4f81b8d6c80751e7",
+    "third_party/lwip/src/core/ipv4/acd.c": "40132cfec33d8efa2b645754b6d5c1bf6ecb6341fb5dbf72cd51448b11ec8bd2",
+    "third_party/lwip/src/include/lwip/acd.h": "ac7477d81a56bedf62e3db9e502a6d9a46ddf6f8705fd420df91e9f8a2398275",
+    "third_party/lwip/src/include/lwip/prot/acd.h": "3d5d347182390f367afd107322bdbc2b4997806cd0bc83a7ccc5579248e956a5",
+    "third_party/lwip/src/core/ipv4/autoip.c": "7cb49b13d57605a31bacdbb946abcc6313d264a4c5f07a6483f84a6d6c73bd1f",
+    "third_party/lwip/src/core/ipv4/etharp.c": "8ee2c65e26eacf265ef34798aefd39aa9678296a64154d3d049b10f32e658f5d",
+    "third_party/lwip/src/include/lwip/snmp.h": "6cdfd8137209605ed6623ba081d37cc291840d85b40fb5120eaa6d93b83dd1a7",
+    "third_party/lwip/src/include/lwip/dhcp.h": "babfa093330aa0b8039badc8c373f11dda5dd8f0e94c55e4440a6643b9996f7e",
+    "third_party/lwip/src/include/lwip/autoip.h": "d7b0a366fc1442033df3e7247fff0cf28851c1ef7ad6539ac2728fb5f483f707",
+    "third_party/lwip/src/include/lwip/prot/iana.h": "745c2d70a5d4839e3df5a34f7e37b83bcc7fe58f39eba1d2f5e238242d74c878",
+    "third_party/lwip/src/include/netif/ethernet.h": "1dd88263e583593e47f7c891680d67838287160551b8c06562c9feca1ddee443",
+    "kernel/net_port/hooks.h": "06bc0b107d5a4fd1d1de30f5d40d473c93f8c3bb9ed0cef03d53ffbaa09a86d5",
+    "third_party/lwip/src/core/ipv4/icmp.c": "d53c96e7ce02514d6c88b41df7c2e37d8e0212a297466f50590305c5e3504285",
+    "third_party/lwip/src/core/ipv4/igmp.c": "8097841aac8642af43ad7e19a5b340f4b34eabbce8b3b18839176dc5df12b981",
+    "third_party/lwip/src/core/ipv4/ip4.c": "d4973142adede3b868036d5404df9a258ed632788d98969539dc21470b748ae6",
+    "third_party/lwip/src/include/lwip/ip4_frag.h": "8b0bb67655cba6da8cddc360e655c711553ad35e6306dbae618637e80be9911c",
+    "third_party/lwip/src/include/lwip/priv/raw_priv.h": "0b2b019a55fab8eed89d668f13402778835117fe472464046472cd04b93c2bb2",
+    "third_party/lwip/src/core/ipv4/ip4_addr.c": "b440b85c9e49e60510cfa61d40e24b0e2ad480e23a821a94017e42df09dcf8be",
+    "third_party/lwip/src/core/ipv4/ip4_frag.c": "bb0ddf79430bcd073f7f837451f868107dd6ce60444df72b7c02aca7ca3d4ff6",
+    "third_party/lwip/src/core/mem.c": "b5316284f3f42782d8b55a750f3f0557d3031edd0c280e653f2fb6dec3f74ed3",
+    "kernel/net_port/stdio.h": "fac3b68e4bff0ea8742d9d131a6300a8905f3a6a47b6777e3b80e2522edf01ca",
+    "third_party/lwip/src/core/memp.c": "91ca3a00487d61849324ae571ac9ede550a879365c557aba38667ace122b6c00",
+    "third_party/lwip/src/include/lwip/altcp.h": "9140dba340b590f329b0d8653c71104d0509d1e7dbb6c184a99afe980474c958",
+    "third_party/lwip/src/include/lwip/netbuf.h": "1aa92014d8919c5073b5123c92881e00b0c507ca485667ccdebbf31afa214ff3",
+    "third_party/lwip/src/include/lwip/priv/tcpip_priv.h": "13fb2e7159ebcafc4ddda4961a9d70b2f8182f9e201aa990cb9148d8897bf598",
+    "third_party/lwip/src/include/lwip/priv/api_msg.h": "e2458063868f0813bc26f41709bbf78d994760e72667b646b88f15e16e235f48",
+    "third_party/lwip/src/include/lwip/priv/sockets_priv.h": "2efcf39c42b1a7055628461915d42521a4df3cb285b6f5635a5c6a961aff4f93",
+    "third_party/lwip/src/include/lwip/netdb.h": "582518497fefd57cd1d227947965c71b1dc16846add471af0fddfbb461c7aca0",
+    "third_party/lwip/src/include/lwip/priv/nd6_priv.h": "0f8b44f4163523c10c2085a8b9393b87e81d054c9a40cf0887be2885d8b2fa35",
+    "third_party/lwip/src/include/lwip/ip6_frag.h": "3ab1bdb9220a3c87c8187fb26b1150cd03c4401b0a0c6db2ea4a22674141dd3b",
+    "third_party/lwip/src/core/netif.c": "62e386985e3f2c9b943466ef01d3dcda798ee0167d56fd59c057e928f979cbc2",
+    "kernel/net_port/stdlib.h": "aecaf771809ad777bf29804ad2e4272c6fd62992ab13f4a96b1a4f29ee234e59",
+    "third_party/lwip/src/core/pbuf.c": "2f953eb2bc5b696b2eea156386cc4f99c793859bbf65cee967653bdf3374db61",
+    "third_party/lwip/src/core/raw.c": "3ba4f2e5d2b61bbfbe813653c7f4e88e2542d567808d3f03be000e0876ce0392",
+    "third_party/lwip/src/core/stats.c": "a18b76cde437213ca9f00137bdb61adb00f6f931fe28c40c81f811a5e674caea",
+    "third_party/lwip/src/core/sys.c": "86e336dedec36e042aadaebe93c8be944675210841ccabf180200e82c91b0f8d",
+    "third_party/lwip/src/core/tcp.c": "76d701944a20dae435fb09a37046fea046ba1d996038362e37eae57157ba586f",
+    "third_party/lwip/src/core/tcp_in.c": "f79b20e6b123af2ed2cfc2b470fe982d0c88d1357fc5a11537bab9cd20d4b639",
+    "third_party/lwip/src/core/tcp_out.c": "d8d8d5a54097114904f89f8c5602c937ef3b086933f2132a557698fc65d7e4af",
+    "third_party/lwip/src/core/udp.c": "6454ba858cf8a2c71e4a27e0da4b1569160f923c2adce19842dbb6f90da61af7",
+    "third_party/lwip/src/include/lwip/icmp6.h": "f790cd444ecbe2e605b2f1a1deab3e6e9662ba6e87fd47b401912c5a118ee836",
+    "third_party/lwip/src/include/lwip/prot/icmp6.h": "a3fdc254460b9e2c45cbfb1ad2402c055b34b907a09fb5337a0f26e068302074",
+    "third_party/lwip/src/netif/ethernet.c": "7c493427956150ca9e97decd87784df0d2adb0f1504fa262b7e732bee1892eaf",
+    "kernel/main.c": "14723b827c2b6a048e8695d8416cd66653e09ddc0e61cd911d0abaa7450da78c",
+    "kernel/sc32_gui.h": "0d88faf80fb4f1068cfe8f73c98e54efef05f61b497b0cb0181fbdd12a74ce15",
+    "kernel/sc32_broker.h": "57527681fa17d22fc582cfa698a080e0ee24f914caa70610280f216cfde5eb57",
+    "kernel/sc32_lease.h": "ad377a80874cfbb01dc2b9c584e0124d5c7fba823bd672209402e44da9c3ae02",
+    "kernel/sc32_drop.h": "3ea6b62c0734ddac2f93227959e098f82b64e19b51227752690ea64317eadd14",
+    "user/dropapi/SC32DROPWIRE.H": "4a9145a671e62ae1b8aa2437608bbf75488d1a9c1ca75b75e9650e29687bb369",
+    "kernel/sc32_host.h": "0c6ba9750002290d33363466533c590e934170ce1087d2b3fb97ddb24f611a50",
+    "user/hostapi/SC32HOSTWIRE.H": "8a20024966c16f5b6cf6851ef6641fc889c3a540068ca51ac358dfded499cfdd",
+    "user/SC32HOST.H": "5e360a8d21491503a8dfc9f1bb972d0319bf7f404eb3ba0ab1c7aa25c17950e1",
+    "kernel/management.h": "733c520700440af67d720e46ba8a10d0d741927f402fadfdfb7dff0b890e5dd6",
+    "kernel/network.h": "79dbdbc5b3d1bed753a1ad22d2813e9eea30fe353071e8df4ad5135d4a96ca05",
+    "kernel/management.c": "7d744ace695a4b6059a1c4a1c89b6e3be58d4f9d14f71316f162e0fadbad1829",
+    "kernel/memory.c": "db28e89d38b4821c352d669ea0ae4b810f4cfc31816e39015f7517c4ef71c953",
+    "kernel/module2.c": "6dd62a6aaceeab35805089e1339f688a81fc7df711b5e23090e655c1040c6d83",
+    "kernel/simd.h": "2a2b3bc547d131ab9b1ff9455feaea59b0fc3f73198b8d13ce18d4baffb97593",
+    "third_party/monocypher/src/optional/monocypher-ed25519.c": "ce0d2f8e32ca8f66398ba5b3456cc74327c3eff14e7b950ce7d57be9025cc453",
+    "third_party/monocypher/src/monocypher.c": "f1f838cdd483bdebe0df0ff5c5ed60535e496f769c6a2f933ac4c0b114207123",
+    "kernel/mouse.c": "7518420d693c3a3215a8076e01bfa2b21e495a565bfc8b7c781cd1155d5c7220",
+    "kernel/net_port/dhcp.c": "003969ad691aa534212b66cd4e87a40886e4568dc08da627e52aeb50ec474c16",
+    "third_party/lwip/src/include/lwip/prot/dhcp.h": "bc74edb6abff7b5182e04e2e588292401ecba3875bb6673156b026a5c391dbc4",
+    "kernel/net_port/loopback.c": "586649cf490d0402af981c947b9ac9758cdf28ad8742967e5f52d192d277aa7d",
+    "kernel/net_port/network_internal.h": "e958b47aa74378c0f13509f1db454915cc3c35f4edc88abc2eb21c19015f27fa",
+    "kernel/net_port/port.c": "5d613dc626ab6cb6c1ca9ab2cc0eb8144830eda490e5504d3b1610b30d411ac7",
+    "kernel/net_port/timeouts.c": "ca74917e80f90102d848eb24d0bbf3515dc4a25bbbd64f2767b2d21d161d51da",
+    "third_party/lwip/src/core/timeouts.c": "930bcfaf5b12b97f975fca7b8c2f7ab999cffa37f7c840ea91b340aa4ef62115",
+    "third_party/lwip/src/include/lwip/dhcp6.h": "dbac3f610e3e76547691af73a667bd5fd6564a7fbfa5ac382ef77604938d4afa",
+    "kernel/net_socket.c": "6e1eb28641fbfd3e56f56746fff2b99bc4759de5444a6c4219e6aec97e34816d",
+    "kernel/network.c": "472e02cd5ce345047265755dc5478094973d47957febe2e3efb9fe19eed68718",
+    "kernel/objpool.c": "4f94afcb2723a4f90a71c049a2be1314abc827dfab42c5eb0101318f5710ea2d",
+    "kernel/paging.c": "e8ad73ac5ae3a84f69b7dfae7c3ad74b4f7da9d404cc50e480a9189e0e2a6d36",
+    "kernel/paging_shared.inc": "a0ccf9ede5f48f1fa270e47ddfb42e7e31b23588107924b8cabaa496b743dc5d",
+    "kernel/process.c": "a14ba4bd5b3da38082eca935e9521bff624c9862c0c11b1123dc2f1b6aed40f0",
+    "kernel/sc32_debug.h": "e9bb682cf5e8d5ce25ab944f27e560e7f7bdf7795bf75c78c003d878bdbbf001",
+    "kernel/random.c": "d7b5d31248910daa1a6bcf333d133b3f95b5190ae7b3331d871e43ce989e69c3",
+    "kernel/ringdebug.c": "6324e88b6ae8d904a1f8ae23e5236b62e5167a23756b442d3d85f6a3473b60f0",
+    "kernel/rtc.c": "6ff2dc1b936a2bc05ed294abff0502d725723f3e051eea43149b11806537e27e",
+    "kernel/rtc.h": "461d64f05dbc705e108f857a025f68af7bbb884cf02dfaae390164249ea67c66",
+    "kernel/sc32_broker.c": "aaf86f806709fde7bd4a16f4cb8d8a78d71379714e02eb40928df964c255449e",
+    "kernel/broker_shell.inc": "d0e97851cd7600f8025e85ae3b6fedc3dcfe6867ad8bfc22fef9592b1261d06e",
+    "kernel/sc32_core.c": "823e2c583f8d58a147cd9ac2f139b65f99ad992e0f3d4c050bee46de915ce1f5",
+    "user/configapi/SC32CONFIGWIRE.H": "db7b905bc00d08d92d361a93d477992877c74cce74cb97d1bfbdb66bd3fb148c",
+    "user/SC32CONFIG.H": "f785b9382682067aff1acca2218ac47b38113e6d841290d9395cfc1e162eebd6",
+    "user/SC32PATH.H": "f0bc29ab842043c7d63791ee8c7ff83760e9c84d5b6aa80e74544a9c4851d037",
+    "user/SC32WALL.H": "a98b644cb7f350f8838747b27a12aae2dcc8d34b25a78ac45162e3b5f570490b",
+    "user/wallapi/SC32WALLWIRE.H": "afcc68f95f20040fa716be98ff5662e4e23d9d0cb6083f67a7a6bc51e0ae270f",
+    "kernel/sc32_wall_query.inc": "3efae5ff1e69ff5a43566944eb5a8b205677fa343d47c5eeb06ce4643291aa55",
+    "kernel/sc32_config_apply.inc": "05634e6d3599e5783c1e5758db71af4a1a25ce5db01bfec3f3c6b5e097da0b29",
+    "kernel/sc32_debug.c": "c714171345e4b41bced4f9d4c17c73200256fc713126c4d853267e86344e2f7e",
+    "user/runtime/SCLFMT.H": "f040266a9d13f513d4cc6ec7fe8ac43175287e2c484abd150607387043053611",
+    "kernel/sc32_debug_modules.inc": "f602dec85f1e67ec8dfab79ec6a737c0cd64d364deffb70df1ff780cefb34647",
+    "kernel/sc32_drop.c": "7d2ac00fd8b2588e8ae434015d211d3536de33c3b72e007f6e420d3eeaad0897",
+    "kernel/sc32_file.c": "2792ef65e0f2d53db41a08ac9fcf62d9e70963eba643debe2111f6c566df5fed",
+    "user/sc32/SC32TERMINALWIRE.H": "1c26de0d11cd53f353b5e09c098cda60f2b3f95ad62d8f6c346204856c527211",
+    "user/SC32TERMINAL.H": "43ff23e6595055d3c044bcd8ac28684d0829b6bbc08cbc6dbc81d277261d1ced",
+    "user/sc32/SC32CAPTUREWIRE.H": "df4e4420693d84867a812d617831c8a6da219a0c018e131554252e8213da5cc6",
+    "user/SC32CAPTURE.H": "20d9779fbd6bbe6081003c050890b1d3624b0bf97c5bc25aa42499ee6aa78445",
+    "user/pathapi/SC32PATHWIRE.H": "8a7bac66c5c24e8f45e3ab26f8ab521a84b62d1aee15fb1daba2a92b2d669e10",
+    "kernel/sc32_path_query.inc": "8716ea616790609dae95a16b8eb15e68efcf7175e08c0ae132ba442528acdc46",
+    "kernel/sc32_capture_kernel.inc": "c406afc2948f93e71c1c9e39416253b46141a7db461d9eaed1773c43a45c66a9",
+    "kernel/sc32_terminal_kernel.inc": "96a34ca928d7af6a86d2c15067c144ea92a0238564f2669810d377964f7dd290",
+    "kernel/sc32_file_lease.inc": "15be029e594fc4d19e095d10d87b23bd49c5b9b82c0158bd12199664ed41223a",
+    "kernel/sc32_font.c": "b55a070897d8315d1b295ee2ef8733eb92893a691dd4d538d127085ccbb23143",
+    "kernel/sc32_font.h": "fa327f31879fa1dd1f80d75463b9e68c26d72d3381ce0a46198e4d6a82a5cfa9",
+    "kernel/sc32_gui.c": "bc36b52dcd21f7c3aaecbdf15b1debe4cd39d23e7cf6eccac699c7079d58a670",
+    "kernel/sc32_host.c": "828c5ecc0edd9edd7b3383a26d4c4f22c1e4b60b9fb01b4accb06f93e9b14533",
+    "kernel/sc32_image.c": "b10b635d767916975de95d23727caf12fc4e61f9f91dea45f8d27e5aebbfd9df",
+    "kernel/sc32_image.h": "5595b19d532244f555319361af4bf708485479ce6debc530e5f708aa4da6de97",
+    "user/imageapi/SC32IMAGEWIRE.H": "e5868225a30e8ea7ecfcc5060c42c1857225c6d294cda8b8b1b49b234beaad85",
+    "user/SC32IMAGE.H": "496db89981b0429dc6664ec1fdfd71c67e958b82a5b58869fb8addacfd446537",
+    "kernel/sc32_lease.c": "6b9e2a39b135894dcb372716e1c2957a369d113e0ffdc68175eec0e18eb4a85b",
+    "kernel/sc32_raw.c": "7b8f9727ccf9a4d53855011d9f80a097ce55c55f394d3ca36c6689be7fc862ff",
+    "user/runtime/scd_format.c": "952db60181b9eddb4b32da97509c2767e7fabfaba40f5423084690c47f01421d",
+    "user/runtime/SCDYN.H": "9fe728833ddddf4e8b7a4a6a21e8b5abc787926e32e6b68127860a05e8e613b1",
+    "kernel/scl_boot.c": "9fadb0516ac006ab1465a08ffba2ba9e5817cd61a504cc94d27c0e793e61f375",
+    "kernel/scl_boot.h": "41c2906d6ef376bc0a35c797db714546d6e912a4e72db5734db9663d993b3aef",
+    "user/runtime/scl_format.c": "72910926be9da4ee90466945e4ac42a9ac2bacb2d83ff3e7cf51a6611894187f",
+    "kernel/serial.c": "a51d37fcbe9918561573af41cafd67969a757eaea42c55f4c73d07e5143586b6",
+    "kernel/session.c": "24c7c3a9160d38bf1cfc46e192a341ac4f108be9e931b9e013a69ea3fc179d27",
+    "kernel/simd.c": "17e7db3890f27231e3dfd2aa94353a43fe78ca9dadef26afc07165bb9ced722d",
+    "kernel/streams.c": "1fd45ebce90658babbcd1a5f9df4fb64637c792c299f1c11ae3e74acdb8183fd",
+    "kernel/streams_pty_core.inc": "7afb2f37ba3b5413791b72d11347a51c6b8873b5215b1c58a26e10c5afa26647",
+    "kernel/streams_launch.inc": "f01b4323a6c23d51644abea81793547a0954698ab356e91df1a2d3a3aa232dc9",
+    "kernel/streams_capture.inc": "4581ac8c9360bc59230235138abb0e80c58a778191c6061b524c6c545458dbe2",
+    "kernel/streams_pty_native.inc": "18d522e787dd9cf555cd6e13f2377896a6311904a187b0a4738cf1c7c757bcbe",
+    "kernel/task.c": "f42f0136f5ab5b52f3ad643a3de43ead68ad92f8f893b054c6b79bfb99ab0199",
+    "kernel/shell_issue.inc": "7d6e34c5c30a38c039e9b2039a11793d5c09bd8829b1f0bf69226d0d58212082",
+    "kernel/login_issue.inc": "404781db95fe7c24c93c93b0bf59f6dad327578dcdcb5bda3f59b58549366bea",
+    "kernel/task_store.c": "42c59eca0a835e17cb45abb7f414a3c7b632053dff454c28c37d4c608001f8a2",
+    "kernel/theme.c": "f6562e71dea1911ec3dba8df780ad674ca4b4a62c7a8fc43909f254aa5992253",
+    "kernel/timer.c": "83c2d7c47de35bf9b5ac026ab0867bd23e4b2e6d89db5db8096f23e147786e7c",
+    "kernel/ttf.c": "047849223b766482a2c1498a92d40476c4d4494dcabb67599d6c75264a4ed0a5",
+    "kernel/userspace.c": "6689d63f5b84987f8ceae97a43ff9f9f0ab15179fc0aeb12dd85fa9fc166464c",
+    "kernel/wm.c": "c26bb73efe464a3f673b2fcd5a68fb7f5003f70297b55b30b3f86a3bff0c14cc",
+    "kernel/wm_wall_snapshot.inc": "34c6d23404956769b575525bb2d62e58bfb3366e5a7030dad33ceed62c923d1c",
+    "kernel/wm_native.inc": "60534f5e8f6061e8178f46c8694b4139c9cb3bd4ac00e7c34b785a9a9e84d152",
+    "kernel/wm_terminal.inc": "15dbcc755e1ba95845ca5a2d206386d64de9756420c69bf94ff447f32427e470",
+    "kernel/wm_popup.inc": "1621b3f7343edad901a76f0c6328ca1753b3bb0e2c784bbda01c5ffbeca65271",
+    "kernel/wm_drop.inc": "4c38b22716d81ef3681a6ca107349140d6919dbaab7a5c9920a9e8ab575edd57",
+    "kernel/wm_shell.inc": "b83b41b118ed7d8d825068f36236099bfedb6ebb5dc6927ef5c7f3b877491fa4"
+  },
+  "assembler_sources": {},
+  "generated_headers": {
+    "build/m10a2-p6-final-15/core/login_resource_issue.h": "cd05c980c1a2717d2920ea268d547e1eedafc2f6cf8c304bf62fa9d491cda16c",
+    "build/m10a2-p6-final-15/core/core_public_key.h": "2ac0c16a3343c827a9ae984dfcd2770d067f4d7a1f65161ca66522ab27d55627",
+    "build/m10a2-p6-final-15/core/font8_data.h": "680f81ae2f3492396c094d8968634d4aed9de609103d29dea18437b1c23013e9",
+    "build/m10a2-p6-final-15/core/font16_data.h": "3d5ca2c2e32ed4956d8d72add07f233cff0b87a65dff94a843d52844dcceef8b",
+    "build/m10a2-p6-final-15/core/shell_host_issue.h": "c41122f6f65f452fd1d334bf521a61094d0a7b2fa237ced1218b3c34aef10da2",
+    "build/m10a2-p6-final-15/core/login_program_issue.h": "5d8818131b130948529f7c9336a9c04b081ffb35df4d379206d65d8f4880e048"
+  },
+  "generated_private_sources": {
+    "build/m10a2-p6-final-15/core/net_port/dhcp_upstream.inc": "6b337eb1451877e06a6f288237b7d339f7cb347a9c21fcbc49f92187acb94007"
+  }
+}

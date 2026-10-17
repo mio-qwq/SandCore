@@ -32,6 +32,15 @@ static U workspace_suffix(const char *name)
     const char *suffix=strrchr(base?base+1:name,'.');
     return suffix&&same_name(suffix,".SCW");
 }
+static ScStatus source_save_name(const char *name,char out[68],U header)
+{
+    ScStatus s=path(name,out);if(s<0)return s;
+    if(!strchr(leaf(out),'.')){
+        U n=(U)strlen(out);if(n>62u)return SC32_E_RANGE;
+        memcpy(out+n,header?".H":".C",3);
+    }
+    return 0;
+}
 static ScStatus workspace_save_name(const char *name,char out[68],U *implicit)
 {
     ScStatus s=path(name,out);
@@ -116,7 +125,7 @@ static ScStatus io_open(const char *name,U kind,U owner)
         if(old){
             st.active=old;
             ScUiTabSelect(st.ui,st.tabs,old->page);
-            return 0;
+            return project_single(absolute);
         }
     }
     ScPathInfo info;
@@ -248,6 +257,7 @@ static void io_complete(void)
         if(s>=0&&io->kind==S_IO_OPEN){
             StDoc *d=0;
             s=doc_new(io->path,v.data,v.bytes,io->revision,&d);
+            if(s>=0)s=project_single(io->path);
             if(s>=0&&st.jump_line){
                 st.jump_doc=d->id;
                 navigate(0);
@@ -284,17 +294,18 @@ static void io_complete(void)
         project_notify();
     }
     U owner=io->owner,kind=io->kind;
+    char failed_path[68];strcpy(failed_path,io->path);
     ScBufferRelease(io->buffer);
     ScStringRelease(io->snapshot);
     free(io);
     st.io=0;
     if(s<0){
-        st.save_all=st.build_requested=0;
+        st.save_all=st.build_requested=st.config_save_requested=0;
         if(st.build.phase){
-            st.build.error=s;
-            st.build.cancel=1;
+            snprintf(st.build.first_error,sizeof(st.build.first_error),"无法%s文件：%s",kind==S_IO_SAVE||kind==S_IO_PROJECT_SAVE?"保存":"读取",failed_path);
+            build_fail(s);
         }
-        error(s,"文件操作未完成，内存作品保留");
+        else{char message[192];snprintf(message,sizeof(message),"无法%s文件：%s；请检查路径和访问权限。",kind==S_IO_SAVE||kind==S_IO_PROJECT_SAVE?"保存":"读取",failed_path);error(s,message);}
     }
     else{
         status("文件操作完成");

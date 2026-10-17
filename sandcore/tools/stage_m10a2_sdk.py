@@ -23,6 +23,7 @@ LIBRARIES = {
     'SCGFX.SCL': ('user/scgfx/SCGFX.json', ('user/scgfx/',)),
 }
 SHARED_HEADERS = ('user/SCTYPES.H', 'user/SC32GUI.H')
+COMPATIBILITY_HEADERS = ('SCAPI.H','SCIO.H','SCMEM.H')
 HEADERS = {
     'SCTYPES.H': 'user/SCTYPES.H', 'SC32API.H': 'user/SC32API.H',
     'SC32GUI.H': 'user/SC32GUI.H', 'SC32FONT.H': 'user/SC32FONT.H',
@@ -45,7 +46,7 @@ HEADERS = {
 STANDARD = ('stddef.h','stdint.h','stdbool.h','stdarg.h','limits.h','errno.h',
             'assert.h','stdlib.h','string.h','ctype.h','stdio.h')
 FORBIDDEN = ('PRIVATE','WIRE','NUI','SCAPI','SCIO','SCMEM','KERNEL','SCLFMT','SCDYN')
-DOCS = ('SCUI-DROP-DEFERRED.md','M10A2-SDK.md','SCL.md','SC32API.md','SC32-GUI-USER.md','SC32-BROKER.md',
+DOCS = ('STUDIO2-USER-GUIDE.md','SCUI-DROP-DEFERRED.md','M10A2-SDK.md','SCL.md','SC32API.md','SC32-GUI-USER.md','SC32-BROKER.md',
         'SC32-DROP.md','SC32-FONT.md','SCUI.md','SCUI-TEXT.md','SCLIB.md','SCCLIB.md',
         'SCCC-SCL.md','SCCC-AGGREGATE-ABI.md','THIRD-PARTY.md','SC32-DEBUG.md',
         'SCO-AND-LINKER.md','SC32-FILE.md','SCSHELL-DESIGN.md','SCSHELL-IMPLEMENTATION.md','SC32-WALL.md','SCGFX.md','SC32-IMAGE.md','SC32-AUTH.md','SCUI-SECRET.md','SESSION2.md')
@@ -339,6 +340,13 @@ def closure(libraries):
 
 def header_allowed(source: Path, target: str):
     name = source.name
+    # 冻结只禁止改旧接口，不能切断旧源码的默认include路径。
+    # 例外只接受仓库内这三个已发布原件，不能借同名导出私有桥。
+    if (name in COMPATIBILITY_HEADERS and source.resolve()==(ROOT/'user'/name).resolve()
+            and target=='SYS/INC/'+name):
+        if name=='SCAPI.H' and sha(source)!='81a730450fcb3d310ed841ad3e5c70a3fed32aa7fbd10acac8b888ac7da9ffc1':
+            raise ValueError('SCAPI.H冻结原字节已改变')
+        return
     if ('kernel' in source.relative_to(ROOT).parts or source.suffix not in ('.H','.h')
             or any(value in name.upper() for value in FORBIDDEN)):
         raise ValueError('私有/旧bridge/内核头不能进入public INC：' + str(source))
@@ -505,6 +513,10 @@ def main():
             file=relative(name);header_allowed(file,'SYS/INC/'+target)
             if name not in recorded:raise ValueError('public header未被当前build固定：'+name)
             add('SYS/INC/'+target,inputs.read(file,recorded[name]),name)
+        for name in COMPATIBILITY_HEADERS:
+            source='user/'+name;file=relative(source);header_allowed(file,'SYS/INC/'+name)
+            if source not in recorded:raise ValueError('compatibility header未被当前build固定：'+source)
+            add('SYS/INC/'+name,inputs.read(file,recorded[source]),source)
         for name in STANDARD:
             source='user/stdlib/'+name;file=relative(source);header_allowed(file,'SYS/INC/'+name)
             if source not in recorded:raise ValueError('standard header未被当前build固定：'+source)
