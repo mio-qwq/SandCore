@@ -1,0 +1,70 @@
+{
+  "status": "ACTUAL_NATIVE08_GENERATION_AND_OWNER_PASS_NOT_NEW_GUI_ACCEPTANCE",
+  "fresh_labels": [
+    "SCUI"
+  ],
+  "reused_qualified_native07_labels": [
+    "FILES2",
+    "DEBUG2",
+    "SETTINGS2",
+    "INSTALLER2"
+  ],
+  "original_native07_status": "FAIL_OR_INTERRUPTED",
+  "original_native07_reclassified": false,
+  "object_count": 27,
+  "ordinary_libraries": 8,
+  "artifacts": 21,
+  "strict_sdk_reader_unchanged": true,
+  "files": {
+    "build/m10a2-p6-target-refresh-08/p6-generation.json": {
+      "archive": "m10a2-p6-target-refresh-08-p6-generation.json.gz",
+      "bytes": 15134592,
+      "sha256": "eeec17054e33fe9acefc6470d85b8e032fb52166522716c8a52261c44e925dc8"
+    },
+    "build/m10a2-p6-refresh-vm-08/refresh-vm.json": {
+      "archive": "m10a2-p6-refresh-vm-08-refresh-vm.json.gz",
+      "bytes": 4786394,
+      "sha256": "e7995034e0940fd4669dee99ee04a81fe15fbfb6515768dcfcd2aac83cde8412"
+    },
+    "build/m10a2-p6-artifact-qualification-07/qualified-artifacts.json": {
+      "archive": "m10a2-p6-artifact-qualification-07-qualified-artifacts.json.gz",
+      "bytes": 12642628,
+      "sha256": "5cc9daa7b6f4414aa9b505f5c2c738a41ccf0515dcace48fcf2b75fbf7dbbe97"
+    },
+    "build/m10a2-main-studio-01/p6-unified-host-14.json": {
+      "archive": "m10a2-main-studio-01-p6-unified-host-14.json.gz",
+      "bytes": 365063,
+      "sha256": "d054c6115d97e75ac26245b602188b477d83f8cd792c43d202f721ab93495ff6"
+    },
+    "build/m10a2-p6-sco-16/report.json": {
+      "archive": "m10a2-p6-sco-16-report.json.gz",
+      "bytes": 5771,
+      "sha256": "bc0d60042cea0e1475f115b2a2f62394af104f642ab9fbaf663c441efbce77ef"
+    },
+    "layout.bin": {
+      "bytes": 68,
+      "sha256": "dd1a4373582c4b684e8a915b5847abc49da2f0392a92f947473f73875655de79"
+    },
+    "layout.o": {
+      "bytes": 25708,
+      "sha256": "fb6b768edc399a8ba42bc03924c90b631506f8cf94ab95b5e18043fe8c79452c"
+    }
+  },
+  "owner": {
+    "before_physical_pages": 14050,
+    "after_physical_pages": 14050,
+    "physical_delta": 0,
+    "attributed_physical_delta": 0,
+    "unexplained_delta": 0,
+    "actual_user_clock_glyph_cache_pages": 0,
+    "unexpected": []
+  },
+  "shortcut_confirmation": {
+    "source": "USER_ACTUAL_USE",
+    "statement": "我试了现在可以快捷键",
+    "date": "2026-10-17",
+    "agent_keypress_pass_claimed": false
+  },
+  "user_playable_disk_modified": false,
+  "full_M10a2": false
+}

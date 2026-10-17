@@ -66,6 +66,8 @@ ScBrokerWait原子等GUI INPUT+broker STREAM；无活事务不10Hz轮询端点�
 
 ContextStep对正常控件操作失败保诊断并一次通知error_procedure，继续有界消息泵，是否退出由应用ContextStop决定；公共Dispatch仍返回精确错误。系统Get失败返回，不递归ERROR。CLOSE被veto或保存失败拒绝时显式清kernel closing，使其可再次关闭。
 
+Timer回调与上述普通消息使用同一通知规则：错误保留原cause/raw，通知一次；CANCELLED/STALE按同一规则结束本次通知，不因此退出上下文。系统时钟查询及消息获取失败继续向调用者返回。ERROR回调期间当前timer仍为firing，因此回调取消/重订/销毁节点后，库可按retired/revision处理，不读已释放记录；ContextStop同样终止本批余下timer。
+
 SC_UI_EVENT_VISIBILITY=37由真实SC32_MSG_VISIBILITY产生，只有native root的实际可见值改变才通知该root；先更新可见性缓存、绘图timer和输入/菜单资格，handler的公开query见新状态。event.message保留原64B消息及其visibility epoch，data借用原data[6]，不是可取消事件，handler返回值不回滚已发布状态。业务BACKGROUND timer可继续，DRAW_ONLY停止，通知本身不请求隐藏画面。沿已有root/context hold派发，重入销root安全，不向已退役root派发。
 
 ## 标准控制族、文档与协调
@@ -105,3 +107,5 @@ Copy/Cut/Paste使用真实session clipboard事务及immutable snapshot，源退�
 2026-10-16执行记录：延迟Drop已由GUI03真实COPY/MOVE/取消及源桌面自动刷新留证；按钮FLOW修复随后合主源，经SCO12、HOST11和真实客体native05生成。final05 CORE/SDK已核验并启动GUI04，四按钮修后画面仍待验证，不把原生生成称为交互通过。
 
 2026-10-17：修复快捷键被旧DISABLED状态挡住，保留执行前动态禁用检查；Debug在状态发布时刷新有限命令。实际SCCC宿主后端与HOST13通过，五目标原生刷新07进行中，修后GUI尚待。GUI04四按钮FLOW实图已保留；Files取消后GUI06实际exit313，不将异常退出写成取消通过。
+
+2026-10-17：发现Timer回调失败与普通消息的非致命通知合同不一致，现共用notification_error/ERROR通知并保留firing生命周期。SCO16、HOST14及真实native08生成通过，最终PF差额0、严格SDK reader通过；新GUI09正在进行，Files取消313的实际根因仍需原始错误诊断确认，不以此改写历史结果。

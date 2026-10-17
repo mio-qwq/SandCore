@@ -934,6 +934,17 @@ static void ui_timer_missed(const ScWideCounter *now,const ScWideCounter *deadli
             else out->lo|=1u<<bit;
             }}
 }
+static void ui_notification_failure(ScUiContext *c,ScStatus s)
+{
+    if(s>=0 || s==SC_UI_E_CANCELLED || s==SC_UI_E_STALE || s==SC32_E_STALE)return;
+    c->notification_error=s;
+    if(c->description.error_procedure){ScUiEvent error;
+        ui_event_record(&error,0,SC_UI_EVENT_ERROR);
+        error.data=&c->error;
+        error.bytes=sizeof(c->error);
+        c->description.error_procedure(c,&error,c->description.context);
+    }
+}
 static ScStatus ui_timer_pump(ScUiContext *c)
 {
     ScWideCounter now;
@@ -966,11 +977,17 @@ static ScStatus ui_timer_pump(ScUiContext *c)
             }
         e.tick=now.lo;
         s=ui_emit(c,n,&e);
+        /* Timer也是普通控件/应用回调，失败沿消息分发的既有诊断合同
+         * 通知一次，由应用决定ContextStop；不能让过期提示框或取消
+         * 动作的失败直接结束整个GUI。时钟/消息获取等系统失败仍返回。
+         * 通知期间仍保持firing，ERROR回调可取消本timer而不提前free。 */
+        if(s<0){ui_notification_failure(c,s);s=SC_UI_OK;}
         t->firing=0;
         if(t->retired){free(t);
+            if(c->object.closing || c->stopped)break;
             continue;
             }
-        if(t->revision!=revision)continue;
+        if(t->revision!=revision){if(c->object.closing || c->stopped)break;continue;}
         if(!t->description.period_ticks){ui_timer_detach(t);
             ScHashRemove(c->timer_index,&t->token,sizeof(t->token));
             free(t);
@@ -1059,13 +1076,7 @@ ScStatus ScUiContextStep(ScUiContext *c,ScU32 timeout)
         if(s!=0)break;
         s=ScUiContextDispatch(c,&message);
         ui_secret_wipe(&message,sizeof(message));
-        if(s<0 && s!=SC_UI_E_CANCELLED && s!=SC_UI_E_STALE && s!=SC32_E_STALE){c->notification_error=s;
-            if(c->description.error_procedure){ScUiEvent error;
-                ui_event_record(&error,0,SC_UI_EVENT_ERROR);
-                error.data=&c->error;
-                error.bytes=sizeof(c->error);
-                c->description.error_procedure(c,&error,c->description.context);
-                }
+        if(s<0 && s!=SC_UI_E_CANCELLED && s!=SC_UI_E_STALE && s!=SC32_E_STALE){ui_notification_failure(c,s);
             s=SC_UI_OK;
             }
         if(c->object.closing || c->stopped)break;

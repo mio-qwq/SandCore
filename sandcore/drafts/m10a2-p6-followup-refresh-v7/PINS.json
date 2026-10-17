@@ -1,0 +1,34 @@
+{
+  "schema": 1,
+  "status": "FROZEN_NATIVE07_ARTIFACT_FACTS_WITH_ORIGINAL_FAILURE_PRESERVED",
+  "files": {
+    "drafts/m10a2-p6-followup-refresh-v6/followup.py": {
+      "bytes": 5672,
+      "sha256": "4deeeca679c57c0349cf487640910203a1a86183e13b3144668bd95c0d6ca8ac"
+    },
+    "drafts/m10a2-p6-followup-refresh-v6/driver.py": {
+      "bytes": 11919,
+      "sha256": "637cca8f850ca3b53bb0828045ee8dd2bcb3cd0070177dcb8eaaed44722b5868"
+    },
+    "drafts/m10a2-p6-followup-refresh-v6/PINS.json": {
+      "bytes": 1112,
+      "sha256": "4a48075692c05c0372165b9074fbb4b5d1610a9dcbd68a07314242e9b92d98f8"
+    },
+    "build/m10a2-p6-artifact-qualification-07/qualified-artifacts.json": {
+      "bytes": 12642628,
+      "sha256": "5cc9daa7b6f4414aa9b505f5c2c738a41ccf0515dcace48fcf2b75fbf7dbbe97"
+    },
+    "build/m10a2-p6-target-refresh-07/p6-generation.json": {
+      "bytes": 13130877,
+      "sha256": "1278c7cd93301b0614bafcadbb23ea4e643e7010c61fc3a2fdf2a6dc12998103"
+    },
+    "build/m10a2-p6-refresh-vm-07/refresh-vm.json": {
+      "bytes": 1253074,
+      "sha256": "07822ca777d8e542a27cb77a67186338d4982cb7d26e2e36be0b404eaf0d92ed"
+    },
+    "build/m10a2-main-studio-01/p6-unified-host-13.json": {
+      "bytes": 365062,
+      "sha256": "dafa297ec617cc4c0ed4cdd7404d9f3e4be1bb2404358840d0a0d2f657540a87"
+    }
+  }
+}

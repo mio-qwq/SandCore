@@ -1,5 +1,7 @@
 # M10a2 实现与恢复入口
 
+> 2026-10-17当前：HOST14/native08/final08真实通过，SCUI定时器错误通知合同已修；原生最终PF零差额。新GUI09显式WHPX运行中，完整目标active。当前句柄、源冻结、失败保留和接续以[M10A2-LIVE-GUI](M10A2-LIVE-GUI.md)为准；下文按原时点保留。
+
 > 2026-10-16当前补充：P5真实文件剪贴板、图标拖动/布局冷恢复、新视觉与连续会话切片通过；完整P5仍待Files跨窗等出口。六个重制应用/SCO/SCLD/调试与壁纸底座已入主源并HOST构建通过，客体未验部分见[M10A2-P6-IMPLEMENTATION](M10A2-P6-IMPLEMENTATION.md)。完整目标继续active。桌面保持Ring3，冷图标对照45→46PIT未证明提速，见新资源证据包；不把HOST或结构简化说成客体/整机性能达标。
 
 正式名称：**SandCore M10a2 — The Application Platform Era**。
@@ -185,3 +187,5 @@ P5隔离候选unified-host-07/08整体构建通过；原实际G1生成SC32API/SC
 
 
 修订：2026-10-16，持久保存新桌面视觉/连续会话与无明确提速结论，六应用及对象/调试/壁纸主源HOST整合；完整P5/P6/SDK继续，未宣布整版完成。
+
+修订：2026-10-17，保存native08定向刷新、final08严格SDK/CORE与GUI08待验边界。
