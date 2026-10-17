@@ -1,2 +1,0 @@
-echo STDLIB_BG_WARM & wait; _m9_status=$?; echo __SCUI_CMD_bd89112cd351cada63e8f2a8:$_m9_status:__SCUI_CMD_bd89112cd351cada63e8f2a8_END
-STDLIB_BG_WARM

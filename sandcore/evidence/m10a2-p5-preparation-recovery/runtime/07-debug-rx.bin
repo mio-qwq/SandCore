@@ -1,6 +1,0 @@
-SandCore loader v1
-CORE START SYS/CORE/CORE.SKM
-SandCore M9 | debug transport ready
-CORE EXT SYS/CORE/WALL100.SKM STARTED
-SHELL HOST stopped pid=00000008 code=00000074
-SHELL HOST stopped pid=00000006 code=00000074

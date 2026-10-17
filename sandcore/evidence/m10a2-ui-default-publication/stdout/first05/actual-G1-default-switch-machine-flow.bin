@@ -1,9 +1,0 @@
-/HOME/M10UI/COMPILER/SCCC1.SCX /TMP/UI-af0b4f/SWDEFAULT.C /HOME/M10UI/NATIVE_APPS/SWDEFAULT.SCX; _m9_status=$?; printf "\n"; echo __M9_c48519f15cbc563be7860606:$_m9_status
-SCCC / mio
-TMP/UI-af0b4f/SWDEFAULT.C -> HOME/M10UI/NATIVE_APPS/SWDEFAULT.SCX
-SCCC: preprocess -> C -> x86
-Preprocessing source and includes
-Parsing C and generating x86
-Linking and writing SCX
-SCCC OK load=696 bss=0 / mio
-Compilation complete

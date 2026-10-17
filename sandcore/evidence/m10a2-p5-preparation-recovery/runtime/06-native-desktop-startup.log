@@ -1,4 +1,0 @@
-startup=-116 callback=0 ui=0 cause=0 raw=0 op=0 node=0
-roots=2 visible=0 paints=0:0 notification=0
-root=1 window=5 state=8320 geometry=2 size=1920,1032
-root=2 window=6 state=8320 geometry=2 size=1920,48

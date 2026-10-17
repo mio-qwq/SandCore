@@ -1,2 +1,0 @@
-printf warm > /HOME/M10SHELL/WARM.DAT; cat /HOME/M10SHELL/WARM.DAT; _m9_status=$?; echo __SCUI_CMD_7384d7594bf390dcc08802a5:$_m9_status:__SCUI_CMD_7384d7594bf390dcc08802a5_END
-warm

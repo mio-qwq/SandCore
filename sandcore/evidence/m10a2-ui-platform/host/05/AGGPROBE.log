@@ -1,6 +1,0 @@
-ACTUAL_MAIN_SOURCE=TMP/UICHECK/AGGPROBE.C OUTPUT=HOME/AGGPROBE.SCX
-SCCC: preprocess -> C -> x86
-SCCC OK SCX DYNAMIC
-Compilation complete
-ROOTLESS_RESOLVE_CALLS=3 RESULT=0 tokens=1430 source=7275 code=4757 data=472 bss=8 fixes=63 macros=38
-SCCC_HOST_CAPACITY types=120 symbols=109 params=95 nodes=1 fixes=63

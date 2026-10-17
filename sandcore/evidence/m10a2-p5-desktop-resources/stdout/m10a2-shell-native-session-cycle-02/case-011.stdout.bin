@@ -1,5 +1,0 @@
-printf '%s\n' '' '/HOME/M10SHELL/GENERATED/SHELLPROBE.SCX prepare; exit' | su mio; _m9_status=$?; echo __SCUI_CMD_b5e1f87df93908e09c72b9cf:$_m9_status:__SCUI_CMD_b5e1f87df93908e09c72b9cf_END
-Password: 
-SHELLPROBE HOST state=1 sid=4 pid=7/1 epoch=1
-SHELLPROBE HOST state=2 sid=4 pid=7/1 epoch=1
-SHELLPROBE PREPARED_ONLY sid=4 pid=7/1 epoch=1

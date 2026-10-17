@@ -1,5 +1,0 @@
-ACTUAL_MAIN_SOURCE=SDK/EDIT2.C OUTPUT=HOME/EDIT2.SCX
-SCCC: preprocess -> C -> x86
-SCCC OK SCX DYNAMIC
-Compilation complete
-ROOTLESS_RESOLVE_CALLS=3 RESULT=0 tokens=19317 source=102737 code=20367 data=932 bss=76 fixes=436 macros=283

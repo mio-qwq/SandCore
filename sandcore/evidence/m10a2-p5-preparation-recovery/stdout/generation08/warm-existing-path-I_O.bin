@@ -1,2 +1,0 @@
-printf warm > /HOME/M10SHELL/WARM.DAT; cat /HOME/M10SHELL/WARM.DAT; _m9_status=$?; printf "\n"; echo __M9_d2b387311b95e8396ee83e41:$_m9_status
-warm

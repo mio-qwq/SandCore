@@ -1,6 +1,0 @@
-printf '%s\n' '' 'id; /HOME/M10UI/AGG/NATIVELIB/AGGPROBE.SCX; _ui=$?; echo __UI_LOGIN_463c8e40a99bc617:$_ui; exit 0' | su mio; _m9_status=$?; printf "\n"; echo __M9_c57228520533fdbb8ac3e570:$_m9_status
-Password: 
-uid=1000 gid=1000 realm=0
-AGGABI STACK before=007ffdb4 after=007ffdb4 delta=0
-AGGABI PASS checks=55 failures=0
-__UI_LOGIN_463c8e40a99bc617:0

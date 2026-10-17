@@ -1,6 +1,0 @@
-ACTUAL_MAIN_SOURCE=TMP/UICHECK/AGGCALLEE.C OUTPUT=HOME/AGGCALLEE.SCL
-SCCC: preprocess -> C -> x86
-SCCC OK SCL NATIVE
-Compilation complete
-ROOTLESS_RESOLVE_CALLS=3 RESULT=0 tokens=540 source=3196 code=1467 data=0 bss=0 fixes=1 macros=18
-SCCC_HOST_CAPACITY types=46 symbols=61 params=39 nodes=1 fixes=1

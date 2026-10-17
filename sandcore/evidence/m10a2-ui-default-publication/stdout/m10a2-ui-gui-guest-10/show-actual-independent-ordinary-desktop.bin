@@ -1,1 +1,0 @@
-sessionctl show 4; _m9_status=$?; printf "\n"; echo __M9_10d4f63e13f601bb44837056:$_m9_status

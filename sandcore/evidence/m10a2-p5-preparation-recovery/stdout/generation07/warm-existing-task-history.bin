@@ -1,1 +1,0 @@
-ls /HOME/M10SHELL/HOST; _m9_status=$?; printf "\n"; echo __M9_e0330c7d844bd8eb7d88ec44:$_m9_status

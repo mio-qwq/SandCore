@@ -1,4 +1,0 @@
-Traceback (most recent call last):
-  File "/mnt/c/Users/Administrator/Desktop/projectos/sandcore/tools/check_m10a2_ui_native.py", line 53, in main
-    raise ValueError('真实宿主适配器观察锚点已改变')
-ValueError: 真实宿主适配器观察锚点已改变

@@ -1,5 +1,0 @@
-printf '%s\n' '' 'id; /HOME/M10UI/NATIVE_APPS/SCUIDEMO.SCX; _gui=$?; echo __SCUI_RESULT_d3bc8723852826c6:$_gui; exit $_gui' | su mio & echo __SCUI_JOB_fa19e2a6805416a8:$!; _m9_status=$?; printf "\n"; echo __M9_5e396ad4b0ccfdc363c8196d:$_m9_status
-__SCUI_JOB_fa19e2a6805416a8:2
-
-Password: 
-uid=1000 gid=1000 realm=0

@@ -1,1 +1,0 @@
-wait 2; _m9_status=$?; echo __SCUI_CMD_b1c4308a9f00798bc1db0420:$_m9_status:__SCUI_CMD_b1c4308a9f00798bc1db0420_END

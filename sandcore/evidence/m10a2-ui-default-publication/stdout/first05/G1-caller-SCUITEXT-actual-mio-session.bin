@@ -1,5 +1,0 @@
-printf '%s\n' '' 'id; /HOME/M10UI/NATIVE_APPS/SCUITEXT.SCX; _ui=$?; echo __UI_LOGIN_fc55a72bc8169b73:$_ui; exit 0' | su mio; _m9_status=$?; printf "\n"; echo __M9_aedde08fdddf30b54682a296:$_m9_status
-Password: 
-uid=1000 gid=1000 realm=0
-SCUI_TEXT_PASS version=15.1 cases=3013 boundaries=12948
-__UI_LOGIN_fc55a72bc8169b73:0
