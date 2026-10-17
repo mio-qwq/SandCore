@@ -1,5 +1,15 @@
 # M10a2 实现与恢复入口
 
+<!-- CURRENT-BEGIN -->
+2026-10-17。当前最终运行绑定为HOST21/native11/final12；真实构建/原生生成均结束，没有后台构建或QEMU仍在运行。CORE SHA256为44d0b635f4f2597ef8009067de0da299bb36270c367589a8898711a64361f6b2。GUI12快拖/取消/持久复制、独立UP检查及Installer列宽通过，owner13950→13950；GUI13退出/注销/默认mio空输入重新登录和root空输入拒绝已实际验证，原资源账+8与FAIL_OR_INTERRUPTED保持，不能称该轮整体PASS。
+
+完整合同与证据交叉表见[M10A2-ACCEPTANCE.md](M10A2-ACCEPTANCE.md)，交付内容及限制见[M10A2-RELEASE.md](M10A2-RELEASE.md)。当前工作为统一文档、同字节最终SDK restage、交付包核验，然后按用户授权签名提交/Release；不再扩展QEMU矩阵。当前正式发布结果以实际publish凭证为准，不预写成功。主代理独立工作，不使用subagent或computer-use。
+<!-- CURRENT-END -->
+
+<details>
+<summary>此前日期的原始记录；旧“当前/待验/正在运行”不作为本次状态</summary>
+
+
 > 2026-10-17当前：HOST15/native08/final09及Windows WHPX GUI10定向流程已收束，driver退出0、输入/原盘保持、最终PF13948→13948。PIO同文件读盘宿主3.188→0.437秒，普通Installer持久写入/回读、Debug快捷键及1024×768真实模式有证据。Files拖放提前结束、Settings临时文件与其它具体缺项继续；完整目标active。参见[当前接续](M10A2-LIVE-GUI.md)及[本轮证据](../evidence/m10a2-pio-gui10/README.md)，下文保持原日期时态。
 
 > 2026-10-16当前补充：P5真实文件剪贴板、图标拖动/布局冷恢复、新视觉与连续会话切片通过；完整P5仍待Files跨窗等出口。六个重制应用/SCO/SCLD/调试与壁纸底座已入主源并HOST构建通过，客体未验部分见[M10A2-P6-IMPLEMENTATION](M10A2-P6-IMPLEMENTATION.md)。完整目标继续active。桌面保持Ring3，冷图标对照45→46PIT未证明提速，见新资源证据包；不把HOST或结构简化说成客体/整机性能达标。
@@ -191,3 +201,9 @@ P5隔离候选unified-host-07/08整体构建通过；原实际G1生成SC32API/SC
 修订：2026-10-17，保存native08定向刷新、final08严格SDK/CORE与GUI08待验边界。
 
 修订：2026-10-17，收齐HOST15/native08/final09、PIO读写与GUI10实际零差退出证据；保留拖放等具体缺陷和完整持续目标。
+
+
+</details>
+
+
+修订：2026-10-17，统一HOST21/native11/final12、GUI12与登录回归实际范围，SDK及发布入口同批整理。

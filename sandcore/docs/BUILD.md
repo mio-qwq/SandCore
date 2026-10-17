@@ -1,5 +1,7 @@
 # SandCore 构建系统文档 v0.7
 
+> **2026-10-17 M10a2交付构建入口：** 统一宿主构建为 `python3 tools/build_m10a2_p6.py --tag p6-unified-host-21 --build build/m10a2-main-session-return-01`（WSL、sandcore工作目录）；报告HOST21已实际exit0。真实客体八库/G1/SCLD及应用生成来源由native11严格清单记录；最后CORE为final12。最终公开SDK按同一来源及最新规范restage到build/m10a2-sdk-delivery-02。四文件运行包直接run.bat，不要求重建。精确执行器、来源摘要和发布审计见drafts/m10a2-p6-final-12-receipt、drafts/m10a2-delivery-01及M10A2-ACCEPTANCE.md。旧默认make/build.bat与历史版本入口仍保留，不把它们等同于本次已绑定的原生产物。下方各日期记录为历史。
+
 > **2026-10-14 M10a2引导切片：** 新增 `make m10a2-bootstrap`，只构建独立 `build/m10a2-bootstrap` 的 core/loader、SCLDR探针和 BASE/UPPER；不依赖全应用目标。实际 WSL 构建及 Windows QEMU 验证见 M10A2-IMPLEMENTATION，默认完整系统入口仍为已验收的 M10a1。
 
 > **2026-10-07最新：** 默认公开键/已签WALL100的整包构建formal-build-01退出0，独立输出build/m10a1-formal-01；MAIN与冻结10全字节相同，正文SHA 3e57a363f5164cc69485a67dfab9f08c76bd1af5426375cc2c2100d5a23f3170。两原M9来源新迁移formal-01/02均256MiB、目录容量2048、1489/1451项，正常扩展只有WALL100，原盘/原M10开发盘不覆盖。M9的225份与M10的167份固定源码/声明归档审计通过。Shell管道修正定向构建输出shell-fix-01，再迁移独立shell-inputs-01双盘；网络/会话与全部其它合同继续，普通入口整体验收未完成。下方早期“默认接线尚未重新构建”仅属沿革。
@@ -416,3 +418,5 @@ dynamic-guest-02已经实际通过；正常/回调异常退出PF8872→8872。�
 当前只接线，尚未执行此目标或QEMU。后续Windows双盘独立会话复用只读基盘，准备相同资源并记录真实源码/库来源；没有因接口枚举/生成数据称UI已运行。
 
 修订：2026-10-15，新增SCUI/平台独立统一目标与数据/完整Unicode许可固定审计、自编译器容量合同，待真实构建/执行。
+
+修订：2026-10-17，补M10a2真实构建/原生来源及最终运行包入口。

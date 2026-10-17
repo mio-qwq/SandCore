@@ -1,6 +1,6 @@
 # SandCore OS（沙核）
 
-> **M10a2：SandCore M10a2 — The Application Platform Era。** 完整目标持续推进。SCL、四大系统库、SCUI及桌面已有真实分项证据，八个普通库和重制组件工具链已由客体 SCCC/SCLD 生成；SCW 工作区与完整 SDK 已接入。普通用户 GUI、复杂开发示例及整版验收仍在收束；失败与修复见[当前客体接力](docs/M10A2-LIVE-GUI.md)，架构见[总体设计](docs/M10A2-DESIGN.md)。SCAPI.H 冻结，已验收运行基线保持 M10a1；M8 封存及历史成果保留。下方旧阶段记录仍属历史。
+> **M10a2：SandCore M10a2 — The Application Platform Era。** 平台/组件/原生多源SDK及GUI证据已统一到[交付检查](docs/M10A2-ACCEPTANCE.md)、[SDK](docs/M10A2-SDK.md)与[版本说明](docs/M10A2-RELEASE.md)。最终HOST21/native11/final12，GUI12资源零差；GUI13退出/注销/重新登录有效，其首次保留登录桌面的+8页资源FAIL如实保留。检查后按最新授权签名提交和Release。下方M10a1及更早状态为历史记录，不限制本轮已授权发布。
 
 > **2026-10-07最新发布决定：** 用户授权将已验收的M10a1包发布为GitHub Preview，后续统一main；原“不创建Release”约定由本次明确授权更新。下载与原包摘要见[M10a1 Preview](docs/M10A1-PREVIEW.md)，项目总介绍见[根README](../README.md)。下方旧状态继续保留为阶段记录。
 
@@ -590,3 +590,6 @@ native-08/build-19后端0b50ea3b与SCMEM能力宏经真正历史M7→G1→G2→G
 修订：2026-10-16，SCUI完整定向GUI22通过并保存证据；P5真实生成和启动故障边界分列，M10a2完整目标继续。
 
 修订：2026-10-16，同步原生组件生成、SCW/SDK接线及普通GUI验证边界。
+
+
+修订：2026-10-17，统一HOST21/native11/final12、GUI12与登录回归实际范围，SDK及发布入口同批整理。

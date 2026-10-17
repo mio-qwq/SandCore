@@ -1,0 +1,176 @@
+{
+  "kind": "application",
+  "name": "UP.SCX",
+  "dependencies": [
+    {
+      "name": "SC32API.SCL",
+      "abi_major": 1,
+      "min_minor": 5,
+      "min_version": 7
+    },
+    {
+      "name": "SCCLIB.SCL",
+      "abi_major": 1,
+      "min_minor": 0,
+      "min_version": 1
+    },
+    {
+      "name": "SCUI.SCL",
+      "abi_major": 1,
+      "min_minor": 4,
+      "min_version": 6
+    }
+  ],
+  "imports": [
+    {
+      "name": "ScProcessSelf",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScIdentityQuery",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScIpcCreate",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScIpcListen",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScIpcClose",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScDropRegister",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScDropUnregister",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScDropCancel",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "printf",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUiContextCreate",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUiContextRelease",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUiContextStop",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUiContextRun",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUiWindowCreate",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUiWindowNative",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUiWidgetCreate",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUiNodeDestroy",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUiNodeSetLayout",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUiLayout",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUiCapture",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUiListen",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScDropAtRelease",
+      "dependency": "SC32API.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "memset",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "memcmp",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "strlen",
+      "dependency": "SCCLIB.SCL",
+      "kind": "function",
+      "size": 1
+    }
+  ]
+}

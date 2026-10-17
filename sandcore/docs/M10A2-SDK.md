@@ -1,6 +1,6 @@
 # M10a2 公开 SDK 与来源合同
 
-SandCore M10a2 — The Application Platform Era。最终 SDK staging 增量已实现；普通系统库、G1/SCLD、codec 例外与独立 ResearchDesk 的来源分别记录。2026-10-17的final11已经用HOST20/native10真实来源完成严格staging：496项/17503689B，八普通原生库、实际G1/SCLD及唯一SCSOUND宿主codec例外均逐项绑定。普通身份ResearchDesk已在GUI04经Studio的SCW工作区实际编译独立RDSTATS.SCL和四个TU的RDESK.SCX，运行与Debug2模块/符号/断点有独立证据；不将此扩成每个示例功能或整版完成。最新拖放/UI增量的普通交互仍由GUI12收束。2026-10-15五库preview和双示例宿主结果保留原时态。
+SandCore M10a2 — The Application Platform Era。最终来源为HOST21/native11/final12；文档统一后只restage到build/m10a2-sdk-delivery-02，不重编未变库。8个普通原生库、实际guest G1/SCLD和唯一SCSOUND宿主codec分别绑定来源，最后SDK清单/文件摘要以该目录MANIFEST、HASHES、SHA256SUMS为准。SDK staging本身的SDK_runtime_verified=false保持；真实复杂开发流程另由GUI04/GUI12和[M10A2-ACCEPTANCE.md](M10A2-ACCEPTANCE.md)证明。不能将staging工具自己的旧PREVIEW/未运行状态字段误解为抹去独立GUI证据，也不能把GUI证据写回旧staging原报告。交付包与限制见[M10A2-RELEASE.md](M10A2-RELEASE.md)。
 
 ## 内容与边界
 
@@ -88,3 +88,6 @@ EDIT2 和 UTILITY 原例及历史证据保留。它们原先的直接 FILE 保�
 2026-10-16：公开SCW工作区合同、示例路径和SDK归档接线。
 
 修订：2026-10-17，更新final11真实原生来源SDK与GUI04普通SCW/独立SCL/四TU运行调试事实，明确新释放凭证接口版本及GUI12尚未验证范围。
+
+
+修订：2026-10-17，统一HOST21/native11/final12、GUI12与登录回归实际范围，SDK及发布入口同批整理。

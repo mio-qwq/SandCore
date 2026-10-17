@@ -1,5 +1,34 @@
 # SandCore M10a2 — The Application Platform Era：完整开发交接
 
+## 2026-10-17 最终交付接手点
+
+下面2026-10-15的详细记录是历史，不能按其“GUI未验/P5未集成”重新开工。唯一当前事实为HOST21/native11/final12、GUI12闭合及GUI13登录功能/资源边界，详见sandcore/docs/M10A2-ACCEPTANCE.md。本轮没有活QEMU/构建，也没有恢复任何子代理；用户已明确禁止subagent和computer-use。
+
+### 固定输入与结果
+
+HOST21报告SHA738e41d51bc4cd026cdc658c0b8d484614c59e7952b4908be389eaa919a76749；native11内报告SHA66396e2bb8eaf81eefffa02fb4fbaffb23c99a0fddf749ba81559b0d07dad9c0；CORE44d0b635f4f2597ef8009067de0da299bb36270c367589a8898711a64361f6b2。对应build/m10a2-main-session-return-01、m10a2-p6-target-refresh-11、m10a2-p6-final-12。最终SDK从同来源restage到build/m10a2-sdk-delivery-02；不再重编或扩展矩阵。
+
+GUI12证据sandcore/evidence/m10a2-gui12，review SHA3b96f6369e85ca4d7ff98eb631dcbaa0a2b2cb6f5266a314e66dc2b9a9dc0680，快拖/取消/168B持久复制、实际客体DROPUP9项和Installer列宽、正常关闭/owner0。GUI13证据sandcore/evidence/m10a2-session-return，review SHA3fdfa7469a0f099ec78903431e6bbbc04cf7dd6483dca309e6b66f7aea456c0a，真实退出/注销/两次mio空输入登录/root拒绝，原资源FAIL/8页地址归属未直接捕获，驱动由Root CtrlC结束为exit1，QEMU已关闭。不要改旧FAIL或追求全绿重跑矩阵。
+
+### 用户盘与最终包
+
+test保持严格四文件；数据盘已更新SHA362e3ce3ec4df694561443b761270bcae4fd0e13382c066681e10ba91d55a983，保留1626个非更新对象含34个HOME/桌面对象；其他三文件不变，账户库不重置。原盘备份sandcore/build/m10a2-test-session-update-01/sanddata-before.img，update.json保留明细。首次prepare因持有Windows读句柄而os.replace失败，原目标未改；完整准备盘复核后释放句柄完成原子发布。helper现改为build内准备再关闭句柄提交，仅静态审阅此helper修正，没有再次迁移用户盘。
+
+最终Release使用原M10a1只读基盘3db2e3cd9262343204e8c19af02847e98244732c5b5ad4397dd334be84fe7e64新建一次干净迁移；不打包用户test盘。SCAPI.H必须保持81a730450fcb3d310ed841ad3e5c70a3fed32aa7fbd10acac8b888ac7da9ffc1。SDK staging字段保持自身未运行语义，独立delivery凭证链接实际GUI，不改写旧报告。
+
+### 用户最新授权与发布顺序
+
+用户要求同步文档/SDK，检查完再做密钥验证的commit和Release。原“不自行Release”由此次明确授权覆盖；仍main、不强推、不读SKM私钥、不自动清理用户或旧代理目录。先完成文档/SDK/zip/摘要检查，再推送保留本地历史、用GitHub自动签名接口创建最终提交并实际核Verified，最后发布附件。没有可用用户GPG私钥，不伪造本地签名；GitHub自动签名不涉及用户SKM密钥。
+
+WSL gh网络直连超时，但Windows现有127.0.0.1:7890代理可通GitHub；drafts/m10a2-session-return-01/github_api.py通过WSL gh凭据管道使用现有账户，令牌不写磁盘/日志。WSL→Windows临时TCP中继被拒绝且已停止，不改VPN/防火墙。远端main已读为01da6943c82364c059df8be9a7128e9006ea1c83，本地提交前HEAD c72923c；任何推送必须重新核远端祖先，不强制覆盖。
+
+### 剩余交付动作
+
+检查SDK当前规范与manifest/实际9库、final12发行表/SCAPI、独立干净盘和4文件zip、SDKzip及SHA256SUMS。保存evidence/m10a2-delivery-01的审计与发布凭证。只显式stage本轮拥有的文件；.zcodeignore及defaults-upgrade/image-tools/native-syntax-fix/source-capacity/sdk-final/session2/settings-installer/sound-cover/sound-review/studio2/terminal2/ui-layout-fix未跟踪目录属于旧代理/用户，不能批量加入。签名commit与Release必须以GitHub实际结果为准，未完成不得写成已发布。达成完整目标后再complete。
+
+<details>
+<summary>2026-10-15详细历史交接，原文保留</summary>
+
 保存日期：2026-10-15，Asia/Shanghai。工作区：`C:/Users/Administrator/Desktop/projectos`。
 
 **这是一份中断恢复文档，不是 M10a2 完成声明。** 用户本次要求“保存当前状态，写极其详细的 m10a2handoff.md，写完告诉我”，随后明确“别用 subagent，你自己快点写好”。因此本次只核实并保存状态，没有继续实现、构建、编译或启动 QEMU。三个子代理均已被中断；恢复开发时必须先遵守用户届时对代理使用的最新要求，不能自动恢复它们。
@@ -721,3 +750,8 @@ Windows文件操作使用同一PowerShell的LiteralPath。递归删除/移动前
 
 以下附录由本次保存脚本直接读取工作区生成；只追加本文，不改被采集文件。任何摘要清单都不是运行PASS。
 
+
+</details>
+
+
+修订：2026-10-17，统一HOST21/native11/final12、GUI12与登录回归实际范围，SDK及发布入口同批整理。

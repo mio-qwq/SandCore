@@ -1,5 +1,15 @@
 # M10a2 主要应用与工具链实施状态
 
+<!-- CURRENT-BEGIN -->
+2026-10-17。当前最终运行绑定为HOST21/native11/final12；真实构建/原生生成均结束，没有后台构建或QEMU仍在运行。CORE SHA256为44d0b635f4f2597ef8009067de0da299bb36270c367589a8898711a64361f6b2。GUI12快拖/取消/持久复制、独立UP检查及Installer列宽通过，owner13950→13950；GUI13退出/注销/默认mio空输入重新登录和root空输入拒绝已实际验证，原资源账+8与FAIL_OR_INTERRUPTED保持，不能称该轮整体PASS。
+
+完整合同与证据交叉表见[M10A2-ACCEPTANCE.md](M10A2-ACCEPTANCE.md)，交付内容及限制见[M10A2-RELEASE.md](M10A2-RELEASE.md)。当前工作为统一文档、同字节最终SDK restage、交付包核验，然后按用户授权签名提交/Release；不再扩展QEMU矩阵。当前正式发布结果以实际publish凭证为准，不预写成功。主代理独立工作，不使用subagent或computer-use。
+<!-- CURRENT-END -->
+
+<details>
+<summary>此前日期的原始记录；旧“当前/待验/正在运行”不作为本次状态</summary>
+
+
 2026-10-17。完整目标active。GUI11已真实结束：Terminal30行后提示符/光标可见，Settings权限失败后的临时文件清理通过，最终owner13948→13948。用户授权当前盘已复制test，凭证evidence/m10a2-test-current-01；后续不擅自覆盖。
 
 本轮主源已写真实UP凭证/独立ScDropAtRelease、自动tooltip资格和Installer默认结果列宽。HOST20实际exit0/41产物/源码变化0，SCO19三目标真实后端宿主检查通过；native10预检只需SC32API/SCUI/INSTALLER2，旧编译器/其余闭包复用，尚未宣布新客体交互通过。完整资料evidence/m10a2-release-drag-host20，活进程与下一步以M10A2-LIVE-GUI.md为准。
@@ -140,3 +150,9 @@ Canvas2/Lens2由图像工具草稿负责真正R3 SCGFX及共享Canvas控件，�
 修订：2026-10-17，GUI11实际exit0/owner13948→13948，终端与配置临时清理通过，用户授权当前数据盘已交test。后续主源新增真实UP凭证/SC32DROP2.H、tooltip资格及Installer按实际DPI初始列宽。新源码未验；原快拖失败和GUI11日志不改写，原盘/旧SCAPI保留。
 
 </details>
+
+
+</details>
+
+
+修订：2026-10-17，统一HOST21/native11/final12、GUI12与登录回归实际范围，SDK及发布入口同批整理。

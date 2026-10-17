@@ -1,0 +1,20 @@
+{
+  "status": "USER_CONFIRMED_FULLSCREEN_MOUSE_WORKS",
+  "user_report": "这样正常了但是桌面就有黑边了",
+  "host_read_only_cim_resolution": [
+    1920,
+    1200
+  ],
+  "delivered_guest_resolution": [
+    1920,
+    1080
+  ],
+  "guest_max_supported_resolution": [
+    1920,
+    1080
+  ],
+  "inference": "SDL aspect preserving fullscreen yields about 60 physical pixels above and below if guest setting unchanged",
+  "guest_current_setting_not_read_from_user_running_vm": true,
+  "computer_use": false,
+  "user_disks_written": false
+}

@@ -1,0 +1,395 @@
+{
+  "status": "SCOPED_GUI12_NATIVE_FAST_RELEASE_AND_INSTALLER_REVIEW_PASS",
+  "full_M10a2": false,
+  "driver_exit_code": 0,
+  "qemu_pid": 4644,
+  "qemu_closed": true,
+  "host_report": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-main-release-drag-01\\p6-unified-host-20.json",
+  "host_report_sha256": "4f0980b97bb3e8b95b99779a4273269108917df17936b864e5a541c913c658b7",
+  "native_report": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-p6-target-refresh-10\\p6-generation.json",
+  "native_report_sha256": "1e39068eeec9de3027f1c04e666b0f24b60ec4795d5ef860a7f376994ffad740",
+  "core_binding": {
+    "core_sha256": "2a6feb8315f9f7036dd2ac62592dc000e44c301763008f28265be7b268ef131e",
+    "payload_sha256": "dfc6cdc0ebb61dddaf69c2edd440ccb13d80c9d339a54b8e6be1ed7dc784293c",
+    "elf_sha256": "a0f93fa1750a8a1a7aa0cb548d690a3a4a29d20963ac1388b229d3ea45ba4789",
+    "actual_compiled_program_hashes": true,
+    "actual_compiled_login_resources": [
+      "SYS/LIB/SC32API.SCL",
+      "SYS/LIB/SCCLIB.SCL",
+      "SYS/LIB/SCLDR.SCL",
+      "SYS/LIB/SCLIB.SCL",
+      "SYS/LIB/SCUI.SCL",
+      "SYS/UI/UAX15_1.SCU"
+    ]
+  },
+  "actual_gui": {
+    "fast_drop_extra_hold_ms": 0,
+    "cancel_source_retained": true,
+    "copy_source_target_bytes": 168,
+    "copy_equal_sha256": "535eca2bfc045f2002d8dfa844b7696c49cb90c9b0896b54234ab38cda4473cd",
+    "copy_durable": true,
+    "desktop_auto_refresh_observed": true,
+    "inactive_tooltip_did_not_show_error_or_stop_files": true,
+    "files_normal_ctrl_w": true,
+    "installer_result_column_visible_at_150_percent": true,
+    "installer_normal_exit": 0,
+    "installer_log_bytes": 0,
+    "probe_guest_compile_and_link": true,
+    "probe_ordinary_uid": 1000,
+    "probe_session": 4,
+    "probe_normal_exit": 0,
+    "probe_checks": 9,
+    "probe_failed": 0
+  },
+  "probe_result": "DROPUP READY uid=1000 session=4 source=12 target=13\nDROPUP CHECK capture actual=0 expected=0 intact=1 pass=1\nDROPUP CHECK no-UP actual=-108 expected=-108 intact=1 pass=1\nDROPUP CHECK wrong-sequence actual=-108 expected=-108 intact=1 pass=1\nDROPUP CHECK wrong-point actual=-108 expected=-108 intact=1 pass=1\nDROPUP CHECK reserved actual=-101 expected=-101 intact=1 pass=1\nDROPUP CHECK actual-UP actual=0 expected=0 intact=1 pass=1\nDROPUP CHECK replayed-UP actual=-108 expected=-108 intact=1 pass=1\nDROPUP CHECK cancel-ticket actual=0 expected=0 intact=1 pass=1\nDROPUP CHECK release-capture actual=0 expected=0 intact=1 pass=1\nDROPUP COMPLETE uid=1000 session=4 checks_failed=0\n",
+  "probe_native": {
+    "bytes": 10460,
+    "sha256": "6a586b4ae5e402a115635080f6f64df3973c24b80a214ca95587984b155d0042"
+  },
+  "owner": {
+    "before_physical_pages": 13950,
+    "after_physical_pages": 13950,
+    "physical_delta": 0,
+    "unexplained_delta": 0,
+    "unexpected": [],
+    "actual_pool_deltas": {
+      "records@008a7fc0": {
+        "pages": 0,
+        "objects": 0,
+        "flags": 1
+      },
+      "view_pool@008cd520": {
+        "pages": 0,
+        "objects": 0,
+        "flags": 0
+      },
+      "window_pool@008cd980": {
+        "pages": 0,
+        "objects": 0,
+        "flags": 0
+      },
+      "capture_pool@008cdde0": {
+        "pages": 0,
+        "objects": 0,
+        "flags": 0
+      },
+      "native_pool@008cf4a0": {
+        "pages": 0,
+        "objects": 0,
+        "flags": 0
+      },
+      "transaction_pool@008cf900": {
+        "pages": 0,
+        "objects": 0,
+        "flags": 0
+      },
+      "native_pool@008d8420": {
+        "pages": 0,
+        "objects": 0,
+        "flags": 0
+      },
+      "job_pool@008d8880": {
+        "pages": 0,
+        "objects": 0,
+        "flags": 0
+      },
+      "pipe_pool@008d8ce0": {
+        "pages": 0,
+        "objects": 0,
+        "flags": 0
+      },
+      "endpoint_pool@008d9140": {
+        "pages": 0,
+        "objects": 0,
+        "flags": 0
+      },
+      "owners@008de960": {
+        "pages": 0,
+        "objects": 0,
+        "flags": 0
+      },
+      "descriptions@008dedc0": {
+        "pages": 0,
+        "objects": 0,
+        "flags": 0
+      },
+      "handles@008df220": {
+        "pages": 0,
+        "objects": 0,
+        "flags": 0
+      },
+      "owners@008df6a0": {
+        "pages": 0,
+        "objects": 0,
+        "flags": 0
+      },
+      "br_offers@008e3b40": {
+        "pages": 0,
+        "objects": 0,
+        "flags": 0
+      },
+      "br_shared_objects@008e3fa0": {
+        "pages": 0,
+        "objects": 0,
+        "flags": 0
+      },
+      "br_messages@008e4400": {
+        "pages": 0,
+        "objects": 0,
+        "flags": 0
+      },
+      "br_connections@008e4860": {
+        "pages": 0,
+        "objects": 0,
+        "flags": 0
+      },
+      "br_endpoints@008e4cc0": {
+        "pages": 0,
+        "objects": 0,
+        "flags": 0
+      },
+      "br_formats@008e5120": {
+        "pages": 0,
+        "objects": 0,
+        "flags": 0
+      },
+      "br_clips@008e5580": {
+        "pages": 0,
+        "objects": 0,
+        "flags": 0
+      },
+      "br_blobs@008e59e0": {
+        "pages": 0,
+        "objects": 0,
+        "flags": 0
+      },
+      "br_handles@008e5e40": {
+        "pages": 0,
+        "objects": 0,
+        "flags": 0
+      },
+      "br_sessions@008e62a0": {
+        "pages": 0,
+        "objects": 0,
+        "flags": 0
+      },
+      "br_owners@008e6700": {
+        "pages": 0,
+        "objects": 0,
+        "flags": 0
+      },
+      "drop_tickets@008e6ba0": {
+        "pages": 0,
+        "objects": 0,
+        "flags": 0
+      },
+      "drop_targets@008e7000": {
+        "pages": 0,
+        "objects": 0,
+        "flags": 0
+      },
+      "drop_sessions@008e7460": {
+        "pages": 0,
+        "objects": 0,
+        "flags": 0
+      },
+      "drop_owners@008e78c0": {
+        "pages": 0,
+        "objects": 0,
+        "flags": 0
+      },
+      "drop_windows@008e7d20": {
+        "pages": 0,
+        "objects": 0,
+        "flags": 0
+      },
+      "owners@008ed240": {
+        "pages": 0,
+        "objects": 0,
+        "flags": 0
+      }
+    },
+    "actual_font_page_delta": 0,
+    "actual_desktop_page_delta": 0
+  },
+  "source_disk_unchanged": true,
+  "current_inputs_unchanged": true,
+  "limitations": [
+    "Original early command typed during foreground linker lost characters; retained, not counted as successful execution",
+    "Early U.LOG snapshot before foreground exit was absent; retained as input uncertainty",
+    "One hand-copied screenshot digest rejected before mouse input; retried with actual file digest",
+    "Initial Files status -301 before HOME navigation is not reclassified as success",
+    "Installer actual data write from unchanged GUI10 is reused; this run checks changed initial column sizing",
+    "Newly reported logout/passwordless local login faults were discovered after this run; not covered here"
+  ],
+  "files": {
+    "p6-gui.json.gz": {
+      "source": "build/m10a2-p6-gui-run-12/p6-gui.json",
+      "bytes": 8208968,
+      "sha256": "a6f3707822ac246acbd07d21ed89cac9128f8ab165c7edf0f85714d1cafa9106",
+      "archive_sha256": "dec8f049f1cd54be47042b671b9b4fc53817665b0910c0c396eff151d4d8b9ce"
+    },
+    "session.json": {
+      "source": "build/m10a2-p6-gui-run-12/session.json",
+      "bytes": 19127877,
+      "sha256": "73787025ea3bc93c6998f87362354fb42d968927fc2579d453e6bc433b4b3ec0",
+      "archive_sha256": "73787025ea3bc93c6998f87362354fb42d968927fc2579d453e6bc433b4b3ec0"
+    },
+    "heartbeat.jsonl": {
+      "source": "build/m10a2-p6-gui-run-12/heartbeat.jsonl",
+      "bytes": 62751,
+      "sha256": "f9e1c53fbf1a7efa368c69f7c2fc280fbd035da4d3585904889923baa3bfe571",
+      "archive_sha256": "f9e1c53fbf1a7efa368c69f7c2fc280fbd035da4d3585904889923baa3bfe571"
+    },
+    "gui12-up-compile.log": {
+      "source": "build/m10a2-p6-gui-run-12/gui12-up-compile.log",
+      "bytes": 208,
+      "sha256": "e30cae405b6ebad2a97d92695ff47d001d354f02c2bc23371287c6215843055c",
+      "archive_sha256": "e30cae405b6ebad2a97d92695ff47d001d354f02c2bc23371287c6215843055c"
+    },
+    "gui12-up-link.log": {
+      "source": "build/m10a2-p6-gui-run-12/gui12-up-link.log",
+      "bytes": 70,
+      "sha256": "02e9ecabc55275c5cd9b5d0b014cc5c196d4cdf1098d053e93b46277f975c4a8",
+      "archive_sha256": "02e9ecabc55275c5cd9b5d0b014cc5c196d4cdf1098d053e93b46277f975c4a8"
+    },
+    "gui12-up-result.log": {
+      "source": "build/m10a2-p6-gui-run-12/gui12-up-result.log",
+      "bytes": 676,
+      "sha256": "c931b95573d604cb09785739d14e29cd2fc114031ee8c4ff7525ffddce63256e",
+      "archive_sha256": "c931b95573d604cb09785739d14e29cd2fc114031ee8c4ff7525ffddce63256e"
+    },
+    "gui12-installer.log": {
+      "source": "build/m10a2-p6-gui-run-12/gui12-installer.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "archive_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "gui12-copy.REC": {
+      "source": "build/m10a2-p6-gui-run-12/gui12-copy.REC",
+      "bytes": 832,
+      "sha256": "551792d7695859a859ee36e7caaaa2433388cf457600cf177946746e0e237e72",
+      "archive_sha256": "551792d7695859a859ee36e7caaaa2433388cf457600cf177946746e0e237e72"
+    },
+    "gui12-source-hello.c": {
+      "source": "build/m10a2-p6-gui-run-12/gui12-source-hello.c",
+      "bytes": 168,
+      "sha256": "535eca2bfc045f2002d8dfa844b7696c49cb90c9b0896b54234ab38cda4473cd",
+      "archive_sha256": "535eca2bfc045f2002d8dfa844b7696c49cb90c9b0896b54234ab38cda4473cd"
+    },
+    "gui12-target-hello.c": {
+      "source": "build/m10a2-p6-gui-run-12/gui12-target-hello.c",
+      "bytes": 168,
+      "sha256": "535eca2bfc045f2002d8dfa844b7696c49cb90c9b0896b54234ab38cda4473cd",
+      "archive_sha256": "535eca2bfc045f2002d8dfa844b7696c49cb90c9b0896b54234ab38cda4473cd"
+    },
+    "gui12-up-native.scx": {
+      "source": "build/m10a2-p6-gui-run-12/gui12-up-native.scx",
+      "bytes": 10460,
+      "sha256": "6a586b4ae5e402a115635080f6f64df3973c24b80a214ca95587984b155d0042",
+      "archive_sha256": "6a586b4ae5e402a115635080f6f64df3973c24b80a214ca95587984b155d0042"
+    },
+    "screenshots/files-home.png": {
+      "source": "build/m10a2-p6-gui-run-12/gui12-files-home.png",
+      "bytes": 876214,
+      "sha256": "704e9024f298e9bea8d13396683c9cdddcf71a12671dca92634b02bab05d1251",
+      "archive_sha256": "704e9024f298e9bea8d13396683c9cdddcf71a12671dca92634b02bab05d1251"
+    },
+    "screenshots/fast-drop.png": {
+      "source": "build/m10a2-p6-gui-run-12/gui12-fast-drop.png",
+      "bytes": 877641,
+      "sha256": "d08919d0696c72411424bdb335a0e2473423aee26a53160442e6419bddaad32f",
+      "archive_sha256": "d08919d0696c72411424bdb335a0e2473423aee26a53160442e6419bddaad32f"
+    },
+    "screenshots/cancel-result.png": {
+      "source": "build/m10a2-p6-gui-run-12/gui12-cancel-result.png",
+      "bytes": 877675,
+      "sha256": "c38cff9213082ece5a7b9d175daf0210cd886619f8f1debe52714e335dd31af8",
+      "archive_sha256": "c38cff9213082ece5a7b9d175daf0210cd886619f8f1debe52714e335dd31af8"
+    },
+    "screenshots/copy-dialog.png": {
+      "source": "build/m10a2-p6-gui-run-12/gui12-copy-dialog.png",
+      "bytes": 879388,
+      "sha256": "33077c5d32b7f9dfebd8f5db1c71c0ce427aca25c9271552777e4d80445b541e",
+      "archive_sha256": "33077c5d32b7f9dfebd8f5db1c71c0ce427aca25c9271552777e4d80445b541e"
+    },
+    "screenshots/copy-settled.png": {
+      "source": "build/m10a2-p6-gui-run-12/gui12-copy-settled.png",
+      "bytes": 874394,
+      "sha256": "4f570c6186241ebf847b4af40df7e65ee900ab27f430f73d1b141a9d2cc791bd",
+      "archive_sha256": "4f570c6186241ebf847b4af40df7e65ee900ab27f430f73d1b141a9d2cc791bd"
+    },
+    "screenshots/inactive-tooltip.png": {
+      "source": "build/m10a2-p6-gui-run-12/gui12-inactive-tooltip.png",
+      "bytes": 874465,
+      "sha256": "72f3bd61e91f34cad8fc6094dabafca44c7d245982f9b830c626041be42a9424",
+      "archive_sha256": "72f3bd61e91f34cad8fc6094dabafca44c7d245982f9b830c626041be42a9424"
+    },
+    "screenshots/after-files.png": {
+      "source": "build/m10a2-p6-gui-run-12/gui12-after-files.png",
+      "bytes": 1361650,
+      "sha256": "d0f6e48a90e73fa3b7a000e74631a0565ba1e6274a32b31d3d2fac69a14f986b",
+      "archive_sha256": "d0f6e48a90e73fa3b7a000e74631a0565ba1e6274a32b31d3d2fac69a14f986b"
+    },
+    "screenshots/probe-current.png": {
+      "source": "build/m10a2-p6-gui-run-12/gui12-probe-current.png",
+      "bytes": 1039533,
+      "sha256": "0272c613c27d7e2f5c7b6b4fc6f11820e1dcae519912f157df6563f433b09059",
+      "archive_sha256": "0272c613c27d7e2f5c7b6b4fc6f11820e1dcae519912f157df6563f433b09059"
+    },
+    "screenshots/probe-return.png": {
+      "source": "build/m10a2-p6-gui-run-12/gui12-probe-return.png",
+      "bytes": 1071553,
+      "sha256": "2da7bb744159a9a6a183af3953588d6b11f76f70b9958ba55716f22c8fc5fea2",
+      "archive_sha256": "2da7bb744159a9a6a183af3953588d6b11f76f70b9958ba55716f22c8fc5fea2"
+    },
+    "screenshots/installer-ready.png": {
+      "source": "build/m10a2-p6-gui-run-12/gui12-installer-ready.png",
+      "bytes": 1022637,
+      "sha256": "cb5a5db2572c0ac0d36a70c9408fe6162af66573f8f595d244fa71bfce2c95e5",
+      "archive_sha256": "cb5a5db2572c0ac0d36a70c9408fe6162af66573f8f595d244fa71bfce2c95e5"
+    },
+    "screenshots/installer-exit-shell-result.png": {
+      "source": "build/m10a2-p6-gui-run-12/gui12-installer-exit-shell-result.png",
+      "bytes": 1073951,
+      "sha256": "cc833ea43e4c2e3c3e4043b3066885b442e0e31d65b9c6f013f67d1e4df80d9c",
+      "archive_sha256": "cc833ea43e4c2e3c3e4043b3066885b442e0e31d65b9c6f013f67d1e4df80d9c"
+    },
+    "stdout/p6-cli-gui12-post-close-ps.bin": {
+      "source": "build/m10a2-p6-gui-run-12/case-025.stdout.bin",
+      "bytes": 238,
+      "sha256": "97f564d5be30210c904ec60ace418fe3f99b9c62d46e022a5cce45fcddf8a110",
+      "archive_sha256": "97f564d5be30210c904ec60ace418fe3f99b9c62d46e022a5cce45fcddf8a110"
+    },
+    "stdout/p6-cli-gui12-restore-original-session.bin": {
+      "source": "build/m10a2-p6-gui-run-12/case-026.stdout.bin",
+      "bytes": 127,
+      "sha256": "e49e5eb0c9fa914cc98e446cd809f351cd6a739438c1d335f6a15c94b674485e",
+      "archive_sha256": "e49e5eb0c9fa914cc98e446cd809f351cd6a739438c1d335f6a15c94b674485e"
+    },
+    "stdout/p6-cli-gui12-remove-finished-test-session.bin": {
+      "source": "build/m10a2-p6-gui-run-12/case-027.stdout.bin",
+      "bytes": 129,
+      "sha256": "f4cf77715c26b8d568cde0d6f5e4dc5ba3a990799ec59b1423971bc182aab20a",
+      "archive_sha256": "f4cf77715c26b8d568cde0d6f5e4dc5ba3a990799ec59b1423971bc182aab20a"
+    },
+    "probe/DROPUP.C": {
+      "source": "drafts/m10a2-drop-release-probe/DROPUP.C",
+      "bytes": 8674,
+      "sha256": "ccf2de2563426017e0d3b6f89cee1bc2dd41af1a56562c026d018aecebfc3855",
+      "archive_sha256": "ccf2de2563426017e0d3b6f89cee1bc2dd41af1a56562c026d018aecebfc3855"
+    },
+    "probe/README.md": {
+      "source": "drafts/m10a2-drop-release-probe/README.md",
+      "bytes": 902,
+      "sha256": "142253c1648ef32c119800677f674985087c793f02d393322bcc727dd41ae2a8",
+      "archive_sha256": "142253c1648ef32c119800677f674985087c793f02d393322bcc727dd41ae2a8"
+    },
+    "probe/UP.JSON": {
+      "source": "build/m10a2-drop-release-probe-03/UP.JSON",
+      "bytes": 3566,
+      "sha256": "c077c1a13361e939a77cd4ead5441500d2221b1bf54fb78a87e7e556a3dc2e9a",
+      "archive_sha256": "c077c1a13361e939a77cd4ead5441500d2221b1bf54fb78a87e7e556a3dc2e9a"
+    }
+  }
+}

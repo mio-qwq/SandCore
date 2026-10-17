@@ -1,0 +1,13 @@
+{
+  "status": "PREPARED_NO_VM_STARTED",
+  "scope": "actual leave desktop then logout and local passwordless sign-in",
+  "auxiliary_drop_probe_not_installed": true,
+  "ordinary_guards_unchanged": true,
+  "owner_observer_unchanged": true,
+  "files": {
+    "coherent_runtime.py": "29f09de6c0a8c3cf5fdaaddcb66beede20f1cc0815eb2d000e9bdd0b90f1e966",
+    "driver.py": "780cd8d08987b0db58e6232187f6ac9b682f1bd32afebe73deb25d3dc699706c",
+    "login_runtime.py": "4ef0eaccb94ae9263e4b10a0c7f79b02251bcf547bb0f93b4c82a0ff9b023d6c",
+    "owner_snapshot.py": "d99587369b93615a2517db490227db04e16f57903e1177aa97880f113cf5c22b"
+  }
+}

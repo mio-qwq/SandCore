@@ -1,0 +1,6 @@
+{
+  "original_failure": "sidecar inheritance chain omitted native09 due copied parent v8",
+  "vm_started": false,
+  "correction": "retain original v9 as parent including all actual native09 sidecar/get proof; no guard removed",
+  "original_product_failure": false
+}

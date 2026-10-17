@@ -10,6 +10,13 @@
 
 精确读取名单为受保护SYS/LIB/SCLDR、SC32API、SCCLIB、SCLIB、SCUI与SYS/UI/UAX15_1.SCU。发行header固定各真实文件长度/SHA，按实际内容revision缓存；不信用户同名覆盖或仅迁移SYSTEM元数据。资源失败在启动前拒绝；后续UI构造失败保持失败关闭，不以提权或恢复未认证桌面绕过锁定。Broker身份仍拒LOCKED/subject=-2；现有handle0 Wait无Broker对象即可服务SCUI，未注册drag/drop时ContextStep不调用IPC。
 
-主代理最终native交付必须由实际LOGIN2与同源五库/UAX重生两个issue头并重编CORE；HOST摘要不是native发行授权。旧F12/登录源码与旧成品保留，新固定路径只在本批CORE接线生效。默认启动盘、用户盘和其它应用迁移由Root验证安排，本草稿没有装盘或启动QEMU。
+主代理最终native交付必须由实际LOGIN2与同源五库/UAX重生两个issue头并重编CORE；HOST摘要不是native发行授权。旧F12/登录源码与旧成品保留，新固定路径只在本批CORE接线生效。默认启动盘、用户盘和其它应用迁移由Root验证安排，本段保留最初实现时态；最终native11/final12已装入独立验证盘并实际启动，见下述2026-10-17结果。
 
-修订：2026-10-16，新增Secret、固定发行登录角色与Session2实现，guest/视觉待验。
+修订：2026-10-16，新增Secret、固定发行登录角色与Session2实现，原实现阶段guest/视觉待验，后续结果见2026-10-17记录。
+
+2026-10-17，桌面“退出桌面”确认后返回固定登录界面，原SID与后台程序保留；不再结束受监管的host并立即触发重启。“注销会话”仍先关闭当前SID中的任务，再到登录界面。固定LOGIN2允许未设密码的默认mio空输入返回；设置过密码后必须输入该密码，root没有公开默认密码。普通Session2不取得该本机例外，也不新增权限。GUI13真实离开桌面后SID4保留、root空输入拒绝、mio登录SID5、注销后SID5消失、再次登录SID6，LOGIN2正常退出。原资源账+8及FAIL保持，见M10A2-ACCEPTANCE.md。
+
+修订：2026-10-17，区分离开桌面和注销，补默认mio本机重新登录回路。
+
+
+修订：2026-10-17，统一HOST21/native11/final12、GUI12与登录回归实际范围，SDK及发布入口同批整理。

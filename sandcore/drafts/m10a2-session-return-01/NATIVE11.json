@@ -1,0 +1,16 @@
+{
+  "build/m10a2-p6-target-refresh-11/p6-generation.json": {
+    "sha256": "66396e2bb8eaf81eefffa02fb4fbaffb23c99a0fddf749ba81559b0d07dad9c0",
+    "status": "DECLARED_P6_NATIVE_GENERATION_PASS",
+    "qemu_pid": 18296,
+    "current_inputs_unchanged": true,
+    "source_disk_unchanged": true
+  },
+  "build/m10a2-p6-refresh-vm-11/refresh-vm.json": {
+    "sha256": "fbb6db090cc822a624f94c5d79ecf9b32ddedabad40ff8bb6ae1ed374ac80d92",
+    "status": "EXPLICIT_LABEL_REFRESH_GENERATED",
+    "qemu_pid": 18296,
+    "current_inputs_unchanged": true,
+    "source_disk_unchanged": true
+  }
+}

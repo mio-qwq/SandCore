@@ -1,0 +1,15 @@
+{
+  "status": "PREPARED_NOT_EXECUTED",
+  "previous": "build/m10a2-p6-target-refresh-10/p6-generation.json",
+  "historical_reports_unchanged": true,
+  "expected_changed_labels": [
+    "DESKTOP"
+  ],
+  "current_kernel_change": "auth.c local fixed LOGIN2 policy only",
+  "runtime_observer_layout_unchanged": true,
+  "files": {
+    "driver.py": "74af6b4ed2c86d12de47e33730586661807dd6bd964013669ee4a5bcf583eb40",
+    "followup.py": "ec594ef0fcf3aa3444b5c86116c2ee13bad7ba578cf9a780dec94c41b0cc165d",
+    "PINS.json": "e8e39fdedc61e764b6730cb0e9abf8af43840fa4dcce0e653e8b1fe73ff316af"
+  }
+}

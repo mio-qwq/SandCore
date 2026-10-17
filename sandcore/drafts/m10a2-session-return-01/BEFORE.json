@@ -1,0 +1,10 @@
+{
+  "kernel/auth.c": {
+    "sha256": "6a4ffcc8d8ec536ae7977ecad293439ac345250b5a13b2e4e3ce404e3288b1e4",
+    "bytes": 20279
+  },
+  "user/scshell/desktop/desktop_actions.inc": {
+    "sha256": "1500e50c5448b2b573c800a2fc635acb5e037720597b03bffb1ffda463d0effa",
+    "bytes": 32110
+  }
+}

@@ -1,0 +1,11 @@
+DROPUP READY uid=1000 session=4 source=12 target=13
+DROPUP CHECK capture actual=0 expected=0 intact=1 pass=1
+DROPUP CHECK no-UP actual=-108 expected=-108 intact=1 pass=1
+DROPUP CHECK wrong-sequence actual=-108 expected=-108 intact=1 pass=1
+DROPUP CHECK wrong-point actual=-108 expected=-108 intact=1 pass=1
+DROPUP CHECK reserved actual=-101 expected=-101 intact=1 pass=1
+DROPUP CHECK actual-UP actual=0 expected=0 intact=1 pass=1
+DROPUP CHECK replayed-UP actual=-108 expected=-108 intact=1 pass=1
+DROPUP CHECK cancel-ticket actual=0 expected=0 intact=1 pass=1
+DROPUP CHECK release-capture actual=0 expected=0 intact=1 pass=1
+DROPUP COMPLETE uid=1000 session=4 checks_failed=0

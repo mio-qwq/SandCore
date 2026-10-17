@@ -1,5 +1,11 @@
 # SandCore M10a2 — The Application Platform Era：组件现状审计
 
+## 2026-10-17 迁移落地索引
+
+原审计保持2026-10-14基线时态。现在Files2位于user/files2，Studio2位于user/studio2，Debug2位于user/debug2；桌面为user/scshell/desktop，Notes/Canvas/Lens/Settings/Monitor/Calculator/Terminal/Palette/Sound/Session/Installer的入口和原生来源见M10A2-P6-IMPLEMENTATION.md与native11完整清单。CLI及旧组件/LEGACY仍保留，不把旧源码表写成新版尚未实现。Installer承接原CLI文件安装流程，SCW为正式工程后缀。完整证据与限制见M10A2-ACCEPTANCE.md。
+
+<details><summary>2026-10-14原始基线审计</summary>
+
 > 2026-10-14。审计基线为 `main` 的
 > `8e1c27abfe1b0c14ddff6d23464a961eabfd8cc0`。本页记录源码与规范审阅，
 > 没有启动旧组件、重新构建系统盘或进行本轮 GUI 验收。
@@ -186,3 +192,8 @@ SandCore Ring3调用、客体异常回收、内核映射/权限、共享物理�
 2026-10-14：建立基线组件/入口/依赖/保真清单，记录旧CPUINFO越界、
 字体测量/私有菜单与Palette口径差异；新增绑定输入的SCL宿主验证范围，
 不宣称本轮桌面运行或M10a2整体完成，不重启封存M8。
+
+</details>
+
+
+修订：2026-10-17，统一HOST21/native11/final12、GUI12与登录回归实际范围，SDK及发布入口同批整理。

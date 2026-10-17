@@ -8,11 +8,12 @@
 
 SandCore is developed by [mio](https://github.com/mio-qwq/). The project includes BIOS boot support, paging and preemptive multitasking, the SandFS filesystem, a multi-user desktop, graphical applications, audio, IPv4 networking, custom executable formats, and an in-system C compiler, assembler, and debugger capable of compiling and running programs within SandCore itself.
 
-Current development is **SandCore M10a2 — The Application Platform Era**. Ring3 dynamic libraries, the system libraries, SCUI, the desktop, native application generation and a complete SDK have execution evidence. HOST15/native08/final09 and the focused GUI10 checks completed with zero final page difference: ordinary-user durable installation/readback, debugger shortcuts and a real 1024×768 mode change. Specific remaining defects and the full M10a2 goal remain active. The Windows launcher uses DPI-aware GTK and prefers WHPX; keyboard shortcuts have been confirmed in actual use. See the [current execution record](sandcore/docs/M10A2-LIVE-GUI.md) and [launcher evidence](sandcore/docs/M10A2-DEFAULT-ENTRY.md). The accepted runnable baseline remains **M10a1**, accepted on **October 7, 2026** and distributed as a **GitHub Preview pre-release**. Development uses `main`; M9, M8a and earlier artifacts remain preserved. Full M10 has not been declared complete and the base kernel has not been frozen.
+Current version: **SandCore M10a2 — The Application Platform Era**. Ring3 SCL, the four core libraries, SCUI, the desktop and major applications, and the native SCCC/SCLD multi-source SCW workflow have implementation and execution evidence. See the [delivery audit](sandcore/docs/M10A2-ACCEPTANCE.md), [SDK](sandcore/docs/M10A2-SDK.md), and [release notes](sandcore/docs/M10A2-RELEASE.md). Final runtime inputs are HOST21/native11/final12. GUI12 ended with zero resource difference; GUI13 verified leaving the desktop, logout and local sign-in, while its original resource FAIL (+8 pages on the first retained login view) remains disclosed. The launcher uses DPI-aware SDL raw mouse input and prefers WHPX; the user confirmed shortcuts and fullscreen mouse behavior. Maximum guest mode is 1920x1080; a 16:10 host uses aspect-preserving bars. Documentation, SDK and package checks precede the authorized signed commit and Release; actual publication is recorded separately. M10a1, M9 and M8a are preserved. Full M10 and the base-kernel freeze are not declared complete.
 
 | Entry point | Description |
 |---|---|
-| [Current development acceptance](sandcore/docs/M10A1-ACCEPTANCE.md) | M10a1 features, usage, actual verification evidence, and limitations |
+| [M10a2 delivery audit](sandcore/docs/M10A2-ACCEPTANCE.md) | Current platform, SDK, actual verification evidence, and limitations |
+| [M10a2 runtime and SDK](sandcore/docs/M10A2-RELEASE.md) | Package contents and launch instructions; publication is recorded separately |
 | [Download M10a1 Preview](https://github.com/mio-qwq/SandCore/releases/tag/M10a1) | Accepted development build; [release notes](sandcore/docs/M10A1-PREVIEW.md) |
 | [Building and running](#building-and-running) | Build the current system from source or launch an existing version |
 | [Architecture](#system-architecture) | Boot sequence, kernel, user space, sessions, and extensions |
@@ -458,7 +459,7 @@ The official Ed25519 private signing key is retained exclusively by its owner. T
 
 | Version | Status |
 |---|---|
-| M10a2 — The Application Platform Era | SCL and the SC32 foundation, native libraries and message windows have run; the complete platform is under development and not yet accepted |
+| M10a2 — The Application Platform Era | Platform, rebuilt components, native multi-source SDK and GUI evidence collected; signing and Release follow delivery checks. GUI13 resource FAIL and other limits remain disclosed |
 | M10a1 | Accepted on October 7, 2026; GitHub Preview pre-release, including the separately added curl; development unified on main |
 | M9 | Accepted on October 5, 2026; stable release |
 | M8a | Approved partial stable release; unfinished goals of the original M8 remain archived |
@@ -478,3 +479,6 @@ Translation note (2026-10-08): Added this English main README. Technical content
 Revision (2026-10-14): Retained the existing English README and license history while adding the M10a2 development and recovery links.
 
 Revision (2026-10-15): Recorded executed SC32/native libraries, three-window input and exact recovery evidence; continued the complete runtime, GUI and component scope.
+
+
+修订：2026-10-17，统一HOST21/native11/final12、GUI12与登录回归实际范围，SDK及发布入口同批整理。

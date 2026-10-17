@@ -1,0 +1,115 @@
+{
+  "status": "FINAL_DELIVERY_FILES_AND_SOURCE_PROVENANCE_CHECKED",
+  "sdk_directory": "build\\m10a2-sdk-delivery-02",
+  "sdk_manifest_sha256": "d042b4e4b21a0b2fd477f3740bac4425ac855b321de95f8a096825898e9baa24",
+  "sdk_payload_files": 499,
+  "runtime_file_sha256": {
+    "run.bat": "ea9f0e859f894ce9e773ba617f77460f13bd9b6d751135f48c8b2801327a4039",
+    "run.py": "bf979ae2208b59f763b06a53027cea48852ca911887df64abf09efb19a5c14b8",
+    "sandcore.img": "47921cc2f9f0a23ea404cbd041a216931844023eedbcdbb4c824e9a55a8cfb3f",
+    "sanddata.img": "d7c53a3c92211ffcf8e256d59a63467fcd9ee7ef0f12b0a8e0aecb57cbf6386b"
+  },
+  "disk_records": 2480,
+  "assets": {
+    "SandCore-M10a2.zip": {
+      "bytes": 21471099,
+      "sha256": "66a9311cf68ba3bf5ca9a1649893163807294064198f70dd228459152df4acec",
+      "entries": 4
+    },
+    "SandCore-M10a2-SDK.zip": {
+      "bytes": 5211109,
+      "sha256": "9170d28760466af1fbf6e287867b1ab9f7073674969af201302cc3953aa4a8eb",
+      "entries": 502
+    }
+  },
+  "sums_sha256": "77a1fd59a0fd03841034946dc3925c8a28c9cbb5943d5b33ffc7a8193800cbcd",
+  "library_versions_and_exports": {
+    "SCLDR.SCL": [
+      1,
+      2,
+      3,
+      12
+    ],
+    "SC32API.SCL": [
+      1,
+      5,
+      7,
+      194
+    ],
+    "SCCLIB.SCL": [
+      1,
+      0,
+      1,
+      94
+    ],
+    "SCLIB.SCL": [
+      1,
+      0,
+      1,
+      163
+    ],
+    "SCUI.SCL": [
+      1,
+      4,
+      6,
+      174
+    ],
+    "SCGFX.SCL": [
+      1,
+      0,
+      1,
+      56
+    ],
+    "SCSHELL.SCL": [
+      1,
+      2,
+      3,
+      99
+    ],
+    "SCTERM.SCL": [
+      1,
+      0,
+      1,
+      19
+    ],
+    "SCSOUND.SCL": [
+      1,
+      0,
+      1,
+      5
+    ]
+  },
+  "core_binding": {
+    "core_sha256": "44d0b635f4f2597ef8009067de0da299bb36270c367589a8898711a64361f6b2",
+    "payload_sha256": "66bfe8e715d2cdd53ef6dbed2c7f35cb502d4cb6b4f7480e38af6750a3d125a5",
+    "elf_sha256": "4d35bafb19eae260a98584db9dd0de5161faa54145f5147b04f170f4154a09e6",
+    "actual_compiled_program_hashes": true,
+    "actual_compiled_login_resources": [
+      "SYS/LIB/SC32API.SCL",
+      "SYS/LIB/SCCLIB.SCL",
+      "SYS/LIB/SCLDR.SCL",
+      "SYS/LIB/SCLIB.SCL",
+      "SYS/LIB/SCUI.SCL",
+      "SYS/UI/UAX15_1.SCU"
+    ]
+  },
+  "scapi_sha256": "81a730450fcb3d310ed841ad3e5c70a3fed32aa7fbd10acac8b888ac7da9ffc1",
+  "source_disk_unchanged": true,
+  "all_sdk_payloads_and_packaged_doc_bytes_equal": true,
+  "zip_crc_and_every_entry_sha256_checked": true,
+  "new_qemu_runs": 0,
+  "new_compiler_runs": 0,
+  "runtime_evidence_reused_by_exact_unchanged_inputs": "docs/M10A2-ACCEPTANCE.md",
+  "gui13_raw_resource_verdict": "FAIL",
+  "gui13_raw_unexplained_pages": 8,
+  "gui13_functional_checks_verified": true,
+  "user_disk_migration": {
+    "status": "SYSTEM_PAYLOAD_UPDATED_USER_OBJECTS_PRESERVED",
+    "data_sha256": "362e3ce3ec4df694561443b761270bcae4fd0e13382c066681e10ba91d55a983",
+    "unlisted_objects_preserved": 1626,
+    "home_desktop_objects_preserved": 34,
+    "raw_user_disk_not_packaged": true
+  },
+  "signed_commit_created": false,
+  "release_created": false
+}

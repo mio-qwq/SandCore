@@ -6,15 +6,16 @@
 
 SandCore 由 [mio](https://github.com/mio-qwq/) 开发。工程包含 BIOS 引导、分页与抢占式多任务、SandFS 文件系统、多用户桌面、图形应用、音频、IPv4 网络、自有可执行格式，以及可以在系统内编译和运行程序的 C 编译器、汇编器和调试器。
 
-当前开发工作为 **SandCore M10a2 — The Application Platform Era**：真正 Ring3 动态链接、四大系统库、SCUI 与桌面已有分项客体证据；八个普通库和重制应用工具链已实际系统内生成，完整 SDK 和 SCW 工程工作区已接入。普通用户 GUI 与独立开发示例仍在收束，实际失败与修复分列于[当前客体接力](sandcore/docs/M10A2-LIVE-GUI.md)，完整目标持续 active。可用验收基线仍为 **M10a1**，已于 **2026-10-07 验收通过**并交付 [GitHub Preview](https://github.com/mio-qwq/SandCore/releases/tag/M10a1)。统一在 `main` 开发；M9、M8a 及更早历史产物保留。完整 M10 尚未宣布完成，基础内核尚未冻结。
+当前版本为 **SandCore M10a2 — The Application Platform Era**：Ring3 SCL、四大系统库、统一SCUI/桌面及主要组件、真实系统内SCCC/SCLD和多源SCW开发流程已交付实现及对应证据。完整范围见[交付检查](sandcore/docs/M10A2-ACCEPTANCE.md)和[版本说明](sandcore/docs/M10A2-RELEASE.md)。HOST21/native11/final12是最终运行绑定；GUI12资源零差，GUI13登录功能有效但首次保留登录桌面+8页的原资源FAIL保持，详情已列出。文档/SDK/附件检查后按用户授权签名提交并发布；实际发布状态以发布凭证为准。M10a1 Preview、M9、M8a及用户盘保留，完整M10及基础内核冻结并未宣称完成。
 
-M10a2试玩入口已修正Windows高DPI显示链路，采用GTK原生显示并优先WHPX硬件加速；默认设置/文件对话框已有双盘冷启动原尺寸截图。快捷键已由实际使用确认可用；HOST15/native08/final09及GUI10定向回归已完成，包含普通安装/回读、Debug快捷键、1024×768真实模式及零差资源回收。完整M10a2和具体剩余缺陷仍在推进，范围见[默认入口修正](sandcore/docs/M10A2-DEFAULT-ENTRY.md)。
+M10a2运行包仅含run.py、run.bat和两个盘，默认SDL原生相对鼠标/物理DPI/最近邻，优先WHPX；用户已确认快捷键及全屏鼠标正常。最大1920×1080，16:10宿主全屏保留比例黑边。退出桌面回登录且保留会话，注销关闭会话；未设密码的默认mio仅固定本机LOGIN2可空输入登录。独立SDK及实际来源见[SDK说明](sandcore/docs/M10A2-SDK.md)。
 
 > **关于 AI 参与与文档质量：** 本项目包含由 AI 生成或辅助编写的代码，部分文档也由 Agent 撰写或整理，因此可能存在表述不清、人称或代词指代错误，以及遗留的 Agent 自述等问题。欢迎通过 [Issues](https://github.com/mio-qwq/SandCore/issues) 指出问题；我也会在后续持续校对与完善。
 
 | 入口 | 内容 |
 |---|---|
-| [当前开发验收](sandcore/docs/M10A1-ACCEPTANCE.md) | M10a1 功能、运行方法、实际证据和限制 |
+| [M10a2交付检查](sandcore/docs/M10A2-ACCEPTANCE.md) | 当前平台、SDK、真实证据与准确限制 |
+| [M10a2运行包/SDK](sandcore/docs/M10A2-RELEASE.md) | 交付内容与启动方法；实际发布以GitHub结果为准 |
 | [M10a1 Preview 下载](https://github.com/mio-qwq/SandCore/releases/tag/M10a1) | 已验收的开发运行包；[发布说明](sandcore/docs/M10A1-PREVIEW.md) |
 | [构建与运行](#构建与运行) | 从源码构建当前系统、启动已有版本 |
 | [架构](#系统架构) | 启动链、内核、用户态、会话和扩展 |
@@ -454,7 +455,7 @@ env -u OS make -j4
 
 | 版本 | 状态 |
 |---|---|
-| M10a2 — The Application Platform Era | Ring3 SCL/四库/SCUI、桌面和文件事务等已有实际分项证据；八个普通库、重制组件与原生SCCC/SCLD已在系统内生成。三目标刷新05与新CORE/SDK完成；剪贴板、拖放自动刷新已有实际证据，IDE完整流程和整版验收继续 |
+| M10a2 — The Application Platform Era | 平台、重制组件、原生多源SDK与真实GUI证据已汇总；检查后签名提交/Release。GUI13登录资源账+8/FAIL等准确限制见版本说明 |
 | M10a1 | 2026-10-07 验收通过，GitHub Preview 预发布，含追加 curl；统一使用 main |
 | M9 | 2026-10-05 验收通过，正式发布 |
 | M8a | 批准的部分正式发布；原 M8 未完成部分继续封存 |
@@ -485,3 +486,6 @@ env -u OS make -j4
 修订：2026-10-16，保存Ring3桌面资源/连续会话证据与六个重制组件HOST整合；新应用客体/Files跨窗/完整SDK继续。
 
 修订：2026-10-16，同步完整原生生成、SCW/SDK和普通GUI实际边界；整版目标继续。
+
+
+修订：2026-10-17，统一HOST21/native11/final12、GUI12与登录回归实际范围，SDK及发布入口同批整理。

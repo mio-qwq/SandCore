@@ -1,24 +1,8 @@
 # M10a2 当前运行与接续
 
-<!-- CURRENT-BEGIN -->
-2026-10-17。完整M10a2目标active，主代理独立工作，无subagent，也不使用computer-use。当前实际会话为GUI12：exec90027 / Windows QEMU4644，输出build/m10a2-p6-gui-run-12，HOST20/native10/final11、WHPX、Windows双盘无头输入。正在启动和建立普通桌面，尚未取得新交互结论或最终owner账。全部运行源、tools、SDK/CORE和活helper冻结；下方旧句柄都不复用。
+2026-10-17。当前最终运行绑定为HOST21/native11/final12；真实构建/原生生成均结束，没有后台构建或QEMU仍在运行。CORE SHA256为44d0b635f4f2597ef8009067de0da299bb36270c367589a8898711a64361f6b2。GUI12快拖/取消/持久复制、独立UP检查及Installer列宽通过，owner13950→13950；GUI13退出/注销/默认mio空输入重新登录和root空输入拒绝已实际验证，原资源账+8与FAIL_OR_INTERRUPTED保持，不能称该轮整体PASS。
 
-native10已实际exit0、QEMU15372关闭。inner SHA1e39068eeec9de3027f1c04e666b0f24b60ec4795d5ef860a7f376994ffad740，outer SHAd37f10f5904e1ff3e5d9cd472047f20ca7ce7679b82abcf2eabddc78c3ed3b0c；27对象/8普通库/21产物、严格reader、源和原盘守恒通过。owner14050→14066，实际+16页由同暂停的allocator块、5个新增时钟字形和一个65536B arena/PTE归属，未解释0；没有固定16页宽限，也没有重分类原native07 FAIL。证据evidence/m10a2-native10。
-
-final11已实际完成codec-proof、严格SDK、CORE构建及只读产物核对，两个执行器均exit0。CORE SHA2a6feb8315f9f7036dd2ac62592dc000e44c301763008f28265be7b268ef131e；SDK496项/17503689B，普通八库及G1/SCLD有真实客体来源，只有SCSOUND沿既有host codec例外。构建源变化0，旧中间物只作make输入，新内核和发行表已实际重编；新镜像尚未GUI验收。证据evidence/m10a2-final11。
-
-本批实现：SC32DROP2.H / ScDropAtRelease / SYS300 selector427，绑定真实capture UP的输入epoch、消息序号、原点、源/目标几何和可见代数及目标登记，30秒期限/成功一次消费。旧ScDropAt、基础SC32API.H和SCAPI原字节保持。SC32API实际1.5/v7、SCUI1.4/v6。SCUI排队MOVE/UP使用真实UP凭证；自动tooltip重核输入资格。Installer初始列宽按实际DPI分配。
-
-GUI12范围严格收敛：无350ms额外按住的快拖/取消/tooltip、Installer结果列，最后正常退出和一次owner账。独立DROPUP源码仅依赖公开SDK，在普通身份由真实手势检查无UP/错误序号/错误点/保留字段/真实UP/重复消费及输出保持；SCCC实际后端+严格链接已通过，仅源码和清单进入会话盘，不安装宿主SCX。首次准备因Windows路径键分隔符不一致在启动VM前失败，修正另记PREPARATION，不改产品判据。
-
-用户试玩数据盘已按明确请求更新为GUI11结束后的256MiB盘，交付SHA48568dd9c2fb9e07c9343b59a7af58db83938ab6dc8b88621a5320b8c5785ea0，凭证evidence/m10a2-test-current-01。之后用户可能已有修改，不能擅自再覆盖。最新只更新run.py，SHA bf979ae2208b59f763b06a53027cea48852ca911887df64abf09efb19a5c14b8：默认SDL原生Raw Input、物理DPI坐标、最近邻，保WHPX优先和GTK可选。全屏鼠标属于尚未实测的入口规避，不称根因确证或修复PASS；两盘和bat未写，凭证evidence/m10a2-fullscreen-entry-01。用户原QEMU4452已实际关闭；不要自动重启试玩盘。
-
-GUI11已实际exit0，SID4注销/原SID1恢复，owner13948→13948且各池/字体/桌面/未解释增量0。Terminal30行提示符、设置拒权后的临时清理/重读通过；350ms诊断拖放的确认/取消保源和Files正常exit0有证据。旧快拖失败及operation7/node12 tooltip拒权日志原样保留。IDE复杂SCW/独立SCL/四TU/调试、PCM、主题/显示、PIO及其它未变证据直接复用。
-
-下一步：继续同一exec90027，实际READY后先看截图再输入；收齐上述必要回归和最后owner，随后整理完整合同证据/文档/最终交付，不增加排列组合。当前main@7add897，后续自产helper/evidence/入口修改待阶段保存；原用户未跟踪目录不纳入。WSL gh上次github.com:443连接失败，远端未确认。只main、无Release、不碰私钥、M8封存及原盘保持。SCAPI冻结SHA81a730450fcb3d310ed841ad3e5c70a3fed32aa7fbd10acac8b888ac7da9ffc1。
-
-修订：2026-10-17，持久化native10真实终态、final11构建和GUI12活句柄，补SDL入口规避的未实测边界。
-<!-- CURRENT-END -->
+完整合同与证据交叉表见[M10A2-ACCEPTANCE.md](M10A2-ACCEPTANCE.md)，交付内容及限制见[M10A2-RELEASE.md](M10A2-RELEASE.md)。当前工作为统一文档、同字节最终SDK restage、交付包核验，然后按用户授权签名提交/Release；不再扩展QEMU矩阵。当前正式发布结果以实际publish凭证为准，不预写成功。主代理独立工作，不使用subagent或computer-use。
 
 <details>
 <summary>此前各时点的原始接力记录（历史状态，不表示当前仍在运行）</summary>
@@ -241,3 +225,6 @@ main仍以e5c37a5为最近已保存代码；上次WSL gh凭据推送实际github
 修订：2026-10-17，保存GUI11实际零差退出、定向结果与用户授权四文件数据盘覆盖。
 
 </details>
+
+
+修订：2026-10-17，统一HOST21/native11/final12、GUI12与登录回归实际范围，SDK及发布入口同批整理。

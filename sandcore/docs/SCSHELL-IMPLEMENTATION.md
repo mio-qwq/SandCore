@@ -1,5 +1,17 @@
 # SCSHELL 实施状态与源码交接
 
+<!-- CURRENT-BEGIN -->
+2026-10-17。当前最终运行绑定为HOST21/native11/final12；真实构建/原生生成均结束，没有后台构建或QEMU仍在运行。CORE SHA256为44d0b635f4f2597ef8009067de0da299bb36270c367589a8898711a64361f6b2。GUI12快拖/取消/持久复制、独立UP检查及Installer列宽通过，owner13950→13950；GUI13退出/注销/默认mio空输入重新登录和root空输入拒绝已实际验证，原资源账+8与FAIL_OR_INTERRUPTED保持，不能称该轮整体PASS。
+
+完整合同与证据交叉表见[M10A2-ACCEPTANCE.md](M10A2-ACCEPTANCE.md)，交付内容及限制见[M10A2-RELEASE.md](M10A2-RELEASE.md)。当前工作为统一文档、同字节最终SDK restage、交付包核验，然后按用户授权签名提交/Release；不再扩展QEMU矩阵。当前正式发布结果以实际publish凭证为准，不预写成功。主代理独立工作，不使用subagent或computer-use。
+
+桌面仍为Ring3 SCSHELL.SCX；退出走SC32_SESSION_LOGIN_PANEL，保留SID与后台任务；注销走SC32_SESSION_LOGOUT。真实文件worker/持久REC、图标CAT/LNK和独立SCUI/SCSHELL系统库继续复用。
+<!-- CURRENT-END -->
+
+<details>
+<summary>此前日期的原始记录；旧“当前/待验/正在运行”不作为本次状态</summary>
+
+
 > 2026-10-16最新补充：主源已整合。FILEJOB04、FILECLIP02、desktop-layout01/cold02、session-cycle02分别提供普通用户持久COPY/MOVE、跨进程文件剪贴板、真实单/组拖及冷恢复、后续新会话首帧/布局的有效证据。新标签/网格和资源代码对应generation17实际原生字节，最终owner账零增量；冷资源45→46PIT未证明加速。完整P5仍需Files跨窗Drop/关联/任务栏等出口，下面未完成描述按日期保留沿革。
 
 > 2026-10-15后续源码状态：下面“此次仅写两份文档”是本文件最初设计审计的历史记录。现在Phase5已有隔离的实际FS lease/条件提交、host/WM角色、SCSHELL库/worker和桌面正文，正在统一收齐与静态审阅；均未接入当前kernel/user工作源，未构建、未客体运行。不能把隔离源码或P4局部证据改称Phase5完成。
@@ -134,3 +146,9 @@ SDK、服务与worker可以再细分正文，但公共header/json和同一aggreg
 
 
 修订：2026-10-16，记录FILECLIP/拖动/冷恢复/连续会话实际通过，新视觉/缓存代码来源及未证明冷资源加速；完整P5未结束。
+
+
+</details>
+
+
+修订：2026-10-17，统一HOST21/native11/final12、GUI12与登录回归实际范围，SDK及发布入口同批整理。

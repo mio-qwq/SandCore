@@ -1,0 +1,18 @@
+{
+  "status": "STRICT_SDK_RESTAGED_CURRENT_DOCS",
+  "output": "build\\m10a2-sdk-delivery-02",
+  "manifest_sha256": "d042b4e4b21a0b2fd477f3740bac4425ac855b321de95f8a096825898e9baa24",
+  "files": 499,
+  "payload_bytes": 17526809,
+  "additional_docs": [
+    "M10A2-ACCEPTANCE.md",
+    "M10A2-RELEASE.md",
+    "M10A2-DEFAULT-ENTRY.md"
+  ],
+  "ordinary_native_libraries": 8,
+  "host_codec_exception": "SCSOUND.SCL",
+  "runtime_evidence": "docs/M10A2-ACCEPTANCE.md",
+  "staging_runtime_flag_unchanged": false,
+  "stage_source_sha256": "c96a3ce73b536becf6a704c34607601e9ea2a901ff1ab3e17a3ccb75885e8f3b",
+  "original_staging_tool_sha256": "c343418c378a5fff04767825d57ca76cfc066b1f5d8f3f7feb591944237ecc12"
+}
