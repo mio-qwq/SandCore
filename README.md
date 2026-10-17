@@ -8,6 +8,8 @@ SandCore 由 [mio](https://github.com/mio-qwq/) 开发。工程包含 BIOS 引�
 
 当前开发工作为 **SandCore M10a2 — The Application Platform Era**：真正 Ring3 动态链接、四大系统库、SCUI 与桌面已有分项客体证据；八个普通库和重制应用工具链已实际系统内生成，完整 SDK 和 SCW 工程工作区已接入。普通用户 GUI 与独立开发示例仍在收束，实际失败与修复分列于[当前客体接力](sandcore/docs/M10A2-LIVE-GUI.md)，完整目标持续 active。可用验收基线仍为 **M10a1**，已于 **2026-10-07 验收通过**并交付 [GitHub Preview](https://github.com/mio-qwq/SandCore/releases/tag/M10a1)。统一在 `main` 开发；M9、M8a 及更早历史产物保留。完整 M10 尚未宣布完成，基础内核尚未冻结。
 
+M10a2试玩入口已修正Windows高DPI显示链路，采用GTK原生显示并优先WHPX硬件加速；默认设置/文件对话框已有双盘冷启动原尺寸截图。其它分辨率与本批应用修复仍在定向回归，范围见[默认入口修正](sandcore/docs/M10A2-DEFAULT-ENTRY.md)。
+
 > **关于 AI 参与与文档质量：** 本项目包含由 AI 生成或辅助编写的代码，部分文档也由 Agent 撰写或整理，因此可能存在表述不清、人称或代词指代错误，以及遗留的 Agent 自述等问题。欢迎通过 [Issues](https://github.com/mio-qwq/SandCore/issues) 指出问题；我也会在后续持续校对与完善。
 
 | 入口 | 内容 |

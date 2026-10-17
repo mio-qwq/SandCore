@@ -1,0 +1,55 @@
+{
+  "status": "VM_ABSENT_AND_CONTROL_HANDLE_MISSING_OBSERVED",
+  "raw_report_status_preserved": "RUNNING",
+  "qemu_pid": 20472,
+  "exec_handle": 36349,
+  "owner_end_snapshot": false,
+  "normal_session_logout": false,
+  "files_cancel": {
+    "actual_target_exit": 313,
+    "passed": false
+  },
+  "installer": {
+    "actual_target_exit": 0,
+    "durable": true
+  },
+  "files": {
+    "p6-gui.json": {
+      "bytes": 1387534,
+      "sha256": "43c00f2ed01b544293bd62b92881e1040c5a02c7876d0de62dea500e290e842d"
+    },
+    "p6-gui6-settings-property-applied.png": {
+      "bytes": 1035406,
+      "sha256": "a865093be97b1c052d12febdb864c76f845a489e3d52aa8a793a297a109a14ef"
+    },
+    "p6-gui6-settings-environment-saved.png": {
+      "bytes": 1032416,
+      "sha256": "a4cc20aadfc56167780a750a5db7343d2e6c7497f92333e95a4b577166292875"
+    },
+    "p6-gui6-installer-restored.png": {
+      "bytes": 660039,
+      "sha256": "1c62b1fbda3d45cd687c508d37f8af9c25c8dd3c4a5910e8b09dce7cdae42c29"
+    },
+    "p6-gui6-installer-durable-details.png": {
+      "bytes": 34573,
+      "sha256": "da53da0a3f3c87d5a136522e7a69c9981d64493d42dd7b92ff9d63d4ce5c5363"
+    },
+    "p6-gui6-installer-normal-exit-result.png": {
+      "bytes": 648570,
+      "sha256": "18c0f727c89ef9dad0e81f04934921a30c4fe28ef51de3f3186a017e9e98eee5"
+    },
+    "p6-gui6-files-cancel-real-exit-code.png": {
+      "bytes": 648502,
+      "sha256": "0e5efbc23d1346926f1c5672e61541bce6d9e8d82e141501828cd1a3274cb2e6"
+    },
+    "gui6-installed-DATA.RDT": {
+      "bytes": 73,
+      "sha256": "e01e31d9117841935f2a0cadbf022efccd4ec7ec30982e6807c1c32363e74ff4"
+    },
+    "gui6-source-DATA.RDT": {
+      "bytes": 73,
+      "sha256": "e01e31d9117841935f2a0cadbf022efccd4ec7ec30982e6807c1c32363e74ff4"
+    }
+  },
+  "full_M10a2": false
+}

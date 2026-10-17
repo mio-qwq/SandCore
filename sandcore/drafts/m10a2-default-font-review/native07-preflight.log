@@ -1,0 +1,117 @@
+{
+  "status": "FOLLOWUP_PREFLIGHT_ONLY_NOT_REFRESHED",
+  "changed": [
+    "SCUI",
+    "FILES2",
+    "DEBUG2",
+    "SETTINGS2",
+    "INSTALLER2"
+  ],
+  "host_report": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-main-studio-01\\p6-unified-host-13.json",
+  "host_report_sha256": "dafa297ec617cc4c0ed4cdd7404d9f3e4be1bb2404358840d0a0d2f657540a87",
+  "bootstrap": {
+    "origin": "FINAL04_PRIOR_NATIVE_RUNTIME_NOT_FOLLOWUP_OUTPUT",
+    "requested_labels": [
+      "SCUI",
+      "DEBUG2",
+      "FILES2",
+      "SETTINGS2",
+      "INSTALLER2"
+    ],
+    "previous_report": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-p6-target-refresh-06\\p6-generation.json",
+    "previous_report_sha256": "f2f5d67a8946ebe07c12459e17d85f00cd6538a38f785298d11194fd4dd1c7ba",
+    "runtime_native04_producer_host": {
+      "path": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-main-studio-01\\p6-unified-host-09.json",
+      "sha256": "879ceb99215972f60d1dfc76f0102d1a2255c8616685dd980eb4e8d5aba77ae4"
+    },
+    "inherited_native06_producer_host": {
+      "path": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-main-studio-01\\p6-unified-host-12.json",
+      "sha256": "7e29017e4c20095c0cf8ec2e5bbcd9ae90626fe974d12dfae4596d641548e750"
+    },
+    "runtime_host": {
+      "path": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-main-studio-01\\p6-unified-host-10.json",
+      "sha256": "67709f3aacb72c6f18ded7be61235d5e9811faf4c41671b7084f46eec254c2ca"
+    },
+    "core": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-p6-final-04\\core",
+    "core_sha256": "37331d772966e8d02759297bf74b08be3025b3b8e36f1e76d75735dc468529b7",
+    "sdk_manifest": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-p6-final-04\\sdk\\MANIFEST.json",
+    "sdk_manifest_sha256": "6038df5a95c534a9d8769355ec827fdf4fca9f9e3eba76457ff57a5c9668329f",
+    "native_libraries": {
+      "SCLDR.SCL": {
+        "bytes": 60008,
+        "sha256": "fecf0eb9e6b68ede0357c166b61e61870a2c8ad218a0e6c053a6bc345459e224"
+      },
+      "SC32API.SCL": {
+        "bytes": 158590,
+        "sha256": "b5a54a79d1aa1d773a766ae85edc9c2162bedfdd7e54d8363a798b7f5c85a647"
+      },
+      "SCCLIB.SCL": {
+        "bytes": 66892,
+        "sha256": "09baf164f186b11c56ababd2c3d5e4db7351472d0207e917a14cb8d727f0f642"
+      },
+      "SCLIB.SCL": {
+        "bytes": 146165,
+        "sha256": "a3003e152f8bdea56bada517b185ac9ceef78e5bd389fdeafdfc1947f53ea2a8"
+      },
+      "SCGFX.SCL": {
+        "bytes": 138309,
+        "sha256": "8bc452b3a781a44d30584713a71ce9b07375833dd64b44db8a58d93078bcc0d9"
+      },
+      "SCTERM.SCL": {
+        "bytes": 69412,
+        "sha256": "cb81a6d0c8b4d853627e5d4f83f7b791fae918275ee7b6ff48c9cf5c3d809ff0"
+      },
+      "SCUI.SCL": {
+        "bytes": 752812,
+        "sha256": "159963852994f46afc7deb71cede4b8b56ae39be35b65c602db678be1837bdf6"
+      },
+      "SCSHELL.SCL": {
+        "bytes": 320068,
+        "sha256": "723b572f533d6af9e37fd5da23484671c36371b2ad906b827d4e95a2a6187fc5"
+      }
+    },
+    "host_codec_exception": "SCSOUND.SCL_ONLY_FIXED_FINAL04_SDK",
+    "current_layout_proof": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-p6-gui-coherent-layout-02\\layout-proof.json",
+    "current_layout_proof_sha256": "6b828bbab032c4bb8ceb00ee6a94f7b55cdf0671ec18d2cb807d73240260e80a",
+    "actual_layout_source_roles": {
+      "kernel/task_store.h": {
+        "path": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\kernel\\task_store.h",
+        "sha256": "75b81aca73f6803ed5ceded6d562f8d270b615e95e8c0b5b28e2e3a2ea197587",
+        "role": "FINAL04_HOST10_ACTUAL_D_CLOSURE"
+      },
+      "kernel/task.h": {
+        "path": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\kernel\\task.h",
+        "sha256": "d007bfd1ca31a9fa00c206a71623a390195cfaa60fb4494a53cb75646c6dd53f",
+        "role": "FINAL04_HOST10_ACTUAL_D_CLOSURE"
+      },
+      "kernel/objpool.h": {
+        "path": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\kernel\\objpool.h",
+        "sha256": "6c9ad6007d0b179d4403495c5152b835338e8680f785eeb6851967a97d57b7ed",
+        "role": "FINAL04_HOST10_ACTUAL_D_CLOSURE"
+      },
+      "user/scui/SCUIPRIVATE.H": {
+        "path": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-p6-final-04\\sdk\\SYS\\SDK\\SRC\\user\\scui\\SCUIPRIVATE.H",
+        "sha256": "b7d51e1bf5bd71130ed49e1e77f1c85193416cf9473112634f1a7ce224e56c08",
+        "role": "SCUI_NATIVE04_ACTUAL_CLOSURE"
+      },
+      "user/scshell/desktop/DESKTOP.H": {
+        "path": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-p6-final-04\\sdk\\SYS\\SDK\\SRC\\user\\scshell\\desktop\\DESKTOP.H",
+        "sha256": "e25d578a648000c19bd213541909f40115f42b33733b7ea255920d80d1cb8afe",
+        "role": "DESKTOP_NATIVE04_ACTUAL_CLOSURE"
+      }
+    },
+    "historical_preflight_task_layout_preserved": true,
+    "extra_actual_get_witness": {
+      "path": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-p6-refresh-vm-06\\refresh-vm.json",
+      "sha256": "33ce11d3dd1ad4763d462fce27b94270a0d73fc9f7666f925e079feea8eb74ae"
+    },
+    "sidecar_audit": {
+      "status": "FIXED_READ_ONLY_WITNESSES_VERIFIED_NOT_REFRESH_EXECUTION",
+      "direct_actual_get": 6,
+      "inherited_actual_get_alias": 79,
+      "changed_labels_not_yet_evaluated": true
+    }
+  },
+  "build_started": false,
+  "vm_started": false
+}

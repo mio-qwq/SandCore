@@ -281,6 +281,12 @@
       "size": 1
     },
     {
+      "name": "ScUiCommandSet",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
       "name": "ScUiContextCreate",
       "dependency": "SCUI.SCL",
       "kind": "function",
@@ -485,6 +491,18 @@
       "size": 1
     },
     {
+      "name": "ScUiToolbarBind",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUiTooltipSet",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
       "name": "ScUiViewBind",
       "dependency": "SCUI.SCL",
       "kind": "function",
@@ -577,12 +595,6 @@
     {
       "name": "strrchr",
       "dependency": "SCCLIB.SCL",
-      "kind": "function",
-      "size": 1
-    },
-    {
-      "name": "ScUiCommandSet",
-      "dependency": "SCUI.SCL",
       "kind": "function",
       "size": 1
     }

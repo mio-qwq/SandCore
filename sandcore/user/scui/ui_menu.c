@@ -1516,7 +1516,9 @@ static ScStatus ui_shortcut(ScUiContext *c,ScU32 key,ScU32 modifiers,ScU32 *out)
     e.version=1;
     modifiers&=SC32_MOD_SHIFT|SC32_MOD_CONTROL|SC32_MOD_ALT;
     while(ScHashNext(&it,&e)==0){UiMenuEntry *entry=*(UiMenuEntry * const *)e.value;
-        if(entry->description.shortcut.key==key && entry->description.shortcut.modifiers==modifiers && !(entry->description.flags&SC_UI_MENU_DISABLED)){*out=entry->description.command;
+        /* 此处只解析绑定；禁用位是上次查询的缓存。执行入口会重新
+         * COMMAND_QUERY，不能先用旧禁用位挡住刚变为可用的快捷键。 */
+        if(entry->description.shortcut.key==key && entry->description.shortcut.modifiers==modifiers){*out=entry->description.command;
             return SC_UI_OK;
             }}
     return SC_UI_E_NOT_FOUND;

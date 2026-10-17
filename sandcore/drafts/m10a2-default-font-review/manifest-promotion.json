@@ -1,0 +1,40 @@
+{
+  "status": "HOST_SCCC_IMPORT_TABLES_PROMOTED_NOT_GUEST_GENERATED",
+  "files": [
+    {
+      "label": "SCUI",
+      "report": "build\\m10a2-p6-sco-14\\report.json",
+      "report_sha256": "914456bf0656bdbb7d0251c0ef48e3560e94d35fbec3e1827f6fca13d6e56aca",
+      "before_sha256": "81fc4c2ed02f3de183c52996ad264cd0bd62f3dccd7b438235a713952335ce39",
+      "after_sha256": "81fc4c2ed02f3de183c52996ad264cd0bd62f3dccd7b438235a713952335ce39"
+    },
+    {
+      "label": "DEBUG2",
+      "report": "build\\m10a2-p6-sco-14\\report.json",
+      "report_sha256": "914456bf0656bdbb7d0251c0ef48e3560e94d35fbec3e1827f6fca13d6e56aca",
+      "before_sha256": "22d21b2e60dcf227158b46f087144b1049cdeec39e058ab674081def348edf5b",
+      "after_sha256": "84037288e74b9c5e53448555070ace475c4e50ebfa89c735027d80bd71fc885a"
+    },
+    {
+      "label": "FILES2",
+      "report": "build\\m10a2-p6-sco-14\\report.json",
+      "report_sha256": "914456bf0656bdbb7d0251c0ef48e3560e94d35fbec3e1827f6fca13d6e56aca",
+      "before_sha256": "639cfed473c8f307bcf5659988b681224d02ab983e14848ab4de503086ee45cf",
+      "after_sha256": "b1b14283a9d81cafbad5307147ae2354204dd5b7d63a58840ea20ef0c6a3e08f"
+    },
+    {
+      "label": "SETTINGS2",
+      "report": "build\\m10a2-p6-sco-14\\report.json",
+      "report_sha256": "914456bf0656bdbb7d0251c0ef48e3560e94d35fbec3e1827f6fca13d6e56aca",
+      "before_sha256": "128ec920ef2f6e4fb0860ee04ef28ee96037185976b8e7638c0ffd4c2199debb",
+      "after_sha256": "128ec920ef2f6e4fb0860ee04ef28ee96037185976b8e7638c0ffd4c2199debb"
+    },
+    {
+      "label": "INSTALLER2",
+      "report": "build\\m10a2-p6-sco-15\\report.json",
+      "report_sha256": "d18a5670436ab27f2794ad56940f64b4614fe233cf7bd424c9e26c238230b97b",
+      "before_sha256": "694950ead58e4870f1bbae208d34977ab07e29bacb7c840a1ba439f40164fc39",
+      "after_sha256": "94048121d91dec20e226c8310486027e2e6e83115bcae5f645c4a1095ba673d1"
+    }
+  ]
+}

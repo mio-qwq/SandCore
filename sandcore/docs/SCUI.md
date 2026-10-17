@@ -56,6 +56,8 @@ Menu/Toolbar/Button/Shortcut共用Command。MenuItem拥有label/help/caption并�
 
 COMMAND_QUERY有真实生产者：显式Query、MenuOpen及执行Command前刷新，目标为Context订阅node0。data借用ScUiCommandDesc，仅flags是in/out；label/icon/shortcut只读。查询保持label/icon引用，重入CommandSet/Remove优先新发布记录，同链不递归Query。paint热路径只读发布状态，避免每次绘制都进用户query。设备触发Command保留tick/epoch/sequence/message，普通调用为程序来源。
 
+快捷键查找只解析键与命令绑定，不预先使用上一次查询的DISABLED缓存排除命令；实际ScUiCommand仍先动态Query，真正禁用时返回CANCELLED。应用在自身业务状态发布时可对有限受影响命令显式Query，让工具栏外观同步；Debug2的暂停/继续/退出采用这一方式，不引入每帧查询全表。
+
 2026-10-16：node0订阅的TARGET仍只接无目标上下文事件；其CAPTURE/BUBBLE阶段分别包围完整控件路径，包括本次消息批中新建的popup。先持有节点路径，再调用上下文捕获；非零返回停止后续分发，销毁目标安全终止。坐标保留原事件坐标，current为0；不重复触发TARGET，也不改变原控件路径的阶段和顺序。Demo诊断键使用这一公开捕获入口，不能把仅注册node0当作旧实现已支持全局键观察的证据。待本批实际生成和GUI验证。
 
 只消费真实64B ScMessage。KEYDOWN导航，TEXT插Unicode，KEYUP真实释放。BUTTON data[2]是当前buttons、data[3]是changed mask；仅真实left边沿开始/提交left动作。WHEEL data[2/3]竖/横，与按钮布局不同。祖先hide/disable也撤后代focus/capture/hover；loss不补UP。hover转目标先Arrow reset再设Editor/Splitter/列边形状，focus恢复与按下再次确认；非聚焦ACCESS不算设置成功，capture/drag期间不覆盖它们的cursor。
@@ -101,3 +103,5 @@ Copy/Cut/Paste使用真实session clipboard事务及immutable snapshot，源退�
 2026-10-16：共享Dialog按钮栏使用现有FLOW与AUTO高度，保留30逻辑像素单行下限；自然宽度、28高按钮、gap6、command/default/cancel、字体和事件不变。宽度足够的2/3按钮仍同排，后续按钮不足宽时自然换行，真实行高在两遍候选布局中传回父VBox，原flex正文让出相应空间；不缩字号或修改应用标签。MessageBox420×170的本次四按钮场景可由原父尺寸容纳。本组隔离源码未构建、未客体验证。
 
 2026-10-16执行记录：延迟Drop已由GUI03真实COPY/MOVE/取消及源桌面自动刷新留证；按钮FLOW修复随后合主源，经SCO12、HOST11和真实客体native05生成。final05 CORE/SDK已核验并启动GUI04，四按钮修后画面仍待验证，不把原生生成称为交互通过。
+
+2026-10-17：修复快捷键被旧DISABLED状态挡住，保留执行前动态禁用检查；Debug在状态发布时刷新有限命令。实际SCCC宿主后端与HOST13通过，五目标原生刷新07进行中，修后GUI尚待。GUI04四按钮FLOW实图已保留；Files取消后GUI06实际exit313，不将异常退出写成取消通过。

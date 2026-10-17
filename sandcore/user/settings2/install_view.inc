@@ -133,11 +133,17 @@ static ScStatus install_labeled(ScUiNode row,const char *label_text,const char *
 }
 static ScStatus install_toolbar(ScUiNode parent,const char **labels,ScU32 first,ScU32 count)
 {
-    ScUiNode row;
-    ScStatus s=responsive_band(parent,118,&row);
-    for(ScU32 i=0;s==0 && i<count;i++){ScUiNode b;
-        s=widget(row,SC_UI_BUTTON,labels[i],first+i,112,28,0,&b);
-    }return s;
+    ScUiNode row;ScUiMenu *tools=0;
+    /* 11个命令不再展开成三四行，挤掉真正的安装计划。标准工具栏
+     * 负责窄窗的chevron，菜单与键盘入口仍保留每一个命令。 */
+    ScStatus s=widget(parent,SC_UI_TOOLBAR,"",0,SC_UI_AUTO,34,0,&row);
+    if(s==0)s=ScUiMenuCreate(&tools);
+    for(ScU32 i=0;s==0 && i<count;i++){
+        ScUiMenuItem item;INIT(item);item.command=first+i;item.label=text(labels[i]);
+        ScU32 token;s=ScUiMenuInsert(tools,0,&item,&token);
+    }
+    if(s==0)s=ScUiToolbarBind(app.ui,row,tools);
+    ScUiMenuRelease(tools);return s;
 }
 static ScStatus installer_create(void)
 {
@@ -152,21 +158,34 @@ static ScStatus installer_create(void)
     AppMenuEntry action[]={{"从计划移除",I2_REMOVE,SC32_KEY_DELETE,0},{"取消",I2_CANCEL,27,0},{"重试选中项",I2_RETRY,0,0},{"详情",I2_DETAILS,0,0},{"复制逐项结果",I2_COPY,'c',SC32_MOD_CONTROL},{"保存结果",I2_REPORT,'s',SC32_MOD_CONTROL},{"关于",I2_ABOUT,SC32_KEY_F1,0}};
     if(s==0)s=menu_part("文件",file,sizeof(file)/sizeof(*file));
     if(s==0)s=menu_part("操作",action,sizeof(action)/sizeof(*action));
-    ScUiNode label,row;
-    if(s==0)s=widget(app.body,SC_UI_LABEL,"文件与目录安装 · 先预检 · 不覆盖用户文件 · 来源始终保留",0,SC_UI_AUTO,28,0,&label);
+    ScUiNode row,options,form,viewport,metadata;
     char home[65]="/HOME";
     ScU32 length;
     ScProcessEnvironment("HOME",home,sizeof(home),&length);
-    if(s==0)s=widget(app.body,SC_UI_PANEL,"",0,SC_UI_AUTO,SC_UI_AUTO,0,&row);
+    /* 表单有独立滚动视口，缩窄时增加的是可滚动内容高度；计划表和
+     * 常用命令仍留在窗口内，不能要求用户先最大化才找到开始按钮。 */
+    if(s==0)s=widget(app.body,SC_UI_PANEL,"",0,SC_UI_AUTO,130,0,&viewport);
+    if(s==0)s=layout(viewport,SC_UI_SCROLL_LAYOUT,SC_UI_AUTO,130,0);
+    if(s==0)s=widget(viewport,SC_UI_PANEL,"",0,SC_UI_AUTO,SC_UI_AUTO,0,&form);
+    if(s==0)s=layout(form,SC_UI_VBOX,SC_UI_AUTO,SC_UI_AUTO,0);
+    if(s==0)s=widget(form,SC_UI_PANEL,"",0,SC_UI_AUTO,28,0,&row);
     if(s==0)s=install_labeled(row,"目标",home,SC_UI_AUTO,&installer.target);
-    if(s==0)s=widget(app.body,SC_UI_PANEL,"",0,SC_UI_AUTO,28,0,&row);
-    if(s==0)s=install_labeled(row,"rw(0..3)","311",SC_UI_AUTO,&installer.mode);
-    if(s==0)s=widget(app.body,SC_UI_PANEL,"",0,SC_UI_AUTO,28,0,&row);
-    if(s==0)s=install_labeled(row,"UID(-2不改)","-2",SC_UI_AUTO,&installer.uid);
-    if(s==0)s=widget(app.body,SC_UI_PANEL,"",0,SC_UI_AUTO,28,0,&row);
-    if(s==0)s=install_labeled(row,"GID(-2不改)","-2",SC_UI_AUTO,&installer.gid);
-    if(s==0)s=widget(app.body,SC_UI_CHECKBOX,"创建缺失父目录",0,SC_UI_AUTO,28,0,&installer.parents);
-    if(s==0)s=widget(app.body,SC_UI_CHECKBOX,"明确对已存在目录应用所填权限（默认保留）",0,SC_UI_AUTO,28,0,&installer.repermission);
+    if(s==0)s=responsive_band(form,164,&metadata);
+    const char *names[]={"rw","UID","GID"},*values[]={"311","-2","-2"};
+    ScUiNode *fields[]={&installer.mode,&installer.uid,&installer.gid};
+    for(ScU32 i=0;s==0 && i<3;i++){
+        ScUiNode label;s=widget(metadata,SC_UI_PANEL,"",0,SC_UI_AUTO,28,0,&row);
+        if(s==0)s=widget(row,SC_UI_LABEL,names[i],0,36,28,0,&label);
+        if(s==0)s=widget(row,SC_UI_TEXTBOX,values[i],0,SC_UI_AUTO,28,1,fields[i]);
+        if(s==0)s=ScUiLabelAssociate(app.ui,label,*fields[i]);
+    }
+    if(s==0)s=responsive_band(form,220,&options);
+    if(s==0)s=widget(options,SC_UI_CHECKBOX,"创建缺失父目录",0,SC_UI_AUTO,28,0,&installer.parents);
+    if(s==0)s=widget(options,SC_UI_CHECKBOX,"应用到已存在目录",0,SC_UI_AUTO,28,0,&installer.repermission);
+    ScUiText tip=text("rw每位0..3（读1、写2）；UID/GID填-2保留原所有者。");
+    if(s==0)s=ScUiTooltipSet(app.ui,metadata,&tip);
+    tip=text("勾选后明确对已存在目录应用所填权限；默认保留原权限。");
+    if(s==0)s=ScUiTooltipSet(app.ui,installer.repermission,&tip);
     const char *plan_actions[]={"添加源文件","加入目录","选择目标","移除计划","只读预检","开始安装","取消","重试选中项","详情","复制结果","保存结果"};
     if(s==0)s=install_toolbar(app.body,plan_actions,I2_ADD,11);
     if(s==0)s=widget(app.body,SC_UI_TABLE,"",0,SC_UI_AUTO,SC_UI_AUTO,1,&installer.table);

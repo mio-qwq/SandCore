@@ -23,8 +23,8 @@
     {
       "name": "SCUI.SCL",
       "abi_major": 1,
-      "min_minor": 3,
-      "min_version": 4
+      "min_minor": 4,
+      "min_version": 5
     }
   ],
   "imports": [
@@ -480,6 +480,12 @@
     },
     {
       "name": "ScUiCommandSet",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUiCommandQuery",
       "dependency": "SCUI.SCL",
       "kind": "function",
       "size": 1

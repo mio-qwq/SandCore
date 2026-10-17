@@ -1,3 +1,29 @@
+# M10a2 当前运行与接续
+
+<!-- CURRENT-BEGIN -->
+2026-10-17。完整M10a2目标保持active，主代理独立工作。当前可运行试玩为HOST12/native06/final06；源码新修复为HOST13，尚未替换用户盘。
+
+| 项目 | 实际状态 |
+|---|---|
+| 默认启动问题 | 旧SDL不感知DPI/96与宿主144不匹配；现GTK实际per-monitor/144，WHPX初始化退出0，同试玩盘冷启动设置/文件对话框原尺寸清楚。见[入口证据](M10A2-DEFAULT-ENTRY.md) |
+| 四文件试玩 | Desktop/test仍只有run.py、run.bat与两盘；只更改启动器，用户盘不覆盖。其当前数据摘要与首次交付不同，保留用户变更 |
+| 最新统一构建 | HOST13退出0，41产物齐全、构建期间源码变化0；SCUI/Debug/Files/Settings的SCCC检查14通过，Installer修正编译名后检查15通过 |
+| 当前真实任务 | 原生刷新07，exec68948、Windows QEMU16136；五标签SCUI/DEBUG2/FILES2/SETTINGS2/INSTALLER2，其余27对象/8普通库/21产物按完整来源复用，最终结果尚未到达 |
+| 最新GUI06 | 安装73B/DURABLE/源目标一致/正常exit0；Settings属性表与ACCESS拒绝实测。Files取消实际exit313。VM已消失、句柄失效，原报告RUNNING不改，最终owner账缺失 |
+| 已完成的可复用GUI04 | 普通SCW逐TU编译/发布独立SCL与四TU应用，真实动态调用/Studio→Debug/单步/暂停/断点/符号/正常退出；声音EOF重播/seek/PCM、Classic和最终零差资源账。见[GUI04](M10A2-GUI04-REVIEW.md) |
+
+刷新07期间主源、tools、HOST13及活helper保持冻结；文档和新的独立草稿可以继续。先轮询同一个exec，不因观察超时或旧RUNNING文件重启。实际报告：build/m10a2-p6-refresh-vm-07/refresh-vm.json；产物报告：build/m10a2-p6-target-refresh-07/p6-generation.json。准备与实际源/sidecar闭包审计在drafts/m10a2-p6-followup-refresh-v6，编译运行底座明确保持final04，产物继承native06，二者不能混称。
+
+本批修复：快捷键解析不先跳过旧DISABLED缓存，Debug状态发布刷新有限命令；单行状态与多行错误框分开；安装设置区滚动、操作工具栏溢出。Files只增加原始错误诊断，取消313原因尚待真实定位；Settings候选.C31清理也仍待核实。
+
+接续顺序：取得刷新07真实终态 → 对其生成新CORE/SDK → 一次定向GUI复核新Debug快捷键、安装默认/窄布局、Files取消的精确cause，并补代表分辨率的原尺寸画面 → 更新用户可用入口时保留其数据 → 按全合同补余下会话/权限/性能/兼容与交付缺项。不能用宿主构建替代客体生成或视觉验收。
+
+SCAPI.H冻结摘要81a730450fcb3d310ed841ad3e5c70a3fed32aa7fbd10acac8b888ac7da9ffc1本次复核一致。只用main、无Release、不读私钥、不重启M8。旧源码、旧盘和失败证据保留。
+<!-- CURRENT-END -->
+
+<details>
+<summary>此前各时点的原始接力记录（历史状态，不表示当前仍在运行）</summary>
+
 # M10a2 当前真实客体接力
 
 > 最新GUI06接力和四文件试玩交付见 [M10A2-GUI06-REVIEW.md](M10A2-GUI06-REVIEW.md)。当前exec36349/QEMU20472仍活，SID4；绑定gui6-rebind-after-installer-process-observation。Installer真实安装73B/DURABLE1/源目标SHA一致/正常exit0；现Files取消诊断中，主源冻结，最终owner未取。以下旧位置保持历史时态。
@@ -151,3 +177,7 @@ SCW（SandCore Workspace）是工程工作区，Studio入口、过滤和SDK示�
 SCAPI.H冻结SHA81a730450fcb3d310ed841ad3e5c70a3fed32aa7fbd10acac8b888ac7da9ffc1；原盘SHA3db2e3cd9262343204e8c19af02847e98244732c5b5ad4397dd334be84fe7e64。M8封存、用户文件、旧SCX、正式产物及失败证据保留，.zcodeignore不动。main已存cce7e6e，之后修复待保存；远端尚未确认。只按具体风险验证，不重复无关矩阵、不扩磁盘副本。
 
 修订：2026-10-16，GUI02正常关闭、一致零差资源账、真实应用结果和必要修复接力。
+
+</details>
+
+修订：2026-10-17，整理唯一当前状态，历史接力原文折叠保留；补默认DPI修正和五目标原生刷新07。

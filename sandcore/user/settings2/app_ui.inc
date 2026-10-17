@@ -18,9 +18,10 @@ static void status(const char *z)
 static ScStatus error(ScStatus code,const char *operation)
 {
     if(code>=0 || code==SC_UI_E_CANCELLED)return code;
-    char body[384];
+    char body[384],line[384];
     snprintf(body,sizeof(body),"%s\n错误 %d",operation?operation:"操作未完成",code);
-    status(body);
+    snprintf(line,sizeof(line),"%s · 错误 %d",operation?operation:"操作未完成",code);
+    status(line);
     if(app.ui && app.root)message("操作未完成",body);
     fprintf(stderr,"setup error=%d %s\n",code,operation?operation:"");
     return code;

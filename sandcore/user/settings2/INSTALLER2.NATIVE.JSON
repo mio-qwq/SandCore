@@ -461,6 +461,12 @@
       "size": 1
     },
     {
+      "name": "ScUiTooltipSet",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
       "name": "ScUiMenuCreate",
       "dependency": "SCUI.SCL",
       "kind": "function",
@@ -480,6 +486,12 @@
     },
     {
       "name": "ScUiMenuBind",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
+      "name": "ScUiToolbarBind",
       "dependency": "SCUI.SCL",
       "kind": "function",
       "size": 1

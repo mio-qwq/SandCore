@@ -23,6 +23,14 @@ int main(void)
         status=ScUiContextWaitTimeout(f2.ui,100,&wait.timeout);if(status<0)break;
         ScU32 events=0;status=ScBrokerWait(&wait,&events);if(status<0)break;
     }
-    if(status<0)fprintf(stderr,"Files2 stopped error=%d\n",status);
+    if(status<0){
+        ScUiErrorInfo detail;memset(&detail,0,sizeof(detail));detail.size=sizeof(detail);detail.version=1;
+        /* 终止必须保留库的原始原因；只有聚合码313无法分辨输入、计时器
+         * 或绘制失败，更不能据此吞掉所有负值继续运行。 */
+        if(ScUiErrorQuery(f2.ui,&detail)==0)
+            fprintf(stderr,"Files2 stopped error=%d cause=%d raw=%d operation=%u node=%u\n",
+                status,detail.cause_code,detail.raw,detail.operation,detail.node);
+        else fprintf(stderr,"Files2 stopped error=%d\n",status);
+    }
     f2_close();return status<0?-status:0;
 }

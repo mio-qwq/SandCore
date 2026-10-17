@@ -205,6 +205,15 @@ void D2Error(D2App *a,const char *operation,ScStatus status)
 static void d2_notify(D2App *a)
 {
     ScUiBatchBegin(a->ui);
+    /* 只在调试状态发布时刷新有限命令，不让工具栏长期保留入口暂停
+     * 或上一目标退出前的禁用位，也不在每帧轮询整个命令目录。 */
+    static const ScU32 commands[]={D2_LAUNCH,D2_BROWSE,D2_RESTART,D2_STOP,
+        D2_CONTINUE,D2_PAUSE,D2_STEP,D2_BREAK_ADD,D2_BREAK_REMOVE,D2_FOLLOW_IP,
+        D2_FOLLOW_BRANCH,D2_GOTO_CODE,D2_GOTO_MEMORY,D2_PREVIOUS,D2_NEXT};
+    for(ScU32 i=0;i<sizeof(commands)/sizeof(*commands);i++){
+        ScUiCommandDesc state;D2Record(&state,sizeof(state));
+        (void)ScUiCommandQuery(a->ui,commands[i],&state);
+    }
     for(ScU32 i=0;i<D2_PANES;i++){D2Pane *p=a->panes+i;
         p->revision++;
         ScUiDataChange d;

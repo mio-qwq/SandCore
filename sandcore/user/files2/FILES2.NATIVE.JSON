@@ -377,6 +377,12 @@
       "size": 1
     },
     {
+      "name": "ScUiErrorQuery",
+      "dependency": "SCUI.SCL",
+      "kind": "function",
+      "size": 1
+    },
+    {
       "name": "ScUiContextStep",
       "dependency": "SCUI.SCL",
       "kind": "function",

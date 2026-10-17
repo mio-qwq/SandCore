@@ -1,5 +1,7 @@
 # M10a2 GUI06 与四文件试玩交接
 
+> 2026-10-17状态纠正：实际Files取消后已看到Target exited(313)，不是正常取消；最终截图与原报告存于evidence/m10a2-p6-gui06-partial。随后恢复时，进程表无QEMU20472、exec36349句柄缺失，不能继续该VM，也没有最后owner回收/注销证据。下文“仍活/冻结/取消待观察”只保留为当时检查点。默认启动器的TCG/SDL/无monitor选择已修正，现为WHPX优先、GTK和图形monitor，详情与冷启动证据见[M10A2-DEFAULT-ENTRY.md](M10A2-DEFAULT-ENTRY.md)。用户两盘没有重写。
+
 2026-10-17，完整目标仍active。当前真实运行HOST12/native06/final06；exec36349、Windows QEMU20472、普通SID4，原SID1。主源、tools、当前SDK/CORE与活helper继续冻结。最终owner账尚未请求。
 
 ## 当前输入位置
@@ -34,3 +36,5 @@ Files实际map的f2_close入口0041BE65已通过真实Add BP按钮安装软件�
 真实执行 `cmd.exe /d /c run.bat --check` 返回0，目录仍严格四项。未替用户启动新VM，客体运行证据明确复用相同产物的当前GUI06。首次装配在移动两盘后因BAT尚未生成而中断，finish.py只补BAT并只读核完整成品，没有再复制整盘；原记录保留。完整回执 `build/m10a2-minimal-playable-01/delivery.json`，源在drafts/m10a2-minimal-playable。
 
 修订：2026-10-17，记录Settings与普通用户安装实测、Debug命令缓存问题、Files取消当前调试位置，以及用户要求的独立四文件试玩副本。
+
+修订：2026-10-17，补Files真实exit313及VM中断边界，撤销当前仍活的解释；补默认入口DPI/WHPX修正的独立证据链接。
