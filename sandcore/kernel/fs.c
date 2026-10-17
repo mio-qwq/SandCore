@@ -475,6 +475,9 @@ int fs_write(const char *path,const u8 *buf,u32 size)
     if(fresh) {
         if((u32)nfiles>=dir_capacity)return -1;
         i=nfiles;
+        /* 目录事务会换入复用的物理页，空余槽不保证为零。新建对象必须
+         * 初始化完整记录，不能把文件名NUL后的旧代码/数据留给另一写回路径。 */
+        for(u32 k=0;k<sizeof(entry_t);k++)((u8 *)&dirents[i])[k]=0;
         dirents[i].uid=auth_subject_uid(task_pid());dirents[i].gid=auth_subject_gid(task_pid());
         if(dirents[i].uid<-1)dirents[i].uid=dirents[i].gid=AUTH_SYSTEM;
         dirents[i].mode=23;dirents[i].flags=dirents[i].reserved=0;dirents[i].generation=0;
@@ -489,6 +492,7 @@ int fs_write(const char *path,const u8 *buf,u32 size)
         for(u32 k=0;k<512;k++) sector[k]=s*512+k<size?buf[s*512+k]:0;
         if(ata_write_sectors(at+s,1,sector)){if(version==5)allocated(at,sectors,0);return -1;}
     }
+    for(u32 k=0;k<sizeof(dirents[i].name);k++)dirents[i].name[k]=0;
     copy(dirents[i].name,name); dirents[i].start_lba=at; dirents[i].size=size;
     dirents[i].generation=generation;
     if(at+sectors>fs_data_end) fs_data_end=at+sectors;
@@ -509,6 +513,7 @@ int fs_mkdir(const char *path)
     if(fs_lease_path_blocked(name,FS_LEASE_TREE) || busy(name))return -6;
     if((u32)nfiles>=dir_capacity)return -1;
     for(int i=0;i<nfiles;i++) if(dirents[i].start_lba && child(name,dirents[i].name)) return -1;
+    for(u32 k=0;k<sizeof(entry_t);k++)((u8 *)&dirents[nfiles])[k]=0;
     copy(dirents[nfiles].name,name); dirents[nfiles].start_lba=0; dirents[nfiles].size=0;
     dirents[nfiles].uid=auth_subject_uid(task_pid());dirents[nfiles].gid=auth_subject_gid(task_pid());
     if(dirents[nfiles].uid<-1)dirents[nfiles].uid=dirents[nfiles].gid=AUTH_SYSTEM;
@@ -549,6 +554,7 @@ int fs_rename(const char *oldpath,const char *newpath)
         if(same(dirents[i].name,old) || child(dirents[i].name,old)) {
             int tail=len(dirents[i].name+n);
             if(m+tail>FS_NAME_MAX || m+tail>=(int)name_bytes())goto failed;
+            for(u32 k=0;k<sizeof(renamed[i].name);k++)renamed[i].name[k]=0;
             copy(renamed[i].name,next); copy(renamed[i].name+m,dirents[i].name+n);
             renamed[i].generation=version==5?new_generation():1;
             if(!renamed[i].generation)goto failed;
@@ -890,10 +896,15 @@ static void native_failed(native_file_t *n,int error,int uncertain)
 }
 static void native_serialize(u8 *p,const entry_t *e)
 {
-    for(u32 j=0;j<64;j++)p[j]=(u8)e->name[j];
+    /* 磁盘名字是最长63B的NUL字符串，其余字节是规范零填充；内存记录
+     * 可能来自旧接口或复用槽，不能按64B裸复制并给脏填充计算合法CRC。
+     * 只处理这条记录的64B，不为每次事务清空整块大容量目录工作数组。 */
+    u32 j=0;for(;j<63u && e->name[j];j++)p[j]=(u8)e->name[j];
+    for(;j<64u;j++)p[j]=0;
     *(u32 *)(p+64)=e->start_lba;*(u32 *)(p+68)=e->size;
     *(i32 *)(p+72)=e->uid;*(i32 *)(p+76)=e->gid;
     *(u32 *)(p+80)=e->mode;*(u32 *)(p+84)=e->flags;*(u32 *)(p+88)=e->generation;
+    *(u32 *)(p+92)=0;
 }
 static int native_publish_start(native_file_t *n)
 {

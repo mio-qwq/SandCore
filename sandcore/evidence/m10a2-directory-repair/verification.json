@@ -1,0 +1,36 @@
+{
+  "status": "TARGETED_DIRECTORY_REGRESSION_PASSED",
+  "scope": "ONE_BOOT_LEGACY_COMPILER_NATIVE_LINKER_DIRECTORY_REGRESSION",
+  "boot_count": 1,
+  "commands": [
+    {
+      "command": "whoami",
+      "exit_code": 0,
+      "output": "whoami; _m9_status=$?; printf \"\\n\"; echo __M9_034aded763665424d7bd5b2a:$_m9_status\nSYSTEM\n"
+    },
+    {
+      "command": "/SYS/BIN/SCCC.SCX /TMP/DIRFIX.C /TMP/DIRFIX.SCO --object",
+      "exit_code": 0,
+      "output": "/SYS/BIN/SCCC.SCX /TMP/DIRFIX.C /TMP/DIRFIX.SCO --object; _m9_status=$?; printf \"\\n\"; echo __M9_9df66463348615c0ccf75660:$_m9_status\nSCCC / mio\nTMP/DIRFIX.C -> TMP/DIRFIX.SCO\nSCCC: preprocess -> C -> x86\nPreprocessing source and includes\nParsing C and generating x86\nLinking and writing SCL\nSCCC OK SCO\nCompilation complete\n"
+    },
+    {
+      "command": "/SYS/BIN/SCLD.SCX /TMP/DIRFIX.SCX --dynamic /TMP/DIRFIX.JSON /TMP/DIRFIX.SCO",
+      "exit_code": 0,
+      "output": "/SYS/BIN/SCLD.SCX /TMP/DIRFIX.SCX --dynamic /TMP/DIRFIX.JSON /TMP/DIRFIX.SCO; _m9_status=$?; printf \"\\n\"; echo __M9_80e93878a50c9c9c43037881:$_m9_status\nSCLD OK DIRFIX.SCX objects=1 image=287 symbols=1 relocs=2 debug=301\n"
+    },
+    {
+      "command": "/TMP/DIRFIX.SCX",
+      "exit_code": 0,
+      "output": "/TMP/DIRFIX.SCX; _m9_status=$?; printf \"\\n\"; echo __M9_81e837c1f8358dce13087d05:$_m9_status\nDIRFIX_OK\n"
+    }
+  ],
+  "base_sha256": "21398a56ad2f31280354d1ad7eb7be05a84f24ae972c16ad43411e9bdf4cf61b",
+  "guest_program_built_linked_ran": true,
+  "qemu_closed": true,
+  "all_committed_names_canonical": true,
+  "actual_disk_metadata_strict_parser_passed": true,
+  "entries_after": 2708,
+  "backing_image_unchanged": true,
+  "core_sha256": "827a9e81e5e33a9f70e695ff579c50b7605a7d088fb90fc138657410e832ef68",
+  "kernel_fs_source_sha256": "08a114fa702368be6a174a1f939d696257a7a3d5baccc6bd5df70525f7dcf3a3"
+}

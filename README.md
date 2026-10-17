@@ -4,6 +4,8 @@
 
 **从引导器、内核到桌面和原生开发工具的 32 位 x86 操作系统。**
 
+当前源码已修复普通编译、保存可能触发的 SandFS 目录文件名填充污染，及其导致的下次启动失败。修复与保留用户文件的恢复结果见[目录写回修复](sandcore/evidence/m10a2-directory-repair/README.md)。M10a2.1 原发布包尚未包含此后续修复。
+
 **M10a2.1 产品修正**：Studio 支持直接打开 C 构建、新建程序项目及具体编译错误；恢复 SCAPI.H 源码兼容，修正文件夹双击、滚动边界和 Files 编辑入口。默认 HelloWorld 已实际构建、运行。见[产品修正记录](sandcore/docs/M10A2-APPLICATION-PRODUCT-FIX.md)、[Studio 使用说明](sandcore/docs/STUDIO2-USER-GUIDE.md)及[补丁下载入口](https://github.com/mio-qwq/SandCore/releases/tag/M10a2.1)。
 
 SandCore 由 [mio](https://github.com/mio-qwq/) 开发。工程包含 BIOS 引导、分页与抢占式多任务、SandFS 文件系统、多用户桌面、图形应用、音频、IPv4 网络、自有可执行格式，以及可以在系统内编译和运行程序的 C 编译器、汇编器和调试器。

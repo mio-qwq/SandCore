@@ -6,6 +6,8 @@
 
 **A 32-bit x86 operating system spanning the bootloader, kernel, desktop environment, and native development tools.**
 
+The current source fixes a SandFS directory name padding bug that normal compilation and saving could trigger, preventing the next boot. See the [repair and file preservation record](sandcore/evidence/m10a2-directory-repair/README.md). The original M10a2.1 release package does not yet include this follow-up fix.
+
 **M10a2.1 product fixes:** Studio can build an opened C file, create a program project and show specific compiler errors. Legacy SCAPI.H source support, directory navigation, scroll bounds and the Files editor action are fixed. The default HelloWorld project was compiled and run in SandCore. See the [repair record](sandcore/docs/M10A2-APPLICATION-PRODUCT-FIX.md), [Studio guide](sandcore/docs/STUDIO2-USER-GUIDE.md) and [patch download](https://github.com/mio-qwq/SandCore/releases/tag/M10a2.1).
 
 SandCore is developed by [mio](https://github.com/mio-qwq/). The project includes BIOS boot support, paging and preemptive multitasking, the SandFS filesystem, a multi-user desktop, graphical applications, audio, IPv4 networking, custom executable formats, and an in-system C compiler, assembler, and debugger capable of compiling and running programs within SandCore itself.
