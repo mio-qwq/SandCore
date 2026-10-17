@@ -26,6 +26,26 @@
 #define CMD_WRITE 0x30
 #define CMD_FLUSH 0xE7
 
+#ifndef BOOT_READ_ONLY
+static void read_sector_words(u16 *buffer)
+{
+    u32 words=256;
+    /* 同样只传一个已由DRQ确认的512B扇区。逐字inw在WHPX等后端会
+     * 反复退出vCPU；REP把固定的256字交给一次字符串IO处理，不扩大
+     * 磁盘命令或关中断预算。ES/DS沿内核既有平坦段，DF按C约定清零；
+     * 两个读写约束声明真实游标/计数变化，memory阻止正文跨IO重排。
+     * 最小loader保留原指令路径，不为本次主核优化改变其尺寸或栈。 */
+    __asm__ __volatile__("cld; rep insw"
+        : "+D"(buffer), "+c"(words) : "d"((u16)ATA_DATA) : "memory", "cc");
+}
+static void write_sector_words(const u16 *buffer)
+{
+    u32 words=256;
+    __asm__ __volatile__("cld; rep outsw"
+        : "+S"(buffer), "+c"(words) : "d"((u16)ATA_DATA) : "memory", "cc");
+}
+#endif
+
 static int have_disk;
 static u32 disk_sectors;
 u32 ata_sector_count(void){return disk_sectors;}
@@ -120,8 +140,7 @@ int ata_write_sectors(u32 lba, u32 count, const void *buf)
         trace_command(CMD_WRITE,lba);outb(ATA_CMD, CMD_WRITE);
 
         if(wait_ready(1)!=0) return -1;
-        for (u32 i = 0; i < 256; i++)
-            outw(ATA_DATA, p[i]);          /* 256 字 = 512 字节 */
+        write_sector_words(p);           /* 仍是256字；完成后才检查设备状态 */
         if(wait_ready(0)!=0) return -1;
         p += 256;
         lba++;
@@ -156,8 +175,12 @@ int ata_read_sectors(u32 lba, u32 count, void *buf)
 
         if(wait_ready(1)!=0) return -1;
 
+#ifdef BOOT_READ_ONLY
         for (u32 i = 0; i < 256; i++)
-            p[i] = inw(ATA_DATA);                  /* 256 字 = 512 字节 */
+            p[i] = inw(ATA_DATA);
+#else
+        read_sector_words(p);
+#endif
         p += 256;
         lba++;
     }

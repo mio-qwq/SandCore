@@ -1,0 +1,3 @@
+time cksum /HOME/WELCOME.SCB; _m9_status=$?; echo __SCUI_CMD_f9d54d8ce15d0a5efd1e9620:$_m9_status:__SCUI_CMD_f9d54d8ce15d0a5efd1e9620_END
+697678241 230424 /HOME/WELCOME.SCB
+real 0.31s (guest PIT)

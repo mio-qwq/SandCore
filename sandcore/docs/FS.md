@@ -259,3 +259,13 @@ SYS/LIB，其余库仍从调用者显式绝对包目录读取。新gate只影响
 2026-10-16修订：fs_path_query为SC32 selector223提供精确META查询；仅观察当前v5已提交目录，不开正文/FD，不pin或遍历子树。先核祖先权限，再区分缺名，坏卷明确IO；输出在成功后一次复制。旧元数据函数与盘上96B条目、代数/双bank/CRC合同均未改变。当前已整体构建及G1生成，COPY/MOVE实际事务结果另记。
 
 2026-10-16实际结果：FILEJOB04通过普通UID1000的精确路径查询、131079B COPY/MOVE、持久ACK、客体逐字节和宿主取回内容对照；两份832B恢复日志的头/frame CRC与START/提交/FINISH独立审计通过。退出/注销13830→13830 PF，各池/历史/字体/未归因增量0，输入/原盘保持。证据入口evidence/m10a2-p5-file-jobs/README.md。完整P5、主要组件和SDK仍未完成，持续目标active。
+
+## 2026-10-17 主核PIO传送粒度
+
+主核在单扇区DRQ确认后以REP INSW/OUTSW传256个16位字，替代256条独立IN/OUT循环。命令仍逐扇发出；BSY/DRQ/ERR/DF、有界等待、设备容量与越尾拒绝、全部数据阶段后的FLUSH、双bank和超级块提交次序保持。字符串IO使用既有平坦段和清零DF，不使用浮点、SIMD、DMA或新CPU能力；最小BOOT_READ_ONLY loader保留原逐字读路径，IDENTIFY语义保持。
+
+修改前Windows WHPX的实际同一文件读取为230424B、POSIX cksum697678241，第二次明确测量的宿主命令3.188秒、客体PIT0.59秒。HOST15和final09构建/检查退出0，GUI10同文件摘要与字节数一致，宿主命令0.437秒、客体PIT0.31秒。QEMU进程CPU观察区间另存原样，不把PIT或含控制开销的CPU区间当作整机帧率。
+
+GUI10通过普通SID4的真实Terminal启动Installer，再用文件对话框添加SYSTEM只读源 /SYS/SDK/EXAMPLES/RDESK/DATA.RDT；先只读预检，再写入 /HOME/DATA.RDT。实际结果73B、错误0、源revision974/目标1506、DURABLE1，正文及uid/gid/rw核实、来源保留。外部只读取回73B，SHAe01e31d9117841935f2a0cadbf022efccd4ec7ec30982e6807c1c32363e74ff4与源相同；Installer正常关闭后真实echo $?为0。这覆盖新REP OUTSW的正文、metadata bank及FLUSH成功路径，不扩大为断电故障注入或全盘吞吐结论。
+
+修订：2026-10-17，记录主核批量PIO及原错误/持久化/loader边界、同文件前后读盘测量和普通GUI真实持久安装/回读/正常退出；本轮最终owner13948→13948、全部资源增量0，driver退出0、输入/原盘保持；证据evidence/m10a2-pio-gui10。

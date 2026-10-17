@@ -1,6 +1,6 @@
 # SandCore M10a2 — The Application Platform Era：持续目标
 
-> 2026-10-17当前：HOST14/native08/final08真实通过，SCUI定时器错误通知合同已修；原生最终PF零差额。新GUI09显式WHPX运行中，完整目标active。当前句柄、源冻结、失败保留和接续以[M10A2-LIVE-GUI](M10A2-LIVE-GUI.md)为准；下文按原时点保留。
+> 2026-10-17当前：HOST15/native08/final09及Windows WHPX GUI10定向流程已收束，driver退出0、输入/原盘保持、最终PF13948→13948。PIO同文件读盘宿主3.188→0.437秒，普通Installer持久写入/回读、Debug快捷键及1024×768真实模式有证据。Files拖放提前结束、Settings临时文件与其它具体缺项继续；完整目标active。参见[当前接续](M10A2-LIVE-GUI.md)及[本轮证据](../evidence/m10a2-pio-gui10/README.md)，下文保持原日期时态。
 
 > 最新GUI04会话已结束：PF13948→13948、全部资源差额0、输入/原盘保持。声音EOF重播/seek/PCM及四按钮FLOW已实测；Settings三表Provider和共享对话框已修，HOST12/SCO13通过、native06运行中。Files取消后来源进程消失仍未定位。完整事实与当前下一步见 [M10A2-GUI04-REVIEW.md](M10A2-GUI04-REVIEW.md)，以下旧检查点保持历史时态；整版目标仍active。
 
@@ -125,3 +125,5 @@ Visual02新标签居中/128×112网格、原壁纸与全部实际icon引用和�
 2026-10-16 SCW工作区：Studio 2 的工作区入口及SDK示例使用.SCW（SandCore Workspace）。普通用户先打开/SYS/SDK/EXAMPLES/RDESK/RDSTATS.SCW构建独立SCL，再打开RDESK.SCW构建四TU应用；F5构建、F6运行、F7调试。此段为当前入口合同，实际执行证据另列。
 
 修订：2026-10-17，保存native08定向刷新、final08严格SDK/CORE与GUI08待验边界。
+
+修订：2026-10-17，收齐HOST15/native08/final09、PIO读写与GUI10实际零差退出证据；保留拖放等具体缺陷和完整持续目标。

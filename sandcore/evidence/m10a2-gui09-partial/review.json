@@ -1,0 +1,36 @@
+{
+  "status": "ACTUAL_FINAL_OWNER_PASS_OUTER_INTERRUPTED_AFTER_FINISH",
+  "original_report_status": "RUNNING",
+  "original_report_sha256": "7e1c4a330da450e71347c8cb407f61b1d1a995f8708d15f8e3fe595b152ec552",
+  "qemu_pid": 17436,
+  "qemu_no_longer_running": true,
+  "normal_qemu_exit_not_observed": true,
+  "post_exit_pin_changes": [],
+  "original_disk_unchanged": true,
+  "owner": {
+    "before_physical_pages": 13948,
+    "after_physical_pages": 13948,
+    "physical_delta": 0,
+    "attributed_physical_delta": 0,
+    "unexplained_delta": 0,
+    "unexpected": []
+  },
+  "measured_read": {
+    "name": "p6-cli-gui9-pio-read-measured",
+    "command": "time cksum /HOME/WELCOME.SCB",
+    "exit_code": 0,
+    "wall_seconds": 3.187999999994645,
+    "stdout_path": "C:\\Users\\Administrator\\Desktop\\projectos\\sandcore\\build\\m10a2-p6-gui-run-09\\case-016.stdout.bin",
+    "stdout_bytes": 196,
+    "stdout_sha256": "ad3eb2cc216bc634fdcb2c5206bc6d320a99ab6061a9b89df94a8b6e08154c63",
+    "output": "time cksum /HOME/WELCOME.SCB; _m9_status=$?; echo __SCUI_CMD_328b7d52954db47acaab1569:$_m9_status:__SCUI_CMD_328b7d52954db47acaab1569_END\n697678241 230424 /HOME/WELCOME.SCB\nreal 0.59s (guest PIT)\n"
+  },
+  "boundaries": [
+    "ordinary Shell actual exit0 viewed",
+    "Terminal process still present before logout; not normal GUI exit proof",
+    "Files normal CtrlW disappearance observed; not original cancel313 fix proof",
+    "no Debug/Installer/resolution regression completed",
+    "failed PS2 target move retained; no speculative IRQ fix"
+  ],
+  "full_M10a2": false
+}

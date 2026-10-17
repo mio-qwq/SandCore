@@ -30,3 +30,5 @@ SCCC宿主IO实际检查14中SCUI/Debug/Files/Settings通过；Installer首次�
 修订：2026-10-17，记录默认SDL的DPI缺陷、GTK/WHPX入口修正、冷启动原尺寸证据、快捷键实测边界与五目标应用修复。
 
 2026-10-17后续：用户实际确认“我试了现在可以快捷键”。代理本次暂停无盘窗口检查被用户Esc中止并正常关闭，未取得可引用的自动按键结果；用户的实际确认与代理自动化证据分列。新HOST14/native08/final08已有实际构建/生成与零差owner，尚未覆盖用户试玩盘，修后GUI09继续。
+
+2026-10-17本轮收束：HOST15/native08/final09的Windows WHPX GUI10实际完成1024×768/150%预览、Keep、关闭重开查询预览0；1920×1080/150%恢复及预览0。Settings文字/响应式按钮实际截图已查看；Debug F5/F4/F9有独立真实GUI证据。最终资源零差、driver退出0；四文件用户盘未覆盖，完整M10a2继续active。参见[PIO与GUI10](../evidence/m10a2-pio-gui10/README.md)。

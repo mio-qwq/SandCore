@@ -1,0 +1,7 @@
+{
+  "ata_before_sha256": "06fe40f3353fa80f2f5449151c88a2e5c678544fbcecd47f71447269af7134e5",
+  "host14_source": "build/m10a2-main-studio-01/p6-unified-host-14.json",
+  "runtime_core": "build/m10a2-p6-final-08/core",
+  "gui09_evidence": "evidence/m10a2-gui09-partial/review.json",
+  "kernel_change_started": false
+}

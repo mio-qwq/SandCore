@@ -7,6 +7,8 @@
  * BIOS int 13h 在保护模式失效；本接口也不能访问 if=floppy 的引导盘。
  * 每次调用的 buf 必须容纳 count*512B，文件字节边界由 fs 层中转。
  * 等待阶段检查 BSY/DRQ/ERR/DF 与超时，写入结束检查缓存 flush；
+ * 主核以REP INSW/OUTSW传送一个扇区的256字；最小loader保留逐字路径。
+ * 命令/DRQ/错误检查与写后FLUSH屏障不变，不使用DMA或新CPU特性。
  * 0=完成，-1=设备错误/超时，不能把单纯“不忙”当成数据已就绪。 */
 
 void ata_init(void);                       /* 探测主盘 */

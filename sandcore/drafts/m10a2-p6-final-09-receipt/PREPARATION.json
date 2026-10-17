@@ -1,0 +1,24 @@
+{
+  "status": "LAYERED_NATIVE08_HOST14_PRODUCER_HOST15_KERNEL_PREPARED_NOT_EXECUTED",
+  "original_helpers": {
+    "drafts\\m10a2-p6-final-08-receipt\\bindings.py": "19180017aad27d2a61755519dcc55fee8dcbfd34b2e1391ed373f1318b33f2a6",
+    "drafts\\m10a2-p6-final-08-receipt\\finalize.py": "8b4fa743950293f599ce61006b9392850afc895b8527d7f671091d1ca2e576ed",
+    "drafts\\m10a2-p6-final-08-receipt\\inspect_final.py": "cb3a2d00c8dbaa2e6ec75f02dc80495a3d734272f78cacb5a3bb2c2651c83aa6"
+  },
+  "host14": {
+    "path": "build/m10a2-main-studio-01/p6-unified-host-14.json",
+    "sha256": "d054c6115d97e75ac26245b602188b477d83f8cd792c43d202f721ab93495ff6"
+  },
+  "host15": {
+    "path": "build/m10a2-main-pio-01/p6-unified-host-15.json",
+    "sha256": "f642bc792d645fe55f91f737bf0b5237e0960b5f73fe9db37640c7e5765660a2"
+  },
+  "changed_original_input_paths": [
+    "kernel/ata.c",
+    "kernel/ata.h"
+  ],
+  "user_snapshot_identical": true,
+  "user_native_regeneration": false,
+  "core_reuses_unchanged_objects_with_rebased_dependencies": true,
+  "core_build_started": false
+}

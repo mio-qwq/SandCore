@@ -109,3 +109,5 @@ Copy/Cut/Paste使用真实session clipboard事务及immutable snapshot，源退�
 2026-10-17：修复快捷键被旧DISABLED状态挡住，保留执行前动态禁用检查；Debug在状态发布时刷新有限命令。实际SCCC宿主后端与HOST13通过，五目标原生刷新07进行中，修后GUI尚待。GUI04四按钮FLOW实图已保留；Files取消后GUI06实际exit313，不将异常退出写成取消通过。
 
 2026-10-17：发现Timer回调失败与普通消息的非致命通知合同不一致，现共用notification_error/ERROR通知并保留firing生命周期。SCO16、HOST14及真实native08生成通过，最终PF差额0、严格SDK reader通过；新GUI09正在进行，Files取消313的实际根因仍需原始错误诊断确认，不以此改写历史结果。
+
+2026-10-17 GUI10定向终态：Debug F5两次继续、F4真实暂停、7模块1765符号、F9两处断点及实际表2→1→0通过；目标及Debug正常exit0。Settings实际1024×768/150% Keep并重开核实预览0，再恢复1920×1080/150%。最终PF13948→13948/全部owner零差、driver退出0、输入原盘保持。Files两类源拖向桌面均提前结束、没有确认框，之后正常exit0/日志空；不据此声称旧取消313已修复。证据evidence/m10a2-pio-gui10。
