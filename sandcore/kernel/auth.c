@@ -91,8 +91,8 @@ static void defaults(void)
     users[0].uid=users[0].gid=0;users[0].flags=USER_ENABLED;
     copy(users[1].name,"mio",32);copy(users[1].home,"HOME",64);
     users[1].uid=users[1].gid=AUTH_DEFAULT;users[1].flags=USER_ENABLED;
-    /* 默认账户没有可登录密码。GUI按普通mio身份启动，root首次密码
-     * 由外部串口SYSTEM设置；不安装公开默认root口令或SYSTEM密码。 */
+    /* 首次启动直接进入普通mio；未设密码的mio也允许固定本机登录窗
+     * 返回该身份。root仍锁住，首次密码由外部串口SYSTEM设置。 */
 }
 void auth_init(void)
 {
@@ -211,6 +211,14 @@ static int begin(int pid,int target,const char *password,u32 action)
     if(action){if(random_bytes(j->salt,16)){login_clear(pid);return -1;}}
     else for(u32 i=0;i<16;i++)j->salt[i]=target>=0?users[target].salt[i]:boot_token[i];
     if(!action && auth_can_manage(pid)){j->state=target>=0?2:3;return (int)j->ticket;}
+    /* 自动进入mio与注销后的本机登录必须闭合。仅内核核验发行字节后
+     * 授予的LOGIN2角色可用空输入重开默认mio；普通EXEC同名程序、
+     * Shell/su/网络入口和root都不走此路。active_uid还保留账户库的
+     * 失败关闭结果，坏库或禁用账户不能借默认内存记录恢复权限。
+     * 已设密码立即走原PBKDF；不改账户格式或旧调用的寄存器含义。 */
+    if(!action && !password[0] && auth_login_screen_role(pid) && active_uid==AUTH_DEFAULT
+        && target>=0 && users[target].uid==AUTH_DEFAULT && users[target].flags==USER_ENABLED
+        && same(users[target].name,"mio")){j->state=2;return (int)j->ticket;}
     pbkdf256_init(&j->derive,password,length(password,129),j->salt,PASSWORD_ITERATIONS);
     login_enqueue(pid);
     return (int)j->ticket;

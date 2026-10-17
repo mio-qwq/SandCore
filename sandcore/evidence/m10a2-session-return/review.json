@@ -1,0 +1,342 @@
+{
+  "status": "ACTUAL_EXIT_LOGOUT_LOCAL_SIGNIN_VERIFIED_RESOURCE_BOUNDARY_DECLARED",
+  "full_M10a2": false,
+  "raw_gui_status": "FAIL_OR_INTERRUPTED",
+  "driver_exit_code": 1,
+  "driver_stop": "Root CtrlC after original finish predicate rejected first retained LOCKED view",
+  "qemu_pid": 13536,
+  "qemu_closed": true,
+  "source_disk_unchanged": true,
+  "current_inputs_unchanged": true,
+  "ordinary_user_uid": 1000,
+  "gui": {
+    "exit_returns_fixed_login": true,
+    "previous_session_preserved": true,
+    "root_empty_password_denied": true,
+    "default_mio_empty_password_accepted": true,
+    "real_logout_removes_session5": true,
+    "relogin_creates_session6": true,
+    "login_process_exits": true
+  },
+  "actual_sessions": {
+    "after_leave": {
+      "1": {
+        "uid": 1000,
+        "kind": "user",
+        "active": false,
+        "tasks": 1
+      },
+      "2": {
+        "uid": -1,
+        "kind": "SYSTEM",
+        "active": false,
+        "tasks": 3
+      },
+      "3": {
+        "uid": -2,
+        "kind": "LOCKED",
+        "active": true,
+        "tasks": 1
+      },
+      "4": {
+        "uid": 1000,
+        "kind": "user",
+        "active": false,
+        "tasks": 1
+      }
+    },
+    "first_signin": {
+      "1": {
+        "uid": 1000,
+        "kind": "user",
+        "active": false,
+        "tasks": 1
+      },
+      "2": {
+        "uid": -1,
+        "kind": "SYSTEM",
+        "active": false,
+        "tasks": 3
+      },
+      "3": {
+        "uid": -2,
+        "kind": "LOCKED",
+        "active": false,
+        "tasks": 0
+      },
+      "4": {
+        "uid": 1000,
+        "kind": "user",
+        "active": false,
+        "tasks": 1
+      },
+      "5": {
+        "uid": 1000,
+        "kind": "user",
+        "active": true,
+        "tasks": 1
+      }
+    },
+    "after_logout": {
+      "1": {
+        "uid": 1000,
+        "kind": "user",
+        "active": false,
+        "tasks": 1
+      },
+      "2": {
+        "uid": -1,
+        "kind": "SYSTEM",
+        "active": false,
+        "tasks": 3
+      },
+      "3": {
+        "uid": -2,
+        "kind": "LOCKED",
+        "active": true,
+        "tasks": 1
+      },
+      "4": {
+        "uid": 1000,
+        "kind": "user",
+        "active": false,
+        "tasks": 1
+      }
+    },
+    "relogin": {
+      "1": {
+        "uid": 1000,
+        "kind": "user",
+        "active": false,
+        "tasks": 1
+      },
+      "2": {
+        "uid": -1,
+        "kind": "SYSTEM",
+        "active": false,
+        "tasks": 3
+      },
+      "3": {
+        "uid": -2,
+        "kind": "LOCKED",
+        "active": false,
+        "tasks": 0
+      },
+      "4": {
+        "uid": 1000,
+        "kind": "user",
+        "active": false,
+        "tasks": 1
+      },
+      "6": {
+        "uid": 1000,
+        "kind": "user",
+        "active": true,
+        "tasks": 1
+      }
+    }
+  },
+  "resource": {
+    "raw_owner_verdict": "FAIL",
+    "physical_before": 13950,
+    "physical_after": 13958,
+    "raw_physical_delta": 8,
+    "raw_unexplained_delta": 8,
+    "new_view_objects": 1,
+    "view_pool_pages_delta": 0,
+    "actual_desktop_state_bytes": 32660,
+    "compiled_state_pages": 8,
+    "existing_live_owner_frames_unchanged": [
+      {
+        "pid": 1,
+        "generation": 1,
+        "private_pages": 2880,
+        "page_tables": 6,
+        "frames_equal": true
+      },
+      {
+        "pid": 2,
+        "generation": 1,
+        "private_pages": 84,
+        "page_tables": 2,
+        "frames_equal": true
+      }
+    ],
+    "other_pool_deltas_zero": true,
+    "font_and_active_desktop_pages_unchanged": true,
+    "interpretation": "Matches first persistent LOCKED SID3 view and desktop_state allocation retained by session.c; source and compiled-size attribution, not captured frame-address attribution",
+    "retained_frame_addresses_captured": false,
+    "original_fail_not_reclassified": true,
+    "no_blanket_page_allowance": true
+  },
+  "files": {
+    "gui13.json.gz": {
+      "source": "build/m10a2-p6-gui-run-13/p6-gui.json",
+      "sha256": "850119ee303f3b9abf14c91569ef48ee2c2a53d3bb0d155a7eb64c7e7e6cf061",
+      "bytes": 8687966,
+      "archive_sha256": "a5fc8d31577b7fc671e4795a07dc2ad35e0e5d481b2e2712dbe0354b24aaf28b"
+    },
+    "session.json": {
+      "source": "build/m10a2-p6-gui-run-13/session.json",
+      "sha256": "76c1486985c437c0486c9d561d6bf51413222db996ef85ed56a25d6d30c1f5d6",
+      "bytes": 11648833,
+      "archive_sha256": "76c1486985c437c0486c9d561d6bf51413222db996ef85ed56a25d6d30c1f5d6"
+    },
+    "heartbeat.jsonl": {
+      "source": "build/m10a2-p6-gui-run-13/heartbeat.jsonl",
+      "sha256": "62481e5ed82322ef348c01e9c7dfaeff22a0df4afc7c65e54628918eecf08a62",
+      "bytes": 30116,
+      "archive_sha256": "62481e5ed82322ef348c01e9c7dfaeff22a0df4afc7c65e54628918eecf08a62"
+    },
+    "screenshots/exit-confirm.png": {
+      "source": "build/m10a2-p6-gui-run-13/gui13-exit-confirm.png",
+      "sha256": "1981d814b0b38db5edad0c75bd1b28759d8c4c3d40e9b8a1ad95725fd733f83c",
+      "bytes": 1236081,
+      "archive_sha256": "1981d814b0b38db5edad0c75bd1b28759d8c4c3d40e9b8a1ad95725fd733f83c"
+    },
+    "screenshots/login-form-ready.png": {
+      "source": "build/m10a2-p6-gui-run-13/gui13-login-form-ready.png",
+      "sha256": "ad310e6cdd39601f8758898a43fa99f26f51c8eac9518f2ed53c11dfe2d983cd",
+      "bytes": 27418,
+      "archive_sha256": "ad310e6cdd39601f8758898a43fa99f26f51c8eac9518f2ed53c11dfe2d983cd"
+    },
+    "screenshots/root-empty-result.png": {
+      "source": "build/m10a2-p6-gui-run-13/gui13-root-empty-result.png",
+      "sha256": "8f5e026b966d1dfebd375f1db7e49e98b9f86ab759bdefc26565f01e01101ded",
+      "bytes": 27853,
+      "archive_sha256": "8f5e026b966d1dfebd375f1db7e49e98b9f86ab759bdefc26565f01e01101ded"
+    },
+    "screenshots/first-desktop-settled.png": {
+      "source": "build/m10a2-p6-gui-run-13/gui13-first-desktop-settled.png",
+      "sha256": "90cb0e807e99bb71b172edb2e4bb7ac41fd8db25a13bfd466e76bfbb68fa36ed",
+      "bytes": 1364354,
+      "archive_sha256": "90cb0e807e99bb71b172edb2e4bb7ac41fd8db25a13bfd466e76bfbb68fa36ed"
+    },
+    "screenshots/logout-confirm.png": {
+      "source": "build/m10a2-p6-gui-run-13/gui13-logout-confirm.png",
+      "sha256": "19712be446facb20fda980b5d72b2fb27c69d9c9012b70562afaa410ac1bbd70",
+      "bytes": 1235450,
+      "archive_sha256": "19712be446facb20fda980b5d72b2fb27c69d9c9012b70562afaa410ac1bbd70"
+    },
+    "screenshots/after-logout-form.png": {
+      "source": "build/m10a2-p6-gui-run-13/gui13-after-logout-form.png",
+      "sha256": "685fb54a6b9d7c1babe324eb376d6d9c9517baba2576da8c3f77871b69930c68",
+      "bytes": 27527,
+      "archive_sha256": "685fb54a6b9d7c1babe324eb376d6d9c9517baba2576da8c3f77871b69930c68"
+    },
+    "screenshots/relogin-result.png": {
+      "source": "build/m10a2-p6-gui-run-13/gui13-relogin-result.png",
+      "sha256": "4f73752814ded162afb2d0b9d71def46fa40baddc32d15fe1ceea1e787321e46",
+      "bytes": 1364355,
+      "archive_sha256": "4f73752814ded162afb2d0b9d71def46fa40baddc32d15fe1ceea1e787321e46"
+    },
+    "stdout/sessions-before-gui.bin": {
+      "source": "build/m10a2-p6-gui-run-13/case-004.stdout.bin",
+      "sha256": "c8feadfbc222f89e76d9211a8f332d49ee405b329fb6d339735187b18963a982",
+      "bytes": 264,
+      "archive_sha256": "c8feadfbc222f89e76d9211a8f332d49ee405b329fb6d339735187b18963a982"
+    },
+    "stdout/sessions-after-gui-login.bin": {
+      "source": "build/m10a2-p6-gui-run-13/case-006.stdout.bin",
+      "sha256": "701c9509922ff95011ca942354020dc98c90b129fc33a8fba2ca34fa2b1a4c81",
+      "bytes": 296,
+      "archive_sha256": "701c9509922ff95011ca942354020dc98c90b129fc33a8fba2ca34fa2b1a4c81"
+    },
+    "stdout/p6-cli-gui13-exit-actual-sessions.bin": {
+      "source": "build/m10a2-p6-gui-run-13/case-009.stdout.bin",
+      "sha256": "4fdbe68111cb9ab448a2bd48da00a61bb302fab92517b8e14404582f48fea0fa",
+      "bytes": 296,
+      "archive_sha256": "4fdbe68111cb9ab448a2bd48da00a61bb302fab92517b8e14404582f48fea0fa"
+    },
+    "stdout/p6-cli-gui13-first-login-sessions.bin": {
+      "source": "build/m10a2-p6-gui-run-13/case-024.stdout.bin",
+      "sha256": "ff8f8495300d442b2a154213861ce5ae8235c79013b8148cd797c5364cbd4748",
+      "bytes": 328,
+      "archive_sha256": "ff8f8495300d442b2a154213861ce5ae8235c79013b8148cd797c5364cbd4748"
+    },
+    "stdout/p6-cli-gui13-after-real-logout-sessions.bin": {
+      "source": "build/m10a2-p6-gui-run-13/case-026.stdout.bin",
+      "sha256": "f0d9b5ba272836be9f6f12d9de23855effc03d4ed0a80199c63504c661ddb4d2",
+      "bytes": 296,
+      "archive_sha256": "f0d9b5ba272836be9f6f12d9de23855effc03d4ed0a80199c63504c661ddb4d2"
+    },
+    "stdout/p6-cli-gui13-relogin-actual-sessions.bin": {
+      "source": "build/m10a2-p6-gui-run-13/case-033.stdout.bin",
+      "sha256": "146aaf0203ba93f6b7754460919c3db7ce54fc977ba692058140f3eeefc75125",
+      "bytes": 328,
+      "archive_sha256": "146aaf0203ba93f6b7754460919c3db7ce54fc977ba692058140f3eeefc75125"
+    },
+    "stdout/p6-cli-gui13-restore-original.bin": {
+      "source": "build/m10a2-p6-gui-run-13/case-034.stdout.bin",
+      "sha256": "46f3c6172478438cb6d4a82ac059828a0d759c100a186e1bfff7119a4e4dd1d0",
+      "bytes": 127,
+      "archive_sha256": "46f3c6172478438cb6d4a82ac059828a0d759c100a186e1bfff7119a4e4dd1d0"
+    },
+    "stdout/p6-final-sessions-gui13-final-owner.bin": {
+      "source": "build/m10a2-p6-gui-run-13/case-037.stdout.bin",
+      "sha256": "5cdd44e72f436552ab57908bb7f69f1aefda0b20d1468d13a1cd15c7df03a63b",
+      "bytes": 264,
+      "archive_sha256": "5cdd44e72f436552ab57908bb7f69f1aefda0b20d1468d13a1cd15c7df03a63b"
+    },
+    "reports/p6-generation.json.gz": {
+      "source": "build/m10a2-p6-target-refresh-11/p6-generation.json",
+      "sha256": "66396e2bb8eaf81eefffa02fb4fbaffb23c99a0fddf749ba81559b0d07dad9c0",
+      "bytes": 14699225,
+      "archive_sha256": "6812a80225e4882244fe92212be6ff6a938b5f9167f904f9d2494fb3ae51d975"
+    },
+    "reports/refresh-vm.json.gz": {
+      "source": "build/m10a2-p6-refresh-vm-11/refresh-vm.json",
+      "sha256": "fbb6db090cc822a624f94c5d79ecf9b32ddedabad40ff8bb6ae1ed374ac80d92",
+      "bytes": 4887564,
+      "archive_sha256": "0a226fe7fce10d7c78b74eda577ce64444046b2289da9de8792db4998e1faf12"
+    },
+    "reports/p6-unified-host-21.json.gz": {
+      "source": "build/m10a2-main-session-return-01/p6-unified-host-21.json",
+      "sha256": "738e41d51bc4cd026cdc658c0b8d484614c59e7952b4908be389eaa919a76749",
+      "bytes": 365701,
+      "archive_sha256": "fb2365a9c04ef062ab4e65fc25d6fdf08b2feb0d9098b7dcb29584e80f7d6074"
+    },
+    "reports/finalization.json.gz": {
+      "source": "build/m10a2-p6-final-12/finalization.json",
+      "sha256": "d54aac7ef1f1500c27d3f666250eaa00c7548c332c7efdbc50bc4a13d65a2037",
+      "bytes": 12102,
+      "archive_sha256": "f15863e42cde393c8c15f325fcc44992c06259b974a8fb152c9701df5df17656"
+    },
+    "source/kernel/auth.c": {
+      "source": "kernel/auth.c",
+      "sha256": "d8d5dfa734753f6a2bd1c1cf0cc5f2f88f330217d3a67959488c148f2632bf7c",
+      "bytes": 20992,
+      "archive_sha256": "d8d5dfa734753f6a2bd1c1cf0cc5f2f88f330217d3a67959488c148f2632bf7c"
+    },
+    "source/kernel/desktop.c": {
+      "source": "kernel/desktop.c",
+      "sha256": "cd6ebda391aa8baba8248f8a43701ac1cff8f6277120fd9e5b984a420fd4ad90",
+      "bytes": 23149,
+      "archive_sha256": "cd6ebda391aa8baba8248f8a43701ac1cff8f6277120fd9e5b984a420fd4ad90"
+    },
+    "source/kernel/session.c": {
+      "source": "kernel/session.c",
+      "sha256": "24c7c3a9160d38bf1cfc46e192a341ac4f108be9e931b9e013a69ea3fc179d27",
+      "bytes": 8386,
+      "archive_sha256": "24c7c3a9160d38bf1cfc46e192a341ac4f108be9e931b9e013a69ea3fc179d27"
+    },
+    "source/kernel/wm.c": {
+      "source": "kernel/wm.c",
+      "sha256": "c26bb73efe464a3f673b2fcd5a68fb7f5003f70297b55b30b3f86a3bff0c14cc",
+      "bytes": 115419,
+      "archive_sha256": "c26bb73efe464a3f673b2fcd5a68fb7f5003f70297b55b30b3f86a3bff0c14cc"
+    },
+    "source/user/scshell/desktop/desktop_actions.inc": {
+      "source": "user/scshell/desktop/desktop_actions.inc",
+      "sha256": "167e9be8c599997621c5893a47834c831148f9573ad0110ac94fb64ee2bc0fd1",
+      "bytes": 32414,
+      "archive_sha256": "167e9be8c599997621c5893a47834c831148f9573ad0110ac94fb64ee2bc0fd1"
+    },
+    "desktop.o": {
+      "source": "build/m10a2-p6-final-12/core/desktop.o",
+      "sha256": "607d6e8cd332c817efe35799bef7d1879b281a934cd28cb7b291caec46ddce52",
+      "bytes": 13388,
+      "archive_sha256": "607d6e8cd332c817efe35799bef7d1879b281a934cd28cb7b291caec46ddce52"
+    }
+  }
+}

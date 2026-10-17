@@ -170,7 +170,10 @@ static ScStatus desk_logout_reply(ScUiContext *ui,const ScUiEvent *event,void *c
     memset(&info,0,sizeof(info));info.size=sizeof(info);info.version=1;
     ScStatus s=ScUiDialogQuery(dialog,&info);
     if(s==0 && info.command==SC_UI_DIALOG_OK){
-        if(context)desk.quit=1;else s=ScSessionControl(desk.identity.session,SC32_SESSION_LOGOUT);
+        /* 桌面host受故障恢复监管，结束进程会被重新拉起，不能拿quit
+         * 冒充离开桌面。返回登录界面由会话协调，保留后台程序和原SID；
+         * 真正注销仍只终止当前会话，不影响同账户的其它桌面。 */
+        s=ScSessionControl(desk.identity.session,context?SC32_SESSION_LOGIN_PANEL:SC32_SESSION_LOGOUT);
     }
     if(desk.dialog==dialog){desk.dialog=0;ScUiDialogRelease(dialog);}return s;
 }
@@ -352,7 +355,7 @@ static ScStatus desk_command(ScU32 command)
         ScShellApplicationRelease(app);
     }else if(command==DESK_LOGOUT || command==DESK_EXIT){
         ScUiText title=desk_text(command==DESK_EXIT?"退出桌面":"注销会话");
-        ScUiText message=desk_text(command==DESK_EXIT?"桌面将关闭，已打开的程序继续运行。":"本会话中的程序将关闭。请先保存文档。");
+        ScUiText message=desk_text(command==DESK_EXIT?"返回登录界面，当前会话及已打开的程序继续运行。":"本会话中的程序将关闭。请先保存文档。");
         if(desk.dialog)s=SC_SHELL_E_BUSY;
         else s=ScShellConfirm(desk.ui,desk.desktop,&title,&message,desk_logout_reply,command==DESK_EXIT?(void *)1:0,&desk.dialog);
     }else if(command==SC_SHELL_COMMAND_COPY || command==SC_SHELL_COMMAND_CUT || command==SC_SHELL_COMMAND_PASTE)
