@@ -8,15 +8,15 @@
 | 默认启动问题 | 旧SDL不感知DPI/96与宿主144不匹配；现GTK实际per-monitor/144，WHPX初始化退出0，同试玩盘冷启动设置/文件对话框原尺寸清楚。见[入口证据](M10A2-DEFAULT-ENTRY.md) |
 | 四文件试玩 | Desktop/test仍只有run.py、run.bat与两盘；只更改启动器，用户盘不覆盖。其当前数据摘要与首次交付不同，保留用户变更 |
 | 最新统一构建 | HOST13退出0，41产物齐全、构建期间源码变化0；SCUI/Debug/Files/Settings的SCCC检查14通过，Installer修正编译名后检查15通过 |
-| 当前真实任务 | 原生刷新07，exec68948、Windows QEMU16136；五标签SCUI/DEBUG2/FILES2/SETTINGS2/INSTALLER2，其余27对象/8普通库/21产物按完整来源复用，最终结果尚未到达 |
+| 当前真实任务 | 刷新07已结束为FAIL：五标签编译/链接/取回通过；最终PF14050→14066，PID1桌面heap增加16页，尚无用途归属。exec68948退出1，QEMU16136已关闭；最终reader审计未执行 |
 | 最新GUI06 | 安装73B/DURABLE/源目标一致/正常exit0；Settings属性表与ACCESS拒绝实测。Files取消实际exit313。VM已消失、句柄失效，原报告RUNNING不改，最终owner账缺失 |
 | 已完成的可复用GUI04 | 普通SCW逐TU编译/发布独立SCL与四TU应用，真实动态调用/Studio→Debug/单步/暂停/断点/符号/正常退出；声音EOF重播/seek/PCM、Classic和最终零差资源账。见[GUI04](M10A2-GUI04-REVIEW.md) |
 
-刷新07期间主源、tools、HOST13及活helper保持冻结；文档和新的独立草稿可以继续。先轮询同一个exec，不因观察超时或旧RUNNING文件重启。实际报告：build/m10a2-p6-refresh-vm-07/refresh-vm.json；产物报告：build/m10a2-p6-target-refresh-07/p6-generation.json。准备与实际源/sidecar闭包审计在drafts/m10a2-p6-followup-refresh-v6，编译运行底座明确保持final04，产物继承native06，二者不能混称。
+刷新07已结束，源冻结解除；不能恢复旧exec或自动重跑五目标。失败原件和精确PTE差额见[evidence/m10a2-native07-failure](../evidence/m10a2-native07-failure/review.json)。实际报告：build/m10a2-p6-refresh-vm-07/refresh-vm.json；产物报告：build/m10a2-p6-target-refresh-07/p6-generation.json。准备与实际源/sidecar闭包审计在drafts/m10a2-p6-followup-refresh-v6，编译运行底座明确保持final04，产物继承native06，二者不能混称。
 
 本批修复：快捷键解析不先跳过旧DISABLED缓存，Debug状态发布刷新有限命令；单行状态与多行错误框分开；安装设置区滚动、操作工具栏溢出。Files只增加原始错误诊断，取消313原因尚待真实定位；Settings候选.C31清理也仍待核实。
 
-接续顺序：取得刷新07真实终态 → 对其生成新CORE/SDK → 一次定向GUI复核新Debug快捷键、安装默认/窄布局、Files取消的精确cause，并补代表分辨率的原尺寸画面 → 更新用户可用入口时保留其数据 → 按全合同补余下会话/权限/性能/兼容与交付缺项。不能用宿主构建替代客体生成或视觉验收。
+接续顺序：查清PID1 heap的连续64KiB增加（当前只是SCCLIB arena调查线索，不是缓存豁免）→ 收束严格原生来源与owner失败 → 生成新CORE/SDK → 一次定向GUI复核新Debug快捷键、安装默认/窄布局、Files取消的精确cause，并补代表分辨率的原尺寸画面 → 更新用户可用入口时保留其数据 → 按全合同补余下会话/权限/性能/兼容与交付缺项。不能用宿主构建替代客体生成或视觉验收。
 
 SCAPI.H冻结摘要81a730450fcb3d310ed841ad3e5c70a3fed32aa7fbd10acac8b888ac7da9ffc1本次复核一致。只用main、无Release、不读私钥、不重启M8。旧源码、旧盘和失败证据保留。
 <!-- CURRENT-END -->
@@ -181,3 +181,5 @@ SCAPI.H冻结SHA81a730450fcb3d310ed841ad3e5c70a3fed32aa7fbd10acac8b888ac7da9ffc1
 </details>
 
 修订：2026-10-17，整理唯一当前状态，历史接力原文折叠保留；补默认DPI修正和五目标原生刷新07。
+
+修订：2026-10-17，补刷新07实际FAIL、PID1 heap精确16页定位及无当前VM；不将生成成功改成整轮PASS。
