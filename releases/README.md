@@ -1,5 +1,7 @@
 # 各版本一次构建产物
 
+最新：[SandCore M10a2 — The Application Platform Era](https://github.com/mio-qwq/SandCore/releases/tag/M10a2)，提供四文件运行包、独立SDK及SHA256SUMS。[实际发布凭证](../sandcore/docs/M10A2-PUBLISHED.md)。以下旧版本原包保持。
+
 M10a1 按用户2026-10-07最新决定作为 [GitHub Preview 预发布](https://github.com/mio-qwq/SandCore/releases/tag/M10a1)提供，附件为原 `SandCore-M10a1-acceptance.zip`。包不在本目录重复保存，发布来源见[M10A1-PREVIEW.md](../sandcore/docs/M10A1-PREVIEW.md)，附件摘要见[SandCore-M10a1-SHA256SUMS.txt](SandCore-M10a1-SHA256SUMS.txt)。
 
 每个ZIP只有一套原启动盘/数据盘和运行工具；四包共19.913MiB。

@@ -1,0 +1,28 @@
+{
+  "status": "RELEASE_PUBLISHED_ASSETS_HASH_VERIFIED",
+  "tag": "M10a2",
+  "commit": "53090db84670d4b875c1ceb164c77ada52cc025a",
+  "commit_verified": true,
+  "release_id": 415753166,
+  "url": "https://github.com/mio-qwq/SandCore/releases/tag/M10a2",
+  "draft": false,
+  "prerelease": false,
+  "published_at": "2026-10-17T10:59:17Z",
+  "assets": {
+    "SandCore-M10a2-SDK.zip": {
+      "url": "https://github.com/mio-qwq/SandCore/releases/download/M10a2/SandCore-M10a2-SDK.zip",
+      "bytes": 5211109,
+      "digest": "sha256:9170d28760466af1fbf6e287867b1ab9f7073674969af201302cc3953aa4a8eb"
+    },
+    "SandCore-M10a2.zip": {
+      "url": "https://github.com/mio-qwq/SandCore/releases/download/M10a2/SandCore-M10a2.zip",
+      "bytes": 21471099,
+      "digest": "sha256:66a9311cf68ba3bf5ca9a1649893163807294064198f70dd228459152df4acec"
+    },
+    "SHA256SUMS": {
+      "url": "https://github.com/mio-qwq/SandCore/releases/download/M10a2/SHA256SUMS",
+      "bytes": 174,
+      "digest": "sha256:77a1fd59a0fd03841034946dc3925c8a28c9cbb5943d5b33ffc7a8193800cbcd"
+    }
+  }
+}

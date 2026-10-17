@@ -1,0 +1,34 @@
+{
+  "status": "GITHUB_SIGNED_VERIFIED_COMMIT_ON_MAIN",
+  "sha": "53090db84670d4b875c1ceb164c77ada52cc025a",
+  "url": "https://github.com/mio-qwq/SandCore/commit/53090db84670d4b875c1ceb164c77ada52cc025a",
+  "parent": "397f256fa34845aaefc798a9979ec59e2a89ef38",
+  "tree": "c564ea6570fd9aae6c635cfe1dd03d545f35769f",
+  "github_verification": {
+    "verified": true,
+    "reason": "valid"
+  },
+  "graphql_signature": {
+    "isValid": true,
+    "state": "VALID"
+  },
+  "prior_history_preserved": true,
+  "force_push": false,
+  "local_main_equals_remote": true,
+  "ordinary_git_transport_commit": "397f256fa34845aaefc798a9979ec59e2a89ef38",
+  "ordinary_git_transport_signed": false,
+  "entire_final_tree_and_parent_chain_github_signed": true,
+  "earlier_verified_batches": [
+    {
+      "sha": "4a29dde6756e7512ef121f45a563e1874f750831",
+      "files": 87,
+      "verified": true
+    },
+    {
+      "sha": "a560ce7c50c31e27dee8d5f217d9693174f0b61e",
+      "files": 1,
+      "verified": true
+    }
+  ],
+  "further_split_uploads_cancelled": true
+}

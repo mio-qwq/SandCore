@@ -29,7 +29,7 @@ def main():
 2026-10-17。SandCore M10a2 — The Application Platform Era已发布。以下来自实际GitHub返回结果；发布前的staging/交付报告保持其原始时态。
 
 - [GitHub Release]('''+url+''')，tag M10a2，draft=false，prerelease=false。
-- [发行源提交]('''+source+''')：`'''+sha+'''`。GitHub签名验证verified=true、reason=valid，GraphQL签名VALID；全部分批提交均验证通过，原23个本地开发提交完整保留，无强推。
+- [发行源提交]('''+source+''')：`'''+sha+'''`。最终完整树快照的GitHub签名验证verified=true、reason=valid，GraphQL签名VALID。主体使用正常Git通过代理提交/推送，传输提交自身未签名的事实记录在commit.json；最终快照签名覆盖完整树与父链。此前开发历史完整保留，无强推。
 - 完整交付合同与GUI13原资源FAIL/+8页边界见[M10A2-ACCEPTANCE.md](M10A2-ACCEPTANCE.md)，未改称零差PASS。
 - SDK是同一native11/HOST21/final12的499项载荷、8普通原生库和唯一SCSOUND宿主codec例外；运行包严格四文件，用户test盘不在附件中。
 

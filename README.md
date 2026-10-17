@@ -6,7 +6,7 @@
 
 SandCore 由 [mio](https://github.com/mio-qwq/) 开发。工程包含 BIOS 引导、分页与抢占式多任务、SandFS 文件系统、多用户桌面、图形应用、音频、IPv4 网络、自有可执行格式，以及可以在系统内编译和运行程序的 C 编译器、汇编器和调试器。
 
-当前版本为 **SandCore M10a2 — The Application Platform Era**：Ring3 SCL、四大系统库、统一SCUI/桌面及主要组件、真实系统内SCCC/SCLD和多源SCW开发流程已交付实现及对应证据。完整范围见[交付检查](sandcore/docs/M10A2-ACCEPTANCE.md)和[版本说明](sandcore/docs/M10A2-RELEASE.md)。HOST21/native11/final12是最终运行绑定；GUI12资源零差，GUI13登录功能有效但首次保留登录桌面+8页的原资源FAIL保持，详情已列出。文档/SDK/附件检查后按用户授权签名提交并发布；实际发布状态以发布凭证为准。M10a1 Preview、M9、M8a及用户盘保留，完整M10及基础内核冻结并未宣称完成。
+当前版本为 **SandCore M10a2 — The Application Platform Era**：Ring3 SCL、四大系统库、统一SCUI/桌面及主要组件、真实系统内SCCC/SCLD和多源SCW开发流程已交付实现及对应证据。完整范围见[交付检查](sandcore/docs/M10A2-ACCEPTANCE.md)和[版本说明](sandcore/docs/M10A2-RELEASE.md)。HOST21/native11/final12是最终运行绑定；GUI12资源零差，GUI13登录功能有效但首次保留登录桌面+8页的原资源FAIL保持，详情已列出。[M10a2已正式发布](https://github.com/mio-qwq/SandCore/releases/tag/M10a2)，运行包/独立SDK附件摘要已核对；[源提交](https://github.com/mio-qwq/SandCore/commit/53090db84670d4b875c1ceb164c77ada52cc025a)经GitHub实际Verified验证。M10a1 Preview、M9、M8a及用户盘保留，完整M10及基础内核冻结并未宣称完成。
 
 M10a2运行包仅含run.py、run.bat和两个盘，默认SDL原生相对鼠标/物理DPI/最近邻，优先WHPX；用户已确认快捷键及全屏鼠标正常。最大1920×1080，16:10宿主全屏保留比例黑边。退出桌面回登录且保留会话，注销关闭会话；未设密码的默认mio仅固定本机LOGIN2可空输入登录。独立SDK及实际来源见[SDK说明](sandcore/docs/M10A2-SDK.md)。
 
@@ -15,7 +15,7 @@ M10a2运行包仅含run.py、run.bat和两个盘，默认SDL原生相对鼠标/�
 | 入口 | 内容 |
 |---|---|
 | [M10a2交付检查](sandcore/docs/M10A2-ACCEPTANCE.md) | 当前平台、SDK、真实证据与准确限制 |
-| [M10a2运行包/SDK](sandcore/docs/M10A2-RELEASE.md) | 交付内容与启动方法；实际发布以GitHub结果为准 |
+| [M10a2运行包/SDK](https://github.com/mio-qwq/SandCore/releases/tag/M10a2) | 正式下载；[发布说明及校验凭证](sandcore/docs/M10A2-PUBLISHED.md) |
 | [M10a1 Preview 下载](https://github.com/mio-qwq/SandCore/releases/tag/M10a1) | 已验收的开发运行包；[发布说明](sandcore/docs/M10A1-PREVIEW.md) |
 | [构建与运行](#构建与运行) | 从源码构建当前系统、启动已有版本 |
 | [架构](#系统架构) | 启动链、内核、用户态、会话和扩展 |
@@ -455,7 +455,7 @@ env -u OS make -j4
 
 | 版本 | 状态 |
 |---|---|
-| M10a2 — The Application Platform Era | 平台、重制组件、原生多源SDK与真实GUI证据已汇总；检查后签名提交/Release。GUI13登录资源账+8/FAIL等准确限制见版本说明 |
+| M10a2 — The Application Platform Era | 平台、重制组件、原生多源SDK与真实GUI证据已汇总；已签名提交并正式发布；附件摘要已核对。GUI13登录资源账+8/FAIL等准确限制见版本说明 |
 | M10a1 | 2026-10-07 验收通过，GitHub Preview 预发布，含追加 curl；统一使用 main |
 | M9 | 2026-10-05 验收通过，正式发布 |
 | M8a | 批准的部分正式发布；原 M8 未完成部分继续封存 |

@@ -1,5 +1,9 @@
 # SandCore M10a2 — The Application Platform Era：完整开发交接
 
+## 最终发布已完成
+
+2026-10-17：https://github.com/mio-qwq/SandCore/releases/tag/M10a2 已公开，发行源提交 53090db84670d4b875c1ceb164c77ada52cc025a 实际Verified。SDK/运行包/摘要已核对，完整凭证见sandcore/docs/M10A2-PUBLISHED.md及evidence/m10a2-delivery-01。下方发布前“剩余动作”已完成，历史记录保留；没有后台QEMU、构建或子代理。GUI13原FAIL/+8页限制没有重分类。
+
 ## 2026-10-17 最终交付接手点
 
 下面2026-10-15的详细记录是历史，不能按其“GUI未验/P5未集成”重新开工。唯一当前事实为HOST21/native11/final12、GUI12闭合及GUI13登录功能/资源边界，详见sandcore/docs/M10A2-ACCEPTANCE.md。本轮没有活QEMU/构建，也没有恢复任何子代理；用户已明确禁止subagent和computer-use。
