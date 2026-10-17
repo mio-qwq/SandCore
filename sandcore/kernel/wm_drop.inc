@@ -44,3 +44,36 @@ int wm_sc32_drop_point(i32 x,i32 y,WmDropFact *out)
 }
 int wm_sc32_drop_point_current(i32 x,i32 y)
 {return active_view && x==active_view->mouse_previous_x && y==active_view->mouse_previous_y;}
+
+static void drop_release_record(window_record_t *source,const ScMessage *message,i32 x,i32 y)
+{
+    gui_window_t *g=&source->gui;g->drop_release_epoch=0;
+    WmDropFact point;if(wm_sc32_drop_point(x,y,&point))return;
+    u32 registration=sc32_drop_registration(point.window);if(!registration)return;
+    u32 now[2];timer_monotonic(now);u32 lifetime=timer_frequency_hz()*30u;
+    g->drop_release_expires_lo=now[0]+lifetime;
+    g->drop_release_expires_hi=now[1]+(g->drop_release_expires_lo<now[0]);
+    g->drop_release_route=gui_route_epoch;g->drop_release_lo=message->sequence_lo;g->drop_release_hi=message->sequence_hi;
+    g->drop_release_geometry=g->geometry;g->drop_release_visibility=source->visibility_epoch;
+    g->drop_release_target=point.window;g->drop_release_target_geometry=point.geometry;
+    g->drop_release_target_visibility=point.visibility;g->drop_release_registration=registration;
+    g->drop_release_x=x;g->drop_release_y=y;g->drop_release_epoch=message->epoch;
+}
+int wm_sc32_drop_released(int pid,const ScDropReleasePoint *request,WmDropFact *source,WmDropFact *point,u32 *registration)
+{
+    int error=wm_sc32_drop_source(pid,request->source_window,request->source_generation,1,source);if(error)return error;
+    window_record_t *p=window_record((int)request->source_window);gui_window_t *g=&p->gui;
+    u32 now[2];timer_monotonic(now);
+    if(now[1]>g->drop_release_expires_hi || (now[1]==g->drop_release_expires_hi && now[0]>=g->drop_release_expires_lo))return SC32_E_STALE;
+    if(!g->drop_release_epoch || request->input_epoch!=g->drop_release_epoch || source->input!=g->drop_release_epoch
+        || g->drop_release_route!=gui_route_epoch || request->sequence_lo!=g->drop_release_lo
+        || request->sequence_hi!=g->drop_release_hi || request->screen_x!=g->drop_release_x
+        || request->screen_y!=g->drop_release_y || source->geometry!=g->drop_release_geometry
+        || source->visibility!=g->drop_release_visibility || (source->buttons&1u))return SC32_E_STALE;
+    error=wm_sc32_drop_point(request->screen_x,request->screen_y,point);if(error)return error;
+    if(point->window!=g->drop_release_target || point->geometry!=g->drop_release_target_geometry
+        || point->visibility!=g->drop_release_target_visibility)return SC32_E_STALE;
+    *registration=g->drop_release_registration;return 0;
+}
+void wm_sc32_drop_release_consume(u32 window)
+{window_record_t *p=window_record((int)window);if(p)p->gui.drop_release_epoch=0;}

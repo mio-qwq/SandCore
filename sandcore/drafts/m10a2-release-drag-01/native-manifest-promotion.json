@@ -1,0 +1,22 @@
+{
+  "status": "PROMOTED_THREE_ACTUAL_SCCC_HOST_MANIFESTS",
+  "host_only": true,
+  "guest_pending": true,
+  "manifests": {
+    "user/sc32/SC32API.NATIVE.JSON": {
+      "before_sha256": "459a2f1ebeb7e90f3efef8d8b040676cf355259b1a440f42d59023c30fa0e2d8",
+      "after_sha256": "8b9ac303aa700b80d2cebd8ebfed760a41a9aa7ad2fa45ca185a29e5f99374c0",
+      "source": "build\\m10a2-p6-sco-17\\SC32API.NATIVE.JSON"
+    },
+    "user/scui/SCUI.NATIVE.JSON": {
+      "before_sha256": "81fc4c2ed02f3de183c52996ad264cd0bd62f3dccd7b438235a713952335ce39",
+      "after_sha256": "0a2f92e5054934d3bd13c4604f09581bc2f94b9b2f3ae8e3978b870c04cba9f4",
+      "source": "build\\m10a2-p6-sco-17\\SCUI.NATIVE.JSON"
+    },
+    "user/settings2/INSTALLER2.NATIVE.JSON": {
+      "before_sha256": "94048121d91dec20e226c8310486027e2e6e83115bcae5f645c4a1095ba673d1",
+      "after_sha256": "f3cf4c01491b699f0aea5e1eb8b54452179c49f8c79fea0bb1040eb64fb6c69c",
+      "source": "build\\m10a2-p6-sco-17\\INSTALLER2.NATIVE.JSON"
+    }
+  }
+}

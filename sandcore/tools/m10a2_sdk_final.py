@@ -172,7 +172,7 @@ def dynamic_contract(stage,table,manifest):
 def extra_headers(name):
     if name=='SCSHELL.SCL':return ('user/SCSHELL.H','user/SCSHELLABSENT.H','user/SC32LEASE.H','user/SC32REPLACE.H')
     if name=='SCTERM.SCL':return ('user/SCUITERM.H','user/SCUI.H','user/SC32API.H','user/sclib/SCLIB.H')
-    if name=='SCUI.SCL':return ('user/SCUI.H','user/SCUITABS.H','user/SCUIARGB.H','user/SC32API.H','user/SC32BROKER.H','user/SC32DROP.H','user/SC32FONT.H','user/sclib/SCLIB.H','user/textdata/SCUTEXTDATA.H')
+    if name=='SCUI.SCL':return ('user/SCUI.H','user/SCUITABS.H','user/SCUIARGB.H','user/SC32API.H','user/SC32BROKER.H','user/SC32DROP.H','user/SC32DROP2.H','user/SC32FONT.H','user/sclib/SCLIB.H','user/textdata/SCUTEXTDATA.H')
     return None
 
 def install_sources(stage,inputs,recorded,add):

@@ -83,6 +83,14 @@ typedef struct {
     char title[128];
     ScMessage close_message,paint_message;
     u32 popup,popup_kind,popup_flags,popup_root,popup_previous,popup_next,popup_linked,cursor;
+    /* 每窗仅一份真实UP凭证；随窗口本体回收，不设全局拖动数量上限。
+     * input/route/geometry/visibility变化使旧凭证失效；目标登记代数防止
+     * UP之后新登记者领取旧手势。坐标和序号来自实际输入路由。 */
+    u32 drop_release_epoch,drop_release_route,drop_release_lo,drop_release_hi;
+    u32 drop_release_expires_lo,drop_release_expires_hi;
+    u32 drop_release_geometry,drop_release_visibility,drop_release_target;
+    u32 drop_release_target_geometry,drop_release_target_visibility,drop_release_registration;
+    i32 drop_release_x,drop_release_y;
 } gui_window_t;
 typedef struct {
     win_t window;
@@ -2078,10 +2086,14 @@ int wm_sc32_route(const Sc32RawEvent *event)
         gui_input_message(p,&m,event->tick);
     }
     u32 changed=previous^event->buttons;p->gui.blocked_buttons&=event->buttons;
+    if(event->buttons&1u)p->gui.drop_release_epoch=0;
     for(u32 button=0;button<3;button++)if((changed&(1u<<button)) && !(p->gui.blocked_buttons&(1u<<button))){
         ScMessage m={0};m.id=event->buttons&(1u<<button)?SC32_MSG_BUTTONDOWN:SC32_MSG_BUTTONUP;
         m.window=(u32)under;m.generation=m.window;m.epoch=p->gui.input;m.data[0]=(u32)x;m.data[1]=(u32)y;
-        m.data[2]=event->buttons;m.data[3]=1u<<button;m.data[4]=event->modifiers;gui_input_message(p,&m,event->tick);}
+        m.data[2]=event->buttons;m.data[3]=1u<<button;m.data[4]=event->modifiers;gui_input_message(p,&m,event->tick);
+        if(button==0 && !(event->buttons&1u) && capture==under && gui_focus_any==under
+            && m.epoch==p->gui.input)drop_release_record(p,&m,event->x,event->y);
+    }
     return 1;
 }
 

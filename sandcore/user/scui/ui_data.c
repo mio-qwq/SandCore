@@ -1,4 +1,5 @@
 #include "SCUIPRIVATE.H"
+#include "../SC32DROP2.H"
 #include "../SC32PALETTE.H"
 
 /* 模型适配只拥有UI的订阅和临时借用；Model本体仍由SCLIB管理。 */
@@ -2352,7 +2353,16 @@ ScStatus ScUiDragBegin(ScUiContext *context,const ScUiDragDesc *desc,ScU32 *toke
     input.version=1;
     s=ScInputQuery(root->window->window,&input);
     if(s<0)return ui_cause(context,s,UI_OP_DATA,source->id);
-    if(!(input.buttons&1) || !input.focused || !input.visible)return SC_UI_E_CANCELLED;
+    if(!input.focused || !input.visible)return SC_UI_E_CANCELLED;
+    if(!(input.buttons&1u)){
+        /* 本次阈值MOVE可排在物理UP之前、却到UP之后才被应用领取。
+         * 这里只准备私有源对象，不凭该旧消息授任何跨窗权限；最终
+         * ScDropAtRelease仍须匹配WM保存的真实capture/UP/序号/目标。 */
+        const ScUiEvent *event=context->current_event;
+        if(!input.captured || !event || event->root!=source->root
+            || event->type!=SC_UI_EVENT_POINTER_MOVE || !(event->flags&SC_UI_EVENT_DEVICE)
+            || !(event->buttons&1u) || event->input_epoch!=input.input_epoch)return SC_UI_E_CANCELLED;
+    }
     s=ui_object_new(sizeof(*d),UI_DRAG_OBJECT,ui_drag_dispose,&candidate);
     if(s<0)return s;
     d=(UiDrag *)candidate;
@@ -2414,7 +2424,7 @@ ScStatus ScUiDragCancel(ScUiContext *context,ScU32 token)
     }
     return SC_UI_E_NOT_FOUND;
 }
-static ScStatus ui_drag_point(UiDrag *d,ScI32 x,ScI32 y)
+static ScStatus ui_drag_point(UiDrag *d,ScI32 x,ScI32 y,const ScMessage *release)
 {
     UiNode *root=ui_root(d->context,d->source);
     if(!root || !root->window)return SC_UI_E_STALE;
@@ -2430,12 +2440,27 @@ static ScStatus ui_drag_point(UiDrag *d,ScI32 x,ScI32 y)
     memset(&target,0,sizeof(target));
     target.size=sizeof(target);
     target.version=1;
-    s=ScDropAt(&point,&target);
-    if(s==SC32_E_STALE){ScInputSnapshot snapshot;
+    if(release){ScDropReleasePoint final;
+        memset(&final,0,sizeof(final));final.size=sizeof(final);final.version=1;
+        final.source_window=d->window;final.source_generation=d->generation;
+        final.screen_x=point.screen_x;final.screen_y=point.screen_y;final.actions=d->actions;
+        final.input_epoch=release->epoch;final.sequence_lo=release->sequence_lo;final.sequence_hi=release->sequence_hi;
+        s=ScDropAtRelease(&final,&target);
+    }else{
+        ScInputSnapshot current;memset(&current,0,sizeof(current));current.size=sizeof(current);current.version=1;
+        s=ScInputQuery(d->window,&current);if(s<0)return s;
+        if(!(current.buttons&1u) && current.captured && current.focused)return 0;
+        s=ScDropAt(&point,&target);
+    }
+    if(!release && (s==SC32_E_STALE || s==SC32_E_ACCESS)){ScInputSnapshot snapshot;
         memset(&snapshot,0,sizeof(snapshot));
         snapshot.size=sizeof(snapshot);
         snapshot.version=1;
-        if(ScInputQuery(d->window,&snapshot)==0){point.screen_x=info.x+left+snapshot.x;
+        if(ScInputQuery(d->window,&snapshot)==0){
+            /* 查询和At之间的真实UP交给已排队UP处理；不把当前鼠标
+             * 改成落点，不在按键已松开时重铸旧式hover票。 */
+            if(!(snapshot.buttons&1u) && snapshot.captured && snapshot.focused)return 0;
+            point.screen_x=info.x+left+snapshot.x;
             point.screen_y=info.y+top+snapshot.y;
             s=ScDropAt(&point,&target);
         }
@@ -2658,12 +2683,13 @@ static ScStatus ui_drag_event(UiNode *root,const ScUiEvent *event)
         return SC_UI_HANDLED;
     }
     if(event->type==SC_UI_EVENT_POINTER_MOVE){if(d->up)return SC_UI_HANDLED;
-        ScStatus s=ui_drag_point(d,event->x,event->y);
+        ScStatus s=ui_drag_point(d,event->x,event->y,0);
         if(s<0)ScUiDragCancel(root->owner,d->token);
         return s<0?ui_cause(root->owner,s,UI_OP_DATA,root->id):SC_UI_HANDLED;
     }
     if(event->type==SC_UI_EVENT_POINTER_UP && event->message && (event->message->data[3]&1u)){
-        ScStatus s=ui_drag_point(d,event->x,event->y);
+        if(d->up)return SC_UI_HANDLED;
+        ScStatus s=ui_drag_point(d,event->x,event->y,event->message);
         d->up=1;
         if(s<0 || !d->channel){ScUiDragCancel(root->owner,d->token);
             return s<0?ui_cause(root->owner,s,UI_OP_DATA,root->id):SC_UI_HANDLED;

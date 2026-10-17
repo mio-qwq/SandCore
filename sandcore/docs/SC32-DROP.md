@@ -69,3 +69,17 @@ Ticket低字是真实池槽+1、高字是不会静默回绕复用的序号；序
 2026-10-15静态授权修复：捕获丢失不当作UP。handoff前核起始真实input epoch及仍有capture，失捕/失焦/INPUTSYNC立即撤票，重获capture不能复活旧票；真正UP的At或仍同输入资格下Validate才冻结handoff，之后合法ACK不要求继续capture。新增事实只在内核local WmDropFact，公开144B布局不变，未运行。
 
 2026-10-16：旧ScDropComplete仍只消费传输轮次、不证明文件提交。显式SCUI v2在HOLD/READY前消费30秒输入票，后续只在已认证channel/nonce/owner上传真实job终态，不延长旧票或增加内核权限。源视图只在最终结果后复核实际FS，旧v1语义保持。详见SCUI-DROP-DEFERRED，待统一构建与客体验证。
+
+## 真实UP签发（ABI1.5/library7，当前源码待验）
+
+新增独立公开头SC32DROP2.H和ScDropAtRelease，SYS300 selector0x427。旧SC32DROP.H、七入口和ScDropAt的真实按住/当前点要求均保持。新请求48B依次为size/version/source_window/source_generation/screen_x/screen_y/actions/flags0/input_epoch/sequence_lo/sequence_hi/reserved0，输出仍为原ScDropInfo144。输入/输出整区预检后才签票；错误不写输出。
+
+WM只在实际路由的左UP、源仍聚焦capture且同一输入代数时保存一份凭证，记录已盖章的真实消息序号、屏幕点、source geometry/visibility、route epoch以及当时真实最高目标的窗口/geometry/visibility/registration。窗口本体只追加56B私有值，80B旧win_t前缀保持；窗口销毁一并回收，没有新静态表或全局数量上限。
+
+新入口核完整源身份和SID、仍有capture/focus、同input/route/geometry/visibility、完全相同的UP序号和落点、真实目标未移动/隐藏/更换/被新遮挡、同登记代数及动作交集。凭证最多30秒、宽单调期限；新左按下、失捕/失焦/输入丢失/会话切换等使其不可再用。成功一次性消费该UP，票直接冻结HANDED_OFF/final_point；重复/伪造/旧序号为STALE，非本人或缺输入资格为ACCESS。没有UP或当时没有合格登记目标不能凭当前鼠标造票。
+
+坐标不要求调用时鼠标仍停在UP位置，但必须仍命中UP时同一真实目标。旧票期限、Connect/peer核对、HOLD/READY和文件持久ACK不变；输入票依旧不是文件提交或删源授权。此增量用于解决应用收到排队MOVE/UP时已松开、旧接口无法给最终目标首次建票的缺口，尚未构建/客体验证。
+
+修订：2026-10-17，增加真实capture UP凭证的独立0x427入口，保留原ScDropAt和SCAPI字节，当前SOURCE_ONLY。
+
+2026-10-17接口收敛：SC32API.H基础头原字节保持，其1.4/v6常量描述基础头的最低合同；新能力仅由SC32DROP2.H声明1.5/v7需求，真实库manifest为1.5/v7。沿SCUI.H/SCUIDROP.H独立扩展头的既有模式，旧应用不因新扩展而被迫重编译，不使用source alias或放宽SDK reader来复用。

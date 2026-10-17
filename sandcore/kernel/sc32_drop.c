@@ -43,6 +43,7 @@ static u32 expiry_first,expiry_last,gc_first,gc_last,session_first,session_last;
 typedef char drop_info_144[(sizeof(ScDropInfo)==144)?1:-1];
 typedef char drop_register_48[(sizeof(Sc32DropRegister)==48)?1:-1];
 typedef char drop_point_32[(sizeof(ScDropPoint)==32)?1:-1];
+typedef char drop_release_point_48[(sizeof(ScDropReleasePoint)==48)?1:-1];
 
 static drop_ticket *ticket_get(u32 low)
 {return low && low<=0x7FFFFFFFu?objpool_get(&drop_tickets,(int)(low-1u)):0;}
@@ -300,6 +301,28 @@ static int at_point(int pid,u32 request,u32 output)
     if(!(source.buttons&1u)){p->handed_off=1;p->final_point=1;}
     ScDropInfo reply;error=ticket_live(p,&reply);return error?error:publish(pid,output,&reply,sizeof(reply));
 }
+static int at_release(int pid,u32 request,u32 output)
+{
+    ScDropReleasePoint input;int error=sc32_core_input(pid,request,&input,sizeof(input));
+    if(!error)error=sc32_core_output(pid,output,sizeof(ScDropInfo));
+    if(error)return error;
+    if(!input.actions || (input.actions&~3u) || input.flags || input.reserved || !input.input_epoch)return SC32_E_INVALID;
+    ScBrokerIdentity identity,server;WmDropFact source,point;u32 registration=0;
+    error=sc32_broker_identity(pid,&identity);if(error)return error;
+    error=wm_sc32_drop_released(pid,&input,&source,&point,&registration);if(error)return error;
+    if(point.session!=identity.session)return SC32_E_ACCESS;
+    drop_window *w=window_get(point.window,0);drop_target *target=w?target_get(w->target):0;
+    WmDropFact registered;error=target_live(target,&registered,&server);if(error)return target?error:SC32_E_NOT_FOUND;
+    if(target->id!=registration || !fact_same(&registered,&point))return SC32_E_STALE;
+    u32 actions=input.actions&target->actions;if(!actions)return SC32_E_NOT_SUPPORTED;
+    drop_ticket *ticket=0;error=new_ticket(&identity,&source,&point,target,actions,input.screen_x,input.screen_y,&ticket);if(error)return error;
+    ticket->handed_off=ticket->final_point=1;
+    ScDropInfo reply;error=ticket_live(ticket,&reply);if(!error)error=publish(pid,output,&reply,sizeof(reply));
+    if(error){ticket_drop(ticket);return error;}
+    /* 只消费成功签发的真实UP，一次输入不能给第二个动作再铸票。
+     * 文件提交仍由目标进程的权限和持久事务决定，输入票不授删源权。 */
+    wm_sc32_drop_release_consume(input.source_window);return 0;
+}
 static int validate_request(int pid,const ScDropValidateRequest *input,drop_ticket **out)
 {
     drop_ticket *p=ticket_get(input->ticket_lo);
@@ -355,6 +378,8 @@ int sc32_drop_init(void)
     drop_started=1;return 0;
 }
 int sc32_drop_available(void){return drop_started && sc32_broker_available();}
+u32 sc32_drop_registration(u32 window)
+{drop_window *w=drop_started?window_get(window,0):0;drop_target *target=w?target_get(w->target):0;return target && target->active?target->id:0;}
 int sc32_drop_call(int pid,u32 operation,u32 request,u32 output)
 {
     if(!sc32_drop_available())return SC32_E_NOT_SUPPORTED;
@@ -366,6 +391,7 @@ int sc32_drop_call(int pid,u32 operation,u32 request,u32 output)
     case SC32_D_CONNECT:return validate_ticket(pid,request,output,1);
     case SC32_D_COMPLETE:return complete_ticket(pid,request,output,0);
     case SC32_D_CANCEL:return complete_ticket(pid,request,output,1);
+    case SC32_D_AT_RELEASE:return at_release(pid,request,output);
     default:return SC32_E_NOT_SUPPORTED;
     }
 }

@@ -1,0 +1,10 @@
+{
+  "changed_labels": [
+    "SC32API",
+    "SCUI",
+    "INSTALLER2"
+  ],
+  "compiler_unchanged": true,
+  "foundation_header_unchanged": true,
+  "reason": "Independent extension header, no old source alias or SDK reader exception"
+}

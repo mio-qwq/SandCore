@@ -27,6 +27,10 @@
     {
       "name": "ScDropValidate",
       "kind": "function"
+    },
+    {
+      "name": "ScDropAtRelease",
+      "kind": "function"
     }
   ]
 }

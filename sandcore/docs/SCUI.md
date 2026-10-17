@@ -111,3 +111,5 @@ Copy/Cut/Paste使用真实session clipboard事务及immutable snapshot，源退�
 2026-10-17：发现Timer回调失败与普通消息的非致命通知合同不一致，现共用notification_error/ERROR通知并保留firing生命周期。SCO16、HOST14及真实native08生成通过，最终PF差额0、严格SDK reader通过；新GUI09正在进行，Files取消313的实际根因仍需原始错误诊断确认，不以此改写历史结果。
 
 2026-10-17 GUI10定向终态：Debug F5两次继续、F4真实暂停、7模块1765符号、F9两处断点及实际表2→1→0通过；目标及Debug正常exit0。Settings实际1024×768/150% Keep并重开核实预览0，再恢复1920×1080/150%。最终PF13948→13948/全部owner零差、driver退出0、输入原盘保持。Files两类源拖向桌面均提前结束、没有确认框，之后正常exit0/日志空；不据此声称旧取消313已修复。证据evidence/m10a2-pio-gui10。
+
+修订：2026-10-17，当前源码SCUI ABI1.4/library6（174入口）接独立真实UP票据入口，最低SC32API1.5/library7；原SCUI.H及flags0保留。自动tooltip到期重核输入/命中，正常失焦取消提示，Menu/Combo错误保留。GUI11日志operation7/node12属于搜索框tooltip；新源码尚待构建和客体验证，详见SCUI-DROP-DEFERRED。

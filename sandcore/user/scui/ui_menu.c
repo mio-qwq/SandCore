@@ -471,7 +471,11 @@ static ScStatus ui_popup_root(UiNode *owner,ScU32 kind,const ScUiRect *anchor,Sc
     c->dispatching++;
     s=ScPopupCreate(&d,&window);
     c->dispatching--;
-    if(s<0 || (n->private_flags&UI_NODE_RETIRED)){s=s<0?ui_cause(c,s,UI_OP_MENU,owner->id):SC_UI_E_CANCELLED;
+    if(s<0 || (n->private_flags&UI_NODE_RETIRED)){
+        /* 延迟tooltip的查询与创建之间仍可能发生真实失焦；这只是
+         * 自动提示取消，不掩盖菜单/Combo或其它popup的权限失败。 */
+        s=s==SC32_E_ACCESS && kind==SC32_POPUP_TOOLTIP?SC_UI_E_CANCELLED:
+            s<0?ui_cause(c,s,UI_OP_MENU,owner->id):SC_UI_E_CANCELLED;
         goto failed;
         }
     n->private_flags&=~UI_ROOT_CREATING;

@@ -1,19 +1,21 @@
 # M10a2 当前运行与接续
 
 <!-- CURRENT-BEGIN -->
-2026-10-17。完整目标active，主代理独立工作。当前无代理持有的活QEMU：GUI11 exec27067已实际退出0，QEMU22336关闭，测试SID4注销、原SID1恢复。HOST16/native09/final10全部固定输入与原盘保持。旧活句柄不能继续输入，源码冻结已解除。
+2026-10-17。完整M10a2持续目标active，主代理独立工作，无subagent。当前实际活进程：native10 exec4991 / Windows QEMU15372，输出build/m10a2-p6-refresh-vm-10和build/m10a2-p6-target-refresh-10。已完成引导、桌面资源就绪、工具身份取回及变化源码上传，尚未取得最终生成和owner账。主源、tools、当前v9 helper、旧编译底座及所有已固定输入冻结；只可继续读/等同一会话，不复用已关闭GUI11句柄。
 
-用户明确授权用当前数据盘覆盖四文件试玩目录，已完成且逐字节摘要核验：C:/Users/Administrator/Desktop/test/sanddata.img 为GUI11真实结束后的256MiB原生盘，SHA48568dd9c2fb9e07c9343b59a7af58db83938ab6dc8b88621a5320b8c5785ea0。run.py/run.bat/启动盘保持；启动盘与GUI11精确相同，目录仍只四文件。凭证evidence/m10a2-test-current-01/delivery.json。此前不覆盖用户试玩盘的约束已被本次明确请求更新；不能据此擅自覆盖下一次用户修改。
+本批实现：独立SC32DROP2.H / ScDropAtRelease / SYS300 selector427，绑定真实capture UP的输入epoch、消息序号、原点、源/目标几何与可见代数及目标登记代数；30秒期限、成功一次消费。旧ScDropAt、基础SC32API.H和SCAPI原字节保持。SC32API库1.5/v7、SCUI1.4/v6。SCUI对排队MOVE/UP沿真实UP凭证接线，不用当前指针猜落点；自动tooltip重核当前输入资格。Installer根据实际DPI分配初始列宽，保留手动调宽与水平滚动。
 
-GUI11实际终端30行和后续echo的提示符/光标均可见，Settings保存被现有权限规则拒绝-103后的临时文件已清理，重读恢复原环境，正常exit0。Files真实350ms按住的诊断手势出现确认框，取消保留源，正常exit0；但files-diag.log仍记UI error=-313 cause=-103 operation=7 node=12。原快拖失败和新权限通知仍未解决，不把延长手势当产品修复。
+HOST20已实际exit0 / 41产物 / 源变化0，SHA4f0980b97bb3e8b95b99779a4273269108917df17936b864e5a541c913c658b7。SCO19三个实际后端检查通过，正式NATIVE清单与真实SCO导入表匹配。原生10只刷新SC32API、SCUI、INSTALLER2；编译器及其余闭包完全复用。冻结编译VM使用final04旧CORE/旧库，生成的新库只取回，不装进旧运行底座；旧task/WM观察源码按真实保留前字节且完整SHA匹配，不冒充当前源码。证据evidence/m10a2-release-drag-host20；新字节还没有GUI PASS。
 
-同暂停最终owner13948→13948，全部池/字体/桌面/归属/未解释增量0。证据evidence/m10a2-gui11。新native09/final10实际凭证在evidence/m10a2-native09，严格SDK reader没有放宽。
+用户试玩目录已按明确请求更新为GUI11结束后的256MiB数据盘，SHA48568dd9c2fb9e07c9343b59a7af58db83938ab6dc8b88621a5320b8c5785ea0。run.py/run.bat/启动盘保持且仅四文件。凭证evidence/m10a2-test-current-01；不能擅自再次覆盖用户之后的修改。
 
-下一步：准确定位Files首次目标票据/UP及权限通知的真实调用路径，避免猜测性放宽内核验证；处理Installer默认结果列可见性。复用已验复杂SCW/独立SCL/四TU/调试、音频、主题/模式、PIO及兼容结果，再收齐全合同剩余出口与统一交付。不启动无关矩阵，不复用已经结束的VM句柄。
+GUI11已真实exit0 / QEMU22336关闭，测试SID4注销、原SID1恢复，最终owner13948→13948且各池/字体/桌面/归属/未解释增量0，输入原盘保持。终端30行后提示符/光标和后续echo通过；Settings保存拒权后的临时清理/重读通过。350ms诊断手势的确认/取消保源与Files正常exit0有证据，但原快拖提前结束、operation7/node12 tooltip拒权日志仍按原失败保留，新源码必须另验。
 
-main仍以e5c37a5为最近已保存代码；上次WSL gh凭据推送实际github.com:443连接失败，远端未确认。只用main、无Release、SCAPI冻结、私钥仅用户持有、M8封存保持。
+下一步：先等exec4991实际收束，取得真实native10结果和最终owner/输入守恒，不能将中途产物当整轮PASS；成功后按同一HOST20/native10签发final11 CORE/严格SDK。只做新字节快拖/取消/tooltip/Installer结果列的必要普通GUI与新输入凭证拒绝边界检查，复用已验IDE复杂SCW/独立SCL/四TU/调试、PCM、主题/显示、PIO与其他未变证据，再收齐全合同与统一交付。若生成失败，保留原日志并只修具体原因。
 
-修订：2026-10-17，保存GUI11实际零差退出、定向结果与用户授权四文件数据盘覆盖。
+最近已保存源码基点2728eb6；本批将保存新的阶段提交，不代表整版完成。WSL gh上次推送实际github.com:443连接失败，远端未确认。只用main、无Release、不读取私钥、M8封存和原盘保留。SCAPI冻结SHA81a730450fcb3d310ed841ad3e5c70a3fed32aa7fbd10acac8b888ac7da9ffc1。
+
+修订：2026-10-17，保存真实UP授权与两项界面修正、HOST20/SCO19及native10活句柄；新客体交互仍待验。
 <!-- CURRENT-END -->
 
 <details>
@@ -213,5 +215,27 @@ GUI11已启动准备进入普通SID：exec27067/QEMU22336，drafts/m10a2-p6-gui-
 SCAPI.H冻结摘要81a730450fcb3d310ed841ad3e5c70a3fed32aa7fbd10acac8b888ac7da9ffc1。只用main、无Release、不读私钥、不重启M8；用户盘与旧成果保留。
 
 修订：2026-10-17，保存GUI10实际退出0、PIO读写/快捷键/1024真实模式及零差owner，明确未解缺陷和下一步。
+
+</details>
+
+<details>
+<summary>native10启动前检查点（历史状态）</summary>
+
+
+2026-10-17接续更新：main最近保存2728eb6。新批次正在主源收齐真实UP凭证（独立SC32DROP2.H、selector427、SC32API1.5/v7、SCUI1.4/v6）、自动tooltip输入资格及Installer初始结果列可见性；新源码尚未构建/客体验证，当前没有代理VM。试玩目录仍是用户明确要求的GUI11结束盘，不能擅自再次覆盖。准备build/m10a2-main-release-drag-01，只复用小型编译中间物，不复制数据盘。
+
+2026-10-17。完整目标active，主代理独立工作。当前无代理持有的活QEMU：GUI11 exec27067已实际退出0，QEMU22336关闭，测试SID4注销、原SID1恢复。HOST16/native09/final10全部固定输入与原盘保持。旧活句柄不能继续输入，源码冻结已解除。
+
+用户明确授权用当前数据盘覆盖四文件试玩目录，已完成且逐字节摘要核验：C:/Users/Administrator/Desktop/test/sanddata.img 为GUI11真实结束后的256MiB原生盘，SHA48568dd9c2fb9e07c9343b59a7af58db83938ab6dc8b88621a5320b8c5785ea0。run.py/run.bat/启动盘保持；启动盘与GUI11精确相同，目录仍只四文件。凭证evidence/m10a2-test-current-01/delivery.json。此前不覆盖用户试玩盘的约束已被本次明确请求更新；不能据此擅自覆盖下一次用户修改。
+
+GUI11实际终端30行和后续echo的提示符/光标均可见，Settings保存被现有权限规则拒绝-103后的临时文件已清理，重读恢复原环境，正常exit0。Files真实350ms按住的诊断手势出现确认框，取消保留源，正常exit0；但files-diag.log仍记UI error=-313 cause=-103 operation=7 node=12。原快拖失败和新权限通知仍未解决，不把延长手势当产品修复。
+
+同暂停最终owner13948→13948，全部池/字体/桌面/归属/未解释增量0。证据evidence/m10a2-gui11。新native09/final10实际凭证在evidence/m10a2-native09，严格SDK reader没有放宽。
+
+下一步：准确定位Files首次目标票据/UP及权限通知的真实调用路径，避免猜测性放宽内核验证；处理Installer默认结果列可见性。复用已验复杂SCW/独立SCL/四TU/调试、音频、主题/模式、PIO及兼容结果，再收齐全合同剩余出口与统一交付。不启动无关矩阵，不复用已经结束的VM句柄。
+
+main仍以e5c37a5为最近已保存代码；上次WSL gh凭据推送实际github.com:443连接失败，远端未确认。只用main、无Release、SCAPI冻结、私钥仅用户持有、M8封存保持。
+
+修订：2026-10-17，保存GUI11实际零差退出、定向结果与用户授权四文件数据盘覆盖。
 
 </details>

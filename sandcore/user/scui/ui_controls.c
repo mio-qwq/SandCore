@@ -1079,6 +1079,16 @@ static ScStatus ui_control_tooltip(UiNode *n)
     ScUiNode label;
     ScStatus s;
     if(!n->tooltip || !(n->effective&SC_UI_HOVER) || (n->private_flags&UI_NODE_RETIRED))return 0;
+    /* hover属于上次已分发的消息；鼠标经过非聚焦窗后可直接离开客户区，
+     * 不一定再有LEAVE。延迟提示必须重新核实当前输入和命中，不能拿旧
+     * hover向内核申请后台popup，把正常失焦变成应用ERROR。 */
+    UiNode *native=ui_native_owner(ui_root(n->owner,n->id));
+    ScInputSnapshot input;memset(&input,0,sizeof(input));input.size=sizeof(input);input.version=1;
+    if(!native || !native->window)return 0;
+    s=ScInputQuery(native->window->window,&input);if(s<0)return s;
+    if(!input.focused || !input.visible || input.captured || input.buttons)return 0;
+    ScUiNode hit=0;
+    if(ScUiHitTest(n->owner,native->id,input.x,input.y,&hit)<0 || hit!=n->id)return 0;
     ui_text_view(n->tooltip,&text);
     if(!text.bytes)return 0;
     memset(&m,0,sizeof(m));
@@ -1088,6 +1098,7 @@ static ScStatus ui_control_tooltip(UiNode *n)
     if(s<0)return s;
     ScUiRect anchor={0,0,n->rectangle.width,n->rectangle.height};
     s=ui_popup_root(n,SC32_POPUP_TOOLTIP,&anchor,m.width+(ScU32)ui_scale(n->owner,8),m.height+(ScU32)ui_scale(n->owner,8),SC32_POPUP_NO_ACTIVATE|SC32_POPUP_HIT_TRANSPARENT,&popup);
+    if(s==SC_UI_E_CANCELLED)return 0;
     if(s<0)return s;
     ScUiWidgetDesc d;
     memset(&d,0,sizeof(d));

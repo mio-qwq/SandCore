@@ -1,5 +1,17 @@
 # M10a2 主要应用与工具链实施状态
 
+2026-10-17。完整目标active。GUI11已真实结束：Terminal30行后提示符/光标可见，Settings权限失败后的临时文件清理通过，最终owner13948→13948。用户授权当前盘已复制test，凭证evidence/m10a2-test-current-01；后续不擅自覆盖。
+
+本轮主源已写真实UP凭证/独立ScDropAtRelease、自动tooltip资格和Installer默认结果列宽。HOST20实际exit0/41产物/源码变化0，SCO19三目标真实后端宿主检查通过；native10预检只需SC32API/SCUI/INSTALLER2，旧编译器/其余闭包复用，尚未宣布新客体交互通过。完整资料evidence/m10a2-release-drag-host20，活进程与下一步以M10A2-LIVE-GUI.md为准。
+
+新SC32API库1.5/v7、SCUI1.4/v6；基础头及SCAPI原字节保持。旧GUI快拖提前结束及GUI11 tooltip权限通知仍按原失败保留，必须以新字节最小回归闭合。IDE复杂SCW/SCL/四TU/调试、音频、显示及其他输入未变结果按真实来源复用。
+
+修订：2026-10-17，收敛唯一当前状态及新接口/宿主/客体边界。
+
+<details>
+<summary>此前逐时检查点（保留历史时态）</summary>
+
+
 > 2026-10-17当前：HOST15/native08/final09及Windows WHPX GUI10定向流程已收束，driver退出0、输入/原盘保持、最终PF13948→13948。PIO同文件读盘宿主3.188→0.437秒，普通Installer持久写入/回读、Debug快捷键及1024×768真实模式有证据。Files拖放提前结束、Settings临时文件与其它具体缺项继续；完整目标active。参见[当前接续](M10A2-LIVE-GUI.md)及[本轮证据](../evidence/m10a2-pio-gui10/README.md)，下文保持原日期时态。
 
 > 2026-10-17当前状态：[唯一运行接力](M10A2-LIVE-GUI.md)记录HOST13/五目标原生刷新07。GUI04复杂SDK/IDE/调试与零差回收已经实际通过；GUI06安装成功、Files取消exit313，整体中断无最终owner。默认GTK/WHPX与高DPI入口已修正，用户盘保留；本批应用布局/快捷键仍待新客体回归。下文各“尚未/运行中”保留原日期时态，不作为当前结论。
@@ -124,3 +136,7 @@ Canvas2/Lens2由图像工具草稿负责真正R3 SCGFX及共享Canvas控件，�
 修订：2026-10-17，保存native08定向刷新、final08严格SDK/CORE与GUI08待验边界。
 
 修订：2026-10-17，收齐HOST15/native08/final09、PIO读写与GUI10实际零差退出证据；保留拖放等具体缺陷和完整持续目标。
+
+修订：2026-10-17，GUI11实际exit0/owner13948→13948，终端与配置临时清理通过，用户授权当前数据盘已交test。后续主源新增真实UP凭证/SC32DROP2.H、tooltip资格及Installer按实际DPI初始列宽。新源码未验；原快拖失败和GUI11日志不改写，原盘/旧SCAPI保留。
+
+</details>

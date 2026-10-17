@@ -47,3 +47,13 @@ HOLD到READY在原短交接期限内完成。READY后允许用户等待确认与
 GUI02原COPY/MOVE的20B正文、CRC/DURABLE恢复日志证明文件操作成立；原source_view_stale与130秒后人工F5清除ghost证明自动失效失败。原取消保源与16项目录不变证据保留。本次是隔离源码修复，未构建、未客体运行；不能用原文件操作通过替代新异步协议、旧即时分支与自动来源视图的定向验证。
 
 修订记录：2026-10-16，显式延迟完成、真实job绑定、短票交接及来源视图失效合同；等待Root统一整合与定向验收。
+
+## 2026-10-17 输入排队修复（源码待验）
+
+GUI11真实350ms按住后出现确认并取消保源、Files正常exit0，但快拖原失败保留。其UI error=-313 cause=-103 operation=7 node=12静态映射为搜索框tooltip PopupCreate，不是DATA操作10；原日志不改写。
+
+SCUI当前library_version6、接口仍ABI1.4和原174入口，最低SC32API1.5/v7。最终UP使用独立ScDropAtRelease和原消息epoch/双字sequence，只认WM真实UP凭证。MOVE已排队而当前物理按钮已松开时只等待对应UP，不用新当前位置猜落点或把ACCESS当文件拒权。ScUiDragBegin可在仍持capture且同代的真实排队MOVE上准备私有源对象，所有跨窗权限仍由最终内核凭证授予；不存在凭程序消息直接投递DROP。旧flags0即时完成与显式v2异步业务合同均保持。
+
+自动tooltip在到期时重查本人输入焦点/可见性/按钮/capture和真实控件命中，查询与创建之间的失焦只取消该自动提示；Menu/Combo及其它权限错误照常报告。避免旧hover在非聚焦窗申请popup触发ERROR，不把权限限制放宽到内核。
+
+修订：2026-10-17，收齐真实UP接线和tooltip输入资格修复，原GUI11与快拖缺陷证据保留，待统一构建及定向验证。

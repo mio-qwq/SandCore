@@ -6,6 +6,7 @@
  * 先验全部caller out再effects；未接kernel gate时保真实错误。 */
 typedef char drop_desc_is_48[(sizeof(ScDropTargetDesc)==48)?1:-1];
 typedef char drop_point_is_32[(sizeof(ScDropPoint)==32)?1:-1];
+typedef char drop_release_point_is_48[(sizeof(ScDropReleasePoint)==48)?1:-1];
 typedef char drop_info_is_144[(sizeof(ScDropInfo)==144)?1:-1];
 typedef char drop_validate_is_32[(sizeof(ScDropValidateRequest)==32)?1:-1];
 typedef char drop_envelope_is_64[(sizeof(ScDragEnvelope)==64)?1:-1];
@@ -38,6 +39,13 @@ ScStatus ScDropAt(const ScDropPoint *point,ScDropInfo *out)
     if(!error)error=sc32_record_out(out,sizeof(*out));
     if(error)return drop_error(error,SC32_D_AT);
     return drop_result(drop_gate(SC32_D_AT,point,out),SC32_D_AT);
+}
+ScStatus ScDropAtRelease(const ScDropReleasePoint *point,ScDropInfo *out)
+{
+    ScStatus error=sc32_record_in(point,sizeof(*point));
+    if(!error)error=sc32_record_out(out,sizeof(*out));
+    if(error)return drop_error(error,SC32_D_AT_RELEASE);
+    return drop_result(drop_gate(SC32_D_AT_RELEASE,point,out),SC32_D_AT_RELEASE);
 }
 ScStatus ScDropValidate(const ScDropValidateRequest *ticket,ScDropInfo *out)
 {

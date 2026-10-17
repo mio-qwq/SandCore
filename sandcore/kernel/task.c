@@ -716,7 +716,7 @@ void syscall_c_common(u32 vec, u32 *frame)
             frame[11]=(u32)sc32_gui_call(current,frame[8],frame[10],frame[9]);
         else if(frame[8]>=SC32_WIRE_FILE_FIRST && frame[8]<SC32_WIRE_CLIPBOARD_FIRST)
             frame[11]=(u32)sc32_file_call(current,frame[8],frame[10],frame[9]);
-        else if(frame[8]>=SC32_D_REGISTER && frame[8]<=SC32_D_CANCEL)
+        else if(frame[8]>=SC32_D_REGISTER && frame[8]<=SC32_D_AT_RELEASE)
             frame[11]=(u32)sc32_drop_call(current,frame[8],frame[10],frame[9]);
         else if(frame[8]==SC32_B_WAIT)frame[11]=(u32)task_broker_wait(frame);
         else if(frame[8]>=SC32_WIRE_CLIPBOARD_FIRST && frame[8]<0x600u)

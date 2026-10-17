@@ -1,0 +1,6 @@
+{
+  "foundation_header_before_refinement": "8a8707b5567b63f83690f9ce667f37291e120e2469fb7b75ac589e666855a31d",
+  "foundation_header_preserved": "0e77851eb66437d2b2afeadf7312b8bf0704d5f61347c5f84f57189819617dda",
+  "extension_header": "acb7e31d43a95d76507be3844b4eff586efba000dd7b2eb11ed12f895ac32fc9",
+  "basis": "Keep existing foundation API header byte-identical. New SC32DROP2.H supplies extension ABI1.5/library7; manifest reports actual library version. Same independent-header pattern as SCUI.H and SCUIDROP.H. No aliases or strict-reader exceptions."
+}

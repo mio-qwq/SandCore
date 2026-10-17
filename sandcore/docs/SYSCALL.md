@@ -676,3 +676,7 @@ WAIT40b在同一IF=0入口完整核request、真实GUI队列及对象ready，再
 2026-10-16增量：SC32 ABI1.4/version6增加Debug私有900..91F族（真实owner/代数/暂停现场、动态断点、映像来源/段/符号登记）及CORE selector006 WALL_QUERY（无请求、本人32B版本输出、失败保持）。ROOT在首条R3指令前由可信loader登记，后续SCL在init前分步核验，ROOT私有桥不依赖SC32。实际布局/错误/生命周期见SC32DEBUG.H、私有SC32DEBUGWIRE.H和SC32-DEBUG.md；WALL见SC32-WALL.md。原SCAPI/旧调用/旧八断点槽不改。本批HOST通过，新的联合客体待验。
 
 修订：2026-10-16，登记Debug/壁纸增量及HOST/客体边界；未来007配置/Capture/图片尚未计作当前入口。
+
+2026-10-17增量（SOURCE_ONLY）：SYS_SC32=0x300新增独立selector0x427 DROP_AT_RELEASE；ECX为48B ScDropReleasePoint，EDX为原144B ScDropInfo输出。SC32DROP2.H/SC32API ABI1.5/v7提供cdecl ScDropAtRelease；旧420..426和旧SCAPI保持。核实本人聚焦capture下WM实际UP的输入代数、双字消息序号、原落点、源/目标geometry/visibility及目标登记代数；30秒宽期限、成功一次消费。不可用程序消息、当前鼠标点或丢失capture造票。输出完整RW预验、错误不写；票仍不授文件提交/删源权。精确合同见SC32-DROP.md。本批尚未构建/运行。
+
+2026-10-17接口收敛：SC32API.H基础头原字节保持，其1.4/v6常量描述基础头的最低合同；新能力仅由SC32DROP2.H声明1.5/v7需求，真实库manifest为1.5/v7。沿SCUI.H/SCUIDROP.H独立扩展头的既有模式，旧应用不因新扩展而被迫重编译，不使用source alias或放宽SDK reader来复用。

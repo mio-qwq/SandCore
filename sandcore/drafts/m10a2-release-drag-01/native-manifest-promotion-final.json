@@ -1,0 +1,25 @@
+{
+  "source_report": "build/m10a2-p6-sco-19/report.json",
+  "source_report_sha256": "80ae2d2e919676bd30bdd1c6051882cbd9ded9ee1e91c05a334e8ec92e89e9eb",
+  "host_only": true,
+  "manifests": {
+    "SC32API": {
+      "target": "user\\sc32\\SC32API.NATIVE.JSON",
+      "source": "build\\m10a2-p6-sco-19\\SC32API.NATIVE.JSON",
+      "sha256": "8b9ac303aa700b80d2cebd8ebfed760a41a9aa7ad2fa45ca185a29e5f99374c0",
+      "before_this_promotion": "8b9ac303aa700b80d2cebd8ebfed760a41a9aa7ad2fa45ca185a29e5f99374c0"
+    },
+    "SCUI": {
+      "target": "user\\scui\\SCUI.NATIVE.JSON",
+      "source": "build\\m10a2-p6-sco-19\\SCUI.NATIVE.JSON",
+      "sha256": "4bf3292352ed22cc0ee5ab22aaa555ecee36c7ca6bfcda3713fdb0d343ddedd5",
+      "before_this_promotion": "0a2f92e5054934d3bd13c4604f09581bc2f94b9b2f3ae8e3978b870c04cba9f4"
+    },
+    "INSTALLER2": {
+      "target": "user\\settings2\\INSTALLER2.NATIVE.JSON",
+      "source": "build\\m10a2-p6-sco-19\\INSTALLER2.NATIVE.JSON",
+      "sha256": "f3cf4c01491b699f0aea5e1eb8b54452179c49f8c79fea0bb1040eb64fb6c69c",
+      "before_this_promotion": "f3cf4c01491b699f0aea5e1eb8b54452179c49f8c79fea0bb1040eb64fb6c69c"
+    }
+  }
+}

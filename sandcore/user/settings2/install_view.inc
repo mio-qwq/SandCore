@@ -197,12 +197,24 @@ static ScStatus installer_create(void)
     if(s==0)s=ScUiViewBind(app.ui,installer.table,installer.provider,installer.selection);
     const char *titles[]={"来源","目标","字节","结果"};
     ScUiColumnDesc columns[4];
+    /* 窗口宽是物理像素，列宽是逻辑长度。初始计划按实际DPI分配，
+     * 让结果列在默认窗口内可见；之后由标准表头保留用户调整，不能
+     * 每次重绘或resize都覆盖用户列宽。极窄窗口沿原水平滚动。 */
+    ScUiNodeInfo bounds;INIT(bounds);ScUiMetrics metrics;INIT(metrics);
+    if(s==0)s=ScUiNodeQuery(app.ui,app.root,&bounds);
+    if(s==0)s=ScUiMetricsQuery(app.ui,app.root,&metrics);
+    ScU32 extra=0;
+    if(s==0 && metrics.scale_percent && bounds.rectangle.width>0){
+        ScU32 available=(ScU32)bounds.rectangle.width*100/metrics.scale_percent;
+        if(available>274)extra=available-274;
+    }
+    const ScU32 weights[]={30,30,0,40};
     for(ScU32 i=0;i<4;i++){INIT(columns[i]);
         /* 表头身份从1开始；实际来源/目标/字节/结果仍按原field取值。 */
         columns[i].column=i+1;
         columns[i].field=i;
         columns[i].title=text(titles[i]);
-        columns[i].width=i==2?90:i==3?230:230;
+        columns[i].width=(ScI32)(64+extra*weights[i]/100);
         columns[i].min_width=64;
         columns[i].max_width=1500;
         if(i==2){columns[i].format=SC_UI_FORMAT_BYTES;

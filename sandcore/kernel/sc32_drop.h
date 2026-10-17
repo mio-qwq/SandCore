@@ -12,4 +12,5 @@ int sc32_drop_stop_step(int pid);
 void sc32_drop_session_discard(u32 session);
 void sc32_drop_window_closed(u32 window);
 void sc32_drop_window_changed(u32 window);
+u32 sc32_drop_registration(u32 window);
 #endif

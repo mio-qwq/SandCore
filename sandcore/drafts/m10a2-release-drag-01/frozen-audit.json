@@ -1,0 +1,18 @@
+{
+  "status": "READ_ONLY_FROZEN_BASIS_AUDIT_PASS_NOT_REFRESHED",
+  "previous": "build/m10a2-p6-target-refresh-09/p6-generation.json",
+  "previous_sha256": "57fa08a3e2ce36e350a0f88f6d56ab93a2418789ec22723ce2c762d10813f32b",
+  "outer_witness": "build/m10a2-p6-refresh-vm-09/refresh-vm.json",
+  "sidecars": {
+    "status": "FIXED_READ_ONLY_WITNESSES_VERIFIED_NOT_REFRESH_EXECUTION",
+    "direct_actual_get": 6,
+    "inherited_actual_get_alias": 79,
+    "changed_labels_not_yet_evaluated": true
+  },
+  "current_layout": "build/m10a2-p6-gui-coherent-layout-02/layout-proof.json",
+  "baseline_core": "build/m10a2-p6-final-04/core",
+  "baseline_sdk": "build/m10a2-p6-final-04/sdk",
+  "historical_task_layout_untouched": true,
+  "build_started": false,
+  "vm_started": false
+}

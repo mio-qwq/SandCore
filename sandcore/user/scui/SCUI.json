@@ -2,7 +2,7 @@
   "name": "SCUI.SCL",
   "abi_major": 1,
   "abi_minor": 4,
-  "library_version": 5,
+  "library_version": 6,
   "init": null,
   "fini": "ScUiFinalize",
   "exports": [
@@ -1543,14 +1543,20 @@
       "kind": "function",
       "dependency": "SC32API.SCL",
       "size": 1
+    },
+    {
+      "name": "ScDropAtRelease",
+      "kind": "function",
+      "dependency": "SC32API.SCL",
+      "size": 1
     }
   ],
   "dependencies": [
     {
       "name": "SC32API.SCL",
       "abi_major": 1,
-      "min_minor": 3,
-      "min_version": 4
+      "min_minor": 5,
+      "min_version": 7
     },
     {
       "name": "SCCLIB.SCL",

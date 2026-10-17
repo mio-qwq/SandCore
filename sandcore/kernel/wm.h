@@ -4,6 +4,7 @@
 #include "io.h"
 #include "../user/sc32/SC32GUIWIRE.H"
 #include "sc32_raw.h"
+#include "../user/SC32DROP2.H"
 /* M10a1：会话桌面资源不依赖固定会话数组，核心只在切换时通知WM。 */
 int wm_session_prepare(u32 id);
 void wm_session_switched(u32 previous,u32 current);
@@ -105,6 +106,8 @@ int wm_sc32_drop_window(int pid,u32 window,u32 generation,WmDropFact *out);
 int wm_sc32_drop_source(int pid,u32 window,u32 generation,int at,WmDropFact *out);
 int wm_sc32_drop_point(i32 x,i32 y,WmDropFact *out);
 int wm_sc32_drop_point_current(i32 x,i32 y);
+int wm_sc32_drop_released(int pid,const ScDropReleasePoint *request,WmDropFact *source,WmDropFact *point,u32 *registration);
+void wm_sc32_drop_release_consume(u32 window);
 int wm_sc32_create(int pid,const Sc32WindowCreate *input,const char *title,Sc32WindowRef *out);
 int wm_sc32_popup_create(int pid,const Sc32PopupCreate *input,Sc32WindowRef *out);
 int wm_sc32_cursor(int pid,u32 handle,u32 generation,u32 shape);

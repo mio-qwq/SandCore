@@ -1,8 +1,8 @@
 {
   "name": "SC32API.SCL",
   "abi_major": 1,
-  "abi_minor": 4,
-  "library_version": 6,
+  "abi_minor": 5,
+  "library_version": 7,
   "init": null,
   "fini": "Sc32Finalize",
   "exports": [
@@ -776,6 +776,10 @@
     },
     {
       "name": "ScWindowSubmit",
+      "kind": "function"
+    },
+    {
+      "name": "ScDropAtRelease",
       "kind": "function"
     }
   ],

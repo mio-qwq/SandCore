@@ -2,10 +2,11 @@
 #define SANDCORE_SC32DROPWIRE_H
 #include "../sc32/SC32BROKERWIRE.H"
 #include "../SC32DROP.H"
+#include "../SC32DROP2.H"
 enum {
     SC32_D_REGISTER=0x420u,SC32_D_UNREGISTER=0x421u,SC32_D_AT=0x422u,
     SC32_D_VALIDATE=0x423u,SC32_D_CONNECT=0x424u,SC32_D_COMPLETE=0x425u,
-    SC32_D_CANCEL=0x426u,SC32_D_OPERATION=0xe00u
+    SC32_D_CANCEL=0x426u,SC32_D_AT_RELEASE=0x427u,SC32_D_OPERATION=0xe00u
 };
 typedef struct {
     ScU32 size,version,window,generation,endpoint,actions,formats,format_count,flags,reserved[3];

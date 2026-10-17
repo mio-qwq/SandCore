@@ -135,9 +135,9 @@ $(BUILD)/sc32_font.o: kernel/sc32_font.c kernel/sc32_font.h user/SC32FONT.H user
 	$(CC) $(CFLAGS) -Werror -c $< -o $@
 $(BUILD)/sc32_broker.o: kernel/sc32_broker.c kernel/sc32_broker.h user/SC32BROKER.H user/sc32/SC32BROKERWIRE.H $(STAMP)
 	$(CC) $(CFLAGS) -Werror -c $< -o $@
-$(BUILD)/sc32_drop.o: kernel/sc32_drop.c kernel/sc32_drop.h user/SC32DROP.H user/dropapi/SC32DROPWIRE.H $(STAMP)
+$(BUILD)/sc32_drop.o: kernel/sc32_drop.c kernel/sc32_drop.h user/SC32DROP.H user/SC32DROP2.H user/dropapi/SC32DROPWIRE.H $(STAMP)
 	$(CC) $(CFLAGS) -Werror -c $< -o $@
-$(BUILD)/scui-library.o: user/scui/SCUI.C user/SCUI.H user/SCUIDROP.H $(wildcard user/scui/*.c user/scui/*.H user/scui/*.inc) user/SC32API.H user/SC32BROKER.H user/SC32DROP.H user/SC32FONT.H user/SC32POPUP.H $(STAMP)
+$(BUILD)/scui-library.o: user/scui/SCUI.C user/SCUI.H user/SCUIDROP.H $(wildcard user/scui/*.c user/scui/*.H user/scui/*.inc) user/SC32API.H user/SC32BROKER.H user/SC32DROP.H user/SC32DROP2.H user/SC32FONT.H user/SC32POPUP.H $(STAMP)
 	$(CC) $(CFLAGS) $(M10A2_SCL_CFLAGS) -Werror -x c -Iuser/stdlib -Iuser/sclib -Iuser -c $< -o $@
 $(BUILD)/SCUI.SCL: $(BUILD)/scui-library.o user/scui/SCUI.json tools/mkscl.py tools/scl_format.py
 	$(PY) tools/mkscl.py $< $@ --manifest user/scui/SCUI.json

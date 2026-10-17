@@ -1,0 +1,20 @@
+{
+  "native_preflight": {
+    "exit_code": 1,
+    "vm_started": false,
+    "error": "AssertionError: user/scui/SCUIPRIVATE.H",
+    "cause": "Frozen allocator observer requires unchanged private layout header. New Drop2 declarations moved from shared private header to ui_data.c, the only consumer; original private header restored exactly."
+  },
+  "layout03": {
+    "exit_code": 1,
+    "vm_started": false,
+    "error": "constant section byte length differs",
+    "cause": "Invoked Windows default GCC/objcopy; COFF padded extracted section. Existing actual i386 ELF layout02 remains valid because its five header sources are unchanged. No new layout or guest matrix required."
+  },
+  "kernel_archive_preflight": {
+    "exit_code": 1,
+    "vm_started": false,
+    "error": "missing frozen observer source kernel/task.c",
+    "resolution": "Use exact preserved preimage only when SHA matches frozen CORE expected source; never substitute current task.c or rewrite runtime provenance."
+  }
+}
