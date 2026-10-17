@@ -154,7 +154,10 @@ static ScStatus a_widget(ScU32 kind,ScU32 dock,ScI32 height,ScUiNode *out)
     if(status<0)return status;
     ScUiLayoutDesc layout;
     a_record(&layout,sizeof(layout));
-    layout.mode=SC_UI_ABSOLUTE;
+    /* TAB的页必须填满实际内容视口。覆盖为ABSOLUTE会让页保留终端
+     * 初始24行的自然高度；下半屏被裁掉后PTY仍按24行输出，提示符
+     * 会落到可视区外。其余dock子控件没有页，继续用原绝对内部布局。 */
+    layout.mode=kind==SC_UI_TAB?SC_UI_OVERLAY:SC_UI_ABSOLUTE;
     layout.dock=dock;
     layout.height=height;
     layout.width=SC_UI_AUTO;

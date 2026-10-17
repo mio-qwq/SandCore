@@ -1,0 +1,17 @@
+{
+  "status": "NATIVE09_HOST16_FINAL10_PREPARED_NOT_EXECUTED",
+  "original_helpers": {
+    "drafts\\m10a2-p6-final-08-receipt\\bindings.py": "19180017aad27d2a61755519dcc55fee8dcbfd34b2e1391ed373f1318b33f2a6",
+    "drafts\\m10a2-p6-final-08-receipt\\finalize.py": "8b4fa743950293f599ce61006b9392850afc895b8527d7f671091d1ca2e576ed",
+    "drafts\\m10a2-p6-final-08-receipt\\inspect_final.py": "cb3a2d00c8dbaa2e6ec75f02dc80495a3d734272f78cacb5a3bb2c2651c83aa6"
+  },
+  "native_report_sha256": "57fa08a3e2ce36e350a0f88f6d56ab93a2418789ec22723ce2c762d10813f32b",
+  "outer_report_sha256": "0a90b72477f46fd02a73fea42d60debab2c7860c0bd3c164893bd7a0f6d5ff69",
+  "host_report_sha256": "a38c9b326d9bb89d8daab3761fd95bac3976d504fe3d424c016e5ff96c137e29",
+  "core_reuses_final09_objects": true,
+  "user_targets_changed": [
+    "SETTINGS2",
+    "TERMINAL2"
+  ],
+  "core_build_started": false
+}

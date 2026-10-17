@@ -1,0 +1,28 @@
+{
+  "files": {
+    "drafts/m10a2-p6-followup-refresh-v7/followup.py": {
+      "sha256": "82ee1f6e7e9cc39452d2ef1c19b0fbd1e16484a1f4c29517451b368ec6f8bd0d",
+      "bytes": 6149
+    },
+    "drafts/m10a2-p6-followup-refresh-v7/driver.py": {
+      "sha256": "c8db6a06f56f6e1c8ad741622a81290c94611c8eae59b17da2ad5ad1dcdf401d",
+      "bytes": 11929
+    },
+    "drafts/m10a2-p6-followup-refresh-v7/PINS.json": {
+      "sha256": "461d178113ed4d05786f7a8e76a43018369130e80e1ab70e7c51b8f69b29e0bd",
+      "bytes": 1321
+    },
+    "build/m10a2-p6-target-refresh-08/p6-generation.json": {
+      "sha256": "eeec17054e33fe9acefc6470d85b8e032fb52166522716c8a52261c44e925dc8",
+      "bytes": 15134592
+    },
+    "build/m10a2-p6-refresh-vm-08/refresh-vm.json": {
+      "sha256": "e7995034e0940fd4669dee99ee04a81fe15fbfb6515768dcfcd2aac83cde8412",
+      "bytes": 4786394
+    },
+    "build/m10a2-main-studio-01/p6-unified-host-14.json": {
+      "sha256": "d054c6115d97e75ac26245b602188b477d83f8cd792c43d202f721ab93495ff6",
+      "bytes": 365063
+    }
+  }
+}

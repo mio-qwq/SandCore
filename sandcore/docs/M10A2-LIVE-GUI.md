@@ -1,7 +1,7 @@
 # M10a2 当前运行与接续
 
 <!-- CURRENT-BEGIN -->
-2026-10-17。完整M10a2目标保持active，主代理独立工作。四文件试玩仍为native06；用户盘未覆盖。当前已验切片为HOST15/native08/final09。Windows WHPX GUI10已真实收束：exec64591退出0、QEMU10232关闭；测试SID4已注销、原SID1恢复。活源冻结解除；接续前不重复启动本轮或重做未变业务。
+2026-10-17。完整M10a2目标保持active，主代理独立工作。四文件试玩仍为native06；用户盘未覆盖。当前已验切片为HOST15/native08/final09。Windows WHPX GUI10已真实收束：exec64591退出0、QEMU10232关闭；测试SID4已注销、原SID1恢复。成果已保存main@bc55021；WSL的gh凭据推送实际连接github.com:443失败，远端未确认。随后两应用小修正在收齐，旧GUI10证据不覆盖新源码。
 
 | 项目 | 实际状态 |
 |---|---|
@@ -19,6 +19,12 @@
 新证据：[native08](../evidence/m10a2-native08/review.json)、[只读heap调查](../evidence/m10a2-parent-heap-02/review.json)。原07报告未改，资格审阅使用独立DECLARED_P6_ARTIFACT_FACTS_AUDIT_PASS，明确original_owner_account_pass=false；不将原轮次失败换名为PASS。新08必须且已经另取真实owner终账。
 
 接续：先静态定位Files拖放提前结束（SYSTEM只读源和新HOME/1000所有源均未弹确认，Files两次正常exit0、日志空，不能称GUI06取消313修复）。独立审阅Settings临时.C31清理、Terminal累计输出后的末尾可见性、Installer默认结果列在可视区外；只针对确证缺陷修改并做最小有效回归。随后收齐合同剩余权限/会话/兼容与统一交付。GUI10已结束，不能再向exec64591输入。当前证据[PIO/GUI10](../evidence/m10a2-pio-gui10/README.md)，原失败不改写，全合同继续active。
+
+新两应用修复（客体未验）：Terminal2的dock创建器对TAB保留OVERLAY，不再把24行自然高度放到裁剪区外；Settings临时文件Remove按文件合同传expected_snapshot_epoch=0，保留object/revision/lease身份。新构建目录build/m10a2-main-appfix-01复用386文件/10043653B编译中间物，没有复制数据盘；HOST15及final09原路径保留，前字节/准备凭证在drafts/m10a2-appfix-01。HOST16实际exit0/41产物/源变化0，SHAa38c9b326d9bb89d8daab3761fd95bac3976d504fe3d424c016e5ff96c137e29；与HOST15逐项比较只有SETTINGS2.SCX、TERMINAL2.SCX变。Files和Installer未随此批修改。
+
+原生09已经完整PASS：exec7795退出0/QEMU6960关闭，SETTINGS2和TERMINAL2真实SCCC/SCLD/get成功，27对象/8库/21产物保持，最终physical0/归属0/未解释0，严格reader未改、输入原盘保持。inner SHA57fa08a3e2ce36e350a0f88f6d56ab93a2418789ec22723ce2c762d10813f32b，outer SHA0a90b72477f46fd02a73fea42d60debab2c7860c0bd3c164893bd7a0f6d5ff69，证据evidence/m10a2-native09。final10三步骤和inspect通过，SDK494项/17489703B；CORE与final09完全相同542f1f795408a9d383d95acfff9cd0a34a82356311e71fd34d2e5be197a9890b，ELF仍7f07f554bb9aa9fae1fe533b41b81ceefd7c7714b128de0441b7d13fce17b532。GUI修复尚待。
+
+GUI11已启动准备进入普通SID：drafts/m10a2-p6-gui-11/driver.py，输出build/m10a2-p6-gui-run-11，HOST16/native09/final10，显式WHPX。只回归Terminal真实累计输出末尾与Settings保存失败后的临时清理；Files拖放使用显式--drag-settle-ms 350真实按住后松开诊断，记录实际停留，不注入Drop或写内存；原GUI10快拖失败保留，不把诊断手势当产品修复。主源/tools/SDK/CORE/当前helper冻结。普通SID和活句柄以实际READY/本轮工具为准，不复用已结束GUI10。
 
 SCAPI.H冻结摘要81a730450fcb3d310ed841ad3e5c70a3fed32aa7fbd10acac8b888ac7da9ffc1。只用main、无Release、不读私钥、不重启M8；用户盘与旧成果保留。
 

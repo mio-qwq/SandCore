@@ -269,3 +269,5 @@ SYS/LIB，其余库仍从调用者显式绝对包目录读取。新gate只影响
 GUI10通过普通SID4的真实Terminal启动Installer，再用文件对话框添加SYSTEM只读源 /SYS/SDK/EXAMPLES/RDESK/DATA.RDT；先只读预检，再写入 /HOME/DATA.RDT。实际结果73B、错误0、源revision974/目标1506、DURABLE1，正文及uid/gid/rw核实、来源保留。外部只读取回73B，SHAe01e31d9117841935f2a0cadbf022efccd4ec7ec30982e6807c1c32363e74ff4与源相同；Installer正常关闭后真实echo $?为0。这覆盖新REP OUTSW的正文、metadata bank及FLUSH成功路径，不扩大为断电故障注入或全盘吞吐结论。
 
 修订：2026-10-17，记录主核批量PIO及原错误/持久化/loader边界、同文件前后读盘测量和普通GUI真实持久安装/回读/正常退出；本轮最终owner13948→13948、全部资源增量0，driver退出0、输入/原盘保持；证据evidence/m10a2-pio-gui10。
+
+2026-10-17 Settings清理修订：发布后的临时文件Info可能携带当前目录epoch，但文件Remove合同只接受object/revision条件且expected_snapshot_epoch必须为0；Settings此前照抄Info该字段，内核会返回INVALID并留.C31。本次仅修应用请求为0，保留本人独占lease、object/revision和真实Advance/DURABLE判据，不放宽内核权限或条件。本批尚未验证临时文件真实移除，不将静态定位改称回归通过。

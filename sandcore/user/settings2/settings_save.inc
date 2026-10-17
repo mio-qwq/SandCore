@@ -78,7 +78,10 @@ static ScStatus settings_temp_remove(SettingsSave *save)
         q.generation=info.generation;
         q.expected_object=info.object_id;
         q.expected_revision=info.revision;
-        q.expected_snapshot_epoch=info.snapshot_epoch;
+        /* 此处只清理本轮独占的临时文件。文件条件由object/revision
+         * 精确绑定；发布后Info可携当前目录epoch，但Remove的文件
+         * 合同要求该字段为0，不能把目录快照条件混入文件操作。 */
+        q.expected_snapshot_epoch=0;
         INIT(info);
         s=ScFileLeaseRemove(&q,&info);
         if(s==SC32_E_BUSY){ScLeaseControl c=pin_control(&save->temporary);
