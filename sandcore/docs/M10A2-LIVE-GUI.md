@@ -1,5 +1,9 @@
 # M10a2 当前真实客体接力
 
+> 最新GUI06接力和四文件试玩交付见 [M10A2-GUI06-REVIEW.md](M10A2-GUI06-REVIEW.md)。当前exec36349/QEMU20472仍活，SID4；绑定gui6-rebind-after-installer-process-observation。Installer真实安装73B/DURABLE1/源目标SHA一致/正常exit0；现Files取消诊断中，主源冻结，最终owner未取。以下旧位置保持历史时态。
+
+> 当前活会话：GUI06 exec36349 / QEMU20472，普通SID4，原SID1。输入绑定initial-ordinary-bind，HOST12/native06/final06与全部活helper冻结。刚实际点击Settings桌面图标，等待初始屏；尚未操作程序/环境/安装。GUI05为非PTY启动后EOF，报告FAIL已保留，不能续用。main最近保存2bb5d46；下一步只针对三表、属性框、安装和Files取消原因。
+
 > 最新GUI04会话已结束：PF13948→13948、全部资源差额0、输入/原盘保持。声音EOF重播/seek/PCM及四按钮FLOW已实测；Settings三表Provider和共享对话框已修，HOST12/SCO13通过、native06运行中。Files取消后来源进程消失仍未定位。完整事实与当前下一步见 [M10A2-GUI04-REVIEW.md](M10A2-GUI04-REVIEW.md)，以下旧检查点保持历史时态；整版目标仍active。
 
 

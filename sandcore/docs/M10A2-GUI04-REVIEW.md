@@ -50,3 +50,7 @@ SCO13真实SCCC宿主IO后端及严格SCLD两项通过，正式两份NATIVE清�
 final06三个实际步骤及只读inspect均退出0，SDK494文件/17483978B；CORE摘要仍为5da64fc176cb273803fddd328b02d5123b726440673689cf20aa5e48a3464eff，实际与final05逐字节相同。未变化的内核、库和其它应用不重跑矩阵。对应普通GUI05尚未启动，设置/安装修后行为仍待实际输入验证。
 
 修订：2026-10-16，记录两目标native06真实生成和final06严格构建/SDK结果，明确GUI待验。
+
+## GUI05启动中断与GUI06接续
+
+GUI05实际达到SID4 READY后，主控因未以持久PTY启动而在serve读到EOF，进程退出1。报告保留FAIL_OR_INTERRUPTED，尚未发送任何业务动作，current_inputs_unchanged/source_disk_unchanged均true，changed路径为空；没有最终owner账。不是设置/安装功能通过或失败的证据。现以tty=true重新启动相同HOST12/native06/final06，独立输出build/m10a2-p6-gui-run-06；不改历史报告或复用失败目录。
