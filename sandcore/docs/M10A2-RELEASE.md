@@ -1,31 +1,38 @@
 # SandCore M10a2 — The Application Platform Era
 
-本版建立可复用的Ring3应用平台：真正SCL动态链接、SCCLIB/SCLIB/SC32API/SCUI、统一桌面和主要应用，以及可在系统内编译复杂多源应用的SDK。发布前检查与实际证据见[M10A2-ACCEPTANCE.md](M10A2-ACCEPTANCE.md)。GitHub发布在检查后执行；实际签名提交、发布结果及附件摘要另由delivery/publish凭证记录。
+M10a2建立可复用的Ring3应用平台：SCL动态链接、四大系统库、统一SCUI桌面和主要应用，以及可在系统内编译多源程序的SDK。
 
-## 交付内容
+## 下载与启动
+
+[下载 SandCore M10a2](https://github.com/mio-qwq/SandCore/releases/latest)。
 
 | 附件 | 内容 |
 |---|---|
-| SandCore-M10a2.zip | 根目录严格4文件：run.py、run.bat、sandcore.img、sanddata.img；干净基盘迁移，含新平台/应用和内置SDK |
-| SandCore-M10a2-SDK.zip | 独立公开SDK：INC、9库、实际原生编译/链接工具、SCW/多源例子、规范、固定源码与完整许可 |
-| SHA256SUMS | 两个附件的SHA256摘要；Release上传后按GitHub资产摘要核对 |
+| SandCore-M10a2.zip | run.py、run.bat、sandcore.img、sanddata.img；桌面、应用与内置SDK |
+| SandCore-M10a2-SDK.zip | 公共头、9个库、原生编译和链接工具、示例、规范、源码及许可证 |
+| SHA256SUMS | 运行包和SDK的SHA256摘要 |
 
-不捆绑QEMU/GCC/Python本体。使用已安装Windows QEMU（默认C:/Program Files/qemu）及Python，双击run.bat；启动参数见run.py --help。run.bat为纯ASCII。默认SDL原生相对鼠标、物理DPI/最近邻，WHPX不可用时回退TCG；当前最大1920×1080，16:10宿主全屏黑边是保持比例的结果。
+安装Windows QEMU和Python后，解压运行包并双击run.bat。QEMU默认路径为C:/Program Files/qemu，参数见run.py --help。启动器优先WHPX，可回退TCG；SDL原生相对鼠标、物理DPI和最近邻显示保持。客体最高1920×1080，宿主比例不同时全屏会保留比例边框。
 
-## 主要变化
+默认mio未设置密码时，可在本机登录界面留空登录；设置过密码后使用实际密码。退出桌面返回登录并保留会话，注销关闭当前会话。已有个人数据盘应先备份，避免用干净发行盘覆盖个人文件。
 
-- 动态SCL、版本/依赖/符号/生命周期与真实SCCC→SCO→SCLD开发闭环；新应用通过大写公共头和库开发，旧SCAPI.H原字节/ABI保留。
-- Ring3桌面、图标持久化/多选、开始菜单/任务栏、关联、跨应用剪贴板和有释放凭证的拖放；文件作业支持持久REC、权限与条件提交。
-- Files、Studio、Debug、Notes、Canvas、Lens、Settings、Monitor、Calculator、Terminal、Palette、Sound、Session和Installer统一框架。Studio的工程后缀为SCW。Installer是既有文件安装流程的GUI，不宣称完整软件包依赖管理器。
-- 实际多源ResearchDesk开发/运行/动态插件/调试证据；缩放/Classic/Aurora、文件/图形/音频/会话定向证据复用。
-- 修复高DPI入口、全屏鼠标、快拖取消、终端滚动与安装结果列；退出桌面返回登录并保留会话，注销关闭当前会话，固定本机LOGIN2允许未设密码的默认mio空输入登录。root、普通su及网络没有此空口令例外。
+## 应用与开发平台
 
-## 准确范围
+- SCL动态装载支持版本、依赖、符号、初始化、退出回收与失败回滚。SCAPI.H旧接口及原字节保留，新能力通过SC32API和系统库公开。
+- Ring3桌面提供图标、多选、持久布局、开始菜单、任务栏、文件关联、跨应用剪贴板与拖放。文件作业提供权限检查、持久记录和条件提交。
+- Files、Studio、Debug、Notes、Canvas、Lens、Settings、Monitor、Calculator、Terminal、Palette、Sound、Session和Installer使用统一界面框架。
+- Studio可直接打开C文件构建，也可新建带默认程序的SCW工程；F7构建、Ctrl+F5运行、F5调试。输出跟随末行，错误显示文件、行号和原因。文件对话框支持双击/Enter进入文件夹。
+- SDK提供SCCC→SCO→SCLD多源编译流程、独立动态插件、标准C与通用库、GUI/图形/终端/音频能力，以及ResearchDesk等示例。
+- SandFS保持目录名字规范补零，主内核与恢复内核使用相同文件系统实现；磁盘格式及公开API/ABI保持兼容。
 
-8个普通系统库与SCCC/SCLD来自实际客体编译；SCSOUND是明确记录的宿主codec例外。SCCLIB只承诺文档中的C32范围；SCL初版不宣称跨进程物理代码共享或NX。当前无HTTPS/TLS、GPU、SMP、IPv6或全系统完整双语承诺。
+Studio操作见[使用说明](STUDIO2-USER-GUIDE.md)，SDK见[M10A2-SDK.md](M10A2-SDK.md)，多源示例见[SDK-RESEARCHDESK.md](SDK-RESEARCHDESK.md)。
 
-**登录回归功能通过，但该轮自动资源账没有通过。** 首次保留LOCKED登录桌面后+8页，与编译出的32660B状态及生命周期匹配；未直接抓取地址归属。GUI13原FAIL_OR_INTERRUPTED、未归因8及驱动退出1保持。native11及GUI12分别有独立零差证据，不冒充GUI13零差。详细记录和截图在evidence/m10a2-session-return。其他历史失败同样保留。
+## 支持范围
 
-C:/Users/Administrator/Desktop/test中的现有用户盘另行做系统载荷迁移，1626个未列入更新的对象（含34个HOME/桌面对象）正文、权限、属主、代数保留；原盘备份在本机build。Release使用独立干净基盘，不收集用户test数据，不覆盖它。M8封存、M9/M10a1正式产物保持；完整M10及基础内核冻结并未在本版宣称完成。
+8个普通系统库及SCCC/SCLD来自系统内编译，SCSOUND使用单独记录的宿主codec实现。SCCLIB支持文档列出的32位C子集，未提供完整ISO C、浮点、64位整数、scanf或完整locale/wide支持。SCL按进程装载，不宣称跨进程物理代码共享或完整W^X。
 
-修订：2026-10-17，形成检查后发布的交付说明与已知限制。
+网络支持Windows QEMU e1000、IPv4和文档列出的HTTP工具，未实现HTTPS/TLS、IPv6或浏览器。GPU、SMP和全系统完整双语不在本版支持范围。登录功能已验证，相关历史资源检查存在未通过项，不宣称全部路径资源零差。M8封存范围保持；完整M10及基础内核冻结未在本版宣称完成。
+
+附件摘要见[M10A2-PUBLISHED.md](M10A2-PUBLISHED.md)。
+
+修订：2026-10-18，统一M10a2发行内容、启动方式与支持范围。

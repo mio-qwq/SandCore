@@ -1,38 +1,15 @@
-# M10a2 实际发布记录
+# SandCore M10a2 下载与校验
 
-## M10a2.2：目录写回修复补丁
+[SandCore M10a2 — The Application Platform Era](https://github.com/mio-qwq/SandCore/releases/latest)。
 
-2026-10-17，独立[Release M10a2.2](https://github.com/mio-qwq/SandCore/releases/tag/M10a2.2)。原M10a2、M10a2.1的tag、Release正文及附件均保留。修复源码来自GitHub签名有效的[60a36d0](https://github.com/mio-qwq/SandCore/commit/60a36d00cfe8e09eebc427cf7dcdaf9f4b6d98e4)，本次tag另包含同步的补丁文档与打包凭证。
-
-运行包严格四文件，从M10a2.1干净发布盘换入相同的已验证主核和恢复主核，并同步3份SDK文档；2483个其它对象的正文、身份、权限与对象代数保持。SDK的508项载荷包括原9库/工具/头/例子/许可证和同步文档，二进制载荷不变。未访问或上传用户test盘，未重复构建、编译或QEMU测试，沿用[已有一次定向结果](../evidence/m10a2-directory-repair/README.md)。详见[M10a2.2说明](M10A2.2-RELEASE.md)。
+运行包包含run.py、run.bat、sandcore.img、sanddata.img四文件；安装Windows QEMU和Python后运行run.bat。SDK单独提供公共头、9个系统库、原生编译和链接工具、示例、规范、源码及许可证。使用与支持范围见[M10A2-RELEASE.md](M10A2-RELEASE.md)。
 
 | 附件 | 字节 | SHA256 |
 |---|---:|---|
-| [SandCore-M10a2.2.zip](https://github.com/mio-qwq/SandCore/releases/download/M10a2.2/SandCore-M10a2.2.zip) | 21645803 | `59ad01b2f172dd00726b592c46e569a68a963df709603cfeb55bd0f5cd79ed5a` |
-| [SandCore-M10a2.2-SDK.zip](https://github.com/mio-qwq/SandCore/releases/download/M10a2.2/SandCore-M10a2.2-SDK.zip) | 5264783 | `5678e518ca773a85d755cf89a15ac4c69cf25565ada8226abda877bca31bf666` |
-| [SHA256SUMS](https://github.com/mio-qwq/SandCore/releases/download/M10a2.2/SHA256SUMS) | 178 | `505a68f37f8a607e9d8eb40600a52282b6fcf6670bc8bf49c93a7b098f5503ab` |
+| [SandCore-M10a2.zip](https://github.com/mio-qwq/SandCore/releases/latest/download/SandCore-M10a2.zip) | 21642012 | `3abfa11b706c47158392e36e421e766bc2f9fb280e807341c2a76445d6799434` |
+| [SandCore-M10a2-SDK.zip](https://github.com/mio-qwq/SandCore/releases/latest/download/SandCore-M10a2-SDK.zip) | 5259694 | `80c7f7ee97ba156c34232199922a801b0d39787cd08ac0073dd90ce9699570fd` |
+| [SHA256SUMS](https://github.com/mio-qwq/SandCore/releases/latest/download/SHA256SUMS) | 174 | `904a48c998a359ace4b562f79f93aa52e4ab5f739bad2e0d6dc6b5608c0fe07c` |
 
-发行内容与摘要记录见[evidence/m10a2-directory-release](../evidence/m10a2-directory-release/README.md)。本地build/m10a2-directory-release-01另保存GitHub签名提交与上传结果。修订：2026-10-17，独立发布目录修复补丁，保留全部旧版本。
+主内核与恢复内核SHA256均为`827a9e81e5e33a9f70e695ff579c50b7605a7d088fb90fc138657410e832ef68`。运行包为干净初始数据盘；已有个人文件应另行保留，避免直接覆盖个人盘。
 
-## M10a2.1：Studio 与 Files 产品修正
-
-[M10a2.1](https://github.com/mio-qwq/SandCore/releases/tag/M10a2.1)绑定已签名提交`112a81fd73a7e6b0eaaffaa8aa13e0ac742e400f`，运行包及SDK原摘要见[原交付记录](../evidence/m10a2-product-fix/delivery.json)。旧附件不含后续目录修复，按历史原样保留。
-
-## 原 M10a2 首发记录
-
-2026-10-17。SandCore M10a2 — The Application Platform Era已发布。以下来自实际GitHub返回结果；发布前的staging/交付报告保持其原始时态。
-
-- [GitHub Release](https://github.com/mio-qwq/SandCore/releases/tag/M10a2)，tag M10a2，draft=false，prerelease=false。
-- [发行源提交](https://github.com/mio-qwq/SandCore/commit/53090db84670d4b875c1ceb164c77ada52cc025a)：`53090db84670d4b875c1ceb164c77ada52cc025a`。最终完整树快照的GitHub签名验证verified=true、reason=valid，GraphQL签名VALID。主体使用正常Git通过代理提交/推送，传输提交自身未签名的事实记录在commit.json；最终快照签名覆盖完整树与父链。此前开发历史完整保留，无强推。
-- 完整交付合同与GUI13原资源FAIL/+8页边界见[M10A2-ACCEPTANCE.md](M10A2-ACCEPTANCE.md)，未改称零差PASS。
-- SDK是同一native11/HOST21/final12的499项载荷、8普通原生库和唯一SCSOUND宿主codec例外；运行包严格四文件，用户test盘不在附件中。
-
-| 附件 | 字节 | SHA256 |
-|---|---:|---|
-| [SandCore-M10a2-SDK.zip](https://github.com/mio-qwq/SandCore/releases/download/M10a2/SandCore-M10a2-SDK.zip) | 5211109 | `9170d28760466af1fbf6e287867b1ab9f7073674969af201302cc3953aa4a8eb` |
-| [SandCore-M10a2.zip](https://github.com/mio-qwq/SandCore/releases/download/M10a2/SandCore-M10a2.zip) | 21471099 | `66a9311cf68ba3bf5ca9a1649893163807294064198f70dd228459152df4acec` |
-| [SHA256SUMS](https://github.com/mio-qwq/SandCore/releases/download/M10a2/SHA256SUMS) | 174 | `77a1fd59a0fd03841034946dc3925c8a28c9cbb5943d5b33ffc7a8193800cbcd` |
-
-GitHub上传后的资产digest/size已与本机逐项相等；原始记录见[evidence/m10a2-delivery-01](../evidence/m10a2-delivery-01/README.md)中的commit.json、publish.json、delivery.json及SHA256SUMS。未因发布新增编译/QEMU矩阵。完整M10及基础内核冻结未在本版宣称完成。
-
-修订：2026-10-17，落地实际签名与Release结果。
+修订：2026-10-18，统一M10a2运行包、SDK下载和附件摘要。

@@ -3,6 +3,8 @@
 __pycache__/
 *.pyc
 /sandcore/build/
+/sandcore/evidence/
+/sandcore/docs/M10A2.*-RELEASE.md
 /temp miotest/
 /temp_miotest/
 /*.zip

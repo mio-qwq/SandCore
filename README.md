@@ -4,13 +4,9 @@
 
 **从引导器、内核到桌面和原生开发工具的 32 位 x86 操作系统。**
 
-**最新补丁 [M10a2.2](https://github.com/mio-qwq/SandCore/releases/tag/M10a2.2)** 已包含 SandFS 目录文件名填充修复，防止普通编译、保存把未初始化的名字尾部写入目录并导致下次启动失败。运行盘的主内核和恢复内核均已更新，SDK及盘内文档同步；用户态程序、库和 API/ABI 不变。见[补丁说明](sandcore/docs/M10A2.2-RELEASE.md)及[目录写回修复](sandcore/evidence/m10a2-directory-repair/README.md)。原 M10a2 / M10a2.1 Release 和附件完整保留。
-
-**M10a2.1 产品修正**：Studio 支持直接打开 C 构建、新建程序项目及具体编译错误；恢复 SCAPI.H 源码兼容，修正文件夹双击、滚动边界和 Files 编辑入口。默认 HelloWorld 已实际构建、运行。见[产品修正记录](sandcore/docs/M10A2-APPLICATION-PRODUCT-FIX.md)、[Studio 使用说明](sandcore/docs/STUDIO2-USER-GUIDE.md)及[补丁下载入口](https://github.com/mio-qwq/SandCore/releases/tag/M10a2.1)。
-
 SandCore 由 [mio](https://github.com/mio-qwq/) 开发。工程包含 BIOS 引导、分页与抢占式多任务、SandFS 文件系统、多用户桌面、图形应用、音频、IPv4 网络、自有可执行格式，以及可以在系统内编译和运行程序的 C 编译器、汇编器和调试器。
 
-当前版本为 **SandCore M10a2 — The Application Platform Era**：Ring3 SCL、四大系统库、统一SCUI/桌面及主要组件、真实系统内SCCC/SCLD和多源SCW开发流程已交付实现及对应证据。完整范围见[交付检查](sandcore/docs/M10A2-ACCEPTANCE.md)和[版本说明](sandcore/docs/M10A2-RELEASE.md)。M10a2首发运行绑定为HOST21/native11/final12；M10a2.1补丁为HOST26/native15/final15；GUI12资源零差，GUI13登录功能有效但首次保留登录桌面+8页的原资源FAIL保持，详情已列出。[M10a2已正式发布](https://github.com/mio-qwq/SandCore/releases/tag/M10a2)，运行包/独立SDK附件摘要已核对；[源提交](https://github.com/mio-qwq/SandCore/commit/53090db84670d4b875c1ceb164c77ada52cc025a)经GitHub实际Verified验证。M10a1 Preview、M9、M8a及用户盘保留，完整M10及基础内核冻结并未宣称完成。
+当前版本为 **SandCore M10a2 — The Application Platform Era**：真正的 Ring3 SCL 动态链接、SCCLIB/SCLIB/SC32API/SCUI、统一桌面与主要应用，以及可在系统内编译、链接、运行和调试程序的 SDK。Studio 支持直接打开 C 文件构建、创建程序项目和显示具体编译错误，旧 SCAPI.H 源码与 ABI 保持兼容。见[版本说明](sandcore/docs/M10A2-RELEASE.md)、[Studio 使用说明](sandcore/docs/STUDIO2-USER-GUIDE.md)及[下载入口](https://github.com/mio-qwq/SandCore/releases/latest)。完整 M10 及基础内核冻结未在本版宣称完成。
 
 M10a2运行包仅含run.py、run.bat和两个盘，默认SDL原生相对鼠标/物理DPI/最近邻，优先WHPX；用户已确认快捷键及全屏鼠标正常。最大1920×1080，16:10宿主全屏保留比例黑边。退出桌面回登录且保留会话，注销关闭会话；未设密码的默认mio仅固定本机LOGIN2可空输入登录。独立SDK及实际来源见[SDK说明](sandcore/docs/M10A2-SDK.md)。
 
@@ -19,7 +15,7 @@ M10a2运行包仅含run.py、run.bat和两个盘，默认SDL原生相对鼠标/�
 | 入口 | 内容 |
 |---|---|
 | [M10a2交付检查](sandcore/docs/M10A2-ACCEPTANCE.md) | 当前平台、SDK、真实证据与准确限制 |
-| [M10a2.2运行包/SDK](https://github.com/mio-qwq/SandCore/releases/tag/M10a2.2) | 最新补丁；[发布说明及校验凭证](sandcore/docs/M10A2-PUBLISHED.md) |
+| [M10a2运行包/SDK](https://github.com/mio-qwq/SandCore/releases/latest) | 正式下载；[附件与校验](sandcore/docs/M10A2-PUBLISHED.md) |
 | [M10a1 Preview 下载](https://github.com/mio-qwq/SandCore/releases/tag/M10a1) | 已验收的开发运行包；[发布说明](sandcore/docs/M10A1-PREVIEW.md) |
 | [构建与运行](#构建与运行) | 从源码构建当前系统、启动已有版本 |
 | [架构](#系统架构) | 启动链、内核、用户态、会话和扩展 |
