@@ -1,6 +1,6 @@
 /build/
 /dist/*
-!/dist/SandBrowser-0.1.2.zip
+!/dist/SandBrowser-0.1.3.zip
 !/dist/BUILD.json
 /vendor/*
 !/vendor/SOURCES.json

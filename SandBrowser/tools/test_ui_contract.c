@@ -10,6 +10,7 @@ static unsigned frame_width = 720, frame_height = 490;
 static unsigned frame_state = SC32_WINDOW_VISIBLE;
 static unsigned submits, ends, cancels, invalidates, captures, creates, spawns, rejects;
 static int claimed, submit_error, resize_on_begin;
+static unsigned existing_backups, staging_exists;
 
 void sb_record(void *p, unsigned n) {
     memset(p, 0, n);
@@ -94,7 +95,12 @@ int sb_file_read(const char *p, SbBuffer *b) {
     return SC32_E_NOT_FOUND;
 }
 ScStatus ScPathStat(const char *p, ScPathStatInfo *out) {
-    (void)p; (void)out;
+    if ((existing_backups && !strcmp(p, "/HOME/SBROWSE.OLD")) ||
+        (existing_backups > 1 && !strcmp(p, "/HOME/SBROWSE.O01")) ||
+        (staging_exists && !strcmp(p, "/HOME/SBROWSE.NEW"))) {
+        out->kind = SC32_PATH_DIRECTORY;
+        return SC32_OK;
+    }
     return SC32_E_NOT_FOUND;
 }
 ScStatus ScPathCreate(const char *p, ScU32 kind, ScU32 mode) {
@@ -184,6 +190,12 @@ int main(void) {
     setup.focus = CONTROL_NEXT;
     message(SC32_MSG_KEYDOWN, 0, 13, 0, 0);
     assert(setup.stage == 2 && !setup.closed);
-    puts("PASS: frame submission, failed-frame cancellation, resize/minimize/restore, setup input and retry");
+    existing_backups = 2;
+    start_install();
+    assert(setup.stage == 3 && creates == 2 && !strcmp(setup.backup, "/HOME/SBROWSE.O02"));
+    setup.stage = 2; staging_exists = 1;
+    start_install();
+    assert(setup.stage == 5 && creates == 2 && strstr(setup.error, ".NEW"));
+    puts("PASS: frame submission, setup input/retry, successive upgrade backups and interrupted staging");
     return 0;
 }

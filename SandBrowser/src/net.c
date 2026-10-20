@@ -1,12 +1,15 @@
 /* Copyright (c) 2026 mio. HTTP/TLS 库及独立的网络进程。 */
 #include "sb.h"
 #include "SBNET.H"
+#include "sb_transport.h"
 #include "bearssl.h"
 #include "miniz_tinfl.h"
 #include <ctype.h>
 #include <strings.h>
-#include "anchors.h"
-extern int sb_raw(int, int, int, int, int, int, int);
+#ifndef SB_TRUST_HEADER
+#define SB_TRUST_HEADER "anchors.h"
+#endif
+#include SB_TRUST_HEADER
 typedef struct {
     char host[256], path[1024], name[128], value[2048];
     int secure;
@@ -39,7 +42,7 @@ static int raw_read(void *v, unsigned char *b, size_t n) {
     for (;;) {
         if (stopped(c))
             return -1;
-        int s = sb_raw(0x258, c->fd, (int)b, n, 0, 0, 0);
+        int s = sb_socket_read(c->fd, b, n, 0);
         if (s == -11) {
             pause_net();
             continue;
@@ -54,7 +57,7 @@ static int raw_write(void *v, const unsigned char *b, size_t n) {
     for (;;) {
         if (stopped(c))
             return -1;
-        int s = sb_raw(0x257, c->fd, (int)b, n, 0, 0, 0);
+        int s = sb_socket_write(c->fd, b, n, 0);
         if (s == -11) {
             pause_net();
             continue;
@@ -116,14 +119,14 @@ static int resolve(SbNetContext *c, const char *host, uint32_t *out, unsigned bu
         *out = 0x7f000001;
         return 0;
     }
-    int ticket = sb_raw(0x260, (int)host, 0, 0, 0, 0, 0);
+    int ticket = sb_dns_begin(host);
     if (ticket < 0)
         return ticket;
     int status = -110;
     uint32_t began = sb_ticks();
     while (!stopped(c) && (!budget || sb_ticks() - began < budget)) {
         uint32_t a[8] = {0};
-        status = sb_raw(0x261, ticket, (int)a, 0, 0, 0, 0);
+        status = sb_dns_poll(ticket, a);
         if (status < 0)
             break;
         if (a[1] == 2) {
@@ -138,7 +141,7 @@ static int resolve(SbNetContext *c, const char *host, uint32_t *out, unsigned bu
         pause_net();
         status = -110;
     }
-    sb_raw(0x262, ticket, 0, 0, 0, 0, 0);
+    sb_dns_close(ticket);
     return stopped(c) ? -115 : status;
 }
 static uint32_t ntp_u32(const unsigned char *p) {
@@ -170,21 +173,21 @@ static int network_time_sample(SbNetContext *c, const char *server, unsigned hz,
     request[0] = (4u << 3) | 3u;
     if (sb_random(request + 40, 8))
         return -1;
-    int fd = sb_raw(0x252, 2, 0, 0, 0, 0, 0); /* SandCore UDP socket. */
+    int fd = sb_socket_open(2);
     if (fd < 0)
         return -1;
     uint32_t destination[4] = {1, *address, 123, 0};
     uint32_t began = sb_ticks();
     int result = -1, sent;
     do {
-        sent = sb_raw(0x257, fd, (int)request, sizeof(request), (int)destination, 0, 0);
+        sent = sb_socket_write(fd, request, sizeof(request), destination);
         if (sent == -11)
             pause_net();
     } while (sent == -11 && !stopped(c) && sb_ticks() - began < 2 * hz);
     if (sent == sizeof(request))
         while (!stopped(c) && sb_ticks() - began < 2 * hz) {
             uint32_t source[4] = {0};
-            int n = sb_raw(0x258, fd, (int)reply, sizeof(reply), (int)source, 0, 0);
+            int n = sb_socket_read(fd, reply, sizeof(reply), source);
             if (n == -11) {
                 pause_net();
                 continue;
@@ -197,7 +200,7 @@ static int network_time_sample(SbNetContext *c, const char *server, unsigned hz,
                 break;
             }
         }
-    sb_raw(0x25a, fd, 0, 0, 0, 0, 0);
+    sb_socket_close(fd);
     return result;
 }
 static int clock_snapshot(ScMonotonicClock *clock, uint64_t *ticks) {
@@ -264,7 +267,7 @@ static int certificate_time(SbNetContext *c, uint32_t *days, uint32_t *seconds) 
 }
 static void disconnect(SbNetContext *c) {
     if (c->fd >= 0)
-        sb_raw(0x25a, c->fd, 0, 0, 0, 0, 0);
+        sb_socket_close(c->fd);
     c->fd = -1;
 }
 static const char *tls_error_text(int error) {
@@ -331,14 +334,14 @@ static int connect_to(SbNetContext *c, SbUrl *u, SbNetResult *r) {
     uint32_t ip;
     if (resolve(c, u->host, &ip, 0) < 0)
         return fail(c, r, -1, "DNS lookup failed");
-    c->fd = sb_raw(0x252, 1, 0, 0, 0, 0, 0);
+    c->fd = sb_socket_open(1);
     if (c->fd < 0)
         return fail(c, r, -2, "Cannot open TCP socket");
     uint32_t a[4] = {1, ip, u->port, 0};
-    int s = sb_raw(0x254, c->fd, (int)a, 0, 0, 0, 0);
+    int s = sb_socket_connect(c->fd, a);
     while (s == -115 && !stopped(c)) {
         uint32_t state[16] = {0};
-        s = sb_raw(0x25b, c->fd, (int)state, 0, 0, 0, 0);
+        s = sb_socket_status(c->fd, state);
         if (s < 0)
             break;
         if (state[4]) {
@@ -500,56 +503,102 @@ static uint32_t crc32(const void *v, unsigned n) {
     }
     return ~crc;
 }
+static uint32_t little32(const unsigned char *p) {
+    return p[0] | ((uint32_t)p[1] << 8) | ((uint32_t)p[2] << 16) | ((uint32_t)p[3] << 24);
+}
+static int inflate_stream(const unsigned char *data, unsigned bytes, SbBuffer *out,
+                          unsigned flags, unsigned *consumed) {
+    tinfl_decompressor state;
+    tinfl_init(&state);
+    unsigned at = 0, begin = out->length;
+    if (sb_buffer_append(out, "", 0))
+        return -1;
+    for (;;) {
+        if (out->length + 1 >= out->capacity) {
+            unsigned capacity = out->capacity * 2;
+            if (capacity > SB_RESOURCE_MAX + 2) capacity = SB_RESOURCE_MAX + 2;
+            if (capacity <= out->capacity) return -1;
+            void *next = realloc(out->data, capacity);
+            if (!next) return -1;
+            out->data = next; out->capacity = capacity;
+        }
+        size_t input = bytes - at, output = out->capacity - out->length - 1;
+        tinfl_status status = tinfl_decompress(&state, data + at, &input, out->data + begin,
+                                               out->data + out->length, &output,
+                                               flags | TINFL_FLAG_USING_NON_WRAPPING_OUTPUT_BUF);
+        at += input; out->length += output;
+        if (out->length > SB_RESOURCE_MAX) return -1;
+        out->data[out->length] = 0;
+        if (status == TINFL_STATUS_DONE) { *consumed = at; return 0; }
+        if (status != TINFL_STATUS_HAS_MORE_OUTPUT || (!input && !output)) return -1;
+    }
+}
 static int decompress_body(SbBuffer *b, int gzip) {
-    unsigned start = 0, end = b->length;
-    uint32_t expected = 0, check = 0;
-    if (gzip) {
-        if (end < 18 || b->data[0] != 31 || b->data[1] != 139 || b->data[2] != 8 ||
-            b->data[3] & 0xe0)
-            return -1;
-        unsigned flags = b->data[3];
-        start = 10;
+    SbBuffer out = {0};
+    unsigned at = 0, end = b->length, consumed;
+    if (!gzip) {
+        /* HTTP deflate is normally zlib-wrapped; older servers also send raw
+         * DEFLATE. A recognizable zlib header always retains Adler checking. */
+        unsigned flags = end >= 2 && (b->data[0] & 15) == 8 &&
+                         (((unsigned)b->data[0] << 8) | b->data[1]) % 31 == 0
+                             ? TINFL_FLAG_PARSE_ZLIB_HEADER : 0;
+        if (inflate_stream(b->data, end, &out, flags, &consumed) || consumed != end)
+            goto bad;
+    } else do {
+        unsigned start = at, begin = out.length;
+        if (end - at < 18 || b->data[at] != 31 || b->data[at + 1] != 139 ||
+            b->data[at + 2] != 8 || b->data[at + 3] & 0xe0)
+            goto bad;
+        unsigned flags = b->data[at + 3];
+        at += 10;
         if (flags & 4) {
-            if (start + 2 > end)
-                return -1;
-            unsigned n = b->data[start] | (b->data[start + 1] << 8);
-            start += 2 + n;
+            if (end - at < 2) goto bad;
+            unsigned length = b->data[at] | ((unsigned)b->data[at + 1] << 8);
+            at += 2;
+            if (length > end - at) goto bad;
+            at += length;
         }
         for (unsigned bit = 8; bit <= 16; bit *= 2)
             if (flags & bit) {
-                while (start < end && b->data[start])
-                    start++;
-                start++;
+                while (at < end && b->data[at]) at++;
+                if (at == end) goto bad;
+                at++;
             }
-        if (flags & 2)
-            start += 2;
-        if (start > end - 8)
-            return -1;
-        end -= 8;
-        memcpy(&check, b->data + end, 4);
-        memcpy(&expected, b->data + end + 4, 4);
-        if (expected > SB_RESOURCE_MAX)
-            return -1;
-    }
-    unsigned cap = gzip ? expected : SB_RESOURCE_MAX;
-    if (!cap)
-        cap = 1;
-    unsigned char *out = malloc(cap + 1);
-    if (!out)
-        return -1;
-    size_t n = tinfl_decompress_mem_to_mem(out, cap, b->data + start, end - start,
-                                           gzip ? 0 : TINFL_FLAG_PARSE_ZLIB_HEADER);
-    if (n == (size_t)-1 || n > SB_RESOURCE_MAX ||
-        (gzip && (n != expected || crc32(out, n) != check))) {
-        free(out);
-        return -1;
-    }
-    out[n] = 0;
-    free(b->data);
-    b->data = out;
-    b->length = n;
-    b->capacity = cap + 1;
+        if (flags & 2) {
+            if (end - at < 2 || (crc32(b->data + start, at - start) & 65535u) !=
+                (unsigned)(b->data[at] | ((unsigned)b->data[at + 1] << 8))) goto bad;
+            at += 2;
+        }
+        if (inflate_stream(b->data + at, end - at, &out, 0, &consumed)) goto bad;
+        at += consumed;
+        if (end - at < 8 || little32(b->data + at) != crc32(out.data + begin, out.length - begin) ||
+            little32(b->data + at + 4) != out.length - begin) goto bad;
+        at += 8;
+    } while (at < end); /* RFC 1952 permits concatenated gzip members. */
+    sb_buffer_reset(b);
+    *b = out;
     return 0;
+bad:
+    sb_buffer_reset(&out);
+    return -1;
+}
+static int content_length(const char *p, uint32_t *result) {
+    int first = 1;
+    for (;;) {
+        while (*p == ' ' || *p == '\t') p++;
+        if (!isdigit((unsigned char)*p)) return -1;
+        uint32_t length = 0;
+        while (isdigit((unsigned char)*p)) {
+            unsigned digit = *p++ - '0';
+            if (length > (SB_RESOURCE_MAX - digit) / 10) return -1;
+            length = length * 10 + digit;
+        }
+        if (!first && length != *result) return -1;
+        *result = length; first = 0;
+        while (*p == ' ' || *p == '\t') p++;
+        if (!*p) return 0;
+        if (*p++ != ',') return -1;
+    }
 }
 SbNetContext *SbNetCreate(void) {
     SbNetContext *c = calloc(1, sizeof(*c));
@@ -570,28 +619,46 @@ void SbNetDestroy(SbNetContext *c) {
     }
 }
 int SbNetFetch(SbNetContext *c, const SbNetRequest *q, SbNetResult *r) {
-    if (!c || !q || !r || q->size != sizeof(*q) || q->version != 1)
+    if (!c || !q || !r)
         return -1;
     memset(r, 0, sizeof(*r));
     r->size = sizeof(*r);
     r->version = 1;
+    if (!((q->version == 1 && (q->size == SB_NET_REQUEST_V1_BYTES || q->size == sizeof(*q))) ||
+          (q->version == SB_NET_REQUEST_VERSION && q->size == sizeof(*q)))) {
+        disconnect(c);
+        r->error = -10;
+        strcpy(r->message, "Unsupported network request record version or size");
+        return r->error;
+    }
     c->request = q;
+    disconnect(c);
+    c->secure = c->tls_ready = c->io_error = 0;
     c->cancelled = 0;
     c->clock_retried = 0;
     c->timeout = q->timeout_ticks ? q->timeout_ticks : 4500;
     c->began = sb_ticks();
+    unsigned flags = q->version >= 2 ? q->flags : 0;
+    if (flags & ~SB_NET_REQUIRE_HTTPS)
+        return fail(c, r, -10, "Unsupported network request flags");
     if (!q->url || strlen(q->url) >= sizeof(r->url) || q->body_bytes > 1024 * 1024)
         return fail(c, r, -10, "Request exceeds limit");
+    if (q->body_bytes && !q->body)
+        return fail(c, r, -10, "Request body is missing");
+    if (q->content_type && (strlen(q->content_type) > 2048 || !token_safe(q->content_type)))
+        return fail(c, r, -12, "Invalid or oversized request Content-Type");
     strcpy(r->url, q->url);
     const char *method = q->method ? q->method : "GET";
     if (strcmp(method, "GET") && strcmp(method, "POST") && strcmp(method, "HEAD"))
         return fail(c, r, -10, "Unsupported HTTP method");
     int use_body = !strcmp(method, "POST");
-    for (unsigned redirects = 0; redirects <= 10; redirects++) {
+    for (unsigned redirects = 0; redirects <= 20; redirects++) {
         SbUrl u;
         char error[256];
         if (sb_url_parse(r->url, &u, error, sizeof(error)))
             return fail(c, r, -11, error);
+        if ((flags & SB_NET_REQUIRE_HTTPS) && !u.secure)
+            return fail(c, r, -19, "An HTTPS page resource redirected to an unencrypted URL");
 retry_connection:
         c->secure = 0;
         if (connect_to(c, &u, r) < 0)
@@ -647,7 +714,10 @@ retry_connection:
         unsigned header_bytes = 0;
         do {
             int n = line_read(c, line, sizeof(line));
-            if (n < 12 || strncmp(line, "HTTP/1.", 7) || line[8] != ' ')
+            if (n < 12 || strncmp(line, "HTTP/1.", 7) || (line[7] != '0' && line[7] != '1') ||
+                line[8] != ' ' || !isdigit((unsigned char)line[9]) ||
+                !isdigit((unsigned char)line[10]) || !isdigit((unsigned char)line[11]) ||
+                (line[12] && line[12] != ' '))
                 return fail(c, r, -14, "Invalid HTTP response or TLS validation failed");
             r->status = strtoul(line + 9, 0, 10);
             if (r->status < 100 || r->status > 599)
@@ -664,9 +734,8 @@ retry_connection:
                 *colon++ = 0;
                 char *v = trim(colon);
                 if (!strcasecmp(line, "Content-Length")) {
-                    char *e;
-                    unsigned long z = strtoul(v, &e, 10);
-                    if (*e || z > SB_RESOURCE_MAX || (has_length && length != z))
+                    uint32_t z;
+                    if (content_length(v, &z) || (has_length && length != z))
                         return fail(c, r, -16, "Invalid or oversized Content-Length");
                     has_length = 1;
                     length = z;
@@ -694,10 +763,13 @@ retry_connection:
         if (location[0] && (r->status == 301 || r->status == 302 || r->status == 303 ||
                             r->status == 307 || r->status == 308)) {
             char next[SB_URL];
-            if (redirects == 10 || sb_url_resolve(r->url, location, next, sizeof(next)))
-                return fail(c, r, -18, "Redirect limit or invalid redirect");
-            if (u.secure && !strncmp(next, "http://", 7))
-                return fail(c, r, -19, "Blocked HTTPS downgrade redirect");
+            if (redirects == 20)
+                return fail(c, r, -22, "The website redirected more than 20 times");
+            SbUrl destination;
+            char redirect_error[128];
+            if (sb_url_resolve(r->url, location, next, sizeof(next)) ||
+                sb_url_parse(next, &destination, redirect_error, sizeof(redirect_error)))
+                return fail(c, r, -18, "The website sent an invalid redirect address");
             strcpy(r->url, next);
             if (r->status == 303 || ((r->status == 301 || r->status == 302) && use_body)) {
                 method = "GET";
@@ -720,8 +792,9 @@ retry_connection:
                 if (semi)
                     *semi = 0;
                 char *e;
-                unsigned long z = strtoul(line, &e, 16);
-                if (e == line || *e || z > SB_RESOURCE_MAX - body.length) {
+                char *size_text = trim(line);
+                unsigned long z = strtoul(size_text, &e, 16);
+                if (e == size_text || *e || z > SB_RESOURCE_MAX - body.length) {
                     bad = 1;
                     break;
                 }
@@ -746,8 +819,14 @@ retry_connection:
                 int n = stream_read(c, data, sizeof(data));
                 if (n == 0)
                     break;
-                if (n < 0) { /* BearSSL requires close_notify when no HTTP length is available. */
-                    if (c->secure && br_ssl_engine_last_error(&c->client.eng) == 0)
+                if (n < 0) {
+                    int tls_error = c->secure ? br_ssl_engine_last_error(&c->client.eng) : 0;
+                    /* A close-delimited HTTP response ends at transport EOF.
+                     * Some HTTP/1.x servers omit TLS close_notify. This exception
+                     * applies only after verified headers; explicit lengths and
+                     * chunked bodies still require complete framing. */
+                    if (c->secure && !stopped(c) && (tls_error == 0 ||
+                        (tls_error == BR_ERR_IO && c->io_error == -32)))
                         break;
                     bad = 1;
                     break;
@@ -774,7 +853,7 @@ retry_connection:
         disconnect(c);
         return 0;
     }
-    return fail(c, r, -22, "Too many redirects");
+    return fail(c, r, -22, "The website redirected more than 20 times");
 }
 static ScIpcChannel owner;
 static SbPacket *packet;
@@ -853,8 +932,8 @@ int SbNetMain(void) {
         unsigned offset = zero - (char *)packet->body + 1;
         active_epoch = h.epoch;
         cancelled = 0;
-        SbNetRequest q = {sizeof(q),
-                          1,
+    SbNetRequest q = {sizeof(q),
+                          SB_NET_REQUEST_VERSION,
                           url,
                           h.a ? "POST" : "GET",
                           "application/x-www-form-urlencoded",
@@ -862,7 +941,8 @@ int SbNetMain(void) {
                           (unsigned)n - offset,
                           4500,
                           poll_owner,
-                          0}; /* body must survive IPC polling */
+                          0,
+                          h.b & SB_NET_REQUIRE_HTTPS}; /* body must survive IPC polling */
         unsigned char *post = 0;
         if (q.body_bytes) {
             post = malloc(q.body_bytes);

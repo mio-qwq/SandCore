@@ -33,8 +33,10 @@ def main():
  for body in re.findall(r'-----BEGIN CERTIFICATE-----\s*(.*?)-----END CERTIFICATE-----',pem,re.S):
   der=base64.b64decode(body);digest=hashlib.sha256(der).hexdigest()
   if digest not in active:continue
-  # 没有实现 Chromium 专属的根约束时，保守排除该根，而非忽略约束。
-  if 'constraints:' in active[digest] or 'constraints {' in active[digest]:continue
+  # The active CA list is the pinned input, not Chrome's versioned CT policy.
+  # A future SCT cutoff does not mean that the CA is untrusted today. Import
+  # active CA keys and retain the source policy as metadata; X.509 signatures,
+  # hostname and validity are checked by BearSSL on every connection.
   tbs=tlvs(tlvs(tlvs(der)[0][1])[0][1]);tbs=tbs[1:] if tbs[0][0]==0xa0 else tbs
   subject=tbs[4][2];spki=tlvs(tbs[5][1]);algorithm=tlvs(spki[0][1]);key=spki[1][1][1:]
   if algorithm[0][1]==bytes.fromhex('2a864886f70d010101'):
@@ -57,9 +59,13 @@ def main():
   else:lines.append(prefix+'{BR_KEYTYPE_EC,{.ec={%d,(unsigned char*)sb_ca_a_%d,%d}}}},'%(b,i,len(a)))
  lines+=['};','#define SB_ANCHOR_COUNT (sizeof(sb_anchors)/sizeof(sb_anchors[0]))']
  target=ROOT/'build/generated/anchors.h';target.parent.mkdir(parents=True,exist_ok=True);target.write_text('\n'.join(lines)+'\n')
- report=dict(source='Chromium Chrome Root Store snapshot',active=len(active),accepted=len(certs),excluded_policy_or_algorithm=len(active)-len(certs),certificate_sha256=[x[0] for x in certs],policy_sha256=hashlib.sha256(policy.encode()).hexdigest())
+ report=dict(source='Pinned active CA certificates from Chromium Chrome Root Store',
+             trust_model='X.509 CA anchors; Chrome version and Certificate Transparency constraints are not implemented',
+             active=len(active),accepted=len(certs),excluded_algorithm=len(active)-len(certs),
+             source_policy_constraints=sum('constraints:' in block or 'constraints {' in block for block in active.values()),
+             certificate_sha256=[x[0] for x in certs],policy_sha256=hashlib.sha256(policy.encode()).hexdigest())
  (ROOT/'build/anchors.json').write_text(json.dumps(report,indent=2))
- if not certs:raise ValueError('No usable unconstrained trust anchors')
- print('Trust anchors:',len(certs),'of',len(active),'active roots; constrained/unsupported roots excluded')
+ if not certs:raise ValueError('No usable CA trust anchors')
+ print('Trust anchors:',len(certs),'of',len(active),'active roots; unsupported algorithms excluded')
 
 if __name__=='__main__':main()

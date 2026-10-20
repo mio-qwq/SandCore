@@ -1,13 +1,13 @@
 {
   "product": "SandBrowser",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "author": "mio",
   "guest_execution": "not run; reserved for the user",
   "files": [
     {
       "name": "ABOUT.HTM",
       "bytes": 1342,
-      "sha256": "24208672ca6b995ee7a97845a664e6e90f9d397f34de6ce8a93524df57653487"
+      "sha256": "7f6456f24da6c05beea95075ef49858db87e6556db34a733a683d953a25c41f5"
     },
     {
       "name": "BROWSER.SCB",
@@ -21,8 +21,8 @@
     },
     {
       "name": "HELP.HTM",
-      "bytes": 6442,
-      "sha256": "859875efea4c0e11f6a8f6dcb4c775e0453a0309eb3ddc49df23fd06b5fbce47"
+      "bytes": 6617,
+      "sha256": "e392d9db9a4802a795a030f6a22c930222b980cfbcc4c8c4d32488c5b80606db"
     },
     {
       "name": "LAB.HTM",
@@ -32,32 +32,32 @@
     {
       "name": "LICENSES.HTM",
       "bytes": 179790,
-      "sha256": "ea52ee58a31b9240c2931af8095fa88bd29f9f4f58211acbf8717b4634e4f522"
+      "sha256": "b11ded32a7534883293b81ad255c2f50cb5fde4bda21cae4b6f7387fac11c75b"
     },
     {
       "name": "NOTICE.TXT",
       "bytes": 177605,
-      "sha256": "9b88653d67474b661e4d867e5657c6e1275ceab37480c423657255e1fba113c8"
+      "sha256": "7eef8197d4f10b24990f573539faeb4dfbac358fd9e11818aefb62f99332c751"
     },
     {
       "name": "ROOTS.JSON",
-      "bytes": 4059,
-      "sha256": "7ce6ea08b16e3bab50f01bf1ffe571160dceceea321fe63ecba719ffdc2703ac"
+      "bytes": 7608,
+      "sha256": "6f31ecf6ec71c3e25254bf041896787aedc4eceeb990cee040c64e0536d371a3"
     },
     {
       "name": "SBNET.SCL",
-      "bytes": 171008,
-      "sha256": "0be5934f6596cbc5490cc3117827e741555af2438096f030c214e972b4a3ab5f"
+      "bytes": 198212,
+      "sha256": "165bf2395483139a31fceb73752c66a3f0ad5e797fbab21e4b83468b14a216d2"
     },
     {
       "name": "SBPAGE.SCL",
-      "bytes": 1016328,
-      "sha256": "5a34448dd4744ceb1c4217f65d7d9ac7960ce670375db75d38ef4db60877c2c8"
+      "bytes": 1017832,
+      "sha256": "d7b61ddb7e8ca9cfd378df90c9b0beb68ffff9fba02c241ff8e8c7e0811813bd"
     },
     {
       "name": "SBUI.SCL",
-      "bytes": 74882,
-      "sha256": "7bcdca20202b88799e0af75272f6cd98d9943c7b75431f77d3f03e9d57183af9"
+      "bytes": 75010,
+      "sha256": "f4e28e07d51d7682230a33e0a1b4f8d34d146fac48e65b404f0cc6ef7d314cb1"
     },
     {
       "name": "WEBNET.SCX",
@@ -72,7 +72,7 @@
     {
       "name": "WELCOME.HTM",
       "bytes": 3935,
-      "sha256": "26d7903a0c9819eefb80e271d9300209743692f728d2637eaf7316e50581c7a5"
+      "sha256": "5c33ebd055f8b7cff3d3104064b27faf1cb470286e10a3635332d94a48863972"
     },
     {
       "name": "WORLD.BMP",
@@ -81,17 +81,17 @@
     }
   ],
   "package": {
-    "name": "SandBrowser-0.1.2.zip",
-    "bytes": 688255,
-    "sha256": "6b995ed5fea895802b2158978e86da034883def7786061be72e293bab6172b32"
+    "name": "SandBrowser-0.1.3.zip",
+    "bytes": 710564,
+    "sha256": "1c057a7483e5e31cc2d01312e174dfbe680b293c660b0f16e16c4943f0fcc8fc"
   },
   "installer": {
-    "bytes": 41444,
-    "sha256": "5afd8b0c2e6dfbb043128c6655516a8a606c449a05ed23b3d8d8a51078f2d45a"
+    "bytes": 41636,
+    "sha256": "8963b7ca21445ea4e16a68ae7a0853388d4d33ae6b82e4f500f2c27be7ad0aa0"
   },
   "payload": {
-    "bytes": 674766,
-    "unpacked_bytes": 1703526,
-    "sha256": "871b3f4ad0bab11bdb86ff70fc8aabdcc5c6e79a243e00f2fa3c6938a6d3cfad"
+    "bytes": 696449,
+    "unpacked_bytes": 1736086,
+    "sha256": "6bcb03550ee21e458cd08b34ff3044f74ec6584c4ff9a001c50f8c2a6f114b4c"
   }
 }

@@ -33,12 +33,21 @@ ScStatus ScSystemWait(ScU32 mask, ScU32 timeout, ScU32 *events) {
     assert(!"The offline test must not wait on a network socket");
     return SC32_E_NOT_FOUND;
 }
-int sb_raw(int call, int a, int b, int c, int d, int e, int f) {
-    (void)a; (void)b; (void)c; (void)d; (void)e; (void)f;
-    assert(call == 0x260); /* DNS fails immediately in this offline boundary. */
+int sb_dns_begin(const char *host) {
+    (void)host;
     network_attempts++;
     return -1;
 }
+int sb_dns_poll(int ticket, uint32_t result[8]) { (void)ticket; (void)result; abort(); }
+void sb_dns_close(int ticket) { (void)ticket; abort(); }
+int sb_socket_open(int type) { (void)type; abort(); }
+int sb_socket_write(int fd, const void *p, unsigned n, const uint32_t a[4]) {
+    (void)fd; (void)p; (void)n; (void)a; abort();
+}
+int sb_socket_read(int fd, void *p, unsigned n, uint32_t a[4]) {
+    (void)fd; (void)p; (void)n; (void)a; abort();
+}
+int sb_socket_close(int fd) { (void)fd; abort(); }
 static void put32(unsigned char *out, uint32_t value) {
     out[0] = value >> 24; out[1] = value >> 16;
     out[2] = value >> 8; out[3] = value;

@@ -58,9 +58,19 @@ int sb_url_parse(const char *input, SbUrl *u, char *error, size_t cap) {
         strcpy(u->path, "/");
     else if (copy(u->path, sizeof(u->path), end, len))
         goto bad;
-    for (char *q = u->path; *q; q++)
-        if ((unsigned char)*q < 32)
-            goto bad;
+    char encoded[SB_URL];
+    size_t used = 0;
+    const char hex[] = "0123456789ABCDEF";
+    for (const unsigned char *q = (const unsigned char *)u->path; *q; q++) {
+        if (*q < 32) goto bad;
+        int escape = *q == ' ' || *q >= 127 || *q == '"' || *q == '<' || *q == '>' || *q == '`';
+        if (used + (escape ? 3 : 1) >= sizeof(encoded)) goto bad;
+        if (escape) {
+            encoded[used++] = '%'; encoded[used++] = hex[*q >> 4]; encoded[used++] = hex[*q & 15];
+        } else encoded[used++] = *q;
+    }
+    encoded[used] = 0;
+    strcpy(u->path, encoded);
     snprintf(u->origin, sizeof(u->origin), "%s://%s:%u", u->scheme, u->host, u->port);
     return 0;
 bad:

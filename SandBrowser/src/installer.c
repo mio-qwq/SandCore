@@ -200,13 +200,26 @@ static void start_install(void) {
     /* valid_destination 已把正文限制在 36B，后缀仍在 65B 路径合同内。 */
     strcpy(setup.temporary, setup.destination);
     strcat(setup.temporary, ".NEW");
-    strcpy(setup.backup, setup.destination);
-    strcat(setup.backup, ".OLD");
     ScPathStatInfo st;
     sb_record(&st, sizeof(st));
-    if (ScPathStat(setup.temporary, &st) >= 0 || ScPathStat(setup.backup, &st) >= 0) {
-        fail("The .NEW or .OLD folder already exists. Choose another destination or inspect the "
-             "previous installation backup first.");
+    if (ScPathStat(setup.temporary, &st) >= 0) {
+        fail("The .NEW staging folder already exists. Inspect the interrupted installation "
+             "before retrying, or choose another destination.");
+        return;
+    }
+    unsigned backup_slot;
+    for (backup_slot = 0; backup_slot < 100; backup_slot++) {
+        if (!backup_slot)
+            snprintf(setup.backup, sizeof(setup.backup), "%.36s.OLD", setup.destination);
+        else
+            snprintf(setup.backup, sizeof(setup.backup), "%.36s.O%02u", setup.destination, backup_slot);
+        sb_record(&st, sizeof(st));
+        int status = ScPathStat(setup.backup, &st);
+        if (status == SC32_E_NOT_FOUND) break;
+        if (status < 0) { fail("Cannot check the installation backup path."); return; }
+    }
+    if (backup_slot == 100) {
+        fail("All 100 installation backup names are in use. Archive an older backup or choose another folder.");
         return;
     }
     sb_record(&st, sizeof(st));
@@ -284,8 +297,8 @@ static void step_install(void) {
             sb_buffer_reset(&b);
         }
         if (ScPathRename(setup.destination, setup.backup) < 0) {
-            fail_install("Cannot move the existing installation to .OLD. Close any running "
-                         "browser and retry.");
+            fail_install("Cannot preserve the existing installation in its backup folder. "
+                         "Close any running browser and retry.");
             return;
         }
     }
@@ -294,7 +307,7 @@ static void step_install(void) {
         fail_install(restored ? "Cannot publish the new installation. The previous installation "
                                 "has been preserved."
                               : "Cannot publish or restore the previous installation. Its files "
-                                "remain in .OLD; recover that folder before retrying.");
+                                "remain in the backup folder; recover it before retrying.");
         return;
     }
     setup.temporary[0] = 0;
@@ -325,8 +338,10 @@ static void step_install(void) {
         } else
             strcpy(setup.detail, "Installed. Existing desktop shortcut was preserved.");
     }
-    if (upgrade && !strcmp(setup.detail, "Installation complete."))
-        strcpy(setup.detail, "Installed. Profile preserved; previous files remain in .OLD.");
+    if (upgrade) {
+        size_t n = strlen(setup.detail);
+        snprintf(setup.detail + n, sizeof(setup.detail) - n, " Profile preserved. Backup: %s.", setup.backup);
+    }
     setup.stage = 4;
     setup.focus = CONTROL_NEXT;
 }

@@ -1,5 +1,6 @@
 /* Copyright (c) 2026 mio. 独立 HTML/CSS/JS 页面进程；不拥有窗口和 socket。 */
 #include "sb.h"
+#include "SBNET.H"
 #include "litehtml.h"
 #include "litehtml/html_tag.h"
 #include "litehtml/el_text.h"
@@ -111,7 +112,7 @@ static const char *form_css =
 struct Resource {
     string url, type, error;
     SbBuffer bytes = {};
-    int state = 0, secure = 0;
+    int state = 0, secure = 0, network_error = 0, tls_error = 0;
     uint32_t status = 0;
     std::vector<uint32_t> pixels;
     int width = 0, height = 0;
@@ -328,7 +329,8 @@ class Page : public document_container {
             return r;
         }
         int status;
-        while ((status = sb_send(channel, SB_FETCH, id, epoch, !post.empty(), 0, 0, 0, req.data,
+        unsigned policy = !main && url.compare(0, 8, "https://") == 0 ? SB_NET_REQUIRE_HTTPS : 0;
+        while ((status = sb_send(channel, SB_FETCH, id, epoch, !post.empty(), policy, 0, 0, req.data,
                                  req.length)) == SC32_E_AGAIN)
             sb_wait(channel, SC32_BROKER_READY_WRITE, 1);
         sb_buffer_reset(&req);
@@ -381,6 +383,8 @@ class Page : public document_container {
                     r->error = "Incomplete resource transfer";
                 break;
             } else if (h.kind == SB_ERROR) {
+                r->network_error = (int)h.a;
+                r->tls_error = (int)h.b;
                 if (n && packet->body[n - 1] == 0)
                     r->error = (char *)packet->body;
                 break;
@@ -1546,12 +1550,28 @@ void Page::navigate() {
     url = r->url;
     base = url;
     if (r->state != 1) {
+        string help = "Check the connection and use Refresh to try again.";
+        if (r->network_error == -1)
+            help = "The hostname could not be resolved. Check the spelling and DNS connection.";
+        else if (r->network_error == -3)
+            help = "The server could not be reached. It may be offline or the connection timed out.";
+        else if (r->network_error == -4)
+            help = "Restart SandCore with RUN-HTTPS.BAT so the virtual CPU exposes RDRAND.";
+        else if (r->network_error == -5)
+            help = "No usable UTC time was obtained. Check access to time servers over UDP port 123.";
+        else if (r->tls_error == 62)
+            help = "The certificate chain could not be linked to an installed public CA. "
+                   "Check that this installation has the current ROOTS.JSON and SBNET.SCL.";
+        else if (r->tls_error == 54 || r->tls_error == 53)
+            help = "The certificate dates could not be validated after checking UTC time.";
+        else if (r->network_error == -22)
+            help = "The website repeatedly redirected this request. Check the address or try its home page.";
         source =
             "<html><head><title>Cannot open page</title></head><body "
             "style='font-family:Tahoma;margin:40px'><h1>This page could not be opened</h1><hr><p>" +
             escape(r->error) + "</p><p>" + escape(url) +
-            "</p><p>Check the address, network, and system UTC clock. Certificate errors cannot be "
-            "bypassed.</p></body></html>";
+            "</p><p>" + help + "</p><p><a href=\"" + escape(url) +
+            "\">Try again</a> &nbsp; <a href='about:help'>Browser help</a></p></body></html>";
         say(SB_HEADERS, url, 0);
     } else {
         source.assign((char *)r->bytes.data, r->bytes.length);

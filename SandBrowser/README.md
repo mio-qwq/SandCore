@@ -4,7 +4,7 @@
 
 ## 安装和启动
 
-发行包：`dist/SandBrowser-0.1.2.zip`。ZIP 中只有两个文件：
+发行包：`dist/SandBrowser-0.1.3.zip`。ZIP 中只有两个文件：
 
 - `SETUP.SCX`：原生解包安装向导。
 - `BROWSER.PAK`：全部程序、私有库、资源、帮助和许可的总载荷。
@@ -25,11 +25,21 @@ M10a2 原启动器的 `-cpu qemu32` 默认隐藏 RDRAND，会出现 `network -4,
 | 图片与表单 | 系统 PNG/JPEG/WebP/BMP；stb_image 的 GIF 首帧；基础表单控件、GET/POST URL 编码提交 |
 | 脚本 | Duktape 2.7.0；基础 DOM、属性/正文/样式修改、事件、计时器、表单值、导航；8 MiB heap 与执行预算 |
 | 网络 | SBNET.SCL 的独立 C API；IPv4 DNS/TCP、HTTP/1.1、重定向、分块响应、gzip/deflate、会话 Cookie |
-| HTTPS | BearSSL 0.6 / TLS 1.2，验证证书链、主机名和有效期；53 个可表达策略的根证书；阻止混合子资源与降级重定向 |
+| HTTPS | BearSSL 0.6 / TLS 1.2，验证证书链、主机名和有效期；100 个固定的活动 CA 信任锚；主页面正常跳转，页面子资源按来源处理 |
 | 安装 | 经典灰色向导、原创地球/网络动画；主题文字为 welcome to the World Wide Web !；CRC/解压校验、暂存提交、取消清理、更新保留 profile 和 .OLD 备份 |
 | 关于 | Help → About 以及 about:about 页面，作者 **mio**、版本、真实编译时间和离线第三方许可 |
 
 这张表说明代码已接入的范围，**不代表客体功能实测通过**。构建检查编译、链接、标准容器和针对性的宿主回归；没有启动客体系统或按指定网站做适配。由用户在 SandCore 中实际运行。
+
+### 0.1.3 网络通路修复
+
+修正主页面跳转策略：正常跟随 HTTP/HTTPS 重定向，地址栏与锁标记反映最终连接；仅 HTTPS 文档的子资源要求重定向全程使用 HTTPS。此前把所有 HTTPS → HTTP 跳转都拦下，是错误地把子资源策略套在了主页面上。
+
+修正信任锚生成：固定快照中的 100 个活动 CA 按标准 X.509 CA 模型使用。此前把包含 Chrome 专属版本/SCT 约束的 47 个 CA 整体删除，连目前仍可签发有效证书的 DigiCert Global Root G2 也被删掉，导致合法站点报 TLS 62。这些 Chrome 专属策略尚未实现，本浏览器不宣称拥有 Chrome 的完整信任策略。
+
+网络层兼容 zlib/raw deflate、连续 gzip 成员、gzip 头部 CRC、相同值的合并 Content-Length、带空白的 chunk 扩展及 HTTP 关闭定界响应；解压按需扩容，不再为小响应固定分配 16 MiB。显式长度和分块正文仍校验完整性。支持 20 次重定向，URL 空格与 UTF-8 路径编码后发送，错误页按实际原因提示。连续升级自动选择 .OLD、.O01… 的空闲备份名。
+
+`tools/test_network_paths.py` 使用实际 SBNET 代码和独立的宿主 socket 适配检查 HTTP/TLS 通路，包含 48 项确定性响应与故障检查。TLS 测试 CA 只进入单独的宿主测试程序。另以同一生产信任根和 TLS 1.2 配置实连检查 mio.blue 与 g.cn 的证书/跳转；没有对这些域名写例外。宿主适配不会进入安装包。
 
 ### 0.1.2 HTTPS、显示与快捷方式
 
@@ -61,7 +71,7 @@ SCX 只是小入口；较大的引擎位于私有 SCL。因此没有修改 SCX �
 
 JS 的语言内核和浏览器 DOM 能力分开：没有完整现代 DOM、fetch/XHR、canvas、媒体、模块和现代框架兼容承诺；事件监听采用每元素/事件一个槽。ActiveX、VBScript、Java 插件和 Windows COM 不在实现中。
 
-网络尚无 TLS 1.3、HTTP/2、IPv6、代理、在线撤销检查和磁盘缓存。Cookie 仅会话内、精确 host/path 匹配，拒绝父域共享 Cookie；Expiry/SameSite 不是完整现代实现。根证书策略无法表达的条目会排除，不冒充 Chrome 的完整信任策略。
+网络尚无 TLS 1.3、HTTP/2、IPv6、代理、在线撤销检查和磁盘缓存。Cookie 仅会话内、精确 host/path 匹配，拒绝父域共享 Cookie；Expiry/SameSite 不是完整现代实现。CA 信任来自固定的活动证书列表，Chrome 版本、SCT 与根计划的完整附加策略尚未实现。
 
 边界：每响应 16 MiB，HTML 4 MiB，资源 96 项，JS heap 8 MiB，表单正文 32 KiB，最大视口 1920×1080。worker 退出会提示，重新打开浏览器重启。收藏上限 64、历史 128 项。
 

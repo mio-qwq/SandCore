@@ -177,7 +177,7 @@ def main():
  if mode in ('net','all'):
   bear=objects(list(Path('vendor/bearssl-0.6/src').rglob('*.c')),['-Ivendor/bearssl-0.6/inc','-Ivendor/bearssl-0.6/src','-DBR_USE_URANDOM=0','-DBR_USE_UNIX_TIME=0','-DBR_RDRAND=0','-DBR_AES_X86NI=0','-DBR_SSE2=0'])
   inflate=objects([Path('vendor/miniz-3.0.2/miniz_tinfl.c')],['-DMINIZ_NO_ARCHIVE_APIS','-DMINIZ_NO_ZLIB_APIS','-DMINIZ_NO_STDIO'])
-  app=objects([Path('src/net.c')],['-Ivendor/bearssl-0.6/inc','-Ivendor/miniz-3.0.2'])
+  app=objects([Path('src/net.c'),Path('src/net_socket.c')],['-Ivendor/bearssl-0.6/inc','-Ivendor/miniz-3.0.2'])
   module('SBNET.SCL','SbNetMain',common+bear+inflate+app,exports=['SbNetMain','SbNetCreate','SbNetFetch','SbNetRelease','SbNetDestroy'])
  if mode in ('ui','all'):
   app=objects([Path('src/browser.c')]);module('SBUI.SCL','SbBrowserMain',common+math+app)
