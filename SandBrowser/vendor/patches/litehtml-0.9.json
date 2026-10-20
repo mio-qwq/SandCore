@@ -1,0 +1,32 @@
+[
+  {
+    "path": "include/litehtml/document.h",
+    "before_sha256": "d08478b082431f40d3a311887c2efefca6beff9455c434e2ecf1498e1642a5fb",
+    "after_sha256": "018a650d45c49d82a99531da4de266969d701752707578933e8a16ac0f039f0f"
+  },
+  {
+    "path": "src/codepoint.cpp",
+    "before_sha256": "b552cc0afbf8e05c1feede5e13dbc4b779ad42135ef1631be464e9d69a23b461",
+    "after_sha256": "7ec0a319eb32bfbb477a968af1349cd8616269463c879205563d095d2f618bb1"
+  },
+  {
+    "path": "src/document.cpp",
+    "before_sha256": "204740d1bce952af9afffde97894f3d08ad244d9ebf5d52174309d44f9816e7f",
+    "after_sha256": "48c2230a595358a5472b8cbde5ae83b8ad9c2ff4027dc396a1db65ed0f3ba060"
+  },
+  {
+    "path": "src/html_tag.cpp",
+    "before_sha256": "692ec433b2c4dba6cecc1e4800ecac60f1d691a0dd8a5521b97a3e7490c80598",
+    "after_sha256": "464db2b5735c9c4a3f6e4858d61ecdcbf2e8e67e097eb4c45e2083b5a105359c"
+  },
+  {
+    "path": "src/render_item.cpp",
+    "before_sha256": "7aa83ddaa9d14b86bc5bc81de5fe9ab66eef4b238a6974d6c2df80f88f77812c",
+    "after_sha256": "967c6d0cfe43489d790e94660e3e76dc75e5a07d6afaafee9f9164baebd7463c"
+  },
+  {
+    "path": "src/url.cpp",
+    "before_sha256": "67d1ce9b90ae441b28007f1921a28c5500b27f97a237616a60aa7b59320a7007",
+    "after_sha256": "317c9dc4070f866dee28e76a2a99da25dd6bd1e126f3d7888429f74d3dd27e72"
+  }
+]

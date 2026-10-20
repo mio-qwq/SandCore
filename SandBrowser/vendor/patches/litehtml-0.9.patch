@@ -1,0 +1,130 @@
+--- a/include/litehtml/document.h
++++ b/include/litehtml/document.h
+@@ -103,6 +103,8 @@
+ 		element::const_ptr				get_over_element() const { return m_over_element; }
+ 
+ 		void							append_children_from_string(element& parent, const char* str);
++		// SandBrowser/mio: refresh the rendering tree after DOM mutations.
++		void rebuild();
+ 		void							dump(dumper& cout);
+ 
+ 		static litehtml::document::ptr	createFromString(const char* str, litehtml::document_container* objPainter, const char* master_styles = litehtml::master_css, const char* user_styles = "");
+--- a/src/codepoint.cpp
++++ b/src/codepoint.cpp
+@@ -29,7 +29,7 @@
+ 
+ #include "codepoint.h"
+ 
+-#include <iostream>
++// SandBrowser/mio: this translation unit does not use hosted iostreams.
+ 
+ namespace {
+ 
+--- a/src/document.cpp
++++ b/src/document.cpp
+@@ -1008,6 +1008,21 @@
+ 	}
+ }
+ 
++// SandBrowser/mio: retain DOM identities while rebuilding layout after script edits.
++void litehtml::document::rebuild()
++{
++ if(!m_root) return;
++ m_over_element = nullptr;
++ m_root_render.reset();
++ m_tabular_elements.clear();
++ m_fixed_boxes.clear();
++ m_root->refresh_styles();
++ m_root->compute_styles();
++ m_root_render = m_root->create_render_item(nullptr);
++ fix_tables_layout();
++ m_root_render = m_root_render->init();
++}
++
+ void litehtml::document::append_children_from_string(element& parent, const char* str)
+ {
+ 	// parent must belong to this document
+@@ -1017,11 +1032,14 @@
+ 	}
+ 
+ 	// parse document into GumboOutput
+-	GumboOutput* output = gumbo_parse(str);
++	GumboOptions fragment_options = kGumboDefaultOptions;
++	fragment_options.fragment_context = gumbo_tag_enum(parent.get_tagName());
++	GumboOutput* output = gumbo_parse_with_options(&fragment_options, str, strlen(str));
+ 
+ 	// Create litehtml::elements.
+ 	elements_list child_elements;
+-	create_node(output->root, child_elements, true);
++	for(unsigned i=0; i<output->root->v.element.children.length; i++)
++		create_node(static_cast<GumboNode*>(output->root->v.element.children.data[i]), child_elements, true);
+ 
+ 	// Destroy GumboOutput
+ 	gumbo_destroy_output(&kGumboDefaultOptions, output);
+--- a/src/html_tag.cpp
++++ b/src/html_tag.cpp
+@@ -5,7 +5,7 @@
+ #include "stylesheet.h"
+ #include "table.h"
+ #include <algorithm>
+-#include <locale>
++// SandBrowser/mio: C locale character functions are provided by SCCLIB.
+ #include "el_before_after.h"
+ #include "num_cvt.h"
+ #include "line_box.h"
+--- a/src/render_item.cpp
++++ b/src/render_item.cpp
+@@ -927,7 +927,7 @@
+ 
+ void litehtml::render_item::dump(litehtml::dumper& cout)
+ {
+-    cout.begin_node(src_el()->dump_get_name() + "{" + string(typeid(*this).name()) + "}");
++    cout.begin_node(src_el()->dump_get_name() + "{render_item}"); // SandBrowser/mio: no RTTI dependency.
+ 
+     auto attrs = src_el()->dump_get_attrs();
+     if(!attrs.empty())
+--- a/src/url.cpp
++++ b/src/url.cpp
+@@ -29,8 +29,8 @@
+ 
+ #include "url.h"
+ 
+-#include <iostream>
+-#include <sstream>
++// SandBrowser/mio: no iostream runtime is required for URL processing.
++// SandBrowser/mio: string concatenation avoids a hosted locale/iostream runtime.
+ #include <algorithm>
+ 
+ #include "codepoint.h"
+@@ -106,24 +106,24 @@
+ , query_(query)
+ , fragment_(fragment)
+ {
+-    std::stringstream tss;
++    string tss;
+ 
+     if (!scheme_.empty()) {
+-        tss << scheme_ << ":";
++        tss += scheme_ + ":";
+     }
+     if (!authority_.empty()) {
+-        tss << "//" << authority_;
++        tss += "//" + authority_;
+     }
+     if (!path_.empty()) {
+-        tss << path_;
++        tss += path_;
+     }
+     if (!query_.empty()) {
+-        tss << "?" << query_;
++        tss += "?" + query_;
+     }
+     if (!fragment_.empty()) {
+-        tss << "#" << fragment_;
++        tss += "#" + fragment_;
+     }
+-    str_ = tss.str();
++    str_ = tss;
+ }
+ 
+ url resolve(const url& b, const url& r)

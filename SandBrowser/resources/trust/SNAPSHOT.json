@@ -1,0 +1,12 @@
+[
+  {
+    "file": "root_store.certs",
+    "sha256": "653230aea8ce815391eb8a13bc22fb3a0243ba0f09395b61c319aa6d52348102",
+    "source": "https://chromium.googlesource.com/chromium/src/+/refs/heads/main/net/data/ssl/chrome_root_store/root_store.certs?format=TEXT"
+  },
+  {
+    "file": "root_store.textproto",
+    "sha256": "28386f4821e87d4d7abdfb2b90a28f938f27f1c16ded746133b2913c85027d5a",
+    "source": "https://chromium.googlesource.com/chromium/src/+/refs/heads/main/net/data/ssl/chrome_root_store/root_store.textproto?format=TEXT"
+  }
+]

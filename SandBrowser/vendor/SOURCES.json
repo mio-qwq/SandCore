@@ -1,0 +1,65 @@
+[
+  {
+    "archive": "bearssl-0.6.tar.gz",
+    "url": "https://bearssl.org/bearssl-0.6.tar.gz",
+    "sha256": "6705bba1714961b41a728dfc5debbe348d2966c117649392f8c8139efc83ff14",
+    "bytes": 765094,
+    "used": true
+  },
+  {
+    "archive": "duktape-2.7.0.tar.xz",
+    "url": "https://duktape.org/duktape-2.7.0.tar.xz",
+    "sha256": "90f8d2fa8b5567c6899830ddef2c03f3c27960b11aca222fa17aa7ac613c2890",
+    "bytes": 1026524,
+    "used": true
+  },
+  {
+    "archive": "gumbo-0.10.1.tar.gz",
+    "url": "https://codeload.github.com/google/gumbo-parser/tar.gz/refs/tags/v0.10.1",
+    "sha256": "28463053d44a5dfbc4b77bcf49c8cee119338ffa636cc17fc3378421d714efad",
+    "bytes": 2119285,
+    "used": false
+  },
+  {
+    "archive": "lib32gcc.deb",
+    "url": "https://archive.ubuntu.com/ubuntu/pool/main/g/gcc-15/lib32gcc-15-dev_15.2.0-16ubuntu1_amd64.deb",
+    "sha256": "8b25c4ac3dc9bd040d0f77f3dc9b72549f3b6fbed4e55138bd51994f9895518d",
+    "bytes": 2493182,
+    "used": true
+  },
+  {
+    "archive": "lib32stdcpp.deb",
+    "url": "https://archive.ubuntu.com/ubuntu/pool/main/g/gcc-15/lib32stdc++-15-dev_15.2.0-16ubuntu1_amd64.deb",
+    "sha256": "c75275662740904aa2c9c9a3aeef70c1af296d6bd80a6fbf85fd5f57d481b414",
+    "bytes": 1541032,
+    "used": true
+  },
+  {
+    "archive": "litehtml-0.9.tar.gz",
+    "url": "https://codeload.github.com/litehtml/litehtml/tar.gz/refs/tags/v0.9",
+    "sha256": "ef957307da15b1258a70961942840bcf54225a8d75315dcbc156186eba35b1a7",
+    "bytes": 813293,
+    "used": true
+  },
+  {
+    "archive": "miniz-3.0.2.tar.gz",
+    "url": "https://codeload.github.com/richgel999/miniz/tar.gz/refs/tags/3.0.2",
+    "sha256": "c4b4c25a4eb81883448ff8924e6dba95c800094a198dc9ce66a292ac2ef8e018",
+    "bytes": 115766,
+    "used": true
+  },
+  {
+    "archive": "musl-1.2.5.tar.gz",
+    "url": "https://musl.libc.org/releases/musl-1.2.5.tar.gz",
+    "sha256": "a9a118bbe84d8764da0ea0d28b3ab3fae8477fc7e4085d90102b8596fc7c75e4",
+    "bytes": 1080786,
+    "used": true
+  },
+  {
+    "archive": "stb.tar.gz",
+    "url": "https://codeload.github.com/nothings/stb/tar.gz/refs/heads/master",
+    "sha256": "bdd8b01ec5862c952dbacac5af9387fc922ae40818429d78bca8916702eda106",
+    "bytes": 1514455,
+    "used": true
+  }
+]
