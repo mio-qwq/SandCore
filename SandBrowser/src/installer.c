@@ -215,7 +215,10 @@ static void start_install(void) {
             snprintf(setup.backup, sizeof(setup.backup), "%.36s.O%02u", setup.destination, backup_slot);
         sb_record(&st, sizeof(st));
         int status = ScPathStat(setup.backup, &st);
-        if (status == SC32_E_NOT_FOUND) break;
+        /* ScPathStat wraps legacy fs_stat: a missing path is FAILED (-116),
+         * not NOT_FOUND (-104). This only selects a candidate; ScPathRename
+         * still refuses to replace any existing destination. */
+        if (status == SC32_E_NOT_FOUND || status == SC32_E_FAILED) break;
         if (status < 0) { fail("Cannot check the installation backup path."); return; }
     }
     if (backup_slot == 100) {

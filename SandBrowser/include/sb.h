@@ -16,7 +16,7 @@ extern "C" {
 #include "SC32FONT.H"
 #include "SC32IMAGE.H"
 
-#define SB_VERSION "0.1.3"
+#define SB_VERSION "0.1.4"
 #define SB_UI_FONT 15
 enum { SB_RNG_RDRAND = 1, SB_RNG_RDSEED = 2 };
 #define SB_MAGIC 0x31574253u

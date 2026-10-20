@@ -11,6 +11,7 @@ static unsigned frame_state = SC32_WINDOW_VISIBLE;
 static unsigned submits, ends, cancels, invalidates, captures, creates, spawns, rejects;
 static int claimed, submit_error, resize_on_begin;
 static unsigned existing_backups, staging_exists;
+static ScStatus absent_path_status = SC32_E_FAILED;
 
 void sb_record(void *p, unsigned n) {
     memset(p, 0, n);
@@ -101,7 +102,7 @@ ScStatus ScPathStat(const char *p, ScPathStatInfo *out) {
         out->kind = SC32_PATH_DIRECTORY;
         return SC32_OK;
     }
-    return SC32_E_NOT_FOUND;
+    return absent_path_status;
 }
 ScStatus ScPathCreate(const char *p, ScU32 kind, ScU32 mode) {
     assert(!strcmp(p, "/HOME/SBROWSE.NEW") && kind == SC32_PATH_DIRECTORY && mode == 3);
@@ -193,9 +194,15 @@ int main(void) {
     existing_backups = 2;
     start_install();
     assert(setup.stage == 3 && creates == 2 && !strcmp(setup.backup, "/HOME/SBROWSE.O02"));
+    setup.stage = 2; existing_backups = 0; absent_path_status = SC32_E_NOT_FOUND;
+    start_install();
+    assert(setup.stage == 3 && creates == 3 && !strcmp(setup.backup, "/HOME/SBROWSE.OLD"));
+    setup.stage = 2; absent_path_status = SC32_E_ACCESS;
+    start_install();
+    assert(setup.stage == 5 && creates == 3);
     setup.stage = 2; staging_exists = 1;
     start_install();
-    assert(setup.stage == 5 && creates == 2 && strstr(setup.error, ".NEW"));
+    assert(setup.stage == 5 && creates == 3 && strstr(setup.error, ".NEW"));
     puts("PASS: frame submission, setup input/retry, successive upgrade backups and interrupted staging");
     return 0;
 }
