@@ -70,9 +70,31 @@ static uint32_t next(const char **p) {
     *p = (const char *)s;
     return v;
 }
+static int scale_position(int value, int scale) {
+    return (int)((int64_t)value * scale / 100);
+}
+static SbCanvas device_canvas(const SbCanvas *c) {
+    SbCanvas d = *c;
+    int scale = c->scale_percent ? c->scale_percent : 100;
+    d.x0 = scale_position(c->x0, scale);
+    d.y0 = scale_position(c->y0, scale);
+    d.x1 = scale_position(c->x1, scale);
+    d.y1 = scale_position(c->y1, scale);
+    d.scale_percent = 0;
+    return d;
+}
 void sb_fill(SbCanvas *c, int x, int y, int w, int h, uint32_t rgb) {
+    if (w <= 0 || h <= 0)
+        return;
     int x0 = x < c->x0 ? c->x0 : x, y0 = y < c->y0 ? c->y0 : y, x1 = x + w > c->x1 ? c->x1 : x + w,
         y1 = y + h > c->y1 ? c->y1 : y + h;
+    int scale = c->scale_percent ? c->scale_percent : 100;
+    if (scale != 100) {
+        x0 = scale_position(x0, scale);
+        y0 = scale_position(y0, scale);
+        x1 = scale_position(x1, scale);
+        y1 = scale_position(y1, scale);
+    }
     if (x0 < 0)
         x0 = 0;
     if (y0 < 0)
@@ -127,6 +149,10 @@ int sb_text_width(const char *p, SbFont f) {
 }
 void sb_text(SbCanvas *c, int x, int y, const char *p, SbFont f, uint32_t rgb) {
     int start = x;
+    int scale = c->scale_percent ? c->scale_percent : 100;
+    int pixels = scale_position(f.pixels, scale);
+    pixels = pixels < 6 ? 6 : pixels > 64 ? 64 : pixels;
+    SbCanvas device = device_canvas(c);
     while (*p) {
         uint32_t cp = next(&p);
         if (cp == '\n') {
@@ -134,34 +160,48 @@ void sb_text(SbCanvas *c, int x, int y, const char *p, SbFont f, uint32_t rgb) {
             y += f.pixels + 3;
             continue;
         }
-        const ScFontGlyph *g = get_glyph(cp, f.pixels);
+        const ScFontGlyph *logical = get_glyph(cp, f.pixels);
+        int advance = logical ? logical->advance : f.pixels / 2;
+        /* Layout keeps CSS metrics. Re-rasterize the font at the physical
+         * zoom size instead of enlarging a previously rendered text bitmap. */
+        const ScFontGlyph *g = scale == 100 ? logical : get_glyph(cp, pixels);
         if (!g) {
-            x += f.pixels / 2;
+            x += advance;
             continue;
         }
-        int gx = x + g->left, gy = y + f.pixels - f.pixels / 5 - g->baseline;
+        int gx = scale_position(x, scale) + g->left;
+        int gy = scale_position(y, scale) + pixels - pixels / 5 - g->baseline;
         for (unsigned r = 0; r < g->height && r < 96; r++)
             for (unsigned k = 0; k < g->width && k < 128; k++)
                 if (g->rows[r][k / 32] & (0x80000000u >> (k % 32))) {
                     int slant = f.italic ? (int)(g->height - r) / 5 : 0;
-                    sb_fill(c, gx + k + slant, gy + r, 1 + !!f.bold, 1, rgb);
+                    sb_fill(&device, gx + k + slant, gy + r, 1 + !!f.bold, 1, rgb);
                 }
         if (f.underline)
-            sb_fill(c, x, y + f.pixels + 1, g->advance, 1, rgb);
-        x += g->advance;
+            sb_fill(c, x, y + f.pixels + 1, advance, 1, rgb);
+        x += advance;
     }
 }
 void sb_blit(SbCanvas *c, int x, int y, int w, int h, const uint32_t *src, int sw, int sh,
              int stride) {
     if (w <= 0 || h <= 0 || sw <= 0 || sh <= 0)
         return;
+    int scale = c->scale_percent ? c->scale_percent : 100;
+    SbCanvas device = device_canvas(c);
+    int right = scale_position(x + w, scale), bottom = scale_position(y + h, scale);
+    x = scale_position(x, scale);
+    y = scale_position(y, scale);
+    w = right - x;
+    h = bottom - y;
+    if (w <= 0 || h <= 0)
+        return;
     for (int j = 0; j < h; j++) {
         int dy = y + j;
-        if (dy < c->y0 || dy >= c->y1 || dy < 0 || dy >= c->height)
+        if (dy < device.y0 || dy >= device.y1 || dy < 0 || dy >= c->height)
             continue;
         for (int i = 0; i < w; i++) {
             int dx = x + i;
-            if (dx < c->x0 || dx >= c->x1 || dx < 0 || dx >= c->width)
+            if (dx < device.x0 || dx >= device.x1 || dx < 0 || dx >= c->width)
                 continue;
             uint32_t s = src[(j * sh / h) * stride + i * sw / w], a = s >> 24;
             if (a == 255)

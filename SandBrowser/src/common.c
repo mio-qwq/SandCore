@@ -50,45 +50,6 @@ uint32_t sb_ticks(void) {
     sb_record(&c, sizeof(c));
     return ScSystemMonotonic(&c) < 0 ? 0 : c.ticks.lo;
 }
-int sb_random(void *p, unsigned n) {
-    unsigned total = n;
-    unsigned a = 1, b, c, d;
-    __asm__ volatile("cpuid" : "+a"(a), "=b"(b), "=c"(c), "=d"(d));
-    if (!(c & (1u << 30)))
-        return -1;
-    unsigned char *out = p;
-    while (n) {
-        unsigned value = 0;
-        unsigned char ok = 0;
-        for (int i = 0; i < 32 && !ok; i++)
-            __asm__ volatile(".byte 0x0f,0xc7,0xf0; setc %1" : "=a"(value), "=qm"(ok)::"cc");
-        if (!ok) {
-            memset(p, 0, total);
-            return -1;
-        }
-        unsigned k = n < 4 ? n : 4;
-        memcpy(out, &value, k);
-        out += k;
-        n -= k;
-    }
-    return 0;
-}
-int sb_utc(uint32_t *days, uint32_t *seconds) {
-    ScUtcClock c;
-    sb_record(&c, sizeof(c));
-    if (ScSystemClock(&c) < 0 || c.year < 2020 || c.year > 2099)
-        return -1;
-    unsigned y = c.year, m = c.month;
-    int yd[] = {0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334};
-    if (m < 1 || m > 12)
-        return -1;
-    unsigned before = y - 1;
-    *days = 365 * y + (before / 4 - before / 100 + before / 400) + 1 + yd[m - 1] + c.day - 1;
-    if (m > 2 && y % 4 == 0 && (y % 100 || y % 400 == 0))
-        ++*days;
-    *seconds = c.hour * 3600 + c.minute * 60 + c.second;
-    return 0;
-}
 int sb_send(ScIpcChannel c, uint32_t kind, uint32_t id, uint32_t epoch, uint32_t a, uint32_t b,
             uint32_t x, uint32_t d, const void *data, unsigned n) {
     if (n > SB_CHUNK)

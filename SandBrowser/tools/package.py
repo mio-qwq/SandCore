@@ -11,6 +11,7 @@ import struct
 import sys
 import zipfile
 import zlib
+from make_icon import make_icon
 
 ROOT = Path(__file__).resolve().parents[1]
 VERSION = re.search(r'#define SB_VERSION "([^"]+)"',
@@ -109,6 +110,7 @@ def notices():
 
 def main():
     artwork()
+    make_icon()
     notices()
     payload = ROOT / 'build/payload'
     shipped = {p.name: p.read_bytes() for p in payload.glob('*') if p.suffix in ('.SCX', '.SCL')}
@@ -120,7 +122,7 @@ def main():
             scd_format.validate_scx(data)
         else:
             scl_format.validate(data)
-    for name in ('WELCOME.HTM', 'HELP.HTM', 'ABOUT.HTM', 'LAB.HTM', 'LICENSES.HTM', 'NOTICE.TXT', 'WORLD.BMP'):
+    for name in ('WELCOME.HTM', 'HELP.HTM', 'ABOUT.HTM', 'LAB.HTM', 'LICENSES.HTM', 'NOTICE.TXT', 'WORLD.BMP', 'BROWSER.SCB'):
         shipped[name] = (ROOT / 'resources' / name).read_bytes()
     shipped['ROOTS.JSON'] = (ROOT / 'build/anchors.json').read_bytes()
     manifest = {

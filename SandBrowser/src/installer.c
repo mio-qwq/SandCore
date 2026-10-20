@@ -46,6 +46,8 @@ static uint32_t crc32(const void *v, unsigned n) {
     return ~crc;
 }
 static void label(int x, int y, const char *s, int px, int bold, uint32_t c) {
+    if (px <= 14)
+        px++;
     sb_text(&setup.canvas, x, y, s, (SbFont){px, bold, 0, 0}, c);
 }
 static void button(int control, int x, int y, int w, const char *s) {
@@ -53,7 +55,7 @@ static void button(int control, int x, int y, int w, const char *s) {
     int down = enabled && setup.pressed == control && setup.hover == control;
     sb_fill(&setup.canvas, x, y, w, 28, 0xc0c0c0);
     sb_bevel(&setup.canvas, x, y, w, 28, down);
-    int tw = sb_text_width(s, (SbFont){14, 0, 0, 0});
+    int tw = sb_text_width(s, (SbFont){SB_UI_FONT, 0, 0, 0});
     label(x + (w - tw) / 2 + down, y + 7 + down, s, 14, 0, enabled ? 0 : 0x808080);
     if (enabled && setup.focus == control) {
         for (int i = 4; i < w - 4; i += 2) {
@@ -299,15 +301,27 @@ static void step_install(void) {
     setup.installed = 1;
     strcpy(setup.detail, "Installation complete.");
     if (setup.shortcut) {
-        char lnk[256], command[96];
+        char lnk[256], previous[160], command[96], icon[96];
         join(command, setup.destination, "BROWSER.SCX");
-        int n = snprintf(lnk, sizeof(lnk), "SandBrowser\n%s\n\n", command);
+        join(icon, setup.destination, "BROWSER.SCB");
+        int n = snprintf(lnk, sizeof(lnk), "SandBrowser\n%s\n%s\n", command, icon);
+        int old_length = snprintf(previous, sizeof(previous), "SandBrowser\n%s\n\n", command);
         ScPathStatInfo info;
         sb_record(&info, sizeof(info));
-        if (ScPathStat("/DESK/SBROWSE.LNK", &info) < 0) {
+        int exists = ScPathStat("/DESK/SBROWSE.LNK", &info) >= 0, repair = 0;
+        if (exists && info.bytes <= sizeof(previous)) {
+            SbBuffer old = {0};
+            if (sb_file_read("/DESK/SBROWSE.LNK", &old) >= 0 &&
+                old.length == (unsigned)old_length && !memcmp(old.data, previous, old.length))
+                repair = 1;
+            sb_buffer_reset(&old);
+        }
+        if (!exists || repair) {
             int s = sb_file_write("/DESK/SBROWSE.LNK", lnk, n);
             if (s < 0)
                 strcpy(setup.detail, "Installed. Desktop shortcut could not be created.");
+            else if (repair)
+                strcpy(setup.detail, "Installed. The desktop shortcut icon was updated.");
         } else
             strcpy(setup.detail, "Installed. Existing desktop shortcut was preserved.");
     }
@@ -353,7 +367,7 @@ static void animation(void) {
     label(25, 396, "mio / 2026", 14, 0, 0xbad5eb);
 }
 static void paint(void) {
-    setup.canvas = (SbCanvas){setup.pixels, 720, 490, 720, 0, 0, 720, 490};
+    setup.canvas = (SbCanvas){setup.pixels, 720, 490, 720, 0, 0, 720, 490, 0};
     sb_fill(&setup.canvas, 0, 0, 720, 490, 0xc0c0c0);
     for (int y = 8; y < 437; y++)
         sb_fill(&setup.canvas, 8, y, 177, 1, 0x001032 + ((y / 8) << 8));
@@ -378,7 +392,7 @@ static void paint(void) {
         label(208, 252, "Third-party notices and licenses will be installed", 14, 0, 0);
         label(208, 274, "as NOTICE.TXT and available in Help > Licenses.", 14, 0, 0);
         label(208, 318, "Secure pages require a compatible processor", 14, 0, 0);
-        label(208, 342, "and a correctly set system clock.", 14, 0, 0);
+        label(208, 342, "and UTC time (time servers are supported).", 14, 0, 0);
         char size[96];
         snprintf(size, sizeof(size), "%u files / %u KiB     Version " SB_VERSION,
                  setup.count, (setup.total + 1023) / 1024);
@@ -394,13 +408,13 @@ static void paint(void) {
         int selected = setup.focus == CONTROL_PATH && setup.select_path;
         if (selected)
             sb_fill(&setup.canvas, 216, 199,
-                    sb_text_width(setup.destination, (SbFont){14, 0, 0, 0}), 19, 0x000080);
+                    sb_text_width(setup.destination, (SbFont){SB_UI_FONT, 0, 0, 0}), 19, 0x000080);
         label(216, 201, setup.destination, 14, 0, selected ? 0xffffff : 0);
         if (setup.focus == CONTROL_PATH && !selected && (setup.phase & 4u)) {
             char before[65];
             memcpy(before, setup.destination, setup.cursor);
             before[setup.cursor] = 0;
-            int x = 216 + sb_text_width(before, (SbFont){14, 0, 0, 0});
+            int x = 216 + sb_text_width(before, (SbFont){SB_UI_FONT, 0, 0, 0});
             sb_fill(&setup.canvas, x, 200, 1, 18, 0);
         }
         setup.canvas = saved;
@@ -668,7 +682,7 @@ static ScStatus procedure(ScWindow w, const ScMessage *m, void *context) {
                     for (unsigned i = 0; i <= strlen(setup.destination); i++) {
                         memcpy(before, setup.destination, i);
                         before[i] = 0;
-                        if (216 + sb_text_width(before, (SbFont){14, 0, 0, 0}) >=
+                        if (216 + sb_text_width(before, (SbFont){SB_UI_FONT, 0, 0, 0}) >=
                             (int)m->data[0]) {
                             setup.cursor = i;
                             break;

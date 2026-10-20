@@ -160,7 +160,7 @@ def main():
  prepare_config();LOG.touch(exist_ok=True)
  if len(sys.argv)<2:raise SystemExit('build_native.py page|net|ui|all')
  mode=sys.argv[1]
- common=objects([Path('src')/n for n in ('common.c','raw.c','url.c','draw.c','window.c','runtime.c','jump.S')])
+ common=objects([Path('src')/n for n in ('common.c','entropy.c','raw.c','url.c','draw.c','window.c','runtime.c','jump.S')])
  math_names=['sin','cos','tan','asin','acos','atan','atan2','sinh','cosh','tanh','asinh','acosh','atanh','exp','expm1','exp2','exp_data','log','log1p','log_data','log2','log2_data','log10','pow','pow_data','sqrt','sqrt_data','cbrt','hypot','fmod','fabs','floor','ceil','trunc','round','copysign','scalbn','scalbnl','frexp','modf','nextafter','ldexp','__sin','__cos','__tan','__expo2','__rem_pio2','__rem_pio2_large','__math_invalid','__math_divzero','__math_oflow','__math_uflow','__math_xflow','__math_invalidl','__fpclassify','__signbit','__fpclassifyl','__signbitl']
  math_sources=[Path('vendor/musl-1.2.5/src/math')/(n+'.c') for n in math_names]
  math_sources.append(Path('vendor/musl-1.2.5/src/math/sqrtl.c'))

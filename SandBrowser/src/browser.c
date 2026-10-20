@@ -35,6 +35,7 @@ typedef struct {
         hover, drag, source_requested, option_script;
     uint32_t epoch, progress, total, last_job_check, startup, next_paint;
     int draw_error;
+    int zoom, sent_zoom, view_pending;
     Edit address, input, homepage;
     char root[128], title[256], status[512], message[2048], loaded_url[SB_URL];
     Place history[128], favorites[64];
@@ -73,7 +74,10 @@ enum {
     C_PROPERTIES,
     C_CLEARHISTORY,
     C_SEARCH,
-    C_NEW
+    C_NEW,
+    C_ZOOM_IN,
+    C_ZOOM_OUT,
+    C_ZOOM_RESET
 };
 static const MenuItem menus[][12] = {{{"New window", "Ctrl+N", C_NEW},
                                       {"Open...", "Ctrl+O", C_OPEN},
@@ -95,6 +99,10 @@ static const MenuItem menus[][12] = {{{"New window", "Ctrl+N", C_NEW},
                                       {"Page source", "", C_SOURCE},
                                       {"Refresh", "F5", C_REFRESH},
                                       {"Stop", "Esc", C_STOP},
+                                      {"-", "", 0},
+                                      {"Zoom in", "Ctrl++", C_ZOOM_IN},
+                                      {"Zoom out", "Ctrl+-", C_ZOOM_OUT},
+                                      {"Restore 100%", "Ctrl+0", C_ZOOM_RESET},
                                       {0}},
                                      {{"Favorites explorer bar", "Ctrl+I", C_FAVORITES},
                                       {"Add to Favorites...", "Ctrl+D", C_ADDFAV},
@@ -144,10 +152,33 @@ static void layout(void) {
     if (app.vh < 64)
         app.vh = 64;
 }
+static void flush_view(void) {
+    if (!app.page.hello)
+        return;
+    if (app.sent_zoom != app.zoom) {
+        if (send_to(app.page.channel, SB_ZOOM, 0, app.zoom, 0, 0, 0, 0, 0) != SC32_OK)
+            return;
+        app.sent_zoom = app.zoom;
+        app.view_pending = 1;
+    }
+    if (app.view_pending &&
+        send_to(app.page.channel, SB_VIEW, 0, app.vw, app.vh, app.sx, app.sy, 0, 0) == SC32_OK)
+        app.view_pending = 0;
+}
 static void view(void) {
     layout();
-    send_to(app.page.channel, SB_VIEW, 0, app.vw, app.vh, app.sx, app.sy, 0, 0);
+    app.view_pending = 1;
+    flush_view();
     changed();
+}
+static void set_zoom(int percent) {
+    percent = percent < 50 ? 50 : percent > 200 ? 200 : percent;
+    if (percent == app.zoom)
+        return;
+    app.sx = (int)((int64_t)app.sx * percent / app.zoom);
+    app.sy = (int)((int64_t)app.sy * percent / app.zoom);
+    app.zoom = percent;
+    view();
 }
 static void path_for(char *out, const char *leaf) {
     snprintf(out, 160, "%s/%s", app.root, leaf);
@@ -182,8 +213,8 @@ static void persist(void) {
     failed |= sb_file_write(path, b.data, b.length) < 0;
     sb_buffer_reset(&b);
     char config[SB_URL + 128];
-    int n = snprintf(config, sizeof(config), "%d %d %d %d\n%s\n", app.script, app.bar, app.links,
-                     app.statusbar, app.homepage.text);
+    int n = snprintf(config, sizeof(config), "%d %d %d %d\n%s\nzoom=%d\n", app.script, app.bar, app.links,
+                     app.statusbar, app.homepage.text, app.zoom);
     path_for(path, "OPTIONS.TXT");
     failed |= sb_file_write(path, config, n) < 0;
     if (failed)
@@ -217,6 +248,7 @@ static void read_places(const char *leaf, Place *p, unsigned *count, unsigned ca
 }
 static void preferences(void) {
     app.script = app.bar = app.links = app.statusbar = 1;
+    app.zoom = 100;
     strcpy(app.homepage.text, "about:welcome");
     read_places("FAVS.TXT", app.favorites, &app.favorite_count, 64);
     read_places("HISTORY.TXT", app.history, &app.history_count, 128);
@@ -234,9 +266,15 @@ static void preferences(void) {
             p += 2;
         }
         if (p > (char *)b.data && strchr(p, '\n')) {
-            *strchr(p, '\n') = 0;
+            char *next = strchr(p, '\n');
+            *next++ = 0;
             if (strlen(p) < SB_URL && *p)
                 strcpy(app.homepage.text, p);
+            if (!strncmp(next, "zoom=", 5)) {
+                int z = atoi(next + 5);
+                if (z >= 50 && z <= 200)
+                    app.zoom = z;
+            }
         }
     }
     sb_buffer_reset(&b);
@@ -492,6 +530,15 @@ static void command(int c) {
     case C_SEARCH:
         open_dialog(11, "");
         break;
+    case C_ZOOM_IN:
+        set_zoom(app.zoom + 10);
+        break;
+    case C_ZOOM_OUT:
+        set_zoom(app.zoom - 10);
+        break;
+    case C_ZOOM_RESET:
+        set_zoom(100);
+        break;
     }
     changed();
 }
@@ -544,7 +591,7 @@ static void dialog_accept(void) {
     changed();
 }
 static void label(int x, int y, const char *s, int bold, uint32_t c) {
-    sb_text(&app.canvas, x, y, s, (SbFont){14, bold, 0, 0}, c);
+    sb_text(&app.canvas, x, y, s, (SbFont){SB_UI_FONT, bold, 0, 0}, c);
 }
 static void wrapped(int x, int y, int max, const char *s, uint32_t c) {
     char line[512];
@@ -560,7 +607,7 @@ static void wrapped(int x, int y, int max, const char *s, uint32_t c) {
         }
         line[at++] = *s++;
         line[at] = 0;
-        if (at >= 500 || sb_text_width(line, (SbFont){14, 0, 0, 0}) > max) {
+        if (at >= 500 || sb_text_width(line, (SbFont){SB_UI_FONT, 0, 0, 0}) > max) {
             int cut = at;
             while (cut > 0 && line[cut - 1] != ' ')
                 cut--;
@@ -581,8 +628,8 @@ static void wrapped(int x, int y, int max, const char *s, uint32_t c) {
 static void button(int x, int y, int w, int h, const char *s, int down, int enabled) {
     sb_fill(&app.canvas, x, y, w, h, GRAY);
     sb_bevel(&app.canvas, x, y, w, h, down);
-    int tw = sb_text_width(s, (SbFont){14, 0, 0, 0});
-    label(x + (w - tw) / 2 + down, y + (h - 16) / 2 + down, s, 0, enabled ? 0 : 0x808080);
+    int tw = sb_text_width(s, (SbFont){SB_UI_FONT, 0, 0, 0});
+    label(x + (w - tw) / 2 + down, y + (h - SB_UI_FONT - 2) / 2 + down, s, 0, enabled ? 0 : 0x808080);
 }
 static void edit_draw(Edit *e, int x, int y, int w, int h, int focused) {
     sb_fill(&app.canvas, x, y, w, h, 0xffffff);
@@ -598,7 +645,7 @@ static void edit_draw(Edit *e, int x, int y, int w, int h, int focused) {
         cursor = strlen(e->text);
     memcpy(prefix, e->text, cursor);
     prefix[cursor] = 0;
-    int cursorw = sb_text_width(prefix, (SbFont){14, 0, 0, 0}),
+    int cursorw = sb_text_width(prefix, (SbFont){SB_UI_FONT, 0, 0, 0}),
         offset = focused && cursorw > w - 14 ? cursorw - w + 14 : 0;
     unsigned a = e->cursor < e->anchor ? e->cursor : e->anchor,
              b = e->cursor > e->anchor ? e->cursor : e->anchor;
@@ -606,10 +653,10 @@ static void edit_draw(Edit *e, int x, int y, int w, int h, int focused) {
     if (focused && a != b) {
         memcpy(prefix, e->text, a);
         prefix[a] = 0;
-        int ax = sb_text_width(prefix, (SbFont){14, 0, 0, 0});
+        int ax = sb_text_width(prefix, (SbFont){SB_UI_FONT, 0, 0, 0});
         memcpy(prefix, e->text + a, b - a);
         prefix[b - a] = 0;
-        int sw = sb_text_width(prefix, (SbFont){14, 0, 0, 0});
+        int sw = sb_text_width(prefix, (SbFont){SB_UI_FONT, 0, 0, 0});
         sb_fill(&app.canvas, x + 5 + ax - offset, y + 4, sw, h - 8, BLUE);
         label(x + 5 + ax - offset, y + 5, prefix, 0, 0xffffff);
     }
@@ -701,7 +748,7 @@ static void draw_menu(void) {
             (m->command == C_STATUS && app.statusbar))
             label(x + 7, yy + 3, "+", 1, selected ? 0xffffff : 0);
         label(x + 24, yy + 4, m->name, 0, selected ? 0xffffff : 0);
-        int kw = sb_text_width(m->key, (SbFont){14, 0, 0, 0});
+        int kw = sb_text_width(m->key, (SbFont){SB_UI_FONT, 0, 0, 0});
         label(x + w - 10 - kw, yy + 4, m->key, 0, selected ? 0xffffff : 0);
     }
 }
@@ -770,8 +817,9 @@ static void draw_dialog(void) {
             wrapped(
                 x + 30, y + 146, w - 60,
                 "HTTPS always validates certificates, hostnames and dates. Mixed HTTP resources on "
-                "HTTPS pages are blocked.\nStrong RDRAND entropy and an accurate UTC clock are "
-                "required.\nCookies are session-only and restricted to the exact host.",
+                "HTTPS pages are blocked.\nRDRAND or RDSEED supplies secure randomness. If the "
+                "UTC clock is missing, time servers are queried automatically.\nCookies are "
+                "session-only and restricted to the exact host.",
                 0);
         } else
             wrapped(
@@ -805,7 +853,7 @@ static void render(void) {
     if (!app.pixels)
         return;
     app.canvas =
-        (SbCanvas){app.pixels, app.width, app.height, app.width, 0, 0, app.width, app.height};
+        (SbCanvas){app.pixels, app.width, app.height, app.width, 0, 0, app.width, app.height, 0};
     sb_fill(&app.canvas, 0, 0, app.width, app.height, GRAY);
     for (int i = 0; i < 6; i++) {
         int w = i == 3 ? 78 : 54;
@@ -829,7 +877,7 @@ static void render(void) {
             if (app.hover == i)
                 sb_bevel(&app.canvas, x, y + 3, 66, 51, 0);
             icon(x + 17, y + 5, i, enabled);
-            int tw = sb_text_width(labels[i], (SbFont){14, 0, 0, 0});
+            int tw = sb_text_width(labels[i], (SbFont){SB_UI_FONT, 0, 0, 0});
             label(x + (66 - tw) / 2, y + 36, labels[i], 0, enabled ? 0 : 0x808080);
         }
         globe(app.width - 30, y + 28, app.busy ? sb_ticks() / 3 : 0);
@@ -901,12 +949,17 @@ static void render(void) {
     sb_fill(&app.canvas, app.vx + 16, app.vy + app.vh + 2, app.vw - 32, 16, 0xd6d6d6);
     if (app.statusbar) {
         int yy = app.height - 24;
-        sb_bevel(&app.canvas, 3, yy, app.width - 283, 21, 1);
+        sb_bevel(&app.canvas, 3, yy, app.width - 414, 21, 1);
         SbCanvas old = app.canvas;
         app.canvas.x0 = 9;
-        app.canvas.x1 = app.width - 288;
+        app.canvas.x1 = app.width - 419;
         label(10, yy + 3, app.status, 0, 0);
         app.canvas = old;
+        char zoom_label[16];
+        snprintf(zoom_label, sizeof(zoom_label), "%d%%", app.zoom);
+        button(app.width - 407, yy, 25, 21, "-", 0, app.zoom > 50);
+        button(app.width - 379, yy, 72, 21, zoom_label, 0, 1);
+        button(app.width - 304, yy, 25, 21, "+", 0, app.zoom < 200);
         sb_bevel(&app.canvas, app.width - 277, yy, 103, 21, 1);
         if (app.busy) {
             unsigned bars = app.total ? app.progress * 12 / app.total : 0;
@@ -1077,6 +1130,15 @@ static ScStatus procedure(ScWindow w, const ScMessage *m, void *context) {
             return 0;
         }
         if (mods & SC32_MOD_CONTROL) {
+            unsigned symbol = key ? key : scalar;
+            int zoom_command = symbol == '+' || symbol == '=' ? C_ZOOM_IN
+                               : symbol == '-' || symbol == '_' ? C_ZOOM_OUT
+                               : symbol == '0' ? C_ZOOM_RESET : 0;
+            if (zoom_command) {
+                if (key)
+                    command(zoom_command);
+                return 0;
+            }
             int c = key == 'n' || key == 'N'   ? C_NEW
                     : key == 'l' || key == 'L' ? C_SELECTALL
                     : key == 'o' || key == 'O' ? C_OPEN
@@ -1166,6 +1228,10 @@ static ScStatus procedure(ScWindow w, const ScMessage *m, void *context) {
     }
     if (m->id == SC32_MSG_WHEEL) {
         int x = (int)m->data[0], y = (int)m->data[1], wheel = (int)m->data[2];
+        if ((m->data[5] & SC32_MOD_CONTROL) && wheel && !app.dialog) {
+            set_zoom(app.zoom + (wheel > 0 ? 10 : -10));
+            return 0;
+        }
         if (app.sidebar && x < 200 && y > app.vy) {
             unsigned count = app.sidebar == 1 ? app.favorite_count : app.history_count;
             int offset = (int)app.side_scroll - wheel * 3;
@@ -1247,6 +1313,15 @@ static ScStatus procedure(ScWindow w, const ScMessage *m, void *context) {
                 app.menu = -1;
                 changed();
             }
+        }
+        if (app.statusbar && down && y >= app.height - 24 && y < app.height - 3) {
+            if (x >= app.width - 407 && x < app.width - 382)
+                command(C_ZOOM_OUT);
+            else if (x >= app.width - 379 && x < app.width - 307)
+                command(C_ZOOM_RESET);
+            else if (x >= app.width - 304 && x < app.width - 279)
+                command(C_ZOOM_IN);
+            return 0;
         }
         if (y < 27 && down) {
             for (int i = 0; i < 6; i++)
@@ -1443,7 +1518,8 @@ static void receive_worker(Worker *w, int role) {
         } else if (h.kind == SB_FRAME) {
             if (app.shared && h.a > 0 && h.b > 0 && h.a <= 1920 && h.b <= 1080 &&
                 h.a * h.b * 4 <= SB_SURFACE_BYTES && app.shared->generation == h.id &&
-                app.shared->width == h.a && app.shared->height == h.b) {
+                app.shared->width == h.a && app.shared->height == h.b &&
+                app.shared->reserved[0] == (unsigned)app.zoom) {
                 __asm__ volatile("" ::: "memory");
                 memcpy(app.pagepixels, (unsigned char *)app.shared + 4096, h.a * h.b * 4);
                 app.framew = h.a;
@@ -1619,6 +1695,7 @@ loop:
         accept_workers();
         receive_worker(&app.page, SB_ROLE_PAGE);
         receive_worker(&app.net, SB_ROLE_NET);
+        flush_view();
         if (app.page.hello && app.net.hello && !app.epoch) {
             char args[SB_URL];
             uint32_t count = 0;

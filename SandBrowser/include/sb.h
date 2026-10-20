@@ -16,7 +16,9 @@ extern "C" {
 #include "SC32FONT.H"
 #include "SC32IMAGE.H"
 
-#define SB_VERSION "0.1.1"
+#define SB_VERSION "0.1.2"
+#define SB_UI_FONT 15
+enum { SB_RNG_RDRAND = 1, SB_RNG_RDSEED = 2 };
 #define SB_MAGIC 0x31574253u
 #define SB_URL 2048
 #define SB_CHUNK 48000
@@ -49,7 +51,8 @@ enum {
     SB_CANCEL,
     SB_SURFACE,
     SB_SCRIPT_OPTION,
-    SB_FORM_POST
+    SB_FORM_POST,
+    SB_ZOOM
 };
 /* 线上的消息不包含指针。payload 紧接 40B 头，精确长度逐次检查。 */
 typedef struct {
@@ -71,6 +74,7 @@ typedef struct {
 typedef struct {
     uint32_t *pixels;
     int width, height, stride, x0, y0, x1, y1;
+    int scale_percent; /* 0/100: native pixels; page clips and coordinates are CSS pixels. */
 } SbCanvas;
 typedef struct {
     int pixels, bold, italic, underline;
@@ -91,6 +95,7 @@ int sb_same_origin(const char *, const char *);
 void sb_percent_encode(const char *, char *, size_t, int);
 uint32_t sb_ticks(void);
 int sb_random(void *, unsigned);
+unsigned sb_random_sources(void);
 int sb_utc(uint32_t *, uint32_t *);
 int sb_send(ScIpcChannel, uint32_t, uint32_t, uint32_t, uint32_t, uint32_t, uint32_t, uint32_t,
             const void *, unsigned);

@@ -181,6 +181,9 @@ class Page : public document_container {
     string focus_id;
     element::ptr focus;
     int zoom = 100;
+    bool viewport_changed = true;
+    int css_width() const { return std::max(1, width * 100 / zoom); }
+    int css_height() const { return std::max(1, height * 100 / zoom); }
     ~Page() {
         if (js)
             duk_destroy_heap(js);
@@ -252,12 +255,14 @@ class Page : public document_container {
         if (h.kind == SB_VIEW) {
             width = std::max(64, std::min(1920, (int)h.a));
             height = std::max(64, std::min(1080, (int)h.b));
-            scrollx = h.c;
-            scrolly = h.d;
-            if (doc) {
-                doc->media_changed();
-                doc->render(width);
-            }
+            scrollx = (int)h.c * 100 / zoom;
+            scrolly = (int)h.d * 100 / zoom;
+            viewport_changed = true;
+            dirty = 1;
+        }
+        if (h.kind == SB_ZOOM) {
+            zoom = std::max(50, std::min(200, (int)h.a));
+            viewport_changed = true;
             dirty = 1;
         }
         if (h.kind == SB_SCRIPT_OPTION)
@@ -388,7 +393,7 @@ class Page : public document_container {
     }
     uint_ptr create_font(const char *, int pixels, int weight, font_style italic,
                          unsigned decoration, font_metrics *fm) override {
-        auto *f = new SbFont{std::max(6, std::min(64, pixels * zoom / 100)), weight >= 600,
+        auto *f = new SbFont{std::max(6, std::min(64, pixels)), weight >= 600,
                              italic == font_style_italic, (decoration & 1) != 0};
         fm->height = f->pixels + 3;
         fm->ascent = f->pixels - f->pixels / 5;
@@ -629,8 +634,8 @@ class Page : public document_container {
     }
     void get_client_rect(position &p) const override {
         p.x = p.y = 0;
-        p.width = width;
-        p.height = height;
+        p.width = css_width();
+        p.height = css_height();
     }
     element::ptr create_element(const char *tag, const string_map &,
                                 const document::ptr &d) override {
@@ -641,8 +646,8 @@ class Page : public document_container {
     }
     void get_media_features(media_features &m) const override {
         m.type = media_type_screen;
-        m.width = width;
-        m.height = height;
+        m.width = css_width();
+        m.height = css_height();
         m.device_width = 1920;
         m.device_height = 1080;
         m.color = 8;
@@ -658,8 +663,12 @@ class Page : public document_container {
             doc->rebuild();
             changed = false;
         }
-        if (doc)
-            doc->render(width);
+        if (doc) {
+            if (viewport_changed)
+                doc->media_changed();
+            viewport_changed = false;
+            doc->render(css_width());
+        }
     }
     void draw_controls(const element::ptr &e) {
         if (!e)
@@ -721,26 +730,28 @@ class Page : public document_container {
         if (!surface || !doc || frame_pending || !dirty)
             return;
         repaint();
-        scrollx = std::max(0, std::min(scrollx, std::max(0, doc->content_width() - width)));
-        scrolly = std::max(0, std::min(scrolly, std::max(0, doc->content_height() - height)));
+        scrollx = std::max(0, std::min(scrollx, std::max(0, doc->content_width() - css_width())));
+        scrolly = std::max(0, std::min(scrolly, std::max(0, doc->content_height() - css_height())));
         canvas = {(uint32_t *)((unsigned char *)surface + 4096),
                   width,
                   height,
                   width,
                   0,
                   0,
-                  width,
-                  height};
-        sb_fill(&canvas, 0, 0, width, height, 0xffffff);
-        position clip(0, 0, width, height);
+                  (width * 100 + zoom - 1) / zoom,
+                  (height * 100 + zoom - 1) / zoom,
+                  zoom};
+        std::fill(canvas.pixels, canvas.pixels + width * height, 0xffffffffu);
+        position clip(0, 0, canvas.x1, canvas.y1);
         doc->draw(0, -scrollx, -scrolly, &clip);
         draw_controls(doc->root());
         surface->width = width;
         surface->height = height;
-        surface->document_width = doc->content_width();
-        surface->document_height = doc->content_height();
-        surface->scroll_x = scrollx;
-        surface->scroll_y = scrolly;
+        surface->document_width = std::max(width, (doc->content_width() * zoom + 99) / 100);
+        surface->document_height = std::max(height, (doc->content_height() * zoom + 99) / 100);
+        surface->scroll_x = scrollx * zoom / 100;
+        surface->scroll_y = scrolly * zoom / 100;
+        surface->reserved[0] = zoom;
         surface->generation = ++frame_sequence;
         __asm__ volatile("" ::: "memory");
         int status = sb_send(channel, SB_FRAME, frame_sequence, epoch, width, height,
@@ -1390,7 +1401,7 @@ void Page::input(const SbWire &h, const unsigned char *b, unsigned n) {
         return;
     if (h.kind == SB_POINTER) {
         position::vector boxes;
-        int x = h.a, y = h.b;
+        int x = (int)h.a * 100 / zoom, y = (int)h.b * 100 / zoom;
         if (h.c == 0) {
             doc->on_mouse_over(x + scrollx, y + scrolly, x, y, boxes);
             auto over = doc->get_over_element();
@@ -1471,7 +1482,7 @@ void Page::input(const SbWire &h, const unsigned char *b, unsigned n) {
                         : (i - fields.begin() + (mods & SC32_MOD_SHIFT ? fields.size() - 1 : 1)) %
                               fields.size();
                 focus = fields[idx];
-                scrolly = std::max(0, focus->get_placement().y - height / 2);
+                scrolly = std::max(0, focus->get_placement().y - css_height() / 2);
             }
             dirty = 1;
         } else if (focus) {
@@ -1556,7 +1567,7 @@ void Page::navigate() {
     }
     if (cancelled || quit)
         return;
-    doc->render(width);
+    doc->render(css_width());
     init_js();
     run_scripts();
     size_t hash = url.find('#');

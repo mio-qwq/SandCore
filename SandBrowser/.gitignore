@@ -1,6 +1,6 @@
 /build/
 /dist/*
-!/dist/SandBrowser-0.1.1.zip
+!/dist/SandBrowser-0.1.2.zip
 !/dist/BUILD.json
 /vendor/*
 !/vendor/SOURCES.json
@@ -9,5 +9,6 @@
 /resources/NOTICE.TXT
 /resources/LICENSES.HTM
 /resources/WORLD.BMP
+/resources/BROWSER.SCB
 __pycache__/
 *.pyc

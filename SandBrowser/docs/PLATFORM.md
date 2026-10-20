@@ -26,7 +26,9 @@ UI 建立共享像素对象，只向准确的页面子进程身份授权。页�
 
 小文件用 ScPathReplace 整体替换；大文件用 ScFileOpen/Write/Flush/Close 分块写，处理 AGAIN 和实际已写前缀，避开 Path 接口的 64 KiB 上限。
 
-TLS 强熵来自 CPUID 检测后的 RDRAND，失败即拒绝 HTTPS；UTC 来自 ScSystemClock。没有时间/计数器熵或证书绕过开关。
+TLS 强熵来自 CPUID 检测后的 RDSEED / RDRAND，失败即拒绝 HTTPS。UTC 优先来自 ScSystemClock；不可用或证书日期错误时，网络进程通过既有 UDP 接口查询时间服务器，核对两个不同地址后按 ScSystemMonotonic 推进。无全局时钟写入、时间/计数器熵或证书绕过开关；网络时间的具体限制见 NETWORK.md。
+
+页面缩放使用独立 SB_ZOOM 消息和共享帧中的缩放标记。CSS 布局按物理视口 / 缩放比例计算，媒体查询随视口更新，字体按物理字号栅格化；页面指针转换回 CSS 坐标，滚动尺寸转换为物理像素。UI 丢弃旧缩放的帧但仍 ACK，避免缩放时旧帧覆盖新滚动位置。
 
 ## 验证状态
 

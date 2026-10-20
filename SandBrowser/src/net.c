@@ -13,7 +13,7 @@ typedef struct {
     uint32_t order;
 } Cookie;
 struct SbNetContext {
-    int fd, secure, cancelled;
+    int fd, secure, cancelled, tls_ready, io_error;
     uint32_t began, timeout;
     const SbNetRequest *request;
     br_ssl_client_context client;
@@ -22,6 +22,9 @@ struct SbNetContext {
     unsigned char tls[BR_SSL_BUFSIZE_BIDI];
     Cookie cookies[64];
     uint32_t serial;
+    uint64_t clock_unix, clock_tick;
+    uint32_t clock_hz;
+    int network_clock, clock_retried;
 };
 static int stopped(SbNetContext *c) {
     return c->cancelled || sb_ticks() - c->began > c->timeout ||
@@ -41,6 +44,8 @@ static int raw_read(void *v, unsigned char *b, size_t n) {
             pause_net();
             continue;
         }
+        if (s < 0)
+            c->io_error = s;
         return s;
     }
 }
@@ -54,11 +59,15 @@ static int raw_write(void *v, const unsigned char *b, size_t n) {
             pause_net();
             continue;
         }
+        if (s <= 0)
+            c->io_error = s ? s : -32;
         return s > 0 ? s : -1;
     }
 }
 static int tls_read(void *v, unsigned char *b, size_t n) {
     int s = raw_read(v, b, n);
+    if (s == 0)
+        ((SbNetContext *)v)->io_error = -32;
     return s > 0 ? s : -1;
 }
 static int stream_read(SbNetContext *c, void *p, unsigned n) {
@@ -75,7 +84,7 @@ static int stream_write(SbNetContext *c, const void *p, unsigned n) {
     }
     return c->secure ? br_sslio_flush(&c->io) : 0;
 }
-static int resolve(SbNetContext *c, const char *host, uint32_t *out) {
+static int resolve(SbNetContext *c, const char *host, uint32_t *out, unsigned budget) {
     unsigned part = 0, ip = 0;
     const char *p = host;
     int valid = 1;
@@ -110,8 +119,9 @@ static int resolve(SbNetContext *c, const char *host, uint32_t *out) {
     int ticket = sb_raw(0x260, (int)host, 0, 0, 0, 0, 0);
     if (ticket < 0)
         return ticket;
-    int status = -1;
-    while (!stopped(c)) {
+    int status = -110;
+    uint32_t began = sb_ticks();
+    while (!stopped(c) && (!budget || sb_ticks() - began < budget)) {
         uint32_t a[8] = {0};
         status = sb_raw(0x261, ticket, (int)a, 0, 0, 0, 0);
         if (status < 0)
@@ -131,22 +141,195 @@ static int resolve(SbNetContext *c, const char *host, uint32_t *out) {
     sb_raw(0x262, ticket, 0, 0, 0, 0, 0);
     return stopped(c) ? -115 : status;
 }
+static uint32_t ntp_u32(const unsigned char *p) {
+    return ((uint32_t)p[0] << 24) | ((uint32_t)p[1] << 16) | ((uint32_t)p[2] << 8) | p[3];
+}
+static int ntp_reply(const unsigned char *p, unsigned n, const unsigned char nonce[8],
+                     uint64_t *unix_seconds) {
+    if (n < 48 || n > 512 || (p[0] >> 6) == 3 || (p[0] & 7) != 4 ||
+        ((p[0] >> 3) & 7) < 3 || ((p[0] >> 3) & 7) > 4 ||
+        p[1] == 0 || p[1] > 15 || memcmp(p + 24, nonce, 8))
+        return -1;
+    uint64_t timestamp = ntp_u32(p + 40);
+    if (!timestamp && !ntp_u32(p + 44))
+        return -1;
+    /* Resolve the 2036 era wrap into the supported 2020..2099 interval. */
+    if (timestamp < 2208988800u)
+        timestamp += 0x100000000ull;
+    timestamp -= 2208988800u;
+    if (timestamp < 1577836800ull || timestamp >= 4102444800ull)
+        return -1;
+    *unix_seconds = timestamp;
+    return 0;
+}
+static int network_time_sample(SbNetContext *c, const char *server, unsigned hz,
+                                uint32_t *address, uint64_t *seconds) {
+    if (resolve(c, server, address, 2 * hz) < 0)
+        return -1;
+    unsigned char request[48] = {0}, reply[512];
+    request[0] = (4u << 3) | 3u;
+    if (sb_random(request + 40, 8))
+        return -1;
+    int fd = sb_raw(0x252, 2, 0, 0, 0, 0, 0); /* SandCore UDP socket. */
+    if (fd < 0)
+        return -1;
+    uint32_t destination[4] = {1, *address, 123, 0};
+    uint32_t began = sb_ticks();
+    int result = -1, sent;
+    do {
+        sent = sb_raw(0x257, fd, (int)request, sizeof(request), (int)destination, 0, 0);
+        if (sent == -11)
+            pause_net();
+    } while (sent == -11 && !stopped(c) && sb_ticks() - began < 2 * hz);
+    if (sent == sizeof(request))
+        while (!stopped(c) && sb_ticks() - began < 2 * hz) {
+            uint32_t source[4] = {0};
+            int n = sb_raw(0x258, fd, (int)reply, sizeof(reply), (int)source, 0, 0);
+            if (n == -11) {
+                pause_net();
+                continue;
+            }
+            if (n < 0)
+                break;
+            if (source[0] == 1 && source[1] == *address && source[2] == 123 &&
+                ntp_reply(reply, n, request + 40, seconds) == 0) {
+                result = 0;
+                break;
+            }
+        }
+    sb_raw(0x25a, fd, 0, 0, 0, 0, 0);
+    return result;
+}
+static int clock_snapshot(ScMonotonicClock *clock, uint64_t *ticks) {
+    sb_record(clock, sizeof(*clock));
+    if (ScSystemMonotonic(clock) != SC32_OK || !clock->hz || clock->hz > 1000000)
+        return -1;
+    *ticks = ((uint64_t)clock->ticks.hi << 32) | clock->ticks.lo;
+    return 0;
+}
+static int synchronize_time(SbNetContext *c) {
+    static const char *servers[] = {"ntp.aliyun.com", "time.windows.com", "time.cloudflare.com"};
+    struct {uint32_t address; uint64_t seconds, tick;} samples[3];
+    unsigned count = 0;
+    ScMonotonicClock clock;
+    uint64_t ticks;
+    if (clock_snapshot(&clock, &ticks))
+        return -1;
+    unsigned hz = clock.hz;
+    for (unsigned i = 0; i < 3 && !stopped(c); i++) {
+        uint32_t address;
+        uint64_t seconds;
+        if (network_time_sample(c, servers[i], hz, &address, &seconds) < 0 ||
+            clock_snapshot(&clock, &ticks))
+            continue;
+        if (clock.hz != hz)
+            return -1;
+        for (unsigned j = 0; j < count; j++) {
+            if (samples[j].address == address || ticks < samples[j].tick)
+                continue;
+            uint64_t previous = samples[j].seconds + (ticks - samples[j].tick) / hz;
+            uint64_t difference = seconds > previous ? seconds - previous : previous - seconds;
+            if (difference <= 5) {
+                c->clock_unix = seconds;
+                c->clock_tick = ticks;
+                c->clock_hz = hz;
+                c->network_clock = 1;
+                return 0;
+            }
+        }
+        samples[count].address = address;
+        samples[count].seconds = seconds;
+        samples[count++].tick = ticks;
+    }
+    return -1;
+}
+static int certificate_time(SbNetContext *c, uint32_t *days, uint32_t *seconds) {
+    if (!c->network_clock && sb_utc(days, seconds) == 0)
+        return 0;
+    ScMonotonicClock clock;
+    uint64_t ticks;
+    if (clock_snapshot(&clock, &ticks))
+        return -1;
+    if (!c->network_clock || clock.hz != c->clock_hz || ticks < c->clock_tick ||
+        (ticks - c->clock_tick) / clock.hz >= 3600) {
+        if (synchronize_time(c) || clock_snapshot(&clock, &ticks))
+            return -1;
+    }
+    if (clock.hz != c->clock_hz || ticks < c->clock_tick)
+        return -1;
+    uint64_t utc = c->clock_unix + (ticks - c->clock_tick) / c->clock_hz;
+    *days = 719528u + (uint32_t)(utc / 86400u);
+    *seconds = (uint32_t)(utc % 86400u);
+    return 0;
+}
 static void disconnect(SbNetContext *c) {
     if (c->fd >= 0)
         sb_raw(0x25a, c->fd, 0, 0, 0, 0, 0);
     c->fd = -1;
 }
+static const char *tls_error_text(int error) {
+    switch (error) {
+    case BR_ERR_NO_RANDOM:
+        return "Secure random generator was not seeded";
+    case BR_ERR_UNSUPPORTED_VERSION:
+    case BR_ERR_BAD_VERSION:
+        return "The server and this TLS 1.2 client could not agree on a TLS version";
+    case BR_ERR_BAD_CIPHER_SUITE:
+    case BR_ERR_INVALID_ALGORITHM:
+        return "The server requested an unsupported TLS algorithm";
+    case BR_ERR_BAD_SIGNATURE:
+    case BR_ERR_X509_BAD_SIGNATURE:
+        return "Certificate or handshake signature verification failed";
+    case BR_ERR_X509_EXPIRED:
+    case BR_ERR_X509_TIME_UNKNOWN:
+        return "Certificate date validation failed; network time could not correct it";
+    case BR_ERR_X509_BAD_SERVER_NAME:
+        return "The certificate does not match the website hostname";
+    case BR_ERR_X509_NOT_TRUSTED:
+        return "The certificate issuer is not in the installed trust store";
+    case BR_ERR_X509_UNSUPPORTED:
+        return "The certificate uses an unsupported format or algorithm";
+    case BR_ERR_IO:
+        return "The TLS connection was interrupted or closed before completion";
+    default:
+        if (error >= BR_ERR_RECV_FATAL_ALERT && error < BR_ERR_SEND_FATAL_ALERT)
+            return "The server rejected the TLS handshake";
+        if (error >= BR_ERR_SEND_FATAL_ALERT)
+            return "TLS negotiation failed";
+        return "TLS protocol or certificate validation failed";
+    }
+}
 static int fail(SbNetContext *c, SbNetResult *r, int code, const char *message) {
     r->error = code;
-    r->tls_error = c->secure ? br_ssl_engine_last_error(&c->client.eng) : 0;
-    snprintf(r->message, sizeof(r->message), "%s%s", message,
+    r->tls_error = c->secure && c->tls_ready ? br_ssl_engine_last_error(&c->client.eng) : 0;
+    snprintf(r->message, sizeof(r->message), "%s%s%s%s", message,
+             r->tls_error ? ": " : "", r->tls_error ? tls_error_text(r->tls_error) : "",
              stopped(c) ? " (cancelled or timed out)" : "");
+    if (r->tls_error == BR_ERR_IO && c->io_error) {
+        size_t n = strlen(r->message);
+        snprintf(r->message + n, sizeof(r->message) - n, " (socket %d)", c->io_error);
+    }
     disconnect(c);
     return code;
 }
 static int connect_to(SbNetContext *c, SbUrl *u, SbNetResult *r) {
+    c->tls_ready = 0;
+    c->io_error = 0;
+    c->secure = u->secure;
+    uint32_t days = 0, sec = 0;
+    if (c->secure) {
+        if (!sb_random_sources())
+            return fail(c, r, -4,
+                        "Hardware RNG unavailable. Enable RDRAND in the virtual CPU; use the "
+                        "SandBrowser RUN-HTTPS.BAT launcher, or add +rdrand to QEMU -cpu");
+        /* Obtain time before connecting: a slow time lookup must not leave the
+         * HTTPS server waiting on an idle TCP connection before ClientHello. */
+        if (certificate_time(c, &days, &sec))
+            return fail(c, r, -5, "Cannot obtain a valid UTC time. Allow DNS and UDP port 123 "
+                                 "to time servers, then retry; or set the system clock");
+    }
     uint32_t ip;
-    if (resolve(c, u->host, &ip) < 0)
+    if (resolve(c, u->host, &ip, 0) < 0)
         return fail(c, r, -1, "DNS lookup failed");
     c->fd = sb_raw(0x252, 1, 0, 0, 0, 0, 0);
     if (c->fd < 0)
@@ -171,17 +354,16 @@ static int connect_to(SbNetContext *c, SbUrl *u, SbNetResult *r) {
     }
     if (s < 0 || stopped(c))
         return fail(c, r, -3, "TCP connection failed");
-    c->secure = u->secure;
     if (c->secure) {
         unsigned char seed[32];
-        uint32_t days, sec;
         if (sb_random(seed, sizeof(seed)))
-            return fail(c, r, -4, "HTTPS requires strong hardware entropy (RDRAND)");
-        if (sb_utc(&days, &sec))
-            return fail(c, r, -5, "HTTPS requires a valid UTC system clock");
+            return fail(c, r, -4, "Hardware RNG is temporarily unavailable; retry the page");
         br_ssl_client_init_full(&c->client, &c->x509, sb_anchors,
                                 sizeof(sb_anchors) / sizeof(sb_anchors[0]));
+        c->tls_ready = 1;
         br_ssl_engine_set_versions(&c->client.eng, BR_TLS12, BR_TLS12);
+        static const char *protocols[] = {"http/1.1"};
+        br_ssl_engine_set_protocol_names(&c->client.eng, protocols, 1);
         br_x509_minimal_set_time(&c->x509, days, sec);
         br_ssl_engine_set_buffer(&c->client.eng, c->tls, sizeof(c->tls), 1);
         br_ssl_engine_inject_entropy(&c->client.eng, seed, sizeof(seed));
@@ -395,6 +577,7 @@ int SbNetFetch(SbNetContext *c, const SbNetRequest *q, SbNetResult *r) {
     r->version = 1;
     c->request = q;
     c->cancelled = 0;
+    c->clock_retried = 0;
     c->timeout = q->timeout_ticks ? q->timeout_ticks : 4500;
     c->began = sb_ticks();
     if (!q->url || strlen(q->url) >= sizeof(r->url) || q->body_bytes > 1024 * 1024)
@@ -409,6 +592,7 @@ int SbNetFetch(SbNetContext *c, const SbNetRequest *q, SbNetResult *r) {
         char error[256];
         if (sb_url_parse(r->url, &u, error, sizeof(error)))
             return fail(c, r, -11, error);
+retry_connection:
         c->secure = 0;
         if (connect_to(c, &u, r) < 0)
             return r->error;
@@ -445,8 +629,17 @@ int SbNetFetch(SbNetContext *c, const SbNetRequest *q, SbNetResult *r) {
         }
         at += snprintf(header + at, sizeof(header) - at, "\r\n");
         if (at < 0 || at >= (int)sizeof(header) || stream_write(c, header, at) < 0 ||
-            (use_body && stream_write(c, q->body, q->body_bytes) < 0))
+            (use_body && stream_write(c, q->body, q->body_bytes) < 0)) {
+            int tls_error = c->tls_ready ? br_ssl_engine_last_error(&c->client.eng) : 0;
+            if (c->secure && !c->network_clock && !c->clock_retried &&
+                (tls_error == BR_ERR_X509_EXPIRED || tls_error == BR_ERR_X509_TIME_UNKNOWN)) {
+                c->clock_retried = 1;
+                disconnect(c);
+                if (synchronize_time(c) == 0)
+                    goto retry_connection;
+            }
             return fail(c, r, -13, "HTTP/TLS send failed");
+        }
         char line[8192], location[SB_URL] = {0};
         int chunked = 0, encoding = 0;
         uint32_t length = 0;
